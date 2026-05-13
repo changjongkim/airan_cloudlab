@@ -130,22 +130,27 @@ Run 4 (09:55): 52.86 ms (HIGH mode, +6.72 ms)
 - LOW 모드: split-50-50 baseline (46.14 ms)과 거의 일치 → 거의 격리됨
 - HIGH 모드: B baseline + 6.66 ms — **이게 leakage의 실체**
 
-### 3.2 다른 split들과 비교
+### 3.2 다른 split들과 비교 — **partition-aware baseline**
 
 ![Splits with Qwen](charts/v2_02_splits_with_qwen.png)
+![Partition-aware leakage](charts/v2_08_partition_aware_leakage.png)
 
-| Split | L1 partition | AI partition | L1 mean | leakage vs B baseline | 패턴 |
+leakage는 **각 split의 L1이 어느 partition에 있는지**에 따라 baseline이 달라져야 함. 그렇게 보면:
+
+| Split | L1 partition | AI partition | L1 mean | 올바른 baseline | leakage |
 |---|---|---|---|---|---|
-| L1 alone (B) | 3g.20gb | — | 46.14 | baseline | — |
-| split-50-50 | 3g.20gb | 3g.20gb | 46.47 | **+0.7%** | 안정 (대칭) |
-| split-40-60 | **2g.10gb** | 3g.20gb | 66.55 | +44% | **partition cap** (다른 문제, 섹션 4) |
-| split-60-40 | 3g.20gb | 4g.20gb | 49.71 avg | **+7.7% avg, +14% high** | **bimodal** |
+| split-50-50 | 3g.20gb | 3g.20gb | 46.47 | B = 46.14 | **+0.7%** 안정 (대칭) |
+| split-40-60 | **2g.10gb** | 3g.20gb | 66.55 | **B2 = 59.27** | **+12%** (대부분 partition cap 영향, 섹션 4) |
+| split-60-40 LOW | 3g.20gb | 4g.20gb | 46.60 avg | B = 46.14 | **+1.0%** (격리 잘 됨) |
+| split-60-40 HIGH | 3g.20gb | 4g.20gb | 52.83 avg | B = 46.14 | **+14%** (leakage spike) |
 
-→ L1 partition 크기가 동일(3g.20gb)할 때:
+→ **L1 partition 크기가 동일(3g.20gb)할 때**:
   - 대칭 옆방(3g.20gb): leakage 거의 0
-  - 비대칭 옆방(4g.20gb): bimodal +0/+14%
+  - 비대칭 옆방(4g.20gb): **bimodal +1% / +14%**
 
 → 결정 변수는 **이웃 partition의 크기/구성**이지, L1 자신의 partition이 아님.
+
+→ ⚠ **이전 framing 정정**: split-40-60의 leakage를 "B (3g.20gb) 기준 +44%"라고 적은 자료가 있다면 잘못된 비교. 실제로는 partition-correct baseline B2 기준으로 **+12%** 이며, 그 12% 안에서도 partition cap이 큰 비중, AI 누수는 작음.
 
 ### 3.3 메커니즘 분석 — **왜 4g.20gb 이웃에서만 leak 되는가**
 

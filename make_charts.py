@@ -303,29 +303,178 @@ def chart_v1_partition_at_20cells():
 # ============================================================================
 
 def chart_v2_partition_baselines():
-    """v2: L1 alone baselines on each partition size (8T8R, no AI)."""
+    """v2: L1 alone baselines on each partition size (8T8R, no AI). Mean + p99."""
     parts = ["1g.5gb\n(OOM)", "2g.10gb (B2)", "3g.20gb (B)\n[sweet spot]", "4g.20gb (B4)", "full GPU (A)\n[not measured]"]
-    lat = [None, 59.27, 46.14, 52.77, None]
+    lat_mean = [None, 59.27, 46.14, 52.77, None]
+    lat_p99  = [None, 61.80, 47.87, 54.31, None]
     sm = ["1", "2", "3", "4", "7"]
     hbm_bw = ["1/8", "2/8", "4/8", "4/8", "8/8"]
-    fig, ax = plt.subplots(figsize=(10, 5))
-    xs = np.arange(len(parts))
-    bars = ax.bar(xs, [v or 0 for v in lat],
-                  color=[C_NOMIG if v is None else (C_MIG_50 if v == 46.14 else C_BASELINE) for v in lat])
-    for i, v in enumerate(lat):
+    fig, ax = plt.subplots(figsize=(11, 5.5))
+    xs = np.arange(len(parts)); w = 0.35
+    # bars
+    for i, v in enumerate(lat_mean):
+        if v is None:
+            continue
+        ax.bar(i - w/2, v, w,
+               color=C_MIG_50 if v == 46.14 else C_BASELINE,
+               label="mean" if i == 1 else None)
+        ax.text(i - w/2, v + 1, f"{v:.2f}", ha="center", fontsize=9, fontweight="bold")
+    for i, p in enumerate(lat_p99):
+        if p is None:
+            continue
+        ax.bar(i + w/2, p, w, color="#e41a1c", alpha=0.75,
+               label="p99" if i == 1 else None)
+        ax.text(i + w/2, p + 1, f"{p:.2f}", ha="center", fontsize=9)
+    # placeholders for missing data
+    for i, v in enumerate(lat_mean):
         if v is None:
             label = "OOM" if i == 0 else "driver bug"
             ax.text(i, 5, label, ha="center", fontsize=10, color="red", fontweight="bold")
-        else:
-            ax.text(i, v + 1.5, f"{v:.2f}", ha="center", fontsize=10, fontweight="bold")
         ax.text(i, -7, f"SM={sm[i]}\nHBM BW={hbm_bw[i]}", ha="center", fontsize=8, color="gray")
     ax.set_xticks(xs); ax.set_xticklabels(parts, fontsize=9)
     ax.set_ylim(-12, 75)
     ax.set_ylabel("L1 alone latency (ms, 8T8R 20 cells, no AI)")
-    ax.set_title("v2 baselines: L1 by partition — cuPHY is HBM-bound\n"
-                 "3g.20gb is OPTIMAL (50% HBM BW saturates 8T8R 20-cell); 4g.20gb (same BW) gives NO speedup")
+    ax.set_title("v2 baselines: L1 by partition — mean + p99\n"
+                 "3g.20gb is OPTIMAL (HBM BW satur.); 4g.20gb (same BW) GIVES NO speedup — partition cap")
+    ax.legend(loc="upper right")
     fig.tight_layout()
     fig.savefig(os.path.join(CHARTS, "v2_01_partition_baselines.png"), bbox_inches="tight")
+    plt.close(fig)
+
+
+def chart_v2_partition_aware_leakage():
+    """Each split's L1 vs ITS OWN partition baseline (B2/B/B4) — the proper leakage chart.
+
+    Replaces the misleading framing where split-40-60 looks like +44% leakage vs B
+    when really its baseline is B2 (2g.10gb) → only +12% leakage.
+    """
+    cases = [
+        # (label, baseline_label, baseline_val, measured_val, color)
+        ("split-40-60 + Qwen\n(L1=2g.10gb)",  "B2 (2g.10gb)\n59.27 ms",  59.27, 66.55, C_MIG_SMALL),
+        ("split-50-50 + Qwen\n(L1=3g.20gb)",  "B (3g.20gb)\n46.14 ms",   46.14, 46.47, C_MIG_50),
+        ("split-50-50 + HBM16\n(L1=3g.20gb)", "B (3g.20gb)\n46.14 ms",   46.14, 46.55, C_MIG_50),
+        ("split-60-40 LOW + Qwen\n(L1=3g.20gb)",  "B (3g.20gb)\n46.14 ms",   46.14, 46.60, C_MIG_ASYM),
+        ("split-60-40 HIGH + Qwen\n(L1=3g.20gb)", "B (3g.20gb)\n46.14 ms",   46.14, 52.83, C_NOMIG),
+    ]
+    labels  = [c[0] for c in cases]
+    bls_lab = [c[1] for c in cases]
+    bls     = [c[2] for c in cases]
+    meas    = [c[3] for c in cases]
+    colors  = [c[4] for c in cases]
+    leak    = [m - b for m, b in zip(meas, bls)]
+    leak_pct = [100 * l / b for l, b in zip(leak, bls)]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
+
+    # Left: side-by-side baseline + measured
+    ax = axes[0]
+    x = np.arange(len(cases)); w = 0.38
+    ax.bar(x - w/2, bls,  w, color="lightgray",  edgecolor="black", label="partition-correct baseline")
+    ax.bar(x + w/2, meas, w, color=colors,        edgecolor="black", label="measured (L1 + AI)")
+    for i, (b, m) in enumerate(zip(bls, meas)):
+        ax.text(i - w/2, b + 0.8, f"{b:.1f}", ha="center", fontsize=8)
+        ax.text(i + w/2, m + 0.8, f"{m:.1f}", ha="center", fontsize=9, fontweight="bold")
+    ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=8)
+    ax.set_ylabel("L1 mean (ms)")
+    ax.set_ylim(0, 78)
+    ax.set_title("L1 with AI vs its PARTITION-CORRECT baseline\n"
+                 "(split-40-60's baseline is B2=59.27, NOT B=46.14)")
+    ax.legend(loc="upper right", fontsize=9)
+
+    # Right: leakage as %
+    ax = axes[1]
+    bars = ax.bar(x, leak_pct, color=colors, edgecolor="black")
+    for i, (lp, ld) in enumerate(zip(leak_pct, leak)):
+        ax.text(i, lp + 0.4, f"+{lp:.1f}%\n(+{ld:.2f} ms)",
+                ha="center", fontsize=9, fontweight="bold")
+    ax.axhline(0, color="black", lw=0.8)
+    ax.axhline(7, color="orange", ls=":", alpha=0.6, label="7% (5G TTI margin)")
+    ax.axhline(14, color="red", ls=":", alpha=0.6, label="14% (HIGH-mode leak)")
+    ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=8)
+    ax.set_ylabel("Leakage vs partition-correct baseline (%)")
+    ax.set_ylim(-2, 22)
+    ax.set_title("Leakage % — symmetric ≤1%, asymmetric LOW ≤1%, asymmetric HIGH ~14%\n"
+                 "split-40-60 leakage = 12% (NOT 44% as naive B-baseline comparison suggests)")
+    ax.legend(loc="upper right", fontsize=9)
+
+    fig.suptitle("Partition-aware leakage — the CORRECT comparison (per KEY_FINDINGS_v2)",
+                 y=1.02, fontweight="bold")
+    fig.tight_layout()
+    fig.savefig(os.path.join(CHARTS, "v2_08_partition_aware_leakage.png"), bbox_inches="tight")
+    plt.close(fig)
+
+
+def chart_v2_keyfindings_summary():
+    """Single chart that mirrors the KEY_FINDINGS_v2.md 3 tables together."""
+    fig = plt.figure(figsize=(14, 9))
+    gs = fig.add_gridspec(3, 1, hspace=0.55)
+
+    # Row 1: L1 baselines (no AI) — mean + p99
+    ax = fig.add_subplot(gs[0])
+    parts = ["B2 (2g.10gb)", "B (3g.20gb) ← sweet", "B4 (4g.20gb)"]
+    means = [59.27, 46.14, 52.77]
+    p99s  = [61.80, 47.87, 54.31]
+    x = np.arange(len(parts)); w = 0.35
+    ax.bar(x - w/2, means, w, color=C_BASELINE, label="mean")
+    ax.bar(x + w/2, p99s,  w, color="#e41a1c", alpha=0.75, label="p99")
+    for i, (m, p) in enumerate(zip(means, p99s)):
+        ax.text(i - w/2, m + 0.8, f"{m:.2f}", ha="center", fontsize=9, fontweight="bold")
+        ax.text(i + w/2, p + 0.8, f"{p:.2f}", ha="center", fontsize=9)
+    ax.set_xticks(x); ax.set_xticklabels(parts)
+    ax.set_ylabel("L1 alone (ms)")
+    ax.set_ylim(0, 70)
+    ax.set_title("(1) L1 baselines on each partition (no AI) — 3g.20gb is sweet spot, 4g.20gb is anomaly")
+    ax.legend(loc="upper right", fontsize=9)
+
+    # Row 2: L1 + Qwen with partition-aware leakage
+    ax = fig.add_subplot(gs[1])
+    cfgs = [
+        "split-40-60 + Qwen\n(vs B2)",
+        "split-50-50 + Qwen\n(vs B)",
+        "split-60-40 LOW + Qwen\n(vs B)",
+        "split-60-40 HIGH + Qwen\n(vs B)",
+    ]
+    bls  = [59.27, 46.14, 46.14, 46.14]
+    meas = [66.55, 46.47, 46.60, 52.83]
+    leak = [m - b for m, b in zip(meas, bls)]
+    leak_pct = [100 * l / b for l, b in zip(leak, bls)]
+    colors = [C_MIG_SMALL, C_MIG_50, C_MIG_ASYM, C_NOMIG]
+    x = np.arange(len(cfgs)); w = 0.35
+    ax.bar(x - w/2, bls,  w, color="lightgray",  edgecolor="black", label="baseline")
+    ax.bar(x + w/2, meas, w, color=colors,        edgecolor="black", label="L1 + AI")
+    for i, (b, m, lp) in enumerate(zip(bls, meas, leak_pct)):
+        ax.text(i - w/2, b + 0.8, f"{b:.1f}", ha="center", fontsize=8)
+        ax.text(i + w/2, m + 0.8, f"{m:.1f}\n(+{lp:.1f}%)", ha="center", fontsize=8, fontweight="bold")
+    ax.set_xticks(x); ax.set_xticklabels(cfgs, fontsize=8)
+    ax.set_ylabel("L1 mean (ms)")
+    ax.set_ylim(0, 80)
+    ax.set_title("(2) L1 + Qwen on MIG — leakage vs partition-correct baseline (symmetric ≤1%, asymmetric HIGH 14%)")
+    ax.legend(loc="upper right", fontsize=9)
+
+    # Row 3: no-mig comparison (shared GPU)
+    ax = fig.add_subplot(gs[2])
+    cfgs = ["no-mig + Qwen", "no-mig + HBM16", "MIG 50:50 + Qwen", "MIG 50:50 + HBM16"]
+    means = [57.89, 48.03, 46.47, 46.55]
+    p99s  = [172.60, 49.91, 48.29, 49.26]
+    x = np.arange(len(cfgs)); w = 0.35
+    colors_m = [C_NOMIG, C_NOMIG, C_MIG_50, C_MIG_50]
+    ax.bar(x - w/2, means, w, color=colors_m,         alpha=0.85, label="mean")
+    ax.bar(x + w/2, p99s,  w, color=colors_m,         alpha=0.5,  label="p99",
+           hatch="//")
+    for i, (m, p) in enumerate(zip(means, p99s)):
+        ax.text(i - w/2, m + 3, f"{m:.1f}", ha="center", fontsize=8, fontweight="bold")
+        ax.text(i + w/2, p + 3, f"{p:.1f}", ha="center", fontsize=8)
+    ax.set_xticks(x); ax.set_xticklabels(cfgs)
+    ax.set_ylabel("L1 (ms)")
+    ax.set_ylim(0, 200)
+    ax.set_title("(3) L1 + AI on no-mig vs MIG — mean 1.24×, p99 3.6× (the only big win)")
+    ax.legend(loc="upper right", fontsize=9)
+    ax.annotate("Qwen p99 spike (3.6×)", xy=(0 + w/2, 172), xytext=(0.7, 150),
+                arrowprops=dict(arrowstyle="->", color="red"), fontsize=9, color="red", fontweight="bold")
+
+    fig.suptitle("KEY_FINDINGS_v2.md — three tables in one chart",
+                 fontsize=13, fontweight="bold", y=1.0)
+    fig.savefig(os.path.join(CHARTS, "v2_09_keyfindings_summary.png"), bbox_inches="tight")
     plt.close(fig)
 
 
@@ -733,17 +882,19 @@ if __name__ == "__main__":
     chart_v1_stability();            print("  v1_10_stability.png")
     chart_v1_partition_at_20cells(); print("  v1_11_partition_v1.png")
     print()
-    print("--- v2 heavy workload (7 charts) ---")
-    chart_v2_partition_baselines();  print("  v2_01_partition_baselines.png")
+    print("--- v2 heavy workload (9 charts) ---")
+    chart_v2_partition_baselines();  print("  v2_01_partition_baselines.png  (now with p99)")
     chart_v2_split_with_qwen();      print("  v2_02_splits_with_qwen.png")
     chart_v2_bimodal_detail();       print("  v2_03_bimodal_detail.png")
     chart_v2_mig_vs_nomig_heavy();   print("  v2_04_mig_vs_nomig_heavy.png")
     chart_v2_percentile_fan();       print("  v2_05_percentile_fan.png")
     chart_v2_coverage();             print("  v2_06_coverage_matrix.png")
     chart_v2_all_splits();           print("  v2_07_all_splits.png")
+    chart_v2_partition_aware_leakage(); print("  v2_08_partition_aware_leakage.png")
+    chart_v2_keyfindings_summary();  print("  v2_09_keyfindings_summary.png")
     print()
     print("--- Critical comparison (2 charts) ---")
     chart_v1_vs_v2_comparison();     print("  X_v1_vs_v2_critical.png")
     chart_mig_bottlenecks_summary(); print("  X_critical_summary.png")
     print()
-    print("Done. 18 charts in", CHARTS)
+    print("Done. 20 charts in", CHARTS)

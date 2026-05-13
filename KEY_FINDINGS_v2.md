@@ -4,9 +4,16 @@ Real cuPHY L1 (20 cells, **8T8R**, 273 PRBs, MCS 2) + **Qwen-7B** / HBM 16GB str
 
 Updated from v1 (light workload) — v1 over-estimated MIG benefit because workloads weren't HBM-bound.
 
+## 📊 한눈에 보기 (세 표 = 한 차트)
+
+![Key findings summary](charts/v2_09_keyfindings_summary.png)
+
 ## 🎯 Key measurements
 
 ### L1 baseline (no AI)
+
+![Baselines with p99](charts/v2_01_partition_baselines.png)
+
 | Partition | SM | HBM | HBM BW | L1 mean (ms) | p99 |
 |---|---|---|---|---|---|
 | 2g.10gb (B2) | 2/7 | 10GB | ~2/8 | **59.27** | 61.80 |
@@ -19,12 +26,17 @@ Observations:
 - 4g.20gb has same HBM BW but slightly slower (likely chip-position artifact or cuPHY kernel tuning)
 - 2g.10gb has half HBM BW → significantly slower
 
-### L1 + AI on MIG (heavy AI: Qwen-7B)
+### L1 + AI on MIG (heavy AI: Qwen-7B) — **partition-aware leakage**
+
+![Partition-aware leakage](charts/v2_08_partition_aware_leakage.png)
+
 | Config | L1 partition | AI partition | L1 mean | vs B baseline | leakage |
 |---|---|---|---|---|---|
 | split-40-60 (C1) | 2g.10gb | 3g.20gb | 66.55 | vs B2=59.27 | **+7.28 (12%)** |
 | split-50-50 (C2) | 3g.20gb | 3g.20gb | 46.53 | vs B=46.14 | **+0.39 (0.8%)** ✅ |
 | split-60-40 (C3 — original) | 3g.20gb | 4g.20gb | 52.80 | vs B=46.14 | +6.66 (14%) |
+
+⚠ **중요**: split-40-60의 L1은 2g.10gb partition에 있음. 따라서 baseline은 B (3g.20gb=46.14)가 아니라 **B2 (2g.10gb=59.27)** 가 되어야 함. 그러면 leakage는 +44%가 아니라 **+12%**. partition cap 효과가 leakage를 과대 보이게 만들었던 것.
 
 ### ⚠ C3 reproducibility (split-60-40 + Qwen) — N=4
 | Run | mean (ms) | mode |

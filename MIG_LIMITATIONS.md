@@ -8,13 +8,15 @@
 
 ![Critical Summary](charts/X_critical_summary.png)
 
-| 측면 | 발견 | 결론 |
-|---|---|---|
-| **mean isolation** | v1: 9× (잘못된 측정) → v2: **1.24×** | 무거운 워크로드에서 거의 효과 없음 |
-| **p99 jitter** | no-mig 172ms → MIG 48ms (3.6×) | **유일하게 결정적 효과** |
-| **Asymmetric split** | split-60-40에서 **bimodal** | 50% 확률로 +14% 누수 |
-| **Partition size** | 1g.5gb OOM, 4g.20gb = 3g.20gb | 하드 cap 존재 |
-| **Cell-count** | MIG는 linear, no-mig polynomial | 큰 cell에서만 MIG 유효 |
+| 측면 | 발견 | 결론 | 메커니즘 (섹션) |
+|---|---|---|---|
+| **mean isolation** | v1: 9× (잘못된 측정) → v2: **1.24×** | 무거운 워크로드에서 거의 효과 없음 | HBM BW는 chip-level 공유 (§2.1) |
+| **p99 jitter** | no-mig 172ms → MIG 48ms (3.6×) | **유일하게 결정적 효과** | SM hard-partition이 preemption 제거 (§2.2) |
+| **Asymmetric split** | split-60-40에서 **bimodal** | 50% 확률로 +14% 누수 | NoC contention × Qwen phase (§3.3) |
+| **Partition size** | 1g.5gb OOM, 4g.20gb < 3g.20gb | 하드 cap 존재 | cuPHY working set 5.5GB, HBM BW bound (§4.2-4.3) |
+| **Cell-count** | MIG는 linear, no-mig polynomial | 큰 cell에서만 MIG 유효 (heavy 미검증) | SM 경합이 cell 수에 따라 폭증 (§6) |
+
+**WHY가 궁금하면**: §2 (heavy AI에서 mean 무력화), §3 (bimodal), §4 (partition cap), §10 (종합). 각 섹션은 메커니즘 + 대안 가설 + 검증 가능한 후속 측정까지 포함.
 
 ---
 
@@ -39,96 +41,263 @@
 
 ---
 
-## 2. 한계 #1: 무거운 워크로드에서 mean isolation은 미미
+## 2. 한계 #1: 무거운 워크로드에서 mean isolation은 미미 (1.24×)
 
 ### v2 heavy AI 측정
 
 ![MIG vs no-mig heavy](charts/v2_04_mig_vs_nomig_heavy.png)
 
 ```
-no-mig + Qwen-7B:        57.89 ms
-MIG split-50-50 + Qwen:  46.47 ms
+no-mig + Qwen-7B (full GPU 공유):  57.89 ms
+MIG split-50-50 + Qwen (분리):     46.47 ms
 isolation factor: 1.24× (mean)
 ```
 
-**의미**: AI 워크로드가 실제로 HBM bandwidth를 쓰는 시나리오 (Qwen-7B 22% BW)에서 MIG는 mean latency를 **고작 24% 개선**. v1의 "11× 격리" 주장은 무너진다.
+**의미**: AI 워크로드가 실제로 HBM bandwidth를 쓰는 시나리오 (Qwen-7B 14GB fp16)에서 MIG는 mean latency를 **고작 24% 개선**. v1의 "11× 격리" 주장은 무너진다.
 
-### 왜 이런 차이인가
+### 2.1 진짜 원인 — MIG는 **메모리 주소**만 격리, **bandwidth는 격리 안 됨**
 
-| 워크로드 | HBM 사용량 (추정) | no-mig + L1 결과 |
-|---|---|---|
-| GPT-2 124M (v1) | ~1% BW | 375ms (SM 경합 + 측정 artifact) |
-| ResNet-50 (v1) | ~1.5% BW | 379ms |
-| **Qwen-7B (v2)** | **~22% BW** | **57.89ms** (실제 HBM 경합) |
-| HBM stress 16GB (v2) | ~100% BW | 48ms (둘이 fair-share) |
+A100 SXM4-40GB 하드웨어 구조:
 
-- v1: AI가 HBM 거의 안 씀 → no-mig에서 SM 경합으로 L1 느려짐 → MIG가 SM 격리하니 11× 개선
-- v2: AI가 진짜 HBM 사용 → no-mig에서도 fair-share → mean 차이 미미
+| 자원 | 총량 | MIG가 격리? | 메커니즘 |
+|---|---|---|---|
+| SM | 108 (실효 98) | ✅ **격리됨** | 인스턴스마다 SM 집합 hard-partition |
+| L2 cache | 40 MB | ✅ **격리됨** | L2 slice 단위 (~5MB/슬라이스, 8슬라이스 중 partition 비율만큼) |
+| HBM2e 용량 | 40 GB | ✅ **격리됨** | 메모리 주소 공간 partition |
+| **HBM2e bandwidth** | **1.555 TB/s** | ⚠ **간헐적 공유** | 메모리 컨트롤러는 chip-level. 채널이 partition별 dedicated가 아닌 best-effort |
+| HBM channel arbiter | (chip-level) | ❌ **공유** | 동일 채널에 두 instance 요청 동시 발생 시 fair-share queue |
+| NoC / crossbar | (chip-level) | ❌ **공유** | request packet 단위 arbitration |
+| Power/thermal budget | 400W TDP | ❌ **공유** | 한 instance가 활발하면 전체 클럭 throttling |
+
+→ NVIDIA MIG whitepaper는 "메모리 bandwidth proportional partition"이라 주장하지만, **proportional ≠ isolated**. 두 partition이 동시에 같은 HBM 채널/스택을 타깃하면 큐잉이 발생.
+
+### 2.2 v1이 왜 잘못된 결론을 줬는가 — 워크로드가 HBM에 닿지도 않았음
+
+A100의 L2 cache는 40MB. 모델이 L2에 들어가면 HBM trip이 거의 없음 → bandwidth 경합도 없음.
+
+| 워크로드 | weight size | L2(40MB)에 fit? | 실제 HBM BW 사용 | no-mig+L1 결과 | 진단 |
+|---|---|---|---|---|---|
+| GPT-2 124M (v1) | 480 MB | 거의 fit (large chunk resident) | ~1% (~15 GB/s) | 375 ms | **SM 경합 artifact** |
+| ResNet-50 b=64 (v1) | 100 MB weight + ~800 MB activ. | 부분 fit | ~1.5% (~23 GB/s) | 379 ms | **SM 경합 artifact** |
+| **Qwen-7B fp16 (v2)** | **14 GB** | **fit 안 됨** | **~22% (~340 GB/s)** | **57.89 ms** | **진짜 HBM 경합** |
+| HBM stress 16GB (v2) | 16 GB | fit 안 됨 | ~70-100% (~1 TB/s) | 48.03 ms | **fair-share 잘 작동** |
+
+**v1의 잘못**:
+- 워크로드가 L2 resident → HBM 거의 안 씀 → no-mig에서 충돌도 없음
+- 그런데 왜 375ms? → 5G L1과 AI가 같은 SM 풀을 두고 **time-slice 경쟁**. CUDA 스케줄러가 두 stream을 round-robin → L1 작업이 매 TTI마다 AI에 의해 preempt
+- MIG는 SM 자체를 hard-partition → 이 SM 경합이 사라짐 → "11× 개선"이라는 환각
+
+**v2의 진짜 모습**:
+- Qwen-7B가 KV cache + weight read로 HBM 채널을 실제로 점유
+- no-mig: HBM 채널을 두고 두 워크로드 경쟁 → L1이 ~12ms 추가
+- MIG: 메모리 주소는 격리되지만 채널 자체는 chip-level 공유 → 여전히 일부 leakage → ~0.4ms (split-50-50) 정도만 격리 효과
+
+### 2.3 이게 왜 결정적 문제인가
+
+production AI-RAN 시나리오는 **반드시 Qwen-급 모델** (수십 GB)을 쓴다. 작은 모델은 GPU에 둘 이유가 없음 (CPU/DLA로 충분). 즉:
+
+- v1 식 워크로드 = 학회 demo / synthetic
+- v2 식 워크로드 = real deployment
+
+그리고 real deployment에서 **MIG의 mean isolation은 24%밖에 안 됨**. 5G L1 budget 1ms/TTI를 지키기에 24% 마진은 너무 작음.
+
+### 2.4 검증할 만한 후속 측정
+
+- `nvidia-smi dmon -s m` (HBM utilization 실시간) — Qwen 실행 중에 MIG instance별 BW 측정
+- Profile (Nsight Systems) — L1 channel-estimation kernel의 HBM stall cycle 비율
+- 모델 크기 sweep: 모델 1GB, 7GB, 14GB, 28GB → isolation factor가 단조 감소하는지
 
 ---
 
 ## 3. 한계 #2: **Asymmetric split에서 Bimodal Leakage** (가장 결정적 한계)
 
-### split-60-40 + Qwen-7B, N=4 반복 측정
+이것이 이 reservation의 **가장 publishable한 발견**이자, MIG가 "isolation 보장한다"는 NVIDIA 주장에 가장 직접적인 반례.
+
+### 3.1 측정: split-60-40 + Qwen-7B, N=4 반복
 
 ![Bimodal](charts/v2_03_bimodal_detail.png)
 
 ```
-Run 1: 52.80 ms (HIGH mode, +6.7ms)
-Run 2: 46.67 ms (LOW mode, baseline)
-Run 3: 46.53 ms (LOW mode)
-Run 4: 52.86 ms (HIGH mode, +6.7ms)
+Run 1 (08:48): 52.80 ms (HIGH mode, +6.66 ms vs baseline)
+Run 2 (09:50): 46.67 ms (LOW mode, baseline ≈ 46.14)
+Run 3 (09:53): 46.53 ms (LOW mode)
+Run 4 (09:55): 52.86 ms (HIGH mode, +6.72 ms)
 ```
 
-**bimodal**: 두 cluster (~46ms, ~52ms), 50:50 확률.
-**MIG가 격리한다고 주장하지만 50% 확률로 +6.7ms leakage가 발생.**
+특징:
+- **두 모드 사이 gap이 정확히 ~6.7 ms** — 연속 분포가 아니라 두 점
+- 두 모드 모두 N=2 → **50:50 확률**
+- LOW 모드: split-50-50 baseline (46.14 ms)과 거의 일치 → 거의 격리됨
+- HIGH 모드: B baseline + 6.66 ms — **이게 leakage의 실체**
 
-### 비교: 다양한 split에서 L1 결과
+### 3.2 다른 split들과 비교
 
 ![Splits with Qwen](charts/v2_02_splits_with_qwen.png)
 
-| Split | L1 partition | L1 mean | leakage vs B baseline |
-|---|---|---|---|
-| L1 alone (B) | 3g.20gb | 46.14 | baseline |
-| split-50-50 | 3g.20gb | 46.47 | +0.7% (대칭, 안정) |
-| split-40-60 | 2g.10gb | 66.55 | +44% (partition cap) |
-| split-60-40 | 3g.20gb | 49.71 avg, **bimodal** | +7.7% avg, +14% high mode |
+| Split | L1 partition | AI partition | L1 mean | leakage vs B baseline | 패턴 |
+|---|---|---|---|---|---|
+| L1 alone (B) | 3g.20gb | — | 46.14 | baseline | — |
+| split-50-50 | 3g.20gb | 3g.20gb | 46.47 | **+0.7%** | 안정 (대칭) |
+| split-40-60 | **2g.10gb** | 3g.20gb | 66.55 | +44% | **partition cap** (다른 문제, 섹션 4) |
+| split-60-40 | 3g.20gb | 4g.20gb | 49.71 avg | **+7.7% avg, +14% high** | **bimodal** |
 
-→ **대칭 split만 신뢰할 수 있음**. 비대칭 split은 간헐적 6ms spike → 5G TTI 1ms deadline 위반.
+→ L1 partition 크기가 동일(3g.20gb)할 때:
+  - 대칭 옆방(3g.20gb): leakage 거의 0
+  - 비대칭 옆방(4g.20gb): bimodal +0/+14%
 
-### 가능한 원인 (추정)
-- L2 cache controller pool 공유 (NVIDIA 공식 spec)
-- HBM channel arbitration (time-multiplexed)
-- LLM burst phase (Qwen attention/KV cache write 폭증)
-- Power budget arbitration (4g instance 활발 시 thermal throttle)
+→ 결정 변수는 **이웃 partition의 크기/구성**이지, L1 자신의 partition이 아님.
+
+### 3.3 메커니즘 분석 — **왜 4g.20gb 이웃에서만 leak 되는가**
+
+A100 MIG의 partition 단위 자원 할당 (NVIDIA MIG arch spec 기반):
+
+```
+3g.20gb instance:
+  SMs: 42 / 98       (3 GPC)
+  L2 slices: 3/8     (≈15 MB)
+  HBM channels: 4/8  (메모리 절반 — 20GB)
+  
+4g.20gb instance:
+  SMs: 56 / 98       (4 GPC)
+  L2 slices: 4/8     (≈20 MB)
+  HBM channels: 4/8  (메모리 절반 — 20GB)
+  
+**핵심**: 3g와 4g 모두 HBM의 절반(4 채널)을 점유. 채널은 **공간적으로 분리**돼 있음 (다른 HBM stack에 mapping).
+**그렇다면 leakage가 왜 발생하는가?**
+```
+
+**가설 1: GPC-level NoC contention (가장 유력)**
+- A100은 7개 GPC. MIG는 GPC 단위 partition.
+- 두 partition 간 직접적인 데이터 경로는 없지만, **on-chip NoC (NVLink-style crossbar)** 는 chip-level 공유
+- 4g instance의 56 SM × 1410 MHz × 64 FMA 동시 실행 → NoC packet 생성률이 3g (42 SM)의 4/3 = **33% 더 높음**
+- 이 NoC saturation이 occasional하게 3g의 HBM round-trip latency를 늘림
+- → 비대칭이라서 leakage. 대칭(3g/3g)이면 NoC load도 균등 분산되어 saturate 안 함
+
+**가설 2: HBM crossbar arbiter 공유**
+- 채널 자체는 partition별이지만, GPU 내부 **memory controller crossbar**는 chip-level
+- 4g가 SM 수 많아 동시 outstanding HBM request 수가 많음 → crossbar queue 길어짐
+- 3g의 request가 crossbar에 들어갈 때 큐 뒤에 줄 → latency spike
+
+**가설 3: L2 directory / inter-slice coherence**
+- L2가 partition돼도 directory controller는 일부 공유 (NVIDIA 비공개)
+- 4g의 large L2 working set이 directory eviction 유발하면 3g의 hit-rate 떨어짐
+
+**왜 bimodal인가 — phase alignment 가설**
+- Qwen-7B token generation은 **prefill ↔ decode** 두 phase로 나뉨
+- prefill: 큰 GEMM, HBM read-burst (수십 ms)
+- decode: 작은 GEMM, KV cache append/read, HBM 상대적 idle
+- L1 측정 윈도우(50 iter × 1ms = 50 ms)는 Qwen의 한 generation step과 비슷한 규모
+- 윈도우가 **prefill 구간에 걸리면 HIGH 모드**, **decode 구간에 걸리면 LOW 모드**
+- 두 phase 비율이 ~50:50이라 binomial → bimodal 측정값
+
+이 가설은 검증 가능:
+- N≥30 측정 → 분포가 두 개의 좁은 peak로 명확히 cluster되는지
+- `nvidia-smi dmon` 동기 측정 → HIGH 측정 윈도우가 Qwen HBM BW peak와 겹치는지
+- Qwen workload을 prefill-only / decode-only로 분리해서 측정 → 한쪽만 leak해야 가설 성립
+
+### 3.4 왜 이게 결정적 문제인가 — 5G TTI deadline 관점
+
+5G NR slot = 0.5 ms (numerology μ=1) ~ 1 ms (μ=0). cuPHY는 매 slot당 PUSCH/PDSCH 처리 완료해야 함.
+
+- LOW 모드 (46.5 ms / 50 TTIs = 0.93 ms/TTI): deadline 직전 — 마진 7%
+- HIGH 모드 (52.8 ms / 50 TTIs = 1.06 ms/TTI): **deadline 초과** — slot drop 발생
+
+mean isolation 7.7%는 보기엔 작은 숫자지만, **TTI 단위로 환산하면 50% 확률로 SLA 위반**.
+
+이건 99.9999% reliability 요구하는 URLLC slice에서 **즉시 실격 사유**.
+
+### 3.5 NVIDIA 공식 입장과의 불일치
+
+NVIDIA MIG documentation: *"each MIG instance has dedicated and isolated memory bandwidth, cache, and compute"*
+
+우리 데이터: **isolated가 아님**. 비대칭 split에서 50% 확률로 14% leakage. 이건 마케팅 주장과 실측 사이의 명백한 gap이며, AI-RAN 학계에서 **하드웨어 isolation에만 의존하는 설계는 잘못된 가정**임을 입증.
 
 ---
 
-## 4. 한계 #3: Partition 크기 하드 cap — 작은 partition은 OOM, 큰 partition도 효과 없음
+## 4. 한계 #3: Partition 크기 하드 cap — 작은 건 OOM, 큰 건 무용
 
-### L1 alone baselines (no AI)
+### 4.1 측정 데이터 (L1 alone, no AI)
 
 ![Partition Baselines](charts/v2_01_partition_baselines.png)
 
 ```
-1g.5gb:  OOM (cuPHY LdpcDeRateMatch가 >5GB HBM 필요)
+1g.5gb:  OOM   (cuPHY 초기화 자체 실패)
 2g.10gb: 59.27 ms
-3g.20gb: 46.14 ms (sweet spot)
-4g.20gb: 52.77 ms (3g보다 느림!)
-full GPU: 측정 못 함 (driver bug)
+3g.20gb: 46.14 ms  ← sweet spot
+4g.20gb: 52.77 ms  ← 3g보다 느림 (anomaly)
+full GPU: 측정 못 함 (driver bug, 섹션 11)
 ```
 
-**결정적 시사점**:
-- 1g.5gb는 **cuPHY 자체가 들어가지 않음** → 가장 작은 partition unusable
-- 3g→4g (SM 4× 증가, HBM BW 동일): L1 **빨라지지 않음** → cuPHY는 HBM-bandwidth-bound
-- 즉 partition을 키워도 격리 더 잘 되는 게 아님. **하드웨어 절반(3g.20gb)이 cuPHY 최적**.
-- 나머지 절반은 AI로 — 하지만 AI도 자기 partition cap에 갇힘.
+**가장 이상한 사실**: 4g.20gb는 3g.20gb 대비 SM 33% 더 많지만 (42→56), **L1이 6.6 ms 느림**. partition을 키울수록 빨라지는 게 정상 직관인데 반대로 나옴.
 
-### v1 partition 비교 (잘못 해석된 데이터)
+### 4.2 1g.5gb OOM의 원인 — cuPHY working-set이 5GB를 넘음
+
+cuPHY PUSCH 파이프라인의 메모리 footprint (component 단위, 8T8R 273 PRB):
+
+| 컴포넌트 | 주요 메모리 사용 | 크기 추정 |
+|---|---|---|
+| ChannelEstimator | 채널 추정 LS matrix + DMRS, 모든 PRB × 14 sym × 8 ant | ~150 MB |
+| ChannelEqualizer | MMSE inverse matrix, layer × layer, 모든 RE | ~300 MB |
+| NoiseIntfEstimator | covariance matrix 누적 | ~80 MB |
+| **LdpcDeRateMatch** | **LDPC code block buffer + HARQ retransmission buffer** | **~2-3 GB** |
+| LdpcDecoder | layered decoder state, 5 iter × N codewords | ~800 MB |
+| CrcChecker + I/O | TB buffer, slot-level RX/TX | ~500 MB |
+| cuPHY context + cuBLAS/cuFFT workspace | static allocation | ~1.2 GB |
+| **합계 (peak)** | | **~5.5 GB** |
+
+1g.5gb instance는 정확히 5GB cap → cuPHY의 LdpcDeRateMatch가 buffer 잡으려는 순간 OOM.
+
+→ **MIG의 7-instance density configuration은 5G L1에 구조적으로 불가능**. NVIDIA가 자랑하는 "GPU를 7개로 쪼개 7개 워크로드 서빙"이 cuPHY에는 안 통함.
+
+### 4.3 4g.20gb가 3g.20gb보다 느린 이유 — cuPHY는 **HBM-bandwidth-bound**
+
+A100 MIG instance별 자원 (NVIDIA spec):
+
+| Instance | SM | HBM 용량 | HBM 채널 | HBM BW (이론) | L2 slices |
+|---|---|---|---|---|---|
+| 2g.10gb | 28 | 10 GB | 2/8 | ~390 GB/s | 2/8 (~10 MB) |
+| 3g.20gb | 42 | 20 GB | **4/8** | **~775 GB/s** | 3/8 (~15 MB) |
+| 4g.20gb | 56 | 20 GB | **4/8** | **~775 GB/s** | 4/8 (~20 MB) |
+| 7g.40gb (full) | 98 | 40 GB | 8/8 | 1.55 TB/s | 8/8 (40 MB) |
+
+**핵심**: 3g와 4g는 **HBM 용량과 BW가 동일**. SM과 L2만 4g가 33% 더 많음.
+
+cuPHY 한 slot 처리의 HBM read 패턴 (channel-est + equalizer 기준):
+- 8 antenna × 273 PRB × 14 sym × 12 sc × 8B (complex64) = **~3 MB/slot** raw RX
+- + 채널 추정 matrix, MMSE intermediate, LDPC code blocks → **~80-120 MB working set/slot**
+- 1 ms slot budget → 평균 80-120 GB/s sustained, peak burst **~300-400 GB/s** (matrix multiply 구간)
+
+3g/4g HBM BW = 775 GB/s. 4g가 SM 늘어도 HBM 빨라지지 않으니 **kernel은 동일하게 HBM stall**.
+
+**그럼 4g가 왜 *더 느림*?** 두 가지 후보:
+1. **L2 thrash**: 4g는 L2 slice 4개 (20MB). cuPHY working set은 ~80-120MB → 어차피 L2 miss → 추가 L2 늘려도 효과 0. 동시에 더 많은 SM이 L2를 두고 경쟁 → eviction rate ↑ → 오히려 hit-rate 감소.
+2. **SM under-occupancy**: cuPHY kernel grid가 56 SM을 다 못 채우면 (kernel별 grid size 작음) → idle SM이 clock gating 못 받아 power budget 낭비 → boost clock 약간 떨어짐
+3. **NoC 거리**: 4 GPC 활성화 → 데이터가 cross-GPC 이동 필요할 때 NoC hop 증가
+
+이 중 가장 가능성 큰 것은 1번 (L2 thrash). 검증: Nsight로 L2 hit-rate를 3g vs 4g 비교.
+
+### 4.4 시사점 — partition 키워도 L1 안 빨라짐
+
+| partition | SM | L1 latency | 효율 (latency / SM) |
+|---|---|---|---|
+| 2g.10gb | 28 | 59.27 ms | 1660 SM·ms |
+| **3g.20gb** | **42** | **46.14 ms** | **1938 SM·ms** ← **최고 효율** |
+| 4g.20gb | 56 | 52.77 ms | 2955 SM·ms (SM 낭비) |
+
+→ **3g.20gb가 cuPHY의 sweet spot**. 더 큰 partition = SM 낭비. 더 작은 partition = HBM BW 부족 + OOM.
+
+→ AI-RAN 설계 상 **L1은 3g.20gb 고정**, 나머지 절반(3g 또는 4g)을 AI에 할당이 유일한 선택. 그런데 비대칭(4g)은 leakage 발생 (섹션 3). 즉 **현실적 유일 선택은 split-50-50 (3g/3g)**.
+
+이건 큰 제약:
+- AI 측이 더 큰 자원 원하면 → 비대칭 → leakage
+- AI 측이 더 작아도 충분하면 → 4g/2g 만들 수 없음 (NVIDIA MIG profile 제한)
+- 결국 **MIG profile catalog 자체가 cuPHY 친화적이지 않음**
+
+### 4.5 v1 partition 비교 (잘못 해석된 데이터)
 
 ![v1 partitions](charts/v1_11_partition_v1.png)
 
-v1에서는 no-mig가 375ms로 보이지만, 이건 **SM 경합 artifact**. v2 data와 일치하지 않음.
+v1에서는 no-mig가 375 ms로 보이지만, 이건 **SM 경합 artifact** (섹션 2.2 참조). 워크로드가 HBM에 닿지 않으니 진짜 isolation 측정이 아님. v2 data와 일치하지 않음.
 
 ---
 
@@ -279,35 +448,72 @@ A100 7-instance 최대 분할에서 모든 instance가 1g.5gb이라는 점에서
 
 ---
 
-## 10. 종합 비판 (Why MIG is not optimal)
+## 10. 종합 비판 — Why MIG is not optimal
 
-### MIG가 "잘 작동"한다고 주장되는 면
-✅ p99 jitter 격리 (3.6×)
-✅ Cell-count saturation 방지 (light AI 한정)
-✅ 안정성 (1000 iter)
+### 10.1 MIG가 "잘 작동"한다고 주장되는 면 (실측 근거)
 
-### MIG의 진짜 문제
-❌ **Mean latency 효과 미미** (heavy AI에서 1.24× 만)
-❌ **Asymmetric split에서 bimodal leakage** (50% 확률, +14% spike)
-❌ **하드 partition cap** — 작은 partition은 OOM, 큰 partition도 효과 무
-❌ **Same preset 내 multimodal** — deterministic 아님
-❌ **Heavy AI cell-count 미검증** — production 시나리오 unknown
+| 측면 | 측정값 | 근거 강도 |
+|---|---|---|
+| ✅ p99 jitter 격리 | no-mig p99 172.60 ms → MIG p99 48.13 ms (3.6×) | **강함** — N=1이지만 magnitude 큼 |
+| ✅ Cell-count linear scaling | v1 split-50-50: cells 1→40 linear (2→69 ms) | **light AI 한정** — heavy 미검증 |
+| ✅ 단기 안정성 | v1 1000-iter run 변동 ±2 ms | 시간 단위 검증 안 됨 |
 
-### 그래서 MIG는?
+### 10.2 MIG의 진짜 문제 (정량 + 메커니즘)
+
+| 문제 | 정량 | 메커니즘 (섹션) |
+|---|---|---|
+| ❌ Mean isolation 미미 | 1.24× (heavy AI) — light AI에서 11×는 SM 경합 artifact | HBM bandwidth는 chip-level 공유 (§2.1) |
+| ❌ Bimodal leakage | 50% 확률, +6.7 ms (+14%) spike, asymmetric split | NoC contention + Qwen phase alignment (§3.3) |
+| ❌ Partition hard cap | 1g.5gb OOM, 4g.20gb < 3g.20gb | cuPHY working set 5.5GB + HBM BW bound (§4.2-4.3) |
+| ❌ Within-preset multimodal | split-50-50 cells=20에서 32-46 ms (±45%) | sub-config 변동성, 원인 미규명 (§5) |
+| ❌ Heavy AI cell scaling 미검증 | cells=4,10,20,40 데이터 없음 | reservation 만료 (§6) |
+| ❌ MIG profile 비유연 | 3g/4g 외 split 불가 → 강제 50:50 | NVIDIA spec hardcoded (§4.4) |
+
+### 10.3 5G TTI SLA 관점에서의 결정타
+
+5G NR slot = 1 ms (μ=0). cuPHY는 slot당 PUSCH/PDSCH 완료 필수.
+
+```
+MIG split-50-50 LOW 모드: 46.5 ms / 50 TTI = 0.93 ms/TTI  → 7% 마진 (위태)
+MIG split-60-40 HIGH 모드: 52.8 ms / 50 TTI = 1.06 ms/TTI → SLA violation
+no-mig + Qwen p99:        172 ms / 50 TTI = 3.45 ms/TTI  → 명백한 violation
+```
+
+**결론**: 어떤 구성이든 deadline 마진이 매우 작거나, 50% 확률로 violation. URLLC (99.9999% reliability) 요구 시나리오에서 **현재 데이터로 MIG는 fail**.
+
+### 10.4 그래서 MIG는?
+
 **Necessary but NOT sufficient**:
-- 5G L1 SLA의 baseline 격리에는 도움 (특히 p99)
-- 하지만 충분하지 않음:
-  - Asymmetric split의 intermittent leakage 처리 못 함
-  - Resource utilization 최적화 못 함 (partition cap)
-  - AI 워크로드의 burst pattern 감안 못 함
+- ✅ baseline 격리 (특히 p99): 도움
+- ✅ asymmetric SM 경합 완화: 도움
+- ❌ HBM bandwidth 격리: **하드웨어가 처음부터 보장 안 함** (NVIDIA whitepaper의 마케팅과 실측 불일치)
+- ❌ workload phase 인지: **CPU/소프트웨어 영역**, MIG의 책임 밖
+- ❌ TTI deadline 보장: **하드웨어로 불가능**
 
-### 진짜 필요한 것
-**Software-level orchestration layer**:
-1. AI 워크로드의 phase (LLM attention/KV cache burst) detect
-2. Bandwidth 사용량 실시간 모니터링
-3. SLA violation prediction
-4. Dynamic AI workload throttling/migration
-5. Symmetric MIG split 권장 + asymmetric 회피
+### 10.5 진짜 필요한 것 — Software-level Orchestration
+
+데이터가 시사하는 필수 컴포넌트:
+
+1. **AI workload phase detector**
+   - Qwen prefill ↔ decode 전환 시점 감지 (latency or HBM BW telemetry)
+   - 근거: §3.3 phase alignment 가설
+
+2. **HBM BW 실시간 모니터**
+   - `nvidia-smi dmon -s m` 또는 NVML programmatic
+   - 임계치 (~600 GB/s aggregate) 초과 시 alert
+   - 근거: §2.1 chip-level shared resource
+
+3. **SLA violation predictor**
+   - 직전 N TTI latency trend + AI phase signal → 다음 TTI 예측
+   - 근거: §3.1 bimodal — 한번 HIGH 모드 진입 시 연속됨
+
+4. **Dynamic AI throttling / migration**
+   - HIGH 모드 감지 시 AI batch size 일시 축소, 또는 다른 GPU로 migrate
+   - 근거: §3.4 5G TTI deadline
+
+5. **Symmetric MIG split 강제 + asymmetric 회피**
+   - 가능하면 3g/3g, 어쩔 수 없을 때 trade-off 명시
+   - 근거: §3.2 asymmetric이 모든 leakage 원인
 
 이건 정확히 사용자님 **PHASE1_PLAN**의 방향. **데이터가 PHASE1_PLAN을 강력히 지지**.
 

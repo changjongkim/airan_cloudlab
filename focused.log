@@ -1,0 +1,21 @@
+
+========== 08:39:05 : ENSURE MIG MODE ON ==========
+Disabled
+^@Enabled MIG Mode for GPU 00000000:01:00.0
+
+Warning: persistence mode is disabled on device 00000000:01:00.0. See the Known Issues section of the nvidia-smi(1) man page for more information. Run with [--help | -h] switch to get more information on how to enable persistence mode.
+All done.
+
+========== 08:40:23 : MIG split-50-50 + Qwen-7B + 8T8R L1 ==========
+
+========== 08:42:45 : MIG split-50-50 + HBM 16GB + 8T8R L1 ==========
+
+========== 08:44:50 : DISABLE MIG MODE ==========
+rmmod: ERROR: Module nvidia_drm is not currently loaded
+Warning: MIG mode is in pending disable state for GPU 00000000:01:00.0:In use by another client
+00000000:01:00.0 is currently being used by one or more other processes (e.g. CUDA application or a monitoring application such as another instance of nvidia-smi). Please first kill all processes using the device and retry the command or reboot the system to make MIG mode effective.
+All done.
+
+========== 08:45:44 : no-mig + Qwen-7B + 8T8R L1 ==========
+
+========== 08:46:51 : no-mig + HBM 16GB + 8T8R L1 ==========

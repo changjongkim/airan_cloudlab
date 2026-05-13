@@ -1,0 +1,21 @@
+MIG mode = Disabled
+rmmod: ERROR: Module nvidia_drm is not currently loaded
+Enabled MIG Mode for GPU 00000000:01:00.0
+
+Warning: persistence mode is disabled on device 00000000:01:00.0. See the Known Issues section of the nvidia-smi(1) man page for more information. Run with [--help | -h] switch to get more information on how to enable persistence mode.
+All done.
+Enabled
+
+========== 09:23:42 : B2_2g10gb_alone : L1 alone on profile 14 ==========
+Successfully created GPU instance ID  5 on GPU  0 using profile MIG 2g.10gb (ID 14)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  5 using profile MIG 2g.10gb (ID  1)
+  L1 UUID=MIG-10a92e82-154a-51a9-980c-5ceddf3d094f
+  RESULT: mean=59.27 p99=61.80
+
+========== 09:25:11 : B4_4g20gb_alone : L1 alone on profile 5 ==========
+Successfully created GPU instance ID  1 on GPU  0 using profile MIG 4g.20gb (ID  5)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  1 using profile MIG 4g.20gb (ID  3)
+  L1 UUID=MIG-954ae2c3-71ae-56e0-bea4-2e81e4c41c02
+  RESULT: mean=52.77 p99=54.31
+
+========== 09:26:42 : v4 DONE ==========

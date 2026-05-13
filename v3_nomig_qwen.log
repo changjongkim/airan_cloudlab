@@ -1,0 +1,20 @@
+results dir: /users/sgkim/cloudlab_aerial/results/20260512_091218
+============================================================
+config: no-mig   AI: qwen7b   cells: 20   09:12:18
+============================================================
+  L1 device: all-GPU-0
+  AI devices: all
+docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: error running prestart hook #0: exit status 1, stdout: , stderr: Auto-detected mode as 'legacy'
+nvidia-container-cli: initialization error: driver rpc error: timed out
+
+Run 'docker run --help' for more information
+  AI[0] qwen7b on all -> 327cc116fd3ef939834464cf2d7da5661fa2fa1a26a83d9da5b3710f5ec7edda
+  running L1 -> /users/sgkim/cloudlab_aerial/results/20260512_091218/no-mig/l1.log
+  L1 returned non-zero
+  ✗ no-mig FAILED (no JSON)
+
+sweep complete: /users/sgkim/cloudlab_aerial/results/20260512_091218
+total 12
+drwxr-xr-x  3 sgkim airanslicing-PG0 4096 May 12 09:12 .
+drwxr-xr-x 15 sgkim airanslicing-PG0 4096 May 12 09:12 ..
+drwxr-xr-x  3 sgkim airanslicing-PG0 4096 May 12 09:17 no-mig

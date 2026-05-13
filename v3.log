@@ -1,0 +1,31 @@
+MIG mode = Enabled
+
+========== 08:58:55 : B: L1 alone on MIG 3g.20gb (no AI), 8T8R, 20 cells ==========
+^@
+========== 09:00:40 : C1: split-40-60 (L1=2g.10gb) + Qwen + 8T8R ==========
+
+========== 09:03:04 : C2: split-50-50 + Qwen + 8T8R (already have, repeat for cleanliness) ==========
+
+========== 09:05:30 : C3: split-60-40 + Qwen + 8T8R ==========
+
+========== 09:07:55 : DISABLE MIG ==========
+Disabled MIG Mode for GPU 00000000:01:00.0
+
+Warning: persistence mode is disabled on device 00000000:01:00.0. See the Known Issues section of the nvidia-smi(1) man page for more information. Run with [--help | -h] switch to get more information on how to enable persistence mode.
+All done.
+
+========== 09:09:01 : A: L1 alone on full GPU (no MIG, no AI), 8T8R, 20 cells ==========
+
+========== 09:12:18 : no-mig + Qwen + 8T8R (control) ==========
+
+========== 09:17:58 : ALL v3 DONE ==========
+20260512_091218
+20260512_090901
+20260512_090530
+20260512_090304
+20260512_090040
+20260512_085855
+20260512_085018
+20260512_084651
+20260512_084544
+20260512_084506

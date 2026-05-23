@@ -32,49 +32,51 @@ sec "PHASE 2 multi-partition sweep — DATE_DIR=$DATE_DIR, N=$N"
 
 # ----------------------------------------------------------------------------
 # M1 — 3way-balanced (2g+2g+3g, L1=3g, AI×2 on 2g instances)
-# Question: bimodal disappears with symmetric AI×2 instead of single 4g AI?
+# Production AI-RAN: L1 + 2 xApps (PHY-layer NN + telemetry analytics)
+# Question: bimodal disappears with symmetric AI×2?
 # Expected: leakage small (symmetric neighbors), NO bimodal
 # ----------------------------------------------------------------------------
-sec "M1: 3way-balanced + qwen_small,qwen_small (symmetric 2 AI)"
-N=$N PRESET=3way-balanced AI=qwen_small,qwen_small \
-  TAG=M1_3way_balanced_qwen_small DMON=1 DURATION=$DURATION \
+sec "M1: 3way-balanced + neuralrx,xapp_anomaly (2 AI-RAN services)"
+N=$N PRESET=3way-balanced AI=neuralrx,xapp_anomaly \
+  TAG=M1_3way_balanced_AIRAN DMON=1 DURATION=$DURATION \
   ./run_n20.sh 2>&1 | tee -a "$LOG"
 
 # ----------------------------------------------------------------------------
 # M2 — 3way-L1small (2g+2g+3g, L1=2g, AI on 2g + 3g asymmetric)
-# Question: L1 on SMALL partition with bigger AI neighbor — partition cap effect?
-# Expected: high mean (partition cap), possible bimodal on 3g asymmetric neighbor
+# Production scenario: L1 on small partition, heavy LLM + light LSTM
+# Expected: high mean (partition cap), possible bimodal on 3g neighbor
 # ----------------------------------------------------------------------------
-sec "M2: 3way-L1small + qwen_small,qwen7b (asymmetric AI sizes)"
-N=$N PRESET=3way-L1small AI=qwen_small,qwen7b \
+sec "M2: 3way-L1small + chanpred,qwen_small (LSTM + small LLM mixed)"
+N=$N PRESET=3way-L1small AI=chanpred,qwen_small \
   TAG=M2_3way_L1small_mixed DMON=1 DURATION=$DURATION \
   ./run_n20.sh 2>&1 | tee -a "$LOG"
 
 # ----------------------------------------------------------------------------
 # M3 — 3way-asym (1g+2g+4g, L1=4g, AI on 2g + 1g)
-# Question: L1 on biggest partition with two smaller AI neighbors
-# Expected: leakage from 2g side, 1g side contributes less (small workload)
+# Production: L1 (RU on big partition) + Neural RX + small xApp
+# Expected: dominated by neuralrx on 2g; 1g xApp minor
 # ----------------------------------------------------------------------------
-sec "M3: 3way-asym + qwen_small,gpt2 (mixed weight AI)"
-N=$N PRESET=3way-asym AI=qwen_small,gpt2 \
-  TAG=M3_3way_asym_mixed DMON=1 DURATION=$DURATION \
+sec "M3: 3way-asym + neuralrx,xapp_anomaly (PHY NN + xApp)"
+N=$N PRESET=3way-asym AI=neuralrx,xapp_anomaly \
+  TAG=M3_3way_asym_AIRAN DMON=1 DURATION=$DURATION \
   ./run_n20.sh 2>&1 | tee -a "$LOG"
 
 # ----------------------------------------------------------------------------
 # M4 — 4way-1L1+3AI (4g+1g+1g+1g, L1=4g, AI×3 on 1g)
-# Question: leakage proportional to AI count? Sum of 3 light AI > single big AI?
-# Expected: cumulative leakage, but each 1g neighbor light
+# Production: L1 + 3 microservices (channel pred + xApp anomaly + RX NN)
+# All 3 are small AI-RAN workloads, fit in 1g.5gb each
+# Question: leakage proportional to AI count?
 # ----------------------------------------------------------------------------
-sec "M4: 4way-1L1+3AI + gpt2,resnet,hbm_1g (3 different light AI)"
-N=$N PRESET=4way-1L1+3AI AI=gpt2,resnet,hbm_1g \
-  TAG=M4_4way_3AI_mix DMON=1 DURATION=$DURATION \
+sec "M4: 4way-1L1+3AI + chanpred,xapp_anomaly,gpt2 (3 mixed AI-RAN xApps)"
+N=$N PRESET=4way-1L1+3AI AI=chanpred,xapp_anomaly,gpt2 \
+  TAG=M4_4way_3xApp DMON=1 DURATION=$DURATION \
   ./run_n20.sh 2>&1 | tee -a "$LOG"
 
 # ----------------------------------------------------------------------------
 # Analysis
 # ----------------------------------------------------------------------------
 sec "Running bimodal_detect on phase 2 results"
-for tag in M1_3way_balanced_qwen_small M2_3way_L1small_mixed M3_3way_asym_mixed M4_4way_3AI_mix; do
+for tag in M1_3way_balanced_AIRAN M2_3way_L1small_mixed M3_3way_asym_AIRAN M4_4way_3xApp; do
   dir="results/$DATE_DIR/n10_$tag"
   if [[ -d "$dir" ]]; then
     echo ""

@@ -33,16 +33,21 @@ mkdir -p "$HOST_HF_CACHE"
 IFS=',' read -ra AI_LIST <<< "$AI"
 ai_script_for() {
   case "$1" in
+    # General AI (proxy / control)
     gpt2)           echo "experiments/run_gpt2_stress.py" ;;
     hbm)            echo "experiments/run_hbm_stress.py" ;;
     hbm_2g)         echo "experiments/run_hbm_stress.py" ;;    # 2g.10gb cap-safe (alloc=6GB)
     hbm_1g)         echo "experiments/run_hbm_stress.py" ;;    # 1g.5gb cap-safe (alloc=3GB)
     resnet)         echo "experiments/run_resnet_stress.py" ;;
+    # LLM (heavy, AI assistant scenario)
     qwen7b)         echo "experiments/run_qwen7b_stress.py" ;;
     qwen7b_prefill) echo "experiments/run_qwen7b_prefill.py" ;;
     qwen7b_decode)  echo "experiments/run_qwen7b_decode.py" ;;
     qwen_small)     echo "experiments/run_qwen_small_stress.py" ;;   # Qwen2.5-1.5B (~3.6GB), 2g.10gb fit
-    neuralrx)       echo "experiments/run_neural_rx_stress.py" ;;
+    # Real AI-RAN workloads (in-line + xApp/rApp)
+    neuralrx)       echo "experiments/run_neural_rx_stress.py" ;;    # PHY-layer NN (channel est + equalize)
+    chanpred)       echo "experiments/run_channel_prediction.py" ;;  # LSTM channel prediction
+    xapp_anomaly)   echo "experiments/run_xapp_anomaly.py" ;;        # rApp telemetry anomaly autoencoder
     none)           echo "" ;;
   esac
 }
@@ -50,14 +55,16 @@ ai_args_for() {
   case "$1" in
     gpt2)           echo "0 $DURATION" ;;
     hbm)            echo "0 $DURATION ${HBM_ALLOC:-1.0}" ;;
-    hbm_2g)         echo "0 $DURATION ${HBM_ALLOC_2G:-6.0}" ;;   # 6GB for 2g.10gb cap
-    hbm_1g)         echo "0 $DURATION ${HBM_ALLOC_1G:-3.0}" ;;   # 3GB for 1g.5gb cap
+    hbm_2g)         echo "0 $DURATION ${HBM_ALLOC_2G:-6.0}" ;;
+    hbm_1g)         echo "0 $DURATION ${HBM_ALLOC_1G:-3.0}" ;;
     resnet)         echo "0 $DURATION ${RESNET_BS:-16}" ;;
     qwen7b)         echo "0 $DURATION" ;;
     qwen7b_prefill) echo "0 $DURATION" ;;
     qwen7b_decode)  echo "0 $DURATION" ;;
     qwen_small)     echo "0 $DURATION" ;;
     neuralrx)       echo "0 $DURATION" ;;
+    chanpred)       echo "0 $DURATION" ;;
+    xapp_anomaly)   echo "0 $DURATION" ;;
     none)           echo "" ;;
   esac
 }

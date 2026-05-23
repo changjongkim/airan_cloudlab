@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# Master 5-hour sweep — runs phase1 + phase2 + phase3 in optimal order
+# Master 5-hour sweep — runs phase1 + phase2 + phase3 + phase4
 # for the 5/24 10AM-3PM CloudLab reservation window.
 #
 # Time budget:
 #   0:00 ~ 0:05  Setup verification (caller should do scp + MIG enable BEFORE this)
-#   0:05 ~ 2:00  Phase 1 (A0/A1a/A1b/A2 N=20) ~ 1h55m
-#   2:00 ~ 2:45  Phase 2 (M1/M2/M3/M4 N=10)   ~ 45m
-#   2:45 ~ 3:30  Phase 3 (D1ab N=10 + A baseline) ~ 45m
-#   3:30 ~ 4:00  Buffer / re-run failures      ~ 30m
-#   4:00 ~ 4:30  rsync + git push + snapshot   ~ 30m (CALLER DOES)
+#   0:05 ~ 2:00  Phase 1 (A0/A1a/A1b/A2 N=20)               ~ 1h55m
+#   2:00 ~ 2:30  Phase 4 (AR1/AR2/AR3 AI-RAN N=10)          ~ 30m
+#   2:30 ~ 3:15  Phase 2 (M1/M2/M3/M4 multi-AI N=10)        ~ 45m
+#   3:15 ~ 4:00  Phase 3 (D1ab N=10 + A baseline)           ~ 45m
+#   4:00 ~ 4:30  Buffer / re-run failures                   ~ 30m
+#   4:30 ~ 5:00  rsync + git push + snapshot   ~ 30m (CALLER DOES)
 #
 # After this script finishes, caller MUST:
 #   1. rsync results to local
@@ -67,6 +68,15 @@ docker images | grep -E "aerial|airan" 2>&1 | tee -a "$MASTER_LOG"
 sec "PHASE 1 START — bimodal mechanism (A0/A1a/A1b/A2 N=20)"
 N=20 DURATION=30 bash ./phase1_sweep.sh 2>&1 | tee -a "$MASTER_LOG"
 sec "PHASE 1 DONE — elapsed $(elapsed)"
+
+# ----------------------------------------------------------------------------
+# PHASE 4 — AI-RAN workload bimodal universality (30m budget)
+# AR1/AR2/AR3 on split-60-40 with Neural RX, chanpred LSTM, xApp anomaly
+# Critical: tests if bimodal is Qwen-specific (H1) or general (H2/H3)
+# ----------------------------------------------------------------------------
+sec "PHASE 4 START — AI-RAN workload bimodal universality (AR1/AR2/AR3 N=10)"
+N=10 DURATION=30 bash ./phase4_airan.sh 2>&1 | tee -a "$MASTER_LOG"
+sec "PHASE 4 DONE — elapsed $(elapsed)"
 
 # ----------------------------------------------------------------------------
 # PHASE 2 — Multi-AI partition (45m budget)

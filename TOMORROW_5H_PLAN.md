@@ -52,19 +52,19 @@ partition cap 분리 + 진짜 best-case L1.
 
 **총 4시간 50분, 10분 여유**.
 
-## scp 올릴 12개 파일
+## scp 올릴 13개 파일
 
 ```bash
-# cloudlab_aerial/ — 8개 sweep + 1 운영
-scp ~/New_research/cloudlab_aerial/{dmon_sync,run_n20,driver_reset,phase1_sweep,phase2_multipartition,phase3_extras,master_5h_sweep,run_sweep_v2}.sh \
+# cloudlab_aerial/ — 9개 sweep shell
+scp ~/New_research/cloudlab_aerial/{dmon_sync,run_n20,driver_reset,phase1_sweep,phase2_multipartition,phase3_extras,phase4_airan,master_5h_sweep,run_sweep_v2}.sh \
     sgkim@<HOST>:~/cloudlab_aerial/
 
-# AIRAN_Changjong/experiments/ — 3 AI workload
-scp ~/New_research/AIRAN_Changjong/experiments/{run_qwen7b_prefill,run_qwen7b_decode,run_qwen_small_stress}.py \
+# AIRAN_Changjong/experiments/ — 5 AI workload (Qwen + AI-RAN + updated neural_rx)
+scp ~/New_research/AIRAN_Changjong/experiments/{run_qwen7b_prefill,run_qwen7b_decode,run_qwen_small_stress,run_channel_prediction,run_xapp_anomaly,run_neural_rx_stress}.py \
     sgkim@<HOST>:~/AIRAN_Changjong/experiments/
 
-# home — bimodal 분석기
-scp ~/New_research/cloudlab_results/bimodal_detect.py sgkim@<HOST>:~/
+# home — 통합 분석기 (6 metric: bimodal + CDF/QQ + SLA miss + dmon corr + cluster + decomp)
+scp ~/New_research/cloudlab_results/analyze_run.py sgkim@<HOST>:~/
 ```
 
 ## 노드 ready 후 명령 (복붙용)

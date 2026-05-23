@@ -11,7 +11,7 @@
 #   results/<YYYYMMDD>/n20_A2_hbm/
 #
 # Each contains: run_*.json, run_*.log, summary.txt, dmon.csv, markers.txt.
-# Run bimodal_detect.py on each subdir afterward for cluster verdict.
+# Run analyze_run.py on each subdir afterward for cluster verdict.
 
 set -uo pipefail
 cd "$HOME/cloudlab_aerial"
@@ -72,7 +72,7 @@ for tag in A0_qwen_baseline A1_prefill A1_decode A2_hbm; do
   if [[ -d "$dir" ]]; then
     echo ""
     echo "----- $tag -----" | tee -a "$LOG"
-    python3 "$HOME/bimodal_detect.py" "$dir" 2>&1 | tee -a "$LOG"
+    python3 "$HOME/analyze_run.py" "$dir" 2>&1 | tee -a "$LOG"
   fi
 done
 

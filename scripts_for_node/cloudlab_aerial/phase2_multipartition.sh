@@ -81,7 +81,7 @@ for tag in M1_3way_balanced_AIRAN M2_3way_L1small_mixed M3_3way_asym_AIRAN M4_4w
   if [[ -d "$dir" ]]; then
     echo ""
     echo "----- $tag -----" | tee -a "$LOG"
-    python3 "$HOME/bimodal_detect.py" "$dir" 2>&1 | tee -a "$LOG"
+    python3 "$HOME/analyze_run.py" "$dir" 2>&1 | tee -a "$LOG"
   fi
 done
 

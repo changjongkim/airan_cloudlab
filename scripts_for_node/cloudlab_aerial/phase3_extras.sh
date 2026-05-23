@@ -72,7 +72,7 @@ for tag in D1a_4060_qwen D1b_4060_alone A_baseline_fullGPU; do
   if [[ -d "$dir" ]]; then
     echo ""
     echo "----- $tag -----" | tee -a "$LOG"
-    python3 "$HOME/bimodal_detect.py" "$dir" 2>&1 | tee -a "$LOG"
+    python3 "$HOME/analyze_run.py" "$dir" 2>&1 | tee -a "$LOG"
   fi
 done
 

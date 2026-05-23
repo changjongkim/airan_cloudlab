@@ -67,7 +67,7 @@ for tag in AR1_6040_neuralrx AR2_6040_chanpred AR3_6040_xapp; do
   if [[ -d "$dir" ]]; then
     echo ""
     echo "----- $tag -----" | tee -a "$LOG"
-    python3 "$HOME/bimodal_detect.py" "$dir" 2>&1 | tee -a "$LOG"
+    python3 "$HOME/analyze_run.py" "$dir" 2>&1 | tee -a "$LOG"
   fi
 done
 

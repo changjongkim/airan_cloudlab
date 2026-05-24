@@ -1,4 +1,4 @@
-# 20 Figures — 5/24 Sweep Analysis (상세 설명)
+# 20 Figures — 5/24 Sweep Analysis (그림 + 상세 설명)
 
 생성: `generate_figures.py`. 각 figure는 paper story arc의 특정 메시지를 뒷받침.
 
@@ -6,7 +6,10 @@
 
 ## A섹션 — MIG mode 자체는 free
 
-### 📊 fig_01_mig_mode_overhead.png
+### 📊 Fig 01. MIG mode itself imposes no overhead
+
+![fig_01](fig_01_mig_mode_overhead.png)
+
 **무엇을 보여주는가**: 막대 그래프 2개
 - 막대 1 (회색): Full GPU (no MIG), median 39.3 ms
 - 막대 2 (파랑): 7g.40gb MIG single instance, median 36.7 ms
@@ -20,7 +23,10 @@
 
 ## B섹션 — Partition cap이 진짜 비용
 
-### 📊 fig_02_partition_cap.png
+### 📊 Fig 02. L1 latency vs MIG partition size
+
+![fig_02](fig_02_partition_cap.png)
+
 **무엇을 보여주는가**: 5개 막대 (왼쪽→오른쪽 큰 partition→작은 partition)
 - Full GPU (no MIG): 39.3 ms (회색)
 - 7g.40gb MIG: 36.7 ms (파랑)
@@ -33,7 +39,10 @@
 
 **Paper 메시지**: "Partition을 작게 쪼개면 성능 직격". AI와 co-locate 하려면 작은 partition 어쩔 수 없음 → 본질적 비효율.
 
-### 📊 fig_03_partition_cap_overhead.png
+### 📊 Fig 03. Partition cap penalty (% slowdown)
+
+![fig_03](fig_03_partition_cap_overhead.png)
+
 **무엇을 보여주는가**: 막대 4개 (% 슬로다운, Full GPU 대비)
 - 7g MIG: -6.5% (오히려 빠름)
 - 4g MIG: +43.8%
@@ -49,7 +58,10 @@
 
 ## C섹션 — Cell scaling (HBM bw saturation, 핵심 figure)
 
-### 📊 fig_04_cell_scaling.png ⭐ (가장 중요)
+### 📊 Fig 04. Cell scaling reveals HBM bandwidth saturation per partition ⭐
+
+![fig_04](fig_04_cell_scaling.png)
+
 **무엇을 보여주는가**: 라인 그래프
 - X축: cells per L1 iteration (5, 10, 20, 40)
 - Y축: L1 latency (ms, median)
@@ -64,20 +76,23 @@
 - cells=20: 76.8 / 52.5 / 56.5 (2g가 다른 둘보다 크게 늦음)
 - cells=40: 141.4 / 148.0 / N=1 데이터만
 
-**해석**: 
+**해석**:
 - 작은 워크로드 (cells=5): partition 크기 상관없이 비슷 (fixed overhead dominant)
 - 중간 워크로드 (cells=10-20): partition 클수록 빠름 — 큰 partition이 HBM bw 더 많이 받음
 - 큰 워크로드 (cells=40): 모든 partition wall 도달 (linear 깨짐)
 
 **Paper 메시지**: "각 MIG partition은 chip HBM bandwidth의 1/7, 2/7, 3/7, 4/7 quota만 할당받음. 워크로드 크기가 quota 한계 넘으면 saturate. partition 작을수록 더 일찍 wall에 부딪힘". 이게 **MIG의 fundamental architecture limit 직접 증명**.
 
-### 📊 fig_05_per_cell_efficiency.png
+### 📊 Fig 05. Per-cell efficiency — saturation appears as increasing per-cell cost
+
+![fig_05](fig_05_per_cell_efficiency.png)
+
 **무엇을 보여주는가**: 라인 그래프 (fig_04의 정규화 버전)
 - X축: cells
 - Y축: latency per cell (ms/cell) — 즉 L1 mean / N_cells
 - 같은 3개 partition 라인
 
-**해석**: 
+**해석**:
 - 효율 좋으면 (linear 시) per-cell이 일정해야 함
 - per-cell이 올라가면 saturation 시작
 - 모든 partition이 cells=5에서 가장 낮은 per-cell (fixed overhead 비중 큼)
@@ -89,7 +104,10 @@
 
 ## D섹션 — Bimodal 현상 (cuPHY 본질)
 
-### 📊 fig_06_bimodal_A0.png
+### 📊 Fig 06. Bimodal distribution — A0 (3g L1 + Qwen-7B)
+
+![fig_06](fig_06_bimodal_A0.png)
+
 **무엇을 보여주는가**: 히스토그램
 - X축: per-iteration L1 latency (ms)
 - Y축: 빈도수
@@ -100,7 +118,10 @@
 
 **Paper 메시지**: "Bimodal 현상 N=1000 sample로 확정". 이게 우리 v2 N=4 finding의 reproducibility 증거.
 
-### 📊 fig_07_bimodal_baseline.png
+### 📊 Fig 07. Bimodal exists even in baseline (no MIG, no AI)
+
+![fig_07](fig_07_bimodal_baseline.png)
+
 **무엇을 보여주는가**: fig_06과 같은 구조, 데이터만 다름
 - 데이터: Full GPU baseline (15 runs × 50 iters)
 - 회색 막대
@@ -109,7 +130,10 @@
 
 **Paper 메시지**: "bimodal은 MIG/AI가 만드는 게 아니라 cuPHY pipeline 자체에 있음". H1 (Qwen phase alignment) 가설 반증. 우리의 v2 "MIG가 bimodal 유발한다" 가설 폐기.
 
-### 📊 fig_08_bimodal_overlay.png
+### 📊 Fig 08. All configurations show bimodal — intrinsic to cuPHY
+
+![fig_08](fig_08_bimodal_overlay.png)
+
 **무엇을 보여주는가**: 3개 히스토그램 overlay (density 정규화)
 - 회색: Full GPU baseline (med 39)
 - 파랑: 3g MIG alone (med 52)
@@ -123,7 +147,10 @@
 
 ## E섹션 — AI workload별 효과
 
-### 📊 fig_09_phase1_qwen_variants.png
+### 📊 Fig 09. Phase 1 — All Qwen variants converge to ~55ms (H1 phase rejected)
+
+![fig_09](fig_09_phase1_qwen_variants.png)
+
 **무엇을 보여주는가**: 5개 막대 (모두 3g L1 partition)
 - 막대 1 (파랑): 3g alone, 52.5
 - 막대 2-5 (주황): A0 Qwen full (55.7), A1a prefill (53.7), A1b decode (56.0), A2 static HBM (55.5)
@@ -134,7 +161,10 @@
 
 **Paper 메시지**: "H1 (Qwen prefill/decode phase 가설) 폐기". Bimodal 메커니즘이 Qwen의 특정 phase가 아님. 단순 AI 메모리 traffic이면 동일 효과.
 
-### 📊 fig_10_airan_vs_llm.png
+### 📊 Fig 10. Real AI-RAN (TensorRT) >>> LLM (Qwen) in L1 disruption
+
+![fig_10](fig_10_airan_vs_llm.png)
+
 **무엇을 보여주는가**: 5개 막대
 - 막대 1 (회색): 3g alone, 52.5
 - 막대 2 (파랑): A0 Qwen LLM, 55.7
@@ -153,14 +183,17 @@
 
 ## F섹션 — Decomposition (cap vs leakage 분리)
 
-### 📊 fig_11_decomposition_stacked.png
+### 📊 Fig 11. L1 latency decomposition — baseline + cap + AI leakage
+
+![fig_11](fig_11_decomposition_stacked.png)
+
 **무엇을 보여주는가**: 5개 stacked bar
 - 회색 (baseline cuPHY): 39 ms 항상
 - 빨강 (+partition cap): 작은 partition으로 줄여서 발생한 추가
 - 주황 (+AI leakage): AI 붙여서 추가로 발생한 leakage
 - 라벨: L1 alone (full) / +cap (3g) / +1 AI / +2 AI (M1) / +Real AI-RAN (AR1)
 
-**해석**: 
+**해석**:
 - baseline 39ms는 항상 깔림
 - partition cap (3g): +13ms 추가
 - AI 1개: +3ms 추가
@@ -169,7 +202,10 @@
 
 **Paper 메시지**: cost를 layered로 분해. cap이 base이고 AI leakage는 그 위에. multi-AI나 real AI-RAN에서 leakage 폭발.
 
-### 📊 fig_14_D1_decomposition.png
+### 📊 Fig 14. D1 decomposition — partition cap dominates, AI leakage small
+
+![fig_14](fig_14_D1_decomposition.png)
+
 **무엇을 보여주는가**: 5개 막대
 - Full GPU baseline (39)
 - 3g L1 alone (52)
@@ -185,7 +221,10 @@
 
 ## G섹션 — Multi-AI (size > count, 핵심 finding)
 
-### 📊 fig_12_multi_ai_count.png ⭐
+### 📊 Fig 12. Multi-AI on 3g L1 — partition SIZE matters more than COUNT ⭐
+
+![fig_12](fig_12_multi_ai_count.png)
+
 **무엇을 보여주는가**: 5개 막대 (모두 3g L1)
 - 회색 (3g alone, 0 AI): 52.5
 - 파랑 (A0 +1 Qwen on 2g): 55.7
@@ -197,14 +236,17 @@
 
 **Paper 메시지**: "MIG의 AI leakage는 **AI partition 크기**에 비례, 개수가 아님". 1g.5gb 4개로 쪼개면 contention 거의 없음. **Design implication: AI는 가능한 한 작은 partition에 쪼개서 배치**.
 
-### 📊 fig_13_phase2_multipartition.png
+### 📊 Fig 13. Phase 2 — Multi-partition AI-RAN configurations
+
+![fig_13](fig_13_phase2_multipartition.png)
+
 **무엇을 보여주는가**: 4개 막대 (Phase 2 각 multi-partition config)
 - M1 3g L1 + 2× 2g AI: 73.9
 - M2 2g L1 + 3g+2g AI: 132.8 (worst)
 - M3 4g L1 + 1g+2g AI: 63.5
 - M4 4g L1 + 3× 1g AI: 59.6 (best)
 
-**해석**: 
+**해석**:
 - L1을 큰 partition (4g)에, AI를 작은 partition (1g)에 → 최적 (M4)
 - L1을 작은 partition (2g)에 두면 catastrophic (M2)
 
@@ -214,7 +256,10 @@
 
 ## H섹션 — Tail latency / URLLC 불가능
 
-### 📊 fig_15_p99_urllc.png
+### 📊 Fig 15. p99 tail latency — URLLC 1ms requirement infeasible in all configs
+
+![fig_15](fig_15_p99_urllc.png)
+
 **무엇을 보여주는가**: 8개 막대 (p99 medians)
 - Full GPU: 55.6
 - 7g MIG: 51.6
@@ -230,7 +275,10 @@
 
 **Paper 메시지**: "URLLC sub-millisecond reliability는 어떤 MIG config로도 달성 불가능. 5G NR TTI deadline (1ms)을 cuPHY가 batched로 처리하더라도 p99에서 fail".
 
-### 📊 fig_16_cdf_comparison.png
+### 📊 Fig 16. CDF — tail distributions across configurations
+
+![fig_16](fig_16_cdf_comparison.png)
+
 **무엇을 보여주는가**: CDF 라인 그래프 5개
 - X축: L1 latency (ms)
 - Y축: CDF (0-1)
@@ -244,7 +292,10 @@
 
 **Paper 메시지**: "median 보다 tail이 훨씬 나쁨. Real-time application은 worst case 봐야 함".
 
-### 📊 fig_17_qq_plot.png
+### 📊 Fig 17. Q-Q plot — A0 deviates from normal (S-curve = bimodal)
+
+![fig_17](fig_17_qq_plot.png)
+
 **무엇을 보여주는가**: Q-Q plot (정규성 검정)
 - X축: theoretical normal quantile
 - Y축: observed L1 latency
@@ -255,7 +306,10 @@
 
 **Paper 메시지**: "bimodal을 statistical test로 confirm. unimodal Gaussian 가정 깨짐 → 평균 통계로만 분석하면 안 됨".
 
-### 📊 fig_18_tail_ratio.png
+### 📊 Fig 18. Tail amplification factor across configurations
+
+![fig_18](fig_18_tail_ratio.png)
+
 **무엇을 보여주는가**: 10개 막대 (p99 / mean ratio)
 - Full GPU ~1.45
 - 7g MIG ~1.40
@@ -271,7 +325,10 @@
 
 ## I섹션 — Overall summary
 
-### 📊 fig_19_airan_spectrum.png
+### 📊 Fig 19. AI-RAN configuration spectrum — median + p99
+
+![fig_19](fig_19_airan_spectrum.png)
+
 **무엇을 보여주는가**: 6개 시나리오 × 2 막대 (median + p99 나란히)
 - Full GPU (unrealistic)
 - Best AI-RAN (M4 4g + 3 light)
@@ -284,7 +341,10 @@
 
 **Paper 메시지**: "AI-RAN deployment 시 trade-off matrix. 어떤 corner를 택하든 베이스라인 도달 불가".
 
-### 📊 fig_20_overall_breakdown.png ⭐ (Final summary)
+### 📊 Fig 20. L1 latency breakdown across AI-RAN configurations ⭐ (Final summary)
+
+![fig_20](fig_20_overall_breakdown.png)
+
 **무엇을 보여주는가**: 8개 시나리오 stacked bar
 - 회색 base: cuPHY baseline (39ms 항상)
 - 빨강 layer: partition cap

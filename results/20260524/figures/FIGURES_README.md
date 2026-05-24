@@ -61,11 +61,17 @@ split-40-60      : [== 2g ==][==== 3g ====][idle][idle]
 - 7g MIG single = 36.7 ms ≈ no-MIG = 39.3 ms (-7% noise level)
 - → MIG 자체가 느린 게 아님
 
-### F2. Partition cap이 진짜 비용
+### F2. Partition cap이 진짜 비용 — **그리고 격리 자체가 추가 cost를 만듦**
 - 7g → 4g: +45%
 - 7g → 3g: +34%
 - 7g → 2g: +82%
 - AI co-locate 하려면 작은 partition 필수 → MIG inevitable cost
+
+**중요한 점**: 8T8R 273 PRB MCS 2 × 20 cells 워크로드는 3g.20gb의 "보장된 자원" (3/7 compute, 20GB, 3/7 HBM bw = 686 GB/s) **안에 충분히 들어감**.
+- Memory: 워크로드 < 100MB << 20GB
+- Compute: cuPHY production 125 μs/cell × 3/7 비례 = ~290 μs/cell 예상
+- 실측: 2.63 ms/cell on 3g (=production보다 ~9× 느림)
+- → **MIG가 "isolated guaranteed resources"를 제공한다는 promise를 위반**. 자원이 부족해서가 아니라, partition 격리 자체가 추가 overhead 부과.
 
 ### F3. Bimodal은 cuPHY 본질
 - baseline (no MIG, no AI)도 bimodal
@@ -97,9 +103,24 @@ split-40-60      : [== 2g ==][==== 3g ====][idle][idle]
 - 절대 latency는 우리 benchmark 한계
 - **하지만 상대 페널티(34-239%)는 robust** — production cuPHY에서도 동일 비율 적용
 
+### F8. ⭐ Isolation promise violation — paper의 가장 강력한 argument
+
+MIG는 "격리된 자원 안에서 deterministic performance" 약속. 그러나:
+
+| 가정 | 예측 | 실측 | 차이 |
+|---|---|---|---|
+| 자원 부족 (resource starvation): 3/7만큼만 받았으니 7/3 = 2.33× 느림 | ~85 ms | **52.5 ms** | 비례 scale의 60% — 자원이 부족하지 않다 |
+| 자원 충분 (isolation works): 워크로드가 budget 안에 들어가니 7g와 동일 | ~37 ms | **52.5 ms** | +43% extra — isolation이 추가 cost 부과 |
+
+8T8R 20-cell 워크로드는 3g.20gb budget 안에 들어가는데도 +43% extra cost. 결론:
+
+> **"MIG isolation은 budget을 보장하지만 deterministic performance는 보장하지 못함. partition을 만드는 행위 자체가 fixed architectural overhead를 부과하며, 이는 workload가 partition resource 안에 들어가더라도 회피 불가능."**
+
+이게 NVIDIA MIG 광고와 정면 충돌. 광고: "isolated, guaranteed performance". 실측: "isolated reservation, but extra overhead inevitable".
+
 ## 한 줄 결론
 
-> **"MIG mode itself는 free. 그러나 AI-RAN co-location에 필수인 partition fragmentation이 L1 latency를 34-239% 증가. AI partition을 작게 쪼개면 multi-AI도 견딜 만 함. 최선의 AI-RAN config (M4)도 +52%. URLLC 마진 잠식 불가피."**
+> **"MIG mode 자체는 free. 그러나 AI-RAN에 필수인 partition 격리는 deterministic isolation을 보장하지 않고 +34%~+239% architectural overhead를 부과. 워크로드가 partition budget 안에 들어가도 회피 불가. AI partition을 작게 쪼개면 multi-AI는 견딜만 함 (M4 +52%). 최선의 config도 production cuPHY의 URLLC 마진을 잠식. NVIDIA MIG의 'isolated guaranteed performance' 광고는 실측 미반영."**
 
 ---
 
@@ -138,7 +159,22 @@ split-40-60      : [== 2g ==][==== 3g ====][idle][idle]
 
 **해석**: Partition을 7g→4g→3g→2g로 줄일수록 L1 느려짐. 단 4g(56.5)가 3g(52.5)보다 살짝 높은 비정상 패턴 (cuPHY가 3g+ 에서 saturate되거나 4g.20gb 측정 noise).
 
-**Paper 메시지**: "Partition을 작게 쪼개면 성능 직격". AI와 co-locate 하려면 작은 partition 어쩔 수 없음 → 본질적 비효율.
+**⚠ 가장 중요한 통찰** — 본 figure가 함의하는 것:
+
+8T8R PUSCH RX (273 PRB, MCS 2, 20 cells) 워크로드는 3g.20gb의 보장 자원(20GB 메모리, 3/7 GPC, 3/7 HBM bw quota) **안에 충분히 들어감**. 만약 MIG가 약속한 대로 "격리된 자원을 제공"한다면, 3g.20gb partition 안에서 이 워크로드는 다른 partition 상태와 무관하게 **deterministic performance**를 보여야 함.
+
+**하지만 그렇지 않음**:
+- 7g (전체 자원) = 36.7 ms
+- 3g (3/7 자원) = 52.5 ms (+43%)
+- 비례 scale 가정 (자원 부족이 진짜 원인이면): 36.7 × (7/3) ≈ 86 ms를 예상해야 함
+- 실측 52.5 ms는 비례 scale의 절반 정도 → "자원 부족" 가설로 설명 안 됨
+- 즉, **3g 자원은 사실 워크로드에 충분한데도 MIG가 추가 overhead 부과**
+
+이게 paper의 가장 강력한 argument:
+
+> **"MIG의 isolation promise는 reservation까지만 보장. 격리된 자원만으로 deterministic performance를 줘야 하지만, 실측은 그렇지 않음. partition 자체가 fixed overhead를 만들어내고 (≥+34%), 이 overhead는 workload가 partition resource budget 안에 들어가도 회피 불가능."**
+
+**Paper 메시지**: "Partition을 작게 쪼개면 성능 직격". 단 이건 단순한 자원 부족 문제가 아니라 **MIG architecture의 inherent overhead** — 격리 자체가 fixed cost를 만듦.
 
 ### 📊 Fig 03. Partition cap penalty (% slowdown)
 

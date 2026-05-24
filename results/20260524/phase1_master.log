@@ -1,0 +1,516 @@
+
+========== [21:17:32] PHASE 1 sweep start — DATE_DIR=20260523, N=20, DURATION=30s ==========
+
+========== [21:17:32] Output root: results/20260523/ ==========
+
+========== [21:17:32] A0: split-60-40 + qwen7b (baseline) ==========
+==========================================
+N=20 reps of PRESET=split-60-40 AI=qwen7b
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n20_A0_qwen_baseline
+DMON: 1
+==========================================
+dmon started, pid 19872, out /users/sgkim/cloudlab_aerial/results/20260523/n20_A0_qwen_baseline/dmon.csv
+
+------ run 1/20 : 21:17:32 ------
+marked: run_1_start
+  run  1  mean=55.663 ms  p99=71.847 ms
+marked: run_1_end
+
+------ run 2/20 : 21:18:00 ------
+marked: run_2_start
+  run  2  mean=57.939 ms  p99=87.759 ms
+marked: run_2_end
+
+------ run 3/20 : 21:18:27 ------
+marked: run_3_start
+  run  3  mean=54.121 ms  p99=95.926 ms
+marked: run_3_end
+
+------ run 4/20 : 21:18:55 ------
+marked: run_4_start
+  run  4  mean=57.600 ms  p99=83.600 ms
+marked: run_4_end
+
+------ run 5/20 : 21:19:22 ------
+marked: run_5_start
+  run  5  mean=55.252 ms  p99=75.572 ms
+marked: run_5_end
+
+------ run 6/20 : 21:19:49 ------
+marked: run_6_start
+  run  6  mean=55.881 ms  p99=76.451 ms
+marked: run_6_end
+
+------ run 7/20 : 21:20:17 ------
+marked: run_7_start
+  run  7  mean=58.085 ms  p99=97.064 ms
+marked: run_7_end
+
+------ run 8/20 : 21:20:45 ------
+marked: run_8_start
+  run  8  mean=56.430 ms  p99=86.993 ms
+marked: run_8_end
+
+------ run 9/20 : 21:21:12 ------
+marked: run_9_start
+  run  9  mean=56.013 ms  p99=83.388 ms
+marked: run_9_end
+
+------ run 10/20 : 21:21:39 ------
+marked: run_10_start
+  run 10  mean=52.316 ms  p99=77.356 ms
+marked: run_10_end
+
+------ run 11/20 : 21:22:07 ------
+marked: run_11_start
+  run 11  mean=52.241 ms  p99=80.638 ms
+marked: run_11_end
+
+------ run 12/20 : 21:22:34 ------
+marked: run_12_start
+  run 12  mean=56.477 ms  p99=77.887 ms
+marked: run_12_end
+
+------ run 13/20 : 21:23:01 ------
+marked: run_13_start
+  run 13  mean=53.925 ms  p99=87.262 ms
+marked: run_13_end
+
+------ run 14/20 : 21:23:28 ------
+marked: run_14_start
+  run 14  mean=54.048 ms  p99=79.192 ms
+marked: run_14_end
+
+------ run 15/20 : 21:23:56 ------
+marked: run_15_start
+  run 15  mean=53.488 ms  p99=77.531 ms
+marked: run_15_end
+
+------ run 16/20 : 21:24:23 ------
+marked: run_16_start
+  run 16  mean=51.764 ms  p99=73.513 ms
+marked: run_16_end
+
+------ run 17/20 : 21:24:50 ------
+marked: run_17_start
+  run 17  mean=56.516 ms  p99=79.907 ms
+marked: run_17_end
+
+------ run 18/20 : 21:25:17 ------
+marked: run_18_start
+  run 18  mean=55.801 ms  p99=77.592 ms
+marked: run_18_end
+
+------ run 19/20 : 21:25:45 ------
+marked: run_19_start
+  run 19  mean=57.590 ms  p99=83.871 ms
+marked: run_19_end
+
+------ run 20/20 : 21:26:12 ------
+marked: run_20_start
+  run 20  mean=53.767 ms  p99=89.186 ms
+marked: run_20_end
+dmon stopped (pid 19872)
+2208 /users/sgkim/cloudlab_aerial/results/20260523/n20_A0_qwen_baseline/dmon.csv
+
+==========================================
+DONE — N=20 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n20_A0_qwen_baseline/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n20_A0_qwen_baseline
+==========================================
+
+========== [21:26:40] A1a: split-60-40 + qwen7b_prefill (PREFILL burst only) ==========
+==========================================
+N=20 reps of PRESET=split-60-40 AI=qwen7b_prefill
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_prefill
+DMON: 1
+==========================================
+dmon started, pid 39074, out /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_prefill/dmon.csv
+
+------ run 1/20 : 21:26:40 ------
+marked: run_1_start
+  run  1  mean=56.275 ms  p99=85.847 ms
+marked: run_1_end
+
+------ run 2/20 : 21:27:07 ------
+marked: run_2_start
+  run  2  mean=55.269 ms  p99=78.621 ms
+marked: run_2_end
+
+------ run 3/20 : 21:27:35 ------
+marked: run_3_start
+  run  3  mean=52.222 ms  p99=73.595 ms
+marked: run_3_end
+
+------ run 4/20 : 21:28:02 ------
+marked: run_4_start
+  run  4  mean=52.608 ms  p99=76.861 ms
+marked: run_4_end
+
+------ run 5/20 : 21:28:29 ------
+marked: run_5_start
+  run  5  mean=54.055 ms  p99=80.920 ms
+marked: run_5_end
+
+------ run 6/20 : 21:28:56 ------
+marked: run_6_start
+  run  6  mean=53.442 ms  p99=79.638 ms
+marked: run_6_end
+
+------ run 7/20 : 21:29:23 ------
+marked: run_7_start
+  run  7  mean=54.284 ms  p99=83.178 ms
+marked: run_7_end
+
+------ run 8/20 : 21:29:51 ------
+marked: run_8_start
+  run  8  mean=52.355 ms  p99=73.597 ms
+marked: run_8_end
+
+------ run 9/20 : 21:30:18 ------
+marked: run_9_start
+  run  9  mean=52.004 ms  p99=76.848 ms
+marked: run_9_end
+
+------ run 10/20 : 21:30:45 ------
+marked: run_10_start
+  run 10  mean=51.754 ms  p99=75.706 ms
+marked: run_10_end
+
+------ run 11/20 : 21:31:12 ------
+marked: run_11_start
+  run 11  mean=57.485 ms  p99=85.723 ms
+marked: run_11_end
+
+------ run 12/20 : 21:31:40 ------
+marked: run_12_start
+  run 12  mean=53.926 ms  p99=78.180 ms
+marked: run_12_end
+
+------ run 13/20 : 21:32:07 ------
+marked: run_13_start
+  run 13  mean=54.601 ms  p99=76.652 ms
+marked: run_13_end
+
+------ run 14/20 : 21:32:34 ------
+marked: run_14_start
+  run 14  mean=56.322 ms  p99=78.376 ms
+marked: run_14_end
+
+------ run 15/20 : 21:33:02 ------
+marked: run_15_start
+  run 15  mean=52.276 ms  p99=76.904 ms
+marked: run_15_end
+
+------ run 16/20 : 21:33:29 ------
+marked: run_16_start
+  run 16  mean=52.104 ms  p99=74.063 ms
+marked: run_16_end
+
+------ run 17/20 : 21:33:56 ------
+marked: run_17_start
+  run 17  mean=54.998 ms  p99=76.705 ms
+marked: run_17_end
+
+------ run 18/20 : 21:34:23 ------
+marked: run_18_start
+  run 18  mean=55.188 ms  p99=80.013 ms
+marked: run_18_end
+
+------ run 19/20 : 21:34:51 ------
+marked: run_19_start
+  run 19  mean=52.402 ms  p99=74.150 ms
+marked: run_19_end
+
+------ run 20/20 : 21:35:18 ------
+marked: run_20_start
+  run 20  mean=52.149 ms  p99=75.898 ms
+marked: run_20_end
+dmon stopped (pid 39074)
+2200 /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_prefill/dmon.csv
+
+==========================================
+DONE — N=20 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_prefill/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_prefill
+==========================================
+
+========== [21:35:45] A1b: split-60-40 + qwen7b_decode (DECODE only, HBM mostly idle) ==========
+==========================================
+N=20 reps of PRESET=split-60-40 AI=qwen7b_decode
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_decode
+DMON: 1
+==========================================
+dmon started, pid 58302, out /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_decode/dmon.csv
+
+------ run 1/20 : 21:35:45 ------
+marked: run_1_start
+  run  1  mean=52.208 ms  p99=74.922 ms
+marked: run_1_end
+
+------ run 2/20 : 21:36:12 ------
+marked: run_2_start
+  run  2  mean=55.771 ms  p99=79.753 ms
+marked: run_2_end
+
+------ run 3/20 : 21:36:39 ------
+marked: run_3_start
+  run  3  mean=55.255 ms  p99=81.020 ms
+marked: run_3_end
+
+------ run 4/20 : 21:37:07 ------
+marked: run_4_start
+  run  4  mean=53.970 ms  p99=85.773 ms
+marked: run_4_end
+
+------ run 5/20 : 21:37:34 ------
+marked: run_5_start
+  run  5  mean=56.770 ms  p99=89.296 ms
+marked: run_5_end
+
+------ run 6/20 : 21:38:01 ------
+marked: run_6_start
+  run  6  mean=54.834 ms  p99=78.294 ms
+marked: run_6_end
+
+------ run 7/20 : 21:38:28 ------
+marked: run_7_start
+  run  7  mean=52.393 ms  p99=79.750 ms
+marked: run_7_end
+
+------ run 8/20 : 21:38:56 ------
+marked: run_8_start
+  run  8  mean=54.944 ms  p99=76.866 ms
+marked: run_8_end
+
+------ run 9/20 : 21:39:23 ------
+marked: run_9_start
+  run  9  mean=54.762 ms  p99=75.004 ms
+marked: run_9_end
+
+------ run 10/20 : 21:39:50 ------
+marked: run_10_start
+  run 10  mean=62.506 ms  p99=228.735 ms
+marked: run_10_end
+
+------ run 11/20 : 21:40:18 ------
+marked: run_11_start
+  run 11  mean=59.900 ms  p99=154.694 ms
+marked: run_11_end
+
+------ run 12/20 : 21:40:46 ------
+marked: run_12_start
+  run 12  mean=58.876 ms  p99=143.183 ms
+marked: run_12_end
+
+------ run 13/20 : 21:41:15 ------
+marked: run_13_start
+  run 13  mean=59.879 ms  p99=152.894 ms
+marked: run_13_end
+
+------ run 14/20 : 21:41:43 ------
+marked: run_14_start
+  run 14  mean=59.604 ms  p99=157.121 ms
+marked: run_14_end
+
+------ run 15/20 : 21:42:12 ------
+marked: run_15_start
+  run 15  mean=58.681 ms  p99=144.821 ms
+marked: run_15_end
+
+------ run 16/20 : 21:42:40 ------
+marked: run_16_start
+  run 16  mean=52.032 ms  p99=75.339 ms
+marked: run_16_end
+
+------ run 17/20 : 21:43:07 ------
+marked: run_17_start
+  run 17  mean=52.193 ms  p99=71.114 ms
+marked: run_17_end
+
+------ run 18/20 : 21:43:35 ------
+marked: run_18_start
+  run 18  mean=58.844 ms  p99=154.851 ms
+marked: run_18_end
+
+------ run 19/20 : 21:44:03 ------
+marked: run_19_start
+  run 19  mean=59.828 ms  p99=143.054 ms
+marked: run_19_end
+
+------ run 20/20 : 21:44:31 ------
+marked: run_20_start
+  run 20  mean=56.297 ms  p99=153.224 ms
+marked: run_20_end
+dmon stopped (pid 58302)
+2234 /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_decode/dmon.csv
+
+==========================================
+DONE — N=20 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_decode/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n20_A1_decode
+==========================================
+
+========== [21:45:00] A2: split-60-40 + hbm 16GB (non-phased, deterministic) ==========
+==========================================
+N=20 reps of PRESET=split-60-40 AI=hbm
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n20_A2_hbm
+DMON: 1
+==========================================
+dmon started, pid 88644, out /users/sgkim/cloudlab_aerial/results/20260523/n20_A2_hbm/dmon.csv
+
+------ run 1/20 : 21:45:00 ------
+marked: run_1_start
+  run  1  mean=59.789 ms  p99=154.577 ms
+marked: run_1_end
+
+------ run 2/20 : 21:45:28 ------
+marked: run_2_start
+  run  2  mean=52.605 ms  p99=75.349 ms
+marked: run_2_end
+
+------ run 3/20 : 21:45:56 ------
+marked: run_3_start
+  run  3  mean=52.770 ms  p99=77.290 ms
+marked: run_3_end
+
+------ run 4/20 : 21:46:23 ------
+marked: run_4_start
+  run  4  mean=55.412 ms  p99=151.379 ms
+marked: run_4_end
+
+------ run 5/20 : 21:46:50 ------
+marked: run_5_start
+  run  5  mean=59.317 ms  p99=144.945 ms
+marked: run_5_end
+
+------ run 6/20 : 21:47:19 ------
+marked: run_6_start
+  run  6  mean=56.047 ms  p99=151.538 ms
+marked: run_6_end
+
+------ run 7/20 : 21:47:47 ------
+marked: run_7_start
+  run  7  mean=60.568 ms  p99=154.218 ms
+marked: run_7_end
+
+------ run 8/20 : 21:48:16 ------
+marked: run_8_start
+  run  8  mean=56.111 ms  p99=151.940 ms
+marked: run_8_end
+
+------ run 9/20 : 21:48:44 ------
+marked: run_9_start
+  run  9  mean=56.291 ms  p99=75.380 ms
+marked: run_9_end
+
+------ run 10/20 : 21:49:12 ------
+marked: run_10_start
+  run 10  mean=51.589 ms  p99=73.917 ms
+marked: run_10_end
+
+------ run 11/20 : 21:49:39 ------
+marked: run_11_start
+  run 11  mean=52.119 ms  p99=75.275 ms
+marked: run_11_end
+
+------ run 12/20 : 21:50:06 ------
+marked: run_12_start
+  run 12  mean=52.436 ms  p99=75.045 ms
+marked: run_12_end
+
+------ run 13/20 : 21:50:33 ------
+marked: run_13_start
+  run 13  mean=52.386 ms  p99=77.727 ms
+marked: run_13_end
+
+------ run 14/20 : 21:51:00 ------
+marked: run_14_start
+  run 14  mean=55.487 ms  p99=78.921 ms
+marked: run_14_end
+
+------ run 15/20 : 21:51:28 ------
+marked: run_15_start
+  run 15  mean=55.927 ms  p99=77.475 ms
+marked: run_15_end
+
+------ run 16/20 : 21:51:55 ------
+marked: run_16_start
+  run 16  mean=56.545 ms  p99=77.072 ms
+marked: run_16_end
+
+------ run 17/20 : 21:52:22 ------
+marked: run_17_start
+  run 17  mean=51.963 ms  p99=72.985 ms
+marked: run_17_end
+
+------ run 18/20 : 21:52:50 ------
+marked: run_18_start
+  run 18  mean=53.475 ms  p99=81.526 ms
+marked: run_18_end
+
+------ run 19/20 : 21:53:17 ------
+marked: run_19_start
+  run 19  mean=53.110 ms  p99=80.177 ms
+marked: run_19_end
+
+------ run 20/20 : 21:53:44 ------
+marked: run_20_start
+  run 20  mean=56.275 ms  p99=76.036 ms
+marked: run_20_end
+dmon stopped (pid 88644)
+2222 /users/sgkim/cloudlab_aerial/results/20260523/n20_A2_hbm/dmon.csv
+
+==========================================
+DONE — N=20 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n20_A2_hbm/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n20_A2_hbm
+==========================================
+
+========== [21:54:11] Running bimodal_detect on all four runs ==========
+----- A0_qwen_baseline -----
+Analyzing results/20260523/n20_A0_qwen_baseline
+  loaded 20 runs, 0 dmon samples, 42 markers
+
+=== Summary: n20_A0_qwen_baseline ===
+  VERDICT: BIMODAL  (LOW=53.21, HIGH=56.60, score=3.76)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n20_A0_qwen_baseline/full_summary.txt
+----- A1_prefill -----
+Analyzing results/20260523/n20_A1_prefill
+  loaded 20 runs, 0 dmon samples, 42 markers
+
+=== Summary: n20_A1_prefill ===
+  VERDICT: BIMODAL  (LOW=52.61, HIGH=55.55, score=3.41)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n20_A1_prefill/full_summary.txt
+----- A1_decode -----
+Analyzing results/20260523/n20_A1_decode
+  loaded 20 runs, 0 dmon samples, 42 markers
+
+=== Summary: n20_A1_decode ===
+  VERDICT: BIMODAL  (LOW=54.29, HIGH=59.76, score=3.96)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n20_A1_decode/full_summary.txt
+----- A2_hbm -----
+Analyzing results/20260523/n20_A2_hbm
+  loaded 20 runs, 0 dmon samples, 42 markers
+
+=== Summary: n20_A2_hbm ===
+  VERDICT: BIMODAL  (LOW=52.49, HIGH=57.07, score=3.94)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n20_A2_hbm/full_summary.txt
+
+========== [21:54:16] PHASE 1 sweep DONE ==========

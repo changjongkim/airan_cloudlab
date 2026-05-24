@@ -1,0 +1,27 @@
+# Analysis — results/20260523/n20_A0_qwen_baseline
+
+N runs: 20
+
+## Bimodal cluster
+  verdict     : BIMODAL
+  LOW cluster : 53.209 ms (N=8)
+  HIGH cluster: 56.604 ms (N=12)
+  gap         : 3.395 ms
+  bimodality  : 3.76
+
+## Distribution (per-iter)
+  iters    : 1000
+  median   : 53.983 ms
+  p95      : 75.216 ms
+  p99      : 85.736 ms
+  p99.9    : 102.742 ms
+  max      : 107.177 ms
+  >1ms TTI : 100.00%
+
+## SLA miss rates (per-run avg)
+  1.0ms                         : 100.00%
+  1.5ms                         : 100.00%
+  2.0ms                         : 100.00%
+  5.0ms                         : 100.00%
+  relative_10pct_over_median    : 8.80%
+

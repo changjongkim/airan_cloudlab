@@ -1,0 +1,537 @@
+
+========== [22:20:58] SEQUENTIAL CHAIN start (GPU 0 MIG) ==========
+
+========== [22:20:58] Phase 2: multi-partition (M1-M4) ==========
+
+========== [22:20:58] PHASE 2 multi-partition sweep — DATE_DIR=20260523, N=10 ==========
+
+========== [22:20:58] M1: 3way-balanced + neuralrx,xapp_anomaly (2 AI-RAN services) ==========
+==========================================
+N=10 reps of PRESET=3way-balanced AI=neuralrx,xapp_anomaly
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_M1_3way_balanced_AIRAN
+DMON: 1
+==========================================
+dmon started, pid 144874, out /users/sgkim/cloudlab_aerial/results/20260523/n10_M1_3way_balanced_AIRAN/dmon.csv
+
+------ run 1/10 : 22:20:58 ------
+marked: run_1_start
+  run  1  mean=62.197 ms  p99=131.497 ms
+marked: run_1_end
+
+------ run 2/10 : 22:21:23 ------
+marked: run_2_start
+  run  2  mean=62.197 ms  p99=131.497 ms
+marked: run_2_end
+
+------ run 3/10 : 22:21:55 ------
+marked: run_3_start
+  run  3  mean=62.197 ms  p99=131.497 ms
+marked: run_3_end
+
+------ run 4/10 : 22:22:20 ------
+marked: run_4_start
+  run  4  mean=62.197 ms  p99=131.497 ms
+marked: run_4_end
+
+------ run 5/10 : 22:22:44 ------
+marked: run_5_start
+  run  5  mean=62.197 ms  p99=131.497 ms
+marked: run_5_end
+
+------ run 6/10 : 22:23:16 ------
+marked: run_6_start
+  run  6  mean=86.384 ms  p99=211.363 ms
+marked: run_6_end
+
+------ run 7/10 : 22:23:48 ------
+marked: run_7_start
+  run  7  mean=85.675 ms  p99=230.460 ms
+marked: run_7_end
+
+------ run 8/10 : 22:24:22 ------
+marked: run_8_start
+  run  8  mean=86.126 ms  p99=231.981 ms
+marked: run_8_end
+
+------ run 9/10 : 22:24:57 ------
+marked: run_9_start
+  run  9  mean=86.126 ms  p99=231.981 ms
+marked: run_9_end
+
+------ run 10/10 : 22:25:22 ------
+marked: run_10_start
+  run 10  mean=86.126 ms  p99=231.981 ms
+marked: run_10_end
+dmon stopped (pid 144874)
+1114 /users/sgkim/cloudlab_aerial/results/20260523/n10_M1_3way_balanced_AIRAN/dmon.csv
+
+==========================================
+DONE — N=10 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n10_M1_3way_balanced_AIRAN/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n10_M1_3way_balanced_AIRAN
+==========================================
+
+========== [22:25:46] M2: 3way-L1small + chanpred,qwen_small (LSTM + small LLM mixed) ==========
+==========================================
+N=10 reps of PRESET=3way-L1small AI=chanpred,qwen_small
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_M2_3way_L1small_mixed
+DMON: 1
+==========================================
+dmon started, pid 197362, out /users/sgkim/cloudlab_aerial/results/20260523/n10_M2_3way_L1small_mixed/dmon.csv
+
+------ run 1/10 : 22:25:46 ------
+marked: run_1_start
+  run  1  mean=132.824 ms  p99=381.613 ms
+marked: run_1_end
+
+------ run 2/10 : 22:26:10 ------
+marked: run_2_start
+  run  2  mean=132.824 ms  p99=381.613 ms
+marked: run_2_end
+
+------ run 3/10 : 22:26:34 ------
+marked: run_3_start
+  run  3  mean=132.824 ms  p99=381.613 ms
+marked: run_3_end
+
+------ run 4/10 : 22:26:58 ------
+marked: run_4_start
+  run  4  mean=132.824 ms  p99=381.613 ms
+marked: run_4_end
+
+------ run 5/10 : 22:27:22 ------
+marked: run_5_start
+  run  5  mean=132.824 ms  p99=381.613 ms
+marked: run_5_end
+
+------ run 6/10 : 22:27:47 ------
+marked: run_6_start
+  run  6  mean=132.824 ms  p99=381.613 ms
+marked: run_6_end
+
+------ run 7/10 : 22:28:10 ------
+marked: run_7_start
+  run  7  mean=132.824 ms  p99=381.613 ms
+marked: run_7_end
+
+------ run 8/10 : 22:28:34 ------
+marked: run_8_start
+  run  8  mean=132.824 ms  p99=381.613 ms
+marked: run_8_end
+
+------ run 9/10 : 22:28:58 ------
+marked: run_9_start
+  run  9  mean=132.824 ms  p99=381.613 ms
+marked: run_9_end
+
+------ run 10/10 : 22:29:24 ------
+marked: run_10_start
+  run 10  mean=132.824 ms  p99=381.613 ms
+marked: run_10_end
+dmon stopped (pid 197362)
+954 /users/sgkim/cloudlab_aerial/results/20260523/n10_M2_3way_L1small_mixed/dmon.csv
+
+==========================================
+DONE — N=10 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n10_M2_3way_L1small_mixed/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n10_M2_3way_L1small_mixed
+==========================================
+
+========== [22:29:48] M3: 3way-asym + neuralrx,xapp_anomaly (PHY NN + xApp) ==========
+==========================================
+N=10 reps of PRESET=3way-asym AI=neuralrx,xapp_anomaly
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_M3_3way_asym_AIRAN
+DMON: 1
+==========================================
+dmon started, pid 230372, out /users/sgkim/cloudlab_aerial/results/20260523/n10_M3_3way_asym_AIRAN/dmon.csv
+
+------ run 1/10 : 22:29:48 ------
+marked: run_1_start
+  run  1  mean=66.811 ms  p99=201.051 ms
+marked: run_1_end
+
+------ run 2/10 : 22:30:21 ------
+marked: run_2_start
+  run  2  mean=61.489 ms  p99=91.054 ms
+marked: run_2_end
+
+------ run 3/10 : 22:30:52 ------
+marked: run_3_start
+  run  3  mean=64.523 ms  p99=129.031 ms
+marked: run_3_end
+
+------ run 4/10 : 22:31:23 ------
+marked: run_4_start
+  run  4  mean=59.570 ms  p99=118.694 ms
+marked: run_4_end
+
+------ run 5/10 : 22:31:54 ------
+marked: run_5_start
+  run  5  mean=61.884 ms  p99=127.246 ms
+marked: run_5_end
+
+------ run 6/10 : 22:32:25 ------
+marked: run_6_start
+  run  6  mean=61.884 ms  p99=127.246 ms
+marked: run_6_end
+
+------ run 7/10 : 22:32:49 ------
+marked: run_7_start
+  run  7  mean=63.534 ms  p99=185.795 ms
+marked: run_7_end
+
+------ run 8/10 : 22:33:19 ------
+marked: run_8_start
+  run  8  mean=63.462 ms  p99=171.690 ms
+marked: run_8_end
+
+------ run 9/10 : 22:33:50 ------
+marked: run_9_start
+  run  9  mean=67.301 ms  p99=172.840 ms
+marked: run_9_end
+
+------ run 10/10 : 22:34:20 ------
+marked: run_10_start
+  run 10  mean=63.983 ms  p99=193.894 ms
+marked: run_10_end
+dmon stopped (pid 230372)
+1202 /users/sgkim/cloudlab_aerial/results/20260523/n10_M3_3way_asym_AIRAN/dmon.csv
+
+==========================================
+DONE — N=10 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n10_M3_3way_asym_AIRAN/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n10_M3_3way_asym_AIRAN
+==========================================
+
+========== [22:34:51] M4: 4way-1L1+3AI + chanpred,xapp_anomaly,gpt2 (3 mixed AI-RAN xApps) ==========
+==========================================
+N=10 reps of PRESET=4way-1L1+3AI AI=chanpred,xapp_anomaly,gpt2
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_M4_4way_3xApp
+DMON: 1
+==========================================
+dmon started, pid 254267, out /users/sgkim/cloudlab_aerial/results/20260523/n10_M4_4way_3xApp/dmon.csv
+
+------ run 1/10 : 22:34:51 ------
+marked: run_1_start
+  run  1  mean=55.157 ms  p99=76.271 ms
+marked: run_1_end
+
+------ run 2/10 : 22:35:21 ------
+marked: run_2_start
+  run  2  mean=59.385 ms  p99=77.887 ms
+marked: run_2_end
+
+------ run 3/10 : 22:35:52 ------
+marked: run_3_start
+  run  3  mean=60.421 ms  p99=95.645 ms
+marked: run_3_end
+
+------ run 4/10 : 22:36:22 ------
+marked: run_4_start
+  run  4  mean=59.904 ms  p99=81.394 ms
+marked: run_4_end
+
+------ run 5/10 : 22:36:53 ------
+marked: run_5_start
+  run  5  mean=59.892 ms  p99=90.878 ms
+marked: run_5_end
+
+------ run 6/10 : 22:37:24 ------
+marked: run_6_start
+  run  6  mean=55.928 ms  p99=76.204 ms
+marked: run_6_end
+
+------ run 7/10 : 22:37:54 ------
+marked: run_7_start
+  run  7  mean=60.769 ms  p99=100.466 ms
+marked: run_7_end
+
+------ run 8/10 : 22:38:25 ------
+marked: run_8_start
+  run  8  mean=55.450 ms  p99=96.958 ms
+marked: run_8_end
+
+------ run 9/10 : 22:38:55 ------
+marked: run_9_start
+  run  9  mean=55.306 ms  p99=82.899 ms
+marked: run_9_end
+
+------ run 10/10 : 22:39:25 ------
+marked: run_10_start
+  run 10  mean=60.495 ms  p99=84.050 ms
+marked: run_10_end
+dmon stopped (pid 254267)
+1214 /users/sgkim/cloudlab_aerial/results/20260523/n10_M4_4way_3xApp/dmon.csv
+
+==========================================
+DONE — N=10 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n10_M4_4way_3xApp/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n10_M4_4way_3xApp
+==========================================
+
+========== [22:39:56] Running bimodal_detect on phase 2 results ==========
+
+----- M1_3way_balanced_AIRAN -----
+Analyzing results/20260523/n10_M1_3way_balanced_AIRAN
+  loaded 10 runs, 0 dmon samples, 24 markers
+
+=== Summary: n10_M1_3way_balanced_AIRAN ===
+  VERDICT: BIMODAL  (LOW=62.20, HIGH=86.09, score=208.40)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n10_M1_3way_balanced_AIRAN/full_summary.txt
+
+----- M2_3way_L1small_mixed -----
+Analyzing results/20260523/n10_M2_3way_L1small_mixed
+  loaded 10 runs, 0 dmon samples, 44 markers
+
+=== Summary: n10_M2_3way_L1small_mixed ===
+  VERDICT: BIMODAL  (LOW=132.82, HIGH=132.82, score=inf)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n10_M2_3way_L1small_mixed/full_summary.txt
+
+----- M3_3way_asym_AIRAN -----
+Analyzing results/20260523/n10_M3_3way_asym_AIRAN
+  loaded 10 runs, 0 dmon samples, 44 markers
+
+=== Summary: n10_M3_3way_asym_AIRAN ===
+  VERDICT: BIMODAL  (LOW=61.21, HIGH=64.94, score=2.98)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n10_M3_3way_asym_AIRAN/full_summary.txt
+
+----- M4_4way_3xApp -----
+Analyzing results/20260523/n10_M4_4way_3xApp
+  loaded 10 runs, 0 dmon samples, 44 markers
+
+=== Summary: n10_M4_4way_3xApp ===
+  VERDICT: BIMODAL  (LOW=55.46, HIGH=60.14, score=12.45)
+  TTI miss rate (>1ms): 100.00%
+  Saved: results/20260523/n10_M4_4way_3xApp/full_summary.txt
+
+========== [22:40:00] PHASE 2 DONE ==========
+Verdicts:
+  VERDICT: BIMODAL  (LOW=62.20, HIGH=86.09, score=208.40)
+  VERDICT: BIMODAL  (LOW=132.82, HIGH=132.82, score=inf)
+  VERDICT: BIMODAL  (LOW=61.21, HIGH=65.67, score=4.24)
+  VERDICT: BIMODAL  (LOW=60.26, HIGH=112.21, score=52.41)
+  VERDICT: BIMODAL  (LOW=62.20, HIGH=86.09, score=208.40)
+  VERDICT: BIMODAL  (LOW=132.82, HIGH=132.82, score=inf)
+  VERDICT: BIMODAL  (LOW=61.21, HIGH=64.94, score=2.98)
+  VERDICT: BIMODAL  (LOW=55.46, HIGH=60.14, score=12.45)
+
+========== [22:40:00] Phase 3 D1a + D1b (skip A baseline) ==========
+==========================================
+N=10 reps of PRESET=split-40-60 AI=qwen7b
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_D1a_4060_qwen
+DMON: 1
+==========================================
+dmon started, pid 268773, out /users/sgkim/cloudlab_aerial/results/20260523/n10_D1a_4060_qwen/dmon.csv
+
+------ run 1/10 : 22:40:00 ------
+marked: run_1_start
+  run  1  mean=74.127 ms  p99=118.417 ms
+marked: run_1_end
+
+------ run 2/10 : 22:40:31 ------
+marked: run_2_start
+  run  2  mean=69.421 ms  p99=86.078 ms
+marked: run_2_end
+
+------ run 3/10 : 22:41:03 ------
+marked: run_3_start
+  run  3  mean=68.660 ms  p99=90.095 ms
+marked: run_3_end
+
+------ run 4/10 : 22:41:34 ------
+marked: run_4_start
+  run  4  mean=72.007 ms  p99=91.098 ms
+marked: run_4_end
+
+------ run 5/10 : 22:42:05 ------
+marked: run_5_start
+  run  5  mean=68.338 ms  p99=97.723 ms
+marked: run_5_end
+
+------ run 6/10 : 22:42:36 ------
+marked: run_6_start
+  run  6  mean=68.646 ms  p99=97.876 ms
+marked: run_6_end
+
+------ run 7/10 : 22:43:07 ------
+marked: run_7_start
+  run  7  mean=73.270 ms  p99=86.792 ms
+marked: run_7_end
+
+------ run 8/10 : 22:43:38 ------
+marked: run_8_start
+  run  8  mean=73.337 ms  p99=98.846 ms
+marked: run_8_end
+
+------ run 9/10 : 22:44:10 ------
+marked: run_9_start
+  run  9  mean=73.133 ms  p99=87.427 ms
+marked: run_9_end
+
+------ run 10/10 : 22:44:41 ------
+marked: run_10_start
+  run 10  mean=68.804 ms  p99=116.767 ms
+marked: run_10_end
+dmon stopped (pid 268773)
+1252 /users/sgkim/cloudlab_aerial/results/20260523/n10_D1a_4060_qwen/dmon.csv
+
+==========================================
+DONE — N=10 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n10_D1a_4060_qwen/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n10_D1a_4060_qwen
+==========================================
+==========================================
+N=10 reps of PRESET=split-40-60 AI=none
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_D1b_4060_alone
+DMON: 0
+==========================================
+
+------ run 1/10 : 22:45:12 ------
+  run  1  mean=67.459 ms  p99=91.197 ms
+
+------ run 2/10 : 22:45:28 ------
+  run  2  mean=71.593 ms  p99=86.461 ms
+
+------ run 3/10 : 22:45:44 ------
+  run  3  mean=71.559 ms  p99=83.760 ms
+
+------ run 4/10 : 22:46:00 ------
+  run  4  mean=70.910 ms  p99=91.938 ms
+
+------ run 5/10 : 22:46:16 ------
+  run  5  mean=67.827 ms  p99=97.105 ms
+
+------ run 6/10 : 22:46:32 ------
+  run  6  mean=69.967 ms  p99=125.021 ms
+
+------ run 7/10 : 22:46:48 ------
+  run  7  mean=74.740 ms  p99=117.282 ms
+
+------ run 8/10 : 22:47:05 ------
+  run  8  mean=75.378 ms  p99=133.570 ms
+
+------ run 9/10 : 22:47:21 ------
+  run  9  mean=74.116 ms  p99=109.863 ms
+
+------ run 10/10 : 22:47:38 ------
+  run 10  mean=71.818 ms  p99=84.652 ms
+
+==========================================
+DONE — N=10 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n10_D1b_4060_alone/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n10_D1b_4060_alone
+==========================================
+
+========== [22:47:54] Phase 4: AI-RAN workloads (AR1-AR3) ==========
+
+========== [22:47:54] PHASE 4 AI-RAN workload bimodal universality — DATE_DIR=20260523, N=10 ==========
+
+========== [22:47:54] AR1: split-60-40 + neuralrx (PHY-layer NN, real AI-RAN in-line) ==========
+==========================================
+N=10 reps of PRESET=split-60-40 AI=neuralrx
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_AR1_6040_neuralrx
+DMON: 1
+==========================================
+dmon started, pid 292506, out /users/sgkim/cloudlab_aerial/results/20260523/n10_AR1_6040_neuralrx/dmon.csv
+
+------ run 1/10 : 22:47:54 ------
+marked: run_1_start
+  run  1  mean=78.405 ms  p99=253.289 ms
+marked: run_1_end
+
+------ run 2/10 : 22:48:29 ------
+marked: run_2_start
+  run  2  mean=82.625 ms  p99=229.350 ms
+marked: run_2_end
+
+------ run 3/10 : 22:49:00 ------
+marked: run_3_start
+  run  3  mean=79.725 ms  p99=236.138 ms
+marked: run_3_end
+
+------ run 4/10 : 22:49:35 ------
+marked: run_4_start
+  run  4  mean=71.297 ms  p99=80.663 ms
+marked: run_4_end
+
+------ run 5/10 : 22:50:11 ------
+marked: run_5_start
+  run  5  mean=78.325 ms  p99=233.428 ms
+marked: run_5_end
+
+------ run 6/10 : 22:50:46 ------
+marked: run_6_start
+  run  6  mean=81.620 ms  p99=233.964 ms
+marked: run_6_end
+
+------ run 7/10 : 22:51:21 ------
+marked: run_7_start
+  run  7  mean=79.009 ms  p99=274.059 ms
+marked: run_7_end
+
+------ run 8/10 : 22:51:56 ------
+marked: run_8_start
+  run  8  mean=87.235 ms  p99=361.446 ms
+marked: run_8_end
+
+------ run 9/10 : 22:52:31 ------
+marked: run_9_start
+  run  9  mean=69.642 ms  p99=92.640 ms
+marked: run_9_end
+
+------ run 10/10 : 22:53:07 ------
+marked: run_10_start
+  run 10  mean=74.315 ms  p99=204.289 ms
+marked: run_10_end
+dmon stopped (pid 292506)
+1390 /users/sgkim/cloudlab_aerial/results/20260523/n10_AR1_6040_neuralrx/dmon.csv
+
+==========================================
+DONE — N=10 reps
+Summary: /users/sgkim/cloudlab_aerial/results/20260523/n10_AR1_6040_neuralrx/summary.txt
+Run bimodal_detect.py for cluster analysis:
+  python3 ../cloudlab_results/bimodal_detect.py /users/sgkim/cloudlab_aerial/results/20260523/n10_AR1_6040_neuralrx
+==========================================
+
+========== [22:53:42] AR2: split-60-40 + chanpred (LSTM channel prediction) ==========
+==========================================
+N=10 reps of PRESET=split-60-40 AI=chanpred
+CELLS=20 DURATION=30s
+DATE_DIR=20260523
+Output: /users/sgkim/cloudlab_aerial/results/20260523/n10_AR2_6040_chanpred
+DMON: 1
+==========================================
+dmon started, pid 323953, out /users/sgkim/cloudlab_aerial/results/20260523/n10_AR2_6040_chanpred/dmon.csv
+
+------ run 1/10 : 22:53:42 ------
+marked: run_1_start
+  run  1  mean=68.418 ms  p99=86.500 ms
+marked: run_1_end
+
+------ run 2/10 : 22:54:13 ------
+marked: run_2_start
+  run  2  mean=73.358 ms  p99=87.048 ms
+marked: run_2_end

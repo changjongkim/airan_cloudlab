@@ -621,6 +621,121 @@ Best AI-RAN (M4):        59.64 ms  ← +52%, minimum achievable
 
 **Note**: 절대 latency (우리 benchmark vs URLLC 1ms slot)는 우리 setup이 cuPHY component-API 사용으로 production보다 ~16× 느림. 따라서 paper에서 강조해야 할 것은 **상대 페널티 (% slowdown vs full GPU)** — 이는 setup-independent.
 
+---
+
+## K섹션 — 추가 raw_ms 분석 (fig 24-35)
+
+dmon.csv가 local에 못 받아져서 (rsync exclude), HBM/SM utilization 시계열은 불가. raw iteration latency (raw_ms) 기반 추가 분석.
+
+### 📊 Fig 24. Run-over-run mean L1 latency — stability check
+
+![fig_24](fig_24_run_progression.png)
+
+**무엇**: 4개 panel × 각 5개 config. X=run index, Y=run mean. baselines / Phase 1 / Phase 4 / Multi-AI count.
+
+**해석**: 각 run이 안정적인지 (drift 없음) 확인. 거의 모든 config가 flat → measurement stable.
+
+**Paper 메시지**: N=10~20 측정 결과가 random walk이 아니라 stable distribution에서 sample.
+
+### 📊 Fig 25. Per-iteration L1 latency box plot
+
+![fig_25](fig_25_boxplot.png)
+
+**무엇**: 11개 config의 iteration latency box plot (fliers hidden). 빨간 점선 = Full GPU median (39).
+
+**해석**: 박스 위치/크기로 partition 간 차이 시각화. 작은 partition + AI = 위쪽으로 이동 + 박스 커짐.
+
+### 📊 Fig 26. Violin plot — bimodal shape visible
+
+![fig_26](fig_26_violin.png)
+
+**무엇**: 같은 11개 config의 violin plot. density shape이 두 봉우리면 bimodal.
+
+**해석**: 거의 모든 config에서 violin 모양이 "두 머리" — 시각적으로 bimodal 확인.
+
+### 📊 Fig 27. Latency vs iteration index — drift/warmup check
+
+![fig_27](fig_27_iter_index.png)
+
+**무엇**: 4 configs (Full GPU, 3g MIG, A0, AR1). X=iteration index within run (0-49), Y=median latency ± IQR.
+
+**해석**: iteration이 늘어도 latency가 일정하면 warmup 효과 없음. drift 보이면 cache 상태 의존.
+
+**Paper 메시지**: warmup 처음 ~20 iters 제외 정당화.
+
+### 📊 Fig 28. Bimodal balance — % iterations in HIGH cluster
+
+![fig_28](fig_28_bimodal_balance.png)
+
+**무엇**: 18개 config의 HIGH mode 비율 (1D k-means 클러스터링). 50% = 균형.
+
+**해석**: 대부분 50%에서 변동. 50% 균형 deviation 크면 systematic bias.
+
+### 📊 Fig 29. Bimodal gap (HIGH - LOW centroid) per config
+
+![fig_29](fig_29_bimodal_gap.png)
+
+**무엇**: HIGH cluster mean - LOW cluster mean (= bimodal "간격"). 18개 config.
+
+**해석**: gap이 크면 더 뚜렷한 bimodal. M2 (2g L1)에서 가장 큰 gap 예상.
+
+### 📊 Fig 30. Variance source — across-run vs within-run
+
+![fig_30](fig_30_variance_source.png)
+
+**무엇**: 각 config에서 (1) run 간 mean stdev, (2) run 내 iteration stdev. 막대 2개씩.
+
+**해석**: 어느 쪽이 큰지로 noise source 식별.
+- within-run 큼 → 일반적 (bimodal 본질)
+- across-run 큼 → run마다 시스템 상태 다름 (예: thermal drift)
+
+### 📊 Fig 31. Per-cell efficiency (cell scaling 재현)
+
+![fig_31](fig_31_per_cell_scaling.png)
+
+**무엇**: 3 partitions × 4 cell counts. fig_05의 정제 버전 + production target line.
+
+**해석**: 모든 partition이 cuPHY production target (125 μs/cell)보다 ~16× 위.
+
+### 📊 Fig 32. Heatmap — partition × cells
+
+![fig_32](fig_32_heatmap.png)
+
+**무엇**: 3 partitions × 4 cell counts heatmap. 색=latency.
+
+**해석**: 우측 상단 (큰 cells, 작은 partition)이 빨간색 = catastrophic. 한 눈에 worst region 확인.
+
+### 📊 Fig 33. Density overlay — full data
+
+![fig_33](fig_33_density_overlay.png)
+
+**무엇**: 7 configs의 histogram density overlay.
+
+**해석**: 각 config의 분포 모양 + 위치. M2 (2g L1)는 오른쪽으로 멀리, AR1은 두 봉우리 + 긴 꼬리.
+
+### 📊 Fig 34. Percentile spread (p50/p95/p99)
+
+![fig_34](fig_34_percentile_spread.png)
+
+**무엇**: 11 configs × 3 percentiles 막대. p99가 p50보다 얼마나 큰지 → tail.
+
+**해석**: p99/p50 ratio가 큰 config가 tail-heavy. AR1 NeuralRx, M2 등.
+
+### 📊 Fig 35. AI co-location L1 disruption ranking
+
+![fig_35](fig_35_ai_disruption_rank.png)
+
+**무엇**: 10가지 AI co-location 시나리오의 Δ vs 3g L1 alone (52.5ms). 정렬됨.
+
+**해석**: 
+- 녹색 (Δ < 5ms): "AI 영향 없음" — 1g 작은 AI partition들 (M4, 3 AI, 4 AI)
+- 주황 (5-15ms): typical AI (Qwen, prefill, ChanPred)
+- 빨강 (>15ms): heavy disruption (NeuralRx, multi-AI on 2g)
+
+**Paper 메시지**: 이 ranking이 곧 AI-RAN deployment guideline — "small AI partition = OK, large or multi-AI = disruption".
+
+---
+
 ## Limitations
 
 - AI workload throughput not validly measured (next reservation)

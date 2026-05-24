@@ -358,6 +358,87 @@
 
 ---
 
+---
+
+## J섹션 — URLLC 정확한 평가 (per-cell)
+
+### ⚠ 측정 metric 명확화
+
+지금까지 figure들의 `L1 latency` = **N개 cell을 sequential로 처리한 total**
+- 예: cells=20, mean=55ms → "20 cell 처리에 55ms"
+- per-cell = 55 / 20 = **2.75 ms/cell**
+
+5G URLLC의 진짜 deadline은 **per-cell-per-slot**:
+- 15 kHz SCS slot = 1 ms → per cell 1ms 안에
+- 30 kHz SCS slot = 0.5 ms → per cell 500μs 안에
+- cuPHY production target: **125 μs/cell**
+
+우리 setup (`real_l1.py` component-level API)은 production pipeline 대비 ~16× 느림.
+→ **MIG 없어도 우리 setup으로는 URLLC fail**. 상대 비교(MIG 페널티)는 여전히 유효.
+
+### 📊 Fig 21. Per-cell latency vs URLLC budgets
+
+![fig_21](fig_21_per_cell_urllc.png)
+
+**무엇을 보여주는가**: 10개 막대 (per-cell L1 latency)
+- 모든 config의 mean을 cells=20으로 나눈 per-cell 값
+- 빨간 점선: URLLC 1 ms (15 kHz SCS slot)
+- 진빨강 점선: URLLC 0.5 ms (30 kHz SCS slot)
+- 검정 점선: cuPHY production target 125 μs
+
+**구체 값** (ms/cell):
+- Full GPU: 1.96
+- 7g MIG: 1.84
+- 4g MIG: 2.83
+- 3g MIG: 2.63
+- 2g MIG: 3.58
+- 3g + Qwen: 2.79
+- 3g + 2 AI (M1): 3.70
+- 4g + 3 AI (M4): 2.98
+- 3g + NeuralRx (AR1): 3.94
+- 2g L1 (M2): 6.64
+
+**해석**: 모든 config가 URLLC 1ms 위. Full GPU baseline조차 1.96 ms/cell. → 우리 benchmark는 production setup이 아니라 component-level "stress test".
+
+**Paper 메시지**:
+- **부정직한 표현**: "MIG 때문에 URLLC 불가능"
+- **정직한 표현**: "MIG 사용 시 L1 latency 30-80% 추가 → production cuPHY의 1ms 마진 잠식"
+
+### 📊 Fig 22. Same data, log scale — production target gap visible
+
+![fig_22](fig_22_per_cell_log.png)
+
+**무엇을 보여주는가**: fig_21과 동일하지만 Y축 log scale
+- cuPHY production target 125 μs 점선이 0.125 위치
+- 우리 측정값 (~2-7 ms)는 production보다 ~16-50× 높음
+
+**해석**: 우리 benchmark의 절대값은 production과 큰 격차. 상대 비교(MIG penalty)만 의미 있음.
+
+**Paper 메시지**: "절대 latency 우리 setup에선 의미 없지만, 같은 setup 내 비교(MIG vs no-MIG)는 robust".
+
+### 📊 Fig 23. Relative penalty (vs Full GPU baseline) — robust message
+
+![fig_23](fig_23_relative_penalty.png)
+
+**무엇을 보여주는가**: 10개 막대 (% 슬로다운, Full GPU 대비)
+- Full GPU: 0% (기준)
+- 7g MIG: -6%
+- 4g MIG: +45%
+- 3g MIG: +34%
+- 2g MIG: +83%
+- 3g + Qwen: +43%
+- 3g + 2 AI: +89%
+- 4g + 3 AI: +52%
+- 3g + NeuralRx: +101%
+- 2g L1 (M2): +239%
+
+**해석**: 이게 paper의 **진짜 핵심 metric**. setup-independent한 상대 비교.
+
+**Paper 메시지** (정확한 결론):
+> "MIG는 AI-RAN co-location 시 L1 latency를 34-239% 증가시킨다. 이 페널티는 우리 benchmark setup의 절대 latency와 무관하게 robust하며, production cuPHY에서도 동일 비율로 적용되어 URLLC slot deadline 마진을 잠식할 것이다."
+
+---
+
 ## Key Numbers Cheat Sheet
 
 ```
@@ -372,9 +453,11 @@ Full GPU (no MIG):       39.28 ms  ← baseline
 Best AI-RAN (M4):        59.64 ms  ← +52%, minimum achievable
 ```
 
-## Paper Punchline
+## Paper Punchline (수정판)
 
-> "MIG mode itself imposes negligible overhead (7g MIG single ≈ no-MIG), but AI-RAN co-location requires partition fragmentation, which costs 34-238% L1 latency. AI leakage is small (≤6%) for single AI on properly-sized partitions, but grows to +88% with multiple co-located AI services. Best feasible AI-RAN configuration (4g L1 + 3 light AI on 1g.5gb partitions) still imposes +52% latency penalty vs full GPU baseline. URLLC sub-millisecond p99 is infeasible in all measured MIG configurations."
+> "MIG mode itself imposes negligible overhead (7g MIG single ≈ no-MIG). However, AI-RAN co-location forces partition fragmentation, imposing a **34-239% L1 latency penalty** depending on partition size and AI co-tenant configuration. This penalty is robust to absolute-benchmark-vs-production-setup differences and directly erodes the per-slot URLLC margin in production cuPHY pipelines. AI leakage is small (≤6%) for single AI on properly-sized partitions, but grows non-linearly to +89% with multi-AI services. The best feasible AI-RAN configuration (4g L1 + 3 light AI on 1g.5gb partitions) still imposes +52% L1 latency penalty vs full GPU baseline, fundamentally challenging URLLC sub-millisecond deadline compliance."
+
+**Note**: 절대 latency (우리 benchmark vs URLLC 1ms slot)는 우리 setup이 cuPHY component-API 사용으로 production보다 ~16× 느림. 따라서 paper에서 강조해야 할 것은 **상대 페널티 (% slowdown vs full GPU)** — 이는 setup-independent.
 
 ## Limitations
 

@@ -1,8 +1,109 @@
-# 20 Figures — 5/24 Sweep Analysis (그림 + 상세 설명)
+# CloudLab 5/24 Sweep — Figures + 분석
 
-생성: `generate_figures.py`. 각 figure는 paper story arc의 특정 메시지를 뒷받침.
+23개 figure (`generate_figures.py` 생성). 각 figure는 paper story arc의 특정 메시지를 뒷받침.
 
 ---
+
+# Part 0 — 사전 지식: MIG 용어 (1g/2g/3g/4g/7g)
+
+## NVIDIA A100 구조
+
+A100 한 장 = **7개 GPC** (compute cluster) + 40GB HBM 메모리.
+
+**MIG (Multi-Instance GPU)**: 이 GPU를 여러 partition으로 hardware-level 격리. 각 partition은 독립적 SM, memory, HBM 대역폭 quota 받음.
+
+## "g" = "GPC slice" (전체의 1/7 단위)
+
+| 이름 | Compute | Memory | HBM bw quota |
+|---|---|---|---|
+| **1g.5gb** | 1/7 GPC | 5 GB | 1/7 (~229 GB/s) |
+| **2g.10gb** | 2/7 GPC | 10 GB | 2/7 (~457 GB/s) |
+| **3g.20gb** | 3/7 GPC | **20 GB** | 3/7 (~686 GB/s) |
+| **4g.20gb** | 4/7 GPC | **20 GB** (3g와 같음) | 4/7 (~915 GB/s) |
+| **7g.40gb** | 전체 GPU | 40 GB | 전체 (~1.6 TB/s) |
+
+## 합 7 = 전체 GPU
+
+여러 partition 동시 존재 가능. 단 합산 ≤ 7 GPC.
+
+```
+GPU 1장 = [GPC1][GPC2][GPC3][GPC4][GPC5][GPC6][GPC7]
+
+7g (전체)        : [============= 7g =============]
+split-60-40      : [==== 3g ====][== 2g ==][idle][idle]
+split-40-60      : [== 2g ==][==== 3g ====][idle][idle]
+3way-asym        : [====== 4g ======][== 2g ==][1g]
+4way-1L1+3AI(M4) : [====== 4g ======][1g][1g][1g]
+3g + 4 AI        : [==== 3g ====][1g][1g][1g][1g]
+2g L1 (M2)       : [== 2g ==][==== 3g ====][== 2g ==]
+                    L1       AI(qwen7b)   AI(qwen_small)
+```
+
+## 우리 실험 매핑
+
+| 실험 | L1 위치 | AI 위치 | layout |
+|---|---|---|---|
+| Baseline | 전체 GPU (no MIG) | 없음 | (MIG off) |
+| 7g MIG | 7g | 없음 | 단일 instance (≈ no MIG) |
+| 3g alone | 3g | 없음 (2g idle) | split-60-40 |
+| **A0** Qwen | 3g | 2g (Qwen-7B) | split-60-40 |
+| **M1** 2 AI | 3g | 2g + 2g | 3way-balanced |
+| **M4** best AI-RAN | 4g | 1g + 1g + 1g | 4way |
+| 3g + 3 AI / 4 AI | 3g | 1g × 3 or × 4 | 5-way layout |
+
+---
+
+# Part 1 — 핵심 결과 정리 (한 페이지 요약)
+
+## 7가지 finding (paper story)
+
+### F1. MIG mode 자체는 free
+- 7g MIG single = 36.7 ms ≈ no-MIG = 39.3 ms (-7% noise level)
+- → MIG 자체가 느린 게 아님
+
+### F2. Partition cap이 진짜 비용
+- 7g → 4g: +45%
+- 7g → 3g: +34%
+- 7g → 2g: +82%
+- AI co-locate 하려면 작은 partition 필수 → MIG inevitable cost
+
+### F3. Bimodal은 cuPHY 본질
+- baseline (no MIG, no AI)도 bimodal
+- → "MIG가 bimodal 만든다" 가설 (v2) 폐기
+
+### F4. AI 종류보다 AI partition SIZE가 더 중요
+- 3g + 1 AI on 2g: +6% leakage
+- 3g + 2 AI on 2g+2g: +41% leakage (multi-AI 폭발)
+- 3g + 3 AI on **1g×3**: -25% (negligible) ← 작은 AI partition은 영향 없음
+- 3g + 4 AI on **1g×4**: -25% (negligible)
+- 핵심: AI에 큰 partition 주면 contention, 작은 partition으로 쪼개면 격리 OK
+
+### F5. Real AI-RAN > LLM in disruption
+- A0 Qwen LLM: +6% L1 slowdown
+- AR1 NeuralRx (TensorRT): +50% L1 slowdown
+- AR2 ChanPred (LSTM): +33%
+- AR3 xApp (CNN): +40%
+- → TensorRT inline AI가 LLM보다 훨씬 큰 부담
+
+### F6. HBM bandwidth saturation per partition (cell scaling이 직접 증명)
+- 2g.10gb: cells=10에서 이미 wall (+85% per-cell cost vs cells=20)
+- 3g.20gb: cells=20 sweet spot, cells=40 wall
+- 4g.20gb: 가장 효율적, 거의 wall 안 보임
+- → "MIG의 HBM bandwidth quota가 L1 throughput의 본질적 한계"
+
+### F7. URLLC 절대 불가능, 상대 비교만 robust
+- 우리 setup: per-cell 1.96 ms (Full GPU) ~ 6.64 ms (2g L1) — 모두 1ms 위
+- cuPHY production target 125 μs/cell — 우리보다 ~16× 빠름
+- 절대 latency는 우리 benchmark 한계
+- **하지만 상대 페널티(34-239%)는 robust** — production cuPHY에서도 동일 비율 적용
+
+## 한 줄 결론
+
+> **"MIG mode itself는 free. 그러나 AI-RAN co-location에 필수인 partition fragmentation이 L1 latency를 34-239% 증가. AI partition을 작게 쪼개면 multi-AI도 견딜 만 함. 최선의 AI-RAN config (M4)도 +52%. URLLC 마진 잠식 불가피."**
+
+---
+
+# Part 2 — 23개 Figure 상세
 
 ## A섹션 — MIG mode 자체는 free
 

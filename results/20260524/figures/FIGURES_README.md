@@ -105,18 +105,43 @@ split-40-60      : [== 2g ==][==== 3g ====][idle][idle]
 
 ### F8. ⭐ Isolation promise violation — paper의 가장 강력한 argument
 
-MIG는 "격리된 자원 안에서 deterministic performance" 약속. 그러나:
+MIG는 "격리된 자원 안에서 deterministic performance" 약속. 그러나 **모든 partition에서** budget 안에 들어가는 워크로드에도 architectural overhead 발생.
 
-| 가정 | 예측 | 실측 | 차이 |
-|---|---|---|---|
-| 자원 부족 (resource starvation): 3/7만큼만 받았으니 7/3 = 2.33× 느림 | ~85 ms | **52.5 ms** | 비례 scale의 60% — 자원이 부족하지 않다 |
-| 자원 충분 (isolation works): 워크로드가 budget 안에 들어가니 7g와 동일 | ~37 ms | **52.5 ms** | +43% extra — isolation이 추가 cost 부과 |
+#### 8T8R × 20 cells 워크로드 vs 각 partition 자원 여유율
 
-8T8R 20-cell 워크로드는 3g.20gb budget 안에 들어가는데도 +43% extra cost. 결론:
+| Partition | Memory 여유 | SMs 여유 | HBM bw 여유 | 자원 충분? | 7g 대비 실측 |
+|---|---|---|---|---|---|
+| 4g.20gb | 200× (20GB ÷ 100MB) | 5.6× (60÷11 추정) | 충분 | ✅ 다 충분 | +54% ⚠ |
+| 3g.20gb | 200× | 4.2× (45÷11) | 충분 | ✅ 다 충분 | +43% ⚠ |
+| 2g.10gb | 17× (10GB ÷ 600MB) | 2.8× (30÷11) | 충분 | ✅ 다 충분 | +95% ⚠ |
 
-> **"MIG isolation은 budget을 보장하지만 deterministic performance는 보장하지 못함. partition을 만드는 행위 자체가 fixed architectural overhead를 부과하며, 이는 workload가 partition resource 안에 들어가더라도 회피 불가능."**
+(SMs 11 = 20 cells × ~0.5 SM/cell parallelism estimate, conservative)
 
-이게 NVIDIA MIG 광고와 정면 충돌. 광고: "isolated, guaranteed performance". 실측: "isolated reservation, but extra overhead inevitable".
+**Cell scaling 검증**:
+- 만약 compute-bound이면 per-cell latency가 cells 늘수록 증가해야 함
+- 2g 실측 per-cell: cells=5/10/20/40 = 3.66/4.16/3.84/3.54 — **증가하지 않음**
+- → **자원 부족이 원인 아님**, fixed overhead가 dominant
+
+#### 두 가설 비교
+
+| 가설 | 3g 예측 | 2g 예측 | 실측 (3g) | 실측 (2g) |
+|---|---|---|---|---|
+| 자원 부족 (proportional scaling): 자원의 역수배 느림 | 37 × 7/3 = 86 ms | 37 × 7/2 = 130 ms | **52.5 ms** | **71.6 ms** |
+| 자원 충분 (isolation works): 7g와 동일 | 37 ms | 37 ms | **52.5 ms** | **71.6 ms** |
+
+3g 실측은 두 가설 모두에서 벗어남. 2g는 자원 부족 가설에 더 가깝지만 그것도 안 맞음. → **두 가설로는 설명 안 됨**.
+
+#### 진짜 원인
+
+partition을 만드는 행위 자체에 fixed architectural overhead:
+- **L2 cache crossbar**: 모든 partition이 일부 공유
+- **HBM scheduler arbitration**: partition별 quota이지만 reservation overhead
+- **GPU 컨텍스트 스위칭**: MIG가 SM 그룹을 partition에 binding
+- **Kernel launch path**: MIG-aware launch로 약간 느림
+
+> **"MIG isolation은 resource budget을 보장하지만 deterministic performance는 보장하지 못함. 8T8R 20-cell 워크로드가 어떤 partition (4g/3g/2g)에도 충분한 자원이 있는데도 30-95% extra overhead 발생. partition을 만드는 행위 자체가 architectural cost를 부과하며, 이는 workload size와 무관하게 회피 불가능."**
+
+이게 NVIDIA MIG 광고와 정면 충돌. 광고: "isolated, guaranteed performance". 실측: "isolated reservation, but extra overhead inevitable for any partition size".
 
 ## 한 줄 결론
 

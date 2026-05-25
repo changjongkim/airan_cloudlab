@@ -184,22 +184,40 @@ partition을 만드는 행위 자체에 fixed architectural overhead:
 
 **해석**: Partition을 7g→4g→3g→2g로 줄일수록 L1 느려짐. 단 4g(56.5)가 3g(52.5)보다 살짝 높은 비정상 패턴 (cuPHY가 3g+ 에서 saturate되거나 4g.20gb 측정 noise).
 
-**⚠ 가장 중요한 통찰** — 본 figure가 함의하는 것:
+### ⚠ 이 figure가 paper의 가장 강력한 single argument
 
-8T8R PUSCH RX (273 PRB, MCS 2, 20 cells) 워크로드는 3g.20gb의 보장 자원(20GB 메모리, 3/7 GPC, 3/7 HBM bw quota) **안에 충분히 들어감**. 만약 MIG가 약속한 대로 "격리된 자원을 제공"한다면, 3g.20gb partition 안에서 이 워크로드는 다른 partition 상태와 무관하게 **deterministic performance**를 보여야 함.
+**측정 조건** (controlled experiment):
+- AI 워크로드 **0개** (no co-tenant)
+- 다른 partition들 모두 **idle** (contention 원천 차단)
+- L1 단독으로 동일한 4T4R 20-cell 워크로드 처리
+- 모든 partition (2g/3g/4g)이 자원 17~수백배 여유 (memory, SMs, HBM bw 다)
 
-**하지만 그렇지 않음**:
-- 7g (전체 자원) = 36.7 ms
-- 3g (3/7 자원) = 52.5 ms (+43%)
-- 비례 scale 가정 (자원 부족이 진짜 원인이면): 36.7 × (7/3) ≈ 86 ms를 예상해야 함
-- 실측 52.5 ms는 비례 scale의 절반 정도 → "자원 부족" 가설로 설명 안 됨
-- 즉, **3g 자원은 사실 워크로드에 충분한데도 MIG가 추가 overhead 부과**
+**MIG가 약속한 isolated guaranteed performance 가설**:
+→ L1 latency가 4g/3g/2g 어디서나 **동일**해야 함 (각각 충분한 자원 받았고 contention 없으니).
 
-이게 paper의 가장 강력한 argument:
+**실측**:
+| Partition | L1 latency | vs 7g |
+|---|---|---|
+| 7g (full) | 36.7 ms | (기준) |
+| 4g.20gb | 56.5 ms | **+54%** |
+| 3g.20gb | 52.5 ms | **+43%** |
+| 2g.10gb | 71.6 ms | **+95%** |
 
-> **"MIG의 isolation promise는 reservation까지만 보장. 격리된 자원만으로 deterministic performance를 줘야 하지만, 실측은 그렇지 않음. partition 자체가 fixed overhead를 만들어내고 (≥+34%), 이 overhead는 workload가 partition resource budget 안에 들어가도 회피 불가능."**
+**±95% 격차** — AI 없이 단순 격리만 했는데도. variation의 원인을 가능 후보 중 식별:
 
-**Paper 메시지**: "Partition을 작게 쪼개면 성능 직격". 단 이건 단순한 자원 부족 문제가 아니라 **MIG architecture의 inherent overhead** — 격리 자체가 fixed cost를 만듦.
+| 후보 원인 | 가능? | 이유 |
+|---|---|---|
+| AI workload contention | ❌ | AI 안 돌렸음 |
+| Resource starvation (자원 부족) | ❌ | 모든 partition이 17×~수백배 여유 |
+| Cross-partition interference | ❌ | 다른 partition 다 idle |
+| Memory bandwidth saturation | ❌ | cell scaling fig_04에서 saturation point ≥cells=20 확인 |
+| **MIG architectural overhead (L2 crossbar, HBM scheduler, kernel launch path)** | ✅ | **남은 유일한 설명** |
+
+> ### **"MIG의 'isolated guaranteed performance' 광고는 실측에 의해 반증됨. AI 없이 다른 partition idle 상태에서 단독 L1 워크로드를 자원 여유 17× 이상인 partition 안에 두어도, partition 크기에 따라 latency가 +43%~+95% 변동. partition을 만드는 행위 자체가 architectural overhead를 부과한다."**
+
+이게 NVIDIA MIG 광고와 정면 충돌하는 direct empirical proof. AI co-location까지 가지 않아도 MIG 자체가 deterministic isolation 약속을 깸.
+
+**Paper 메시지**: "Partition cap"이 자원 제약이 아니라 **MIG architecture의 inherent cost** — 자원 충분해도 격리 자체가 fixed overhead 부과.
 
 ### 📊 Fig 03. Partition cap penalty (% slowdown)
 

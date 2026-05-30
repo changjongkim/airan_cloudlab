@@ -1,57 +1,88 @@
 # 5/31 Morning Checklist — CloudLab Reservation 30h
 
+## ⚠ 확정 시나리오: WORST (5/24에 image save 안 함)
+
+→ Fresh Ubuntu에서 시작. 처음 1시간 40분은 setup, 그 후 27시간 실험 가능.
+
 ## 사전 준비 (오늘 저녁 / 내일 아침 reservation 시작 전)
 
-- [ ] CloudLab dashboard에서 reservation 시작 시간 확인
-- [ ] 5/24 image snapshot 했는지 확인 (했으면 setup 단축 가능)
-- [ ] github 마지막 commit에 모든 신규 scripts 포함됐는지 확인
-- [ ] 이 문서 (`MORNING_531_CHECKLIST.md`) 출력 또는 모바일에서 열어두기
+- [ ] CloudLab dashboard에서 reservation 시작 시간 확인 (1시간 단위 slot 주의)
+- [ ] github에 모든 신규 scripts pushed 확인 (이 commit: `0737938` 이후)
+- [ ] 이 문서 출력 또는 모바일에서 열어두기
+- [ ] 로컬에 다음 파일 준비:
+  - `~/New_research/cloudlab_aerial/*.sh, *.py, Dockerfile.airan`
+  - `~/New_research/AIRAN_Changjong/experiments/run_*.py`
+  - `~/New_research/cloudlab_results/analyze_run.py`
 
 ---
 
-## Reservation 시작 직후 (T+0 ~ T+0:15)
+## Phase 0: Reservation 시작 + 진단 (T+0 ~ T+0:10)
 
 ```bash
 # 1. SSH 접속
 ssh sgkim@<HOSTNAME>.wisc.cloudlab.us
 
-# 2. 진단 — 어떤 상태로 들어왔나
-bash ~/cloudlab_aerial/recovery.sh
-# 출력 마지막 줄: BEST / PARTIAL / WORST
+# 2. 로컬에서 모든 scripts 전송 (한 번에)
+# (로컬 별도 터미널에서)
+HOST=<HOSTNAME>.wisc.cloudlab.us
+ssh sgkim@$HOST "mkdir -p ~/cloudlab_aerial ~/AIRAN_Changjong/experiments"
+scp ~/New_research/cloudlab_aerial/*.sh ~/New_research/cloudlab_aerial/*.py \
+    ~/New_research/cloudlab_aerial/Dockerfile.airan \
+    sgkim@$HOST:~/cloudlab_aerial/
+scp ~/New_research/AIRAN_Changjong/experiments/run_*.py sgkim@$HOST:~/AIRAN_Changjong/experiments/
+scp ~/New_research/cloudlab_results/analyze_run.py sgkim@$HOST:~/
+
+# 3. Node에서 chmod + 진단
+ssh sgkim@$HOST
+cd ~/cloudlab_aerial && chmod +x *.sh
+nvidia-smi 2>&1 | head -5  # driver 있나? 없으면 WORST 확정
+lsblk  # /mydata 마운트 상태?
 ```
-
-### 분기
-
-| 결과 | 의미 | 후속 |
-|---|---|---|
-| 🟢 **BEST** | 이미지 + /mydata 다 살아있음 | 바로 실험 가능, T+0:15부터 실험 |
-| 🟡 **PARTIAL** | 이미지 OK, /mydata 비어있음 | `post_reboot_setup.sh` 실행 (~45-60분) |
-| 🔴 **WORST** | 이미지조차 fresh Ubuntu | `00_bootstrap.sh` + `post_reboot_setup.sh` (~90분) |
 
 ---
 
-## PARTIAL 시나리오 (most likely, 70% 확률)
+## Phase 1: Bootstrap (T+0:10 ~ T+0:45) — driver/docker/NGC 설치
 
 ```bash
-# Local에서 scp (최신 스크립트들 전송)
-scp ~/New_research/cloudlab_aerial/*.sh sgkim@<HOST>:~/cloudlab_aerial/
-scp ~/New_research/cloudlab_aerial/real_l1.py sgkim@<HOST>:~/cloudlab_aerial/
-scp ~/New_research/cloudlab_aerial/Dockerfile.airan sgkim@<HOST>:~/cloudlab_aerial/
-scp ~/New_research/AIRAN_Changjong/experiments/run_*.py sgkim@<HOST>:~/AIRAN_Changjong/experiments/
-scp ~/New_research/cloudlab_results/analyze_run.py sgkim@<HOST>:~/
+# WORST 시나리오: nvidia-smi가 "command not found" → bootstrap 필요
+nohup sudo bash ~/cloudlab_aerial/00_bootstrap.sh > /tmp/bootstrap.log 2>&1 &
+tail -f /tmp/bootstrap.log
+# 30분 대기 — apt + nvidia-driver-550 + CUDA 12.4 + docker + NGC CLI 설치
 
-# Node에서
-chmod +x ~/cloudlab_aerial/*.sh
+# 완료되면 "REBOOT REQUIRED" 메시지
+```
+
+## Phase 2: Reboot (T+0:45 ~ T+0:48)
+
+```bash
+sudo reboot
+# 3분 후 SSH 재접속, nvidia-smi로 4× A100 확인
+ssh sgkim@$HOST
+nvidia-smi -L  # 4 GPUs 보여야 함
+```
+
+## Phase 3: Post-reboot setup (T+0:48 ~ T+1:48) — Aerial + Qwen + pyaerial
+
+```bash
+# /mydata 마운트 + docker root + Aerial container + Qwen + pyaerial 빌드 (병렬)
 nohup bash ~/cloudlab_aerial/post_reboot_setup.sh > /tmp/setup.log 2>&1 &
 tail -f /tmp/setup.log
-# 45-60분 대기 — Aerial pull + Qwen DL + pyaerial build 병렬 진행
+# ~60분 대기 (Aerial pull 30분 + Qwen DL 15분 + pyaerial build 20분 병렬)
+```
+
+진행 중 확인 명령:
+```bash
+docker images | grep -E "aerial|airan"   # 두 이미지 확인
+du -sh /mydata/hf_cache /mydata/aerial-cuda-accelerated-ran  # 크기 확인
 ```
 
 setup 끝나면 다음으로:
 
 ---
 
-## 실험 단계 (T+1:00 ~ T+27:00)
+## 실험 단계 (T+1:48 ~ T+28:48)
+
+> Setup 끝나는 시각이 약 T+1:48 (1시간 48분). 실험에 27시간 사용 가능.
 
 ### 🔴 Tier 1: Paper-Critical (T+1 ~ T+10)
 
@@ -166,13 +197,21 @@ git commit -m "5/31 30h sweep: 8T8R + AI throughput v2 + Nsight profiles + MPS"
 git push
 ```
 
-### CloudLab Image Save (T+29:30 ~ T+30:00) ⭐ 절대 잊지 마
+### ⭐⭐⭐ CloudLab Image Save (T+29:30 ~ T+30:00) — **5/24에 못 했으니 5/31엔 무조건!**
+
 ```
 1. CloudLab portal → Experiments → 클릭
 2. "Save Image" 또는 "Snapshot"
 3. Image name: small-lan (덮어쓰기)
-4. 시작
+4. Custom name 가능하면 "small-lan-with-aerial" 같이 명확히
+5. 시작 → 10-15분 소요
 ```
+
+### ⚠ Image Save 안 하면 다음 reservation에도 같은 90분 setup 반복!
+
+**알람 설정 권장**: reservation 끝나기 30분 전 (T+29:30) 알람.
+- 14:30 (한국 시간) 또는 reservation 종료 시간 - 30분
+- "CloudLab portal → Save Image" 텍스트로 메모
 
 ---
 

@@ -72,23 +72,37 @@ get_uuid() {
 # ============================================================
 # Measurement function
 # ============================================================
+# Builds correct --gpus argument from "all" or a MIG UUID.
+gpu_arg_for() {
+  local u=$1
+  if [[ "$u" == "all" ]]; then echo "all"
+  elif [[ "$u" == \"device=* ]]; then echo "$u"
+  else echo "\"device=$u\""
+  fi
+}
+
 measure_ai() {
   local ai_name=$1     # workload name (key in AI_SCRIPT)
-  local partition=$2   # partition size string e.g. "2g.10gb"
-  local setup=$3       # "alone" or "with_l1"
-  local ai_uuid=$4     # MIG UUID for AI
+  local partition=$2   # partition size string e.g. "2g.10gb", "fullgpu_noMIG"
+  local setup=$3       # "alone" or "with_l1_*"
+  local ai_uuid=$4     # MIG UUID or "all" for AI
   local l1_uuid=$5     # MIG UUID for L1 (empty if alone)
 
   local dir="$OUT_ROOT/${ai_name}_${partition//./_}_${setup}"
   mkdir -p "$dir" && chmod 777 "$dir"
+
+  local ai_gpu_arg
+  ai_gpu_arg=$(gpu_arg_for "$ai_uuid")
 
   for i in $(seq 1 "$N"); do
     log "  [$ai_name | $partition | $setup] run $i/$N"
 
     # If with_l1, start persistent L1 background first
     local l1_cid=""
-    if [[ "$setup" == "with_l1" && -n "$l1_uuid" ]]; then
-      l1_cid=$(docker run -d --rm --gpus "\"device=$l1_uuid\"" \
+    if [[ "$setup" == with_l1* && -n "$l1_uuid" ]]; then
+      local l1_gpu_arg
+      l1_gpu_arg=$(gpu_arg_for "$l1_uuid")
+      l1_cid=$(docker run -d --rm --gpus "$l1_gpu_arg" \
         -v "$AERIAL_SDK:/opt/nvidia/cuBB" \
         -v "$SCRIPT_DIR:/scripts" \
         "$IMAGE" bash /scripts/real_l1_loop.sh bg_l1 20 50)
@@ -96,7 +110,7 @@ measure_ai() {
     fi
 
     # Run AI workload, measure throughput
-    docker run --rm --gpus "\"device=$ai_uuid\"" \
+    docker run --rm --gpus "$ai_gpu_arg" \
       -v "$AERIAL_SDK:/opt/nvidia/cuBB" \
       -v "$REPO_DIR:/workspace/AIRAN_Changjong" \
       -v "$SCRIPT_DIR:/scripts" \
@@ -118,12 +132,36 @@ measure_ai() {
 }
 
 # ============================================================
-# AXIS A: AI alone, across partition sizes (baseline)
+# AXIS A: AI alone, across partition sizes (BASELINE)
 # ============================================================
 log "===== AXIS A: AI throughput baseline across partitions ====="
 
-# A1: AI on 1g.5gb (max 7 instances, but we just need 1)
-log "--- Setup: 7-way 1g layout ---"
+# A0: AI on Full GPU (NO MIG) — ABSOLUTE baseline (best case for AI)
+log "--- A0: Full GPU baseline (no MIG) ---"
+mig_state=$(nvidia-smi --query-gpu=mig.mode.current --format=csv,noheader -i $GPU)
+if [[ "$mig_state" == "Disabled" ]]; then
+  for ai in qwen_small neuralrx chanpred xapp; do
+    measure_ai "$ai" "fullgpu_noMIG" "alone" "all" ""
+  done
+else
+  log "  SKIP: MIG enabled on GPU $GPU. Run separately with MIG off, or reboot."
+  log "  To measure A0 standalone: sudo nvidia-smi -i $GPU -mig 0; sudo reboot; bash ai_perf_matrix.sh A0"
+fi
+
+# A0b: AI on 7g MIG single — MIG mode overhead baseline
+log "--- A0b: 7g.40gb MIG single (MIG mode overhead test) ---"
+sudo nvidia-smi -i $GPU -mig 1 2>&1 | tail -1
+sleep 2
+mig_create "0"
+UUID_7G=$(get_uuid "7g.40gb")
+if [[ -n "$UUID_7G" ]]; then
+  for ai in qwen_small neuralrx chanpred xapp; do
+    measure_ai "$ai" "7g.40gb" "alone" "\"device=$UUID_7G\"" ""
+  done
+fi
+
+# A1: AI on 1g.5gb (smallest partition)
+log "--- A1: 1g.5gb (7-way layout) ---"
 mig_create "19,19,19,19,19,19,19"
 UUID_1G=$(get_uuid "1g.5gb")
 if [[ -n "$UUID_1G" ]]; then
@@ -234,11 +272,21 @@ log "    echo \"--- \$(basename \$d) ---\""
 log "    cat \"\$d/throughput.txt\" | tail -3"
 log "  done"
 log ""
-log "Comparison axes:"
-log "  A (partition size, AI alone):  *_1g.5gb_alone / *_2g.10gb_alone / *_3g.20gb_alone / *_4g.20gb_alone"
-log "  B (L1 co-tenant impact):       compare *_alone vs *_with_l1_*"
-log "  C (workload type):             across qwen_small / neuralrx / chanpred / xapp"
+log "Comparison axes (with baselines):"
+log "  A0 (Full GPU baseline, no MIG):   *_fullgpu_noMIG_alone        ← AI absolute best"
+log "  A0b (7g MIG single, MIG overhead): *_7g.40gb_alone              ← MIG mode itself"
+log "  A1-A4 (partition size effect):   *_1g.5gb to *_4g.20gb_alone   ← partition cap on AI"
+log "  B1-B5 (L1 co-tenant impact):     *_with_l1_3g / _4g / _2g       ← L1 disruption on AI"
+log "  C (workload type):                qwen_small / neuralrx / chanpred / xapp"
+log ""
+log "Three-tier degradation analysis:"
+log "  Tier 1: Full GPU baseline (A0)             — absolute best"
+log "  Tier 2: 7g MIG (A0b)                       — MIG mode overhead on AI"
+log "  Tier 3: smaller partition (A1-A4)          — partition cap on AI"
+log "  Tier 4: smaller partition + L1 (B1-B5)     — co-residency loss"
 log ""
 log "Expected output table:"
 log "  Throughput(workload, partition, setup) for all combinations"
-log "  ΔThroughput = (alone) - (with_l1) = L1 disruption on AI"
+log "  Δ_partition = (A0) - (A1-A4)  = AI partition cap penalty"
+log "  Δ_L1       = (alone) - (with_l1) = L1 disruption on AI"
+log "  Δ_total    = (A0) - (B-config)   = total AI-RAN AI penalty

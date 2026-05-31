@@ -290,31 +290,85 @@ S22 (2g L1 + NeuralRx)에서 GPC cycles +9.8%, GPU time +9.7% 증가 보이는�
 
 ---
 
-## 8. **5/24 paper claim 재해석**
+## 8. **오늘 데이터 종합 해석** (Tier1 + Stage 2 + nsight ncu)
 
-### ❌ 기존 가설: "MIG L2 cache slice fragmentation이 L1 disturbance 원인"
-**데이터 안 맞음**:
-- L2 hit rate가 작은 partition에서 **오히려 증가** (36% → 61%)
-- AI co-tenant 추가해도 L2 hit rate 거의 동일 (변화 < 1%)
-- → "L2 fragmentation"이라는 단순 frame은 작동하지 않음
+오늘 수집된 모든 데이터를 함께 보면 **두 개의 독립된 비효율 원천**이 보임.
 
-### ✅ 새 가설 (데이터 기반):
+### 원천 1: **MIG partition 자체의 fundamental overhead** (alone 상태)
 
-**Claim A**: **MIG 자체가 작은 partition에서 memory subsystem 압박 발생**
-- L2 traffic 30배 증가, MIO throttle 33배 증가, DRAM throughput 55% 감소
-- 이건 **AI 없어도 발생** = MIG의 fundamental cost
-- baseline L1 latency 차이를 설명함 (Full GPU 36ms → 2g 51ms = +40%)
+**근거**:
+- L1 baseline 데이터:
+  - Full GPU: 36 ms / 7g MIG: 37 ms / 4g: 39 ms / 3g: 40 ms / **2g: 51 ms** (+40%)
+- nsight ncu 비교 1 (alone):
+  - L2 traffic 30배 증가 (7g 12 KB → 3g 378 KB per kernel)
+  - MIO throttle 33배 증가 (7g 0.02% → 2g 0.66%)
+  - DRAM throughput 55% 감소 (controller bottleneck)
+  - SM throughput / warp activity 증가 (적은 SM에 같은 작업 집중)
 
-**Claim B**: **AI co-tenant 추가 시 ncu가 안 잡는 inter-kernel scheduling 압박 발생**
-- per-kernel metric은 동일 (격리 잘됨)
-- 그러나 wall-clock latency +33% (Tier1)
-- → kernel 사이 시간 늘어남 = **driver-level kernel launch contention 추정**
-- nsys timeline으로 확인 예정 (GPU 1에서 진행중)
+**해석**:
+- 작은 partition = SM 적음 + L2 slice 좁음 + memory pipeline 좁음
+- 같은 cuPHY 작업이 좁은 memory subsystem 통과 → 모든 단계에서 압박
+- → **AI 없어도 MIG 자체가 비효율 발생**, partition 작을수록 심함
+- L1 baseline latency 차이 (36→51 ms)를 설명함
 
-**Claim C**: **NeuralRx outlier (p99 +377%)는 별도 메커니즘**
-- 같은 cuPHY library 사용 → 같은 NVIDIA kernel scheduling queue 경쟁?
-- 또는 cuDNN auto-tune의 race condition?
-- 추가 조사 필요
+### 원천 2: **AI workload-specific wall-clock 누설** (Tier1 + Stage 2 결과)
+
+**근거** (오늘 측정한 AI 종류별 wall-clock 영향):
+
+| AI co-tenant | L1 partition | wall-clock 변화 | 출처 |
+|---|---|---|---|
+| Qwen LLM | 3g | **+33% mean, +69% p99** | Tier1 Phase1 |
+| Qwen × 2 | 3g (2g+2g layout) | **+33% mean** | Tier1 Phase2 M1 |
+| NeuralRx | 3g | **+50% mean, +377% p99** 🔥 | Tier1 Phase4 |
+| chanpred (alone) | 3g | **+34%** | Tier1 Phase4 |
+| chanpred (with ResNet, on 2g) | 3g | **0%** | Stage 2 M5c |
+| xapp | 3g | +32% | Tier1 Phase4 |
+| sat_compute × 2 | 3g | **0%** | Stage 2 M5a |
+| sat_hbm × 2 | 3g | **0%** | Stage 2 M5b |
+| ResNet + chanpred | 3g | **0%** | Stage 2 M5c |
+| ResNet + Forecaster | 3g | **0%** | Stage 2 M8a |
+| 3 × sat_compute | 4g | **0%** | Stage 2 M7a (worst) |
+
+**패턴**:
+- **누설 일으키는 AI**: Qwen (LLM autoregressive), NeuralRx (PHY-NN), chanpred/xapp on 큰 partition
+- **누설 안 일으키는 AI**: sat_compute, sat_hbm, ResNet (fp16 Tensor Core), Forecaster
+- **chanpred는 partition size 의존적**: 3g에선 누설, 2g에선 안 누설
+
+**ncu에서 안 보이는 것**:
+- 누설 발생한 케이스 (Phase1 Qwen, Phase4 NeuralRx)도 ncu per-kernel 메트릭 변화 <2%
+- L2 hit rate, MIO throttle, DRAM throughput 모두 baseline과 동일
+- → **이 누설은 kernel 실행 자체가 아닌 다른 곳에서 발생**
+
+**가설** (nsys timeline에서 확정 예정):
+- AI 종류에 따라 kernel launch 빈도와 패턴 다름
+- Qwen (autoregressive decode): 토큰마다 다른 KV cache 패턴 → driver-level queue 자주 침해
+- NeuralRx: cuPHY와 같은 library 경로 사용 → kernel launch 경쟁 가능성
+- sat_compute (단일 GEMM 반복): driver-level 부담 적음 → L1 영향 없음
+- → **kernel launch overhead가 누설의 주된 변수**라는 가설 (nsys로 검증 가능)
+
+### 원천 1과 원천 2의 관계
+
+| 시나리오 | 원천 1 (MIG overhead) | 원천 2 (AI 누설) | 총 wall-clock |
+|---|---|---|---|
+| L1 7g alone | small (37 ms) | — | 37 ms |
+| L1 3g alone | medium (40 ms) | — | 40 ms |
+| L1 2g alone | **large (51 ms)** | — | 51 ms |
+| L1 3g + Qwen | medium | **+13 ms** | 53 ms |
+| L1 3g + sat | medium | 0 | 40 ms |
+| L1 2g + Qwen | large | +? | **66 ms** (D1 데이터) |
+| L1 3g + NeuralRx | medium | **+20 ms (p99 156)** | 60 ms (p99 196) |
+
+→ **두 원천은 독립적이고 additive**.
+
+### 결론
+
+**오늘 데이터가 보여주는 그림**:
+1. MIG 자체의 비효율은 **partition size에 비례** (memory subsystem 압박, ncu로 측정됨)
+2. AI 누설은 **특정 AI 워크로드**에서만 발생 (chaotic memory access 또는 cuPHY-유사 NN)
+3. AI 누설의 메커니즘은 **per-kernel level이 아님** (ncu가 못 봄, 추정: kernel launch queue / driver contention)
+
+→ MIG의 hardware-level isolation은 양적으로는 잘 작동 (per-kernel metric으로 확인됨).  
+→ 그러나 system-level (driver, kernel launch queue) 에서 격리 실패하는 AI 종류가 존재.
 
 ---
 

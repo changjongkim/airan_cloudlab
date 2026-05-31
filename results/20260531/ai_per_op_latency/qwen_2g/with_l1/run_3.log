@@ -1,0 +1,21 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+[Qwen-latency] loading Qwen/Qwen2.5-1.5B...
+[Qwen-latency] loaded, HBM=5.9/10.3GB
+We detected that you are passing `past_key_values` as a tuple and this is deprecated and will be removed in v4.43. Please use an appropriate `Cache` class (https://huggingface.co/docs/transformers/v4.41.3/en/internal/generation_utils#transformers.Cache)
+[Qwen-latency] measuring decode for 30.0s
+[Qwen-latency] done: n=1326 mean=22.504ms p50=22.339 p95=23.017 p99=27.040 p999=27.275 max=29.754
+[Qwen-latency-json] {"workload": "qwen_decode", "model": "Qwen/Qwen2.5-1.5B", "n_tokens": 1326, "mean_ms": 22.504271121765875, "median_ms": 22.338560104370117, "p50_ms": 22.338560104370117, "p90_ms": 22.530048370361328, "p95_ms": 23.017471313476562, "p99_ms": 27.039743423461914, "p999_ms": 27.275264739990234, "min_ms": 20.23423957824707, "max_ms": 29.75436782836914, "stdev_ms": 0.8065819100988558}

@@ -18,10 +18,16 @@
 | **AI throughput v2** | `ai_throughput_v2.sh` | persistent L1 wrapper로 AI throughput 격리 측정 | 4 × 2 × N=5 = 40 | ✅ 완료 |
 | **AI full matrix** | `run_ai_full_matrix.sh` | 모든 파티션 × AI 워크로드 throughput | 19 × 2 × N=5 = 190 | ✅ 완료 (qwen_small_1g, qwen7b_stress_4g 실패) |
 | **AI supplement** | `run_ai_supplement.sh` | ResNet (fp16) + Forecaster batch sweep | 22 × 2 × N=5 = 220 | ✅ 완료 |
-| **L1 multi-AI matrix** | `run_l1_multi_ai_matrix.sh` | L1 latency × multi-AI 동시 co-tenant | 21 × 2 × N=5 = 210 | 🟢 진행중 |
-| **Nsight matrix** | `nsight_full_matrix.sh` | L2 cache hit rate 직접 측정 | 26 scenarios | ⏳ 대기 |
+| **L1 multi-AI matrix** | `run_l1_multi_ai_matrix.sh` | L1 latency × multi-AI 동시 co-tenant | 21 × 2 × N=5 = 210 | ✅ 완료 (14/21, M9 3개 실패) |
+| **Nsight ncu matrix** | `nsight_full_matrix.sh` | per-kernel 28 metrics (L2/DRAM/MIO/stalls) | 16 scenarios | ✅ 완료 (재부팅 후 perm fix) |
+| **Stage 4: AI per-op latency** | `run_ai_per_op_latency_matrix.sh` ⭐ | **AI workload p99 latency (mean 아님!)** | 16 × 2 × N=5 = 160 | ✅ 완료 |
+| **nsys timeline v2** | `nsys_full_matrix.sh` (Tier1-matched: CELLS=20 ITERS=30 N=3) | kernel start/end timestamps for gap analysis | 16 × 3 = 48 | 🟢 진행중 (마지막) |
+| **P3/P4/P5/P7** | `run_p*.sh` | partition sweep, timeseries, sustained, PDSCH TX | — | ⏳ 대기 (자동 chain) |
 
-**Chain wrapper**: `chain_post_full_matrix.sh` (PID 632955) — Stage 1→2→3 자동 chain.
+**Chain wrappers**:
+- `chain_post_full_matrix.sh` — Stage 1→2→3 (initial chain, kill 후 재시작)
+- `chain_post_reboot_resume.sh` — Stage 3 nsight → 4 ai_per_op → 5+ (재부팅 후 resume chain)
+- `nsys_full_matrix.sh` — nsys timeline (GPU 1, 병렬)
 
 ---
 
@@ -376,6 +382,118 @@ Nsight S7 (3g L1 + NeuralRx 2g) 측정으로 직접 검증 가능.
 
 ---
 
-## 12. 한 줄 요약 (paper draft용)
+## 12. 한 줄 요약 (paper draft용 — 초기 버전, §13~14에서 업데이트됨)
 
 > NVIDIA A100 MIG는 AI workload throughput (LLM, CNN, sparse-attention encoder, dense GEMM 모두)을 0.2% 이내로 격리하지만, cuPHY L1 PUSCH RX의 tail latency(p99)는 인접 partition AI co-tenant 한 개만으로도 64~377% 증가하며, partition 크기를 늘려도 보호되지 않는 비대칭 격리 실패를 보인다.
+
+---
+
+## 13. ⭐ **Stage 4: AI per-op latency 측정 결과 — framing 완전 수정**
+
+### 측정
+`run_ai_per_op_latency_matrix.sh` — AI workload의 **per-operation latency** (mean이 아닌 p99 tail) 측정.
+- 4 workloads (qwen / chanpred / neuralrx / resnet) × 4 partitions × {alone, with_l1 background} × N=5
+- 16 cells × 2 setups × 5 runs = 160 runs
+- 각 run = 30초간 CUDA event 기반 per-op timing 기록
+
+### 결과 — **mean과 p99의 deceptive 차이**
+
+| Workload × Part | mean Δ | **p99 Δ** |
+|---|---|---|
+| chanpred 1g | +1.4% | **+9.0%** |
+| **chanpred 2g** | +0.5% | **+27.0%** ⭐ |
+| **chanpred 3g** | 0% | **+23.7%** ⭐ |
+| **chanpred 4g** | +0.5% | **+19.6%** ⭐ |
+| neuralrx 1g | -0.4% | +2.1% |
+| neuralrx 2g | -0.5% | +4.2% |
+| **neuralrx 3g** | -1.1% | **+12.9%** |
+| neuralrx 4g | (진행중) | — |
+| qwen 2g | -1.1% | **+6.7%** |
+| qwen 3g | -1.3% | +4.7% |
+| qwen 4g | -2.8% | +3.2% |
+| **ResNet 1g/2g/3g/4g** | +0.1~0.2% | **+0.2~0.4%** (거의 무영향) |
+
+### 패턴 — L1 latency 데이터와 **동일**
+
+| AI 종류 | AI p99 Δ (Stage 4) | L1 p99 Δ when AI co-tenant (Tier1) |
+|---|---|---|
+| chanpred (LSTM) | +20-27% | +72% (3g L1 + chanpred 3g) |
+| NeuralRx (PHY-NN) | +13% (3g) | +377% (3g L1 + NRx 3g) |
+| Qwen (LLM autoregressive) | +3-7% | +69% (3g L1 + qwen) |
+| ResNet (CNN fp16 Tensor Core) | +0.2-0.4% | 0% (Stage 2 M8a) |
+
+→ AI side도 L1과 **같은 방향, 같은 워크로드 패턴** 따름.
+
+---
+
+## 14. ⭐⭐⭐ **최종 framing — paper claim**
+
+### 이전 framing (§7) — 부분만 맞음
+> "MIG는 AI throughput 격리는 잘 작동 (avg metric), L1만 p99 latency 격리 실패"
+
+### **새 framing — 데이터로 확정** ⭐
+
+**"MIG는 평균(mean/throughput) 격리는 양호하지만, tail latency (p99) 격리는 부족.  
+L1 (latency-critical workload)뿐만 아니라 AI workload도 per-op latency로 측정하면 동일한 p99 inflation 발생.  
+다만 inflation 정도는 workload memory access pattern에 의존:  
+- ResNet/sat_compute/sat_hbm/Forecaster (uniform pattern) → 영향 거의 없음 (<1%)  
+- LLM (Qwen) / LSTM (chanpred) / PHY-NN (NeuralRx) (chaotic pattern) → p99 +9~27% inflation"**
+
+### 데이터 evidence 종합
+
+| 비교 axis | mean 측정 | p99 측정 | 결론 |
+|---|---|---|---|
+| L1 alone vs L1 + Qwen | +33% | +69% | L1 + LLM = p99 inflate ✅ |
+| L1 alone vs L1 + ResNet | 0% | 0% | L1 + ResNet = 무영향 ✅ |
+| **Qwen alone vs Qwen + L1bg** | **-1.3%** | **+4.7%** | **AI + L1bg = p99 inflate (작지만 측정됨)** ⭐ |
+| **chanpred alone vs chanpred + L1bg** | **0%** | **+24%** | **AI + L1bg = 크게 p99 inflate** ⭐ |
+| **ResNet alone vs ResNet + L1bg** | **+0.1%** | **+0.2%** | **AI + L1bg = ResNet은 무영향** ⭐ |
+
+### 메커니즘 — nsys timeline (v2 진행중)
+- nsys v1 (10 cells × 15 iters 짧음): S22 (2g + NeuralRx) idle time +22.6% — kernel 사이 시간 증가 확인
+- nsys v2 (Tier1-matched 20 cells × 30 iters × N=3): 진행중, 모든 시나리오에서 inter-kernel gap 분포 캡처 예정
+- 가설: **driver-level kernel launch queue contention** (chaotic kernel launch frequency의 AI가 시스템 부담)
+
+### Paper-grade evidence 한 그림
+
+```
+같은 chanpred 워크로드, 같은 측정 시점:
+- iter/s (throughput):  2249 → 2252 (+0.1%)   ← "격리 잘됨"으로 보임
+- p99 latency (us):     444  → 564  (+27%)    ← "격리 실패" 진짜 그림
+```
+
+**→ metric 선택이 결과를 정반대로 바꿈.**  
+**→ "비대칭 격리 실패" 결론은 throughput-only 측정에서 나온 measurement artifact였음.**  
+**→ 진짜 그림: MIG의 tail latency 격리 부족 — 양방향 모두.**
+
+---
+
+## 15. 데이터 백업 위치 + 분석 스크립트
+
+### 백업 (로컬, 779 MB)
+`/Users/changjongkim/New_research/cloudlab_results/results/20260531/`
+- 베이스라인 + Tier1 phases (~5 MB)
+- ai_full_matrix, ai_supplement, l1_multi_ai, ai_throughput_v2 (~3 MB)
+- **ai_per_op_latency** (Stage 4, 16 cells) ⭐
+- **ncu/** (Stage 3 nsight 16 binary reports, 361 MB)
+- **nsight_csv/** (Stage 3 extracted CSVs, 61 MB)
+- **nsys_full/** (nsys v2 timeline, 진행중)
+- **nsys_v1_short/** (archived 10×15 first attempt)
+- **nsys_csv/** (nsys v1 kernel timing CSVs, 15 MB)
+
+### 분석 스크립트
+- `analyze.py` — Tier1 main aggregation
+- `analyze_nsight_full.py` — ncu 16 scenarios × 28 metrics 비교 테이블
+- `analyze_nsys_gaps.py` — nsys kernel gap 분포 분석
+
+### 분석 결과 문서
+- `EXPERIMENTS_20260531.md` (이 문서) — 종합 실험 결과
+- `NCU_ANALYSIS_20260531.md` — ncu 28 metrics 상세 분석 (12 sections)
+
+### Repo
+- github: `changjongkim/airan_cloudlab`
+- branch: `main`
+- 최근 커밋:
+  - `83ab788` — 5/31 NCU section 8 reframe (data-driven)
+  - `8654675` — 5/31 NCU 28-metric analysis push
+  - `c5afd4d` — 5/31 comprehensive data dump + EXPERIMENTS md

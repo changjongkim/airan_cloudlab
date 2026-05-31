@@ -494,6 +494,109 @@ L1 (latency-critical workload)뿐만 아니라 AI workload도 per-op latency로 
 - github: `changjongkim/airan_cloudlab`
 - branch: `main`
 - 최근 커밋:
+  - `42ce156` — 5/31 nsys v3 expansion (10 new scenarios) + analyses
+  - `eff65cd` — 5/31 nsys advanced sqlite (5 new analysis types)
+  - `9791290` — 5/31 nsys v2 SQLite comprehensive (3 MD + 4 CSV)
+  - `1774a1f` — 5/31 Stage 4 results + new framing
   - `83ab788` — 5/31 NCU section 8 reframe (data-driven)
   - `8654675` — 5/31 NCU 28-metric analysis push
   - `c5afd4d` — 5/31 comprehensive data dump + EXPERIMENTS md
+
+---
+
+## 16. ⭐⭐⭐ **NSYS v2 + v3 + Advanced Analysis — 메커니즘 직접 증명**
+
+### NSYS 측정 데이터 규모
+- v2 (Tier1-matched, 16 scenarios × 3 runs): 48 traces
+- v3 (10 새 scenarios × 3 runs): 30 traces
+- **Total: 78 traces, 16 SQLite + CSV outputs**
+
+### v3 새 시나리오 — workload coverage 확장
+| Scenario | 설명 | Steady p99 vs S5 |
+|---|---|---|
+| S27 | 3g + chanpred | +8% |
+| **S28** | 3g + ResNet | **+26%** ⭐ |
+| S29 | 3g + Forecaster | +19% |
+| S30 | 3g + xapp | +11% |
+| **S31** | 3g + ResNet+chanpred (M5c) | **+3.4%** (smoothing!) |
+| **S32** | 3g + ResNet+Forecaster (M8a) | **+7%** (smoothing!) |
+| S33 | 4g + chanpred | +7% |
+| **S34** | 4g + ResNet | **-1.3%** (robust!) |
+| **S35** | **2g + chanpred** | **+66%** ⭐⭐⭐ (catastrophic!) |
+| S36 | 4g + Forecaster | +3% |
+
+### Stage 4 framing 추가 수정
+- 이전 (Stage 4 AI side): "ResNet은 격리 잘됨 (0.2%)"
+- **새 (NSYS v3 L1 side, S28)**: **ResNet 단독 시 L1 p99 +26%**
+- → AI mean throughput으로는 안 잡히지만 **L1 p99 tail은 ResNet도 disturb**
+- → 새 framing: **단일 AI는 chaotic도 uniform도 모두 L1 p99 일부 inflate**
+- → **Multi-AI heterogeneous (M5c/M8a)가 오히려 smoothing**
+
+### Burst-mode disturbance (NSYS advanced)
+- Top 1% gap = **45-50% 전체 idle 시간** (모든 scenario)
+- Auto-correlation **~0** → burst events 독립적
+- p90/p10 = **130-138x** → 극히 long-tailed distribution
+- Steady-state median unchanged, **p99만 무작위 burst**
+- → URLLC SLA 절대 보장 불가능
+
+### Memory operations
+- memcpy total: S5 140ms → S7 NeuralRx 585ms (**+317%**)
+- memcpy median: 4us → 14us (**3.4x slower**)
+- → GPU memory controller queue 압박 직접 evidence
+
+### Kernel-pair transitions (가장 vulnerable)
+- `cupy_copy → convert_kernel`: NeuralRx +399%, 3 AI +499%
+- `convert_kernel → noiseIntfEst`: NeuralRx +292%, 3 AI +509%
+- → memory-heavy transitions가 누설 위치
+
+### CUDA Runtime API (driver-level)
+- 109K kernel launch API calls per scenario
+- 2g L1 p99: 1115us (4g L1의 520us 대비 +115%)
+- → Partition-size dependent driver overhead
+
+---
+
+## 17. **최종 종합 paper claim** (모든 데이터 종합)
+
+> **"NVIDIA A100 MIG는 GPU의 hardware capacity (SM, HBM, L2 slice) 격리는 양호하지만 driver-level kernel launch queue와 GPU memory controller queue는 partition 간 공유되어, latency-critical workload의 p99 tail latency 격리는 부족하다.  
+>   
+> 누설은 burst-mode (top 1% events가 전체 idle 45-50% 차지), 독립적 (auto-correlation ~0), workload-pattern-dependent (chaotic AI > uniform AI), partition-size-dependent (2g L1 catastrophic, 4g L1 robust), 그리고 AI count/mix의 비선형 함수 (multi-AI het = smoothing).  
+>   
+> 메커니즘: cross-partition driver/memory pipeline contention.  
+> - NCU per-kernel: <2% (hardware iso 작동)  
+> - NSYS inter-kernel: +20~509% gap inflation  
+> - Tier1 wall-clock: +33~377% latency  
+>   
+> AI-RAN production deployment 시 sub-ms slot deadline (URLLC SLA) 보장 불가능. **4g L1 + uniform-pattern AI 권장**, **NeuralRx 등 chaotic AI는 별도 GPU 분리 필요**."**
+
+---
+
+## 18. **최종 데이터 위치**
+
+### MD 문서 (5개, paper draft용)
+- `EXPERIMENTS_20260531.md` (이 문서) — 모든 실험 종합
+- `NCU_ANALYSIS_20260531.md` — NCU 28-metric (12 sections)
+- `NSYS_ANALYSIS_20260531.md` — NSYS v2 scenario-level (11 sections)
+- **`NSYS_DETAILED_ANALYSIS.md`** — SQLite kernel-pair level (13 sections, v2+v3)
+- **`MIG_INEFFICIENCY_REPORT.md`** — 한글 종합 보고서 (13 sections)
+
+### 분석 스크립트 (6개)
+- `analyze.py` — Tier1 main aggregation
+- `analyze_nsight_full.py` — NCU 28-metric comparison
+- `analyze_nsys_v2.py` — NSYS v2 scenario-level (3 runs averaged)
+- `analyze_nsys_sqlite.py` — cuPHY-only kernel inflation
+- `analyze_nsys_comprehensive.py` — all-kernel + pairs + memory ops
+- `analyze_nsys_advanced.py` — 5 advanced analyses (timeseries, longtail, autocorr, shape, API)
+
+### CSV outputs (`nsys_sqlite_v2_analysis/`)
+- `all_kernel_summary.csv`, `kernel_inflation_vs_S5.csv`, `kernel_pair_transitions.csv`
+- `memory_ops_analysis.csv`
+- `longtail_contribution.csv`, `timeseries_gaps.csv`, `gap_distribution_shape.csv`
+- `gap_autocorrelation.csv`, `runtime_api_analysis.csv`
+
+### Binary data (서버에만)
+- `nsys_full/*.nsys-rep` — 78 nsys binary reports (v2+v3)
+- `ncu/*.ncu-rep` — 16 ncu binary reports (361 MB)
+
+### 로컬 사이즈
+- 779 MB (모든 raw + CSV + MD)

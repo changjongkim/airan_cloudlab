@@ -286,6 +286,161 @@ uniform AI (sat_compute/sat_hbm/ResNet/Forecaster):
 
 ---
 
-## 9. **한 줄 요약**
+## 9. **한 줄 요약** (v2 기준)
 
-> **"NSYS SQLite 종합 분석 결과: MIG kernel-level isolation은 작동하지만 driver-level kernel launch queue와 GPU memory controller queue가 partition 간 공유되어, chaotic AI co-tenant 추가 시 (1) memcpy time +180~317%, (2) cupy_copy→convert/convert→cuphy transition post-gap +134~509%, (3) L1 wall-clock +33~377% 폭증. Uniform AI (sat_compute/sat_hbm/ResNet)는 이 누설 없음. → MIG가 GPU의 모든 공유 자원을 격리하지 못한다는 직접 evidence."**
+> **"NSYS SQLite 종합 분석 결과: MIG kernel-level isolation은 작동하지만 driver-level kernel launch queue와 GPU memory controller queue가 partition 간 공유되어, chaotic AI co-tenant 추가 시 (1) memcpy time +180~317%, (2) cupy_copy→convert/convert→cuphy transition post-gap +134~509%, (3) L1 wall-clock +33~377% 폭증. Uniform AI (sat_compute/sat_hbm/ResNet)는 이 누설 없음."**
+
+---
+
+## 10. **v3 확장 (10 new scenarios, 09:25-09:34)**
+
+기존 v2의 16 → **총 26 scenarios** with new AI workloads.
+
+### v3 시나리오 추가
+| ID | 설명 | MIG layout |
+|---|---|---|
+| **S27** | 3g L1 + chanpred (2g) | 9,14 |
+| **S28** | 3g L1 + ResNet fp16 (2g) | 9,14 |
+| **S29** | 3g L1 + Forecaster (2g) | 9,14 |
+| **S30** | 3g L1 + xapp (2g) | 9,14 |
+| **S31** | 3g L1 + **ResNet + chanpred** (2g+2g, M5c equiv) | 9,14,14 |
+| **S32** | 3g L1 + **ResNet + Forecaster** (2g+2g, M8a equiv) | 9,14,14 |
+| **S33** | 4g L1 + chanpred (2g) | 5,14,19 |
+| **S34** | 4g L1 + ResNet (2g) | 5,14,19 |
+| **S35** | **2g L1 + chanpred** (3g) | 14,9 |
+| **S36** | 4g L1 + Forecaster (2g) | 5,14,19 |
+
+### v3 Steady-state p99 inflation (vs S5 alone 843us)
+
+| Scenario | Steady p99 | **vs S5** | 발견 |
+|---|---|---|---|
+| S5 alone | 843 us | baseline | — |
+| **S27 chanpred** | 913 | +8.2% | 2g placement = 작은 효과 |
+| **S28 ResNet** | **1064** | **+26.2%** ⭐ | **ResNet도 p99 disturb!** |
+| **S29 Forecaster** | 1000 | **+18.6%** | Forecaster도 effect |
+| S30 xapp | 932 | +10.5% | 2g에서 작음 |
+| **S31 ResNet+chanpred** | 872 | **+3.4%** ⭐ | het combo = 작은 효과 |
+| **S32 ResNet+Forecaster** | 902 | **+6.9%** ⭐ | het combo = 작은 효과 |
+| S33 4g + chanpred | 905 | +7.3% | 4g L1 robust |
+| **S34 4g + ResNet** | **833** | **-1.3%** ⭐ | 4g L1 + ResNet = ZERO! |
+| **S35 2g + chanpred** | **1402** | **+66.2%** ⭐⭐⭐ | **catastrophic** |
+| S36 4g + Forecaster | 866 | +2.7% | 4g 무영향 |
+
+### v3 Long-tail (p999 threshold — 0.1% worst gap)
+
+| Scenario | p99 threshold | **p999 threshold** | 의미 |
+|---|---|---|---|
+| S27 chanpred | 822 us | **3859 us** ⭐ | rare 3.9ms burst |
+| S30 xapp | 814 us | **3450 us** ⭐ | rare 3.5ms burst |
+| S28 ResNet | 934 us | 2853 us | rare 2.9ms burst |
+| S29 Forecaster | 853 us | 2501 us | rare 2.5ms burst |
+| S35 2g chanpred | **1403 us** | 1425 us | **median burst 1.4ms** |
+| S31 ResNet+chanpred | 862 us | **1018 us** ✅ | smoothed |
+| S32 ResNet+Forecaster | 853 us | **991 us** ✅ | smoothed |
+| S33 4g chanpred | 876 us | **1017 us** ✅ | 4g robust |
+| S34 4g ResNet | 817 us | **949 us** ✅ | 4g robust |
+| S36 4g Forecaster | 817 us | 1811 us | medium |
+
+→ **Multi-AI het가 p999을 1000us로 낮춤 (smoothing)**  
+→ **Single AI는 p999을 2500-3900us로 inflate**
+
+---
+
+## 11. **충격적 새 발견 — framing 수정**
+
+### 발견 A: ResNet은 L1 p99을 **inflate**한다 (이전 framing 수정 필요)
+
+**이전 (Stage 4 결과)**: 
+- AI side: "ResNet 0.2% 변화" → "ResNet은 깨끗"
+
+**v3 새 측정 (L1 side)**:
+- S28 (3g L1 + ResNet 2g): **L1 steady p99 +26%**
+- → **ResNet도 L1 p99에 영향**, 단 mean(throughput)에는 안 나옴
+- → "burst-mode p99 leak"의 universal pattern 확정
+
+### 발견 B: **Multi-AI heterogeneous는 smoothing**
+
+**이전 가설 (잘못)**: "Multi-AI = 더 큰 disturbance"  
+**데이터 (S31/S32)**: ResNet+chanpred / ResNet+Forecaster = **+3-7%만 inflation**
+
+비교:
+| Configuration | Steady p99 | p999 |
+|---|---|---|
+| 3g L1 alone | 843 us | 2000+ us |
+| 3g + Qwen (single) | 1011 us | high |
+| 3g + ResNet (single) | 1064 us | 2853 us |
+| **3g + ResNet+chanpred (M5c)** | 872 us | **1018 us** |
+| **3g + ResNet+Forecaster (M8a)** | 902 us | **991 us** |
+
+→ **두 개의 AI가 서로 driver queue traffic 평준화**  
+→ Stage 2 M5c/M8a wall-clock 0% 결과와 일관  
+→ **"chaos canceling chaos"**
+
+### 발견 C: **2g L1 + chanpred = catastrophic** (worst-case scenario)
+
+S35: **steady p99 +66.2%** (843 → 1402 us)
+
+```
+catastrophe ingredients:
+  - 2g L1 (smallest, MIG bandwidth throttle baseline 자체 big)
+  + chanpred on 3g (큰 AI partition, LSTM chaotic pattern)
+  = +66% p99 inflation
+```
+
+→ Paper의 worst-case figure 후보
+
+### 발견 D: **4g L1 universal robust**
+
+| 4g L1 + AI | Steady p99 Δ |
+|---|---|
+| ResNet | **-1.3%** |
+| Forecaster | +2.7% |
+| chanpred | +7.3% |
+
+→ **4g L1은 어떤 AI에도 robust**  
+→ Tier1 Phase2 M3 (4g L1 + 2 AI) +38%과 약간 다름 — 새 framing에선 wall-clock vs steady p99 차이
+
+---
+
+## 12. **확장된 메커니즘 그림 (모든 데이터)**
+
+```
+변수 1: AI workload memory pattern
+  - Chaotic (Qwen autoregressive, NeuralRx PHY-NN, chanpred LSTM): p99 leak 큼
+  - ResNet/Forecaster: medium leak (단독), small (multi-AI 때)
+  - Uniform (sat_compute, sat_hbm): no leak
+
+변수 2: L1 partition size
+  - 2g: 최악 (baseline overhead + AI inflation 누적)
+  - 3g: 표준
+  - 4g: robust (모든 AI에 작은 effect)
+  - 7g: 측정 의미 없음 (AI placement 불가)
+
+변수 3: AI partition size
+  - 1g: 작은 AI partition은 큰 효과 못 만들 수 있음 (constrained)
+  - 2g: typical placement, 대부분 시나리오
+  - 3g: 큰 AI partition + chaotic pattern = catastrophic (S35)
+  - 4g: AI placement 안 함
+
+변수 4: AI 개수와 mix
+  - Single chaotic AI: 큰 leak
+  - Multi-AI heterogeneous: smoothing (Stage 2 M5c, S31/S32)
+  - Multi-AI homogeneous saturating: cumulative (S26 4g+3sat = 11% idle, S24 3g+2sat = 6%)
+  - Multi-AI homogeneous chaotic: typically additive
+```
+
+---
+
+## 13. **최종 paper claim** (모든 데이터 종합)
+
+> **"NVIDIA A100 MIG는 mean throughput/latency 격리는 양호하지만 p99 tail latency 격리는 부족하다. 누설 메커니즘: cross-partition driver kernel launch queue + GPU memory controller queue의 burst-mode contention. Tail latency burst 이벤트는 독립적이고 무작위로 발생 (auto-correlation ~0), top 1% gap이 전체 idle 시간의 45-50% 차지하는 long-tailed 분포 (p90/p10 ratio 130-138x).  
+>   
+> 누설 정도는 4가지 변수의 비선형 함수:  
+> (1) AI workload memory access pattern: chaotic (LLM/LSTM/PHY-NN) > uniform (sat/Tensor Core ResNet)  
+> (2) L1 partition size: 작을수록 더 큼 (2g worst, 4g robust)  
+> (3) AI partition size: 큰 AI partition + chaotic pattern = catastrophic  
+> (4) AI count/mix: heterogeneous multi-AI는 smoothing 효과로 단일 AI보다 누설 작음  
+>   
+> 가장 큰 누설 시나리오: 2g L1 + chanpred on 3g AI = +66% steady p99 (S35).  
+> 가장 robust 시나리오: 4g L1 + ResNet on 2g = -1.3% (S34).  
+> Multi-AI heterogeneous (M5c/M8a): 단일 AI보다 누설 작음 (chaos canceling)."**

@@ -1,0 +1,41 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+[Qwen-small] model=Qwen/Qwen2.5-1.5B, ctx=512, phase=mixed, dur=30s
+Traceback (most recent call last):
+  File "/workspace/AIRAN_Changjong/experiments/run_qwen_small_stress.py", line 35, in <module>
+    model = AutoModelForCausalLM.from_pretrained(
+  File "/home/aerial/.local/lib/python3.10/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/aerial/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 4034, in from_pretrained
+    dispatch_model(model, **device_map_kwargs)
+  File "/home/aerial/.local/lib/python3.10/site-packages/accelerate/big_modeling.py", line 494, in dispatch_model
+    model.to(device)
+  File "/home/aerial/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 2905, in to
+    return super().to(*args, **kwargs)
+  File "/home/aerial/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1174, in to
+    return self._apply(convert)
+  File "/home/aerial/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 780, in _apply
+    module._apply(fn)
+  File "/home/aerial/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 780, in _apply
+    module._apply(fn)
+  File "/home/aerial/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 780, in _apply
+    module._apply(fn)
+  [Previous line repeated 2 more times]
+  File "/home/aerial/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 854, in _apply
+    self._buffers[key] = fn(buf)
+  File "/home/aerial/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1160, in convert
+    return t.to(
+RuntimeError: NVML_SUCCESS == r INTERNAL ASSERT FAILED at "../c10/cuda/CUDACachingAllocator.cpp":838, please report a bug to PyTorch. 

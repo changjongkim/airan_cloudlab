@@ -31,6 +31,10 @@ L1_LOG_RUNS = ROOT / "all_deep_dive" / "l1_log_runs.csv"
 DV2_SUMMARY = ROOT / "20260531" / "nsys_deep_Dv2_analysis" / "Dv2_summary.csv"
 NSYS_A_TABLE = ROOT / "20260531" / "nsys_deep_A_analysis" / "paper_table.csv"
 MEMORY_OPS = ROOT / "20260531" / "nsys_sqlite_v2_analysis" / "memory_ops_analysis.csv"
+NSYS_FAST = OUT / "deep_nsys_fast"
+NSYS_KERNEL_ACTIVITY = NSYS_FAST / "kernel_vs_all_activity_summary.csv"
+NSYS_MEMORY_ACTIVITY = NSYS_FAST / "memory_activity_summary.csv"
+NSYS_TRANSITIONS = NSYS_FAST / "top_gap_transitions_by_condition.csv"
 
 
 COLORS = {
@@ -618,6 +622,104 @@ def plot_memory_ops_pressure() -> str:
     return savefig("fig13_memory_ops_pressure.png")
 
 
+def plot_nsys_kernel_vs_activity_gap() -> str:
+    rows = read_csv(NSYS_KERNEL_ACTIVITY)
+    order = [
+        "S2_7g_mig",
+        "S5_3g_alone",
+        "S7_3g_neuralrx",
+        "S10_2g_alone",
+        "S35_2g_chanpred",
+        "S28_3g_resnet",
+        "S31_3g_resnet_chanpred",
+        "S32_3g_resnet_forecaster",
+        "S34_4g_resnet",
+    ]
+    by_scenario = {r["scenario"]: r for r in rows}
+    out = [by_scenario[s] for s in order if s in by_scenario]
+    write_csv(
+        DATA / "nsys_kernel_vs_all_activity_summary.csv",
+        out,
+        [
+            "scenario",
+            "condition",
+            "runs",
+            "kernel_busy_pct",
+            "all_activity_busy_pct",
+            "kernel_gap_p50_us",
+            "kernel_gap_p99_us",
+            "all_activity_gap_p99_us",
+            "big_kernel_gaps_ge_1ms",
+            "big_gaps_with_mem_pct",
+            "mean_mem_fraction_in_big_gaps_pct",
+        ],
+    )
+
+    labels = [r["condition"].replace(" + ", "\n+ ").replace(" alone", "\nalone").replace(" MIG", "\nMIG") for r in out]
+    x = list(range(len(out)))
+    kernel_gap = [fnum(r["kernel_gap_p99_us"]) for r in out]
+    activity_gap = [fnum(r["all_activity_gap_p99_us"]) for r in out]
+    mem_share = [fnum(r["big_gaps_with_mem_pct"]) for r in out]
+
+    fig, ax1 = plt.subplots(figsize=(11.6, 5.2))
+    ax1.bar([i - 0.18 for i in x], kernel_gap, width=0.36, color=COLORS["red"], label="kernel-only p99 gap")
+    ax1.bar([i + 0.18 for i in x], activity_gap, width=0.36, color=COLORS["blue"], label="all GPU activity p99 gap")
+    ax1.set_ylabel("Gap p99 (us)")
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(labels, rotation=22, ha="right")
+    ax1.set_title("NSYS SQLite: many long kernel gaps are filled by memcpy/memset")
+    ax1.legend(loc="upper left", frameon=False)
+
+    ax2 = ax1.twinx()
+    ax2.plot(x, mem_share, color=COLORS["gold"], marker="o", linewidth=2.0, label=">=1ms gaps with memory ops")
+    ax2.set_ylabel(">=1ms kernel gaps containing memcpy/memset (%)")
+    ax2.set_ylim(0, 110)
+    ax2.legend(loc="upper right", frameon=False)
+    return savefig("fig12_nsys_kernel_vs_activity_gap.png")
+
+
+def plot_nsys_memory_activity_breakdown() -> str:
+    rows = read_csv(NSYS_MEMORY_ACTIVITY)
+    order = [
+        "L1 7g MIG alone",
+        "L1 3g alone",
+        "L1 3g + NeuralRx",
+        "L1 2g alone",
+        "L1 2g + ChanPred",
+        "L1 3g + ResNet",
+        "L1 3g + ResNet+ChanPred",
+        "L1 3g + ResNet+Forecaster",
+        "L1 4g + ResNet",
+    ]
+    by_condition: dict[str, dict[str, float]] = {}
+    for r in rows:
+        by_condition.setdefault(r["condition"], {})[r["op"]] = fnum(r["duration_ms"])
+    out = []
+    for condition in order:
+        vals = by_condition.get(condition, {})
+        out.append(
+            {
+                "condition": condition,
+                "memcpy_ms": f"{vals.get('memcpy', float('nan')):.1f}",
+                "memset_ms": f"{vals.get('memset', float('nan')):.1f}",
+            }
+        )
+    write_csv(DATA / "nsys_memory_activity_breakdown.csv", out, ["condition", "memcpy_ms", "memset_ms"])
+
+    labels = [r["condition"].replace(" + ", "\n+ ").replace(" alone", "\nalone").replace(" MIG", "\nMIG") for r in out]
+    memcpy = [fnum(r["memcpy_ms"]) for r in out]
+    memset = [fnum(r["memset_ms"]) for r in out]
+    x = list(range(len(out)))
+    plt.figure(figsize=(11.2, 5.2))
+    plt.bar(x, memset, color=COLORS["teal"], label="memset duration")
+    plt.bar(x, memcpy, bottom=memset, color=COLORS["purple"], label="memcpy duration")
+    plt.ylabel("Total profiled memory activity duration (ms)")
+    plt.title("NSYS memory ops: 2g increases memset time; NeuralRx/ResNet increase memcpy time")
+    plt.xticks(x, labels, rotation=22, ha="right")
+    plt.legend(frameon=False)
+    return savefig("fig13_nsys_memory_activity_breakdown.png")
+
+
 def plot_dv2_sanity() -> str:
     rows = read_csv(DV2_SUMMARY)
     out = [{"scenario": r["scenario"], "p99_mean_us": fnum(r["p99_mean"]), "p99_ci_lo": fnum(r["p99_ci_lo"]), "p99_ci_hi": fnum(r["p99_ci_hi"])} for r in rows]
@@ -790,7 +892,113 @@ def nsys_profile_tables() -> dict[str, str]:
         )
     write_csv(DATA / "dv2_sanity_table.csv", dv2_rows, ["condition", "n", "p99_mean_us", "p99_ci_us", "p999_mean_us", "max_mean_us"])
 
+    rootcause_rows = []
+    rootcause_order = [
+        "L1 7g MIG alone",
+        "L1 3g alone",
+        "L1 3g + NeuralRx",
+        "L1 2g alone",
+        "L1 2g + ChanPred",
+        "L1 3g + ResNet",
+        "L1 3g + ResNet+ChanPred",
+        "L1 3g + ResNet+Forecaster",
+        "L1 4g + ResNet",
+    ]
+    rootcause_by_condition = {r["condition"]: r for r in read_csv(NSYS_KERNEL_ACTIVITY)}
+    for condition in rootcause_order:
+        if condition not in rootcause_by_condition:
+            continue
+        r = rootcause_by_condition[condition]
+        rootcause_rows.append(
+            {
+                "condition": condition,
+                "kernel_p99_us": f"{fnum(r['kernel_gap_p99_us']):.0f}",
+                "all_activity_p99_us": f"{fnum(r['all_activity_gap_p99_us']):.0f}",
+                "big_gaps_per_run": f"{fnum(r['big_kernel_gaps_ge_1ms']):.1f}",
+                "big_gaps_with_mem": f"{fnum(r['big_gaps_with_mem_pct']):.1f}%",
+                "mem_fraction": f"{fnum(r['mean_mem_fraction_in_big_gaps_pct']):.1f}%",
+            }
+        )
+
+    memory_by_condition: dict[str, dict[str, float]] = {}
+    for r in read_csv(NSYS_MEMORY_ACTIVITY):
+        memory_by_condition.setdefault(r["condition"], {})[r["op"]] = fnum(r["duration_ms"])
+    base_memcpy_ms = memory_by_condition["L1 3g alone"]["memcpy"]
+    base_memset_ms = memory_by_condition["L1 3g alone"]["memset"]
+    memory_deep_rows = []
+    for condition in rootcause_order:
+        vals = memory_by_condition.get(condition, {})
+        if not vals:
+            continue
+        memcpy_ms = vals.get("memcpy", float("nan"))
+        memset_ms = vals.get("memset", float("nan"))
+        memory_deep_rows.append(
+            {
+                "condition": condition,
+                "memcpy_ms": f"{memcpy_ms:.1f}",
+                "memcpy_vs_3g": f"{memcpy_ms / base_memcpy_ms:.1f}x",
+                "memset_ms": f"{memset_ms:.1f}",
+                "memset_vs_3g": f"{memset_ms / base_memset_ms:.1f}x",
+            }
+        )
+
+    transition_rows = []
+    transition_keep = {
+        ("L1 3g + NeuralRx", "copy_complex64_kernel -> convert_kernel"),
+        ("L1 3g + NeuralRx", "convert_kernel -> noise_intf_est"),
+        ("L1 3g + NeuralRx", "convert_kernel -> eq_coef"),
+        ("L1 2g alone", "convert_kernel -> noise_intf_est"),
+        ("L1 2g alone", "copy_float32_kernel -> convert_kernel"),
+        ("L1 2g alone", "convert_kernel -> eq_coef"),
+        ("L1 3g + ResNet+ChanPred", "convert_kernel -> ch_est_pre"),
+        ("L1 3g + ResNet+Forecaster", "convert_kernel -> ch_est_pre"),
+        ("L1 4g + ResNet", "convert_kernel -> ch_est_pre"),
+    }
+    for r in read_csv(NSYS_TRANSITIONS):
+        if (r["condition"], r["transition"]) not in transition_keep:
+            continue
+        transition_rows.append(
+            {
+                "condition": r["condition"],
+                "transition": r["transition"],
+                "count": r["count"],
+                "p50_gap_us": f"{fnum(r['p50_gap_us']):.0f}",
+                "p99_gap_us": f"{fnum(r['p99_gap_us']):.0f}",
+                "max_gap_ms": r["max_gap_ms"],
+                "mem_fraction": f"{fnum(r['mean_mem_fraction_pct']):.1f}%",
+            }
+        )
+    write_csv(
+        DATA / "nsys_selected_rootcause_transitions.csv",
+        transition_rows,
+        ["condition", "transition", "count", "p50_gap_us", "p99_gap_us", "max_gap_ms", "mem_fraction"],
+    )
+
     return {
+        "rootcause": md_table(rootcause_rows, [
+            ("condition", "Condition"),
+            ("kernel_p99_us", "kernel-only p99 gap us"),
+            ("all_activity_p99_us", "all-activity p99 gap us"),
+            ("big_gaps_per_run", ">=1ms kernel gaps / run"),
+            ("big_gaps_with_mem", "with memcpy/memset"),
+            ("mem_fraction", "memory fraction inside big gaps"),
+        ]),
+        "memory_deep": md_table(memory_deep_rows, [
+            ("condition", "Condition"),
+            ("memcpy_ms", "memcpy total ms"),
+            ("memcpy_vs_3g", "memcpy vs 3g alone"),
+            ("memset_ms", "memset total ms"),
+            ("memset_vs_3g", "memset vs 3g alone"),
+        ]),
+        "transitions_deep": md_table(transition_rows, [
+            ("condition", "Condition"),
+            ("transition", "Boundary transition"),
+            ("count", "count"),
+            ("p50_gap_us", "p50 gap us"),
+            ("p99_gap_us", "p99 gap us"),
+            ("max_gap_ms", "max gap ms"),
+            ("mem_fraction", "mean mem fraction"),
+        ]),
         "profile": md_table(profile, [
             ("condition", "NSYS condition"),
             ("p99_gap_us", "p99 gap us"),
@@ -926,37 +1134,37 @@ MIG에서 선택지는 모두 비용을 가진다.
 
 이 그림은 "어떤 AI가 외부에 있으면 위험한가?"라는 질문보다 "L1과 in-line PHY-AI를 같은 partition에 넣어도 되는가?"라는 질문이 더 중요하다는 점을 보여준다. 답은 데이터상 명확히 아니다. MIG는 partition 사이 capacity isolation은 줄 수 있지만, 같은 MIG device 안에서 L1과 PHY-AI가 runtime, kernel launch, copy, SM/memory path를 시간적으로 나눠 쓰는 문제는 해결하지 못한다.
 
-## 12. NSYS gap 분석: tail은 inter-kernel gap에서 보인다
+## 12. NSYS SQLite 재분석: kernel-only gap은 idle이 아니다
 
 ![NSYS gap]({figs['nsys_gap']})
 
-NSYS deep analysis는 L1 kernel 자체의 평균 실행시간만으로는 tail을 설명하기 어렵고, kernel 사이 gap과 burst idle 구간이 중요하다는 점을 보여준다. 그림의 라벨은 실제 조건으로 풀어쓴 것이다. `L1 2g + ChanPred on 3g` 조건은 p99/p999 inter-kernel gap이 가장 크고, `L1 4g + ResNet on 2g`는 상대적으로 작다. `L1 3g + ResNet+ChanPred`, `L1 3g + ResNet+Forecaster`처럼 heterogeneous AI 조합은 중간에 위치한다.
+처음 NSYS 결과를 kernel-to-kernel gap만으로 보면 "L1 kernel 사이에 긴 idle이 있다"처럼 보인다. 그런데 SQLite에서 `CUPTI_ACTIVITY_KIND_KERNEL`, `MEMCPY`, `MEMSET` interval을 다시 합쳐보면 해석이 달라진다. 많은 long gap은 진짜로 GPU가 논 것이 아니라, 다음 L1 kernel로 넘어가기 전 boundary가 memcpy/memset 활동으로 채워진 구간이다.
 
-이 결과는 우리가 말하는 bandwidth 문제가 단순히 "몇 GB/s를 썼는가"가 아니라는 점을 뒷받침한다. L1이 일정한 frame cadence를 유지하려면 다음 kernel이 제때 launch되고 copy/convert 단계가 제때 지나가야 한다. 하지만 small partition이나 특정 AI mix에서는 kernel 사이 빈 시간이 길어지고, 이 gap tail이 L1 p99/p999로 나타난다. 그래서 이 문제를 **temporal bandwidth 또는 scheduling headroom 부족**으로 해석하는 것이 sustained HBM bandwidth 하나로 설명하는 것보다 더 정확하다.
+따라서 여기서의 문제 지점은 단순 idle gap이 아니다. 더 정확히는 **L1 pipeline의 convert/copy/memset boundary가 partition size와 co-tenant에 따라 길어지는 현상**이다. 이게 중요한 이유는 AI-RAN L1이 sustained 평균 throughput만 필요한 workload가 아니라 frame cadence를 맞춰야 하는 workload이기 때문이다. 평균 GPU busy가 낮아도, 특정 boundary가 수백 us~ms 단위로 흔들리면 p99/p999 deadline이 바로 깨진다.
 
-아래 표는 같은 NSYS SQLite 분석에서 가져온 전체 조건 요약이다. 코드명은 실제 partition/workload 의미로 풀어썼다. 여기서 중요한 패턴은 세 가지다. 첫째, p50 gap은 대부분 1us 수준으로 작기 때문에 평균적인 kernel cadence만 보면 문제가 작아 보인다. 둘째, p99/p999 gap과 top-tail share는 조건별로 크게 달라져 tail이 특정 시간 구간에 몰린다. 셋째, runtime API p99와 memcpy total이 workload별로 다르게 움직여서, 단순 SM 점유율이나 sustained HBM throughput 하나로 tail을 설명하기 어렵다.
+그림에서 빨간 막대는 kernel만 보고 잰 p99 gap이고, 파란 막대는 kernel/memcpy/memset을 모두 activity로 merge한 뒤 잰 p99 gap이다. 두 값의 차이가 클수록 kernel 사이가 "빈 시간"이 아니라 memory op로 채워졌다는 뜻이다. 노란 선은 1ms 이상 kernel gap 중 memcpy/memset이 포함된 비율이다.
 
-{tables['profile']}
+가장 선명한 조건은 `L1 2g alone`과 `L1 2g + ChanPred`다. kernel-only p99 gap은 각각 1444us, 1404us까지 커지지만 all-activity p99 gap은 243us, 175us로 훨씬 작다. 동시에 1ms 이상 kernel gap의 96.7%, 99.1%가 memcpy/memset을 포함한다. 즉 2g에서는 L1이 alone이어도 memory/setup boundary가 매우 조밀하게 끼어들고, ChanPred를 같이 두면 그 구조가 더 강해진다.
 
-더 자세히 보면 tail은 median이 아니라 극단부에서 생긴다. `L1 3g alone`도 p50 gap은 1.2us 수준이지만 p99/p999는 수백~수천 us로 벌어진다. small L1 또는 특정 AI co-tenant에서는 이 long-tail 구조가 더 커진다. 즉, L1 deadline 관점에서는 "대부분의 kernel gap이 짧다"가 안전을 의미하지 않는다. p99/p999 구간이 실제 frame tail을 만든다.
+`L1 3g + NeuralRx`도 같은 방향의 증거다. 3g baseline은 1ms 이상 kernel gap이 run당 19.3개이고 그중 memory 포함 비율이 45.3%인데, NeuralRx가 붙으면 run당 83.0개, memory 포함 비율 72.4%로 늘어난다. 이 결과는 NeuralRx가 단순히 "외부 AI 하나"가 아니라 L1의 copy/convert boundary와 시간적으로 충돌하는 PHY-AI workload라는 해석을 뒷받침한다.
 
-{tables['gap_detail']}
+{tables['rootcause']}
 
-## 13. Memory/copy pressure는 workload별로 다르다
+## 13. NSYS가 가리키는 실제 문제 지점: convert/copy/memset boundary
 
 ![Memory ops]({figs['memory_ops']})
 
-NSYS memory-op summary는 각 workload가 L1 주변에 만드는 copy pressure가 다르다는 점을 보여준다. 이 그림은 `L1 3g alone`을 1.0으로 정규화했다. NeuralRx, Qwen, ResNet, Forecaster는 total memcpy나 memcpy p99가 baseline 대비 크게 달라진다. 반면 모든 workload가 같은 방식으로 나빠지는 것은 아니다.
+memory activity를 보면 원인이 더 구체화된다. 같은 L1 pipeline에서 memcpy call 수와 memset call 수는 거의 같지만, 총 duration은 partition/workload에 따라 크게 바뀐다. `L1 3g alone`의 memcpy 총 시간은 46.8ms인데 `L1 3g + NeuralRx`에서는 195.1ms로 약 4.2배 증가한다. `L1 3g + ResNet`도 155.2ms, `L1 3g + ResNet+Forecaster`도 140.4ms까지 커진다. 반대로 2g 조건은 memcpy보다 memset 쪽이 더 직접적이다. `L1 3g alone`의 memset은 408.2ms인데 `L1 2g alone`과 `L1 2g + ChanPred`는 각각 814.5ms, 813.9ms로 거의 2배다.
 
-이 그림의 역할은 mechanism 설명이다. 6/1 F/Dv2에서 generic D2D/H2D saturation이 L1 p99를 크게 망가뜨리지 않았는데, 5/31 NeuralRx나 6/1 coloc에서는 문제가 커졌다. 그 차이는 단순 bandwidth 양만으로는 설명하기 어렵다. PHY-AI는 copy, convert, kernel launch, framework runtime phase가 L1 pipeline과 특정 시간 패턴으로 겹칠 수 있고, 이 temporal overlap이 tail을 만든다.
+이 차이가 중요하다. 만약 문제가 단순 sustained HBM bandwidth 포화라면 H2D/D2D/GEMM synthetic stress가 일관되게 L1 p99를 망가뜨려야 한다. 하지만 6/1 F와 Dv2에서는 generic cross-partition stress가 대부분 baseline 근처에 머물렀다. 반면 NeuralRx, ResNet 계열, 작은 2g L1에서는 copy/memset boundary가 길어진다. 즉 우리가 주장해야 할 bandwidth 문제는 "평균 GB/s를 많이 썼다"가 아니라, **고정된 device bandwidth와 memory path를 시간적으로 나눠 쓰는 상황에서 L1 boundary가 deterministic하게 보호되지 않는다**는 것이다.
 
-아래 kernel/copy-level 표는 이 해석을 더 구체화한다. L1 파이프라인에서는 `convert_kernel`, `cupy_copy__complex64_complex64`, `cupy_copy__float32_float32` 같은 반복적인 copy/convert 단계가 많이 등장한다. median duration은 짧지만, 특정 조건에서는 post-gap p99와 max post-gap이 크게 벌어진다. 이 말은 kernel 자체가 항상 오래 걸리는 것이 아니라, kernel 사이 scheduling/copy boundary에서 긴 대기 구간이 생긴다는 뜻이다.
+{tables['memory_deep']}
 
-{tables['kernel']}
+transition level에서도 같은 구조가 보인다. NeuralRx 조건에서는 `copy_complex64_kernel -> convert_kernel`, `convert_kernel -> noise_intf_est`, `convert_kernel -> eq_coef` 같은 L1 stage boundary의 p99 gap이 수십 ms까지 벌어진다. ResNet+ChanPred/Forecaster 조건에서는 `convert_kernel -> ch_est_pre`가 1920번 반복되고, 그 boundary의 평균 memory fraction이 88~90% 수준이다. 즉 tail은 하나의 거대한 kernel이 느려져서 생기는 것이 아니라, 반복적인 L1 stage 사이에서 copy/memset이 끼어드는 방식으로 만들어진다.
 
-Runtime API 관점에서도 비슷한 패턴이 보인다. top API는 대부분 `cuLaunchKernel`이고 총 API call 수는 동일하게 108,999개로 맞춰져 있다. 그런데 runtime total, p99, max는 조건별로 달라진다. 즉, 실행한 L1 pipeline 구조는 같아도 주변 AI workload와 partition placement에 따라 runtime layer에서 tail이 달라진다.
+{tables['transitions_deep']}
 
-{tables['runtime']}
+그래서 NSYS 근거로 써야 할 문장은 더 좁고 강해야 한다. "MIG가 bandwidth isolation을 전혀 못 한다"가 아니라, **MIG의 정적 capacity isolation은 L1 kernel boundary의 temporal memory activity를 제어하지 못한다**가 맞다. 이것이 AI-RAN에서 치명적인 이유는 L1은 throughput workload가 아니라 deadline workload이고, NeuralRx/ChanPred/ResNet 같은 PHY-AI workload도 평균 처리량뿐 아니라 per-op tail latency와 fit constraint를 동시에 갖기 때문이다.
 
 ## 14. Dv2 replication은 negative result를 강화한다
 
@@ -982,15 +1190,15 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 
 2. **하지만 AI-RAN이 원하는 것은 capacity isolation만이 아니다.** L1은 frame deadline을 맞춰야 하고, AI workload도 throughput뿐 아니라 per-op p99와 fit constraint를 가진다. 2g L1은 standalone부터 headroom이 작고, AI workload는 작은 slice에서 fit 실패나 throughput scaling 문제를 보인다.
 
-3. **NSYS는 failure mechanism이 sustained bandwidth 하나가 아니라 temporal gap이라는 점을 보여준다.** p50 gap은 작지만 p99/p999 gap이 조건별로 커지고, top 0.1~1% gap이 전체 gap time의 큰 부분을 차지한다. 즉, 평균적인 GPU 사용률보다 긴 kernel 사이 빈 구간이 real-time tail을 만든다.
+3. **NSYS는 failure mechanism이 단순 idle gap이 아니라 memory-filled kernel boundary라는 점을 보여준다.** kernel-only gap만 보면 긴 idle처럼 보이지만, kernel/memcpy/memset activity를 merge하면 2g 조건의 1ms 이상 kernel gap 대부분이 memory op로 채워져 있다. 즉 문제는 GPU가 놀아서가 아니라, L1의 convert/copy/memset boundary가 temporal하게 보호되지 않는다는 것이다.
 
-4. **copy/convert/runtime boundary가 workload별로 다르게 흔들린다.** NeuralRx, Qwen, ResNet, Forecaster는 memcpy total, memcpy p99, runtime p99가 서로 다른 패턴을 보인다. 이것은 synthetic HBM stress와 PHY-AI workload가 같지 않다는 뜻이다.
+4. **copy/convert/runtime boundary가 workload별로 다르게 흔들린다.** NeuralRx는 3g L1의 memcpy total을 4.2배로 키우고, 2g L1은 memset duration을 3g 대비 거의 2배로 키운다. 이것은 synthetic HBM stress와 PHY-AI workload가 같지 않다는 뜻이다.
 
 5. **가장 치명적인 지점은 same-partition L1+PHY-AI coloc이다.** 6/1 G/H에서 L1과 NeuralRx가 같은 partition에 들어가면 p99가 수백 ms로 폭발한다. 외부 AI 종류를 바꿔도 coloc 이후에는 p99가 이미 높은 영역에 머문다. 이 결과는 MIG가 partition 사이 격리는 줄 수 있어도, 같은 MIG device 내부의 temporal sharing 문제는 해결하지 못한다는 점을 보여준다.
 
 따라서 논문에서 최종 메시지는 이렇게 가져가야 한다.
 
-> MIG는 GPU를 공간적으로 나누는 좋은 capacity isolation 도구지만, AI-RAN의 real-time L1 + PHY-AI consolidation에는 부족하다. 이유는 L1과 AI가 모두 tail-sensitive하고, static partition은 workload phase, copy/runtime boundary, kernel launch gap, PHY-AI coloc behavior를 제어하지 못하기 때문이다. AI-RAN에는 MIG 위에 workload-aware temporal scheduling 또는 admission/control layer가 추가로 필요하다.
+> MIG는 GPU를 공간적으로 나누는 좋은 capacity isolation 도구지만, AI-RAN의 real-time L1 + PHY-AI consolidation에는 부족하다. 이유는 L1과 AI가 모두 tail-sensitive하고, static partition은 workload phase, copy/memset/runtime boundary, kernel launch gap, PHY-AI coloc behavior를 제어하지 못하기 때문이다. AI-RAN에는 MIG 위에 workload-aware temporal scheduling 또는 admission/control layer가 추가로 필요하다.
 
 ## 생성된 source tables
 
@@ -1010,6 +1218,9 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 - `data/g_coloc_external_dominance.csv`
 - `data/nsys_gap_summary.csv`
 - `data/memory_ops_pressure.csv`
+- `data/nsys_kernel_vs_all_activity_summary.csv`
+- `data/nsys_memory_activity_breakdown.csv`
+- `data/nsys_selected_rootcause_transitions.csv`
 - `data/dv2_sanity.csv`
 - `data/nsys_profile_matrix.csv`
 - `data/nsys_gap_detail_selected.csv`
@@ -1078,8 +1289,8 @@ def main() -> None:
     figs["static_partition"] = plot_static_partition_sweep(rows)
     figs["ai_tput_vs_p99"] = plot_ai_throughput_vs_p99(ai_latency)
     figs["coloc_external"] = plot_coloc_external_dominance()
-    figs["nsys_gap"] = plot_nsys_gap_summary()
-    figs["memory_ops"] = plot_memory_ops_pressure()
+    figs["nsys_gap"] = plot_nsys_kernel_vs_activity_gap()
+    figs["memory_ops"] = plot_nsys_memory_activity_breakdown()
     figs["dv2"] = plot_dv2_sanity()
     build_markdown(figs)
     build_notebook()

@@ -1,0 +1,73 @@
+condition,transition,count,p50_gap_us,p99_gap_us,max_gap_ms,mean_mem_us_inside,mean_mem_fraction_pct
+L1 2g + ChanPred,convert_kernel -> copy_complex64_kernel,3,119617.6,120639.5,120.6,9.7,0.0
+L1 2g + ChanPred,convert_kernel -> eq_coef,2,81317.8,81317.8,81.3,18.9,0.6
+L1 2g + ChanPred,convert_kernel -> copy_float16_kernel,3,79273.8,79522.8,79.5,0.0,0.0
+L1 2g + ChanPred,ch_est_filter -> copy_complex64_kernel,3,74195.5,75246.6,75.2,0.0,0.0
+L1 2g + ChanPred,copy_complex64_kernel -> copy_float32_kernel,6,73290.9,73716.2,73.7,0.0,0.0
+L1 2g + ChanPred,convert_kernel -> convert_kernel,6,69000.1,71271.5,71.3,24.8,0.0
+L1 2g + ChanPred,copy_complex64_kernel -> convert_kernel,8,615.5,2931.4,2.9,0.0,0.0
+L1 2g + ChanPred,copy_float32_kernel -> convert_kernel,2,2371.0,2371.0,2.4,0.0,0.0
+L1 2g alone,convert_kernel -> copy_complex64_kernel,3,115527.7,117223.8,117.2,10.9,0.0
+L1 2g alone,convert_kernel -> noise_intf_est,32,1521.6,91139.1,91.1,117.0,7.9
+L1 2g alone,convert_kernel -> copy_float16_kernel,3,75758.1,82150.5,82.2,0.0,0.0
+L1 2g alone,copy_complex64_kernel -> copy_float32_kernel,6,74224.4,74585.8,74.6,0.0,0.0
+L1 2g alone,ch_est_filter -> copy_complex64_kernel,3,72985.4,74243.3,74.2,0.0,0.0
+L1 2g alone,convert_kernel -> convert_kernel,6,70051.6,72895.1,72.9,32.6,0.0
+L1 2g alone,copy_float32_kernel -> convert_kernel,26,2005.4,39580.4,39.6,0.0,0.0
+L1 2g alone,convert_kernel -> eq_coef,26,3426.3,37847.1,37.8,32.1,1.4
+L1 3g + NeuralRx,convert_kernel -> copy_complex64_kernel,3,109402.1,109969.6,110.0,10.0,0.0
+L1 3g + NeuralRx,copy_complex64_kernel -> convert_kernel,58,1377.3,76266.6,76.3,0.0,0.0
+L1 3g + NeuralRx,ch_est_filter -> copy_complex64_kernel,3,73877.8,73992.3,74.0,0.0,0.0
+L1 3g + NeuralRx,convert_kernel -> copy_float16_kernel,3,72311.1,72618.2,72.6,0.0,0.0
+L1 3g + NeuralRx,copy_complex64_kernel -> copy_float32_kernel,6,70640.6,72177.0,72.2,0.0,0.0
+L1 3g + NeuralRx,convert_kernel -> convert_kernel,6,69468.3,70854.0,70.9,41.0,0.1
+L1 3g + NeuralRx,convert_kernel -> noise_intf_est,36,1387.5,69276.6,69.3,119.2,13.2
+L1 3g + NeuralRx,convert_kernel -> eq_coef,36,1380.1,62632.5,62.6,92.6,10.0
+L1 3g + ResNet,convert_kernel -> copy_complex64_kernel,3,108639.1,114277.3,114.3,9.6,0.0
+L1 3g + ResNet,convert_kernel -> noise_intf_est,17,1578.2,89216.6,89.2,64.7,4.6
+L1 3g + ResNet,convert_kernel -> copy_float16_kernel,3,73000.4,76796.3,76.8,0.0,0.0
+L1 3g + ResNet,ch_est_filter -> copy_complex64_kernel,3,71871.5,74365.8,74.4,0.0,0.0
+L1 3g + ResNet,copy_complex64_kernel -> copy_float32_kernel,7,72244.4,73796.2,73.8,0.0,0.0
+L1 3g + ResNet,convert_kernel -> eq_coef,19,2336.6,71374.1,71.4,32.7,2.2
+L1 3g + ResNet,convert_kernel -> convert_kernel,6,69961.5,70298.2,70.3,31.5,0.0
+L1 3g + ResNet,copy_float32_kernel -> convert_kernel,12,1872.3,39117.7,39.1,0.0,0.0
+L1 3g + ResNet+ChanPred,convert_kernel -> copy_complex64_kernel,3,114152.1,114818.0,114.8,10.7,0.0
+L1 3g + ResNet+ChanPred,ch_est_filter -> copy_complex64_kernel,3,74815.8,74888.7,74.9,0.0,0.0
+L1 3g + ResNet+ChanPred,convert_kernel -> copy_float16_kernel,3,74216.4,74349.4,74.3,0.0,0.0
+L1 3g + ResNet+ChanPred,copy_complex64_kernel -> copy_float32_kernel,6,71955.5,73309.9,73.3,0.0,0.0
+L1 3g + ResNet+ChanPred,convert_kernel -> convert_kernel,6,70005.6,71214.8,71.2,30.3,0.0
+L1 3g + ResNet+ChanPred,copy_float32_kernel -> copy_complex64_kernel,2,1488.6,1488.6,1.5,3.7,0.4
+L1 3g + ResNet+ChanPred,convert_kernel -> noise_intf_est,2,1224.9,1224.9,1.2,96.0,9.1
+L1 3g + ResNet+ChanPred,convert_kernel -> ch_est_pre,1920,745.6,1019.4,1.0,690.7,88.8
+L1 3g + ResNet+Forecaster,convert_kernel -> copy_complex64_kernel,3,105968.3,112247.1,112.2,9.8,0.0
+L1 3g + ResNet+Forecaster,ch_est_filter -> copy_complex64_kernel,3,73777.8,78704.0,78.7,0.0,0.0
+L1 3g + ResNet+Forecaster,convert_kernel -> copy_float16_kernel,3,73186.3,77349.0,77.3,0.0,0.0
+L1 3g + ResNet+Forecaster,copy_complex64_kernel -> copy_float32_kernel,6,70515.7,73714.4,73.7,0.0,0.0
+L1 3g + ResNet+Forecaster,convert_kernel -> convert_kernel,6,71121.4,72379.6,72.4,40.1,0.1
+L1 3g + ResNet+Forecaster,convert_kernel -> noise_intf_est,1,1169.9,1169.9,1.2,62.5,5.3
+L1 3g + ResNet+Forecaster,convert_kernel -> ch_est_pre,1920,845.9,992.8,2.0,732.8,89.7
+L1 3g + ResNet+Forecaster,copy_complex64_kernel -> convert_kernel,5,583.5,991.3,1.0,0.0,0.0
+L1 3g alone,convert_kernel -> convert_kernel,6,71182.1,120616.5,120.6,22.2,0.0
+L1 3g alone,convert_kernel -> copy_complex64_kernel,3,116059.2,116854.6,116.9,9.5,0.0
+L1 3g alone,convert_kernel -> copy_float16_kernel,3,74686.3,80284.5,80.3,0.0,0.0
+L1 3g alone,ch_est_filter -> copy_complex64_kernel,3,76615.2,77921.8,77.9,0.0,0.0
+L1 3g alone,copy_complex64_kernel -> copy_float32_kernel,6,73469.4,73966.2,74.0,0.0,0.0
+L1 3g alone,copy_complex64_kernel -> convert_kernel,15,2000.6,16564.9,16.6,0.0,0.0
+L1 3g alone,convert_kernel -> eq_coef,7,966.3,4808.2,4.8,17.4,1.6
+L1 3g alone,copy_float32_kernel -> convert_kernel,7,1469.0,4004.0,4.0,0.0,0.0
+L1 4g + ResNet,convert_kernel -> copy_complex64_kernel,3,114923.6,115505.0,115.5,10.3,0.0
+L1 4g + ResNet,ch_est_filter -> copy_complex64_kernel,3,72656.1,75945.3,75.9,0.0,0.0
+L1 4g + ResNet,convert_kernel -> copy_float16_kernel,3,74504.0,74794.0,74.8,0.0,0.0
+L1 4g + ResNet,copy_complex64_kernel -> copy_float32_kernel,7,70512.0,73741.4,73.7,0.0,0.0
+L1 4g + ResNet,convert_kernel -> convert_kernel,6,68292.3,71829.1,71.8,30.2,0.0
+L1 4g + ResNet,copy_float32_kernel -> convert_kernel,1,2959.0,2959.0,3.0,0.0,0.0
+L1 4g + ResNet,copy_complex64_kernel -> convert_kernel,4,602.7,2741.9,2.7,0.0,0.0
+L1 4g + ResNet,convert_kernel -> ch_est_pre,1920,687.9,950.2,1.8,667.6,89.1
+L1 7g MIG alone,convert_kernel -> copy_complex64_kernel,3,114867.7,117175.2,117.2,9.7,0.0
+L1 7g MIG alone,convert_kernel -> copy_float16_kernel,3,75546.4,76986.5,77.0,0.0,0.0
+L1 7g MIG alone,ch_est_filter -> copy_complex64_kernel,3,73554.5,74690.2,74.7,0.0,0.0
+L1 7g MIG alone,copy_complex64_kernel -> copy_float32_kernel,7,71235.0,73753.6,73.8,0.0,0.0
+L1 7g MIG alone,convert_kernel -> convert_kernel,6,70512.0,70936.5,70.9,30.3,0.0
+L1 7g MIG alone,copy_complex64_kernel -> convert_kernel,44,1936.2,56155.2,56.2,0.0,0.0
+L1 7g MIG alone,convert_kernel -> noise_intf_est,20,1598.9,17843.3,17.8,49.8,4.2
+L1 7g MIG alone,convert_kernel -> eq_coef,27,1828.8,5261.9,5.3,40.0,2.8

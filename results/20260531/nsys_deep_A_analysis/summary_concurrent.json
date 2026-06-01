@@ -1,0 +1,423 @@
+[
+  {
+    "scenario": "A1_S35_2gL1_chanpred3g",
+    "n_l1_kernels": 48976,
+    "n_gaps": 48975,
+    "med_gap_us": 1.248,
+    "p95_gap_us": 328.253,
+    "p99_gap_us": 1564.28232,
+    "p999_gap_us": 1611.9548320000001,
+    "max_gap_us": 118786.95,
+    "top1_pct_count": 489,
+    "top1_total_idle_pct_share": 26.337853241246425,
+    "top_l1_pairs": [
+      [
+        [
+          "convert_kernel",
+          "windowedChEstPreNoDftSOfdmKernel"
+        ],
+        481
+      ],
+      [
+        [
+          "cupy_copy__complex64_complex64",
+          "cupy_copy__float32_float32"
+        ],
+        2
+      ],
+      [
+        [
+          "convert_kernel",
+          "convert_kernel"
+        ],
+        2
+      ],
+      [
+        [
+          "convert_kernel",
+          "cupy_copy__complex64_complex64"
+        ],
+        1
+      ],
+      [
+        [
+          "convert_kernel",
+          "cupy_copy__float16_float16"
+        ],
+        1
+      ]
+    ],
+    "top_ai_events": [
+      [
+        [
+          "A1_S35_2gL1_chanpred3g",
+          "kernel"
+        ],
+        269
+      ],
+      [
+        [
+          "A1_S35_2gL1_chanpred3g",
+          "Kernel"
+        ],
+        82
+      ],
+      [
+        [
+          "A1_S35_2gL1_chanpred3g",
+          "elemWiseRNNcell"
+        ],
+        73
+      ],
+      [
+        [
+          "A1_S35_2gL1_chanpred3g",
+          "vectorized_elementwise_kernel"
+        ],
+        47
+      ],
+      [
+        [
+          "A1_S35_2gL1_chanpred3g",
+          "ampere_fp16_s16816gemm_fp16_64x64_sliced1x2_ldg8_f"
+        ],
+        16
+      ]
+    ],
+    "ai_workloads": [
+      "A1_S35_2gL1_chanpred3g"
+    ]
+  },
+  {
+    "scenario": "A2_S34_4gL1_resnet2g",
+    "n_l1_kernels": 48976,
+    "n_gaps": 48975,
+    "med_gap_us": 1.184,
+    "p95_gap_us": 262.27929999999986,
+    "p99_gap_us": 811.36032,
+    "p999_gap_us": 839.5107840000063,
+    "max_gap_us": 106490.939,
+    "top1_pct_count": 489,
+    "top1_total_idle_pct_share": 28.687643025219415,
+    "top_l1_pairs": [
+      [
+        [
+          "convert_kernel",
+          "windowedChEstPreNoDftSOfdmKernel"
+        ],
+        475
+      ],
+      [
+        [
+          "cupy_copy__complex64_complex64",
+          "cupy_copy__float32_float32"
+        ],
+        3
+      ],
+      [
+        [
+          "convert_kernel",
+          "convert_kernel"
+        ],
+        2
+      ],
+      [
+        [
+          "convert_kernel",
+          "cupy_copy__complex64_complex64"
+        ],
+        1
+      ],
+      [
+        [
+          "chEstFilterNoDftSOfdmDispatchKernel",
+          "cupy_copy__complex64_complex64"
+        ],
+        1
+      ]
+    ],
+    "top_ai_events": [
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "batch_norm_transform_input_kernel"
+        ],
+        132
+      ],
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "vectorized_elementwise_kernel"
+        ],
+        126
+      ],
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "Kernel"
+        ],
+        66
+      ],
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "nchwToNhwcKernel"
+        ],
+        37
+      ],
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "nhwcToNchwKernel"
+        ],
+        27
+      ],
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "max_pool_forward_nchw"
+        ],
+        25
+      ],
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "ampere_fp16_s1688gemm_fp16_256x64_ldg8_f2f_nn"
+        ],
+        22
+      ],
+      [
+        [
+          "A2_S34_4gL1_resnet2g",
+          "ampere_fp16_s1688gemm_fp16_256x128_ldg8_f2f_stages"
+        ],
+        12
+      ]
+    ],
+    "ai_workloads": [
+      "A2_S34_4gL1_resnet2g"
+    ]
+  },
+  {
+    "scenario": "A3_M5c_3gL1",
+    "n_l1_kernels": 48976,
+    "n_gaps": 48975,
+    "med_gap_us": 1.28,
+    "p95_gap_us": 281.03159999999986,
+    "p99_gap_us": 869.8092200000002,
+    "p999_gap_us": 1014.4832880000058,
+    "max_gap_us": 117400.904,
+    "top1_pct_count": 489,
+    "top1_total_idle_pct_share": 28.015986557676065,
+    "top_l1_pairs": [
+      [
+        [
+          "convert_kernel",
+          "windowedChEstPreNoDftSOfdmKernel"
+        ],
+        475
+      ],
+      [
+        [
+          "cupy_copy__complex64_complex64",
+          "convert_kernel"
+        ],
+        3
+      ],
+      [
+        [
+          "cupy_copy__complex64_complex64",
+          "cupy_copy__float32_float32"
+        ],
+        2
+      ],
+      [
+        [
+          "convert_kernel",
+          "convert_kernel"
+        ],
+        2
+      ],
+      [
+        [
+          "cupy_copy__float32_float32",
+          "convert_kernel"
+        ],
+        2
+      ]
+    ],
+    "top_ai_events": [
+      [
+        [
+          "A3_M5c_resnet",
+          "batch_norm_transform_input_kernel"
+        ],
+        135
+      ],
+      [
+        [
+          "A3_M5c_resnet",
+          "vectorized_elementwise_kernel"
+        ],
+        125
+      ],
+      [
+        [
+          "A3_M5c_resnet",
+          "Kernel"
+        ],
+        67
+      ],
+      [
+        [
+          "A3_M5c_resnet",
+          "nchwToNhwcKernel"
+        ],
+        39
+      ],
+      [
+        [
+          "A3_M5c_resnet",
+          "nhwcToNchwKernel"
+        ],
+        27
+      ],
+      [
+        [
+          "A3_M5c_resnet",
+          "ampere_fp16_s1688gemm_fp16_256x64_ldg8_f2f_nn"
+        ],
+        19
+      ],
+      [
+        [
+          "A3_M5c_resnet",
+          "ampere_fp16_s16816gemm_fp16_128x64_ldg8_f2f_stages"
+        ],
+        14
+      ],
+      [
+        [
+          "A3_M5c_resnet",
+          "max_pool_forward_nchw"
+        ],
+        14
+      ]
+    ],
+    "ai_workloads": [
+      "A3_M5c_chanpred_v2",
+      "A3_M5c_resnet"
+    ]
+  },
+  {
+    "scenario": "A4_M8a_3gL1",
+    "n_l1_kernels": 48976,
+    "n_gaps": 48975,
+    "med_gap_us": 1.248,
+    "p95_gap_us": 280.9995999999999,
+    "p99_gap_us": 980.12732,
+    "p999_gap_us": 1184.8648800000153,
+    "max_gap_us": 116110.967,
+    "top1_pct_count": 489,
+    "top1_total_idle_pct_share": 29.33160966285754,
+    "top_l1_pairs": [
+      [
+        [
+          "convert_kernel",
+          "windowedChEstPreNoDftSOfdmKernel"
+        ],
+        452
+      ],
+      [
+        [
+          "cupy_copy__float32_float32",
+          "convert_kernel"
+        ],
+        11
+      ],
+      [
+        [
+          "cupy_copy__complex64_complex64",
+          "convert_kernel"
+        ],
+        10
+      ],
+      [
+        [
+          "convert_kernel",
+          "noiseIntfEstNoDftSOfdmKernel"
+        ],
+        5
+      ],
+      [
+        [
+          "convert_kernel",
+          "eqMmseCoefCompLowMimoKernel"
+        ],
+        4
+      ]
+    ],
+    "top_ai_events": [
+      [
+        [
+          "A4_M8a_forecaster",
+          "ampere_sgemm_32x128_tn"
+        ],
+        146
+      ],
+      [
+        [
+          "A4_M8a_resnet",
+          "vectorized_elementwise_kernel"
+        ],
+        133
+      ],
+      [
+        [
+          "A4_M8a_resnet",
+          "batch_norm_transform_input_kernel"
+        ],
+        127
+      ],
+      [
+        [
+          "A4_M8a_forecaster",
+          "ampere_sgemm_64x64_tn"
+        ],
+        120
+      ],
+      [
+        [
+          "A4_M8a_forecaster",
+          "ampere_sgemm_128x64_tn"
+        ],
+        76
+      ],
+      [
+        [
+          "A4_M8a_resnet",
+          "Kernel"
+        ],
+        68
+      ],
+      [
+        [
+          "A4_M8a_resnet",
+          "nchwToNhwcKernel"
+        ],
+        47
+      ],
+      [
+        [
+          "A4_M8a_forecaster",
+          "fmha_cutlassF_f32_aligned_64x64_rf_sm80"
+        ],
+        35
+      ]
+    ],
+    "ai_workloads": [
+      "A4_M8a_forecaster",
+      "A4_M8a_resnet"
+    ]
+  }
+]

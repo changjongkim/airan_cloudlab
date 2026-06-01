@@ -27,6 +27,10 @@ DATA = OUT / "data"
 SUMMARY = ROOT / "all_deep_dive" / "l1_condition_summary.csv"
 F_SUMMARY = ROOT / "20260601" / "analysis_F" / "F_summary.csv"
 G_SUMMARY = ROOT / "20260601" / "analysis_G" / "G_summary.csv"
+L1_LOG_RUNS = ROOT / "all_deep_dive" / "l1_log_runs.csv"
+DV2_SUMMARY = ROOT / "20260531" / "nsys_deep_Dv2_analysis" / "Dv2_summary.csv"
+NSYS_A_TABLE = ROOT / "20260531" / "nsys_deep_A_analysis" / "paper_table.csv"
+MEMORY_OPS = ROOT / "20260531" / "nsys_sqlite_v2_analysis" / "memory_ops_analysis.csv"
 
 
 COLORS = {
@@ -414,6 +418,211 @@ def plot_tradeoff_summary() -> str:
     return savefig("fig08_tradeoff_summary.png")
 
 
+def plot_l1_multi_ai_matrix() -> str:
+    rows = read_csv(L1_LOG_RUNS)
+    buckets: dict[tuple[str, str], list[float]] = {}
+    for r in rows:
+        if r["group"] != "l1_multi_ai":
+            continue
+        parts = Path(r["file"]).parts
+        if len(parts) < 4:
+            continue
+        scenario = parts[2]
+        mode = parts[3]
+        if mode not in {"alone", "multi"}:
+            continue
+        buckets.setdefault((scenario, mode), []).append(fnum(r["p99_ms"]))
+
+    out = []
+    for scenario in sorted({k[0] for k in buckets}):
+        alone = mean(buckets.get((scenario, "alone"), []))
+        multi = mean(buckets.get((scenario, "multi"), []))
+        if math.isnan(alone) or math.isnan(multi):
+            continue
+        out.append({"scenario": scenario, "alone_p99_ms": alone, "multi_p99_ms": multi, "p99_delta_pct": pct(multi, alone)})
+    write_csv(DATA / "l1_multi_ai_matrix.csv", out, ["scenario", "alone_p99_ms", "multi_p99_ms", "p99_delta_pct"])
+
+    labels = [r["scenario"].split("_", 1)[0] for r in out]
+    vals = [r["p99_delta_pct"] for r in out]
+    colors = [COLORS["red"] if v > 5 else COLORS["gold"] if v > 1 else COLORS["teal"] if v < -1 else COLORS["gray"] for v in vals]
+    plt.figure(figsize=(11, 4.8))
+    plt.bar(labels, vals, color=colors)
+    plt.axhline(0, color=COLORS["gray"], linewidth=1)
+    plt.axhline(5, color=COLORS["red"], linestyle="--", linewidth=1)
+    plt.axhline(-5, color=COLORS["teal"], linestyle="--", linewidth=1)
+    plt.ylabel("L1 p99 delta: multi vs alone (%)")
+    plt.xlabel("l1_multi_ai scenario")
+    plt.title("Multi-AI placement is non-monotonic, not a static rule")
+    plt.xticks(rotation=45, ha="right")
+    return savefig("fig09_l1_multi_ai_matrix.png")
+
+
+def parse_ai_throughput_v2() -> list[dict]:
+    root = ROOT / "20260531" / "ai_throughput_v2"
+    rows = []
+    pats = [
+        ("it_s", re.compile(r"([0-9.]+) it/s")),
+        ("pred_s", re.compile(r"\(([0-9.]+) pred/s")),
+        ("inf_s", re.compile(r"\(([0-9.]+) inf/s")),
+    ]
+    for log in root.glob("*/*run_*.log"):
+        text = log.read_text(errors="ignore")
+        group = log.parents[0].name
+        if group.endswith("_with_l1"):
+            workload = group[: -len("_with_l1")]
+            mode = "with_l1"
+        elif group.endswith("_alone"):
+            workload = group[: -len("_alone")]
+            mode = "alone"
+        else:
+            continue
+        for metric, pat in pats:
+            m = pat.search(text)
+            if m:
+                rows.append({"workload": workload, "mode": mode, "metric": metric, "value": fnum(m.group(1))})
+                break
+    write_csv(DATA / "ai_throughput_v2_parsed.csv", rows, ["workload", "mode", "metric", "value"])
+    return rows
+
+
+def plot_ai_throughput_vs_p99(ai_latency_rows: list[dict]) -> str:
+    t_rows = parse_ai_throughput_v2()
+    t_buckets: dict[tuple[str, str], list[float]] = {}
+    for r in t_rows:
+        t_buckets.setdefault((r["workload"], r["mode"]), []).append(fnum(r["value"]))
+    throughput_out = []
+    for workload in sorted({r["workload"] for r in t_rows}):
+        a = mean(t_buckets.get((workload, "alone"), []))
+        w = mean(t_buckets.get((workload, "with_l1"), []))
+        if not math.isnan(a) and not math.isnan(w):
+            throughput_out.append({"workload": workload, "throughput_delta_pct": pct(w, a)})
+
+    p99_rows = read_csv(DATA / "ai_per_op_p99_delta.csv")
+    p99_by_workload: dict[str, list[float]] = {}
+    for r in p99_rows:
+        p99_by_workload.setdefault(r["workload"], []).append(fnum(r["p99_delta_pct"]))
+    out = []
+    for r in throughput_out:
+        workload = "qwen" if r["workload"] == "qwen_small" else r["workload"]
+        p99_max = max(p99_by_workload.get(workload, [float("nan")]))
+        out.append({"workload": r["workload"], "throughput_delta_pct": r["throughput_delta_pct"], "max_per_op_p99_delta_pct": p99_max})
+    write_csv(DATA / "ai_throughput_vs_p99.csv", out, ["workload", "throughput_delta_pct", "max_per_op_p99_delta_pct"])
+
+    labels = [r["workload"].replace("_", "\n") for r in out]
+    x = range(len(labels))
+    plt.figure(figsize=(8.4, 4.8))
+    plt.bar([i - 0.18 for i in x], [r["throughput_delta_pct"] for r in out], width=0.36, color=COLORS["teal"], label="mean throughput delta")
+    plt.bar([i + 0.18 for i in x], [r["max_per_op_p99_delta_pct"] for r in out], width=0.36, color=COLORS["red"], label="max per-op p99 delta")
+    plt.axhline(0, color=COLORS["gray"], linewidth=1)
+    plt.ylabel("Delta with L1 background (%)")
+    plt.title("Mean throughput can look stable while AI tail latency moves")
+    plt.xticks(list(x), labels)
+    plt.legend(frameon=False)
+    return savefig("fig10_ai_throughput_vs_p99.png")
+
+
+def plot_p5_sustained() -> str:
+    root = ROOT / "20260531" / "p5_sustained"
+    pat = re.compile(r"\[realL1\]\s+([^:]+):\s+mean=([0-9.]+)ms\s+p95=([0-9.]+)ms\s+p99=([0-9.]+)ms")
+    buckets: dict[str, dict[str, list[float]]] = {}
+    for log in root.glob("*/*_l1.log"):
+        workload = log.parent.name
+        text = log.read_text(errors="ignore")
+        m = pat.search(text)
+        if not m:
+            continue
+        buckets.setdefault(workload, {"mean_ms": [], "p99_ms": []})
+        buckets[workload]["mean_ms"].append(fnum(m.group(2)))
+        buckets[workload]["p99_ms"].append(fnum(m.group(4)))
+    out = []
+    base = mean(buckets.get("alone", {}).get("p99_ms", []))
+    for workload in sorted(buckets):
+        out.append(
+            {
+                "workload": workload,
+                "mean_ms": mean(buckets[workload]["mean_ms"]),
+                "p99_ms": mean(buckets[workload]["p99_ms"]),
+                "p99_delta_pct_vs_alone": pct(mean(buckets[workload]["p99_ms"]), base),
+            }
+        )
+    write_csv(DATA / "p5_sustained_l1.csv", out, ["workload", "mean_ms", "p99_ms", "p99_delta_pct_vs_alone"])
+
+    order = ["alone", "qwen_small", "chanpred", "xapp", "resnet", "forecaster", "sat_compute", "sat_hbm", "neuralrx"]
+    ordered = [r for name in order for r in out if r["workload"] == name]
+    plt.figure(figsize=(9.6, 4.8))
+    colors = [COLORS["gray"] if r["workload"] == "alone" else COLORS["red"] if r["workload"] == "neuralrx" else COLORS["teal"] for r in ordered]
+    plt.bar([r["workload"].replace("_", "\n") for r in ordered], [r["p99_ms"] for r in ordered], color=colors)
+    plt.axhline(base, color=COLORS["gray"], linestyle="--", linewidth=1)
+    plt.ylabel("L1 p99 latency (ms)")
+    plt.title("P5 sustained runs: long-run co-tenant behavior remains workload-dependent")
+    return savefig("fig11_p5_sustained_l1.png")
+
+
+def plot_nsys_gap_summary() -> str:
+    rows = read_csv(NSYS_A_TABLE)
+    out = []
+    for r in rows:
+        out.append(
+            {
+                "scenario": r["scenario"],
+                "p99_gap_us": fnum(r["p99_gap_us"]),
+                "p999_gap_us": fnum(r["p999_gap_us"]),
+                "max_gap_ms": fnum(r["max_gap_ms"]),
+                "top1_pct_idle_share": fnum(r["top1_pct_idle_share"].strip("%")),
+            }
+        )
+    write_csv(DATA / "nsys_gap_summary.csv", out, ["scenario", "p99_gap_us", "p999_gap_us", "max_gap_ms", "top1_pct_idle_share"])
+    labels = [r["scenario"].replace("_", "\n", 2) for r in out]
+    x = range(len(labels))
+    plt.figure(figsize=(9, 4.8))
+    plt.bar([i - 0.18 for i in x], [r["p99_gap_us"] for r in out], width=0.36, color=COLORS["blue"], label="p99 gap")
+    plt.bar([i + 0.18 for i in x], [r["p999_gap_us"] for r in out], width=0.36, color=COLORS["gold"], label="p999 gap")
+    plt.ylabel("Inter-kernel gap (us)")
+    plt.title("NSYS: long-tail gaps depend on placement and workload mix")
+    plt.xticks(list(x), labels)
+    plt.legend(frameon=False)
+    return savefig("fig12_nsys_gap_summary.png")
+
+
+def plot_memory_ops_pressure() -> str:
+    rows = read_csv(MEMORY_OPS)
+    wanted = ["S5_3g_alone", "S6_3g_qwen", "S7_3g_neuralrx", "S27_3g_chanpred", "S28_3g_resnet", "S29_3g_forecaster", "S35_2g_chanpred"]
+    out = []
+    for r in rows:
+        if r["scenario"] in wanted:
+            out.append({"scenario": r["scenario"], "memcpy_total_ms": fnum(r["memcpy_total_us"]) / 1000.0, "memcpy_p99_us": fnum(r["memcpy_p99_us"])})
+    write_csv(DATA / "memory_ops_pressure.csv", out, ["scenario", "memcpy_total_ms", "memcpy_p99_us"])
+
+    base_total = next(r["memcpy_total_ms"] for r in out if r["scenario"] == "S5_3g_alone")
+    base_p99 = next(r["memcpy_p99_us"] for r in out if r["scenario"] == "S5_3g_alone")
+    labels = [r["scenario"].replace("_", "\n", 2) for r in out]
+    x = range(len(labels))
+    plt.figure(figsize=(10, 4.8))
+    plt.bar([i - 0.18 for i in x], [r["memcpy_total_ms"] / base_total for r in out], width=0.36, color=COLORS["purple"], label="memcpy total / S5")
+    plt.bar([i + 0.18 for i in x], [r["memcpy_p99_us"] / base_p99 for r in out], width=0.36, color=COLORS["gold"], label="memcpy p99 / S5")
+    plt.axhline(1.0, color=COLORS["gray"], linestyle="--", linewidth=1)
+    plt.ylabel("Normalized copy pressure vs S5 3g alone")
+    plt.title("NSYS memory ops: copy pressure is workload-specific")
+    plt.xticks(list(x), labels)
+    plt.legend(frameon=False)
+    return savefig("fig13_memory_ops_pressure.png")
+
+
+def plot_dv2_sanity() -> str:
+    rows = read_csv(DV2_SUMMARY)
+    out = [{"scenario": r["scenario"], "p99_mean_us": fnum(r["p99_mean"]), "p99_ci_lo": fnum(r["p99_ci_lo"]), "p99_ci_hi": fnum(r["p99_ci_hi"])} for r in rows]
+    write_csv(DATA / "dv2_sanity.csv", out, ["scenario", "p99_mean_us", "p99_ci_lo", "p99_ci_hi"])
+    labels = [r["scenario"].replace("Dv2_", "").replace("_", "\n") for r in out]
+    vals = [r["p99_mean_us"] for r in out]
+    yerr = [[v - r["p99_ci_lo"] for v, r in zip(vals, out)], [r["p99_ci_hi"] - v for v, r in zip(vals, out)]]
+    plt.figure(figsize=(8.2, 4.6))
+    plt.bar(labels, vals, yerr=yerr, color=COLORS["teal"], capsize=4)
+    plt.ylabel("p99 inter-kernel gap (us)")
+    plt.title("Dv2 replication: generic cross-partition stress stays near baseline")
+    plt.xticks(rotation=20, ha="right")
+    return savefig("fig14_dv2_sanity.png")
+
+
 def build_markdown(figs: dict[str, str]) -> None:
     md = f"""# MIG는 AI-RAN에 충분한 격리 추상화가 아니다: 시각 증거
 
@@ -478,6 +687,42 @@ MIG에서 선택지는 모두 비용을 가진다.
 
 이 마지막 그림은 단일 실험의 raw plot이 아니라 evidence synthesis plot이다. L1 축은 관측된 latency inflation을 사용했고, AI 축은 fit failure, AI p99 inflation, coloc NeuralRx throughput 감소 정황을 하나의 risk axis에 모은 것이다. 따라서 논문 본문에서는 앞선 개별 figure들을 primary evidence로 쓰고, 이 그림은 전체 tradeoff를 설명하는 summary figure로 쓰는 것이 안전하다.
 
+## 9. Multi-AI placement는 단조롭지 않다
+
+![Multi AI matrix]({figs['multi_ai']})
+
+5/31 `l1_multi_ai` sweep은 같은 L1이라도 AI 조합과 partition 배치에 따라 p99가 증가하기도 하고 감소하기도 함을 보여준다. 이 결과는 "AI가 많으면 항상 나쁘다"도 아니고 "AI를 분리하면 항상 안전하다"도 아니라는 점을 말한다. MIG static slicing은 workload phase alignment와 runtime behavior를 모르기 때문에, 미리 정한 고정 배치 규칙만으로 real-time safety를 보장하기 어렵다.
+
+## 10. AI throughput과 AI p99는 같은 이야기를 하지 않는다
+
+![AI throughput vs p99]({figs['ai_tput_vs_p99']})
+
+5/31 `ai_throughput_v2`에서는 L1 background가 있어도 AI mean throughput은 거의 변하지 않는다. 하지만 `ai_per_op_latency`에서는 ChanPred, NeuralRx, Qwen의 per-op p99가 증가한다. 이 그래프는 throughput-only isolation metric이 AI-RAN에는 부족하다는 점을 보여준다. AI-RAN에서는 L1뿐 아니라 AI inference 자체도 tail-sensitive service가 될 수 있다.
+
+## 11. P5 sustained run에서도 workload-dependent behavior가 남는다
+
+![P5 sustained]({figs['p5']})
+
+P5 sustained run은 짧은 micro test가 아니라 긴 시간 동안 L1과 co-tenant AI를 같이 돌린 결과다. p99는 workload마다 다르게 움직이며, NeuralRx와 다른 AI workload의 pattern이 동일하지 않다. 이것은 단발성 outlier가 아니라, co-tenant temporal behavior가 L1 tail에 계속 관여한다는 보조 증거다.
+
+## 12. NSYS gap 분석: tail은 inter-kernel gap에서 보인다
+
+![NSYS gap]({figs['nsys_gap']})
+
+NSYS deep analysis는 L1 kernel 자체의 평균 실행시간만으로는 tail을 설명하기 어렵고, kernel 사이 gap과 burst idle 구간이 중요하다는 점을 보여준다. 특히 2g L1 + ChanPred는 p99 gap이 크게 나타난다. 이 결과는 대역폭을 단순 sustained GB/s로만 보면 놓치는 **temporal bandwidth / scheduling gap** 문제를 뒷받침한다.
+
+## 13. Memory/copy pressure는 workload별로 다르다
+
+![Memory ops]({figs['memory_ops']})
+
+NSYS memory-op summary를 보면 NeuralRx, ResNet, Forecaster 등은 memcpy total이나 p99 pattern이 다르다. 이 차이는 왜 synthetic D2D/H2D saturation만으로는 PHY-AI interference를 재현하기 어려운지 설명한다. 문제는 총량 bandwidth 하나가 아니라 copy/convert/kernel phase가 L1과 어떻게 겹치는가다.
+
+## 14. Dv2 replication은 negative result를 강화한다
+
+![Dv2 sanity]({figs['dv2']})
+
+Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근처에 머무는 것을 보여준다. 이 그림은 주장을 더 조심스럽고 강하게 만든다. 즉, "MIG cross-partition이 항상 깨진다"가 아니라, **generic cross-partition stress는 대체로 안전하지만 AI-RAN PHY-AI composition에서는 정적 MIG가 충분하지 않다**가 맞다.
+
 ## 결론
 
 데이터 기반으로 가장 강한 주장은 다음이다.
@@ -496,6 +741,13 @@ MIG에서 선택지는 모두 비용을 가진다.
 - `data/ai_per_op_latency_parsed.csv`
 - `data/ai_per_op_p99_delta.csv`
 - `data/tradeoff_summary.csv`
+- `data/l1_multi_ai_matrix.csv`
+- `data/ai_throughput_v2_parsed.csv`
+- `data/ai_throughput_vs_p99.csv`
+- `data/p5_sustained_l1.csv`
+- `data/nsys_gap_summary.csv`
+- `data/memory_ops_pressure.csv`
+- `data/dv2_sanity.csv`
 """
     (OUT / "MIG_AIRAN_VISUAL_EVIDENCE_KR.md").write_text(md)
 
@@ -555,6 +807,12 @@ def main() -> None:
     ai_latency = parse_ai_latency()
     figs["ai_p99"] = plot_ai_per_op_p99(ai_latency)
     figs["tradeoff"] = plot_tradeoff_summary()
+    figs["multi_ai"] = plot_l1_multi_ai_matrix()
+    figs["ai_tput_vs_p99"] = plot_ai_throughput_vs_p99(ai_latency)
+    figs["p5"] = plot_p5_sustained()
+    figs["nsys_gap"] = plot_nsys_gap_summary()
+    figs["memory_ops"] = plot_memory_ops_pressure()
+    figs["dv2"] = plot_dv2_sanity()
     build_markdown(figs)
     build_notebook()
     print(f"wrote {OUT / 'MIG_AIRAN_VISUAL_EVIDENCE_KR.md'}")

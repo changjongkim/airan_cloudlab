@@ -80,6 +80,7 @@ We are claiming:
 | Cross-partition early spikes exist | Yes, but exploratory | 5/31 Tier1/NSYS/A stage | Use as motivation, not final proof |
 | Separate-partition NeuralRx is dangerous | Yes | 5/31 Phase4 NeuralRx: L1 p99 +376%; NSYS S7 idle/gap/memcpy inflation | Strong but workload-specific |
 | Throughput metrics are misleading | Yes | AI throughput stable while L1/coloc p99 explodes | Strong claim |
+| AI placement also has a performance tradeoff | Yes | AI full matrix/supplement: fit limits, capacity scaling, sublinear scaling, AI per-op p99 inflation | Strong claim |
 | Same-partition L1 + NeuralRx is catastrophic | Yes | 6/1 G/H: p99 +373% to +537% | Strongest claim |
 | Multi-AI effects are non-monotonic | Yes | 5/31 l1_multi_ai and NSYS v3: many multi-AI cases near baseline or smoothing | Important nuance |
 | MIG needs workload-aware placement | Yes | F safe cross-partition vs G catastrophic coloc; external AI type less important after coloc | Strong claim |
@@ -253,7 +254,83 @@ The placement conclusion is:
 
 > MIG static slicing is too coarse for AI-RAN. The same partition size can be safe or unsafe depending on workload phase behavior; adding more AI can sometimes smooth rather than worsen tail latency; and small L1 partitions are fragile regardless.
 
-### Act 6: Same-Partition PHY-AI Co-Location Breaks L1 Catastrophically
+### Act 6: AI Workloads Also Pay A Placement Cost
+
+This project is not only about protecting L1. AI-RAN needs both sides:
+
+- L1 must preserve real-time tail latency.
+- AI workloads must retain useful throughput and per-operation latency.
+
+MIG creates a two-sided tradeoff. If we allocate more GPU to L1, AI gets smaller partitions and may not fit or may lose throughput. If we allocate more GPU to AI, L1 loses headroom. If we co-locate, L1 tail explodes.
+
+#### AI throughput is strongly partition-dependent
+
+5/31 AI full matrix and supplement show that AI capacity is not arbitrary; workload type decides what partition is viable.
+
+| AI workload | Partition behavior | Implication |
+|---|---|---|
+| Qwen small / Qwen 7B | qwen_small 1g failed; Qwen-7B variants fit only on 4g | LLM placement is capacity-constrained |
+| sat_compute | 1g 26.6 TFLOPS -> 4g 148.1 TFLOPS | compute AI directly consumes partition capacity |
+| sat_hbm | 1g 87 GB/s -> 3g/4g ~347-351 GB/s | memory AI throughput scales with HBM slice |
+| ResNet fp16 | 1g bs64 659 img/s -> 4g bs64 2577 img/s | CNN throughput nearly scales with SM allocation |
+| Forecaster | 1g bs64 25.8 batch/s -> 4g bs64 59.6 batch/s | sparse attention scales sublinearly and is memory-pattern-sensitive |
+| chanpred/xapp/neuralrx | weak 1g->4g scaling in throughput | some PHY/launch-heavy AIs are scheduler/launch-bound, not simply SM-bound |
+
+This proves a central AI-RAN scheduling issue:
+
+> AI workloads cannot simply be assigned a fixed leftover MIG slice. Some need capacity to fit, some need capacity to scale, and some do not scale even when given more SMs because they are bound by launch/memory patterns.
+
+#### L1 may not reduce AI mean throughput much, but it can inflate AI tail latency
+
+5/31 AI throughput v2 initially looks reassuring:
+
+| AI | Alone | With L1 | Mean throughput change |
+|---|---:|---:|---:|
+| qwen_small | 46.68 it/s | 47.18 it/s | +1.1% |
+| chanpred | 2248.8 pred/s | 2251.6 pred/s | +0.1% |
+| xapp | 1820 inf/s | 1859.6 inf/s | +2.2% |
+| neuralrx | 9.0 inf/s | 9.0 inf/s | 0% |
+
+But AI per-op latency shows the hidden cost:
+
+| AI workload | Mean change | p99 change with L1 background |
+|---|---:|---:|
+| chanpred 1g | +1.4% | +9.0% |
+| chanpred 2g | +0.5% | +27.0% |
+| chanpred 3g | 0% | +23.7% |
+| chanpred 4g | +0.5% | +19.6% |
+| neuralrx 3g | -1.1% | +12.9% |
+| qwen 2g | -1.1% | +6.7% |
+| qwen 3g | -1.3% | +4.7% |
+| qwen 4g | -2.8% | +3.2% |
+| ResNet 1g-4g | +0.1-0.2% | +0.2-0.4% |
+
+This gives a stronger two-sided claim:
+
+> MIG can make both sides look safe under average throughput, while both sides can still suffer tail-latency risk. L1 p99 can explode, and AI per-op p99 can inflate even when AI throughput is flat.
+
+#### Co-location also suggests AI-side throughput loss
+
+The 6/1 G coloc logs show NeuralRx throughput around 6 inf/s for a 3g coloc run, while the 5/31 neuralrx throughput v2 run reports 9 inf/s. This comparison is not as clean as the L1 p99 tables because the runs differ in duration and setup, so it should be treated as supporting evidence rather than the primary claim.
+
+Safe wording:
+
+> The strongest AI-side evidence is partition-capacity scaling and per-op p99 inflation. Coloc logs additionally suggest NeuralRx throughput degradation under shared execution, but this should be normalized in a dedicated experiment before being used as a headline number.
+
+#### The real tradeoff
+
+| Goal | MIG action | Consequence |
+|---|---|---|
+| Protect L1 | give L1 bigger partition | less capacity for AI; some AI may not fit or scale |
+| Preserve AI throughput | give AI bigger partition | L1 may be forced into 2g/3g with less headroom |
+| Avoid cross-partition split | coloc L1 + PHY-AI | catastrophic L1 p99 and possible AI throughput loss |
+| Use many AI workloads | split into many partitions | static placement becomes non-monotonic and workload-dependent |
+
+This strengthens the paper claim:
+
+> MIG is not merely unsafe for L1; it is a poor control knob for the whole AI-RAN tradeoff. It exposes static partition sizes, but the system needs dynamic, workload-aware scheduling across L1 tail latency and AI throughput/tail latency.
+
+### Act 7: Same-Partition PHY-AI Co-Location Breaks L1 Catastrophically
 
 This is the strongest evidence that MIG is ineffective for AI-RAN deployment.
 
@@ -283,7 +360,7 @@ Claim:
 
 This is the core AI-RAN argument. NeuralRx is not just "another AI"; it represents in-line PHY-AI, the exact AI-RAN workload class that operators want to integrate near L1.
 
-### Act 7: Static MIG Placement Is Not Enough
+### Act 8: Static MIG Placement Is Not Enough
 
 Final deployment problem:
 
@@ -291,6 +368,7 @@ Final deployment problem:
 - If NeuralRx is placed in a separate partition, 5/31 data still shows a severe L1 p99 risk.
 - If L1 and NeuralRx are placed in the same partition, p99 explodes.
 - If generic AI is placed in a separate partition, cross-partition isolation is often good, but then capacity is fragmented and workload-specific PHY-AI behavior still matters.
+- If AI gets too small a partition, it may fail to fit, fail to scale, or suffer per-op p99 inflation.
 - Throughput measurements miss the problem.
 
 Claim:
@@ -323,6 +401,10 @@ Your initial intuition is still useful, but it must be narrowed.
    - 5/31 NeuralRx says a PHY-AI co-tenant can still be dangerous.
    - Therefore the issue is not "bandwidth amount" alone, but the temporal pattern of memory movement, kernel launches, copy/convert boundaries, and PHY-like processing phases.
 
+5. **AI-side capacity and tail latency matter too**
+   - Qwen fit limits, ResNet/sat_compute scaling, Forecaster sublinear scaling, and chanpred/qwen/neuralrx per-op p99 inflation show that fixed AI partitioning is not free.
+   - AI-RAN must optimize both L1 tail latency and AI service quality. MIG only exposes static slices, so improving one side can directly consume headroom from the other.
+
 ### What the data does not support
 
 1. **General cross-partition HBM saturation failure**
@@ -342,11 +424,11 @@ Your initial intuition is still useful, but it must be narrowed.
 
 ### More systems-paper style
 
-> MIG solves spatial capacity isolation, but AI-RAN requires temporal latency isolation. Our data show that cross-partition saturation is not the dominant problem; instead, the combination of partition fragmentation and same-partition PHY-AI time-sharing produces unacceptable L1 tail latency.
+> MIG solves spatial capacity isolation, but AI-RAN requires joint temporal control of L1 latency and AI service quality. Our data show that cross-partition saturation is not the dominant problem; instead, static partitioning creates a tradeoff between L1 headroom and AI capacity, while same-partition PHY-AI time-sharing produces unacceptable L1 tail latency.
 
 ### Full version that includes separate-partition NeuralRx
 
-> MIG is not a sufficient isolation mechanism for AI-RAN because safety depends on workload semantics, not only resource size. Generic cross-partition saturation is well isolated, but L1 loses headroom under small slices, NeuralRx can create severe L1 p99 inflation even as a separate PHY-AI co-tenant, and same-partition L1+NeuralRx co-location produces catastrophic bimodal tail latency.
+> MIG is not a sufficient isolation mechanism for AI-RAN because safety depends on workload semantics, not only resource size. Generic cross-partition saturation is well isolated, but L1 loses headroom under small slices, AI workloads have partition-dependent throughput and tail latency, NeuralRx can create severe L1 p99 inflation even as a separate PHY-AI co-tenant, and same-partition L1+NeuralRx co-location produces catastrophic bimodal tail latency.
 
 ### Strongest paper-title version
 
@@ -366,9 +448,10 @@ Use claims in this order. The first three are the backbone; the later ones are s
 | 2 | Small L1 partition loses headroom | Very strong | 5/31 baselines, 2g +40.2% mean vs Full |
 | 3 | Generic cross-partition saturation is not the culprit | Very strong | 6/1 F, 0/39 positive p99 inflation |
 | 4 | Separate-partition NeuralRx is high-risk | Strong but condition-specific | 5/31 Phase4 p99 +376%, NSYS supports |
-| 5 | Throughput isolation is misleading | Strong | throughput stable, p99 not stable |
-| 6 | Multi-AI behavior is non-monotonic | Strong nuance | l1_multi_ai and NSYS v3 smoothing |
-| 7 | L2/cache/memory headroom shrinks with partitioning | Supportive mechanism | NCU MIO/L2 evidence |
+| 5 | AI placement has its own throughput/tail tradeoff | Strong | AI full matrix, supplement, per-op latency |
+| 6 | Throughput isolation is misleading | Strong | throughput stable, p99 not stable |
+| 7 | Multi-AI behavior is non-monotonic | Strong nuance | l1_multi_ai and NSYS v3 smoothing |
+| 8 | L2/cache/memory headroom shrinks with partitioning | Supportive mechanism | NCU MIO/L2 evidence |
 
 ## 5.2 The One-Slide Version
 
@@ -384,10 +467,11 @@ Result:
     (1) L1 small slices lose headroom: 2g L1 mean +40%.
     (2) NeuralRx separate partition can inflate L1 p99 +376%.
     (3) L1+NeuralRx same partition inflates p99 +373% to +537%.
-    (4) AI throughput metrics hide the failure.
+    (4) AI workloads also have partition-dependent throughput/fit/p99.
+    (5) Throughput metrics hide the real-time failure.
 
 Conclusion:
-  MIG partitions capacity; AI-RAN needs bounded temporal latency.
+  MIG partitions capacity; AI-RAN needs joint L1/AI temporal control.
   Static MIG slicing alone is not a sufficient isolation mechanism.
 ```
 
@@ -416,6 +500,12 @@ Larger partitions reduce fragmentation risk but consume the GPU budget that AI-R
 Answer:
 
 No. Smoothing proves the opposite of a static guarantee. Tail behavior depends on workload timing and phase alignment. An isolation mechanism that is safe only for some accidental mixes is not a real-time scheduling abstraction.
+
+### Objection: "But AI throughput is mostly stable, so why is this a tradeoff?"
+
+Answer:
+
+Mean throughput stability is not enough for AI-RAN. First, AI fit and scaling are partition-dependent: Qwen-small failed on 1g, Qwen-7B only fit on 4g, and ResNet/sat_compute/Forecaster scale materially with partition size. Second, AI per-op p99 can inflate even when average throughput is flat, especially for chanpred, qwen, and NeuralRx. Third, protecting L1 with a larger slice consumes the same GPU capacity that these AI services need. The tradeoff is therefore not only "does L1 survive"; it is "can L1 and AI both meet their service objectives under a static partition."
 
 ### Objection: "Your L1 latency numbers are tens of ms, not sub-ms URLLC."
 
@@ -460,11 +550,15 @@ Use these as the core figures:
    - Claim: real-time tail failure, not average slowdown.
 
 8. **Throughput vs p99 contrast**
-   - AI throughput stable, L1 p99 catastrophic under coloc.
+   - AI throughput can be stable while AI per-op p99 and L1 p99 move.
    - Claim: throughput isolation is the wrong metric.
+
+9. **AI partition tradeoff figure**
+   - Qwen fit, ResNet/sat_compute scaling, Forecaster scaling, chanpred/qwen/neuralrx p99 inflation.
+   - Claim: AI workloads cannot simply be pinned to leftover static partitions.
 
 ## 7. Bottom Line
 
 Yes, we can support the claim that MIG is not effective for AI-RAN. The cleanest version is:
 
-> MIG is effective at many forms of cross-partition throughput isolation, but AI-RAN needs deterministic L1 tail-latency isolation. MIG fails this deployment objective because static slicing reduces L1 headroom, workload-specific PHY-AI such as NeuralRx can still create severe L1 tail inflation even when separated, and same-partition in-line PHY-AI co-location creates catastrophic bimodal tail latency. Therefore MIG alone is not a sufficient isolation mechanism for AI-RAN real-time L1 + PHY-AI consolidation.
+> MIG is effective at many forms of cross-partition throughput isolation, but AI-RAN needs joint deterministic control of L1 tail latency and AI service quality. MIG fails this deployment objective because static slicing reduces L1 headroom, constrains AI workload fit/throughput/tail latency, workload-specific PHY-AI such as NeuralRx can still create severe L1 tail inflation even when separated, and same-partition in-line PHY-AI co-location creates catastrophic bimodal tail latency. Therefore MIG alone is not a sufficient isolation mechanism for AI-RAN real-time L1 + PHY-AI consolidation.

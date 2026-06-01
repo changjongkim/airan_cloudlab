@@ -95,6 +95,49 @@ NSYS deep analysis는 L1 kernel 자체의 평균 실행시간만으로는 tail�
 
 이 결과는 우리가 말하는 bandwidth 문제가 단순히 "몇 GB/s를 썼는가"가 아니라는 점을 뒷받침한다. L1이 일정한 frame cadence를 유지하려면 다음 kernel이 제때 launch되고 copy/convert 단계가 제때 지나가야 한다. 하지만 small partition이나 특정 AI mix에서는 kernel 사이 빈 시간이 길어지고, 이 gap tail이 L1 p99/p999로 나타난다. 그래서 이 문제를 **temporal bandwidth 또는 scheduling headroom 부족**으로 해석하는 것이 sustained HBM bandwidth 하나로 설명하는 것보다 더 정확하다.
 
+아래 표는 같은 NSYS SQLite 분석에서 가져온 전체 조건 요약이다. 코드명은 실제 partition/workload 의미로 풀어썼다. 여기서 중요한 패턴은 세 가지다. 첫째, p50 gap은 대부분 1us 수준으로 작기 때문에 평균적인 kernel cadence만 보면 문제가 작아 보인다. 둘째, p99/p999 gap과 top-tail share는 조건별로 크게 달라져 tail이 특정 시간 구간에 몰린다. 셋째, runtime API p99와 memcpy total이 workload별로 다르게 움직여서, 단순 SM 점유율이나 sustained HBM throughput 하나로 tail을 설명하기 어렵다.
+
+| NSYS condition | p99 gap us | p999 gap us | top 1% gap share | runtime p99 us | memcpy total vs 3g alone |
+| --- | --- | --- | --- | --- | --- |
+| L1 7g MIG alone | 535 | 3707 | 54.4% | 306 | 1.8x |
+| L1 3g alone | 808 | 1494 | 48.4% | 514 | 1.0x |
+| L1 3g + Qwen | 856 | 3517 | 49.3% | 628 | 2.8x |
+| L1 3g + NeuralRx | 983 | 3534 | 49.3% | 678 | 4.2x |
+| L1 3g + 3 AI on 1g slices | 818 | 4226 | 52.1% | 525 | 1.1x |
+| L1 2g alone | 1411 | 4786 | 46.6% | 1115 | 1.7x |
+| L1 2g + 2 AI | 1413 | 1572 | 42.6% | 1116 | 1.9x |
+| L1 3g + GEMM/sat-compute | 847 | 1000 | 46.3% | 520 | 1.9x |
+| L1 3g + HBM saturation | 847 | 1161 | 47.8% | 528 | 2.0x |
+| L1 2g + GEMM/sat-compute | 1399 | 1413 | 42.2% | 1106 | 1.0x |
+| L1 4g + NeuralRx | 850 | 1028 | 46.0% | 520 | 2.1x |
+| L1 4g + 2 synthetic stressors | 821 | 3903 | 50.3% | 516 | 1.8x |
+| L1 2g + NeuralRx | 1437 | 4721 | 46.4% | 1130 | 2.1x |
+| L1 3g + 2 synthetic stressors | 815 | 3284 | 49.6% | 513 | 1.0x |
+| L1 4g + 3 synthetic stressors | 829 | 5127 | 52.7% | 563 | 1.8x |
+| L1 3g + ChanPred | 822 | 3859 | 51.4% | 521 | 1.1x |
+| L1 3g + ResNet | 934 | 2853 | 48.4% | 669 | 3.3x |
+| L1 3g + Forecaster | 853 | 2501 | 48.7% | 634 | 2.9x |
+| L1 3g + XApp | 814 | 3450 | 50.5% | 515 | 1.0x |
+| L1 3g + ResNet+ChanPred | 862 | 1018 | 45.8% | 535 | 2.2x |
+| L1 3g + ResNet+Forecaster | 853 | 991 | 45.1% | 628 | 3.0x |
+| L1 4g + ChanPred | 876 | 1016 | 45.0% | 626 | 3.1x |
+| L1 4g + ResNet | 817 | 949 | 46.0% | 516 | 1.7x |
+| L1 2g + ChanPred | 1403 | 1425 | 43.0% | 1110 | 1.0x |
+| L1 4g + Forecaster | 817 | 1811 | 49.6% | 510 | 1.0x |
+
+더 자세히 보면 tail은 median이 아니라 극단부에서 생긴다. `L1 3g alone`도 p50 gap은 1.2us 수준이지만 p99/p999는 수백~수천 us로 벌어진다. small L1 또는 특정 AI co-tenant에서는 이 long-tail 구조가 더 커진다. 즉, L1 deadline 관점에서는 "대부분의 kernel gap이 짧다"가 안전을 의미하지 않는다. p99/p999 구간이 실제 frame tail을 만든다.
+
+| Condition | p50 gap us | p90 gap us | p99 gap us | p999 gap us | max gap us | top 0.1% gap share |
+| --- | --- | --- | --- | --- | --- | --- |
+| L1 3g alone | 1.2 | 130 | 808 | 1494 | 966 | 40.6% |
+| L1 3g + NeuralRx | 1.2 | 140 | 983 | 3534 | 999 | 39.4% |
+| L1 2g alone | 1.1 | 131 | 1411 | 4786 | 998 | 35.2% |
+| L1 2g + NeuralRx | 1.1 | 130 | 1437 | 4721 | 988 | 35.0% |
+| L1 3g + ChanPred | 1.2 | 131 | 822 | 3859 | 999 | 42.8% |
+| L1 2g + ChanPred | 1.1 | 129 | 1403 | 1425 | 829 | 32.4% |
+| L1 3g + ResNet+ChanPred | 1.2 | 133 | 862 | 1018 | 1000 | 37.3% |
+| L1 3g + ResNet+Forecaster | 1.1 | 135 | 853 | 991 | 998 | 36.5% |
+
 ## 13. Memory/copy pressure는 workload별로 다르다
 
 ![Memory ops](figures/fig13_memory_ops_pressure.png)
@@ -103,17 +146,88 @@ NSYS memory-op summary는 각 workload가 L1 주변에 만드는 copy pressure�
 
 이 그림의 역할은 mechanism 설명이다. 6/1 F/Dv2에서 generic D2D/H2D saturation이 L1 p99를 크게 망가뜨리지 않았는데, 5/31 NeuralRx나 6/1 coloc에서는 문제가 커졌다. 그 차이는 단순 bandwidth 양만으로는 설명하기 어렵다. PHY-AI는 copy, convert, kernel launch, framework runtime phase가 L1 pipeline과 특정 시간 패턴으로 겹칠 수 있고, 이 temporal overlap이 tail을 만든다.
 
+아래 kernel/copy-level 표는 이 해석을 더 구체화한다. L1 파이프라인에서는 `convert_kernel`, `cupy_copy__complex64_complex64`, `cupy_copy__float32_float32` 같은 반복적인 copy/convert 단계가 많이 등장한다. median duration은 짧지만, 특정 조건에서는 post-gap p99와 max post-gap이 크게 벌어진다. 이 말은 kernel 자체가 항상 오래 걸리는 것이 아니라, kernel 사이 scheduling/copy boundary에서 긴 대기 구간이 생긴다는 뜻이다.
+
+| Condition | Kernel/copy | count | median duration us | p99 post-gap us | max post-gap ms |
+| --- | --- | --- | --- | --- | --- |
+| L1 2g alone | convert_kernel | 7728 | 78.1 | 1605 | 117.2 |
+| L1 2g alone | copy complex64_complex64 | 19200 | 3.0 | 136 | 74.6 |
+| L1 2g alone | copy float32_float32 | 5760 | 1.6 | 328 | 39.6 |
+| L1 2g + NeuralRx | convert_kernel | 7728 | 78.0 | 1922 | 120.8 |
+| L1 2g + NeuralRx | copy complex64_complex64 | 19200 | 3.0 | 140 | 96.4 |
+| L1 2g + NeuralRx | copy float32_float32 | 5760 | 1.6 | 344 | 6.0 |
+| L1 3g + ChanPred | convert_kernel | 7728 | 79.4 | 871 | 118.9 |
+| L1 3g + ChanPred | copy complex64_complex64 | 19200 | 2.7 | 144 | 90.0 |
+| L1 3g + ChanPred | copy float32_float32 | 5760 | 1.6 | 302 | 4.6 |
+| L1 3g + ResNet+ChanPred | convert_kernel | 7728 | 79.4 | 1006 | 114.8 |
+| L1 3g + ResNet+ChanPred | copy complex64_complex64 | 19200 | 2.7 | 141 | 73.3 |
+| L1 3g + ResNet+ChanPred | copy float32_float32 | 5760 | 1.6 | 275 | 1.5 |
+| L1 3g + ResNet+Forecaster | convert_kernel | 7728 | 79.4 | 986 | 112.2 |
+| L1 3g + ResNet+Forecaster | copy complex64_complex64 | 19200 | 2.7 | 135 | 73.7 |
+| L1 3g + ResNet+Forecaster | copy float32_float32 | 5760 | 1.6 | 272 | 0.5 |
+| L1 2g + ChanPred | convert_kernel | 7728 | 78.0 | 1420 | 120.6 |
+| L1 2g + ChanPred | copy complex64_complex64 | 19200 | 3.0 | 128 | 73.7 |
+| L1 2g + ChanPred | copy float32_float32 | 5760 | 1.6 | 273 | 2.4 |
+| L1 3g alone | convert_kernel | 7728 | 79.4 | 828 | 120.6 |
+| L1 3g alone | copy complex64_complex64 | 19200 | 2.7 | 142 | 74.0 |
+| L1 3g alone | copy float32_float32 | 5760 | 1.6 | 283 | 4.0 |
+| L1 3g + NeuralRx | convert_kernel | 7728 | 79.4 | 1380 | 110.0 |
+| L1 3g + NeuralRx | copy complex64_complex64 | 19200 | 2.7 | 126 | 76.3 |
+| L1 3g + NeuralRx | copy float32_float32 | 5760 | 1.6 | 330 | 4.1 |
+
+Runtime API 관점에서도 비슷한 패턴이 보인다. top API는 대부분 `cuLaunchKernel`이고 총 API call 수는 동일하게 108,999개로 맞춰져 있다. 그런데 runtime total, p99, max는 조건별로 달라진다. 즉, 실행한 L1 pipeline 구조는 같아도 주변 AI workload와 partition placement에 따라 runtime layer에서 tail이 달라진다.
+
+| Condition | API calls | runtime total ms | runtime p99 us | runtime max ms | top API |
+| --- | --- | --- | --- | --- | --- |
+| L1 3g alone | 108999 | 3436 | 514 | 259.6 | cuLaunchKernel |
+| L1 3g + NeuralRx | 108999 | 4583 | 678 | 371.9 | cuLaunchKernel |
+| L1 2g alone | 108999 | 5157 | 1115 | 174.6 | cuLaunchKernel |
+| L1 2g + NeuralRx | 108999 | 5164 | 1130 | 182.4 | cuLaunchKernel |
+| L1 3g + ChanPred | 108999 | 3620 | 521 | 201.1 | cuLaunchKernel |
+| L1 2g + ChanPred | 108999 | 4340 | 1110 | 163.5 | cuLaunchKernel |
+| L1 3g + ResNet+ChanPred | 108999 | 3427 | 535 | 260.1 | cuLaunchKernel |
+| L1 3g + ResNet+Forecaster | 108999 | 3623 | 628 | 282.4 | cuLaunchKernel |
+
 ## 14. Dv2 replication은 negative result를 강화한다
 
 ![Dv2 sanity](figures/fig14_dv2_sanity.png)
 
 Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근처에 머무는 것을 보여준다. 이 그림은 주장을 더 조심스럽고 강하게 만든다. 즉, "MIG cross-partition이 항상 깨진다"가 아니라, **generic cross-partition stress는 대체로 안전하지만 AI-RAN PHY-AI composition에서는 정적 MIG가 충분하지 않다**가 맞다.
 
+아래 표는 Dv2 반복 실험의 숫자다. H2D, D2D, compute, launch, ChanPred 모두 p99 mean이 baseline 주변에 있고 CI도 크게 분리되지 않는다. 이 표는 논문에서 매우 중요하다. 왜냐하면 reviewer가 "그냥 MIG가 isolation을 못 하는 것 아닌가?"라고 물을 때, 우리는 "아니다. generic cross-partition stress는 꽤 잘 막힌다. 문제는 AI-RAN의 L1+PHY-AI composition과 static placement다"라고 답할 수 있기 때문이다.
+
+| Dv2 condition | n | p99 mean us | p99 CI us | p999 mean us | max mean us |
+| --- | --- | --- | --- | --- | --- |
+| 0 alone | 10 | 950 | 920-980 | 1006 | 2691 |
+| 1 H2D 8MB | 10 | 952 | 908-997 | 1131 | 14395 |
+| 2 D2D 32MB | 10 | 892 | 853-930 | 942 | 2518 |
+| 3 compute | 10 | 918 | 875-961 | 967 | 2399 |
+| 4 launch | 10 | 952 | 921-982 | 1043 | 23500 |
+| 5 chanpred | 10 | 913 | 871-955 | 985 | 2016 |
+
 ## 결론
 
 데이터 기반으로 가장 강한 주장은 다음이다.
 
 > MIG는 generic cross-partition throughput isolation에는 효과적일 수 있다. 그러나 AI-RAN은 L1 tail latency와 AI workload service quality를 동시에 보장해야 한다. MIG는 static capacity slicing만 제공하므로, L1 headroom, AI fit/throughput/p99, PHY-AI co-location tail latency 사이의 tradeoff를 안전하게 제어하지 못한다. 따라서 MIG 단독으로는 real-time L1 + PHY-AI consolidation을 위한 충분한 isolation mechanism이 아니다.
+
+## NSYS까지 포함한 최종 해석
+
+지금까지의 데이터는 다음 순서로 읽는 것이 가장 강하다.
+
+1. **MIG는 capacity isolation에는 의미가 있다.** 6/1 F와 5/31 Dv2에서 generic D2D/H2D/GEMM/launch/ChanPred stress는 baseline 주변에 머물렀다. 따라서 "MIG가 모든 cross-partition isolation에 실패한다"는 주장은 데이터와 맞지 않는다.
+
+2. **하지만 AI-RAN이 원하는 것은 capacity isolation만이 아니다.** L1은 frame deadline을 맞춰야 하고, AI workload도 throughput뿐 아니라 per-op p99와 fit constraint를 가진다. 2g L1은 standalone부터 headroom이 작고, AI workload는 작은 slice에서 fit 실패나 throughput scaling 문제를 보인다.
+
+3. **NSYS는 failure mechanism이 sustained bandwidth 하나가 아니라 temporal gap이라는 점을 보여준다.** p50 gap은 작지만 p99/p999 gap이 조건별로 커지고, top 0.1~1% gap이 전체 gap time의 큰 부분을 차지한다. 즉, 평균적인 GPU 사용률보다 긴 kernel 사이 빈 구간이 real-time tail을 만든다.
+
+4. **copy/convert/runtime boundary가 workload별로 다르게 흔들린다.** NeuralRx, Qwen, ResNet, Forecaster는 memcpy total, memcpy p99, runtime p99가 서로 다른 패턴을 보인다. 이것은 synthetic HBM stress와 PHY-AI workload가 같지 않다는 뜻이다.
+
+5. **가장 치명적인 지점은 same-partition L1+PHY-AI coloc이다.** 6/1 G/H에서 L1과 NeuralRx가 같은 partition에 들어가면 p99가 수백 ms로 폭발한다. 외부 AI 종류를 바꿔도 coloc 이후에는 p99가 이미 높은 영역에 머문다. 이 결과는 MIG가 partition 사이 격리는 줄 수 있어도, 같은 MIG device 내부의 temporal sharing 문제는 해결하지 못한다는 점을 보여준다.
+
+따라서 논문에서 최종 메시지는 이렇게 가져가야 한다.
+
+> MIG는 GPU를 공간적으로 나누는 좋은 capacity isolation 도구지만, AI-RAN의 real-time L1 + PHY-AI consolidation에는 부족하다. 이유는 L1과 AI가 모두 tail-sensitive하고, static partition은 workload phase, copy/runtime boundary, kernel launch gap, PHY-AI coloc behavior를 제어하지 못하기 때문이다. AI-RAN에는 MIG 위에 workload-aware temporal scheduling 또는 admission/control layer가 추가로 필요하다.
 
 ## 생성된 source tables
 
@@ -134,3 +248,8 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 - `data/nsys_gap_summary.csv`
 - `data/memory_ops_pressure.csv`
 - `data/dv2_sanity.csv`
+- `data/nsys_profile_matrix.csv`
+- `data/nsys_gap_detail_selected.csv`
+- `data/nsys_kernel_gap_selected.csv`
+- `data/nsys_runtime_selected.csv`
+- `data/dv2_sanity_table.csv`

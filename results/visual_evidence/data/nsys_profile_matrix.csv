@@ -1,0 +1,26 @@
+condition,p99_gap_us,p999_gap_us,top1_gap_share,runtime_p99_us,memcpy_total_vs_3g
+L1 7g MIG alone,535,3707,54.4%,306,1.8x
+L1 3g alone,808,1494,48.4%,514,1.0x
+L1 3g + Qwen,856,3517,49.3%,628,2.8x
+L1 3g + NeuralRx,983,3534,49.3%,678,4.2x
+L1 3g + 3 AI on 1g slices,818,4226,52.1%,525,1.1x
+L1 2g alone,1411,4786,46.6%,1115,1.7x
+L1 2g + 2 AI,1413,1572,42.6%,1116,1.9x
+L1 3g + GEMM/sat-compute,847,1000,46.3%,520,1.9x
+L1 3g + HBM saturation,847,1161,47.8%,528,2.0x
+L1 2g + GEMM/sat-compute,1399,1413,42.2%,1106,1.0x
+L1 4g + NeuralRx,850,1028,46.0%,520,2.1x
+L1 4g + 2 synthetic stressors,821,3903,50.3%,516,1.8x
+L1 2g + NeuralRx,1437,4721,46.4%,1130,2.1x
+L1 3g + 2 synthetic stressors,815,3284,49.6%,513,1.0x
+L1 4g + 3 synthetic stressors,829,5127,52.7%,563,1.8x
+L1 3g + ChanPred,822,3859,51.4%,521,1.1x
+L1 3g + ResNet,934,2853,48.4%,669,3.3x
+L1 3g + Forecaster,853,2501,48.7%,634,2.9x
+L1 3g + XApp,814,3450,50.5%,515,1.0x
+L1 3g + ResNet+ChanPred,862,1018,45.8%,535,2.2x
+L1 3g + ResNet+Forecaster,853,991,45.1%,628,3.0x
+L1 4g + ChanPred,876,1016,45.0%,626,3.1x
+L1 4g + ResNet,817,949,46.0%,516,1.7x
+L1 2g + ChanPred,1403,1425,43.0%,1110,1.0x
+L1 4g + Forecaster,817,1811,49.6%,510,1.0x

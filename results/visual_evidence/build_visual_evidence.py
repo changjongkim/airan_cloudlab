@@ -633,7 +633,210 @@ def plot_dv2_sanity() -> str:
     return savefig("fig14_dv2_sanity.png")
 
 
+NSYS_LABELS = {
+    "S2_7g_mig": "L1 7g MIG alone",
+    "S5_3g_alone": "L1 3g alone",
+    "S6_3g_qwen": "L1 3g + Qwen",
+    "S7_3g_neuralrx": "L1 3g + NeuralRx",
+    "S9_3g_3AI_1g": "L1 3g + 3 AI on 1g slices",
+    "S10_2g_alone": "L1 2g alone",
+    "S12_2g_2AI": "L1 2g + 2 AI",
+    "S13_3g_sat_compute": "L1 3g + GEMM/sat-compute",
+    "S14_3g_sat_hbm": "L1 3g + HBM saturation",
+    "S15_4g_sat_compute": "L1 4g + GEMM/sat-compute",
+    "S17_2g_sat_compute": "L1 2g + GEMM/sat-compute",
+    "S18_4g_neuralrx": "L1 4g + NeuralRx",
+    "S21_4g_2sat": "L1 4g + 2 synthetic stressors",
+    "S22_2g_neuralrx": "L1 2g + NeuralRx",
+    "S24_3g_2sat": "L1 3g + 2 synthetic stressors",
+    "S26_4g_3sat": "L1 4g + 3 synthetic stressors",
+    "S27_3g_chanpred": "L1 3g + ChanPred",
+    "S28_3g_resnet": "L1 3g + ResNet",
+    "S29_3g_forecaster": "L1 3g + Forecaster",
+    "S30_3g_xapp": "L1 3g + XApp",
+    "S31_3g_resnet_chanpred": "L1 3g + ResNet+ChanPred",
+    "S32_3g_resnet_forecaster": "L1 3g + ResNet+Forecaster",
+    "S33_4g_chanpred": "L1 4g + ChanPred",
+    "S34_4g_resnet": "L1 4g + ResNet",
+    "S35_2g_chanpred": "L1 2g + ChanPred",
+    "S36_4g_forecaster": "L1 4g + Forecaster",
+}
+
+
+def md_table(rows: list[dict], fields: list[tuple[str, str]]) -> str:
+    if not rows:
+        return ""
+    header = "| " + " | ".join(label for _, label in fields) + " |"
+    sep = "| " + " | ".join("---" for _ in fields) + " |"
+    body = []
+    for r in rows:
+        body.append("| " + " | ".join(str(r.get(key, "")) for key, _ in fields) + " |")
+    return "\n".join([header, sep, *body])
+
+
+def nsys_profile_tables() -> dict[str, str]:
+    longtail = {r["scenario"]: r for r in read_csv(ROOT / "20260531" / "nsys_sqlite_v2_analysis" / "longtail_contribution.csv")}
+    runtime = {r["scenario"]: r for r in read_csv(ROOT / "20260531" / "nsys_sqlite_v2_analysis" / "runtime_api_analysis.csv")}
+    memory = {r["scenario"]: r for r in read_csv(ROOT / "20260531" / "nsys_sqlite_v2_analysis" / "memory_ops_analysis.csv")}
+    gap_shape = {r["scenario"]: r for r in read_csv(ROOT / "20260531" / "nsys_sqlite_v2_analysis" / "gap_distribution_shape.csv")}
+    kernel_rows = read_csv(ROOT / "20260531" / "nsys_sqlite_v2_analysis" / "all_kernel_summary.csv")
+
+    order = [
+        "S2_7g_mig",
+        "S5_3g_alone",
+        "S6_3g_qwen",
+        "S7_3g_neuralrx",
+        "S9_3g_3AI_1g",
+        "S10_2g_alone",
+        "S12_2g_2AI",
+        "S13_3g_sat_compute",
+        "S14_3g_sat_hbm",
+        "S17_2g_sat_compute",
+        "S18_4g_neuralrx",
+        "S21_4g_2sat",
+        "S22_2g_neuralrx",
+        "S24_3g_2sat",
+        "S26_4g_3sat",
+        "S27_3g_chanpred",
+        "S28_3g_resnet",
+        "S29_3g_forecaster",
+        "S30_3g_xapp",
+        "S31_3g_resnet_chanpred",
+        "S32_3g_resnet_forecaster",
+        "S33_4g_chanpred",
+        "S34_4g_resnet",
+        "S35_2g_chanpred",
+        "S36_4g_forecaster",
+    ]
+    base_memcpy = fnum(memory["S5_3g_alone"]["memcpy_total_us"])
+    profile = []
+    for s in order:
+        if s not in longtail:
+            continue
+        profile.append(
+            {
+                "condition": NSYS_LABELS.get(s, s),
+                "p99_gap_us": f"{fnum(longtail[s]['p99_threshold_us']):.0f}",
+                "p999_gap_us": f"{fnum(longtail[s]['p999_threshold_us']):.0f}",
+                "top1_gap_share": f"{100 * fnum(longtail[s]['top1pct_fraction']):.1f}%",
+                "runtime_p99_us": f"{fnum(runtime[s]['p99_api_us']):.0f}",
+                "memcpy_total_vs_3g": f"{fnum(memory[s]['memcpy_total_us']) / base_memcpy:.1f}x",
+            }
+        )
+    write_csv(
+        DATA / "nsys_profile_matrix.csv",
+        profile,
+        ["condition", "p99_gap_us", "p999_gap_us", "top1_gap_share", "runtime_p99_us", "memcpy_total_vs_3g"],
+    )
+
+    selected = ["S5_3g_alone", "S7_3g_neuralrx", "S10_2g_alone", "S22_2g_neuralrx", "S27_3g_chanpred", "S35_2g_chanpred", "S31_3g_resnet_chanpred", "S32_3g_resnet_forecaster"]
+    detail = []
+    for s in selected:
+        detail.append(
+            {
+                "condition": NSYS_LABELS.get(s, s),
+                "p50_gap_us": f"{fnum(gap_shape[s]['p50_us']):.1f}",
+                "p90_gap_us": f"{fnum(gap_shape[s]['p90_us']):.0f}",
+                "p99_gap_us": f"{fnum(longtail[s]['p99_threshold_us']):.0f}",
+                "p999_gap_us": f"{fnum(longtail[s]['p999_threshold_us']):.0f}",
+                "max_gap_us": f"{fnum(gap_shape[s]['max_us']):.0f}",
+                "top0_1_share": f"{100 * fnum(longtail[s]['top0_1pct_fraction']):.1f}%",
+            }
+        )
+    write_csv(DATA / "nsys_gap_detail_selected.csv", detail, ["condition", "p50_gap_us", "p90_gap_us", "p99_gap_us", "p999_gap_us", "max_gap_us", "top0_1_share"])
+
+    kernels = []
+    selected_kernels = {"convert_kernel", "cupy_copy__complex64_complex64", "cupy_copy__float32_float32"}
+    for r in kernel_rows:
+        if r["scenario"] not in selected or r["kernel_name"] not in selected_kernels:
+            continue
+        kernels.append(
+            {
+                "condition": NSYS_LABELS.get(r["scenario"], r["scenario"]),
+                "kernel_or_copy": r["kernel_name"].replace("cupy_copy__", "copy "),
+                "count": r["count"],
+                "median_us": f"{fnum(r['median_dur_us']):.1f}",
+                "p99_post_gap_us": f"{fnum(r['p99_post_gap_us']):.0f}",
+                "max_post_gap_ms": f"{fnum(r['max_post_gap_us']) / 1000.0:.1f}",
+            }
+        )
+    write_csv(DATA / "nsys_kernel_gap_selected.csv", kernels, ["condition", "kernel_or_copy", "count", "median_us", "p99_post_gap_us", "max_post_gap_ms"])
+
+    runtime_rows = []
+    for s in selected:
+        runtime_rows.append(
+            {
+                "condition": NSYS_LABELS.get(s, s),
+                "api_calls": runtime[s]["total_api_calls"],
+                "runtime_total_ms": f"{fnum(runtime[s]['total_api_time_us']) / 1000.0:.0f}",
+                "runtime_p99_us": f"{fnum(runtime[s]['p99_api_us']):.0f}",
+                "runtime_max_ms": f"{fnum(runtime[s]['max_api_us']) / 1000.0:.1f}",
+                "top_api": runtime[s]["top_api_name"],
+            }
+        )
+    write_csv(DATA / "nsys_runtime_selected.csv", runtime_rows, ["condition", "api_calls", "runtime_total_ms", "runtime_p99_us", "runtime_max_ms", "top_api"])
+
+    dv2_rows = []
+    for r in read_csv(DV2_SUMMARY):
+        dv2_rows.append(
+            {
+                "condition": r["scenario"].replace("Dv2_", "").replace("_", " "),
+                "n": r["n"],
+                "p99_mean_us": f"{fnum(r['p99_mean']):.0f}",
+                "p99_ci_us": f"{fnum(r['p99_ci_lo']):.0f}-{fnum(r['p99_ci_hi']):.0f}",
+                "p999_mean_us": f"{fnum(r['p999_mean']):.0f}",
+                "max_mean_us": f"{fnum(r['max_mean']):.0f}",
+            }
+        )
+    write_csv(DATA / "dv2_sanity_table.csv", dv2_rows, ["condition", "n", "p99_mean_us", "p99_ci_us", "p999_mean_us", "max_mean_us"])
+
+    return {
+        "profile": md_table(profile, [
+            ("condition", "NSYS condition"),
+            ("p99_gap_us", "p99 gap us"),
+            ("p999_gap_us", "p999 gap us"),
+            ("top1_gap_share", "top 1% gap share"),
+            ("runtime_p99_us", "runtime p99 us"),
+            ("memcpy_total_vs_3g", "memcpy total vs 3g alone"),
+        ]),
+        "gap_detail": md_table(detail, [
+            ("condition", "Condition"),
+            ("p50_gap_us", "p50 gap us"),
+            ("p90_gap_us", "p90 gap us"),
+            ("p99_gap_us", "p99 gap us"),
+            ("p999_gap_us", "p999 gap us"),
+            ("max_gap_us", "max gap us"),
+            ("top0_1_share", "top 0.1% gap share"),
+        ]),
+        "kernel": md_table(kernels, [
+            ("condition", "Condition"),
+            ("kernel_or_copy", "Kernel/copy"),
+            ("count", "count"),
+            ("median_us", "median duration us"),
+            ("p99_post_gap_us", "p99 post-gap us"),
+            ("max_post_gap_ms", "max post-gap ms"),
+        ]),
+        "runtime": md_table(runtime_rows, [
+            ("condition", "Condition"),
+            ("api_calls", "API calls"),
+            ("runtime_total_ms", "runtime total ms"),
+            ("runtime_p99_us", "runtime p99 us"),
+            ("runtime_max_ms", "runtime max ms"),
+            ("top_api", "top API"),
+        ]),
+        "dv2": md_table(dv2_rows, [
+            ("condition", "Dv2 condition"),
+            ("n", "n"),
+            ("p99_mean_us", "p99 mean us"),
+            ("p99_ci_us", "p99 CI us"),
+            ("p999_mean_us", "p999 mean us"),
+            ("max_mean_us", "max mean us"),
+        ]),
+    }
+
+
 def build_markdown(figs: dict[str, str]) -> None:
+    tables = nsys_profile_tables()
     md = f"""# MIG는 AI-RAN에 충분한 격리 추상화가 아니다: 시각 증거
 
 생성일: 2026-06-01  
@@ -731,6 +934,14 @@ NSYS deep analysis는 L1 kernel 자체의 평균 실행시간만으로는 tail�
 
 이 결과는 우리가 말하는 bandwidth 문제가 단순히 "몇 GB/s를 썼는가"가 아니라는 점을 뒷받침한다. L1이 일정한 frame cadence를 유지하려면 다음 kernel이 제때 launch되고 copy/convert 단계가 제때 지나가야 한다. 하지만 small partition이나 특정 AI mix에서는 kernel 사이 빈 시간이 길어지고, 이 gap tail이 L1 p99/p999로 나타난다. 그래서 이 문제를 **temporal bandwidth 또는 scheduling headroom 부족**으로 해석하는 것이 sustained HBM bandwidth 하나로 설명하는 것보다 더 정확하다.
 
+아래 표는 같은 NSYS SQLite 분석에서 가져온 전체 조건 요약이다. 코드명은 실제 partition/workload 의미로 풀어썼다. 여기서 중요한 패턴은 세 가지다. 첫째, p50 gap은 대부분 1us 수준으로 작기 때문에 평균적인 kernel cadence만 보면 문제가 작아 보인다. 둘째, p99/p999 gap과 top-tail share는 조건별로 크게 달라져 tail이 특정 시간 구간에 몰린다. 셋째, runtime API p99와 memcpy total이 workload별로 다르게 움직여서, 단순 SM 점유율이나 sustained HBM throughput 하나로 tail을 설명하기 어렵다.
+
+{tables['profile']}
+
+더 자세히 보면 tail은 median이 아니라 극단부에서 생긴다. `L1 3g alone`도 p50 gap은 1.2us 수준이지만 p99/p999는 수백~수천 us로 벌어진다. small L1 또는 특정 AI co-tenant에서는 이 long-tail 구조가 더 커진다. 즉, L1 deadline 관점에서는 "대부분의 kernel gap이 짧다"가 안전을 의미하지 않는다. p99/p999 구간이 실제 frame tail을 만든다.
+
+{tables['gap_detail']}
+
 ## 13. Memory/copy pressure는 workload별로 다르다
 
 ![Memory ops]({figs['memory_ops']})
@@ -739,17 +950,47 @@ NSYS memory-op summary는 각 workload가 L1 주변에 만드는 copy pressure�
 
 이 그림의 역할은 mechanism 설명이다. 6/1 F/Dv2에서 generic D2D/H2D saturation이 L1 p99를 크게 망가뜨리지 않았는데, 5/31 NeuralRx나 6/1 coloc에서는 문제가 커졌다. 그 차이는 단순 bandwidth 양만으로는 설명하기 어렵다. PHY-AI는 copy, convert, kernel launch, framework runtime phase가 L1 pipeline과 특정 시간 패턴으로 겹칠 수 있고, 이 temporal overlap이 tail을 만든다.
 
+아래 kernel/copy-level 표는 이 해석을 더 구체화한다. L1 파이프라인에서는 `convert_kernel`, `cupy_copy__complex64_complex64`, `cupy_copy__float32_float32` 같은 반복적인 copy/convert 단계가 많이 등장한다. median duration은 짧지만, 특정 조건에서는 post-gap p99와 max post-gap이 크게 벌어진다. 이 말은 kernel 자체가 항상 오래 걸리는 것이 아니라, kernel 사이 scheduling/copy boundary에서 긴 대기 구간이 생긴다는 뜻이다.
+
+{tables['kernel']}
+
+Runtime API 관점에서도 비슷한 패턴이 보인다. top API는 대부분 `cuLaunchKernel`이고 총 API call 수는 동일하게 108,999개로 맞춰져 있다. 그런데 runtime total, p99, max는 조건별로 달라진다. 즉, 실행한 L1 pipeline 구조는 같아도 주변 AI workload와 partition placement에 따라 runtime layer에서 tail이 달라진다.
+
+{tables['runtime']}
+
 ## 14. Dv2 replication은 negative result를 강화한다
 
 ![Dv2 sanity]({figs['dv2']})
 
 Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근처에 머무는 것을 보여준다. 이 그림은 주장을 더 조심스럽고 강하게 만든다. 즉, "MIG cross-partition이 항상 깨진다"가 아니라, **generic cross-partition stress는 대체로 안전하지만 AI-RAN PHY-AI composition에서는 정적 MIG가 충분하지 않다**가 맞다.
 
+아래 표는 Dv2 반복 실험의 숫자다. H2D, D2D, compute, launch, ChanPred 모두 p99 mean이 baseline 주변에 있고 CI도 크게 분리되지 않는다. 이 표는 논문에서 매우 중요하다. 왜냐하면 reviewer가 "그냥 MIG가 isolation을 못 하는 것 아닌가?"라고 물을 때, 우리는 "아니다. generic cross-partition stress는 꽤 잘 막힌다. 문제는 AI-RAN의 L1+PHY-AI composition과 static placement다"라고 답할 수 있기 때문이다.
+
+{tables['dv2']}
+
 ## 결론
 
 데이터 기반으로 가장 강한 주장은 다음이다.
 
 > MIG는 generic cross-partition throughput isolation에는 효과적일 수 있다. 그러나 AI-RAN은 L1 tail latency와 AI workload service quality를 동시에 보장해야 한다. MIG는 static capacity slicing만 제공하므로, L1 headroom, AI fit/throughput/p99, PHY-AI co-location tail latency 사이의 tradeoff를 안전하게 제어하지 못한다. 따라서 MIG 단독으로는 real-time L1 + PHY-AI consolidation을 위한 충분한 isolation mechanism이 아니다.
+
+## NSYS까지 포함한 최종 해석
+
+지금까지의 데이터는 다음 순서로 읽는 것이 가장 강하다.
+
+1. **MIG는 capacity isolation에는 의미가 있다.** 6/1 F와 5/31 Dv2에서 generic D2D/H2D/GEMM/launch/ChanPred stress는 baseline 주변에 머물렀다. 따라서 "MIG가 모든 cross-partition isolation에 실패한다"는 주장은 데이터와 맞지 않는다.
+
+2. **하지만 AI-RAN이 원하는 것은 capacity isolation만이 아니다.** L1은 frame deadline을 맞춰야 하고, AI workload도 throughput뿐 아니라 per-op p99와 fit constraint를 가진다. 2g L1은 standalone부터 headroom이 작고, AI workload는 작은 slice에서 fit 실패나 throughput scaling 문제를 보인다.
+
+3. **NSYS는 failure mechanism이 sustained bandwidth 하나가 아니라 temporal gap이라는 점을 보여준다.** p50 gap은 작지만 p99/p999 gap이 조건별로 커지고, top 0.1~1% gap이 전체 gap time의 큰 부분을 차지한다. 즉, 평균적인 GPU 사용률보다 긴 kernel 사이 빈 구간이 real-time tail을 만든다.
+
+4. **copy/convert/runtime boundary가 workload별로 다르게 흔들린다.** NeuralRx, Qwen, ResNet, Forecaster는 memcpy total, memcpy p99, runtime p99가 서로 다른 패턴을 보인다. 이것은 synthetic HBM stress와 PHY-AI workload가 같지 않다는 뜻이다.
+
+5. **가장 치명적인 지점은 same-partition L1+PHY-AI coloc이다.** 6/1 G/H에서 L1과 NeuralRx가 같은 partition에 들어가면 p99가 수백 ms로 폭발한다. 외부 AI 종류를 바꿔도 coloc 이후에는 p99가 이미 높은 영역에 머문다. 이 결과는 MIG가 partition 사이 격리는 줄 수 있어도, 같은 MIG device 내부의 temporal sharing 문제는 해결하지 못한다는 점을 보여준다.
+
+따라서 논문에서 최종 메시지는 이렇게 가져가야 한다.
+
+> MIG는 GPU를 공간적으로 나누는 좋은 capacity isolation 도구지만, AI-RAN의 real-time L1 + PHY-AI consolidation에는 부족하다. 이유는 L1과 AI가 모두 tail-sensitive하고, static partition은 workload phase, copy/runtime boundary, kernel launch gap, PHY-AI coloc behavior를 제어하지 못하기 때문이다. AI-RAN에는 MIG 위에 workload-aware temporal scheduling 또는 admission/control layer가 추가로 필요하다.
 
 ## 생성된 source tables
 
@@ -770,6 +1011,11 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 - `data/nsys_gap_summary.csv`
 - `data/memory_ops_pressure.csv`
 - `data/dv2_sanity.csv`
+- `data/nsys_profile_matrix.csv`
+- `data/nsys_gap_detail_selected.csv`
+- `data/nsys_kernel_gap_selected.csv`
+- `data/nsys_runtime_selected.csv`
+- `data/dv2_sanity_table.csv`
 """
     (OUT / "MIG_AIRAN_VISUAL_EVIDENCE_KR.md").write_text(md)
 

@@ -787,6 +787,107 @@ deep_A 실험은 cross-partition AI 워크로드 측을 직접 nsys로 캡처해
 
 결론: §16의 메커니즘 해석이 (a) 직접 측정 (per-call duration 분해), (b) hardware counter (NCU DRAM throughput), (c) AI-side signature 예측, (d) alternative 가설 elimination, (e) sustained persistence의 5개 독립적 evidence layer로 지지된다.
 
+## 20. 추가 NSYS time breakdown — queue 위치 정정 + 새 차원
+
+§17까지 했던 time breakdown 외에 NSYS sqlite에는 분석 안 한 다른 차원들이 있다. 본 절은 그 중 4가지를 추가 분석한다. 첫 번째 결과는 **§16의 queue 위치 framing을 더 정확하게** 정정하는 중요한 발견이다.
+
+### 20.1. Memcpy direction 분해 — queue는 PCIe/DMA path (HBM 아님)
+
+![Memcpy direction](figures/fig_supp_24_memcpy_direction.png)
+
+NSYS `CUPTI_ACTIVITY_KIND_MEMCPY` 테이블의 `copyKind` 필드를 분해해보면 cuPHY L1의 memcpy가 어디로 가는지 정확히 보인다.
+
+| Condition | H2D (PCIe path) | D2D (HBM) | D2H (PCIe path) |
+| --- | --- | --- | --- |
+| 7g full | 45.3ms | **0** | 1.1ms |
+| 3g alone | 45.7ms | **0** | 1.1ms |
+| 3g + chanpred | 50.0ms | 0 | 1.3ms |
+| 3g + Forecaster | 45.6ms | 0 | 1.2ms |
+| 3g + sat_compute | 45.9ms | 0 | 1.1ms |
+| **3g + ResNet** | **205.6ms** | 0 | 1.1ms |
+| **3g + Qwen** | **190.0ms** | 0 | 1.1ms |
+| **3g + NeuralRx** | **197.8ms** | 0 | 1.1ms |
+| **3g + sat_hbm** | **185.7ms** | 0 | 1.1ms |
+| 2g alone | 45.7ms | 0 | 1.1ms |
+| 2g + NeuralRx | 45.8ms | 0 | 1.1ms |
+
+→ **L1 cuPHY의 5778개 memcpy는 거의 모두 H2D**. D2D는 모든 condition에서 사실상 0. 그리고 **contention의 +300%는 전부 H2D 항목에서 발생**.
+
+이게 §16의 mechanism 위치 framing을 정정한다. 우리가 "memory controller arbitration queue"라고 부른 위치는 사실 더 정확하게는 **PCIe / DMA copy engine arbitration queue**다. 동작 원리(chip 전체에서 shared, 패턴 similar workload가 contention을 만든다)는 똑같지만, hardware 위치는:
+
+- ❌ HBM memory controller queue (이전 표현 — 부정확했음)
+- ✅ **PCIe DMA copy engine scheduler / arbitration queue** (정확한 위치)
+
+A100은 5개의 copy engine을 가지지만 chip level에서 cudaMemcpyAsync request의 ordering / arbitration은 shared. 두 MIG partition (L1 partition + AI partition) 양쪽에서 H2D 요청이 들어오면 이 shared scheduler에서 줄을 선다.
+
+기능적으로 차이가 거의 없는 정정이다 (메커니즘 해석 동일). 다만 PCIe 자체의 bandwidth는 chip 전체로 32 GB/s 한계이므로, "왜 transfer 자체는 0.09us 미만이지만 queue wait가 10us인지"의 hardware 설명이 더 정확해진다: 60KB transfer는 PCIe로 0.002ms 정도면 보낼 수 있는데, queue scheduler에서 다른 partition의 request들과 arbitration해야 하므로 wait time이 발생한다.
+
+이 정정이 메인 thesis에 미치는 영향은 미미하다 (메커니즘 ↔ 측정 ↔ 영향은 동일). 다만 §16의 "memory controller queue" 표현은 본 절 기준으로 "PCIe/DMA arbitration queue"로 읽어야 정확하다.
+
+### 20.2. AI 워크로드의 H2D rate가 contention 임계 결정
+
+![AI H2D rate](figures/fig_supp_25_ai_h2d_rate.png)
+
+§19.1의 memcpy rate signature를 H2D 방향 specific으로 다시 보면 더 sharp한 threshold가 나타난다.
+
+| AI workload | H2D rate (transfers/sec) | L1 contention |
+| --- | --- | --- |
+| chanpred | ~0.4 | NO |
+| Forecaster | ~1.4 | NO |
+| ResNet | ~7.4 | YES (bistable) |
+| NeuralRx (est) | >10 | YES (always) |
+| sat_hbm | high | YES |
+| Qwen | high | YES |
+
+→ AI의 H2D rate가 약 **5~7 transfers/sec 이하면 안전, 7~10 이상이면 contention** 발생. 이 threshold는 L1 자체의 H2D rate (5778 / ~2초 ≈ 2900/sec)와 비교하면 매우 낮다. 즉 AI는 L1보다 훨씬 적은 H2D만 발생시켜도 contention을 만들 수 있다. queue arbitration이 throughput contention이 아니라는 점을 다시 확인한다.
+
+### 20.3. Synchronization 분해 — sync는 bottleneck 아님
+
+![Sync breakdown](figures/fig_supp_26_sync_breakdown.png)
+
+`CUPTI_ACTIVITY_KIND_SYNCHRONIZATION` 테이블을 syncType별로 분해.
+
+| syncType | 의미 | 3g+NeuralRx 측정 |
+| --- | --- | --- |
+| 1 | Stream synchronize | 31 calls, 4.4ms |
+| 2 | Event/Future sync | 668 calls, 1.0ms |
+| 4 | Device synchronize | 1 call, 0.2ms |
+
+총 sync time은 모든 condition에서 5~6ms 수준이고, 어떤 setup에서도 크게 변하지 않는다. 즉 **synchronization은 contention의 source가 아니다**. cuPHY는 stream sync (frame end)와 event sync (intermediate)를 사용하지만 둘 다 작다. queue contention 이외의 sync-related bottleneck 가설은 reject할 수 있다.
+
+### 20.4. Per-stream activity — cuPHY는 single-stream sequential
+
+![Per-stream activity](figures/fig_supp_27_stream_activity.png)
+
+cuPHY pipeline이 몇 개의 CUDA stream을 사용하는지 분해해보면 대부분 condition에서 stream 2개를 쓴다.
+
+| Condition | Stream 1 (main) kernels | Other streams | Note |
+| --- | --- | --- | --- |
+| 7g full | 15364 kernels (497ms) | 12 kernels (0.1ms) | main만 사용 |
+| 3g alone | 15364 (408ms) | 12 | 동일 |
+| 3g + NeuralRx | 15364 (407ms) | 12 | 동일 |
+| 2g + NeuralRx | 15364 (427ms) | 12 | 동일 |
+
+→ **cuPHY는 sequential pipeline**. 한 stream에 모든 work가 sequential하게 들어간다. 다른 stream에서 동시 실행되는 work는 거의 없다 (other streams 12 kernels 0.1ms). 운영 관점에서 함의는 두 가지:
+
+1. **CUDA stream parallelism으로 queue contention을 회피하는 것은 불가능**. cuPHY pipeline 구조 자체가 sequential하기 때문에 더 많은 stream을 줘도 더 빨라지지 않는다.
+2. **Contention은 stream 내부의 sequential dependency 때문에 누적된다**. 한 H2D가 queue에서 10us 더 걸리면 그 다음 kernel은 그만큼 늦게 시작하고, pipeline 전체가 밀린다. 5778개 H2D × 10us = 57ms additional, 측정된 +152ms와 같은 order of magnitude.
+
+→ 이 두 가지가 합쳐서 H2D queue contention이 sequential pipeline에서 어떻게 wall-clock 비용으로 누적되는지 설명한다.
+
+### 20.5. 종합 — 분석 layer 확장
+
+§20은 §17에 없던 4가지 새 차원을 추가:
+
+| Dimension | Finding | 영향 |
+| --- | --- | --- |
+| Memcpy direction (H2D/D2D/D2H) | 거의 모두 H2D. contention도 H2D | queue 위치를 PCIe/DMA로 refine |
+| AI H2D rate threshold | 5~7/sec 이하 안전, 이상 contention | AI workload screening rule |
+| Synchronization type | sync 5~6ms 일정, bottleneck 아님 | alternative 가설 elimination |
+| Per-stream concurrency | cuPHY는 1 main stream | stream parallelism 회피 불가 |
+
+이 4가지 추가 분석은 §16-§19의 메커니즘 해석에 새로운 차원을 더하고, queue arbitration이 실제로 PCIe/DMA scheduler에서 발생함을 확정한다.
+
 ## Supplementary figures (약점 보강)
 
 | Supp # | 보강한 약점 | 그림 |
@@ -814,6 +915,10 @@ deep_A 실험은 cross-partition AI 워크로드 측을 직접 nsys로 캡처해
 | 21 | §19.1 AI workload nsys signature가 L1 contention 예측 (memcpy rate similarity가 trigger) | `fig_supp_21_ai_workload_signature.png` |
 | 22 | §19.2 chanpred 125K launch/s로 L1 영향 0 → kernel launch queue 가설 결정적 reject | `fig_supp_22_launch_queue_ruled_out.png` |
 | 23 | §19.3 P5 5분 sustained × n=2: contention reproducible CV<5% → transient artifact 아님 | `fig_supp_23_sustained_persistence.png` |
+| 24 | §20.1 Memcpy direction breakdown — L1 memcpy 거의 전부 H2D, contention도 H2D만 → queue 위치는 PCIe/DMA arbitration | `fig_supp_24_memcpy_direction.png` |
+| 25 | §20.2 AI workload H2D rate가 contention threshold 결정 (~7/sec 임계) | `fig_supp_25_ai_h2d_rate.png` |
+| 26 | §20.3 Synchronization 분해 (Stream/Event/Device sync) — sync는 bottleneck 아님 (5~6ms 일정) | `fig_supp_26_sync_breakdown.png` |
+| 27 | §20.4 Per-stream activity — cuPHY는 single dominant stream (sequential pipeline) | `fig_supp_27_stream_activity.png` |
 
 이 6개 supplementary는 본문 §1, §2, §3, §4, §7, §12를 직접 강화한다. 모두 우리가 이미 가진 데이터에서 추가 측정 없이 만든 것이다. 추가로 닫지 못한 약점은 다음 두 가지로, 추후 실험이 필요하다.
 

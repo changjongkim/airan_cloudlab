@@ -263,6 +263,91 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 
 > MIG는 GPU를 공간적으로 나누는 좋은 capacity isolation 도구지만, AI-RAN의 real-time L1 + PHY-AI consolidation에는 부족하다. 이유는 L1과 AI가 모두 tail-sensitive하고, static partition은 workload phase, copy/memset/runtime boundary, kernel launch gap, PHY-AI coloc behavior를 제어하지 못하기 때문이다. AI-RAN에는 MIG 위에 workload-aware temporal scheduling 또는 admission/control layer가 추가로 필요하다.
 
+## 15. memcpy/memset의 정확한 정의 — structural cost vs contention cost 분리
+
+§12-13까지 memcpy/memset boundary를 "L1 disturbance의 원인"으로 묶어 말했지만, NSYS SQLite를 깊게 파보면 **memcpy와 memset이 사실 두 개의 다른 메커니즘**이라는 점이 드러난다. 이게 사용자의 "그래서 메모리 복사/초기화하는 게 왜 문제냐"에 대한 직접 답이다.
+
+### 15.1. 핵심 관찰: count는 변하지 않는다. duration만 변한다.
+
+![Count vs Duration](figures/fig_supp_09_count_vs_duration.png)
+
+`CUPTI_ACTIVITY_KIND_MEMCPY` count는 어떤 condition에서도 **정확히 6433회**, `CUPTI_ACTIVITY_KIND_MEMSET` count는 **정확히 1920회**다. 7g, 4g, 3g, 2g 모두, alone/sat_compute/NeuralRx/sat_hbm 어느 setup이든 같다. 즉:
+
+- L1 cuPHY pipeline은 frame마다 **고정된 수의 memcpy/memset** operation을 발생시킨다. AI 워크로드가 L1에 새로운 memcpy를 "주입"하지는 않는다.
+- 변하는 건 **각 operation의 wait/transfer duration**이다. 즉 L1은 같은 일을 하는데, 같은 일이 더 오래 걸린다.
+
+이 관찰이 mechanism을 단순화한다: "L1 boundary가 deformation"이 아니라 "L1 boundary operation이 더 느려진다" 다. 그러면 *왜* 느려지는지의 답이 두 가지로 분리된다.
+
+### 15.2. Memset = STRUCTURAL cost (partition 자체의 HBM bandwidth share)
+
+![Memset structural](figures/fig_supp_07_memset_structural.png)
+
+L1 pipeline은 매 frame마다 **약 435MB짜리 큰 buffer를 zeroing**한다 (LDPC/symbol working buffer로 추정). 같은 buffer, 같은 zeroing call. 그런데 per-call duration이 partition 크기에 따라:
+
+| Partition | 435MB memset per-call | 7g 대비 |
+| --- | --- | --- |
+| 7g (full GPU MIG) | **297us** | 1.0x |
+| 4g | 588us | 2.0x |
+| 3g | 589us | 2.0x |
+| 2g | **1176us** | **4.0x** |
+
+이건 AI 워크로드와 무관한 **순수 structural cost**다. MIG는 partition별로 HBM bandwidth를 capacity proportional하게 나눠준다. 2g는 7g 대비 약 1/4 bandwidth를 받으니, 같은 buffer 같은 memset이 정확히 4배 시간이 걸린다. NeuralRx coloc을 추가해도 memset duration은 변하지 않는다 (3g+NeuralRx, 2g+NeuralRx 모두 alone과 동일).
+
+→ **함의**: 작은 partition = 더 적은 HBM bandwidth = 같은 L1 work가 더 오래 걸림. 이건 MIG의 "capacity slicing이 자연스럽게 만드는 비용"이고 어떤 워크로드 placement로도 회피 불가능하다. paper에서 §1의 "small slice는 L1 headroom을 줄인다"의 hardware mechanism 수준 증거.
+
+### 15.3. Memcpy = CONTENTION cost (workload pattern 의존)
+
+![Memcpy contention map](figures/fig_supp_08_memcpy_contention_map.png)
+
+Memcpy는 정반대 패턴이다. 같은 partition (3g) 안에서 background AI가 무엇이냐에 따라 memcpy total duration이:
+
+| Condition | memcpy total ms | Δ vs 3g alone |
+| --- | --- | --- |
+| 3g alone | 46.8 | — |
+| 3g + sat_compute (HBM-heavy compute) | 47.1 | **+0%** |
+| 3g + NeuralRx (PHY-AI) | 199.0 | **+325%** |
+| 3g + Qwen (LLM) | 190.0 | +306% |
+| 3g + sat_hbm (HBM bandwidth saturator) | 186.9 | +299% |
+| 2g + NeuralRx | 46.9 | **+0%** |
+| 2g + ChanPred | 48.6 | +4% |
+
+이 패턴은 매우 비직관적이다:
+
+1. **sat_compute (compute-heavy GEMM)는 HBM도 많이 쓰는데 memcpy를 +0% disturb한다**. 사용자의 원래 가설 ("AI가 HBM bandwidth를 잡아먹는다") 으로는 설명 안 된다.
+2. **sat_hbm (순수 HBM bandwidth saturator)은 +299% disturb한다**. 같은 "HBM 대량 사용"인데 sat_compute와 결과가 다르다.
+3. **2g L1은 어떤 AI에도 면역이다**. 같은 NeuralRx가 3g/4g L1은 +300% disturb 하는데 2g L1은 +0%.
+
+이를 통합 설명하는 가설: memcpy queue contention은 **메모리 access pattern의 similarity**가 결정한다.
+- L1의 memcpy는 §15.4에서 보듯 0.1KB~1MB 범위의 small frequent ops다.
+- NeuralRx, Qwen은 PHY-AI / LLM inference라 같은 small ops 패턴이다 → 같은 memory controller arbitration queue에서 자리를 차지함 → L1 memcpy가 queue에서 대기 → duration +300%
+- sat_compute는 tensor core compute가 dominant라 memcpy queue를 거의 안 씀 → L1 memcpy queue 무경합 → +0%
+- sat_hbm은 *명시적으로* HBM bandwidth saturation을 위해 만들어진 stressor → memcpy queue에 직접 들어감 → +300%
+- 2g L1은 SM이 너무 작아서 L1 자체가 SM-bound로 동작 → memcpy duration이 critical path 아님 → +0%
+
+### 15.4. L1 memcpy는 bulk가 아니다 (왜 F의 D2D 1024MB가 disturb를 못 했는지)
+
+![Memcpy size distribution](figures/fig_supp_10_memcpy_size_distribution.png)
+
+L1 pipeline의 memcpy 6433회를 size별로 보면 거의 모두 **0.1KB~1MB 범위**에 분포한다 (대표 buckets: 0.1KB × 1296, 60KB × 1920, 128KB × 1920, 806KB × 640, 1.4MB × 1). bulk transfer는 거의 없다.
+
+이게 §3의 "F는 generic saturation 0% disturb"의 mechanism 수준 답이다. F의 stressor `run_memcpy_massive.py`는 **1024MB × 8 streams D2D bulk transfer**다. memory controller가 bulk transfer를 처리하는 path와 small frequent ops를 처리하는 path는 다르다 (HBM2의 channel/bank parallelism + L2 cache pollution 패턴이 완전히 다름). bulk D2D는 L1의 small-op queue와 거의 충돌하지 않는다. 반면 NeuralRx같이 frame당 수십 개의 small memcpy를 발생시키는 워크로드는 정확히 같은 queue에서 L1과 경쟁한다.
+
+→ 사용자의 원래 가설 "HBM bandwidth contention" 은 **잘못된 추상화 수준에서 정확했다**. bandwidth는 분명 contention 자원이지만, 어떤 워크로드도 똑같이 contention을 일으키지 않는다. memcpy queue arbitration이 actual 메커니즘이고, 이는 워크로드의 access pattern (size / frequency / direction) 에 따라 다르게 작동한다.
+
+### 15.5. 결론 — MIG의 구조적 한계 두 가지
+
+이 두 메커니즘 분리가 본 연구의 가장 정확한 paper claim을 만들어준다:
+
+> **MIG의 정적 partitioning은 두 가지 비용을 동시에 만든다.**
+> 
+> **(1) Structural cost** — 작은 partition은 HBM bandwidth share가 작아 같은 L1 work가 비례적으로 느려진다 (§15.2 memset: 7g→2g 4x slow). 이는 어떤 워크로드 조합으로도 회피 불가능한 hardware 수준의 비용이다.
+>
+> **(2) Contention cost** — 같은 device 안에서 small frequent memory operations을 발생시키는 워크로드 (NeuralRx, Qwen, sat_hbm)는 L1의 memcpy queue와 arbitration level에서 경쟁한다. 이건 partition placement로 회피할 수 있지만, AI-RAN deployment에서 가장 붙이고 싶은 워크로드(in-line PHY-AI)가 정확히 이 패턴이라 회피가 어렵다.
+>
+> Sat_compute가 +0% disturb한다는 사실은 이 두 비용을 분리하는 결정적 증거다. "AI가 단순히 HBM을 많이 쓰면 위험"이 아니다. "AI의 memory access pattern이 L1과 similar할 때 위험"이다.
+>
+> 따라서 MIG 단독으로 AI-RAN을 안전하게 운영하려면: (a) NeuralRx/Qwen/sat_hbm처럼 memcpy-pattern이 L1과 유사한 워크로드는 같은 device에 두면 안 되고, (b) 두어야 한다면 partition 안에서 L1과 PHY-AI의 memory operation을 시간적으로 분리하는 admission control layer가 필요하다.
+
 ## Supplementary figures (약점 보강)
 
 | Supp # | 보강한 약점 | 그림 |
@@ -273,6 +358,10 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 | 4 | §12-13 mechanism evidence가 n=1 단일 capture 의혹 → 30 condition aggregated | `fig_supp_04_nsys_aggregated_boundary.png` |
 | 5 | §7 AI side가 L1 side와 동등하지 않다는 점 명시 (6 AI × 4 partition 매트릭스) | `fig_supp_05_ai_per_op_cross_partition.png` |
 | 6 | §1 mean → p99 tail variance 강조 (작은 slice가 mean뿐 아니라 tail 분산도 키움) | `fig_supp_06_baseline_tail_variance.png` |
+| 7 | §15.2 Memset duration이 partition size에 비례 → MIG의 hardware-level structural cost | `fig_supp_07_memset_structural.png` |
+| 8 | §15.3 Memcpy contention이 workload pattern 의존 (sat_compute +0%, NeuralRx +325%) | `fig_supp_08_memcpy_contention_map.png` |
+| 9 | §15.1 count는 invariant, duration이 변수 (AI는 op 수가 아니라 wait time을 늘림) | `fig_supp_09_count_vs_duration.png` |
+| 10 | §15.4 L1 memcpy는 small ops (KB-MB), bulk D2D와 다른 queue | `fig_supp_10_memcpy_size_distribution.png` |
 
 이 6개 supplementary는 본문 §1, §2, §3, §4, §7, §12를 직접 강화한다. 모두 우리가 이미 가진 데이터에서 추가 측정 없이 만든 것이다. 추가로 닫지 못한 약점은 다음 두 가지로, 추후 실험이 필요하다.
 

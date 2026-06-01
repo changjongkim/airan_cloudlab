@@ -1,0 +1,27 @@
+scenario,condition,runs,wall_ms,kernel_busy_pct,all_gpu_busy_pct,kernel_gap_p99_us,all_activity_gap_p99_us,big_kernel_gaps_ge_1ms,big_kernel_gaps_with_mem_pct,mean_mem_fraction_inside_big_gaps
+S10_2g_alone,L1 2g alone,3,2790.5,15.6,47.7,1444,242.6,682,96.7,87.5
+S12_2g_2AI,L1 2g + 2 AI,3,2587.7,16.5,51.3,1441,168.7,650,99.0,92.3
+S13_3g_sat_compute,L1 3g + GEMM/sat-compute,3,2127.6,19.2,42.6,832,173.1,16,62.3,26.0
+S14_3g_sat_hbm,L1 3g + HBM saturation,3,2189.8,18.6,41.6,864,190.9,19,57.9,15.2
+S15_4g_sat_compute,L1 4g + GEMM/sat-compute,3,2165.3,18.4,43.3,913,170.3,9,50.3,12.6
+S17_2g_sat_compute,L1 2g + GEMM/sat-compute,3,2482.4,17.2,51.9,1399,166.4,647,99.4,92.7
+S18_4g_neuralrx,L1 4g + NeuralRx,3,2148.2,18.6,42.0,867,174.7,23,76.7,44.7
+S21_4g_2sat,L1 4g + 2 synthetic stressors,3,2296.6,17.5,38.8,860,221.1,38,52.5,6.1
+S22_2g_neuralrx,L1 2g + NeuralRx,3,2805.3,15.2,47.6,1456,250.1,686,96.5,86.9
+S24_3g_2sat,L1 3g + 2 synthetic stressors,3,2255.5,18.1,38.3,815,228.2,41,57.8,11.6
+S26_4g_3sat,L1 4g + 3 synthetic stressors,3,2429.4,16.5,36.7,866,252.2,77,55.2,12.0
+S27_3g_chanpred,L1 3g + ChanPred,3,2271.5,18.0,38.3,821,217.2,33,47.9,2.4
+S28_3g_resnet,L1 3g + ResNet,3,2349.2,17.4,41.3,925,226.3,69,77.8,43.6
+S29_3g_forecaster,L1 3g + Forecaster,3,2307.7,17.8,41.4,909,228.7,40,62.5,27.4
+S2_7g_mig,L1 7g MIG alone,3,2216.3,22.7,35.7,567,242.2,43,45.6,2.2
+S30_3g_xapp,L1 3g + XApp,3,2221.0,18.4,38.9,814,219.4,33,49.4,5.2
+S31_3g_resnet_chanpred,L1 3g + ResNet+ChanPred,3,2145.4,19.0,42.8,874,175.2,37,62.9,24.3
+S32_3g_resnet_forecaster,L1 3g + ResNet+Forecaster,3,2177.1,18.7,43.9,919,172.5,10,59.7,16.5
+S33_4g_chanpred,L1 4g + ChanPred,3,2171.5,18.4,43.9,922,181.9,59,81.4,50.7
+S34_4g_resnet,L1 4g + ResNet,3,2121.6,18.8,41.7,819,171.1,11,48.3,11.4
+S35_2g_chanpred,L1 2g + ChanPred,3,2520.5,16.9,51.2,1404,175.1,650,99.1,92.2
+S36_4g_forecaster,L1 4g + Forecaster,3,2210.5,18.1,38.6,818,198.5,29,52.0,5.9
+S5_3g_alone,L1 3g alone,3,2177.2,18.8,39.7,808,189.1,19,45.3,3.6
+S6_3g_qwen,L1 3g + Qwen,3,2330.0,17.6,40.7,915,227.0,50,63.5,21.1
+S7_3g_neuralrx,L1 3g + NeuralRx,3,2501.4,16.3,40.5,986,228.9,83,72.4,37.8
+S9_3g_3AI_1g,L1 3g + 3 AI on 1g slices,3,2327.5,17.5,37.4,818,238.9,65,56.2,8.0

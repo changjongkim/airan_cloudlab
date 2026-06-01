@@ -1,0 +1,290 @@
+condition,transition,count,p50_gap_us,p99_gap_us,max_gap_ms,mean_mem_us_inside,mean_mem_fraction
+L1 2g alone,convert_kernel -> copy_complex64,3,115527.7,117223.8,117.2,10.9,0.0%
+L1 2g alone,convert_kernel -> noise_intf_est,32,1521.6,91139.1,91.1,117.0,7.9%
+L1 2g alone,convert_kernel -> copy_float16,3,75758.1,82150.5,82.2,0.0,0.0%
+L1 2g alone,copy_complex64 -> copy_float32,6,74224.4,74585.8,74.6,0.0,0.0%
+L1 2g alone,ch_est_filter -> copy_complex64,3,72985.4,74243.3,74.2,0.0,0.0%
+L1 2g alone,convert_kernel -> convert_kernel,6,70051.6,72895.1,72.9,32.6,0.0%
+L1 2g alone,copy_float32 -> convert_kernel,26,2005.4,39580.4,39.6,0.0,0.0%
+L1 2g alone,convert_kernel -> eq_coef,26,3426.3,37847.1,37.8,32.1,1.4%
+L1 2g alone,copy_complex64 -> convert_kernel,40,1765.0,6355.1,6.4,0.0,0.0%
+L1 2g alone,convert_kernel -> ch_est_pre,1920,1277.5,2390.5,5.2,1257.7,93.1%
+L1 2g alone,copy_complex64 -> copy_complex64,2,819.6,819.6,0.8,0.0,0.0%
+L1 2g alone,copy_float32 -> copy_complex64,1,790.0,790.0,0.8,2.0,0.3%
+L1 2g + 2 AI,convert_kernel -> copy_complex64,3,115883.2,119042.1,119.0,10.6,0.0%
+L1 2g + 2 AI,convert_kernel -> eq_coef,1,83979.3,83979.3,84.0,43.1,0.1%
+L1 2g + 2 AI,ch_est_filter -> copy_complex64,3,73544.6,79233.8,79.2,0.0,0.0%
+L1 2g + 2 AI,convert_kernel -> copy_float16,3,76515.0,77240.1,77.2,0.0,0.0%
+L1 2g + 2 AI,convert_kernel -> convert_kernel,6,70056.3,74546.1,74.5,30.9,0.0%
+L1 2g + 2 AI,copy_complex64 -> copy_float32,6,71991.2,73047.9,73.0,0.0,0.0%
+L1 2g + 2 AI,copy_complex64 -> convert_kernel,6,1144.6,2788.6,2.8,0.0,0.0%
+L1 2g + 2 AI,noise_intf_est -> copy_complex64,3,1868.4,2504.9,2.5,0.0,0.0%
+L1 2g + 2 AI,convert_kernel -> ch_est_pre,1920,1278.8,1573.0,1.9,1262.8,93.7%
+L1 2g + 2 AI,copy_float32 -> convert_kernel,1,1285.5,1285.5,1.3,0.0,0.0%
+L1 2g + 2 AI,copy_complex64 -> copy_complex64,1,551.8,551.8,0.6,0.0,0.0%
+L1 3g + GEMM/sat-compute,convert_kernel -> copy_complex64,3,116014.4,116287.2,116.3,9.8,0.0%
+L1 3g + GEMM/sat-compute,convert_kernel -> copy_float16,3,76102.0,77365.4,77.4,0.0,0.0%
+L1 3g + GEMM/sat-compute,ch_est_filter -> copy_complex64,3,74206.8,75720.8,75.7,0.0,0.0%
+L1 3g + GEMM/sat-compute,copy_complex64 -> copy_float32,6,72829.3,73420.6,73.4,0.0,0.0%
+L1 3g + GEMM/sat-compute,convert_kernel -> convert_kernel,6,68839.5,69891.6,69.9,26.9,0.0%
+L1 3g + GEMM/sat-compute,convert_kernel -> ch_est_pre,1920,690.4,1011.5,2.7,679.7,89.3%
+L1 3g + GEMM/sat-compute,noise_intf_est -> copy_complex64,2,1000.5,1000.5,1.0,0.0,0.0%
+L1 3g + GEMM/sat-compute,copy_float32 -> convert_kernel,2,770.0,770.0,0.8,0.0,0.0%
+L1 3g + GEMM/sat-compute,copy_complex64 -> convert_kernel,4,589.2,732.9,0.7,0.0,0.0%
+L1 3g + GEMM/sat-compute,convert_kernel -> noise_intf_est,3,530.5,616.2,0.6,59.7,10.8%
+L1 3g + GEMM/sat-compute,copy_complex64 -> copy_complex64,1,538.4,538.4,0.5,0.0,0.0%
+L1 3g + HBM saturation,convert_kernel -> copy_complex64,3,115483.7,118189.4,118.2,10.2,0.0%
+L1 3g + HBM saturation,convert_kernel -> noise_intf_est,14,1161.2,96418.1,96.4,61.9,6.3%
+L1 3g + HBM saturation,ch_est_filter -> copy_complex64,3,77040.4,77335.6,77.3,0.0,0.0%
+L1 3g + HBM saturation,copy_complex64 -> copy_float32,7,70560.4,75303.1,75.3,0.0,0.0%
+L1 3g + HBM saturation,convert_kernel -> copy_float16,3,74474.8,75277.3,75.3,0.0,0.0%
+L1 3g + HBM saturation,convert_kernel -> convert_kernel,6,69507.8,70014.9,70.0,27.9,0.0%
+L1 3g + HBM saturation,copy_float32 -> convert_kernel,12,930.5,2699.6,2.7,0.0,0.0%
+L1 3g + HBM saturation,copy_complex64 -> convert_kernel,14,816.1,2622.7,2.6,0.0,0.0%
+L1 3g + HBM saturation,convert_kernel -> eq_coef,7,1273.0,1996.8,2.0,17.8,1.7%
+L1 3g + HBM saturation,convert_kernel -> ch_est_pre,1920,693.2,994.0,2.5,682.4,89.3%
+L1 3g + HBM saturation,copy_complex64 -> copy_complex64,1,550.6,550.6,0.6,0.0,0.0%
+L1 4g + GEMM/sat-compute,convert_kernel -> copy_complex64,3,106291.5,112750.8,112.8,10.5,0.0%
+L1 4g + GEMM/sat-compute,ch_est_filter -> copy_complex64,3,72948.3,76256.2,76.3,0.0,0.0%
+L1 4g + GEMM/sat-compute,convert_kernel -> copy_float16,3,73248.9,75735.6,75.7,0.0,0.0%
+L1 4g + GEMM/sat-compute,copy_complex64 -> copy_float32,6,71335.7,73608.4,73.6,0.0,0.0%
+L1 4g + GEMM/sat-compute,convert_kernel -> convert_kernel,6,69663.9,72134.5,72.1,38.4,0.1%
+L1 4g + GEMM/sat-compute,copy_complex64 -> convert_kernel,4,630.0,1049.9,1.0,0.0,0.0%
+L1 4g + GEMM/sat-compute,convert_kernel -> ch_est_pre,1920,815.7,995.7,1.1,724.9,89.5%
+L1 4g + GEMM/sat-compute,convert_kernel -> noise_intf_est,2,990.4,990.4,1.0,73.9,9.0%
+L1 4g + GEMM/sat-compute,copy_complex64 -> copy_complex64,2,559.4,559.4,0.6,0.0,0.0%
+L1 4g + GEMM/sat-compute,convert_kernel -> eq_coef,1,547.4,547.4,0.5,55.8,10.2%
+L1 2g + GEMM/sat-compute,convert_kernel -> copy_complex64,3,116957.9,119491.8,119.5,9.4,0.0%
+L1 2g + GEMM/sat-compute,convert_kernel -> copy_float16,3,78745.2,78868.6,78.9,0.0,0.0%
+L1 2g + GEMM/sat-compute,ch_est_filter -> copy_complex64,3,74658.2,75132.8,75.1,0.0,0.0%
+L1 2g + GEMM/sat-compute,copy_complex64 -> copy_float32,6,73245.3,73996.4,74.0,0.0,0.0%
+L1 2g + GEMM/sat-compute,convert_kernel -> convert_kernel,6,70211.2,71672.7,71.7,22.6,0.0%
+L1 2g + GEMM/sat-compute,convert_kernel -> noise_intf_est,4,979.3,1530.8,1.5,105.1,11.8%
+L1 2g + GEMM/sat-compute,convert_kernel -> ch_est_pre,1920,1271.4,1413.8,3.2,1219.5,93.7%
+L1 2g + GEMM/sat-compute,copy_complex64 -> convert_kernel,5,521.1,967.2,1.0,0.0,0.0%
+L1 4g + NeuralRx,convert_kernel -> copy_complex64,3,113031.7,116313.3,116.3,9.6,0.0%
+L1 4g + NeuralRx,convert_kernel -> copy_float16,3,76024.9,76284.1,76.3,0.0,0.0%
+L1 4g + NeuralRx,ch_est_filter -> copy_complex64,3,75003.7,75478.7,75.5,0.0,0.0%
+L1 4g + NeuralRx,copy_complex64 -> copy_float32,6,73334.7,74658.4,74.7,0.0,0.0%
+L1 4g + NeuralRx,convert_kernel -> convert_kernel,6,69264.0,71533.5,71.5,30.2,0.0%
+L1 4g + NeuralRx,copy_complex64 -> convert_kernel,5,679.9,2228.0,2.2,0.0,0.0%
+L1 4g + NeuralRx,convert_kernel -> eq_coef,2,1088.2,1088.2,1.1,70.3,9.0%
+L1 4g + NeuralRx,convert_kernel -> ch_est_pre,1920,698.4,1047.8,2.2,686.3,89.2%
+L1 4g + NeuralRx,convert_kernel -> noise_intf_est,6,567.3,863.9,0.9,244.2,39.3%
+L1 4g + NeuralRx,copy_complex64 -> copy_complex64,1,585.4,585.4,0.6,0.0,0.0%
+L1 4g + 2 synthetic stressors,convert_kernel -> copy_complex64,3,115417.5,118716.6,118.7,10.0,0.0%
+L1 4g + 2 synthetic stressors,convert_kernel -> noise_intf_est,18,2883.5,93942.0,93.9,78.3,3.4%
+L1 4g + 2 synthetic stressors,ch_est_filter -> copy_complex64,3,75577.7,78647.0,78.6,0.0,0.0%
+L1 4g + 2 synthetic stressors,convert_kernel -> copy_float16,3,74643.6,74646.8,74.6,0.0,0.0%
+L1 4g + 2 synthetic stressors,copy_complex64 -> copy_float32,6,71673.8,73797.0,73.8,0.0,0.0%
+L1 4g + 2 synthetic stressors,convert_kernel -> convert_kernel,6,70160.9,72182.3,72.2,31.6,0.0%
+L1 4g + 2 synthetic stressors,convert_kernel -> eq_coef,18,1605.3,21865.5,21.9,40.3,2.9%
+L1 4g + 2 synthetic stressors,copy_complex64 -> convert_kernel,29,1757.6,13862.9,13.9,0.0,0.0%
+L1 4g + 2 synthetic stressors,copy_float32 -> convert_kernel,16,2407.6,6659.1,6.7,0.0,0.0%
+L1 4g + 2 synthetic stressors,convert_kernel -> ch_est_pre,1920,690.9,1022.5,36.4,671.5,88.6%
+L1 4g + 2 synthetic stressors,noise_intf_est -> copy_complex64,1,929.1,929.1,0.9,0.0,0.0%
+L1 4g + 2 synthetic stressors,copy_complex64 -> copy_complex64,1,621.4,621.4,0.6,0.0,0.0%
+L1 2g + NeuralRx,convert_kernel -> copy_complex64,3,114329.5,120785.3,120.8,10.2,0.0%
+L1 2g + NeuralRx,copy_complex64 -> copy_float32,6,71390.0,96404.4,96.4,0.0,0.0%
+L1 2g + NeuralRx,convert_kernel -> noise_intf_est,49,1413.6,89846.4,89.8,158.1,15.9%
+L1 2g + NeuralRx,convert_kernel -> copy_float16,3,78331.3,80624.4,80.6,0.0,0.0%
+L1 2g + NeuralRx,ch_est_filter -> copy_complex64,3,73825.2,75069.2,75.1,0.0,0.0%
+L1 2g + NeuralRx,convert_kernel -> convert_kernel,6,70548.9,71824.5,71.8,30.5,0.0%
+L1 2g + NeuralRx,convert_kernel -> eq_coef,37,1314.2,38075.1,38.1,54.4,6.6%
+L1 2g + NeuralRx,copy_complex64 -> convert_kernel,51,1213.8,6058.2,6.1,0.0,0.0%
+L1 2g + NeuralRx,copy_float32 -> convert_kernel,37,1272.0,6034.5,6.0,0.0,0.0%
+L1 2g + NeuralRx,convert_kernel -> ch_est_pre,1920,1281.3,2422.6,67.0,1271.6,92.9%
+L1 2g + NeuralRx,copy_complex64 -> copy_complex64,1,603.7,603.7,0.6,0.0,0.0%
+L1 3g + 2 synthetic stressors,convert_kernel -> copy_complex64,3,114924.7,115297.5,115.3,9.6,0.0%
+L1 3g + 2 synthetic stressors,convert_kernel -> copy_float16,3,76218.3,77303.4,77.3,0.0,0.0%
+L1 3g + 2 synthetic stressors,ch_est_filter -> copy_complex64,3,75302.7,75452.8,75.5,0.0,0.0%
+L1 3g + 2 synthetic stressors,copy_complex64 -> copy_float32,7,73934.2,74176.9,74.2,0.0,0.0%
+L1 3g + 2 synthetic stressors,convert_kernel -> convert_kernel,6,69612.1,70531.8,70.5,24.4,0.0%
+L1 3g + 2 synthetic stressors,copy_float32 -> convert_kernel,25,1213.8,39340.9,39.3,0.0,0.0%
+L1 3g + 2 synthetic stressors,convert_kernel -> eq_coef,20,1320.1,39183.2,39.2,17.7,1.4%
+L1 3g + 2 synthetic stressors,convert_kernel -> noise_intf_est,25,1534.6,20322.7,20.3,59.4,5.0%
+L1 3g + 2 synthetic stressors,copy_complex64 -> convert_kernel,31,1347.8,6269.7,6.3,0.0,0.0%
+L1 3g + 2 synthetic stressors,convert_kernel -> ch_est_pre,1920,682.2,1194.1,74.2,632.5,88.4%
+L1 3g + 2 synthetic stressors,noise_intf_est -> copy_complex64,1,703.2,703.2,0.7,0.0,0.0%
+L1 4g + 3 synthetic stressors,convert_kernel -> copy_complex64,3,116681.8,117920.5,117.9,10.8,0.0%
+L1 4g + 3 synthetic stressors,copy_complex64 -> copy_float32,7,69294.3,95752.4,95.8,0.0,0.0%
+L1 4g + 3 synthetic stressors,convert_kernel -> noise_intf_est,37,1614.9,90414.5,90.4,68.2,5.4%
+L1 4g + 3 synthetic stressors,convert_kernel -> eq_coef,38,1945.1,75086.4,75.1,27.6,2.0%
+L1 4g + 3 synthetic stressors,ch_est_filter -> copy_complex64,3,73646.9,74893.8,74.9,0.0,0.0%
+L1 4g + 3 synthetic stressors,convert_kernel -> copy_float16,3,74375.2,74717.2,74.7,0.0,0.0%
+L1 4g + 3 synthetic stressors,convert_kernel -> convert_kernel,6,68960.2,70409.7,70.4,31.9,0.0%
+L1 4g + 3 synthetic stressors,copy_complex64 -> convert_kernel,76,1757.5,40682.4,40.7,0.0,0.0%
+L1 4g + 3 synthetic stressors,copy_float32 -> convert_kernel,34,1474.1,39230.8,39.2,0.0,0.0%
+L1 4g + 3 synthetic stressors,convert_kernel -> ch_est_pre,1920,695.0,2025.4,37.2,673.0,87.9%
+L1 4g + 3 synthetic stressors,copy_complex64 -> copy_complex64,3,913.8,1987.6,2.0,0.0,0.0%
+L1 4g + 3 synthetic stressors,copy_float32 -> copy_complex64,2,1227.3,1227.3,1.2,2.1,0.2%
+L1 3g + ChanPred,convert_kernel -> copy_complex64,3,116489.0,118903.5,118.9,9.7,0.0%
+L1 3g + ChanPred,copy_complex64 -> convert_kernel,31,1923.4,89982.8,90.0,0.0,0.0%
+L1 3g + ChanPred,convert_kernel -> copy_float16,3,75354.3,78649.1,78.6,0.0,0.0%
+L1 3g + ChanPred,ch_est_filter -> copy_complex64,3,75438.4,76218.0,76.2,0.0,0.0%
+L1 3g + ChanPred,copy_complex64 -> copy_float32,6,73606.9,74009.4,74.0,0.0,0.0%
+L1 3g + ChanPred,convert_kernel -> convert_kernel,6,70351.6,72067.6,72.1,26.7,0.0%
+L1 3g + ChanPred,convert_kernel -> eq_coef,14,1777.0,5311.3,5.3,18.2,1.2%
+L1 3g + ChanPred,copy_float32 -> convert_kernel,15,1950.5,4617.9,4.6,0.0,0.0%
+L1 3g + ChanPred,convert_kernel -> noise_intf_est,16,1507.4,3859.1,3.9,62.1,4.7%
+L1 3g + ChanPred,noise_intf_est -> copy_complex64,1,994.5,994.5,1.0,0.0,0.0%
+L1 3g + ChanPred,convert_kernel -> ch_est_pre,1920,689.2,891.9,87.1,635.7,88.0%
+L1 3g + ChanPred,copy_float32 -> copy_complex64,1,623.9,623.9,0.6,0.0,0.0%
+L1 3g + ResNet,convert_kernel -> copy_complex64,3,108639.1,114277.3,114.3,9.6,0.0%
+L1 3g + ResNet,convert_kernel -> noise_intf_est,17,1578.2,89216.6,89.2,64.7,4.6%
+L1 3g + ResNet,convert_kernel -> copy_float16,3,73000.4,76796.3,76.8,0.0,0.0%
+L1 3g + ResNet,ch_est_filter -> copy_complex64,3,71871.5,74365.8,74.4,0.0,0.0%
+L1 3g + ResNet,copy_complex64 -> copy_float32,7,72244.4,73796.2,73.8,0.0,0.0%
+L1 3g + ResNet,convert_kernel -> eq_coef,19,2336.6,71374.1,71.4,32.7,2.2%
+L1 3g + ResNet,convert_kernel -> convert_kernel,6,69961.5,70298.2,70.3,31.5,0.0%
+L1 3g + ResNet,copy_float32 -> convert_kernel,12,1872.3,39117.7,39.1,0.0,0.0%
+L1 3g + ResNet,copy_complex64 -> convert_kernel,27,1633.6,3793.3,3.8,0.0,0.0%
+L1 3g + ResNet,convert_kernel -> ch_est_pre,1920,850.5,1093.3,3.6,749.8,89.7%
+L1 3g + ResNet,copy_complex64 -> copy_complex64,2,534.1,534.1,0.5,0.0,0.0%
+L1 3g + Forecaster,convert_kernel -> copy_complex64,3,107360.1,114150.5,114.2,9.6,0.0%
+L1 3g + Forecaster,convert_kernel -> eq_coef,15,2096.8,87552.1,87.6,49.6,3.0%
+L1 3g + Forecaster,ch_est_filter -> copy_complex64,3,73310.7,77708.4,77.7,0.0,0.0%
+L1 3g + Forecaster,convert_kernel -> noise_intf_est,14,1674.2,76768.6,76.8,84.4,8.5%
+L1 3g + Forecaster,convert_kernel -> copy_float16,3,72836.2,76228.7,76.2,0.0,0.0%
+L1 3g + Forecaster,copy_complex64 -> copy_float32,6,71484.8,73861.8,73.9,0.0,0.0%
+L1 3g + Forecaster,convert_kernel -> convert_kernel,6,69814.9,71287.8,71.3,35.7,0.1%
+L1 3g + Forecaster,copy_complex64 -> convert_kernel,32,1607.7,39854.9,39.9,0.0,0.0%
+L1 3g + Forecaster,copy_complex64 -> copy_complex64,3,533.6,4213.1,4.2,0.0,0.0%
+L1 3g + Forecaster,copy_float32 -> convert_kernel,15,1063.4,3892.9,3.9,0.0,0.0%
+L1 3g + Forecaster,convert_kernel -> ch_est_pre,1920,825.7,1082.6,31.6,727.0,89.4%
+L1 3g + Forecaster,noise_intf_est -> copy_complex64,1,834.4,834.4,0.8,0.0,0.0%
+L1 7g MIG alone,convert_kernel -> copy_complex64,3,114867.7,117175.2,117.2,9.7,0.0%
+L1 7g MIG alone,convert_kernel -> copy_float16,3,75546.4,76986.5,77.0,0.0,0.0%
+L1 7g MIG alone,ch_est_filter -> copy_complex64,3,73554.5,74690.2,74.7,0.0,0.0%
+L1 7g MIG alone,copy_complex64 -> copy_float32,7,71235.0,73753.6,73.8,0.0,0.0%
+L1 7g MIG alone,convert_kernel -> convert_kernel,6,70512.0,70936.5,70.9,30.3,0.0%
+L1 7g MIG alone,copy_complex64 -> convert_kernel,44,1936.2,56155.2,56.2,0.0,0.0%
+L1 7g MIG alone,convert_kernel -> noise_intf_est,20,1598.9,17843.3,17.8,49.8,4.2%
+L1 7g MIG alone,convert_kernel -> eq_coef,27,1828.8,5261.9,5.3,40.0,2.8%
+L1 7g MIG alone,copy_float32 -> convert_kernel,18,2000.0,5081.7,5.1,0.0,0.0%
+L1 7g MIG alone,convert_kernel -> ch_est_pre,920,525.9,2168.7,75.7,421.7,76.0%
+L1 7g MIG alone,copy_complex64 -> copy_complex64,3,838.6,988.3,1.0,0.0,0.0%
+L1 7g MIG alone,noise_intf_est -> copy_complex64,2,753.7,753.7,0.8,0.0,0.0%
+L1 3g + XApp,convert_kernel -> copy_complex64,3,118546.5,119868.3,119.9,9.2,0.0%
+L1 3g + XApp,convert_kernel -> eq_coef,13,3341.8,88044.0,88.0,17.4,0.7%
+L1 3g + XApp,convert_kernel -> copy_float16,3,76719.3,79132.6,79.1,0.0,0.0%
+L1 3g + XApp,ch_est_filter -> copy_complex64,3,77329.4,77426.5,77.4,0.0,0.0%
+L1 3g + XApp,copy_complex64 -> copy_float32,7,70443.1,74451.5,74.5,0.0,0.0%
+L1 3g + XApp,convert_kernel -> convert_kernel,6,67066.2,69141.0,69.1,23.2,0.0%
+L1 3g + XApp,convert_kernel -> noise_intf_est,18,1520.1,36329.8,36.3,59.4,4.6%
+L1 3g + XApp,copy_complex64 -> convert_kernel,30,1748.8,7656.4,7.7,0.0,0.0%
+L1 3g + XApp,copy_float32 -> convert_kernel,14,1492.3,5407.0,5.4,0.0,0.0%
+L1 3g + XApp,copy_complex64 -> copy_complex64,2,4058.1,4058.1,4.1,0.0,0.0%
+L1 3g + XApp,copy_float32 -> copy_complex64,1,1194.5,1194.5,1.2,1.7,0.1%
+L1 3g + XApp,convert_kernel -> ch_est_pre,1920,681.2,919.1,36.0,632.0,88.5%
+L1 3g + ResNet+ChanPred,convert_kernel -> copy_complex64,3,114152.1,114818.0,114.8,10.7,0.0%
+L1 3g + ResNet+ChanPred,ch_est_filter -> copy_complex64,3,74815.8,74888.7,74.9,0.0,0.0%
+L1 3g + ResNet+ChanPred,convert_kernel -> copy_float16,3,74216.4,74349.4,74.3,0.0,0.0%
+L1 3g + ResNet+ChanPred,copy_complex64 -> copy_float32,6,71955.5,73309.9,73.3,0.0,0.0%
+L1 3g + ResNet+ChanPred,convert_kernel -> convert_kernel,6,70005.6,71214.8,71.2,30.3,0.0%
+L1 3g + ResNet+ChanPred,copy_float32 -> copy_complex64,2,1488.6,1488.6,1.5,3.7,0.4%
+L1 3g + ResNet+ChanPred,convert_kernel -> noise_intf_est,2,1224.9,1224.9,1.2,96.0,9.1%
+L1 3g + ResNet+ChanPred,convert_kernel -> ch_est_pre,1920,745.6,1019.4,1.0,690.7,88.8%
+L1 3g + ResNet+ChanPred,convert_kernel -> eq_coef,1,766.5,766.5,0.8,21.3,2.8%
+L1 3g + ResNet+ChanPred,copy_complex64 -> convert_kernel,3,537.4,602.7,0.6,0.0,0.0%
+L1 3g + ResNet+ChanPred,copy_complex64 -> copy_complex64,1,555.0,555.0,0.6,0.0,0.0%
+L1 3g + ResNet+Forecaster,convert_kernel -> copy_complex64,3,105968.3,112247.1,112.2,9.8,0.0%
+L1 3g + ResNet+Forecaster,ch_est_filter -> copy_complex64,3,73777.8,78704.0,78.7,0.0,0.0%
+L1 3g + ResNet+Forecaster,convert_kernel -> copy_float16,3,73186.3,77349.0,77.3,0.0,0.0%
+L1 3g + ResNet+Forecaster,copy_complex64 -> copy_float32,6,70515.7,73714.4,73.7,0.0,0.0%
+L1 3g + ResNet+Forecaster,convert_kernel -> convert_kernel,6,71121.4,72379.6,72.4,40.1,0.1%
+L1 3g + ResNet+Forecaster,convert_kernel -> noise_intf_est,1,1169.9,1169.9,1.2,62.5,5.3%
+L1 3g + ResNet+Forecaster,convert_kernel -> ch_est_pre,1920,845.9,992.8,2.0,732.8,89.7%
+L1 3g + ResNet+Forecaster,copy_complex64 -> convert_kernel,5,583.5,991.3,1.0,0.0,0.0%
+L1 3g + ResNet+Forecaster,copy_complex64 -> copy_complex64,2,567.7,567.7,0.6,0.0,0.0%
+L1 3g + ResNet+Forecaster,convert_kernel -> eq_coef,1,518.7,518.7,0.5,248.0,47.8%
+L1 4g + ChanPred,convert_kernel -> copy_complex64,3,105661.9,122725.2,122.7,11.6,0.0%
+L1 4g + ChanPred,ch_est_filter -> copy_complex64,3,72264.4,77017.2,77.0,0.0,0.0%
+L1 4g + ChanPred,copy_complex64 -> copy_float32,6,71063.9,74939.3,74.9,0.0,0.0%
+L1 4g + ChanPred,convert_kernel -> copy_float16,3,71778.6,73947.8,73.9,0.0,0.0%
+L1 4g + ChanPred,convert_kernel -> convert_kernel,6,69361.7,69772.7,69.8,31.3,0.0%
+L1 4g + ChanPred,convert_kernel -> eq_coef,1,2258.5,2258.5,2.3,16.8,0.7%
+L1 4g + ChanPred,convert_kernel -> noise_intf_est,5,956.9,1606.0,1.6,78.6,9.0%
+L1 4g + ChanPred,copy_complex64 -> convert_kernel,4,578.2,1589.8,1.6,0.0,0.0%
+L1 4g + ChanPred,copy_complex64 -> copy_complex64,4,639.1,1398.6,1.4,0.0,0.0%
+L1 4g + ChanPred,convert_kernel -> ch_est_pre,1920,855.1,1016.6,1.2,738.5,89.3%
+L1 4g + ChanPred,copy_float32 -> convert_kernel,1,892.2,892.2,0.9,0.0,0.0%
+L1 4g + ChanPred,copy_float16 -> copy_complex64,1,745.6,745.6,0.7,0.0,0.0%
+L1 4g + ResNet,convert_kernel -> copy_complex64,3,114923.6,115505.0,115.5,10.3,0.0%
+L1 4g + ResNet,ch_est_filter -> copy_complex64,3,72656.1,75945.3,75.9,0.0,0.0%
+L1 4g + ResNet,convert_kernel -> copy_float16,3,74504.0,74794.0,74.8,0.0,0.0%
+L1 4g + ResNet,copy_complex64 -> copy_float32,7,70512.0,73741.4,73.7,0.0,0.0%
+L1 4g + ResNet,convert_kernel -> convert_kernel,6,68292.3,71829.1,71.8,30.2,0.0%
+L1 4g + ResNet,copy_float32 -> convert_kernel,1,2959.0,2959.0,3.0,0.0,0.0%
+L1 4g + ResNet,copy_complex64 -> convert_kernel,4,602.7,2741.9,2.7,0.0,0.0%
+L1 4g + ResNet,convert_kernel -> ch_est_pre,1920,687.9,950.2,1.8,667.6,89.1%
+L1 4g + ResNet,convert_kernel -> noise_intf_est,1,579.5,579.5,0.6,61.0,10.5%
+L1 2g + ChanPred,convert_kernel -> copy_complex64,3,119617.6,120639.5,120.6,9.7,0.0%
+L1 2g + ChanPred,convert_kernel -> eq_coef,2,81317.8,81317.8,81.3,18.9,0.6%
+L1 2g + ChanPred,convert_kernel -> copy_float16,3,79273.8,79522.8,79.5,0.0,0.0%
+L1 2g + ChanPred,ch_est_filter -> copy_complex64,3,74195.5,75246.6,75.2,0.0,0.0%
+L1 2g + ChanPred,copy_complex64 -> copy_float32,6,73290.9,73716.2,73.7,0.0,0.0%
+L1 2g + ChanPred,convert_kernel -> convert_kernel,6,69000.1,71271.5,71.3,24.8,0.0%
+L1 2g + ChanPred,copy_complex64 -> convert_kernel,8,615.5,2931.4,2.9,0.0,0.0%
+L1 2g + ChanPred,copy_float32 -> convert_kernel,2,2371.0,2371.0,2.4,0.0,0.0%
+L1 2g + ChanPred,convert_kernel -> ch_est_pre,1920,1273.1,1425.6,2.9,1220.7,93.6%
+L1 2g + ChanPred,convert_kernel -> noise_intf_est,5,829.1,1258.2,1.3,105.9,12.0%
+L1 2g + ChanPred,copy_float32 -> copy_complex64,1,817.2,817.2,0.8,0.0,0.0%
+L1 2g + ChanPred,copy_complex64 -> copy_complex64,1,512.1,512.1,0.5,0.0,0.0%
+L1 4g + Forecaster,convert_kernel -> copy_complex64,3,115070.4,115780.5,115.8,9.3,0.0%
+L1 4g + Forecaster,copy_float32 -> convert_kernel,12,1046.5,104889.4,104.9,0.0,0.0%
+L1 4g + Forecaster,ch_est_filter -> copy_complex64,3,77670.5,77767.4,77.8,0.0,0.0%
+L1 4g + Forecaster,convert_kernel -> copy_float16,3,75497.2,76200.9,76.2,0.0,0.0%
+L1 4g + Forecaster,copy_complex64 -> copy_float32,6,73212.1,74596.6,74.6,0.0,0.0%
+L1 4g + Forecaster,convert_kernel -> convert_kernel,6,69635.4,70438.3,70.4,22.1,0.0%
+L1 4g + Forecaster,copy_complex64 -> copy_complex64,2,41988.9,41988.9,42.0,0.0,0.0%
+L1 4g + Forecaster,convert_kernel -> eq_coef,15,1341.9,38441.2,38.4,16.6,1.3%
+L1 4g + Forecaster,copy_complex64 -> convert_kernel,28,1298.4,3868.9,3.9,0.0,0.0%
+L1 4g + Forecaster,convert_kernel -> noise_intf_est,20,673.3,2854.2,2.9,59.0,7.6%
+L1 4g + Forecaster,noise_intf_est -> copy_complex64,1,954.2,954.2,1.0,0.0,0.0%
+L1 4g + Forecaster,convert_kernel -> ch_est_pre,1920,682.7,883.6,35.1,632.2,88.4%
+L1 3g alone,convert_kernel -> convert_kernel,6,71182.1,120616.5,120.6,22.2,0.0%
+L1 3g alone,convert_kernel -> copy_complex64,3,116059.2,116854.6,116.9,9.5,0.0%
+L1 3g alone,convert_kernel -> copy_float16,3,74686.3,80284.5,80.3,0.0,0.0%
+L1 3g alone,ch_est_filter -> copy_complex64,3,76615.2,77921.8,77.9,0.0,0.0%
+L1 3g alone,copy_complex64 -> copy_float32,6,73469.4,73966.2,74.0,0.0,0.0%
+L1 3g alone,copy_complex64 -> convert_kernel,15,2000.6,16564.9,16.6,0.0,0.0%
+L1 3g alone,convert_kernel -> eq_coef,7,966.3,4808.2,4.8,17.4,1.6%
+L1 3g alone,copy_float32 -> convert_kernel,7,1469.0,4004.0,4.0,0.0,0.0%
+L1 3g alone,convert_kernel -> noise_intf_est,7,962.5,1876.7,1.9,59.0,5.5%
+L1 3g alone,copy_float32 -> copy_complex64,2,1238.4,1238.4,1.2,0.8,0.1%
+L1 3g alone,convert_kernel -> ch_est_pre,1920,681.2,876.1,4.4,632.4,88.9%
+L1 3g + Qwen,convert_kernel -> copy_complex64,3,108143.4,113111.2,113.1,10.0,0.0%
+L1 3g + Qwen,convert_kernel -> noise_intf_est,15,1705.4,92579.4,92.6,86.1,5.6%
+L1 3g + Qwen,ch_est_filter -> copy_complex64,3,72652.4,76895.4,76.9,0.0,0.0%
+L1 3g + Qwen,convert_kernel -> copy_float16,3,73876.1,75706.9,75.7,0.0,0.0%
+L1 3g + Qwen,convert_kernel -> eq_coef,17,2527.6,75058.4,75.1,53.6,2.6%
+L1 3g + Qwen,copy_complex64 -> copy_float32,6,70760.1,73490.4,73.5,0.0,0.0%
+L1 3g + Qwen,convert_kernel -> convert_kernel,6,68656.8,70848.9,70.8,38.9,0.1%
+L1 3g + Qwen,copy_float32 -> convert_kernel,15,1965.6,38416.0,38.4,0.0,0.0%
+L1 3g + Qwen,copy_complex64 -> convert_kernel,32,1556.3,6068.1,6.1,0.0,0.0%
+L1 3g + Qwen,convert_kernel -> ch_est_pre,1920,816.4,1074.1,3.8,722.9,89.1%
+L1 3g + Qwen,eq_coef -> eq_softdemap,1,803.4,803.4,0.8,0.0,0.0%
+L1 3g + Qwen,copy_float32 -> copy_complex64,1,638.6,638.6,0.6,1.8,0.3%
+L1 3g + NeuralRx,convert_kernel -> copy_complex64,3,109402.1,109969.6,110.0,10.0,0.0%
+L1 3g + NeuralRx,copy_complex64 -> convert_kernel,58,1377.3,76266.6,76.3,0.0,0.0%
+L1 3g + NeuralRx,ch_est_filter -> copy_complex64,3,73877.8,73992.3,74.0,0.0,0.0%
+L1 3g + NeuralRx,convert_kernel -> copy_float16,3,72311.1,72618.2,72.6,0.0,0.0%
+L1 3g + NeuralRx,copy_complex64 -> copy_float32,6,70640.6,72177.0,72.2,0.0,0.0%
+L1 3g + NeuralRx,convert_kernel -> convert_kernel,6,69468.3,70854.0,70.9,41.0,0.1%
+L1 3g + NeuralRx,convert_kernel -> noise_intf_est,36,1387.5,69276.6,69.3,119.2,13.2%
+L1 3g + NeuralRx,convert_kernel -> eq_coef,36,1380.1,62632.5,62.6,92.6,10.0%
+L1 3g + NeuralRx,copy_float32 -> convert_kernel,33,1318.5,4067.8,4.1,0.0,0.0%
+L1 3g + NeuralRx,convert_kernel -> ch_est_pre,1920,851.5,2051.7,37.8,791.9,89.4%
+L1 3g + NeuralRx,copy_complex64 -> copy_complex64,3,591.8,757.7,0.8,0.0,0.0%
+L1 3g + 3 AI on 1g slices,convert_kernel -> copy_complex64,3,108619.6,110723.8,110.7,11.0,0.0%
+L1 3g + 3 AI on 1g slices,convert_kernel -> eq_coef,36,1422.3,90597.2,90.6,19.8,1.5%
+L1 3g + 3 AI on 1g slices,copy_complex64 -> copy_float32,6,70805.6,87672.1,87.7,0.0,0.0%
+L1 3g + 3 AI on 1g slices,convert_kernel -> copy_float16,3,77426.9,78203.2,78.2,0.0,0.0%
+L1 3g + 3 AI on 1g slices,ch_est_filter -> copy_complex64,3,71547.1,72111.6,72.1,0.0,0.0%
+L1 3g + 3 AI on 1g slices,convert_kernel -> convert_kernel,6,68739.4,69779.9,69.8,26.9,0.0%
+L1 3g + 3 AI on 1g slices,convert_kernel -> noise_intf_est,43,1600.3,68092.2,68.1,61.3,4.7%
+L1 3g + 3 AI on 1g slices,copy_complex64 -> convert_kernel,63,1410.4,37097.9,37.1,0.0,0.0%
+L1 3g + 3 AI on 1g slices,copy_float32 -> convert_kernel,41,1412.5,10782.0,10.8,0.0,0.0%
+L1 3g + 3 AI on 1g slices,copy_complex64 -> copy_complex64,1,6090.5,6090.5,6.1,0.0,0.0%
+L1 3g + 3 AI on 1g slices,convert_kernel -> ch_est_pre,1920,691.0,2073.4,37.3,638.2,87.9%

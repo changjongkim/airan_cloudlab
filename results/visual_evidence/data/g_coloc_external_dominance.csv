@@ -1,0 +1,11 @@
+label,condition,p99_ms
+L1 3g + NeuralRx / same partition,G_1a_3g_coloc,265.32
++ external ChanPred,G_2_3gColoc_chanpred,361.13
++ external Forecaster,G_2_3gColoc_forecaster,356.85
++ external Qwen-small,G_2_3gColoc_qwen_small,359.28
++ external ResNet,G_2_3gColoc_resnet,360.85
++ external GEMM/sat-compute,G_2_3gColoc_sat_compute,359.55
++ external HBM saturation,G_2_3gColoc_sat_hbm,356.6
++ external XApp,G_2_3gColoc_xapp,357.92
++ external ChanPred+ResNet,G_3_3gColoc_het_chanpred_resnet,371.2
++ external 2x ChanPred,G_4_3gColoc_homo_2chanpred,370.83

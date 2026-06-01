@@ -61,35 +61,47 @@ MIG에서 선택지는 모두 비용을 가진다.
 
 이 마지막 그림은 단일 실험의 raw plot이 아니라 evidence synthesis plot이다. L1 축은 관측된 latency inflation을 사용했고, AI 축은 fit failure, AI p99 inflation, coloc NeuralRx throughput 감소 정황을 하나의 risk axis에 모은 것이다. 따라서 논문 본문에서는 앞선 개별 figure들을 primary evidence로 쓰고, 이 그림은 전체 tradeoff를 설명하는 summary figure로 쓰는 것이 안전하다.
 
-## 9. Multi-AI placement는 단조롭지 않다
+## 9. 정적 partition plan은 L1과 AI 사이의 tradeoff를 드러낸다
 
-![Multi AI matrix](figures/fig09_l1_multi_ai_matrix.png)
+![Static partition sweep](figures/fig09_static_partition_sweep.png)
 
-5/31 `l1_multi_ai` sweep은 같은 L1이라도 AI 조합과 partition 배치에 따라 p99가 증가하기도 하고 감소하기도 함을 보여준다. 이 결과는 "AI가 많으면 항상 나쁘다"도 아니고 "AI를 분리하면 항상 안전하다"도 아니라는 점을 말한다. MIG static slicing은 workload phase alignment와 runtime behavior를 모르기 때문에, 미리 정한 고정 배치 규칙만으로 real-time safety를 보장하기 어렵다.
+5/31 Phase2/Phase3는 여러 MIG partition plan을 직접 바꿔가며 L1 p99를 본 sweep이다. 그림의 라벨은 코드명 대신 실제 배치 의미로 풀어썼다. 예를 들어 `L1 3g / Qwen-small on 2g+2g`는 L1이 3g slice를 쓰고, Qwen-small 계열 AI가 두 개의 2g slice에 배치된 조건이다. `L1 2g / Qwen-small on 3g`는 AI 쪽에 더 큰 slice를 주는 대신 L1이 2g로 줄어든 조건이다.
+
+여기서 가장 중요한 점은 L1이 2g로 작아지는 순간 p99가 82~84ms대로 올라간다는 것이다. 반대로 L1을 4g 또는 약 3g로 키워도 p99가 완전히 baseline으로 돌아오지는 않는다. 즉, L1에 더 큰 slice를 주면 headroom은 좋아지지만 AI가 쓸 수 있는 GPU budget이 줄고, AI에 더 큰 slice를 주면 L1이 작아져 real-time tail이 악화된다. 이것이 MIG의 정적 slicing이 만드는 가장 기본적인 운영 tradeoff다.
+
+이 그림은 내부 실험 코드명 대신 실제 partition과 workload 의미로 바꿔 표시했다. 빨간 막대는 L1이 2g로 starved된 조건이고, 노란 막대는 L1이 3g/4g를 받았지만 여전히 AI co-tenant와 함께 실행된 조건이다. 핵심은 특정 AI 하나가 아니라, **partition plan 자체가 L1 safety와 AI capacity를 동시에 결정한다**는 점이다.
 
 ## 10. AI throughput과 AI p99는 같은 이야기를 하지 않는다
 
 ![AI throughput vs p99](figures/fig10_ai_throughput_vs_p99.png)
 
-5/31 `ai_throughput_v2`에서는 L1 background가 있어도 AI mean throughput은 거의 변하지 않는다. 하지만 `ai_per_op_latency`에서는 ChanPred, NeuralRx, Qwen의 per-op p99가 증가한다. 이 그래프는 throughput-only isolation metric이 AI-RAN에는 부족하다는 점을 보여준다. AI-RAN에서는 L1뿐 아니라 AI inference 자체도 tail-sensitive service가 될 수 있다.
+5/31 `ai_throughput_v2`에서는 L1 background가 있어도 AI mean throughput은 거의 변하지 않는다. ChanPred, NeuralRx, Qwen-small, XApp 모두 평균 처리량 변화만 보면 0~2% 수준으로 안전해 보인다. 하지만 같은 계열의 `ai_per_op_latency`를 보면 ChanPred는 최대 +27%, NeuralRx는 +12.9%, XApp은 +12.3%, Qwen은 +6.7%까지 per-operation p99가 증가한다.
 
-## 11. P5 sustained run에서도 workload-dependent behavior가 남는다
+이 그림의 목적은 AI side도 단순 throughput으로 평가하면 안 된다는 점을 보여주는 것이다. AI-RAN에서 AI inference가 scheduling loop 안에 들어오거나 near-real-time decision에 쓰이면, 평균 throughput이 아니라 per-op tail latency가 중요해진다. 그러면 MIG의 문제는 L1만의 문제가 아니다. L1을 보호하기 위한 partitioning이 AI의 fit/throughput/tail latency와 충돌하고, AI를 보호하기 위한 partitioning이 L1 headroom과 충돌한다.
 
-![P5 sustained](figures/fig11_p5_sustained_l1.png)
+## 11. Coloc이 시작되면 외부 AI 종류는 2차 문제가 된다
 
-P5 sustained run은 짧은 micro test가 아니라 긴 시간 동안 L1과 co-tenant AI를 같이 돌린 결과다. p99는 workload마다 다르게 움직이며, NeuralRx와 다른 AI workload의 pattern이 동일하지 않다. 이것은 단발성 outlier가 아니라, co-tenant temporal behavior가 L1 tail에 계속 관여한다는 보조 증거다.
+![Coloc external dominance](figures/fig11_coloc_external_dominance.png)
+
+6/1 G 실험은 L1과 NeuralRx를 같은 MIG partition에 coloc한 뒤, 바깥 partition에 다른 AI workload를 추가로 올린 조건들을 비교한다. 결과는 매우 선명하다. 외부에 ChanPred, Forecaster, Qwen-small, ResNet, HBM saturation, XApp, 또는 복수 AI를 올려도 L1 p99는 대체로 356~371ms 근처에 머문다. 즉, 이 구간에서는 외부 AI 종류가 핵심 원인이 아니다. 이미 같은 partition 안에서 L1과 NeuralRx가 temporal resources를 공유하는 순간, tail failure가 지배적이 된다.
+
+이 그림은 "어떤 AI가 외부에 있으면 위험한가?"라는 질문보다 "L1과 in-line PHY-AI를 같은 partition에 넣어도 되는가?"라는 질문이 더 중요하다는 점을 보여준다. 답은 데이터상 명확히 아니다. MIG는 partition 사이 capacity isolation은 줄 수 있지만, 같은 MIG device 안에서 L1과 PHY-AI가 runtime, kernel launch, copy, SM/memory path를 시간적으로 나눠 쓰는 문제는 해결하지 못한다.
 
 ## 12. NSYS gap 분석: tail은 inter-kernel gap에서 보인다
 
 ![NSYS gap](figures/fig12_nsys_gap_summary.png)
 
-NSYS deep analysis는 L1 kernel 자체의 평균 실행시간만으로는 tail을 설명하기 어렵고, kernel 사이 gap과 burst idle 구간이 중요하다는 점을 보여준다. 특히 2g L1 + ChanPred는 p99 gap이 크게 나타난다. 이 결과는 대역폭을 단순 sustained GB/s로만 보면 놓치는 **temporal bandwidth / scheduling gap** 문제를 뒷받침한다.
+NSYS deep analysis는 L1 kernel 자체의 평균 실행시간만으로는 tail을 설명하기 어렵고, kernel 사이 gap과 burst idle 구간이 중요하다는 점을 보여준다. 그림의 라벨은 실제 조건으로 풀어쓴 것이다. `L1 2g + ChanPred on 3g` 조건은 p99/p999 inter-kernel gap이 가장 크고, `L1 4g + ResNet on 2g`는 상대적으로 작다. `L1 3g + ResNet+ChanPred`, `L1 3g + ResNet+Forecaster`처럼 heterogeneous AI 조합은 중간에 위치한다.
+
+이 결과는 우리가 말하는 bandwidth 문제가 단순히 "몇 GB/s를 썼는가"가 아니라는 점을 뒷받침한다. L1이 일정한 frame cadence를 유지하려면 다음 kernel이 제때 launch되고 copy/convert 단계가 제때 지나가야 한다. 하지만 small partition이나 특정 AI mix에서는 kernel 사이 빈 시간이 길어지고, 이 gap tail이 L1 p99/p999로 나타난다. 그래서 이 문제를 **temporal bandwidth 또는 scheduling headroom 부족**으로 해석하는 것이 sustained HBM bandwidth 하나로 설명하는 것보다 더 정확하다.
 
 ## 13. Memory/copy pressure는 workload별로 다르다
 
 ![Memory ops](figures/fig13_memory_ops_pressure.png)
 
-NSYS memory-op summary를 보면 NeuralRx, ResNet, Forecaster 등은 memcpy total이나 p99 pattern이 다르다. 이 차이는 왜 synthetic D2D/H2D saturation만으로는 PHY-AI interference를 재현하기 어려운지 설명한다. 문제는 총량 bandwidth 하나가 아니라 copy/convert/kernel phase가 L1과 어떻게 겹치는가다.
+NSYS memory-op summary는 각 workload가 L1 주변에 만드는 copy pressure가 다르다는 점을 보여준다. 이 그림은 `L1 3g alone`을 1.0으로 정규화했다. NeuralRx, Qwen, ResNet, Forecaster는 total memcpy나 memcpy p99가 baseline 대비 크게 달라진다. 반면 모든 workload가 같은 방식으로 나빠지는 것은 아니다.
+
+이 그림의 역할은 mechanism 설명이다. 6/1 F/Dv2에서 generic D2D/H2D saturation이 L1 p99를 크게 망가뜨리지 않았는데, 5/31 NeuralRx나 6/1 coloc에서는 문제가 커졌다. 그 차이는 단순 bandwidth 양만으로는 설명하기 어렵다. PHY-AI는 copy, convert, kernel launch, framework runtime phase가 L1 pipeline과 특정 시간 패턴으로 겹칠 수 있고, 이 temporal overlap이 tail을 만든다.
 
 ## 14. Dv2 replication은 negative result를 강화한다
 
@@ -115,10 +127,10 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 - `data/ai_per_op_latency_parsed.csv`
 - `data/ai_per_op_p99_delta.csv`
 - `data/tradeoff_summary.csv`
-- `data/l1_multi_ai_matrix.csv`
+- `data/static_partition_sweep.csv`
 - `data/ai_throughput_v2_parsed.csv`
 - `data/ai_throughput_vs_p99.csv`
-- `data/p5_sustained_l1.csv`
+- `data/g_coloc_external_dominance.csv`
 - `data/nsys_gap_summary.csv`
 - `data/memory_ops_pressure.csv`
 - `data/dv2_sanity.csv`

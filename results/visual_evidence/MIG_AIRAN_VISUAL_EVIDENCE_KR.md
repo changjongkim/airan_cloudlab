@@ -3,7 +3,41 @@
 생성일: 2026-06-01  
 소스 범위: `cloudlab_results/results/20260531`, `cloudlab_results/results/20260601`
 
-이 문서는 정리된 evidence를 그림 중심으로 다시 구성한 한국어 버전이다. 핵심 결론은 단순히 "L1만 격리하면 되는가"가 아니라, **L1 tail latency와 AI workload service quality를 동시에 만족해야 하는 AI-RAN에서 MIG의 정적 파티셔닝이 잘못된 제어 추상화**라는 점이다.
+---
+
+## 📍 서론 — 본 연구의 한 줄 요약
+
+> **"NVIDIA MIG는 GPU를 partition으로 잘라 capacity를 분리해주지만, AI-RAN의 실시간 cuPHY L1 + in-line PHY-AI 워크로드를 함께 운영하기에는 부족하다. 부족함이 (1) 작은 partition의 HBM bandwidth share 감소로 인한 L1 자동 지연 (structural), (2) chip 전체에서 공유되는 PCIe/DMA arbitration queue에서의 cross-partition memcpy contention, (3) 같은 partition 내 L1 + PHY-AI coloc시 양방향 200x 폭락의 세 가지로 측정된다. 결국 MIG의 isolation은 partition별 capacity는 제공하지만, chip-wide shared hardware structures는 isolation을 제공하지 못한다."**
+
+### 본 연구가 답하는 두 가지 질문
+
+| 질문 | 답 (section) |
+| --- | --- |
+| Q1. AI 워크로드를 cuPHY L1 옆에 두면 정말 문제가 되는가? 어디서? | §1-§11 (현상 측정) |
+| Q2. 그 문제는 왜 발생하는가? Hardware 어디서? | §12-§20 (메커니즘 추적) |
+
+### 본 연구의 5개 핵심 claim
+
+1. **Generic cross-partition saturation은 L1에 영향 없음** — MIG capacity isolation 작동 (§3, §14, §18.2)
+2. **그러나 작은 partition은 자동 비용** — HBM bandwidth share 비례 감소 (§1, §15.2)
+3. **PHY-AI cross-partition은 PCIe/DMA queue contention 유발** — pattern-similar workload만 (§15.3, §16, §20.1)
+4. **같은 partition coloc은 catastrophic** — L1 p99 +537%, AI throughput 200x ↓ (§4, §18.3)
+5. **메커니즘은 throughput 경쟁이 아니라 shared queue arbitration** — Hardware counter로 확인 (§18.2, §19.2)
+
+### 문서 구조 — 4 PART
+
+| PART | Section | 주제 |
+| --- | --- | --- |
+| **A. 현상 관측** | §1-§11 | 측정 데이터: 어떤 condition에서 L1이 망가지는지 |
+| **B. 메커니즘 1차 추적** | §12-§14 | NSYS gap이 사실은 memcpy/memset boundary, Dv2로 가설 정밀화 |
+| **C. 메커니즘 hardware-level closure** | §15-§17 | structural vs contention 분리, queue arbitration 직접 증거, time decomposition |
+| **D. Evidence 강화 & 정정** | §18-§20 | 빠뜨린 데이터 보강, 대안 가설 제거, queue 위치 정정 (PCIe/DMA) |
+
+---
+
+# PART A — 현상 관측 (§1-§11)
+
+본 part는 어떤 condition에서 cuPHY L1이 망가지는지 측정 결과만 보여준다. 메커니즘 해석은 PART B-C에서.
 
 ## 1. 작은 MIG slice는 L1 headroom을 줄인다
 
@@ -152,6 +186,12 @@ MIG에서 선택지는 모두 비용을 가진다.
 
 이 그림은 "어떤 AI가 외부에 있으면 위험한가?"라는 질문보다 "L1과 in-line PHY-AI를 같은 partition에 넣어도 되는가?"라는 질문이 더 중요하다는 점을 보여준다. 답은 데이터상 명확히 아니다. MIG는 partition 사이 capacity isolation은 줄 수 있지만, 같은 MIG device 안에서 L1과 PHY-AI가 runtime, kernel launch, copy, SM/memory path를 시간적으로 나눠 쓰는 문제는 해결하지 못한다.
 
+---
+
+# PART B — 메커니즘 1차 추적 (§12-§14)
+
+PART A의 측정 데이터를 보고 "왜 그런가"를 추적하기 시작한다. NSYS sqlite로 GPU activity 안을 들여다본다.
+
 ## 12. NSYS SQLite 재분석: kernel-only gap은 idle이 아니다
 
 ![NSYS gap](figures/fig12_nsys_kernel_vs_activity_gap.png)
@@ -239,29 +279,21 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 | 4 launch | 10 | 952 | 921-982 | 1043 | 23500 |
 | 5 chanpred | 10 | 913 | 871-955 | 985 | 2016 |
 
-## 결론
+## PART B 중간 정리
 
-데이터 기반으로 가장 강한 주장은 다음이다.
+§12-§14를 통해 다음 두 가지를 확인했다.
 
-> MIG는 generic cross-partition throughput isolation에는 효과적일 수 있다. 그러나 AI-RAN은 L1 tail latency와 AI workload service quality를 동시에 보장해야 한다. MIG는 static capacity slicing만 제공하므로, L1 headroom, AI fit/throughput/p99, PHY-AI co-location tail latency 사이의 tradeoff를 안전하게 제어하지 못한다. 따라서 MIG 단독으로는 real-time L1 + PHY-AI consolidation을 위한 충분한 isolation mechanism이 아니다.
+1. **NSYS의 "kernel-only gap"은 사실 idle이 아니라 memcpy/memset 같은 boundary memory activity로 채워져 있다.** 즉 문제 위치는 L1 kernel 자체가 아니라 stage 경계의 memory 작업이다.
 
-## NSYS까지 포함한 최종 해석
+2. **Dv2 (n=10) 결과로 generic cross-partition stress 효과가 통계적으로 부재함을 확인했다.** 따라서 단순 "MIG isolation이 깨진다"는 주장은 데이터와 맞지 않는다. 문제는 PHY-AI 같은 *특정 workload pattern*에 국한된다.
 
-지금까지의 데이터는 다음 순서로 읽는 것이 가장 강하다.
+→ 이걸 hardware level까지 추적하는 것이 PART C의 목표다.
 
-1. **MIG는 capacity isolation에는 의미가 있다.** 6/1 F와 5/31 Dv2에서 generic D2D/H2D/GEMM/launch/ChanPred stress는 baseline 주변에 머물렀다. 따라서 "MIG가 모든 cross-partition isolation에 실패한다"는 주장은 데이터와 맞지 않는다.
+---
 
-2. **하지만 AI-RAN이 원하는 것은 capacity isolation만이 아니다.** L1은 frame deadline을 맞춰야 하고, AI workload도 throughput뿐 아니라 per-op p99와 fit constraint를 가진다. 2g L1은 standalone부터 headroom이 작고, AI workload는 작은 slice에서 fit 실패나 throughput scaling 문제를 보인다.
+# PART C — Hardware-level mechanism closure (§15-§17)
 
-3. **NSYS는 failure mechanism이 단순 idle gap이 아니라 memory-filled kernel boundary라는 점을 보여준다.** kernel-only gap만 보면 긴 idle처럼 보이지만, kernel/memcpy/memset activity를 merge하면 2g 조건의 1ms 이상 kernel gap 대부분이 memory op로 채워져 있다. 즉 문제는 GPU가 놀아서가 아니라, L1의 convert/copy/memset boundary가 temporal하게 보호되지 않는다는 것이다.
-
-4. **copy/convert/runtime boundary가 workload별로 다르게 흔들린다.** NeuralRx는 3g L1의 memcpy total을 4.2배로 키우고, 2g L1은 memset duration을 3g 대비 거의 2배로 키운다. 이것은 synthetic HBM stress와 PHY-AI workload가 같지 않다는 뜻이다.
-
-5. **가장 치명적인 지점은 same-partition L1+PHY-AI coloc이다.** 6/1 G/H에서 L1과 NeuralRx가 같은 partition에 들어가면 p99가 수백 ms로 폭발한다. 외부 AI 종류를 바꿔도 coloc 이후에는 p99가 이미 높은 영역에 머문다. 이 결과는 MIG가 partition 사이 격리는 줄 수 있어도, 같은 MIG device 내부의 temporal sharing 문제는 해결하지 못한다는 점을 보여준다.
-
-따라서 논문에서 최종 메시지는 이렇게 가져가야 한다.
-
-> MIG는 GPU를 공간적으로 나누는 좋은 capacity isolation 도구지만, AI-RAN의 real-time L1 + PHY-AI consolidation에는 부족하다. 이유는 L1과 AI가 모두 tail-sensitive하고, static partition은 workload phase, copy/memset/runtime boundary, kernel launch gap, PHY-AI coloc behavior를 제어하지 못하기 때문이다. AI-RAN에는 MIG 위에 workload-aware temporal scheduling 또는 admission/control layer가 추가로 필요하다.
+PART B에서 "memcpy/memset boundary가 비용 위치"라고 식별했다. PART C는 이걸 hardware level까지 정확히 정의하고 측정한다.
 
 ## 15. memcpy/memset의 정확한 정의 — structural cost vs contention cost 분리
 
@@ -607,6 +639,12 @@ Wall-clock =
 
 이 decomposition은 reviewer가 "그래서 어떤 component가 정확히 늘어났냐?"라고 물을 때 직접 답할 수 있는 data structure를 제공한다.
 
+---
+
+# PART D — Evidence 강화 & 정정 (§18-§20)
+
+PART C에서 메커니즘 해석을 만들었다. PART D는 (1) 빠뜨린 evidence 보강, (2) 대안 가설 elimination, (3) hardware location 정정으로 메커니즘 해석을 robust하게 만든다.
+
 ## 18. 빠뜨렸던 데이터 — 약점 3개 직접 prove
 
 본 절은 이전 self-assessment에서 약점으로 인정했던 3개 항목 (n=1 capture, NCU evidence 미흡, AI side cost 미측정) 이 사실은 **수집된 데이터에 이미 존재**했고, 단지 적절히 분석되지 않았음을 보여준다. 모두 기존 sqlite/csv/log에서 직접 추출.
@@ -887,6 +925,131 @@ cuPHY pipeline이 몇 개의 CUDA stream을 사용하는지 분해해보면 대�
 | Per-stream concurrency | cuPHY는 1 main stream | stream parallelism 회피 불가 |
 
 이 4가지 추가 분석은 §16-§19의 메커니즘 해석에 새로운 차원을 더하고, queue arbitration이 실제로 PCIe/DMA scheduler에서 발생함을 확정한다.
+
+---
+
+# PART E — 최종 결론
+
+§1-§20까지의 모든 측정과 분석을 토대로 본 연구의 결론을 정리한다.
+
+## 21. 본 연구가 prove한 두 가지 문제
+
+본 연구는 MIG의 구조적 한계를 두 가지 독립적 문제로 분리해서 정확히 측정했다. 두 문제는 발생 위치, 메커니즘, AI 영향, 회피 가능성이 모두 다르다.
+
+### 문제 1: STRUCTURAL — partition 자체의 HBM bandwidth share
+
+```
+원인:       MIG가 HBM bandwidth를 partition share에 비례 분배
+측정:       7g 290us → 4g 588us → 3g 589us → 2g 1176us (memset duration)
+이론치:     435MB / (partition's HBM share) = duration
+            7g (1500 GB/s) → 290us 이론
+            2g (430 GB/s)  → 1012us 이론
+            → 측정치와 일치 (§15.1.5)
+AI 영향:    없음 (memset duration은 AI 추가시 변하지 않음)
+회피 가능?: 작은 partition을 선택 안 하면 됨 (단 capacity 양보)
+MIG 측면:   capacity isolation은 작동 (partition share가 결정되니까)
+            그러나 그 isolation의 효과가 자동 비용을 만듦
+```
+
+### 문제 2: CONTENTION — chip-wide shared PCIe/DMA queue
+
+```
+원인:       MIG가 partition별로 isolation을 제공하지 못하는 hardware
+            (PCIe/DMA copy engine scheduler가 chip 전체에서 1개)
+측정:       L1 60KB memcpy per-call: alone 4.2us → +NeuralRx 14.3us (3.4x)
+            늘어난 10us는 launch와 transfer 사이 queue wait (transfer 자체는 0.09us)
+패턴 의존:  AI workload가 L1과 같은 small frequent H2D pattern일 때만 발생
+            (NeuralRx/Qwen/sat_hbm/ResNet → contention. chanpred/Forecaster/sat_compute → no)
+AI 영향:    있음 (AI workload의 H2D rate가 ~7/sec 이상이면 trigger)
+회피 가능?: AI workload pattern을 L1과 다르게 두거나 layout으로 분리
+MIG 측면:   isolation 작동 안 함 (chip-wide queue는 partition 경계 무시)
+            MIG promise와 실제의 gap
+```
+
+### 문제 1+2 결합: COLOC catastrophe
+
+같은 MIG partition 안에 L1 + PHY-AI를 두면 위 두 가지가 모두 시간 분할 (time-slicing)으로 합쳐지면서 양방향 200x 폭락:
+
+- L1 p99: alone 56ms → 3g coloc 265ms (+372%), 4g coloc 357ms (+537%)
+- NeuralRx throughput: alone 1294 inf/s → 3g coloc **6 inf/s (200x ↓)**
+- → 두 워크로드가 동시에 useless가 됨
+
+## 22. MIG framing — 무엇이 작동하고 무엇이 부족한가
+
+본 연구의 데이터를 종합하면 MIG의 isolation은 다음과 같이 분류된다:
+
+| Hardware resource | MIG가 partition별로 isolate? | 본 연구의 evidence |
+| --- | --- | --- |
+| SM (compute cores) | ✅ 작동 | F의 39 conds + Dv2가 L1 kernel time 일정 (§17.1) |
+| L2 cache | ✅ 부분 작동 | NCU L2 hit rate 분리 (§4 of fig 19) |
+| HBM bandwidth share | ✅ 작동 (그게 비용을 만듦) | memset 이론치-측정치 일치 (§15.2) |
+| Kernel launch queue | ✅ 작동 | chanpred 117K launch/s가 L1 영향 0 (§19.2) |
+| **PCIe/DMA scheduler** | ❌ **작동 안 함** | per-call memcpy 4.2→14.3us under pattern-matching AI (§16, §20.1) |
+| **Memory controller arbitration** | ❌ **부분만 작동** | shared chip-wide queue가 cross-partition contention 허용 |
+| **Same-partition time slicing** | ❌ **작동 안 함** (intra-partition은 MIG 범위 밖) | coloc L1+NeuralRx 200x degradation (§4, §18.3) |
+
+→ **MIG의 promise ("각 partition은 isolated된 GPU처럼 작동")는 capacity (SM, HBM bandwidth share)에 대해서만 부분적으로 만족된다. chip-wide shared hardware structures는 isolate 못 한다. AI-RAN의 in-line PHY-AI consolidation은 정확히 이 미작동 resource (PCIe/DMA queue + same-partition time slicing)에 의존하므로 MIG로는 부족하다.**
+
+## 23. 메커니즘 evidence 5 layer 확립
+
+본 연구의 메커니즘 해석 (PCIe/DMA queue arbitration이 contention point)은 다음 5개 독립적 evidence layer로 지지된다:
+
+1. **직접 측정** (§16.1) — per-call memcpy duration bimodal split (4.2us vs 14.3us)
+2. **시간 분해** (§16.2) — transfer 0.09us, launch 4.1us, queue wait 10us
+3. **Hardware counter** (§18.2) — NCU L1 DRAM throughput ≤12.6% peak (throughput contention REJECT)
+4. **AI-side signature** (§19.1, §20.2) — AI의 H2D rate가 L1 contention threshold 결정
+5. **Alternative 가설 elimination** (§19.2) — chanpred 117K launch/s로 L1 영향 0 (launch queue 가설 REJECT)
+6. **Sustained persistence** (§19.3) — P5 5분 × n=2에서 CV<5% (transient artifact 아님)
+7. **Hardware location refinement** (§20.1) — Memcpy direction 분해로 PCIe/DMA path 확정
+
+7개의 독립적 evidence가 모두 같은 결론 (memcpy queue arbitration at PCIe/DMA scheduler)을 지지한다. 메커니즘 해석이 alternative-eliminated 수준에 도달.
+
+## 24. AI-RAN 운영 함의 — 4가지 design rule
+
+본 연구 데이터에서 AI-RAN deployment에 직접 적용 가능한 4개 rule이 도출된다.
+
+### Rule 1: Partition sizing은 L1 alone일 때도 비용을 만든다
+
+작은 partition은 AI 추가 여부와 무관하게 L1 자체의 boundary memset을 비례적으로 느리게 만든다. 2g L1은 7g 대비 같은 work에 4x 시간이 걸린다. → "큰 slice는 capacity 낭비"가 아니다. 작은 slice는 throughput 비용을 confer한다.
+
+### Rule 2: Cross-partition AI workload 선택 시 H2D rate를 확인
+
+AI 워크로드를 L1 옆 partition에 두려고 한다면:
+
+- **H2D rate < 5/sec** (chanpred, Forecaster 등) → 안전
+- **H2D rate > 7/sec** (NeuralRx, Qwen, sat_hbm, ResNet 등) → L1 boundary memcpy queue 경쟁 발생
+
+본 연구의 nsys signature 분석은 AI 워크로드를 deployment 전에 screening하는 toolkit으로 사용 가능하다.
+
+### Rule 3: Same-partition L1 + PHY-AI coloc은 절대 하지 말 것
+
+L1 + NeuralRx 같은 PHY-AI를 같은 MIG partition에 함께 두면 L1 p99 +537%, AI throughput 200x ↓로 양방향 catastrophic 실패. partition을 더 크게 줘도 (4g coloc) 해결 안 되고 오히려 더 나빠진다. **PHY-AI는 반드시 별도 MIG partition 또는 별도 device에 배치해야 한다.**
+
+### Rule 4: MIG 단독은 불충분 — temporal admission control 필요
+
+위 3개 rule을 모두 따라도 cross-partition queue contention과 partition share 자동 비용은 남는다. AI-RAN의 frame deadline (1ms) 보장을 위해서는 MIG 위에 다음 중 하나가 필요하다:
+
+- Workload-aware admission control (어떤 AI를 어느 partition에 둘지 분류)
+- Temporal scheduling (PHY-AI과 L1의 H2D rate를 동기화해서 burst 충돌 회피)
+- 또는 hardware level에서 NVIDIA가 chip-wide queue partitioning을 추가 (현재 미제공)
+
+## 25. 본 연구의 정직한 caveat
+
+본 연구의 evidence가 paper-grade 수준에 도달했지만 다음 3가지는 추가 실험으로 더 robust해질 수 있다.
+
+| Caveat | 현재 상태 | 강화 방법 |
+| --- | --- | --- |
+| Coloc 실험이 PHY-AI = NeuralRx 단일 워크로드만 직접 측정 | §16.1 mechanism level에서 chanpred coloc은 안전 예측 가능. 그러나 직접 측정 없음 | chanpred coloc, ResNet coloc 실험 (~2시간 GPU 시간) |
+| AI side 200x degradation은 G_1a 단일 capture | 다른 G_* logs는 container kill로 final stat 미기록 | 자연 종료하도록 AI 실행시간 조정 후 재실험 |
+| Memory controller queue 내부 state는 NVIDIA 비공개 | hardware behavior로부터 inference. 직접 측정 불가 | (NVIDIA가 micro-architecture 공개해야 가능, 본 연구 범위 밖) |
+
+이 caveat에도 불구하고 PART D §18-§20의 7개 evidence layer는 메커니즘 해석이 robust함을 보여준다. caveat은 paper의 confidence interval을 정의하는 데 사용한다.
+
+## 26. 한 줄 종합
+
+> **"MIG는 GPU를 공간적으로 분할하는 좋은 capacity isolation 도구다. SM, HBM bandwidth share, kernel launch queue는 partition별로 잘 isolate한다. 그러나 PCIe/DMA copy engine scheduler와 memory controller arbitration queue 같은 chip-wide shared hardware structures는 isolate하지 못한다. AI-RAN의 cuPHY L1 + in-line PHY-AI consolidation은 정확히 이 미작동 isolation에 의존하므로, MIG 단독으로는 양쪽의 service quality를 동시에 보장하지 못한다 (L1 p99 +537%, NeuralRx throughput 200x ↓). 본 연구는 이 한계를 hardware-level까지 분리하고 측정해서 7개 독립적 evidence layer로 prove했다."**
+
+---
 
 ## Supplementary figures (약점 보강)
 

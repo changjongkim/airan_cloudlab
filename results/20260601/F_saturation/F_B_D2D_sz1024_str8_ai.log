@@ -1,0 +1,7 @@
+[memcpy_massive] D2D size=1024MB streams=8 duration=240s
+Traceback (most recent call last):
+  File "/workspace/AIRAN_Changjong/experiments/run_memcpy_massive.py", line 13, in <module>
+    bufs = [(torch.empty(N, dtype=torch.float32, device=f'cuda:{gpu_id}'),
+  File "/workspace/AIRAN_Changjong/experiments/run_memcpy_massive.py", line 13, in <listcomp>
+    bufs = [(torch.empty(N, dtype=torch.float32, device=f'cuda:{gpu_id}'),
+RuntimeError: NVML_SUCCESS == r INTERNAL ASSERT FAILED at "../c10/cuda/CUDACachingAllocator.cpp":838, please report a bug to PyTorch. 

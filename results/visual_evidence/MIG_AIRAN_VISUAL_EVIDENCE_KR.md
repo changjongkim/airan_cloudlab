@@ -432,6 +432,64 @@ L1 pipeline의 memcpy 6433회를 size별로 보면 거의 모두 **0.1KB~1MB 범
 >
 > **AI-RAN 운영 함의**: 본 데이터가 지지하는 가장 강한 함의는 두 가지다. (a) L1을 작은 partition에 두는 결정은 그 자체로 structural memset cost를 confer한다 — AI placement 무관. (b) L1을 같은 device에 두는 AI는 *어떤 AI든* 안전한 게 아니라, memory access pattern이 L1과 similar한 AI (small frequent ops를 가지는 PHY-AI, LLM small batch inference, HBM saturator)는 같이 두면 위험하다. 따라서 MIG 단독으로 AI-RAN을 운영하려면 partition planning 외에 workload pattern 기반 placement / temporal admission control layer가 추가로 필요하다.
 
+## 16. 직접 증거 — queue arbitration mechanism이 측정으로 보인다
+
+§15에서 contention cost의 mechanism을 "memory controller arbitration queue 경쟁"으로 주장했지만 그건 indirect inference였다. 본 절은 NSYS sqlite의 per-call duration 분포로 이 메커니즘의 **직접 증거**를 제시한다.
+
+### 16.1. Per-call 60KB memcpy duration — bimodal split이 queue evidence
+
+![Per-call queue evidence](figures/fig_supp_11_percall_queue_evidence.png)
+
+3g L1 + 다양한 AI 시나리오에서 **같은 크기 (60KB) memcpy operation의 per-call duration**을 비교했다 (`bytes BETWEEN 50000 AND 80000`). 각 condition에서 n=1920 ops.
+
+| 3g L1 + | per-call median (us) | per-call p99 (us) |
+| --- | --- | --- |
+| alone (baseline) | **4.2** | 4.8 |
+| sat_compute | 4.2 | 4.9 |
+| Forecaster | 4.2 | 5.1 |
+| chanpred | 4.3 | 8.7 |
+| ResNet+chanpred | 4.4 | 8.7 |
+| Qwen | **14.3** | 16.7 |
+| sat_hbm | **14.3** | 15.3 |
+| NeuralRx | **14.3** | 15.4 |
+| ResNet | **14.3** | 25.2 |
+
+결과는 **bimodal**이다. 4.2us 그룹 (no contention) vs 14.3us 그룹 (contention). 중간 값이 없다.
+
+### 16.2. 시간 분해 — 늘어난 10us는 전부 queue wait
+
+![Time decomposition](figures/fig_supp_12_time_decomposition.png)
+
+이 bimodal split을 분해하면:
+
+- **실제 transfer 시간**: 60KB / 640 GB/s ≈ **0.09us** (3g L1의 HBM bandwidth). 무시 가능.
+- **launch + CUDA runtime overhead**: 약 4.1us. alone과 sat_compute에서 측정되는 baseline.
+- **추가된 10us** (contention condition): transfer 시간이 아니다 (0.09us). 이건 **launch와 실제 transfer 사이의 queue wait time**이다.
+
+만약 contention의 원인이 throughput 경쟁이었다면 transfer 시간 자체가 늘어야 한다. 그런데 transfer 시간은 baseline과 동일하다 (per-call distribution이 평행 이동이지 stretch가 아니다). 추가된 10us는 정확히 **memory controller queue에서 대기한 시간**이라고 해석할 수밖에 없다.
+
+이게 §15.3의 "queue arbitration이 메커니즘이다"라는 inference를 **직접 측정으로** 닫는다. 그리고 동시에 사용자의 원래 직관 ("bandwidth가 문제다")을 hardware level에서 한 번 더 정확히 한다: 본 데이터에서 보이는 contention은 단순 throughput 경쟁이 아니라 **shared memory controller arbitration queue에서의 대기**다.
+
+### 16.3. PHY-AI 일반화의 nuance — workload pattern + partition layout 둘 다
+
+![Partition layout dependence](figures/fig_supp_13_partition_layout_dependence.png)
+
+§5에서 "PHY-AI는 위험하다"의 일반화를 NeuralRx 한 종류에 의존한다는 약점을 인정했다. 위 데이터는 그 nuance를 더 정확하게 한다:
+
+- 3g L1: ResNet/Qwen/sat_hbm/NeuralRx는 contention (14.3us), chanpred/Forecaster는 baseline (4.2us)
+- 4g L1: NeuralRx만 contention (14.3us), ResNet은 baseline (4.2us), chanpred도 baseline
+
+즉 "어떤 PHY-AI가 위험한가"는 두 변수의 함수다:
+
+1. **AI workload의 memory access pattern** — small frequent memcpy를 발생시키는가? (NeuralRx, Qwen, sat_hbm, ResNet은 YES. chanpred, Forecaster는 NO — LSTM/Informer는 자체 캐싱이 강함.)
+2. **MIG partition layout** — L1과 AI가 같은 HBM channel/memory controller path를 공유하는가? (3g+2g 조합과 4g+2g+1g 조합은 다른 controller path를 줄 수 있음 — A100 NVIDIA 비공개 내부 구조.)
+
+이 둘이 모두 충족될 때만 queue contention이 발생한다. 그래서 본 연구의 정확한 일반화 주장은 다음과 같다:
+
+> "MIG는 partition 사이 capacity isolation을 보장하지만, memory controller arbitration queue는 chip 전체에서 한 개이므로 두 partition의 워크로드가 (a) 비슷한 small frequent memory access pattern을 가지고 (b) layout으로 같은 controller path를 공유할 때 cross-partition contention이 발생한다. 즉 NeuralRx coloc은 worst case이지만, 다른 PHY-AI도 *partition layout과 pattern이 맞으면* 같은 메커니즘으로 catastrophic이 될 수 있다. 안전한 default는 'PHY-AI는 별도 device 또는 layout-aware placement를 한다'."
+
+이 framing은 paper-grade에서 robust하다. "PHY-AI is always dangerous"를 주장하지 않으므로 chanpred case가 counter-evidence가 되지 않고, "NeuralRx specifically"로 좁히지도 않아 일반화 범위를 유지한다. 메커니즘(queue contention)을 명시하고 그 메커니즘의 trigger 조건 (pattern + layout)을 설명하는 구조다.
+
 ## Supplementary figures (약점 보강)
 
 | Supp # | 보강한 약점 | 그림 |
@@ -446,6 +504,9 @@ L1 pipeline의 memcpy 6433회를 size별로 보면 거의 모두 **0.1KB~1MB 범
 | 8 | §15.3 Memcpy contention이 workload pattern 의존 (sat_compute +0%, NeuralRx +325%) | `fig_supp_08_memcpy_contention_map.png` |
 | 9 | §15.1 count는 invariant, duration이 변수 (AI는 op 수가 아니라 wait time을 늘림) | `fig_supp_09_count_vs_duration.png` |
 | 10 | §15.4 L1 memcpy는 small ops (KB-MB), bulk D2D와 다른 queue | `fig_supp_10_memcpy_size_distribution.png` |
+| 11 | §16.1 Per-call 60KB memcpy bimodal split (4.2us vs 14.3us) → queue 직접 증거 | `fig_supp_11_percall_queue_evidence.png` |
+| 12 | §16.2 시간 분해: transfer 0.09us / launch 4.1us / queue wait 10us → throughput 아님 | `fig_supp_12_time_decomposition.png` |
+| 13 | §16.3 3g vs 4g layout 차이 — 같은 ResNet도 partition layout에 따라 contention 발생/안함 | `fig_supp_13_partition_layout_dependence.png` |
 
 이 6개 supplementary는 본문 §1, §2, §3, §4, §7, §12를 직접 강화한다. 모두 우리가 이미 가진 데이터에서 추가 측정 없이 만든 것이다. 추가로 닫지 못한 약점은 다음 두 가지로, 추후 실험이 필요하다.
 

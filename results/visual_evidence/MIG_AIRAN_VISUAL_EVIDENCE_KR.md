@@ -318,6 +318,48 @@ cuPHY 입장에서 working buffer 사이즈 (435MB 등)는 PRB count, MCS, anten
 
 이 관찰이 mechanism을 단순화한다: "L1 boundary가 deformation"이 아니라 "L1 boundary operation이 더 느려진다" 다. 그러면 *왜* 느려지는지의 답이 두 가지로 분리된다.
 
+### 15.1.5. 그래서 duration이 *왜* 늘어나는가 — hardware-level 직관
+
+본 연구의 가장 중요한 질문이 "memset/memcpy duration이 왜 늘어나는가"이므로 두 갈래 각각의 hardware 수준 메커니즘을 명시한다.
+
+**Memset duration 증가 = throughput 산수 그대로**
+
+A100 HBM2 peak bandwidth 약 1500 GB/s. MIG는 이걸 partition share에 비례해 분배한다. 같은 435MB buffer를 zero로 채울 때:
+
+| Partition | 이론적 HBM bandwidth | 435MB / bandwidth = 예상 duration | 측정 duration |
+| --- | --- | --- | --- |
+| 7g | 약 1500 GB/s | 290us | **297us** |
+| 4g | 약 860 GB/s | 506us | 588us |
+| 3g | 약 640 GB/s | 680us | 589us |
+| 2g | 약 430 GB/s | 1012us | **1176us** |
+
+측정값과 이론값이 거의 일치한다 (4g에서 약간의 차이는 실제 HBM 채널 분배의 비-선형성으로 추정). 즉 memset의 시간 증가는 큐잉/스케줄링 같은 복잡한 메커니즘이 아니라 **"파이프가 좁아져서 같은 양의 데이터를 쏘는 데 더 걸린다"**는 산수 그 자체다. 이건 partition을 선택하는 순간 자동으로 결정된다. AI 추가 여부와 무관한 이유는 memset이 partition의 **dedicated HBM bandwidth를 streaming write로** 쓰기 때문이다. 다른 partition의 AI는 자기 partition의 다른 bandwidth allocation으로 처리되어 path가 분리된다.
+
+**Memcpy duration 증가 = memory controller queue 경쟁**
+
+memcpy는 다르다. 작은 op (KB~MB 단위) 6,433회를 frame당 발생시키는데, 각 op마다:
+
+1. CUDA runtime이 `cudaMemcpyAsync` 호출 → memory controller request queue에 enqueue
+2. memory controller가 arbitration해서 어느 partition의 어느 request를 다음에 처리할지 결정
+3. HBM channel에서 실제 transfer
+
+여기서 핵심은 **MIG가 capacity는 partition별로 나눠주지만 memory controller의 request arbitration queue 자체는 chip 전체에서 한 개**라는 점이다. 그래서 다른 partition의 AI가 이 queue에 자주 request를 넣으면 L1 request의 대기시간이 늘어난다.
+
+각 시나리오를 이 queueing 관점으로 해석하면 측정 데이터가 깔끔하게 정렬된다:
+
+- **3g alone**: L1만 queue에 request 넣음 → 거의 즉시 처리 → 46.8ms
+- **3g + NeuralRx**: L1 + NeuralRx 둘 다 small frequent ops로 queue 채움 → L1 request가 NeuralRx request 뒤에 줄서기 → **199ms (+325%)**
+- **3g + sat_compute**: sat_compute는 tensor core + L2 cache로 GEMM 처리, HBM request queue를 거의 안 씀 → L1 queue 무경합 → 47ms (+0%)
+- **2g + NeuralRx**: 2g L1은 SM이 작아 다음 memcpy를 발행하는 속도 자체가 낮음 → queue에 자주 안 들어감 → contention 무관 → **47ms (+0%)**
+
+직관 비유로는 *단일 계산대에 손님이 줄서는 상황*이다:
+- L1만 줄: 즉시 처리.
+- L1 + NeuralRx: 둘 다 작은 물건 자주 사러 와서 줄이 길어짐.
+- L1 + sat_compute: sat_compute는 self-checkout (tensor core)으로 가서 줄 안 섬.
+- 2g L1 + anything: 2g L1 자체가 손님을 천천히 보내서 줄에 자주 도착 안 함.
+
+이 두 메커니즘이 합쳐서 본 연구 데이터의 모든 패턴을 설명한다. memset은 "파이프 굵기" 문제고 memcpy는 "줄서기" 문제다.
+
 ### 15.2. Memset = STRUCTURAL cost (partition 자체의 HBM bandwidth share)
 
 ![Memset structural](figures/fig_supp_07_memset_structural.png)

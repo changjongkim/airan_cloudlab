@@ -490,6 +490,123 @@ L1 pipeline의 memcpy 6433회를 size별로 보면 거의 모두 **0.1KB~1MB 범
 
 이 framing은 paper-grade에서 robust하다. "PHY-AI is always dangerous"를 주장하지 않으므로 chanpred case가 counter-evidence가 되지 않고, "NeuralRx specifically"로 좁히지도 않아 일반화 범위를 유지한다. 메커니즘(queue contention)을 명시하고 그 메커니즘의 trigger 조건 (pattern + layout)을 설명하는 구조다.
 
+## 17. 시간 분해 — partition × workload별 component-level breakdown
+
+지금까지 "memcpy/memset duration"으로 mechanism을 설명했지만, NSYS sqlite는 더 자세한 component time breakdown을 제공한다. 본 절은 4가지 다른 각도에서 시간을 분해해서 paper-grade evidence를 보강한다.
+
+### 17.0. 각 component가 무엇인지
+
+먼저 component를 정확히 정의한다. NSYS는 두 layer로 시간을 측정한다.
+
+**GPU side (CUPTI activity tables — GPU에서 실제 일어난 일):**
+- `KERNEL`: GPU compute kernel 실행 (예: cuPHY의 `windowedChEstPreNoDftSOfdmKernel`, `eqMmseSoftDemapKernel` 등). 실제 알고리즘 작업.
+- `MEMCPY`: device-device 또는 host-device 데이터 이동. cuPHY pipeline stage 사이의 intermediate tensor 이동, parameter copy 등.
+- `MEMSET`: buffer를 zero (또는 fixed value)로 초기화. cuPHY가 매 frame working buffer를 재사용하기 위해 reset.
+- `SYNCHRONIZATION`: 명시적 동기화 (예: `cudaStreamSynchronize`). 다음 작업을 시작하기 전에 이전 작업 완료를 기다림.
+- `idle (gap)`: 위 어느 카테고리에도 속하지 않은 시간. GPU가 아무것도 안 하고 있는 구간. wall-clock에서 모든 GPU activity를 뺀 나머지.
+
+**Host CPU side (CUPTI_ACTIVITY_KIND_RUNTIME — CPU가 CUDA driver를 호출한 시간):**
+- `cuLaunchKernel`: GPU kernel을 driver level에서 launch (low-level CUDA driver API).
+- `cudaLaunchKernel`: runtime API level kernel launch.
+- `cudaMemcpyAsync`: async memcpy를 enqueue.
+- `cudaMemsetAsync`: async memset을 enqueue.
+- `cudaMalloc`/`cudaFree`: device memory 할당/해제. cuPHY는 init time에 1회 allocate하고 frame마다 재사용하므로 정상적으로는 자주 발생 안 함.
+- `cudaStreamSynchronize`: 특정 stream이 끝날 때까지 host가 대기.
+- `cudaStreamCreate` / `cuLibraryLoadData`: 초기화 시간 (cuPHY 컴포넌트 build 시점에만).
+
+이 두 layer는 다른 정보를 준다. GPU side는 "GPU가 실제로 뭘 했는가". Host side는 "host CPU가 CUDA driver call에 얼마를 썼는가". 두 layer가 서로를 보완해서 wall-clock decomposition을 만든다.
+
+### 17.1. GPU activity time decomposition — wall-clock의 절반 이상은 idle gap이다
+
+![GPU activity decomposition](figures/fig_supp_14_gpu_activity_decomposition.png)
+
+13개 condition에서 GPU가 시간을 어떻게 썼는지 stacked bar로 그렸다. 주요 관찰:
+
+- **Wall-clock total** (각 막대 위 숫자): 7g 2027ms / 3g alone 1831ms / 3g+coloc workloads 1953-2262ms / **2g alone 2518ms** / 2g+chanpred 2237ms. 같은 cuPHY work인데 wall-clock이 1.4x 까지 다르다.
+- **GPU kernel time** (파랑): 모든 condition에서 약 400-500ms로 *거의 일정*하다. 이게 결정적이다. AI 워크로드 추가가 L1 kernel computation을 *느리게 만들지는 않는다* — kernel 자체 duration은 그대로다.
+- **memset** (빨강): 2g 시나리오에서 800+ms로 폭증 (3g/4g 408ms 대비 2x). 이게 §15.2에서 보였던 partition HBM bandwidth scaling의 wall-clock 영향이다.
+- **memcpy** (보라): 3g/4g + NeuralRx/Qwen/ResNet에서 visible. §16의 queue contention.
+- **idle (gap)** (회색): 모든 condition에서 wall-clock의 **40-60%를 차지**. GPU가 절반 이상 시간을 그냥 기다리는 데 쓴다.
+
+→ "AI는 L1 kernel을 느리게 만들지 않는다. wall-clock 비용은 모두 boundary memory ops와 idle gap에서 온다." 이게 핵심 paper claim이 된다.
+
+### 17.2. cuPHY pipeline stage 분해 — 어느 stage가 늘어나는가
+
+![cuPHY pipeline stages](figures/fig_supp_15_pipeline_stages.png)
+
+GPU kernel time을 cuPHY pipeline stage별로 분해했다.
+
+| Stage | 역할 | 측정 시간 (3g alone) |
+| --- | --- | --- |
+| pre-ChEst (`windowedChEstPreNoDft...`) | 채널 추정 전처리 (window function 적용) | ~5ms |
+| ChEst dispatch (`chEstFilter...Dispatch`) | 채널 추정 필터 dispatch | ~7ms |
+| Noise/Intf est (`noiseIntfEstNoDft...`) | 노이즈 + interference 추정 | ~6ms |
+| Equalizer MMSE (`eqMmseCoefComp`, `eqMmseSoftDemap`) | MMSE equalizer 계수 + soft demapping | ~8ms |
+| LDPC (`ldpc*`, `decode*`) | LDPC rate match + decode | (small) |
+| **Convert (boundary)** (`convert_kernel`) | 데이터 type/format conversion. **stage 경계에서 발생.** | **~357ms** (dominant!) |
+| Copy ops (`cupy_copy__complex64_complex64` 등) | cupy 내부 memory copy (numpy↔cupy bridge) | ~55ms |
+| Other | 기타 | small |
+
+**핵심 관찰**: cuPHY의 모든 pipeline stage들이 거의 일정한 시간을 가진다 (5-10ms 수준). 그러나 **`convert_kernel`이 357ms로 압도적**이다. convert_kernel은 stage 사이에서 데이터 type/format을 변환하는 boundary operation으로, 매 cell-iteration 당 4번씩 호출된다 (2576회 / 640 iter = 약 4번).
+
+partition/AI 변화에 따라 stage time은 거의 변하지 않는다. 즉 L1 kernel computation은 isolated된다 (예상대로 MIG SM partitioning이 작동). 다만 **convert_kernel boundary에서 나는 idle gap (다음 stage로 넘어가기 전 wait time)**이 시간 비용의 진짜 원천이다. 이게 §16에서 보였던 queue arbitration이 일어나는 정확한 시점이다.
+
+### 17.3. Host CPU runtime API 분해 — cudaFree가 가장 큰 비용?!
+
+![Runtime API breakdown](figures/fig_supp_16_runtime_api.png)
+
+CUDA runtime API에 host CPU가 쓴 시간을 분해했다.
+
+| API call | 역할 | 시간 (3g + NeuralRx) |
+| --- | --- | --- |
+| **cudaFree** | device memory 해제 | **598ms (1위)** |
+| cudaStreamCreate | stream 생성 (init time) | 371ms |
+| cuLibraryLoadData | CUDA library 로드 (init time) | 226ms |
+| cudaMalloc | device memory 할당 | 84ms |
+| cuLaunchKernel | kernel launch (low-level) | 80ms |
+| cudaMemcpyAsync | async memcpy enqueue | 43ms |
+| cudaLaunchKernel | kernel launch (high-level) | 20ms |
+| cudaMemsetAsync | async memset enqueue | 16ms |
+
+여기서 **cudaFree가 가장 큰 비용 (598ms)**이라는 점이 흥미롭다. cuPHY는 init 시점에만 allocate하는 것이 아니라 frame마다 일부 buffer를 free + re-malloc하는 패턴이 있다 (1983회 cudaFree, 1986회 cudaMalloc). 작은 partition일수록 이 free/malloc operation의 host CPU 비용이 더 커진다 (2g 1380ms vs 7g 880ms). 이건 driver의 internal page table 관리 비용이 partition별로 다르거나, allocate/free의 contention이 있다는 가설을 만든다.
+
+`cuLaunchKernel`은 condition마다 80ms 정도로 일정하다. 즉 kernel launch overhead는 cross-partition AI에 거의 영향받지 않는다. 이건 또 다른 evidence다: launch queue contention은 발생하지 않고, **memcpy/cudaFree queue contention이 진짜 비용 원천**이다.
+
+### 17.4. Wall-clock 정규화 분해 — partition별 GPU 활용 비율
+
+![Normalized wall-clock](figures/fig_supp_17_normalized_wallclock.png)
+
+각 condition의 wall-clock을 100%로 정규화해서 component 비율을 보면 패턴이 더 분명하다.
+
+- **GPU kernel 비율**: 모든 condition에서 ~20%로 일정. L1 compute work는 wall-clock의 1/5만 차지.
+- **memset 비율**: 7g 10% → 3g 19% → **2g 36%**. 작은 partition일수록 memset이 GPU 시간의 큰 부분.
+- **memcpy 비율**: 3g coloc workloads에서 9-12%로 증가 (alone 2%에서).
+- **idle (gap) 비율**: 7g 63% → 3g 53% → 2g 42%. 작은 partition은 GPU가 더 바쁘지만 wall-clock은 더 길다 (그만큼 memset이 길어서).
+
+이 정규화 view는 운영 관점에서 흥미롭다. 큰 partition (7g)은 GPU가 60% 시간 idle한데 wall-clock이 가장 짧다. 작은 partition (2g)은 GPU 활용률이 더 높은데도 wall-clock이 가장 길다. 즉 **GPU busy time을 늘리는 것이 latency를 줄이는 것과 같지 않다**. AI-RAN deadline workload에서는 wall-clock이 metric이지 GPU utilization이 아니다.
+
+### 17.5. 종합 — 시간 분해가 말해주는 것
+
+이 4가지 decomposition을 합치면 cuPHY L1 wall-clock 비용의 구조가 다음과 같이 드러난다:
+
+```
+Wall-clock = 
+    GPU kernel work (~20%, partition/AI 무관)
+  + memset (10~36%, partition size에 비례 — structural)
+  + memcpy (2~12%, AI pattern에 의존 — contention)
+  + sync (<1%)
+  + idle gap (40~60%, boundary에서 발생 — queue arbitration)
+```
+
+핵심 함의:
+
+1. **L1 kernel work 자체는 MIG isolation이 잘 됨** — 모든 condition에서 ~400ms로 일정.
+2. **wall-clock 비용의 진짜 변동 원천 두 개**: memset structural (작은 partition) + memcpy queue contention (AI pattern). 이건 §15-§16에서 이미 prove된 것을 이제 decomposition으로 보여줌.
+3. **CPU side에서는 cudaFree가 가장 큰 비용** — 이건 unexpected finding이고 paper에 추가 mechanism으로 쓸 수 있다.
+4. **convert_kernel이 GPU kernel time의 압도적 부분 (357ms / 400ms)** — pipeline boundary가 hot path이고 queue contention이 거기서 일어나는 이유.
+
+이 decomposition은 reviewer가 "그래서 어떤 component가 정확히 늘어났냐?"라고 물을 때 직접 답할 수 있는 data structure를 제공한다.
+
 ## Supplementary figures (약점 보강)
 
 | Supp # | 보강한 약점 | 그림 |
@@ -507,6 +624,10 @@ L1 pipeline의 memcpy 6433회를 size별로 보면 거의 모두 **0.1KB~1MB 범
 | 11 | §16.1 Per-call 60KB memcpy bimodal split (4.2us vs 14.3us) → queue 직접 증거 | `fig_supp_11_percall_queue_evidence.png` |
 | 12 | §16.2 시간 분해: transfer 0.09us / launch 4.1us / queue wait 10us → throughput 아님 | `fig_supp_12_time_decomposition.png` |
 | 13 | §16.3 3g vs 4g layout 차이 — 같은 ResNet도 partition layout에 따라 contention 발생/안함 | `fig_supp_13_partition_layout_dependence.png` |
+| 14 | §17.1 GPU activity time decomposition (kernel/memcpy/memset/sync/idle) per condition | `fig_supp_14_gpu_activity_decomposition.png` |
+| 15 | §17.2 cuPHY pipeline stage 분해: convert_kernel boundary가 357ms로 dominant | `fig_supp_15_pipeline_stages.png` |
+| 16 | §17.3 CUDA Runtime API host CPU 시간 분해: cudaFree가 unexpected 1위 | `fig_supp_16_runtime_api.png` |
+| 17 | §17.4 Wall-clock 정규화 분해: kernel ~20% 일정, idle 40-60%, 작은 partition은 memset 비율 36% | `fig_supp_17_normalized_wallclock.png` |
 
 이 6개 supplementary는 본문 §1, §2, §3, §4, §7, §12를 직접 강화한다. 모두 우리가 이미 가진 데이터에서 추가 측정 없이 만든 것이다. 추가로 닫지 못한 약점은 다음 두 가지로, 추후 실험이 필요하다.
 

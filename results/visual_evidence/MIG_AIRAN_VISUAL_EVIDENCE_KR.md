@@ -267,6 +267,46 @@ Dv2 반복 실험은 H2D, D2D, compute, launch, ChanPred stress가 baseline 근�
 
 §12-13까지 memcpy/memset boundary를 "L1 disturbance의 원인"으로 묶어 말했지만, NSYS SQLite를 깊게 파보면 **memcpy와 memset이 사실 두 개의 다른 메커니즘**이라는 점이 드러난다. 이게 사용자의 "그래서 메모리 복사/초기화하는 게 왜 문제냐"에 대한 직접 답이다.
 
+### 15.0. 왜 cuPHY L1이 memcpy/memset을 하는가 — pipeline intrinsic, 메모리 부족 아니다
+
+먼저 memcpy/memset이 어떤 성격의 연산인지 분명히 해야 한다. 결론부터:
+
+> **이 memcpy/memset은 cuPHY L1 pipeline의 정상 동작이다. 메모리가 부족해서 재할당 받느라 발생하는 것이 아니다.**
+
+cuPHY 5G NR PUSCH RX pipeline은 다음 stage로 구성된다:
+
+```
+[symbol input] → ChannelEstimator → ChannelEqualizer → NoiseIntfEstimator
+              → LdpcDeRateMatch → LdpcDecoder → CrcChecker → [TB output]
+```
+
+각 stage는 다음 stage가 사용할 intermediate tensor를 만든다. cuPHY는 init 시점에 모든 working buffer를 **한 번만 allocate**하고 frame마다 재사용한다. 즉 매 frame:
+
+1. 이전 frame의 잔여 데이터를 지우려고 working buffer를 zero로 초기화 → **memset**
+2. stage A의 output을 stage B의 input buffer로 옮김 → **memcpy**
+3. cudaMemcpy로 host↔device 또는 device-device 작은 parameter/config copy
+
+이건 LDPC decoder가 부분 결과 누적을 위해 매 frame 깨끗한 working memory를 요구하기 때문에 발생하는 알고리즘 수준 요구다. 외부 memory pressure나 OOM과 무관하다.
+
+이걸 어떻게 데이터로 확신할 수 있는가? **count의 invariance**가 직접 증거다.
+
+| Partition | HBM share | memcpy count | memset count |
+| --- | --- | --- | --- |
+| 7g full | 1.0x | 6,433 | 1,920 |
+| 4g | ~0.6x | 6,433 | 1,920 |
+| 3g | ~0.5x | 6,433 | 1,920 |
+| 2g | ~0.3x | 6,433 | 1,920 |
+
+만약 작은 partition이 HBM 부족 때문에 재할당/swap을 강요받았다면, 2g의 memcpy/memset **count가 늘었어야** 한다. 그런데 정확히 같다. 즉 **2g는 메모리가 부족하지 않다 — 7g와 똑같이 한 번 allocate해서 재사용 중**이다.
+
+cuPHY 입장에서 working buffer 사이즈 (435MB 등)는 PRB count, MCS, antenna config로 결정되는 *알고리즘 파라미터*다. partition 크기와 무관하다. 그래서 partition을 줄여도 working memory 요구량은 그대로다. 다만 그 요구량을 채우는 데 사용 가능한 **HBM bandwidth만 줄어든다**. 이게 §15.2의 memset duration 비례 증가의 mechanism이다.
+
+따라서 본 연구에서 "memcpy/memset이 길어진다"가 발견된 것의 의미는:
+
+> "cuPHY가 normal pipeline 동작으로 발생시키는 fixed-count memory operations이, MIG partition의 HBM bandwidth share 감소 또는 cross-partition AI workload의 memory queue contention 때문에 **개별 op의 wait/transfer time이 늘어남**" 이다.
+
+이걸 본문 narrative에 깔고 §15.1~§15.5로 들어간다.
+
 ### 15.1. 핵심 관찰: count는 변하지 않는다. duration만 변한다.
 
 ![Count vs Duration](figures/fig_supp_09_count_vs_duration.png)
@@ -334,19 +374,21 @@ L1 pipeline의 memcpy 6433회를 size별로 보면 거의 모두 **0.1KB~1MB 범
 
 → 사용자의 원래 가설 "HBM bandwidth contention" 은 **잘못된 추상화 수준에서 정확했다**. bandwidth는 분명 contention 자원이지만, 어떤 워크로드도 똑같이 contention을 일으키지 않는다. memcpy queue arbitration이 actual 메커니즘이고, 이는 워크로드의 access pattern (size / frequency / direction) 에 따라 다르게 작동한다.
 
-### 15.5. 결론 — MIG의 구조적 한계 두 가지
+### 15.5. 결론 — 대역폭이 문제 맞다. 단 두 갈래로 갈라진다.
 
-이 두 메커니즘 분리가 본 연구의 가장 정확한 paper claim을 만들어준다:
+종합하면 본 연구에서 "대역폭(memory bandwidth)이 문제다"라는 직관은 옳다. 단순 가설이 아니라 NSYS data로 hardware-level evidence가 보인다. 다만 그 "대역폭 문제"가 한 종류의 단순 contention이 아니라 두 갈래로 분리된다.
 
-> **MIG의 정적 partitioning은 두 가지 비용을 동시에 만든다.**
-> 
-> **(1) Structural cost** — 작은 partition은 HBM bandwidth share가 작아 같은 L1 work가 비례적으로 느려진다 (§15.2 memset: 7g→2g 4x slow). 이는 어떤 워크로드 조합으로도 회피 불가능한 hardware 수준의 비용이다.
+> **갈래 (1) — Structural bandwidth share (partition 자체 비용)**
 >
-> **(2) Contention cost** — 같은 device 안에서 small frequent memory operations을 발생시키는 워크로드 (NeuralRx, Qwen, sat_hbm)는 L1의 memcpy queue와 arbitration level에서 경쟁한다. 이건 partition placement로 회피할 수 있지만, AI-RAN deployment에서 가장 붙이고 싶은 워크로드(in-line PHY-AI)가 정확히 이 패턴이라 회피가 어렵다.
+> MIG는 partition마다 HBM bandwidth를 capacity proportional하게 잘라준다. 같은 cuPHY L1 워크로드가 매 frame 같은 435MB working buffer를 memset 하는데, 그 memset의 per-call duration이 7g 297us → 4g 588us → 3g 589us → 2g 1176us로 partition size 역수에 비례한다 (§15.2). 이건 어떤 AI placement로도 회피 불가능한 hardware 수준 비용이다. 작은 slice를 선택한 순간 같은 L1 work가 비례적으로 느려진다.
 >
-> Sat_compute가 +0% disturb한다는 사실은 이 두 비용을 분리하는 결정적 증거다. "AI가 단순히 HBM을 많이 쓰면 위험"이 아니다. "AI의 memory access pattern이 L1과 similar할 때 위험"이다.
+> **갈래 (2) — Cross-partition memcpy queue contention (AI 개입 비용)**
 >
-> 따라서 MIG 단독으로 AI-RAN을 안전하게 운영하려면: (a) NeuralRx/Qwen/sat_hbm처럼 memcpy-pattern이 L1과 유사한 워크로드는 같은 device에 두면 안 되고, (b) 두어야 한다면 partition 안에서 L1과 PHY-AI의 memory operation을 시간적으로 분리하는 admission control layer가 필요하다.
+> 같은 partition (3g) 안에서 alone 대비 외부 AI가 붙으면 L1의 memcpy 총 duration이 +0%~+325%로 갈린다. 어떤 AI는 disturb하고 어떤 AI는 안 한다는 점에서 단순 throughput steal로는 설명되지 않는다 (sat_compute는 HBM heavy인데 +0%). 작동하는 메커니즘은 HBM/memory controller arbitration queue에서 L1의 small frequent ops와 AI의 small frequent ops가 자리를 놓고 경쟁하는 것이다. NeuralRx, Qwen, sat_hbm은 small op pattern을 가져서 L1과 queue를 공유하지만, sat_compute는 tensor core 자체 caching으로 memcpy queue를 거의 안 쓴다. 이건 partition placement로 회피 가능하지만, AI-RAN에서 가장 붙이고 싶은 PHY-AI 워크로드가 정확히 (1)+(2)를 모두 충족하는 small-op pattern이라 회피가 어렵다.
+>
+> **두 갈래의 식별 가능성**: 첫째 갈래는 AI 추가/제거로 *변하지 않는다* (memset duration이 alone과 +AI 사이 동일). 둘째 갈래는 AI 추가시 *변한다* (memcpy duration이 +0%~+325%). 즉 같은 NSYS sqlite에서 memset/memcpy 두 metric을 함께 보면 "이게 partition 구조 비용인가 vs AI contention 비용인가"를 분리해 진단할 수 있다.
+>
+> **AI-RAN 운영 함의**: 본 데이터가 지지하는 가장 강한 함의는 두 가지다. (a) L1을 작은 partition에 두는 결정은 그 자체로 structural memset cost를 confer한다 — AI placement 무관. (b) L1을 같은 device에 두는 AI는 *어떤 AI든* 안전한 게 아니라, memory access pattern이 L1과 similar한 AI (small frequent ops를 가지는 PHY-AI, LLM small batch inference, HBM saturator)는 같이 두면 위험하다. 따라서 MIG 단독으로 AI-RAN을 운영하려면 partition planning 외에 workload pattern 기반 placement / temporal admission control layer가 추가로 필요하다.
 
 ## Supplementary figures (약점 보강)
 

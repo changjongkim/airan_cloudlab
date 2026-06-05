@@ -147,6 +147,34 @@ NeuralRx는 L1과 같은 PHY 파이프라인을 공유하는 co-tenant라 가장
 
 ---
 
+# §F7. no-MIG **MPS** — 대부분 회복하지만 메모리 대역폭에서 붕괴 (우선순위 2)
+
+![MPS vs default vs MIG](figures/figF8_mps_vs_default_vs_mig.png)
+
+같은 7개 조건을 **CUDA MPS**(시간분할이 아닌 동시 실행)로 측정. MPS는 default time-slice의 contention을 **극적으로 회복**한다 — 대부분 MIG cross-partition(~45ms) 수준 이하로:
+
+| 조건 | default p99 | **MPS p99** | MIG cross-part | MPS/default |
+|---|---|---|---|---|
+| alone | 124 | **40** | 59 | 0.32x |
+| chanpred | 201 | **53** | 45 | 0.27x |
+| qwen_small | 185 | **43** | — | 0.23x |
+| forecaster | 381 | **42** | 45 | 0.11x |
+| **NeuralRx** | 389 | **40** | (197 격리) | **0.10x** |
+| ResNet | 418 | **98** | 45 | 0.24x |
+| **sat_hbm** | 426 | **6985** ⚠️ | — | **16.4x** |
+
+**두 가지 결정적 발견:**
+1. **MPS는 연산/캐시 contention을 거의 제거** — NeuralRx조차 389→**40ms**(MIG coloc 356보다도, MIG cross-part 격리 197보다도 우수). forecaster/qwen/chanpred 모두 ~40–53ms로 회복.
+2. **단 메모리 대역폭 포화(sat_hbm)에서 MPS는 catastrophic + bistable**:
+
+![MPS sat_hbm bistable](figures/figF9_mps_sat_hbm_bistable.png)
+
+→ sat_hbm은 5 run 중 **2번이 ~7000ms**(p50 6820!), 3번은 ~40ms. MPS가 진짜 동시 실행을 허용하므로, **메모리 대역폭을 독점하는 AI가 L1의 HBM 접근을 완전히 굶기면 L1이 7초까지 정지**한다 (예측 불가, MIG 3g coloc의 bistability와 유사한 현상).
+
+> **MPS 결론**: MPS는 compute-bound AI co-location에는 MIG에 준하는(때로는 더 나은) 격리를 주지만, **memory-bandwidth-bound AI에는 격리를 전혀 제공하지 못하고 오히려 default보다 16배 위험**하다. AI-RAN 운영에서 MPS는 "AI 종류를 통제할 수 있을 때만" 부분적 대안.
+
+---
+
 ## 핵심 발견 종합
 
 1. **no-MIG = 격리 0**: 단일 AI에 MIG cross-part 대비 4–9배, 누적에 최대 **29배**.
@@ -167,7 +195,7 @@ NeuralRx는 L1과 같은 PHY 파이프라인을 공유하는 co-tenant라 가장
 | 우선순위 | 내용 | 상태 |
 |---|---|---|
 | 1 | no-MIG default time-slice (본 PART F) | ✅ 완료·분석됨 |
-| 2 | no-MIG **MPS** | 🟡 측정 중 → §F7 (MIG·default·MPS 3-way) |
+| 2 | no-MIG **MPS** | ✅ 완료·분석됨 (§F7) |
 | 3 | NCU DRAM/L2/SM | 🟡 큐 → §F8 (상위 §18.2 비교) |
 | 4 | per-call NSYS | 🟡 큐 → §F9 (상위 §16.1 memcpy 4.2→14.3us 비교) |
 | 5 | 5분 sustained | 🟡 큐 → §F10 (상위 §19.3 지속성 비교) |

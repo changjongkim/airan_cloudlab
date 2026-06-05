@@ -65,7 +65,9 @@ xp=[d[2] for d in data]; nm=[d[1] for d in data]
 ax.bar(x-w/2,xp,w,label="MIG cross-partition (AI on separate slice)",color=C_X)
 ax.bar(x+w/2,nm,w,label="no-MIG full GPU (time-slice)",color=C_NM)
 ax.set_yscale("log"); ax.set_ylabel("L1 frame-time p99 (ms, log)")
-ax.set_title("MIG cross-partition isolates L1; no-MIG does not (4-ant, n=5)")
+ax.axhline(coloc_nrx if 'coloc_nrx' in dir() else 356, color=C_CO, ls="--", lw=1.5,
+           label="MIG same-partition coloc (~356ms) — NOT flat")
+ax.set_title("MIG is flat ONLY cross-partition (isolated); coloc=356ms; no-MIG=124-1330ms (4-ant)")
 ax.set_xticks(x); ax.set_xticklabels(labs,rotation=35,ha="right")
 for xi,v in zip(x-w/2,xp): ax.text(xi,v*1.05,f"{v:.0f}",ha="center",fontsize=8,color=C_X)
 for xi,v in zip(x+w/2,nm): ax.text(xi,v*1.05,f"{v:.0f}",ha="center",fontsize=8,color=C_NM)
@@ -86,7 +88,10 @@ x=np.arange(len(data)); labs=[d[0] for d in data]
 ax.plot(x,[d[2]/xp_alone for d in data],"o-",color=C_X,label="MIG cross-part (vs MIG alone)")
 ax.plot(x,[d[1]/nm_alone for d in data],"s-",color=C_NM,label="no-MIG (vs no-MIG alone)")
 ax.axhline(1,color="gray",ls="--",lw=0.8); ax.set_yscale("log")
-ax.set_ylabel("L1 p99 / own alone baseline"); ax.set_title("Isolation: MIG stays ~flat, no-MIG climbs up to ~11x")
+ax.axhline(coloc_nrx/xp_alone, color=C_CO, ls=":", lw=2,
+           label=f"MIG same-part coloc (~{coloc_nrx/xp_alone:.0f}x — MIG is NOT always flat)")
+ax.set_ylabel("L1 p99 / own alone baseline")
+ax.set_title("MIG cross-part stays flat; but MIG coloc jumps ~6x and no-MIG up to ~11x")
 ax.set_xticks(x); ax.set_xticklabels(labs,rotation=35,ha="right"); ax.legend()
 fig.tight_layout(); fig.savefig(f"{OUT}/figF3_normalized_contention.png"); plt.close(fig)
 
@@ -128,6 +133,31 @@ ax.set_xticks(x); ax.set_xticklabels(labs,rotation=35,ha="right")
 for xi,d in zip(x,data): ax.text(xi,d[1]*1.05,f"{d[1]:.0f}",ha="center",fontsize=8,color=C_NM)
 ax.legend(loc="upper left"); fig.tight_layout(); fig.savefig(f"{OUT}/figF6_three_regime_spectrum.png"); plt.close(fig)
 
+# ===================== FIG 7: MIG is NOT flat — placement & bistability =====================
+fig,(axL,axR)=plt.subplots(1,2,figsize=(15,6),gridspec_kw={"width_ratios":[1.1,1]})
+# left: MIG L1 p99 by placement
+mig_xpart = xp_alone  # ~45-59 representative (use chanpred cross-part instead for "under AI")
+mig_xpart_ai = p99(XPART,"realL1_F_E_chanpred_b64_run*.json")
+c4 = p99(COLOC,"realL1_G_1b_4g_coloc_run*.json")
+c2 = p99(COLOC,"realL1_G_1c_2g_coloc_run*.json")
+names=["cross-part\n+AI (3g)","coloc 4g\n+NeuralRx","coloc 2g\n+NeuralRx","coloc 3g\n+NeuralRx\n(bistable)"]
+vals=[mig_xpart_ai, c4, c2, p99(COLOC,"realL1_G_1a_3g_coloc_run*.json")]
+cols=[C_X,C_CO,C_CO,C_CO]
+b=axL.bar(names,vals,color=cols)
+for bb,v in zip(b,vals): axL.text(bb.get_x()+bb.get_width()/2,v+6,f"{v:.0f}",ha="center",fontsize=10)
+axL.set_ylabel("MIG L1 frame-time p99 (ms)")
+axL.set_title("MIG is NOT flat: depends entirely on placement\n(cross-part isolates; same-part coloc 6-8x worse)")
+# right: 3g coloc per-run bistability
+runs=[]
+for f in sorted(glob.glob(f"{COLOC}/realL1_G_1a_3g_coloc_run*.json")):
+    d=json.load(open(f)); runs.append(np.percentile(d["raw_ms"],99))
+axR.bar(range(1,len(runs)+1),runs,color=[C_X if r<100 else C_CO for r in runs])
+axR.axhline(100,color="gray",ls="--",lw=0.8)
+axR.set_xlabel("run #"); axR.set_ylabel("L1 p99 (ms)")
+axR.set_title("Same MIG 3g coloc config, run-to-run BISTABLE\n(7/10 runs ~360ms, 3/10 runs ~45ms)")
+fig.tight_layout(); fig.savefig(f"{OUT}/figF7_mig_not_flat_bistable.png"); plt.close(fig)
+
+print("MIG not-flat: xpart+AI", round(mig_xpart_ai,1), "coloc4g", round(c4,1), "coloc2g", round(c2,1))
 print("OK. baselines: no-MIG alone", round(nm_alone,1), "| MIG xpart alone", round(xp_alone,1),
       "| MIG coloc alone", round(coloc_alone,1), "| MIG coloc+nrx", round(coloc_nrx,1),
       "| no-MIG+nrx", round(nrx_nomig,1))

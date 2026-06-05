@@ -37,11 +37,31 @@
 
 ---
 
-# §F1. MIG cross-partition은 격리한다, no-MIG는 못 한다
+# §F0. 먼저 — MIG는 "평탄"하지 않다 (오해 방지)
+
+![MIG not flat](figures/figF7_mig_not_flat_bistable.png)
+
+뒤의 §F1/§F3에서 MIG가 ~45ms로 평탄하게 보이는 것은 **cross-partition(AI를 별도 slice에 격리) regime만** 그렸기 때문이다. **MIG 전체는 결코 평탄하지 않다** — placement에 따라 6–8배 출렁이고, 심지어 같은 설정에서 run마다 튄다:
+
+| MIG placement | L1 p99 |
+|---|---|
+| cross-partition + AI (3g) | **45ms** (격리됨) |
+| same-partition coloc 4g + NeuralRx | **356ms** |
+| same-partition coloc 2g + NeuralRx | **371ms** |
+| same-partition coloc 3g + NeuralRx | **bistable: 7/10 run ≈ 360ms, 3/10 run ≈ 45ms** |
+
+- **왼쪽 그림**: MIG L1 p99는 cross-part 45ms → coloc 356–371ms. AI를 어디 두느냐가 전부.
+- **오른쪽 그림**: MIG 3g coloc은 **같은 설정인데 run마다 ~360ms 또는 ~45ms로 양극화(bistable)** — 예측 불가능. (상위 문서 §4 bistable contention과 일치.)
+
+> 따라서 §F1의 파란 막대(평탄 45ms)는 **MIG의 best-case(cross-partition)일 뿐**이다. MIG의 realistic/worst case(coloc)는 §F5–F7에서 별도로 본다. 이 점을 전제로 아래를 읽어야 한다.
+
+---
+
+# §F1. MIG cross-partition은 격리한다, no-MIG는 못 한다 (MIG best-case)
 
 ![MIG vs no-MIG p99](figures/figF1_mig_vs_nomig_p99.png)
 
-`F_saturation`(cross-partition)과 우리 no-MIG에 **둘 다 존재하는 10개 조건**의 깔끔한 1:1 비교. 파란색(MIG)은 전부 ~45ms 평탄, 빨간색(no-MIG)은 124→1330ms로 상승.
+`F_saturation`(cross-partition)과 우리 no-MIG에 **둘 다 존재하는 10개 조건**의 1:1 비교. 파란색(MIG **cross-partition, best-case**)은 ~45ms, 빨간색(no-MIG)은 124→1330ms로 상승. **단, 파란색은 MIG의 best-case일 뿐이며 MIG coloc은 356ms다(§F0/§F5 참조 — 보라 점선).**
 
 | 조건 | MIG cross-part p99 | no-MIG p99 | no-MIG/MIG |
 |---|---|---|---|
@@ -159,7 +179,7 @@ NeuralRx는 L1과 같은 PHY 파이프라인을 공유하는 co-tenant라 가장
 | 5 | 5분 sustained | 🟡 큐 → §F10 (상위 §19.3 지속성 비교) |
 
 ## 한 줄 종합
-> **MIG cross-partition 격리는 AI-RAN L1을 어떤 AI에도 ~45ms로 지켜내지만(no-MIG 대비 4–29배 우위), same-partition coloc은 MIG여도 ~356ms로 no-MIG(389ms)와 동급이다. → "MIG는 필요(격리)하지만 충분하지 않다(coloc)"를 한 데이터셋으로 입증.**
+> **MIG는 평탄하지 않다 — placement에 전적으로 의존한다(§F0). cross-partition 격리만 L1을 ~45ms로 지키고(no-MIG 대비 4–29배 우위), same-partition coloc은 MIG여도 ~356ms이며 3g에서는 run마다 45↔360ms로 bistable하다. no-MIG(389ms)는 MIG coloc과 동급. → "MIG는 필요(격리)하지만 충분하지 않다(coloc·bistable)"를 한 데이터셋으로 입증.**
 
 ---
 

@@ -58,20 +58,35 @@ nm_alone = data[0][1]; xp_alone = data[0][2]
 coloc_nrx = p99(COLOC, "realL1_G_1b_4g_coloc_run*.json")
 coloc_alone = p99(COLOC, "realL1_G_0b_4g_alone_run*.json")
 
-# ===================== FIG 1: no-MIG vs MIG cross-partition (paired, clean) =====================
-fig,ax=plt.subplots(figsize=(12,6))
-labs=[d[0] for d in data]; x=np.arange(len(labs)); w=0.4
-xp=[d[2] for d in data]; nm=[d[1] for d in data]
-ax.bar(x-w/2,xp,w,label="MIG cross-partition (AI on separate slice)",color=C_X)
-ax.bar(x+w/2,nm,w,label="no-MIG full GPU (time-slice)",color=C_NM)
+# ---- full no-MIG condition list (all 14, ordered light->heavy) for the headline ----
+NM_ALL = [
+    ("alone","F_0_alone"),("xApp","F_E_xapp"),("qwen","F_E_qwen_small"),
+    ("H2D memcpy","F_C_H2D_256MB_str4"),("chanpred","F_E_chanpred_b64"),
+    ("forecaster","F_E_forecaster_d384"),("NeuralRx","F_E_neuralrx"),
+    ("GEMM","F_D_GEMM_4096"),("sat_compute","F_E_sat_compute"),("ResNet","F_E_resnet_b64"),
+    ("sat_hbm","F_E_sat_hbm"),("D2D memcpy","F_B_D2D_256MB_str4"),
+    ("ResNet x2","F_F_stack_resnet_x2"),("kitchen","F_G_kitchen"),
+    ("chanpred x4","F_F_stack_chanpred_x4"),
+]
+nm_all = [(d, p99(NOMIG,f"realL1_{l}_run*.json")) for d,l in NM_ALL]
+coloc_lo, coloc_hi = 356.0, 371.0   # MIG same-partition coloc range (4g..2g), worst case
+
+# ===================== FIG 1: no-MIG vs MIG WORST case (same-partition coloc) =====================
+fig,ax=plt.subplots(figsize=(13,6.5))
+labs=[d[0] for d in nm_all]; x=np.arange(len(labs)); vals=[d[1] for d in nm_all]
+bars=ax.bar(x,vals,0.62,color=C_NM,label="no-MIG full GPU (time-slice), measured")
+# MIG WORST case (same-partition coloc) — the realistic MIG scenario, prominent
+ax.axhspan(coloc_lo,coloc_hi,color=C_CO,alpha=0.18)
+ax.axhline(coloc_nrx,color=C_CO,ls="--",lw=2.5,label=f"MIG WORST: same-partition coloc ~{coloc_nrx:.0f}ms (+ 3g bistable)")
+# MIG BEST case (cross-partition isolated) — only if perfectly isolated
+ax.axhline(xp_alone,color=C_X,ls=":",lw=2,label=f"MIG best: cross-partition isolated ~{xp_alone:.0f}ms")
 ax.set_yscale("log"); ax.set_ylabel("L1 frame-time p99 (ms, log)")
-ax.axhline(coloc_nrx if 'coloc_nrx' in dir() else 356, color=C_CO, ls="--", lw=1.5,
-           label="MIG same-partition coloc (~356ms) — NOT flat")
-ax.set_title("MIG is flat ONLY cross-partition (isolated); coloc=356ms; no-MIG=124-1330ms (4-ant)")
-ax.set_xticks(x); ax.set_xticklabels(labs,rotation=35,ha="right")
-for xi,v in zip(x-w/2,xp): ax.text(xi,v*1.05,f"{v:.0f}",ha="center",fontsize=8,color=C_X)
-for xi,v in zip(x+w/2,nm): ax.text(xi,v*1.05,f"{v:.0f}",ha="center",fontsize=8,color=C_NM)
-ax.legend(); fig.tight_layout(); fig.savefig(f"{OUT}/figF1_mig_vs_nomig_p99.png"); plt.close(fig)
+ax.set_title("no-MIG vs MIG: MIG's realistic (worst) case is same-partition coloc ~356ms, not the isolated 45ms")
+ax.set_xticks(x); ax.set_xticklabels(labs,rotation=40,ha="right")
+for xi,v in zip(x,vals):
+    if v: ax.text(xi,v*1.05,f"{v:.0f}",ha="center",fontsize=8,color=C_NM)
+ax.legend(loc="upper left")
+fig.tight_layout(); fig.savefig(f"{OUT}/figF1_mig_vs_nomig_p99.png"); plt.close(fig)
 
 # ===================== FIG 2: ratio no-MIG / MIG cross-part =====================
 fig,ax=plt.subplots(figsize=(10,6))
@@ -119,19 +134,6 @@ for bb,v in zip(b,vals): ax.text(bb.get_x()+bb.get_width()/2,v+6,f"{v:.0f}ms",ha
 ax.set_ylabel("L1 frame-time p99 (ms)")
 ax.set_title("NeuralRx co-tenant: no-MIG ~ MIG same-partition coloc (both bad)\n(MIG coloc = CloudLab G_1b 4g; no-MIG = Perlmutter, measured)")
 fig.tight_layout(); fig.savefig(f"{OUT}/figF5_neuralrx_focus.png"); plt.close(fig)
-
-# ===================== FIG 6: 3-regime spectrum =====================
-fig,ax=plt.subplots(figsize=(12,6))
-labs=[d[0] for d in data]; x=np.arange(len(labs))
-ax.bar(x,[d[1] for d in data],0.6,color=C_NM,label="no-MIG (time-slice)")
-ax.axhline(xp_alone,color=C_X,ls="-",lw=2,label=f"MIG cross-partition isolated (~{xp_alone:.0f}ms)")
-ax.axhspan(min(xp for _,_,xp in data), max(xp for _,_,xp in data),color=C_X,alpha=0.12)
-ax.axhline(coloc_nrx,color=C_CO,ls="--",lw=2,label=f"MIG same-part coloc +NeuralRx (~{coloc_nrx:.0f}ms)")
-ax.set_yscale("log"); ax.set_ylabel("L1 frame-time p99 (ms, log)")
-ax.set_title("Three regimes: MIG isolated (best) < MIG coloc ~ no-MIG single < no-MIG stacked (worst)")
-ax.set_xticks(x); ax.set_xticklabels(labs,rotation=35,ha="right")
-for xi,d in zip(x,data): ax.text(xi,d[1]*1.05,f"{d[1]:.0f}",ha="center",fontsize=8,color=C_NM)
-ax.legend(loc="upper left"); fig.tight_layout(); fig.savefig(f"{OUT}/figF6_three_regime_spectrum.png"); plt.close(fig)
 
 # ===================== FIG 7: MIG is NOT flat — placement & bistability =====================
 fig,(axL,axR)=plt.subplots(1,2,figsize=(15,6),gridspec_kw={"width_ratios":[1.1,1]})

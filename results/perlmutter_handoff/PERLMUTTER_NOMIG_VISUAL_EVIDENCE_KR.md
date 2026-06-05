@@ -57,24 +57,33 @@
 
 ---
 
-# §F1. MIG cross-partition은 격리한다, no-MIG는 못 한다 (MIG best-case)
+# §F1. no-MIG vs MIG — MIG의 현실적(worst) 케이스 기준 비교 (핵심 그림)
 
 ![MIG vs no-MIG p99](figures/figF1_mig_vs_nomig_p99.png)
 
-`F_saturation`(cross-partition)과 우리 no-MIG에 **둘 다 존재하는 10개 조건**의 1:1 비교. 파란색(MIG **cross-partition, best-case**)은 ~45ms, 빨간색(no-MIG)은 124→1330ms로 상승. **단, 파란색은 MIG의 best-case일 뿐이며 MIG coloc은 356ms다(§F0/§F5 참조 — 보라 점선).**
+빨간 막대 = no-MIG(측정), **보라 점선/띠 = MIG의 worst(현실) 케이스 same-partition coloc ~356ms(+3g bistable)**, 파란 점선 = MIG best(cross-partition 격리 ~59ms, AI를 완벽히 분리할 수 있을 때만). MIG는 보라(현실)를 기준으로 봐야 한다 — paper 주장이 "MIG coloc은 불충분"이기 때문이다.
 
-| 조건 | MIG cross-part p99 | no-MIG p99 | no-MIG/MIG |
+읽는 법 (no-MIG가 MIG coloc 선 대비 어디 있나):
+- **가벼운 AI**(xApp 162, qwen 185, H2D 195, chanpred 201) → MIG coloc(356) **아래** : 이 경우 no-MIG가 오히려 MIG 현실 케이스보다 낫다.
+- **무거운 단일 AI**(forecaster 381 ~ D2D 435) → MIG coloc과 **동급~약간 위**.
+- **누적 부하**(ResNet×2 739, kitchen 987, chanpred×4 1330) → MIG coloc보다 **2–4배 위**.
+
+> **서열: MIG 격리(59) ≪ {MIG coloc(356) ≈ no-MIG 무거운 단일 AI(~400)} ≪ no-MIG 누적(739–1330).**
+> MIG가 이기는 건 **AI를 완벽히 별도 slice에 격리할 때(파란선)뿐**이고, AI가 L1과 자원을 나눠 쓰는 현실(coloc)에선 MIG도 no-MIG와 비슷하게 무너진다.
+
+#### 참고 — MIG **best**(cross-partition) 기준으로 보면 (상한 비교)
+AI를 별도 slice에 완벽 격리한 MIG best 케이스(~45ms)와 비교하면 no-MIG는 다음과 같이 나쁘다(이건 MIG에 가장 유리한 비교):
+
+| 조건 | MIG cross-part(best) p99 | no-MIG p99 | no-MIG/MIG-best |
 |---|---|---|---|
-| alone | 59.2 | 124.0 | 2.1x |
 | chanpred | 45.2 | 200.7 | 4.4x |
-| H2D memcpy | 47.6 | 195.2 | 4.1x |
-| forecaster | 45.4 | 381.3 | 8.4x |
-| GEMM 4096 | 45.4 | 406.6 | 9.0x |
 | ResNet50 | 45.3 | 417.7 | 9.2x |
 | D2D memcpy | 45.6 | 434.9 | 9.5x |
 | ResNet ×2 | 45.2 | 739.3 | 16.3x |
 | kitchen | 45.6 | 987.4 | 21.7x |
 | chanpred ×4 | 45.4 | 1329.7 | 29.3x |
+
+→ MIG best 대비 4–29배. 단 이는 **MIG에 최대로 유리한 상한**이며, MIG 현실(coloc 356) 기준으로는 위 본문처럼 가벼운 AI에서 no-MIG가 더 낫기도 하다.
 
 ---
 
@@ -118,22 +127,6 @@ NeuralRx는 L1과 같은 PHY 파이프라인을 공유하는 co-tenant라 가장
 | **no-MIG + NeuralRx** | **389ms** | **본 측정** |
 
 → **no-MIG(389ms)와 MIG coloc(356ms)은 사실상 동급.** AI를 L1과 같은 자원에 넣으면 MIG여도 격리가 무너진다. (MIG 3g coloc은 bimodal 265±144ms, 2g coloc은 370ms — 상위 §4.1 partition paradox.)
-
----
-
-# §F6. 종합 — 세 regime 스펙트럼 (핵심 그림)
-
-![three regimes](figures/figF6_three_regime_spectrum.png)
-
-한 장으로 보는 전체 그림:
-- **파란 띠 (~59ms)** = MIG cross-partition 격리 → **최선**
-- **보라 점선 (~356ms)** = MIG same-partition coloc(+NeuralRx) → 중간
-- **빨간 막대** = no-MIG 시간분할:
-  - 가벼운 단일 AI(chanpred 201, H2D 195)는 두 MIG 사이
-  - 무거운 단일 AI(forecaster 381 ~ D2D 435)는 **MIG coloc 선과 동급/약간 위**
-  - 누적(resnet×2 739, kitchen 987, chanpred×4 1330)은 **MIG coloc보다도 2–4배 위**
-
-**서열: MIG 격리(59) ≪ {MIG coloc(356) ≈ no-MIG 단일 AI(~400)} ≪ no-MIG 누적(739–1330).**
 
 ---
 
@@ -190,4 +183,4 @@ python3 analyze_F_nomig.py          # no-MIG 조건별 집계
 python3 compare_mig_vs_nomig.py     # MIG(F_saturation) vs no-MIG
 shifter --image=<aerial> airan_venv/bin/python build_perlmutter_figures.py   # figF1–F6
 ```
-데이터: `perlmutter_nomig/F_nomig/realL1_*.json`(80) · MIG: `../20260601/{F_saturation,G_coloc}` · 그림: `figures/figF1–F6.png`
+데이터: `perlmutter_nomig/F_nomig/realL1_*.json`(80) · MIG: `../20260601/{F_saturation,G_coloc}` · 그림: `figures/figF1–F5,F7.png`

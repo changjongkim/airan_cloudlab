@@ -21,8 +21,11 @@ AI_DIR="$REPO/scripts_for_node/experiments"
 RESULTS_DIR="${RESULTS_DIR:-$HANDOFF/perlmutter_nomig/P5_nomig}"
 
 CELLS="${CELLS:-20}"
-ITERS="${ITERS:-7500}"       # ~5 min at ~40ms/iter (alone); fewer effective under load
+ITERS="${ITERS:-7500}"       # high iteration cap; the real bound is MAX_SECONDS below
 N="${N:-2}"
+# True 5-min sustained: bound each L1 run by wall time, not iteration count, so a
+# heavily-contended run still ends in ~5 min instead of ballooning to 30-60 min.
+MAX_SECONDS="${MAX_SECONDS:-300}"
 AI_DUR="${AI_DUR:-3600}"     # AI runs until killed; sustained runs are long
 NEURALRX_WAIT="${NEURALRX_WAIT:-75}"
 
@@ -40,6 +43,7 @@ profile_l1_sustained() {
             --volume="$AERIAL_REPO:/opt/nvidia/cuBB" --volume="$SCRIPTS_DIR:/scripts" \
             --volume="$RESULTS_DIR:/out" \
             --env=PYTHONPATH=/opt/nvidia/cuBB/pyaerial/src --env=RESULTS_DIR=/out \
+            --env=MAX_SECONDS="$MAX_SECONDS" \
             --workdir=/scripts \
             python3 real_l1.py "P5_${label}_run${i}" "$CELLS" "$ITERS" 2>&1 | tail -1 | tee -a "$LOG"
     done

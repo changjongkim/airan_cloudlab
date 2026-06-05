@@ -16,6 +16,7 @@ import os
 import sys
 import json
 import datetime
+import time
 
 import numpy as np
 import cupy as cp
@@ -46,6 +47,10 @@ LABEL = sys.argv[1] if len(sys.argv) > 1 else "real_l1"
 NUM_CELLS = int(sys.argv[2]) if len(sys.argv) > 2 else 20
 ITERATIONS = int(sys.argv[3]) if len(sys.argv) > 3 else 100
 NUM_WARMUP = 20
+# Optional wall-time cap (seconds) for the measurement loop. 0 = no cap (default,
+# fixed ITERATIONS). Used by the P5 sustained test to bound each run to ~5 min
+# regardless of how much contention slows each iteration.
+MAX_SECONDS = float(os.environ.get("MAX_SECONDS", "0"))
 
 RESULTS_DIR = os.environ.get("RESULTS_DIR", "./results")
 os.makedirs(RESULTS_DIR, exist_ok=True)
@@ -148,6 +153,7 @@ print("[realL1] measuring...", flush=True)
 latencies = []
 start_event = cp.cuda.Event()
 end_event = cp.cuda.Event()
+_t0 = time.time()
 for i in range(ITERATIONS):
     start_event.record()
     for _ in range(NUM_CELLS):
@@ -155,13 +161,15 @@ for i in range(ITERATIONS):
     end_event.record()
     end_event.synchronize()
     latencies.append(cp.cuda.get_elapsed_time(start_event, end_event))
+    if MAX_SECONDS and (time.time() - _t0) >= MAX_SECONDS:
+        break
 
 arr = np.array(latencies)
 miss_1ms = int(np.sum(arr > 1.0))
 result = {
     "label": LABEL,
     "num_cells": NUM_CELLS,
-    "iterations": ITERATIONS,
+    "iterations": len(latencies),
     "num_rx_ant": num_rx_ant,
     "num_tx_ant": num_tx_ant,
     "num_prbs": num_prbs,

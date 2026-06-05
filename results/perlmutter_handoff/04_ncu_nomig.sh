@@ -1,104 +1,102 @@
 #!/usr/bin/env bash
-# NCU hardware counter measurement on no-MIG — DRAM throughput / L2 / SM
-# 우선순위 3
+# NCU hardware-counter measurement on no-MIG — DRAM throughput / L2 / SM occupancy.
+# Priority 3.
 #
-# CloudLab MIG NCU 결과: L1 DRAM throughput 11~12% peak. 우리 paper의 핵심 evidence.
-# Perlmutter no-MIG에서 같은 measurement → MIG 격리가 NCU 측 metric에 어떻게 영향 주는지 비교
+# CloudLab MIG NCU result: L1 DRAM throughput ~11-12% of peak (core paper evidence).
+# Here we measure the same on Perlmutter no-MIG, alone and under contention, to see
+# how the absence of MIG isolation moves those hardware metrics.
+#
+# Adapted for the validated environment (see 02_F_saturation_nomig.sh).
+# ncu ships inside the Aerial container (/usr/local/cuda/bin/ncu); --clock-control
+# none because clocks can't be locked on these nodes.
 
 set -uo pipefail
 
-AERIAL_IMAGE="${AERIAL_IMAGE:-nvcr.io/nvidia/aerial/aerial-cuda-accelerated-ran:25-3-cubb}"
-AERIAL_REPO="${AERIAL_REPO:-$SCRATCH/aerial-cuda-accelerated-ran}"
-REPO="${REPO:-$SCRATCH/airan_cloudlab}"
-RESULTS_DIR="${RESULTS_DIR:-$REPO/results/perlmutter_nomig/NCU_nomig}"
-AI_WORKLOAD_DIR="$REPO/cloudlab_aerial/experiments"
-SCRIPTS_DIR="$REPO/cloudlab_aerial"
+IMG="${AERIAL_IMAGE:-nvcr.io/nvidia/aerial/aerial-cuda-accelerated-ran:25-3-cubb}"
+AERIAL_REPO="${AERIAL_REPO:-/pscratch/sd/s/sgkim/kcj/AI-RAN/aerial-cuda-accelerated-ran}"
+REPO="${REPO:-/pscratch/sd/s/sgkim/kcj/airan_cloudlab}"
+HANDOFF="${HANDOFF:-$REPO/results/perlmutter_handoff}"
+VENV="${VENV:-$HANDOFF/airan_venv}"
+HF_HOME="${HF_HOME:-$HANDOFF/hf_cache}"
+SCRIPTS_DIR="$REPO/scripts_for_node/cloudlab_aerial"
+AI_DIR="$REPO/scripts_for_node/experiments"
+RESULTS_DIR="${RESULTS_DIR:-$HANDOFF/perlmutter_nomig/NCU_nomig}"
 
-CELLS=20
-ITERS=3   # NCU replay-mode은 매우 느림 → iters 작게
+CELLS="${CELLS:-20}"
+ITERS="${ITERS:-3}"          # NCU kernel-replay is very slow → keep iters tiny
+AI_DUR="${AI_DUR:-1800}"     # AI runs until killed (NCU replay can take minutes)
+NEURALRX_WAIT="${NEURALRX_WAIT:-75}"
+
+NCU_METRICS="dram__throughput.avg.pct_of_peak_sustained_elapsed,dram__bytes.sum,lts__t_sector_hit_rate.pct,sm__warps_active.avg.pct_of_peak_sustained_active,launch__waves_per_multiprocessor"
 
 mkdir -p "$RESULTS_DIR"
 LOG="$RESULTS_DIR/NCU.log"
 ts(){ date '+%H:%M:%S'; }
-log() { echo "[$(ts)] $*" | tee -a "$LOG"; }
-
-NCU_METRICS="dram__throughput.avg.pct_of_peak_sustained_elapsed,dram__bytes.sum,lts__t_sector_hit_rate.pct,sm__warps_active.avg.pct_of_peak_sustained_active,launch__waves_per_multiprocessor"
-
-shifter_run() {
-    shifter --image="$AERIAL_IMAGE" \
-        --volume="$AERIAL_REPO:/opt/nvidia/cuBB" \
-        --volume="$SCRIPTS_DIR:/scripts" \
-        --volume="$AI_WORKLOAD_DIR:/workspace/AIRAN_Changjong/experiments" \
-        --volume="$RESULTS_DIR:/out" \
-        --env=PYTHONPATH=/opt/nvidia/cuBB/pyaerial/src \
-        --env=RESULTS_DIR=/out \
-        --workdir=/scripts \
-        "$@"
-}
-
-start_ai_bg() {
-    local tag=$1 script=$2 ai_dur=$3; shift 3
-    nohup shifter_run python3 "/workspace/AIRAN_Changjong/experiments/$script" 0 "$ai_dur" "$@" \
-        > "$RESULTS_DIR/${tag}_ai.log" 2>&1 &
-    echo $! > "$RESULTS_DIR/ai_${tag}.pid"
-}
-kill_all_ai() {
-    for pidfile in "$RESULTS_DIR"/ai_*.pid; do
-        [[ -f $pidfile ]] || continue
-        kill -TERM $(cat "$pidfile") 2>/dev/null || true
-        rm -f "$pidfile"
-    done
-    sleep 2
-}
+log(){ echo "[$(ts)] $*" | tee -a "$LOG"; }
+PIDS="$RESULTS_DIR/ai_pids"; : > "$PIDS"
 
 profile_l1_ncu() {
     local label=$1
     log "  NCU [$label] (replay-mode, slow)"
-    shifter_run \
-        bash -c "ncu --target-processes all \
-                     --replay-mode kernel \
-                     --clock-control none \
+    shifter --image="$IMG" \
+        --volume="$AERIAL_REPO:/opt/nvidia/cuBB" --volume="$SCRIPTS_DIR:/scripts" \
+        --volume="$RESULTS_DIR:/out" \
+        --env=PYTHONPATH=/opt/nvidia/cuBB/pyaerial/src --env=RESULTS_DIR=/out \
+        --workdir=/scripts \
+        bash -c "ncu --target-processes all --replay-mode kernel --clock-control none \
                      --metrics $NCU_METRICS \
                      --csv --log-file /out/${label}.csv \
-                     python3 real_l1.py ${label} $CELLS $ITERS" \
-        2>&1 | tail -3 | tee -a "$LOG"
+                     python3 real_l1.py ${label} $CELLS $ITERS" 2>&1 | tail -3 | tee -a "$LOG"
+}
+
+ai_bg_venv() {
+    local tag=$1 envs=$2 script=$3; shift 3
+    ( shifter --image="$IMG" --volume="$AI_DIR:/experiments" \
+        --env=HF_HOME="$HF_HOME" $envs \
+        "$VENV/bin/python" "/experiments/$script" 0 "$AI_DUR" "$@" ) \
+        > "$RESULTS_DIR/${tag}_ai.log" 2>&1 &
+    echo $! >> "$PIDS"; log "  AI(venv) [$tag] pid=$!"
+}
+ai_bg_base() {
+    local tag=$1 script=$2; shift 2
+    ( shifter --image="$IMG" \
+        --volume="$AERIAL_REPO:/opt/nvidia/cuBB" --volume="$AI_DIR:/experiments" \
+        --env=PYTHONPATH=/opt/nvidia/cuBB/pyaerial/src --env=cuBB_SDK=/opt/nvidia/cuBB \
+        python3 "/experiments/$script" 0 "$AI_DUR" "$@" ) \
+        > "$RESULTS_DIR/${tag}_ai.log" 2>&1 &
+    echo $! >> "$PIDS"; log "  AI(base) [$tag] pid=$!"
+}
+kill_all_ai() {
+    while read -r pid; do [[ -n "$pid" ]] && kill -TERM "$pid" 2>/dev/null; done < "$PIDS"
+    : > "$PIDS"; sleep 4
 }
 
 log "===== Perlmutter no-MIG NCU ====="
-log "GPU: $(nvidia-smi --query-gpu=uuid --format=csv,noheader | head -1)"
+log "GPU: $(nvidia-smi --query-gpu=name,mig.mode.current --format=csv,noheader | head -1)"
+log "CELLS=$CELLS ITERS=$ITERS metrics=DRAM/L2/SM | Results: $RESULTS_DIR"
 
-log "=== NCU_0 alone (baseline DRAM/L2 metrics) ==="
+log "=== NCU_0_alone (baseline DRAM/L2/SM) ==="
 profile_l1_ncu "NCU_0_alone"
 
-log "=== NCU_NeuralRx (critical comparison) ==="
-start_ai_bg "neuralrx" "run_neural_rx_stress.py" 300
-sleep 30
-profile_l1_ncu "NCU_neuralrx"
-kill_all_ai
+log "=== NCU_neuralrx (critical) ==="
+ai_bg_base neuralrx run_neural_rx_stress.py
+sleep "$NEURALRX_WAIT"; profile_l1_ncu "NCU_neuralrx"; kill_all_ai
 
-log "=== NCU_ResNet ==="
-start_ai_bg "resnet" "run_resnet_stress.py" 300 64 fp16
-sleep 10
-profile_l1_ncu "NCU_resnet"
-kill_all_ai
+log "=== NCU_resnet ==="
+ai_bg_venv resnet "" run_resnet_stress.py 64 fp16
+sleep 10; profile_l1_ncu "NCU_resnet"; kill_all_ai
 
 log "=== NCU_chanpred (safe AI control) ==="
-start_ai_bg "chanpred" "run_channel_prediction.py" 300
-sleep 10
-profile_l1_ncu "NCU_chanpred"
-kill_all_ai
+ai_bg_venv chanpred "" run_channel_prediction.py
+sleep 10; profile_l1_ncu "NCU_chanpred"; kill_all_ai
 
 log "=== NCU_sat_hbm ==="
-start_ai_bg "sat_hbm" "run_hbm_stress.py" 300
-sleep 10
-profile_l1_ncu "NCU_sat_hbm"
-kill_all_ai
+ai_bg_venv sat_hbm "" run_hbm_stress.py 16
+sleep 10; profile_l1_ncu "NCU_sat_hbm"; kill_all_ai
 
 log "=== NCU_sat_compute ==="
-start_ai_bg "sat_compute" "run_realistic_ai_stress.py" 300
-sleep 10
-profile_l1_ncu "NCU_sat_compute"
-kill_all_ai
+ai_bg_venv sat_compute "" run_realistic_ai_stress.py matmul 0.8
+sleep 10; profile_l1_ncu "NCU_sat_compute"; kill_all_ai
 
 log "===== NCU no-MIG DONE ====="
-log "Outputs: $(ls $RESULTS_DIR/*.csv 2>/dev/null | wc -l) CSV files"
+log "CSV outputs: $(ls "$RESULTS_DIR"/NCU_*.csv 2>/dev/null | wc -l)"

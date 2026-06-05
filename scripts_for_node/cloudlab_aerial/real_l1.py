@@ -33,7 +33,14 @@ from aerial.phy5g.config import (
     PuschConfig, PuschUeConfig,
     AerialPdschTxConfig,
 )
-from aerial.util.cuda import get_cuda_stream
+try:
+    # Older pyaerial (CloudLab 25-3 build): module-level helper.
+    from aerial.util.cuda import get_cuda_stream
+except ImportError:
+    # Newer pyaerial (Perlmutter open-source build): CudaStream class.
+    from aerial.util.cuda import CudaStream
+    def get_cuda_stream():
+        return CudaStream()
 
 LABEL = sys.argv[1] if len(sys.argv) > 1 else "real_l1"
 NUM_CELLS = int(sys.argv[2]) if len(sys.argv) > 2 else 20

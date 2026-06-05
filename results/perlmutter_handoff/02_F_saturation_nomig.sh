@@ -30,7 +30,10 @@ RESULTS_DIR="${RESULTS_DIR:-$HANDOFF/perlmutter_nomig/F_nomig}"
 CELLS="${CELLS:-20}"
 ITERS="${ITERS:-100}"
 N="${N:-5}"
-AI_DUR="${AI_DUR:-90}"
+# AI workloads run "until killed": set a long duration so they outlive the L1
+# measurement (heavy conditions can take >800s for N runs); kill_all_ai stops
+# them after each condition. Keeping this short would let AI die mid-measurement.
+AI_DUR="${AI_DUR:-1800}"
 USE_NSYS="${USE_NSYS:-0}"
 
 mkdir -p "$RESULTS_DIR"

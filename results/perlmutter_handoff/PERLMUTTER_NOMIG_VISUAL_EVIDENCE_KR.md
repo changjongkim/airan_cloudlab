@@ -121,12 +121,13 @@ NeuralRx는 L1과 같은 PHY 파이프라인을 공유하는 co-tenant라 가장
 
 | 케이스 | L1 p99 | 출처 |
 |---|---|---|
-| L1 alone (no-MIG full GPU) | 124ms | 본 측정 |
-| L1 alone (MIG 4g slice) | 60ms | CloudLab G_0b |
+| MIG cross-part + **generic** AI (격리) | **45ms** | F_saturation (chanpred 등) |
+| **MIG cross-part + NeuralRx** (격리해도!) | **197ms** | CloudLab 5/31 phase4 (상위 §2.2) |
 | **MIG same-partition coloc + NeuralRx** | **356ms** | CloudLab G_1b (4g) |
 | **no-MIG + NeuralRx** | **389ms** | **본 측정** |
+| (참고) L1 alone: no-MIG 124 / MIG 59 | — | baseline |
 
-→ **no-MIG(389ms)와 MIG coloc(356ms)은 사실상 동급.** AI를 L1과 같은 자원에 넣으면 MIG여도 격리가 무너진다. (MIG 3g coloc은 bimodal 265±144ms, 2g coloc은 370ms — 상위 §4.1 partition paradox.)
+→ **격리 수준별 escalation: 45(격리+generic) → 197(격리+NeuralRx) → 356(coloc) → 389(no-MIG).** generic AI는 cross-partition 격리로 45ms를 지키지만, **NeuralRx는 격리해도 197ms로 튄다(L1과 같은 PHY 패턴이라 partition을 넘어 간섭)**. 같은 파티션 coloc(356)·no-MIG(389)는 더 나쁘고 사실상 동급. (MIG 3g coloc은 bimodal — 상위 §4.1 partition paradox. cross-part 197은 8-ant 5/31 캠페인 값이라 절대치는 참고.)
 
 ---
 

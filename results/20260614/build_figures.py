@@ -130,35 +130,41 @@ def fig_t02():
 # Figure 3: same-partition coloc workload-invariance
 # --------------------------------------------------------------------------
 def fig_t03():
+    # Coloc cases on 3g — single AI vs mixed (2 AI tenants)
     conds = [
-        ("chanpred (E3)",                     f"{ROOT}/E3_coloc/realL1_*.json"),
-        ("NeuralRx (E6-3g)",                  f"{ROOT}/E6_coloc_neuralrx/3g/realL1_*.json"),
-        ("chanpred+ResNet mixed (A2)",        f"{ROOT}/A2_mixed_coloc/chanpred_resnet/realL1_*.json"),
+        ("alone 3g",                             f"{ROOT}/E0_baseline_3g/realL1_*.json", "alone"),
+        ("coloc + chanpred (E3)\n2 procs",       f"{ROOT}/E3_coloc/realL1_*.json", "1ai"),
+        ("coloc + NeuralRx (E6-3g)\n2 procs",    f"{ROOT}/E6_coloc_neuralrx/3g/realL1_*.json", "1ai"),
+        ("coloc + chanpred+ResNet (A2)\n3 procs", f"{ROOT}/A2_mixed_coloc/chanpred_resnet/realL1_*.json", "2ai"),
     ]
-    labels, p50s, p99s, maxs = [], [], [], []
-    for label, pat in conds:
+    palette = {"alone":"#10b981", "1ai":"#dc2626", "2ai":"#7f1d1d"}
+    labels, p50s, p99s, colors = [], [], [], []
+    for label, pat, kind in conds:
         s = stats(load_ms(pat))
         if s is None: continue
-        labels.append(label); p50s.append(s["p50"]); p99s.append(s["p99"]); maxs.append(s["max"])
+        labels.append(label); p50s.append(s["p50"]); p99s.append(s["p99"]); colors.append(palette[kind])
 
-    fig, ax = plt.subplots(figsize=(9, 4.5))
+    fig, ax = plt.subplots(figsize=(11, 5))
     x = np.arange(len(labels))
-    w = 0.25
-    ax.bar(x - w, p50s, w, label="p50", color="#fca5a5")
-    ax.bar(x,     p99s, w, label="p99", color="#dc2626")
-    ax.bar(x + w, maxs, w, label="max", color="#7f1d1d")
-    ax.set_xticks(x); ax.set_xticklabels(labels)
+    w = 0.36
+    ax.bar(x - w/2, p50s, w, label="p50", color=colors, alpha=0.6, edgecolor="black", lw=0.7)
+    ax.bar(x + w/2, p99s, w, label="p99", color=colors, edgecolor="black", lw=0.7)
+    ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=10)
     ax.set_ylabel("L1 frame time (ms)")
-    ax.set_title("Same-partition coloc on 3g — workload doesn't matter, always ~360ms")
-    ax.legend()
-    for i, (a, b, c) in enumerate(zip(p50s, p99s, maxs)):
-        ax.text(i - w, a+3, f"{a:.0f}", ha="center", fontsize=9)
-        ax.text(i,     b+3, f"{b:.0f}", ha="center", fontsize=9)
-        ax.text(i + w, c+3, f"{c:.0f}", ha="center", fontsize=9)
-    ax.set_ylim(0, max(maxs)*1.15)
-    ax.axhline(43, ls="--", color="grey", alpha=0.5)
-    ax.text(0.02, 0.08, "alone baseline ~43ms", color="grey",
-            transform=ax.get_yaxis_transform(), va="center", fontsize=9)
+    ax.set_title("3g same-partition coloc: floor scales with # AI processes (1 AI → 360ms, 2 AI → 700ms)")
+    for i, (a, b) in enumerate(zip(p50s, p99s)):
+        ax.text(i - w/2, a+8, f"{a:.0f}", ha="center", fontsize=10, fontweight="bold")
+        ax.text(i + w/2, b+8, f"{b:.0f}", ha="center", fontsize=10, fontweight="bold")
+    ax.set_ylim(0, max(p99s)*1.18)
+    ax.axhline(43, ls=":", color="grey", alpha=0.6); ax.text(0.02, 43, " alone ~43ms", color="grey", transform=ax.get_yaxis_transform(), va="bottom", fontsize=9)
+    ax.axhline(360, ls=":", color="grey", alpha=0.6); ax.text(0.02, 360, " 1-AI floor ~360ms", color="grey", transform=ax.get_yaxis_transform(), va="bottom", fontsize=9)
+    ax.axhline(700, ls=":", color="grey", alpha=0.6); ax.text(0.02, 700, " 2-AI floor ~700ms (2×)", color="grey", transform=ax.get_yaxis_transform(), va="bottom", fontsize=9)
+    # legend by color
+    from matplotlib.patches import Patch
+    legend_items = [Patch(color=palette["alone"], label="alone (1 proc)"),
+                    Patch(color=palette["1ai"], label="coloc 1 AI (2 procs)"),
+                    Patch(color=palette["2ai"], label="coloc 2 AI (3 procs)")]
+    ax.legend(handles=legend_items, loc="upper left")
     plt.tight_layout()
     plt.savefig(f"{FIGDIR}/fig_t03_coloc_workload_invariant.png", dpi=140, bbox_inches="tight")
     plt.close()

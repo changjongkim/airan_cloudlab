@@ -175,6 +175,55 @@ NeuralRx는 L1과 같은 PHY 파이프라인을 공유하는 co-tenant라 가장
 
 ---
 
+# §F8. 5분 sustained — contention은 transient warmup이 아니다 (우선순위 5)
+
+![P5 sustained](figures/figF10_p5_sustained.png)
+
+9개 시나리오를 각 ~5분(MAX_SECONDS=300) 지속 측정. 짧은 burst(ITERS=100)와 비교하면 **저하가 5분 내내 유지**된다(일부는 더 낮아짐 — burst의 warmup tail 비중이 빠져서). alone 40ms 대비:
+
+| 시나리오 | sustained p99 | alone 대비 |
+|---|---|---|
+| xApp / qwen | 91 / 121 | 2–3x |
+| chanpred | 149 | 3.7x |
+| forecaster / NeuralRx | 350 / 359 | 9x |
+| sat_compute / resnet / sat_hbm | 381 / 382 / 387 | ~9.5x |
+
+→ **no-MIG 저하는 일시적 warmup이 아니라 지속적**(상위 §19.3과 일치). 운영 중 계속 발생.
+
+---
+
+# §F9. NCU 하드웨어 카운터 — throughput 가설 reject (우선순위 3, 부분)
+
+![NCU DRAM](figures/figF11_ncu_dram_throughput.png)
+
+ncu replay로 L1 커널의 DRAM/L2/SM을 측정(11,056 커널 인스턴스). **핵심 비교**:
+
+| | L1 DRAM throughput (% peak) | L2 hit | SM warps |
+|---|---|---|---|
+| no-MIG alone | **8.56%** | 81.7% | 18.5% |
+| no-MIG + NeuralRx | **8.07%** | 82.8% | 18.4% |
+| (MIG alone, 상위 §18.2) | 11.1% | — | — |
+| (MIG + NeuralRx, 상위 §18.2) | 11.0% | — | — |
+
+→ **양쪽 플랫폼 모두 L1 커널 DRAM throughput이 낮고(8–11%), NeuralRx를 붙여도 안 변한다.** 즉 L1 저하는 **L1 커널이 DRAM을 더 써서가 아니라 큐 중재(queue arbitration)** 때문 — paper의 핵심 메커니즘(상위 §16·§18.2)을 **no-MIG에서 독립 재현**. (※ NCU 잡은 3h TIMEOUT으로 alone+NeuralRx만 완료, resnet 등 4조건 미완 — 핵심 2개는 확보.)
+
+---
+
+# §F10. per-call NSYS — per-op 시간은 그대로, gap이 늘어난다 (우선순위 4)
+
+L1 alone vs L1+NeuralRx의 GPU mem-op을 nsys로 분해(CELLS=20, ITERS=50):
+
+| op | alone avg | +NeuralRx avg | count |
+|---|---|---|---|
+| CUDA memset | 83,247 ns | 83,009 ns | 4,200 (동일) |
+| memcpy H2D | 7,982 ns | 8,013 ns | 12,618 (동일) |
+| memcpy D2H | 1,733 ns | 1,677 ns | 1,400 (동일) |
+| **총 GPU mem time** | **450M ns** | **450M ns** | 동일 |
+
+→ **per-op GPU 시간·횟수가 NeuralRx 유무와 무관하게 동일.** L1 frame이 느려지는 시간은 op 자체가 아니라 **커널 사이 gap(큐 대기)**에 있다 — §F9(throughput 불변)와 정합. (CloudLab MIG coloc §16.1은 per-op memcpy가 4.2→14.3us로 늘었던 것과 대비 — no-MIG는 gap-dominated. 단 이 캡처 윈도우의 contention 강도는 §F1 burst보다 약했을 수 있어 절대 해석은 보수적으로.)
+
+---
+
 ## 핵심 발견 종합
 
 1. **no-MIG = 격리 0**: 단일 AI에 MIG cross-part 대비 4–9배, 누적에 최대 **29배**.
@@ -196,9 +245,9 @@ NeuralRx는 L1과 같은 PHY 파이프라인을 공유하는 co-tenant라 가장
 |---|---|---|
 | 1 | no-MIG default time-slice (본 PART F) | ✅ 완료·분석됨 |
 | 2 | no-MIG **MPS** | ✅ 완료·분석됨 (§F7) |
-| 3 | NCU DRAM/L2/SM | 🟡 큐 → §F8 (상위 §18.2 비교) |
-| 4 | per-call NSYS | 🟡 큐 → §F9 (상위 §16.1 memcpy 4.2→14.3us 비교) |
-| 5 | 5분 sustained | 🟡 큐 → §F10 (상위 §19.3 지속성 비교) |
+| 3 | NCU DRAM/L2/SM | ✅ 부분완료 (§F9, alone+NeuralRx) |
+| 4 | per-call NSYS | ✅ 완료 (§F10) |
+| 5 | 5분 sustained | ✅ 완료 (§F8) |
 
 ## 한 줄 종합
 > **MIG는 평탄하지 않다 — placement에 전적으로 의존한다(§F0). cross-partition 격리만 L1을 ~45ms로 지키고(no-MIG 대비 4–29배 우위), same-partition coloc은 MIG여도 ~356ms이며 3g에서는 run마다 45↔360ms로 bistable하다. no-MIG(389ms)는 MIG coloc과 동급. → "MIG는 필요(격리)하지만 충분하지 않다(coloc·bistable)"를 한 데이터셋으로 입증.**

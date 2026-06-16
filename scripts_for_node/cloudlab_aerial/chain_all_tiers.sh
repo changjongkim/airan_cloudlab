@@ -66,6 +66,11 @@ skip_if_done(){
   if [[ $got -ge $expect ]]; then return 0; else return 1; fi
 }
 
+ensure_writable(){
+  # Make subdirs world-writable so containers (UID 1000) can drop JSON in them.
+  sudo chmod -R 777 "$RESULTS" 2>/dev/null || chmod -R 777 "$RESULTS" 2>/dev/null || true
+}
+
 run_l1_once(){
   local label=$1 uuid=$2 outdir=$3
   docker run --rm --gpus "\"device=$uuid\"" \
@@ -107,7 +112,7 @@ log "=== A1 stacking on cross-partition ==="
 
 # A1-a: chanpred x4 on 4g
 outdir=$RESULTS/A1_stacking/chanpred_x4
-mkdir -p "$outdir"
+mkdir -p "$outdir"; chmod 777 "$outdir"
 if skip_if_done "$outdir" 5; then log "  skip A1-chanpred_x4 (already have ≥5)"; else
   for k in 1 2 3 4; do
     ai_bg "stack_cp_$k" "$AI_UUID" /experiments/run_channel_prediction.py 0 1200
@@ -122,7 +127,7 @@ fi
 
 # A1-b: resnet x2 on 4g
 outdir=$RESULTS/A1_stacking/resnet_x2
-mkdir -p "$outdir"
+mkdir -p "$outdir"; chmod 777 "$outdir"
 if skip_if_done "$outdir" 5; then log "  skip A1-resnet_x2"; else
   for k in 1 2; do
     ai_bg "stack_rn_$k" "$AI_UUID" /experiments/run_resnet_stress.py 0 1200 64 fp16
@@ -137,7 +142,7 @@ fi
 
 # A1-c: kitchen sink (chanpred + memcpy + gemm)
 outdir=$RESULTS/A1_stacking/kitchen
-mkdir -p "$outdir"
+mkdir -p "$outdir"; chmod 777 "$outdir"
 if skip_if_done "$outdir" 5; then log "  skip A1-kitchen"; else
   ai_bg "stack_kitch_cp" "$AI_UUID" /experiments/run_channel_prediction.py 0 1200
   ai_bg "stack_kitch_mc" "$AI_UUID" /experiments/run_memcpy_massive.py 0 1200
@@ -153,7 +158,7 @@ fi
 ###### A2: mixed coloc (L1 + chanpred + ResNet all on 3g) ######
 log "=== A2 mixed coloc on 3g (L1 + chanpred + ResNet) ==="
 outdir=$RESULTS/A2_mixed_coloc/chanpred_resnet
-mkdir -p "$outdir"
+mkdir -p "$outdir"; chmod 777 "$outdir"
 if skip_if_done "$outdir" 10; then log "  skip A2"; else
   ai_bg "ai_mix_cp" "$L1_UUID" /experiments/run_channel_prediction.py 0 1200
   ai_bg "ai_mix_rn" "$L1_UUID" /experiments/run_resnet_stress.py 0 1200 64 fp16
@@ -169,7 +174,7 @@ fi
 log "=== B3 ResNet batch sweep on 3g coloc ==="
 for b in 16 64 256; do
   outdir=$RESULTS/B3_resnet_batch/b${b}
-  mkdir -p "$outdir"
+  mkdir -p "$outdir"; chmod 777 "$outdir"
   if skip_if_done "$outdir" 5; then log "  skip B3-b${b}"; continue; fi
   ai_bg "ai_rn_b${b}" "$L1_UUID" /experiments/run_resnet_stress.py 0 1200 ${b} fp16
   log "  ResNet b=${b} on 3g coloc, warming 10s"
@@ -243,7 +248,7 @@ fi
 ###############################################################
 for size in 2g 4g 7g; do
   outdir=$RESULTS/A3_chanpred_coloc/$size
-  mkdir -p "$outdir"
+  mkdir -p "$outdir"; chmod 777 "$outdir"
   if skip_if_done "$outdir" 10; then log "skip A3-$size (already have ≥10)"; continue; fi
   mig_reconfig "$(profile_for $size)" "Phase2 single $size for A3 chanpred coloc"
   UUID=$(mig_uuids | head -1)
@@ -270,7 +275,7 @@ log "  L1(4g)=$L1_UUID  AI1(1g)=$AI1_UUID  AI2(1g)=$AI2_UUID  AI3(1g)=$AI3_UUID"
 
 # B1-a: 4g L1 alone (just to compare with E5-4g)
 outdir=$RESULTS/B1_four_way/alone_4g
-mkdir -p "$outdir"
+mkdir -p "$outdir"; chmod 777 "$outdir"
 if ! skip_if_done "$outdir" 5; then
   for i in 1 2 3 4 5; do
     run_l1_once "B1_alone_4g_run${i}" "$L1_UUID" "$outdir"
@@ -279,7 +284,7 @@ fi
 
 # B1-b: 4g L1 + 3 chanpred (each on its own 1g)
 outdir=$RESULTS/B1_four_way/three_chanpred
-mkdir -p "$outdir"
+mkdir -p "$outdir"; chmod 777 "$outdir"
 if ! skip_if_done "$outdir" 5; then
   ai_bg "ai_b1_cp1" "$AI1_UUID" /experiments/run_channel_prediction.py 0 1200
   ai_bg "ai_b1_cp2" "$AI2_UUID" /experiments/run_channel_prediction.py 0 1200
@@ -295,7 +300,7 @@ fi
 # B1-c: 4g L1 + heterogeneous (chanpred + resnet + neuralrx, each on a 1g)
 # NOTE: NeuralRx needs ≥ ~2GB; 1g.5gb may be too small. Try, accept failure.
 outdir=$RESULTS/B1_four_way/het_cp_rn_nrx
-mkdir -p "$outdir"
+mkdir -p "$outdir"; chmod 777 "$outdir"
 if ! skip_if_done "$outdir" 5; then
   ai_bg "ai_b1_cp"   "$AI1_UUID" /experiments/run_channel_prediction.py 0 1200
   ai_bg "ai_b1_rn"   "$AI2_UUID" /experiments/run_resnet_stress.py 0 1200 32 fp16
@@ -340,7 +345,7 @@ declare -a SUSTAINED_SCENARIOS=(
 for scen in "${SUSTAINED_SCENARIOS[@]}"; do
   IFS=":" read -r name ai_script <<< "$scen"
   outdir=$RESULTS/C3_sustained/$name
-  mkdir -p "$outdir"
+  mkdir -p "$outdir"; chmod 777 "$outdir"
   if skip_if_done "$outdir" 2; then log "  skip C3-$name"; continue; fi
   log "=== C3 sustained: $name (n=2 × 5min each) ==="
   if [[ "$ai_script" != "none" ]]; then

@@ -233,7 +233,32 @@ SQLite `CUPTI_ACTIVITY_KIND_RUNTIME`(host-side CUDA API 호출)을 분해하면 
 - **MPS + compute AI**: 동시 실행으로 device가 안 막힘 → cudaFree 279μs(baseline) → neuralrx 40ms 회복.
 - **MPS + memory AI**: DRAM 굶김 → cudaFree **115ms** 블록 → sat_hbm 7,000ms 붕괴.
 
-figF14가 10조건 cudaFree avg를 보여준다: compute AI(qwen·chanpred·neuralrx·resnet·forecaster)는 MPS에서 ~280μs로 복귀, memory AI(sat_hbm 114ms·2sat 103ms)는 폭발. **GPU 커널·CUDA API 두 레벨이 같은 결론을 가리킨다.** (다음: `--trace=osrt`로 host thread가 어떤 syscall(futex/poll)에서 블록하는지까지 추적 — 측정 진행 중.)
+figF14가 10조건 cudaFree avg를 보여준다: compute AI(qwen·chanpred·neuralrx·resnet·forecaster)는 MPS에서 ~280μs로 복귀, memory AI(sat_hbm 114ms·2sat 103ms)는 폭발. **GPU 커널·CUDA API 두 레벨이 같은 결론을 가리킨다.**
+
+## 10.7. 큐의 정확한 위치와 시그니처 — convert 경계 + 60KB memcpy bimodal (§13/§15/§16.1 재현)
+
+세 가지 SQLite 정밀 분석으로 큐 대기의 **위치·시그니처**를 짝 문서 §13/§15/§16.1 수준으로 닫는다.
+
+**(A) §13 — gap은 `convert_kernel` 경계에 국소화.** cuPHY 커널별 post-gap(완료 후 다음 커널까지 대기)을 보면, 지배 커널 `convert_kernel<__half2,float2>`(fp16↔fp32 변환, copy 경계) **직후에만** gap이 폭증하고 다른 stage(ch_est/noise_intf/eq)는 ~1μs로 깨끗하다:
+
+| 조건 | convert_kernel post-gap p99 | 다른 cuPHY stage |
+|---|---|---|
+| alone | 2,837μs | ~1μs |
+| neuralrx default | 7,150μs | ~1μs |
+| sat_hbm default | 7,321μs | ~1μs |
+| sat_hbm MPS | 45,247μs | **noise/ch_est/eq 전부 ~23,000μs** |
+
+→ 큐 대기는 랜덤이 아니라 **convert/copy 경계에 붙는다**(짝 문서 §13과 동일). sat_hbm MPS에선 gap이 모든 stage로 번져 붕괴.
+
+**(B) §16.1 — 60KB memcpy per-call duration이 bimodal로 갈라진다.**
+
+![60KB memcpy bimodal](figures/figF15_memcpy_bimodal.png)
+
+정확히 61,440 byte(60KB) memcpy 4,200콜의 per-call 분포: alone/neuralrx는 **4.2μs fast mode에 단봉**, 그러나 **sat_hbm default는 4.2μs↔16.8μs로 양봉 분리**(p99 16.83μs, 1.5%가 slow mode). 이것이 짝 문서 §16.1의 queue-arbitration 시그니처(4.2→14.3μs)를 no-MIG에서 재현한 것이다. **중요**: neuralrx(compute contention)는 per-op이 깨끗하고 gap만 크다 → **compute 경합 = gap-only, memory 경합 = gap + per-op bimodal** 두 메커니즘이 분리된다.
+
+**(C) §15 — direction별.** H2D가 지배(12,618콜 @ 8μs)하고 D2H/D2D는 작다. memory 경합(sat_hbm MPS)에서만 H2D 8→9.8μs, D2H 1.7→4.8μs로 팽창 — 대역폭 경쟁이 모든 방향을 늦춘다.
+
+> 종합: **큐 대기는 convert/copy 경계(§13)에 위치하고, memory 경합일 때만 per-op이 bimodal로 갈라진다(§16.1).** GPU-gap·CUDA-API·per-call 세 레벨이 동일한 메커니즘을 가리킨다.
 
 ## 11. 5분 sustained — 저하는 transient warmup이 아니다
 

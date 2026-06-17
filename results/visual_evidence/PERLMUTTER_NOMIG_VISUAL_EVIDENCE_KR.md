@@ -215,6 +215,26 @@ L1 frame이 느려지는 시간은 op 자체가 아니라 **커널 사이 gap(�
 
 idle-gap 비율도 같은 그림: default는 단일 AI에 86–96%로 포화, MPS는 compute AI를 ~60%(baseline)로 되돌리지만 memory AI는 92–99%로 유지/악화. **판별자는 compute-bound vs memory-bound** — MPS는 연산 경쟁은 동시 실행으로 풀지만, 공유 자원(DRAM 대역폭) 경쟁은 풀지 못한다.
 
+## 10.6. CUDA API 레벨 — gap의 host-side 정체는 cudaFree 블로킹 (§17.3 재현)
+
+![cudaFree host blocking](figures/figF14_cudafree_host_blocking.png)
+
+SQLite `CUPTI_ACTIVITY_KIND_RUNTIME`(host-side CUDA API 호출)을 분해하면 GPU gap이 host에서 **무엇 때문에** 생기는지 보인다. cuPHY는 측정당 **~4,263회 cudaFree + cudaMalloc**(프레임마다 버퍼 free/재할당, 짝 문서 §15.0의 structural cost)을 호출하고, **cudaFree가 host 최대 비용**이다(짝 문서 §17.3과 동일).
+
+| API (avg/call) | alone | neuralrx default | neuralrx MPS | sat_hbm MPS |
+|---|---|---|---|---|
+| **cudaFree** | 246μs | **3,752μs** (15x) | 279μs (회복) | **115,506μs** (115ms) |
+| cudaMemcpyAsync | 6.7μs | 434μs (65x) | 6.4μs (회복) | 6,733μs |
+| cudaEventSynchronize | 131μs | 4,784μs (37x) | 117μs (회복) | 128,875μs (129ms) |
+
+**cudaFree는 동기화 호출**(device의 pending 작업 완료를 기다린 뒤 free)이라, 메커니즘이 한 줄로 연결된다:
+> **device가 (AI로) 바쁨 → cudaFree/eventSync가 host에서 블록 → GPU 타임라인 gap → L1 frame latency 폭증.**
+- **default**: cudaFree 3.7ms 블록(=§10.5의 2.4ms gap) → neuralrx 389ms.
+- **MPS + compute AI**: 동시 실행으로 device가 안 막힘 → cudaFree 279μs(baseline) → neuralrx 40ms 회복.
+- **MPS + memory AI**: DRAM 굶김 → cudaFree **115ms** 블록 → sat_hbm 7,000ms 붕괴.
+
+figF14가 10조건 cudaFree avg를 보여준다: compute AI(qwen·chanpred·neuralrx·resnet·forecaster)는 MPS에서 ~280μs로 복귀, memory AI(sat_hbm 114ms·2sat 103ms)는 폭발. **GPU 커널·CUDA API 두 레벨이 같은 결론을 가리킨다.** (다음: `--trace=osrt`로 host thread가 어떤 syscall(futex/poll)에서 블록하는지까지 추적 — 측정 진행 중.)
+
 ## 11. 5분 sustained — 저하는 transient warmup이 아니다
 
 ![P5](figures/figF10_p5_sustained.png)

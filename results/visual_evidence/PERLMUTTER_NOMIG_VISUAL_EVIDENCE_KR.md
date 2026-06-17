@@ -275,6 +275,29 @@ figF14가 10조건 cudaFree avg를 보여준다: compute AI(qwen·chanpred·neur
 
 **4-레벨 메커니즘 체인이 닫힌다:** `GPU 커널 gap(§10.5) ↔ cudaFree 동기화(§10.6) ↔ convert 경계·bimodal(§10.7) ↔ ioctl GPU-sync syscall(§10.8) ↔ frame latency`. 가장 깨끗한 인과 신호는 CUDA API(cudaFree)이며, GPU·syscall 양끝이 이를 뒷받침한다.
 
+## 10.9. cuPHY stage 분해 + correlationId 인과 증명 (§17.2, MIG와 동일 스타일)
+
+아래 두 그림은 짝 문서 `MIG_AIRAN_VISUAL_EVIDENCE_KR.md`의 **Supp 14/15와 동일한 스타일·동일 분석**으로 만들어 1:1 비교가 가능하다(동일 rcParams·색상·stage 분류).
+
+![cuPHY stage 분해](figures/pmF_supp_15_pipeline_stages.png)
+
+**(A) §17.2 — cuPHY pipeline stage별 kernel 시간.** `convert(boundary)` stage가 커널 시간의 **87–90%**를 차지(L1의 구조적 fp16↔fp32 변환). 대부분 조건에서 ~1,100ms로 일정하지만, **sat_hbm MPS에서 convert가 12,015ms(98%)로 12배 폭증** — 메모리 경합이 convert/copy 경계 커널을 직접 느리게 만든다(§10.7-A의 gap 확산과 정합). 다른 stage(ChEst/Noise/Equalizer/LDPC)는 작고 안정.
+
+![GPU activity 분해](figures/pmF_supp_14_gpu_activity.png)
+
+GPU activity 분해(kernel/memcpy/memset/sync/**idle**)도 같은 스타일: 대부분 조건은 idle(gap)이 wall-clock의 큰 비중, sat_hbm MPS는 전체가 폭증.
+
+**(B) #3 correlationId — gap == cudaFree 블로킹을 시간 overlap으로 직접 증명.** 각 GPU idle-gap 구간을 어떤 host API 호출이 시간적으로 덮는지 계산:
+
+| 조건 | total GPU-gap | cudaFree 커버 | +cudaMemcpyAsync |
+|---|---|---|---|
+| neuralrx default | 24,206ms | **60.3%** | +24.9% (= 85%) |
+| neuralrx MPS | 2,273ms | 21.8% | (gap 자체가 작음 → 회복) |
+| sat_hbm default | 26,652ms | 59.4% | +24.5% (= 84%) |
+| **sat_hbm MPS** | **585,354ms** | **82.0% (480초!)** | +16.1% |
+
+→ **GPU가 노는 시간의 ~85%가 "host가 cudaFree(+memcpy) 안에서 블록 중"인 시간과 겹친다.** 즉 GPU gap은 추상적 "큐"가 아니라 **구체적으로 cudaFree 동기화 호출이 device를 기다리는 시간**이다. MPS는 이를 제거(24→2초)하고, memory 경합에선 480초까지 폭발시킨다 — §10.5–§10.8의 모든 레벨이 이 한 지점(cudaFree↔device sync)으로 수렴한다.
+
 ## 11. 5분 sustained — 저하는 transient warmup이 아니다
 
 ![P5](figures/figF10_p5_sustained.png)

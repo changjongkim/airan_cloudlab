@@ -1,0 +1,19 @@
+[forecaster] batch=64 hidden=384 seq=32 dur=120s
+Traceback (most recent call last):
+  File "/experiments/run_traffic_forecaster.py", line 41, in <module>
+    model = Forecaster(in_dim, hidden_dim).to(dev).eval()
+  File "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/airan_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1174, in to
+    return self._apply(convert)
+  File "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/airan_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 780, in _apply
+    module._apply(fn)
+  File "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/airan_venv/lib/python3.10/site-packages/torch/nn/modules/rnn.py", line 223, in _apply
+    ret = super()._apply(fn, recurse)
+  File "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/airan_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 805, in _apply
+    param_applied = fn(param)
+  File "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/airan_venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1160, in convert
+    return t.to(
+RuntimeError: CUDA error: CUDA-capable device(s) is/are busy or unavailable
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+

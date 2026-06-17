@@ -1,0 +1,118 @@
+[02:38:04] MPS start
+[02:38:07] ===== MPS+NSYS no-MIG (CELLS=20 ITERS=50) =====
+[02:38:07] === alone ===
+[02:38:07]   NSYS [MPSnsys_alone]
+Generated:
+	/out/MPSnsys_alone.nsys-rep
+[02:38:35] === chanpred ===
+[02:38:35]   AI(venv) [chanpred] pid=2261101
+[02:38:45]   NSYS [MPSnsys_chanpred]
+Generated:
+	/out/MPSnsys_chanpred.nsys-rep
+[02:39:05] === resnet ===
+[02:39:05]   AI(venv) [resnet] pid=2261882
+[02:39:15]   NSYS [MPSnsys_resnet]
+Generated:
+	/out/MPSnsys_resnet.nsys-rep
+[02:39:45] === neuralrx ===
+[02:39:45]   AI(base) [neuralrx] pid=2262664
+[02:41:00]   NSYS [MPSnsys_neuralrx]
+Generated:
+	/out/MPSnsys_neuralrx.nsys-rep
+[02:41:22] === qwen ===
+[02:41:22]   AI(venv) [qwen] pid=2263791
+[02:41:37]   NSYS [MPSnsys_qwen]
+Generated:
+	/out/MPSnsys_qwen.nsys-rep
+[02:42:01] === sat_hbm ===
+[02:42:01]   AI(venv) [sat_hbm] pid=2264636
+[02:42:11]   NSYS [MPSnsys_sat_hbm]
+Generated:
+	/out/MPSnsys_sat_hbm.nsys-rep
+[02:52:55] === forecaster ===
+[02:52:55]   AI(venv) [forecaster] pid=2265749
+[02:53:05]   NSYS [MPSnsys_forecaster]
+Generated:
+	/out/MPSnsys_forecaster.nsys-rep
+[02:53:29] MPS stop
+[02:53:32] ===== DONE: 7 nsys-rep =====
+[04:09:04] MPS start
+[04:09:07] ===== MPS+NSYS no-MIG (CELLS=20 ITERS=50) conds='alone qwen xapp chanpred forecaster neuralrx resnet sat_compute sat_hbm resnet_fore 2AI 2sat 3AI 3sat' =====
+[04:09:07] === alone ===
+[04:09:08]   NSYS [MPSnsys_alone]
+Generated:
+	/out/MPSnsys_alone.nsys-rep
+[04:09:39] === qwen ===
+[04:09:39]   AI(venv) [qwen] pid=1648380
+[04:09:54]   NSYS [MPSnsys_qwen]
+Generated:
+	/out/MPSnsys_qwen.nsys-rep
+[04:10:19] === xapp ===
+[04:10:19]   AI(venv) [xapp] pid=1649228
+[04:10:29]   NSYS [MPSnsys_xapp]
+Generated:
+	/out/MPSnsys_xapp.nsys-rep
+[04:10:53] === chanpred ===
+[04:10:53]   AI(venv) [chanpred] pid=1650012
+[04:11:03]   NSYS [MPSnsys_chanpred]
+Generated:
+	/out/MPSnsys_chanpred.nsys-rep
+[04:11:27] === forecaster ===
+[04:11:27]   AI(venv) [forecaster] pid=1650796
+[04:11:37]   NSYS [MPSnsys_forecaster]
+Generated:
+	/out/MPSnsys_forecaster.nsys-rep
+[04:12:01] === neuralrx ===
+[04:12:01]   AI(base) [neuralrx] pid=1651595
+[04:13:16]   NSYS [MPSnsys_neuralrx]
+Generated:
+	/out/MPSnsys_neuralrx.nsys-rep
+[04:13:37] === resnet ===
+[04:13:37]   AI(venv) [resnet] pid=1653990
+[04:13:47]   NSYS [MPSnsys_resnet]
+Generated:
+	/out/MPSnsys_resnet.nsys-rep
+[04:14:12] === sat_compute ===
+[04:14:12]   AI(venv) [satc] pid=1654775
+[04:14:22]   NSYS [MPSnsys_sat_compute]
+Generated:
+	/out/MPSnsys_sat_compute.nsys-rep
+[04:15:15] === sat_hbm ===
+[04:15:15]   AI(venv) [sath] pid=1655560
+[04:15:25]   NSYS [MPSnsys_sat_hbm]
+Generated:
+	/out/MPSnsys_sat_hbm.nsys-rep
+[04:15:49] === resnet_fore ===
+[04:15:49]   AI(venv) [rf_r] pid=1656363
+[04:15:49]   AI(venv) [rf_f] pid=1656369
+[04:16:03]   NSYS [MPSnsys_resnet_fore]
+Generated:
+	/out/MPSnsys_resnet_fore.nsys-rep
+[04:16:34] === 2AI ===
+[04:16:34]   AI(venv) [a1] pid=1657426
+[04:16:34]   AI(venv) [a2] pid=1657432
+[04:16:48]   NSYS [MPSnsys_2AI]
+Generated:
+	/out/MPSnsys_2AI.nsys-rep
+[04:17:18] === 2sat ===
+[04:17:18]   AI(venv) [s1] pid=1658472
+[04:17:18]   AI(venv) [s2] pid=1658478
+[04:17:32]   NSYS [MPSnsys_2sat]
+Generated:
+	/out/MPSnsys_2sat.nsys-rep
+[04:27:04] === 3AI ===
+[04:27:04]   AI(venv) [a1] pid=1660913
+[04:27:04]   AI(venv) [a2] pid=1660919
+[04:27:04]   AI(venv) [a3] pid=1660925
+[04:27:18]   NSYS [MPSnsys_3AI]
+Generated:
+	/out/MPSnsys_3AI.nsys-rep
+[04:27:42] === 3sat ===
+[04:27:42]   AI(venv) [s1] pid=1662282
+[04:27:42]   AI(venv) [s2] pid=1662288
+[04:27:42]   AI(venv) [s3] pid=1662294
+[04:27:56]   NSYS [MPSnsys_3sat]
+Generated:
+	/out/MPSnsys_3sat.nsys-rep
+[04:28:18] MPS stop
+[04:28:21] ===== DONE: 14 nsys-rep =====

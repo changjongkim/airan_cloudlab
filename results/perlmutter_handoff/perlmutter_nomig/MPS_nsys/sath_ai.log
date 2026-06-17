@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/experiments/run_hbm_stress.py", line 15, in <module>
+    src = torch.randn(n, dtype=torch.float32, device=f"cuda:{gpu_id}")
+RuntimeError: CUDA error: CUDA-capable device(s) is/are busy or unavailable
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+

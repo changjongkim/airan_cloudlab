@@ -1,10 +1,12 @@
-# Perlmutter run artifacts — never commit (large / machine-generated)
-airan_venv/
-hf_cache/
-perlmutter_nomig/
-mps_pipe_*/
-mps_log_*/
-*.log
-*.err
-*.nsys-rep
-*.sqlite
+# Perlmutter run artifacts.
+# Excluded (huge / regenerable / machine-local):
+airan_venv/            # 5GB python venv — rebuild via 01_setup + pip
+hf_cache/              # 3GB HuggingFace model cache (Qwen)
+*.sqlite               # up to 312MB each, >GitHub 100MB limit; regenerate from
+                       #   .nsys-rep via: nsys export --type sqlite -o X.sqlite X.nsys-rep
+mps_pipe_*/            # transient MPS server pipes
+mps_log_*/             # transient MPS server logs
+*.err                  # SLURM stderr (noise)
+
+# Tracked (primary experiment data): perlmutter_nomig/**/*.json (results),
+# *.csv (NCU counters), *.nsys-rep (raw traces), *.log (run records).

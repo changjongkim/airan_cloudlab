@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/experiments/run_resnet_stress.py", line 20, in <module>
+    torch.cuda.set_device(gpu_id)
+  File "/pscratch/sd/s/sgkim/kcj/AI-RAN/site-packages/torch/cuda/__init__.py", line 529, in set_device
+    torch._C._cuda_setDevice(device)
+  File "/pscratch/sd/s/sgkim/kcj/AI-RAN/site-packages/torch/cuda/__init__.py", line 372, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 807: MPS server is not ready to accept new MPS client requests

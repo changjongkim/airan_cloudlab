@@ -1,0 +1,46 @@
+[03:22:44] ===== Perlmutter no-MIG NCU =====
+[03:22:44] GPU: NVIDIA A100-SXM4-40GB, Disabled
+[03:22:44] CELLS=20 ITERS=3 metrics=DRAM/L2/SM | Results: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/perlmutter_nomig/NCU_nomig
+[03:22:44] === NCU_0_alone (baseline DRAM/L2/SM) ===
+[03:22:44]   NCU [NCU_0_alone] (replay-mode, slow)
+[realL1] measuring...
+[realL1] NCU_0_alone: mean=130226.117ms p95=133978.508ms p99=134223.327ms miss1ms=3/3
+[realL1] saved: /out/realL1_NCU_0_alone_20260606_111315.json
+[04:13:26] === NCU_neuralrx (critical) ===
+[04:13:26]   AI(base) [neuralrx] pid=924072
+[04:14:41]   NCU [NCU_neuralrx] (replay-mode, slow)
+[realL1] measuring...
+[realL1] NCU_neuralrx: mean=152494.151ms p95=155939.816ms p99=156148.638ms miss1ms=3/3
+[realL1] saved: /out/realL1_NCU_neuralrx_20260606_123623.json
+[05:36:38] === NCU_resnet ===
+[05:36:38]   AI(venv) [resnet] pid=971837
+[05:36:48]   NCU [NCU_resnet] (replay-mode, slow)
+[00:15:17] ===== Perlmutter no-MIG NCU =====
+[00:15:17] GPU: NVIDIA A100-SXM4-40GB, Disabled
+[00:15:17] CELLS=4 ITERS=3 conds='resnet chanpred sat_hbm sat_compute' | Results: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/perlmutter_nomig/NCU_nomig
+[00:15:17] === NCU_resnet ===
+[00:15:17]   AI(venv) [resnet] pid=1240128
+[00:15:27]   NCU [NCU_resnet] (replay-mode, slow)
+[realL1] measuring...
+[realL1] NCU_resnet: mean=30655.314ms p95=30744.708ms p99=30754.760ms miss1ms=3/3
+[realL1] saved: /out/realL1_NCU_resnet_20260617_075531.json
+[00:55:39] === NCU_chanpred (safe AI control) ===
+[00:55:39]   AI(venv) [chanpred] pid=1253180
+[00:55:49]   NCU [NCU_chanpred] (replay-mode, slow)
+[realL1] measuring...
+[realL1] NCU_chanpred: mean=30460.919ms p95=30533.188ms p99=30539.863ms miss1ms=3/3
+[realL1] saved: /out/realL1_NCU_chanpred_20260617_083103.json
+[01:31:11] === NCU_sat_hbm ===
+[01:31:11]   AI(venv) [sat_hbm] pid=1265166
+[01:31:21]   NCU [NCU_sat_hbm] (replay-mode, slow)
+[realL1] measuring...
+[realL1] NCU_sat_hbm: mean=27484.792ms p95=27508.404ms p99=27511.564ms miss1ms=3/3
+[realL1] saved: /out/realL1_NCU_sat_hbm_20260617_091032.json
+[02:10:40] === NCU_sat_compute ===
+[02:10:40]   AI(venv) [sat_compute] pid=1276036
+[02:10:50]   NCU [NCU_sat_compute] (replay-mode, slow)
+[realL1] measuring...
+[realL1] NCU_sat_compute: mean=31713.344ms p95=36586.758ms p99=36840.545ms miss1ms=3/3
+[realL1] saved: /out/realL1_NCU_sat_compute_20260617_094951.json
+[02:50:00] ===== NCU no-MIG DONE =====
+[02:50:00] CSV outputs: 6

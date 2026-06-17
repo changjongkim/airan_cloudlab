@@ -1,0 +1,201 @@
+[03:11:29] ===== Perlmutter no-MIG F-equivalent =====
+[03:11:29] GPU: NVIDIA A100-SXM4-40GB, Disabled (GPU-9528920d-745f-07f0-9d1c-dc8d10c1f290)
+[03:11:29] CELLS=20 ITERS=100 N=5 AI_DUR=1800 USE_NSYS=0
+[03:11:29] Results: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/perlmutter_nomig/F_nomig
+[03:11:29] === F_0 alone baseline (n=10) ===
+[03:11:29]     L1 [F_0_alone] run 1/10
+[realL1] saved: /out/realL1_F_0_alone_run1_20260605_101148.json
+[03:11:50]     L1 [F_0_alone] run 2/10
+[realL1] saved: /out/realL1_F_0_alone_run2_20260605_101203.json
+[03:12:05]     L1 [F_0_alone] run 3/10
+[realL1] saved: /out/realL1_F_0_alone_run3_20260605_101218.json
+[03:12:20]     L1 [F_0_alone] run 4/10
+[realL1] saved: /out/realL1_F_0_alone_run4_20260605_101234.json
+[03:12:36]     L1 [F_0_alone] run 5/10
+[realL1] saved: /out/realL1_F_0_alone_run5_20260605_101249.json
+[03:12:51]     L1 [F_0_alone] run 6/10
+[realL1] saved: /out/realL1_F_0_alone_run6_20260605_101304.json
+[03:13:06]     L1 [F_0_alone] run 7/10
+[realL1] saved: /out/realL1_F_0_alone_run7_20260605_101319.json
+[03:13:21]     L1 [F_0_alone] run 8/10
+[realL1] saved: /out/realL1_F_0_alone_run8_20260605_101334.json
+[03:13:36]     L1 [F_0_alone] run 9/10
+[realL1] saved: /out/realL1_F_0_alone_run9_20260605_101349.json
+[03:13:50]     L1 [F_0_alone] run 10/10
+[realL1] saved: /out/realL1_F_0_alone_run10_20260605_101404.json
+[03:14:06] === F_B_D2D 256MB streams=4 ===
+[03:14:06]   AI(venv) [memcpy_d2d] pid=972512
+[03:14:14]     L1 [F_B_D2D_256MB_str4] run 1/5
+[realL1] saved: /out/realL1_F_B_D2D_256MB_str4_run1_20260605_101509.json
+[03:15:11]     L1 [F_B_D2D_256MB_str4] run 2/5
+[realL1] saved: /out/realL1_F_B_D2D_256MB_str4_run2_20260605_101603.json
+[03:16:04]     L1 [F_B_D2D_256MB_str4] run 3/5
+[realL1] saved: /out/realL1_F_B_D2D_256MB_str4_run3_20260605_101657.json
+[03:16:58]     L1 [F_B_D2D_256MB_str4] run 4/5
+[realL1] saved: /out/realL1_F_B_D2D_256MB_str4_run4_20260605_101751.json
+[03:17:52]     L1 [F_B_D2D_256MB_str4] run 5/5
+[realL1] saved: /out/realL1_F_B_D2D_256MB_str4_run5_20260605_101845.json
+[03:18:48] === F_C_H2D 256MB streams=4 ===
+[03:18:49]   AI(venv) [memcpy_h2d] pid=974469
+[03:18:57]     L1 [F_C_H2D_256MB_str4] run 1/5
+[realL1] saved: /out/realL1_F_C_H2D_256MB_str4_run1_20260605_101921.json
+[03:19:22]     L1 [F_C_H2D_256MB_str4] run 2/5
+[realL1] saved: /out/realL1_F_C_H2D_256MB_str4_run2_20260605_101944.json
+[03:19:44]     L1 [F_C_H2D_256MB_str4] run 3/5
+[realL1] saved: /out/realL1_F_C_H2D_256MB_str4_run3_20260605_102006.json
+[03:20:07]     L1 [F_C_H2D_256MB_str4] run 4/5
+[realL1] saved: /out/realL1_F_C_H2D_256MB_str4_run4_20260605_102029.json
+[03:20:29]     L1 [F_C_H2D_256MB_str4] run 5/5
+[realL1] saved: /out/realL1_F_C_H2D_256MB_str4_run5_20260605_102051.json
+[03:20:54] === F_D_GEMM DIM=4096 ===
+[03:20:54]   AI(venv) [gemm] pid=976398
+[03:21:02]     L1 [F_D_GEMM_4096] run 1/5
+[realL1] saved: /out/realL1_F_D_GEMM_4096_run1_20260605_102154.json
+[03:21:55]     L1 [F_D_GEMM_4096] run 2/5
+[realL1] saved: /out/realL1_F_D_GEMM_4096_run2_20260605_102244.json
+[03:22:45]     L1 [F_D_GEMM_4096] run 3/5
+[realL1] saved: /out/realL1_F_D_GEMM_4096_run3_20260605_102334.json
+[03:23:35]     L1 [F_D_GEMM_4096] run 4/5
+[realL1] saved: /out/realL1_F_D_GEMM_4096_run4_20260605_102424.json
+[03:24:24]     L1 [F_D_GEMM_4096] run 5/5
+[realL1] saved: /out/realL1_F_D_GEMM_4096_run5_20260605_102514.json
+[03:25:17] === F_E chanpred ===
+[03:25:17]   AI(venv) [chanpred] pid=978358
+[03:25:27]     L1 [F_E_chanpred_b64] run 1/5
+[realL1] saved: /out/realL1_F_E_chanpred_b64_run1_20260605_102553.json
+[03:25:54]     L1 [F_E_chanpred_b64] run 2/5
+[realL1] saved: /out/realL1_F_E_chanpred_b64_run2_20260605_102617.json
+[03:26:18]     L1 [F_E_chanpred_b64] run 3/5
+[realL1] saved: /out/realL1_F_E_chanpred_b64_run3_20260605_102641.json
+[03:26:42]     L1 [F_E_chanpred_b64] run 4/5
+[realL1] saved: /out/realL1_F_E_chanpred_b64_run4_20260605_102705.json
+[03:27:06]     L1 [F_E_chanpred_b64] run 5/5
+[realL1] saved: /out/realL1_F_E_chanpred_b64_run5_20260605_102729.json
+[03:27:33] === F_E resnet b64 fp16 ===
+[03:27:33]   AI(venv) [resnet] pid=980504
+[03:27:43]     L1 [F_E_resnet_b64] run 1/5
+[realL1] saved: /out/realL1_F_E_resnet_b64_run1_20260605_102811.json
+[03:28:12]     L1 [F_E_resnet_b64] run 2/5
+[realL1] saved: /out/realL1_F_E_resnet_b64_run2_20260605_102903.json
+[03:29:04]     L1 [F_E_resnet_b64] run 3/5
+[realL1] saved: /out/realL1_F_E_resnet_b64_run3_20260605_102955.json
+[03:29:56]     L1 [F_E_resnet_b64] run 4/5
+[realL1] saved: /out/realL1_F_E_resnet_b64_run4_20260605_103047.json
+[03:30:48]     L1 [F_E_resnet_b64] run 5/5
+[realL1] saved: /out/realL1_F_E_resnet_b64_run5_20260605_103139.json
+[03:31:42] === F_E NeuralRx (in-line PHY-AI — critical) ===
+[03:31:42]   AI(base) [neuralrx] pid=983496
+[03:32:57]     L1 [F_E_neuralrx] run 1/5
+[realL1] saved: /out/realL1_F_E_neuralrx_run1_20260605_103345.json
+[03:33:46]     L1 [F_E_neuralrx] run 2/5
+[realL1] saved: /out/realL1_F_E_neuralrx_run2_20260605_103433.json
+[03:34:34]     L1 [F_E_neuralrx] run 3/5
+[realL1] saved: /out/realL1_F_E_neuralrx_run3_20260605_103521.json
+[03:35:21]     L1 [F_E_neuralrx] run 4/5
+[realL1] saved: /out/realL1_F_E_neuralrx_run4_20260605_103609.json
+[03:36:10]     L1 [F_E_neuralrx] run 5/5
+[realL1] saved: /out/realL1_F_E_neuralrx_run5_20260605_103657.json
+[03:37:00] === F_E qwen_small ===
+[03:37:00]   AI(venv) [qwen] pid=986115
+[03:37:15]     L1 [F_E_qwen_small] run 1/5
+[realL1] saved: /out/realL1_F_E_qwen_small_run1_20260605_103737.json
+[03:37:38]     L1 [F_E_qwen_small] run 2/5
+[realL1] saved: /out/realL1_F_E_qwen_small_run2_20260605_103758.json
+[03:37:58]     L1 [F_E_qwen_small] run 3/5
+[realL1] saved: /out/realL1_F_E_qwen_small_run3_20260605_103818.json
+[03:38:18]     L1 [F_E_qwen_small] run 4/5
+[realL1] saved: /out/realL1_F_E_qwen_small_run4_20260605_103838.json
+[03:38:38]     L1 [F_E_qwen_small] run 5/5
+[realL1] saved: /out/realL1_F_E_qwen_small_run5_20260605_103858.json
+[03:39:01] === F_E forecaster d384 ===
+[03:39:01]   AI(venv) [forecaster] pid=988128
+[03:39:11]     L1 [F_E_forecaster_d384] run 1/5
+[realL1] saved: /out/realL1_F_E_forecaster_d384_run1_20260605_104000.json
+[03:40:01]     L1 [F_E_forecaster_d384] run 2/5
+[realL1] saved: /out/realL1_F_E_forecaster_d384_run2_20260605_104048.json
+[03:40:49]     L1 [F_E_forecaster_d384] run 3/5
+[realL1] saved: /out/realL1_F_E_forecaster_d384_run3_20260605_104136.json
+[03:41:37]     L1 [F_E_forecaster_d384] run 4/5
+[realL1] saved: /out/realL1_F_E_forecaster_d384_run4_20260605_104224.json
+[03:42:25]     L1 [F_E_forecaster_d384] run 5/5
+[realL1] saved: /out/realL1_F_E_forecaster_d384_run5_20260605_104312.json
+[03:43:16] === F_E xapp ===
+[03:43:16]   AI(venv) [xapp] pid=991344
+[03:43:26]     L1 [F_E_xapp] run 1/5
+[realL1] saved: /out/realL1_F_E_xapp_run1_20260605_104344.json
+[03:43:45]     L1 [F_E_xapp] run 2/5
+[realL1] saved: /out/realL1_F_E_xapp_run2_20260605_104402.json
+[03:44:02]     L1 [F_E_xapp] run 3/5
+[realL1] saved: /out/realL1_F_E_xapp_run3_20260605_104419.json
+[03:44:19]     L1 [F_E_xapp] run 4/5
+[realL1] saved: /out/realL1_F_E_xapp_run4_20260605_104436.json
+[03:44:37]     L1 [F_E_xapp] run 5/5
+[realL1] saved: /out/realL1_F_E_xapp_run5_20260605_104453.json
+[03:44:56] === F_E sat_compute (realistic_ai matmul) ===
+[03:44:56]   AI(venv) [sat_compute] pid=993271
+[03:45:06]     L1 [F_E_sat_compute] run 1/5
+[realL1] saved: /out/realL1_F_E_sat_compute_run1_20260605_104559.json
+[03:46:00]     L1 [F_E_sat_compute] run 2/5
+[realL1] saved: /out/realL1_F_E_sat_compute_run2_20260605_104651.json
+[03:46:52]     L1 [F_E_sat_compute] run 3/5
+[realL1] saved: /out/realL1_F_E_sat_compute_run3_20260605_104743.json
+[03:47:43]     L1 [F_E_sat_compute] run 4/5
+[realL1] saved: /out/realL1_F_E_sat_compute_run4_20260605_104842.json
+[03:48:43]     L1 [F_E_sat_compute] run 5/5
+[realL1] saved: /out/realL1_F_E_sat_compute_run5_20260605_104934.json
+[03:49:37] === F_E sat_hbm ===
+[03:49:37]   AI(venv) [sat_hbm] pid=995230
+[03:49:47]     L1 [F_E_sat_hbm] run 1/5
+[realL1] saved: /out/realL1_F_E_sat_hbm_run1_20260605_105042.json
+[03:50:44]     L1 [F_E_sat_hbm] run 2/5
+[realL1] saved: /out/realL1_F_E_sat_hbm_run2_20260605_105137.json
+[03:51:38]     L1 [F_E_sat_hbm] run 3/5
+[realL1] saved: /out/realL1_F_E_sat_hbm_run3_20260605_105231.json
+[03:52:32]     L1 [F_E_sat_hbm] run 4/5
+[realL1] saved: /out/realL1_F_E_sat_hbm_run4_20260605_105325.json
+[03:53:26]     L1 [F_E_sat_hbm] run 5/5
+[realL1] saved: /out/realL1_F_E_sat_hbm_run5_20260605_105419.json
+[03:54:23] === F_F 4x chanpred ===
+[03:54:23]   AI(venv) [chanpred_x4_1] pid=998445
+[03:54:23]   AI(venv) [chanpred_x4_2] pid=998451
+[03:54:23]   AI(venv) [chanpred_x4_3] pid=998457
+[03:54:23]   AI(venv) [chanpred_x4_4] pid=998464
+[03:54:35]     L1 [F_F_stack_chanpred_x4] run 1/5
+[realL1] saved: /out/realL1_F_F_stack_chanpred_x4_run1_20260605_105721.json
+[03:57:22]     L1 [F_F_stack_chanpred_x4] run 2/5
+[realL1] saved: /out/realL1_F_F_stack_chanpred_x4_run2_20260605_110005.json
+[04:00:06]     L1 [F_F_stack_chanpred_x4] run 3/5
+[realL1] saved: /out/realL1_F_F_stack_chanpred_x4_run3_20260605_110249.json
+[04:02:50]     L1 [F_F_stack_chanpred_x4] run 4/5
+[realL1] saved: /out/realL1_F_F_stack_chanpred_x4_run4_20260605_110533.json
+[04:05:33]     L1 [F_F_stack_chanpred_x4] run 5/5
+[realL1] saved: /out/realL1_F_F_stack_chanpred_x4_run5_20260605_110817.json
+[04:08:20] === F_F 2x resnet ===
+[04:08:20]   AI(venv) [resnet_x2_1] pid=1003167
+[04:08:20]   AI(venv) [resnet_x2_2] pid=1003173
+[04:08:32]     L1 [F_F_stack_resnet_x2] run 1/5
+[realL1] saved: /out/realL1_F_F_stack_resnet_x2_run1_20260605_111004.json
+[04:10:05]     L1 [F_F_stack_resnet_x2] run 2/5
+[realL1] saved: /out/realL1_F_F_stack_resnet_x2_run2_20260605_111135.json
+[04:11:36]     L1 [F_F_stack_resnet_x2] run 3/5
+[realL1] saved: /out/realL1_F_F_stack_resnet_x2_run3_20260605_111305.json
+[04:13:06]     L1 [F_F_stack_resnet_x2] run 4/5
+[realL1] saved: /out/realL1_F_F_stack_resnet_x2_run4_20260605_111435.json
+[04:14:36]     L1 [F_F_stack_resnet_x2] run 5/5
+[realL1] saved: /out/realL1_F_F_stack_resnet_x2_run5_20260605_111606.json
+[04:16:10] === F_G kitchen (chanpred + memcpy + gemm) ===
+[04:16:10]   AI(venv) [kitchen_chanpred] pid=1006659
+[04:16:10]   AI(venv) [kitchen_memcpy] pid=1006665
+[04:16:10]   AI(venv) [kitchen_gemm] pid=1006671
+[04:16:22]     L1 [F_G_kitchen] run 1/5
+[realL1] saved: /out/realL1_F_G_kitchen_run1_20260605_111833.json
+[04:18:35]     L1 [F_G_kitchen] run 2/5
+[realL1] saved: /out/realL1_F_G_kitchen_run2_20260605_112044.json
+[04:20:45]     L1 [F_G_kitchen] run 3/5
+[realL1] saved: /out/realL1_F_G_kitchen_run3_20260605_112247.json
+[04:22:48]     L1 [F_G_kitchen] run 4/5
+[realL1] saved: /out/realL1_F_G_kitchen_run4_20260605_112450.json
+[04:24:51]     L1 [F_G_kitchen] run 5/5
+[realL1] saved: /out/realL1_F_G_kitchen_run5_20260605_112653.json
+[04:26:56] ===== F-equivalent on no-MIG DONE =====
+[04:26:56] JSON captures: 80

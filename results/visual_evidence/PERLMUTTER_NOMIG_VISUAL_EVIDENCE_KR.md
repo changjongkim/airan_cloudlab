@@ -260,6 +260,21 @@ figF14가 10조건 cudaFree avg를 보여준다: compute AI(qwen·chanpred·neur
 
 > 종합: **큐 대기는 convert/copy 경계(§13)에 위치하고, memory 경합일 때만 per-op이 bimodal로 갈라진다(§16.1).** GPU-gap·CUDA-API·per-call 세 레벨이 동일한 메커니즘을 가리킨다.
 
+## 10.8. System-call 레벨 — cudaFree는 ioctl(GPU sync)로 내려간다
+
+마지막으로 `nsys --trace=cuda,osrt`로 host thread가 어떤 **OS syscall**에서 블록하는지 본다(`OSRT_API` 테이블).
+
+| 조건 | regime | ioctl avg (GPU sync) | poll avg (background) |
+|---|---|---|---|
+| alone | default | 205μs | 19,846μs |
+| neuralrx | default | **321μs (1.6x)** | 19,855μs |
+| sat_hbm | default | **559μs (2.7x)** | 19,869μs |
+
+- **`ioctl`**(GPU 드라이버 명령/동기화)이 contention에 따라 205→559μs로 팽창 — **cudaFree(§10.6)가 syscall 레벨에서 ioctl로 내려가는 것**이 확인된다.
+- **`poll`**은 ~19,850μs로 모든 조건 일정 → L1 critical path가 아닌 **백그라운드 폴링 스레드**(20ms 주기)다. 정직하게 분리해 둔다.
+
+**4-레벨 메커니즘 체인이 닫힌다:** `GPU 커널 gap(§10.5) ↔ cudaFree 동기화(§10.6) ↔ convert 경계·bimodal(§10.7) ↔ ioctl GPU-sync syscall(§10.8) ↔ frame latency`. 가장 깨끗한 인과 신호는 CUDA API(cudaFree)이며, GPU·syscall 양끝이 이를 뒷받침한다.
+
 ## 11. 5분 sustained — 저하는 transient warmup이 아니다
 
 ![P5](figures/figF10_p5_sustained.png)

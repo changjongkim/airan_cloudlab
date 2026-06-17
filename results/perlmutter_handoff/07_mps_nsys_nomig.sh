@@ -41,17 +41,17 @@ ai_bg_base(){ local tag=$1 script=$2; shift 2
   echo $! >> "$PIDS"; log "  AI(base) [$tag] pid=$!"; }
 kill_all_ai(){ while read -r p; do [[ -n "$p" ]] && kill -TERM "$p" 2>/dev/null; done < "$PIDS"; : > "$PIDS"; sleep 6; }
 
+source "$HANDOFF/nsight_conditions.sh"
+CONDS="${CONDS:-$CONDS_FULL}"
 trap 'stop_mps; kill_all_ai' EXIT INT TERM
 start_mps
-log "===== MPS+NSYS no-MIG (CELLS=$CELLS ITERS=$ITERS) ====="
-
-log "=== alone ==="; profile_l1_nsys "MPSnsys_alone"
-log "=== chanpred ==="; ai_bg_venv chanpred run_channel_prediction.py; sleep 10; profile_l1_nsys "MPSnsys_chanpred"; kill_all_ai
-log "=== resnet ==="; ai_bg_venv resnet run_resnet_stress.py 64 fp16; sleep 10; profile_l1_nsys "MPSnsys_resnet"; kill_all_ai
-log "=== neuralrx ==="; ai_bg_base neuralrx run_neural_rx_stress.py; sleep "$NEURALRX_WAIT"; profile_l1_nsys "MPSnsys_neuralrx"; kill_all_ai
-log "=== qwen ==="; ai_bg_venv qwen run_qwen_small_stress.py; sleep 15; profile_l1_nsys "MPSnsys_qwen"; kill_all_ai
-log "=== sat_hbm ==="; ai_bg_venv sat_hbm run_hbm_stress.py 16; sleep 10; profile_l1_nsys "MPSnsys_sat_hbm"; kill_all_ai
-log "=== forecaster ==="; ai_bg_venv forecaster run_traffic_forecaster.py 64 384; sleep 10; profile_l1_nsys "MPSnsys_forecaster"; kill_all_ai
-
+log "===== MPS+NSYS no-MIG (CELLS=$CELLS ITERS=$ITERS) conds='$CONDS' ====="
+for c in $CONDS; do
+  log "=== $c ==="
+  launch_condition "$c"
+  s=$(settle_for "$c"); [ "$s" -gt 0 ] && sleep "$s"
+  profile_l1_nsys "MPSnsys_$c"
+  kill_all_ai
+done
 stop_mps; trap - EXIT INT TERM
 log "===== DONE: $(ls "$RESULTS_DIR"/MPSnsys_*.nsys-rep 2>/dev/null|wc -l) nsys-rep ====="

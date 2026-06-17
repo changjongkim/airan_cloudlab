@@ -66,20 +66,19 @@ kill_all_ai() {
     : > "$PIDS"; sleep 4
 }
 
-log "===== Perlmutter no-MIG per-call NSYS ====="
+source "$HANDOFF/nsight_conditions.sh"
+CONDS="${CONDS:-$CONDS_FULL}"
+log "===== Perlmutter no-MIG per-call NSYS conds='$CONDS' ====="
 log "GPU: $(nvidia-smi --query-gpu=name,mig.mode.current --format=csv,noheader | head -1)"
 log "CELLS=$CELLS ITERS=$ITERS | Results: $RESULTS_DIR"
 
-log "=== nsys_alone ==="
-profile_l1_nsys "nsys_alone"
-
-log "=== nsys_neuralrx (critical) ==="
-ai_bg_base neuralrx run_neural_rx_stress.py
-sleep "$NEURALRX_WAIT"; profile_l1_nsys "nsys_neuralrx"; kill_all_ai
-
-log "=== nsys_resnet ==="
-ai_bg_venv resnet run_resnet_stress.py 64 fp16
-sleep 10; profile_l1_nsys "nsys_resnet"; kill_all_ai
+for c in $CONDS; do
+  log "=== $c ==="
+  launch_condition "$c"
+  s=$(settle_for "$c"); [ "$s" -gt 0 ] && sleep "$s"
+  profile_l1_nsys "nsys_$c"
+  kill_all_ai
+done
 
 log "===== per-call NSYS no-MIG DONE ====="
 log "nsys-rep captures: $(ls "$RESULTS_DIR"/nsys_*.nsys-rep 2>/dev/null | wc -l)"

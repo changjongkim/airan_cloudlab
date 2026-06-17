@@ -4,7 +4,7 @@
 #SBATCH --exclusive
 #SBATCH --gpus-per-node=4
 #SBATCH -q regular
-#SBATCH -t 03:00:00
+#SBATCH -t 06:00:00
 #SBATCH -A m1248_g
 #SBATCH -J NCU_nomig
 #SBATCH -o %x_%j.log
@@ -18,7 +18,8 @@
 # our own node, not other users. trap guarantees resume even on failure/timeout.
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff
 
-export CELLS=20 ITERS=3 AI_DUR=1800 NEURALRX_WAIT=75
+export CELLS=4 ITERS=3 AI_DUR=1800 NEURALRX_WAIT=75
+export NCU_CONDS="qwen xapp forecaster resnet_fore 2AI 2sat 3AI 3sat"
 export RESULTS_DIR="/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/perlmutter_handoff/perlmutter_nomig/NCU_nomig"
 
 resume_dcgm() { echo "[ncu] resuming DCGM..."; dcgmi profile --resume 2>&1 | tail -1; }

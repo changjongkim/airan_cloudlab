@@ -43,14 +43,17 @@ ai_bg_base(){ local tag=$1 script=$2; shift 2
   echo $! >> "$PIDS"; log "  AI(base) [$tag] pid=$!"; }
 kill_all_ai(){ while read -r p; do [[ -n "$p" ]] && kill -TERM "$p" 2>/dev/null; done < "$PIDS"; : > "$PIDS"; sleep 6; }
 
+source "$HANDOFF/nsight_conditions.sh"
+NCU_CONDS="${NCU_CONDS:-$CONDS_FULL}"
 trap 'stop_mps; kill_all_ai' EXIT INT TERM
 start_mps
 log "===== MPS+NCU no-MIG CELLS=$CELLS ITERS=$ITERS conds='$NCU_CONDS' ====="
-if want alone;       then log "=== alone ===";       profile_l1_ncu "MPSncu_alone"; fi
-if want neuralrx;    then log "=== neuralrx ===";    ai_bg_base neuralrx run_neural_rx_stress.py; sleep "$NEURALRX_WAIT"; profile_l1_ncu "MPSncu_neuralrx"; kill_all_ai; fi
-if want resnet;      then log "=== resnet ===";      ai_bg_venv resnet run_resnet_stress.py 64 fp16; sleep 10; profile_l1_ncu "MPSncu_resnet"; kill_all_ai; fi
-if want chanpred;    then log "=== chanpred ===";    ai_bg_venv chanpred run_channel_prediction.py; sleep 10; profile_l1_ncu "MPSncu_chanpred"; kill_all_ai; fi
-if want sat_hbm;     then log "=== sat_hbm ===";     ai_bg_venv sat_hbm run_hbm_stress.py 16; sleep 10; profile_l1_ncu "MPSncu_sat_hbm"; kill_all_ai; fi
-if want sat_compute; then log "=== sat_compute ==="; ai_bg_venv sat_compute run_realistic_ai_stress.py matmul 0.8; sleep 10; profile_l1_ncu "MPSncu_sat_compute"; kill_all_ai; fi
+for c in $NCU_CONDS; do
+  log "=== $c ==="
+  launch_condition "$c"
+  s=$(settle_for "$c"); [ "$s" -gt 0 ] && sleep "$s"
+  profile_l1_ncu "MPSncu_$c"
+  kill_all_ai
+done
 stop_mps; trap - EXIT INT TERM
 log "===== DONE: $(ls "$RESULTS_DIR"/MPSncu_*.csv 2>/dev/null|wc -l) CSV ====="

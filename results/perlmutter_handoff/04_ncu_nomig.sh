@@ -71,32 +71,43 @@ kill_all_ai() {
     : > "$PIDS"; sleep 4
 }
 
+# Condition subset (default all). Resume runs pass NCU_CONDS to skip done ones.
+NCU_CONDS="${NCU_CONDS:-alone neuralrx resnet chanpred sat_hbm sat_compute}"
+want(){ [[ " $NCU_CONDS " == *" $1 "* ]]; }
+
 log "===== Perlmutter no-MIG NCU ====="
 log "GPU: $(nvidia-smi --query-gpu=name,mig.mode.current --format=csv,noheader | head -1)"
-log "CELLS=$CELLS ITERS=$ITERS metrics=DRAM/L2/SM | Results: $RESULTS_DIR"
+log "CELLS=$CELLS ITERS=$ITERS conds='$NCU_CONDS' | Results: $RESULTS_DIR"
 
-log "=== NCU_0_alone (baseline DRAM/L2/SM) ==="
-profile_l1_ncu "NCU_0_alone"
-
-log "=== NCU_neuralrx (critical) ==="
-ai_bg_base neuralrx run_neural_rx_stress.py
-sleep "$NEURALRX_WAIT"; profile_l1_ncu "NCU_neuralrx"; kill_all_ai
-
-log "=== NCU_resnet ==="
-ai_bg_venv resnet "" run_resnet_stress.py 64 fp16
-sleep 10; profile_l1_ncu "NCU_resnet"; kill_all_ai
-
-log "=== NCU_chanpred (safe AI control) ==="
-ai_bg_venv chanpred "" run_channel_prediction.py
-sleep 10; profile_l1_ncu "NCU_chanpred"; kill_all_ai
-
-log "=== NCU_sat_hbm ==="
-ai_bg_venv sat_hbm "" run_hbm_stress.py 16
-sleep 10; profile_l1_ncu "NCU_sat_hbm"; kill_all_ai
-
-log "=== NCU_sat_compute ==="
-ai_bg_venv sat_compute "" run_realistic_ai_stress.py matmul 0.8
-sleep 10; profile_l1_ncu "NCU_sat_compute"; kill_all_ai
+if want alone; then
+  log "=== NCU_0_alone (baseline DRAM/L2/SM) ==="
+  profile_l1_ncu "NCU_0_alone"
+fi
+if want neuralrx; then
+  log "=== NCU_neuralrx (critical) ==="
+  ai_bg_base neuralrx run_neural_rx_stress.py
+  sleep "$NEURALRX_WAIT"; profile_l1_ncu "NCU_neuralrx"; kill_all_ai
+fi
+if want resnet; then
+  log "=== NCU_resnet ==="
+  ai_bg_venv resnet "" run_resnet_stress.py 64 fp16
+  sleep 10; profile_l1_ncu "NCU_resnet"; kill_all_ai
+fi
+if want chanpred; then
+  log "=== NCU_chanpred (safe AI control) ==="
+  ai_bg_venv chanpred "" run_channel_prediction.py
+  sleep 10; profile_l1_ncu "NCU_chanpred"; kill_all_ai
+fi
+if want sat_hbm; then
+  log "=== NCU_sat_hbm ==="
+  ai_bg_venv sat_hbm "" run_hbm_stress.py 16
+  sleep 10; profile_l1_ncu "NCU_sat_hbm"; kill_all_ai
+fi
+if want sat_compute; then
+  log "=== NCU_sat_compute ==="
+  ai_bg_venv sat_compute "" run_realistic_ai_stress.py matmul 0.8
+  sleep 10; profile_l1_ncu "NCU_sat_compute"; kill_all_ai
+fi
 
 log "===== NCU no-MIG DONE ====="
 log "CSV outputs: $(ls "$RESULTS_DIR"/NCU_*.csv 2>/dev/null | wc -l)"

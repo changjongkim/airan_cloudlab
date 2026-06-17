@@ -186,7 +186,34 @@ L1 alone vs L1+NeuralRx의 GPU mem-op을 nsys로 분해한 결과, per-op 시간
 | memcpy H2D | 7,982 ns | 8,013 ns | 12,618 (동일) |
 | 총 GPU mem time | 450M ns | 450M ns | 동일 |
 
-L1 frame이 느려지는 시간은 op 자체가 아니라 **커널 사이 gap(큐 대기)**에 있다 — §9(throughput 불변)와 정합한다. (CloudLab MIG coloc §16.1은 per-op memcpy가 4.2→14.3us로 늘었던 것과 대비되며, no-MIG는 gap-dominated. 캡처 윈도우 contention 강도는 보수적으로 해석.)
+L1 frame이 느려지는 시간은 op 자체가 아니라 **커널 사이 gap(큐 대기)**에 있다 — §9(throughput 불변)와 정합한다.
+
+## 10.5. Deep nsys (SQLite) — 큐-gap이 메커니즘이다 (default vs MPS, 14조건)
+
+![deep gap p99](figures/figF12_deep_gap_p99.png)
+
+짝 문서 §12/§16/§17 방식대로 nsys-rep를 SQLite로 변환해, L1 GPU 타임라인의 **커널 사이 idle-gap 분포**(= 큐 대기)와 per-call duration을 14조건 × {default, MPS}로 분석했다. 측정 지표: `gap_p99` = 최악 커널간 대기, `gap_frac` = 타임라인 중 idle 비율.
+
+| 조건 | default gap_p99 | MPS gap_p99 | 해석 |
+|---|---|---|---|
+| alone | 251μs | 251μs | baseline |
+| qwen / xapp | 251 / 478 | 251 / 251 | MPS 회복 |
+| chanpred | 1,427 | 250 | MPS 회복 |
+| forecaster / neuralrx / resnet | 2,416 / 2,410 / 2,462 | 252 / 251 / 250 | **MPS 완전 회복** |
+| 2AI / 3AI / resnet_fore | 4,711 / 4,710 / 4,723 | 744 / 250 / 723 | MPS 회복 |
+| **sat_compute** | 2,439 | **4,174** | MPS 악화 |
+| **sat_hbm** | 2,457 | **23,238** | **MPS 붕괴** |
+| **2sat** | 4,744 | **25,953** | **MPS 붕괴** |
+| **3sat** | 507,332 | 166,817 | 둘 다 재앙 |
+
+**세 단계 메커니즘 (per-op 평균으론 안 보이던 것):**
+1. **default time-slice = 큐 대기가 전부.** per-op memcpy/memset(med ~4.5μs / ~25μs)은 모든 조건에서 불변인데, gap_p99만 alone 251μs → 단일 AI ~2,400μs(10배) → 누적 ~4,700μs → 3sat 507,000μs로 커진다. **L1 커널이 GPU 차례를 ms 단위로 기다린다**(AI가 점유). 짝 문서 §12/§16의 queue-arbitration 메커니즘을 no-MIG에서 재현.
+2. **MPS = compute AI의 gap을 제거 → 회복.** qwen·xapp·chanpred·forecaster·neuralrx·resnet·**3AI** 전부 gap_p99가 ~250μs(baseline)로 복귀. 동시 실행이 gap을 메워 L1이 안 기다린다 → NeuralRx 389→40ms 회복의 직접 증거.
+3. **MPS = memory AI의 gap을 폭발 → 붕괴.** sat_hbm은 단일 gap이 **23ms**, 2sat은 **26ms**까지 치솟고 per-op memcpy도 4.5→6.2μs 팽창. 진짜 동시 실행에서 **HBM hog가 L1을 수십 ms씩 메모리 굶긴다** → sat_hbm 7,000ms 붕괴의 메커니즘.
+
+![deep gap fraction](figures/figF13_deep_gap_fraction.png)
+
+idle-gap 비율도 같은 그림: default는 단일 AI에 86–96%로 포화, MPS는 compute AI를 ~60%(baseline)로 되돌리지만 memory AI는 92–99%로 유지/악화. **판별자는 compute-bound vs memory-bound** — MPS는 연산 경쟁은 동시 실행으로 풀지만, 공유 자원(DRAM 대역폭) 경쟁은 풀지 못한다.
 
 ## 11. 5분 sustained — 저하는 transient warmup이 아니다
 

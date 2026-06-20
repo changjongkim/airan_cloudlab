@@ -185,20 +185,20 @@ SLIDES = [
     },
     {
         "slide_num": 7,
-        "title": "Mechanism Layer 3 — Bimodal Queue Arbitration Signature",
+        "title": "Mechanism Layer 3 — cudaFree Host-Blocking is the Direct Cause",
         "subtitle": "",
         "bullets": [
-            "**Per-Call Duration Splits:** The 60 KB memcpy per-call distribution "
-            "becomes bimodal under co-location, with discrete fast (~4.2 μs) and slow "
-            "(~14.3 μs) modes.",
-            "**Discrete States, Not Gaussian Noise:** The split is not statistical "
-            "variance; it is the signature of binary queue arbitration — empty vs "
-            "occupied.",
-            "**Direct Mechanism Evidence:** Each call is either served immediately or "
-            "waits for the queue, exposing queue arbitration at the per-operation "
-            "level.",
+            "**Host-Side cudaFree Inflates with Contention:** cudaFree average duration "
+            "grows from 246 μs (alone) to 3,752 μs under NeuralRx (15×) and 115,506 μs "
+            "(115 ms) under MPS + sat_hbm (470×).",
+            "**The Same Call Recovers Under MPS:** cudaFree returns to 279 μs under "
+            "MPS + NeuralRx — the host stops blocking only when concurrent execution "
+            "frees the device.",
+            "**Causal Proof via correlationId:** 60–82 % of GPU idle gap time overlaps "
+            "temporally with the host’s cudaFree call, identifying it as the direct "
+            "cause of the GPU stall.",
         ],
-        "figure_main": "fig_slide7_60kb_bimodal_histogram.png",
+        "figure_main": "fig_slide7_cudafree_direct_evidence.png",
         "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
@@ -266,6 +266,27 @@ SLIDES = [
     },
     {
         "slide_num": 11,
+        "title": "Operational Scaling Law — Each AI Adds ~330 ms",
+        "subtitle": "",
+        "bullets": [
+            "**Linear Cost per Co-Located AI:** L1 frame latency follows "
+            "L1 = 37.5 + N_AI × 330.6 ms when AI processes share the same MIG "
+            "partition — every additional tenant adds a fixed ~330 ms.",
+            "**A2 Validates the Slope:** L1 + 2 AI measures 698 ms (n=900, "
+            "std=0.42 ms) — exactly 2× the single-AI co-location (354 ms), confirming "
+            "the linear model rather than a single-step collapse.",
+            "**Multi-Tenant Misplacement Compounds:** Operational mistakes do not "
+            "saturate; each additional misplaced tenant adds another fixed penalty, "
+            "predicting 1,029 ms at 3 AI and 1,360 ms at 4 AI.",
+        ],
+        "figure_main": "fig_slide_n_ai_scaling.png",
+        "figure_aux": "",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
+    },
+    {
+        "slide_num": 12,
         "title": "Cost Decomposition — Two Hardware-Level Costs",
         "subtitle": "",
         "bullets": [
@@ -284,7 +305,7 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 12,
+        "slide_num": 13,
         "title": "Design Rules & Next Steps",
         "subtitle": "",
         "bullets": [
@@ -306,7 +327,7 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 13,
+        "slide_num": 14,
         "title": "Thank You",
         "subtitle": "",
         "bullets": [],

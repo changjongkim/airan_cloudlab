@@ -97,7 +97,7 @@ SLIDES = [
         "figure_main": "fig04_g_coloc_explosion.png",
         "figure_aux": "",
         "table_md": (
-            "| Workload | Cross-part (ms) | Same-part coloc (ms) |\n"
+            "| Workload | Cross-part | Coloc |\n"
             "|---|---|---|\n"
             "| chanpred | 45 | 357 |\n"
             "| NeuralRx | — | 360 |\n"
@@ -276,7 +276,7 @@ SLIDES = [
         "figure_main": "figF8_mps_vs_default_vs_mig.png",
         "figure_aux": "figF9_mps_sat_hbm_bistable.png",
         "table_md": (
-            "| Workload | Default | MPS | MIG cross-part |\n"
+            "| Workload | Default | MPS | MIG cross |\n"
             "|---|---|---|---|\n"
             "| NeuralRx | 389ms | **40ms** | 197ms |\n"
             "| forecaster | 381ms | **42ms** | — |\n"
@@ -708,43 +708,41 @@ def build_content_slide(slide: dict) -> plt.Figure:
 
     # Bullets: top region (subtitle below underline)
     bullet_top = 0.83
-    bullet_bottom = 0.55
+    bullet_bottom = 0.58  # tightened to give figure area more room
     _render_bullets_richtext(fig, slide["bullets"], bullet_top, bullet_bottom)
 
     has_main = bool(slide.get("figure_main"))
     has_aux = bool(slide.get("figure_aux"))
     has_table = bool(slide.get("table_md"))
 
-    # Lower region for figure + table
-    lower_top = 0.50
-    lower_bottom = 0.10
+    # Lower region for figure + table (enlarged 20%)
+    lower_top = 0.54
+    lower_bottom = 0.09
     lower_h = lower_top - lower_bottom
 
     if has_main and has_aux and has_table:
-        # main | aux on left half, table on right
-        # Actually: per spec — main + aux side-by-side, table beside or below.
-        # Layout: left 60% figures (main, aux), right 36% table
-        fig_w = 0.55
+        # main + aux on left, narrower table on right — give figures more room
+        fig_w = 0.64
         each_w = fig_w / 2
         _place_image(fig, slide["figure_main"],
-                     (0.06, lower_bottom, each_w - 0.01, lower_h))
+                     (0.04, lower_bottom, each_w - 0.01, lower_h))
         _place_image(fig, slide["figure_aux"],
-                     (0.06 + each_w, lower_bottom, each_w - 0.01, lower_h))
+                     (0.04 + each_w, lower_bottom, each_w - 0.01, lower_h))
         _render_table(fig, slide["table_md"],
-                      (0.66, lower_bottom + 0.05, 0.30, lower_h - 0.10))
+                      (0.72, lower_bottom + 0.04, 0.25, lower_h - 0.08))
     elif has_main and has_aux:
         # main + aux side by side, full width
-        each_w = 0.43
+        each_w = 0.44
         _place_image(fig, slide["figure_main"],
-                     (0.06, lower_bottom, each_w, lower_h))
+                     (0.04, lower_bottom, each_w, lower_h))
         _place_image(fig, slide["figure_aux"],
-                     (0.06 + each_w + 0.02, lower_bottom, each_w, lower_h))
+                     (0.04 + each_w + 0.02, lower_bottom, each_w, lower_h))
     elif has_main and has_table:
-        # figure on left, table on right
+        # figure on left, table on right — widen figure for wide-aspect images
         _place_image(fig, slide["figure_main"],
-                     (0.06, lower_bottom, 0.55, lower_h))
+                     (0.04, lower_bottom, 0.62, lower_h))
         _render_table(fig, slide["table_md"],
-                      (0.66, lower_bottom + 0.04, 0.30, lower_h - 0.08))
+                      (0.69, lower_bottom + 0.04, 0.28, lower_h - 0.08))
     elif has_main:
         # figure centered, wide
         _place_image(fig, slide["figure_main"],

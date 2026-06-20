@@ -37,45 +37,40 @@ OUT.mkdir(parents=True, exist_ok=True)
 # Figure A — Slide 7 replacement: cudaFree host-blocking direct evidence
 # ----------------------------------------------------------------------------
 def fig_cudafree_direct_evidence():
-    # Data points from PART F §10.6 (Perlmutter SQLite analysis)
+    # Default-mode only (no MPS — MPS is introduced later in the deck)
     conds = [
-        ("alone\n(baseline)",            246.0,   "#10b981"),
-        ("L1 + NeuralRx\n(default)",     3752.0,  "#dc2626"),
-        ("L1 + NeuralRx\n(MPS recover)", 279.0,   "#10b981"),
-        ("L1 + sat_hbm\n(MPS catastrophic)", 115506.0, "#7f1d1d"),
+        ("alone\n(baseline)",          246.0,   "#10b981"),
+        ("L1 + NeuralRx\n(default)",   3752.0,  "#dc2626"),
     ]
 
     labels = [c[0] for c in conds]
     vals = [c[1] for c in conds]
     colors = [c[2] for c in conds]
 
-    fig, ax = plt.subplots(figsize=(11.5, 5.6))
+    fig, ax = plt.subplots(figsize=(10.5, 5.6))
     x = np.arange(len(conds))
-    ax.bar(x, vals, color=colors, edgecolor="black", lw=0.8, width=0.62)
+    ax.bar(x, vals, color=colors, edgecolor="black", lw=0.8, width=0.5)
     ax.set_yscale("log")
-    ax.set_ylim(100, 1_500_000)  # extra headroom so labels stay clear of title
+    ax.set_ylim(100, 50_000)
     ax.set_ylabel("cudaFree avg duration (μs, log scale)", fontsize=12)
-    ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=11)
-    ax.set_title("cudaFree host-blocking grows with contention "
-                 "— the host-side cause of GPU \"gap\"", fontsize=13, pad=14)
+    ax.set_xticks(x); ax.set_xticklabels(labels, fontsize=12)
+    ax.set_title("cudaFree host-blocking grows under contention "
+                 "— host-side cause of the GPU \"gap\"", fontsize=13, pad=14)
     ax.grid(True, axis="y", alpha=0.3)
 
-    # Value labels (inside the headroom)
+    # Value labels
     for i, v in enumerate(vals):
-        if v >= 10000:
-            text = f"{v/1000:.1f} ms"
-        elif v >= 1000:
+        if v >= 1000:
             text = f"{int(v):,} μs"
         else:
             text = f"{int(v)} μs"
-        ax.text(i, v * 1.45, text, ha="center", fontsize=12,
+        ax.text(i, v * 1.35, text, ha="center", fontsize=13,
                 fontweight="bold", color=colors[i])
 
-    # Fold-changes vs alone (placed clearly above the value labels)
-    for i in [1, 3]:
-        fold = vals[i] / vals[0]
-        ax.text(i, vals[i] * 4.2, f"{fold:.0f}× alone", ha="center",
-                fontsize=10, color="black", fontweight="bold")
+    # Fold-change vs alone
+    fold = vals[1] / vals[0]
+    ax.text(1, vals[1] * 3.5, f"{fold:.0f}× alone", ha="center",
+            fontsize=12, color="black", fontweight="bold")
 
     # Annotation: correlationId causal proof (bottom-left so it doesn't fight the title)
     ax.text(

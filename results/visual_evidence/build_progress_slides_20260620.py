@@ -220,12 +220,14 @@ SLIDES = [
         "title": "Mechanism — cudaFree Host-Blocking is the Direct Cause",
         "subtitle": "",
         "bullets": [
-            "**cudaFree inflates with contention:** 246 µs alone → 3,752 µs "
-            "(NeuralRx, 15×) → 115,506 µs (sat_hbm MPS, 470×).",
-            "**Same call recovers under MPS + NeuralRx:** 279 µs. Host blocking "
-            "resolves when the device is freed.",
-            "**Causal proof via correlationId:** 60–82% of GPU idle gap time "
+            "**cudaFree inflates with contention:** alone 246 µs → L1 + "
+            "NeuralRx (default) 3,752 µs — a 15× host-side blow-up on the same "
+            "call, with no change in the cuPHY workload itself.",
+            "**Causal proof via correlationId:** 60–82% of the GPU idle gap "
             "aligns temporally with cudaFree blocking on the host.",
+            "**Conclusion:** the host waits on cudaFree, and the GPU "
+            "consequently sits idle — this is the mechanism behind the "
+            "kernel-invariant, gap-dominated decomposition we just saw in §17.",
         ],
         "figure_main": "fig_slide7_cudafree_direct_evidence.png",
         "figure_aux": "",
@@ -294,19 +296,21 @@ SLIDES = [
     },
     {
         "slide_num": 13,
-        "title": "Cross-Platform Validation on Perlmutter",
+        "title": "Cross-Platform Validation on Perlmutter (Default Mode)",
         "subtitle": "",
         "bullets": [
             "**Bimodal signature reproduced:** Perlmutter no-MIG (different "
-            "cluster, different driver) shows the same 60 KB memcpy bimodal split "
-            "(4.2 ↔ 16.8 µs).",
-            "**cudaFree scaling matches:** cudaFree average grows 15× under "
-            "NeuralRx default and 469× under MPS + sat_hbm, mirroring CloudLab.",
-            "**Conclusion:** The mechanism is NVIDIA-stack-wide, not specific to "
-            "MIG or to the CloudLab driver.",
+            "cluster, different driver) shows the same 60 KB memcpy bimodal "
+            "split (4.2 ↔ 16.8 µs) under L1 + AI co-tenancy.",
+            "**cudaFree growth matches CloudLab:** under NeuralRx default the "
+            "Perlmutter cudaFree average grows 15× — identical fold-change to "
+            "the CloudLab MIG measurement.",
+            "**Conclusion:** the queue + cudaFree mechanism is NVIDIA-stack-wide, "
+            "not specific to MIG or the CloudLab driver — same default-mode "
+            "signature on independent hardware.",
         ],
-        "figure_main": "figF14_cudafree_host_blocking.png",
-        "figure_aux": "figF15_memcpy_bimodal.png",
+        "figure_main": "figF15_memcpy_bimodal.png",
+        "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
         "transition": "",

@@ -52,7 +52,7 @@ SLIDES = [
     {
         "slide_num": 0,
         "title": "Progress",
-        "subtitle": "AI-RAN GPU Isolation — Mechanism Deep-Dive",
+        "subtitle": "AI-RAN GPU Isolation — NSYS Time Decomposition Deep-Dive",
         "bullets": [
             "Changjong Kim",
             "Bigdata and HPC Lab",
@@ -70,12 +70,13 @@ SLIDES = [
         "title": "Today",
         "subtitle": "",
         "bullets": [
-            "**Continuation of Exp1–6 (5/29):** MIG single-tenant overhead measured "
-            "at +13–32 ms.",
-            "**Goal:** Identify the hardware resource responsible for the L1 latency "
-            "cost under AI co-tenancy.",
-            "**Setup:** n=500–1000 per condition (25× the prior n=20), CloudLab "
-            "d8545 (driver 550) + Perlmutter cross-validation.",
+            "**Continuation of Exp1–6 (5/29):** MIG single-tenant overhead "
+            "+13–32 ms measured.",
+            "**Today's approach:** Profile L1 + AI co-tenancy with NSYS "
+            "time-decomposition analysis.",
+            "**Flow:** cuPHY L1 background → NSYS decomposition (GPU/host/pipeline) "
+            "→ identify the queue → verify with more experiments → cross-validate "
+            "on Perlmutter + MPS.",
         ],
         "figure_main": "fig01_partition_baseline.png",
         "figure_aux": "",
@@ -85,18 +86,19 @@ SLIDES = [
     },
     {
         "slide_num": 2,
-        "title": "Placement Determines an 8× Collapse",
+        "title": "cuPHY L1 — What We Measure",
         "subtitle": "",
         "bullets": [
-            "**Cross-Partition is Stable:** Five distinct AI workloads (chanpred, "
-            "NeuralRx, xApp, ResNet, forecaster) all keep L1 p99 at ~45 ms when "
-            "placed on a separate MIG partition.",
-            "**Same-Partition Collapses 8×:** Identical workloads co-located in the "
-            "same partition as L1 jump to ~358 ms.",
-            "**The Cost Driver is Placement, Not Workload:** The contrast holds "
-            "across all five workloads. The cost is set by where AI is placed.",
+            "**Pipeline:** PUSCH RX = pre-ChEst → ChEst dispatch → Noise/Intf "
+            "estimation → MMSE equalizer → LDPC decode, with `convert_kernel` "
+            "between stages.",
+            "**Per-frame setup:** 20 cells serial, MCS=2, 273 PRB, 4×4 antennas. "
+            "n=500–1000 per condition.",
+            "**Decomposition target:** L1 frame latency p99 + NSYS GPU/host trace "
+            "broken into kernel / memcpy / memset / sync / idle gap and CUDA "
+            "runtime API per call.",
         ],
-        "figure_main": "fig_slide_8x_contrast.png",
+        "figure_main": "",
         "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
@@ -104,19 +106,17 @@ SLIDES = [
     },
     {
         "slide_num": 3,
-        "title": "NeuralRx is Uniquely Dangerous Even Cross-Partition",
+        "title": "NSYS §17.1 — GPU Activity Decomposition",
         "subtitle": "",
         "bullets": [
-            "**PHY-AI Breaks Cross-Partition Isolation:** NeuralRx in a separate "
-            "partition inflates L1 p99 by +376% (41 → 197 ms). ChanPred, xApp, and "
-            "Qwen on the same setup only inflate L1 by +60–72%.",
-            "**Why NeuralRx Specifically:** NeuralRx (TensorRT inline NN) shares the "
-            "cuPHY-style copy/convert traffic pattern with L1, producing contention "
-            "even across MIG partition boundaries.",
-            "**Implication:** The MIG cross-partition isolation that holds for "
-            "generic AI does not hold for PHY-AI co-tenants.",
+            "**Wall-clock varies 1.4×:** 7g 2,027 ms, 3g alone 1,831 ms, 2g alone "
+            "2,518 ms — same cuPHY work, different total time.",
+            "**GPU kernel time is invariant:** ~400–500 ms in every condition. AI "
+            "co-location does not slow L1 compute itself.",
+            "**Idle gap dominates 40–60% of wall-clock:** The cost is in waiting "
+            "between operations, not in computing.",
         ],
-        "figure_main": "fig02_phase4_neuralrx_risk.png",
+        "figure_main": "fig_supp_14_gpu_activity_decomposition.png",
         "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
@@ -124,18 +124,18 @@ SLIDES = [
     },
     {
         "slide_num": 4,
-        "title": "Larger Partition = MORE Catastrophic",
+        "title": "NSYS §17.2 — cuPHY Pipeline Stage Breakdown",
         "subtitle": "",
         "bullets": [
-            "**Counter-Intuitive Outcome:** 4g co-location (371 ms) is worse than "
-            "2g co-location (369 ms). Adding SMs and HBM does not reduce the "
-            "collapse.",
-            "**Resource Allocation is Not the Lever:** Partition sizing controls "
-            "the structural HBM share but not the contention path.",
-            "**Bottleneck is Chip-Global:** The contended resource lies outside the "
-            "per-partition abstraction MIG provides.",
+            "**Per-stage time is small:** ChEst, Noise/Intf, Equalizer, LDPC all "
+            "5–10 ms each.",
+            "**convert_kernel dominates 357 ms:** A boundary op between pipeline "
+            "stages, called ~4× per cell iteration (2,576 calls / 640 iter).",
+            "**Stage timing is partition/AI-invariant:** L1 kernel work is "
+            "isolated as expected; the cost lives at the stage boundary, not in "
+            "the stages.",
         ],
-        "figure_main": "fig_supp_03_g_coloc_partition_paradox.png",
+        "figure_main": "fig_supp_15_pipeline_stages.png",
         "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
@@ -143,19 +143,18 @@ SLIDES = [
     },
     {
         "slide_num": 5,
-        "title": "Mechanism — Gaps Grow at Memory-Op Boundaries with Same Op Count",
+        "title": "NSYS §17.3 — Host CPU Runtime API",
         "subtitle": "",
         "bullets": [
-            "**Kernel Duration Unchanged:** Per-kernel execution time is identical "
-            "under alone and co-location; only inter-kernel gaps grow.",
-            "**Gaps Are Not Idle:** Gaps coincide with memcpy and memset boundaries "
-            "— filled with memory ops, not idle time (confirmed across 30 NSYS "
-            "captures).",
-            "**Op Count is Invariant, Duration Inflates:** memcpy and memset call "
-            "counts are identical (5,778 each); memcpy average duration rises from "
-            "4.2 µs to 9.8 µs (+133%). Same work, longer wait per operation.",
+            "**cudaFree is the largest host cost: 598 ms (1st).** cuPHY allocates "
+            "per-frame and calls cudaFree ~1,983 times per measurement.",
+            "**cuLaunchKernel is invariant ~80 ms:** Launch queue is not contended; "
+            "the host-side overhead is in memory management, not in kernel launch.",
+            "**Small partition compounds the cost:** cudaFree on 2g = 1,380 ms vs "
+            "7g = 880 ms (1.6×). Driver's page-table management scales with "
+            "partition size.",
         ],
-        "figure_main": "fig12_nsys_kernel_vs_activity_gap.png",
+        "figure_main": "fig_supp_16_runtime_api.png",
         "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
@@ -163,15 +162,34 @@ SLIDES = [
     },
     {
         "slide_num": 6,
+        "title": "NSYS §17.4 — Wall-Clock Normalized Decomposition",
+        "subtitle": "",
+        "bullets": [
+            "**GPU kernel: ~20% in every condition.** L1 compute is a small slice "
+            "of wall-clock; the rest is overhead.",
+            "**memset grows with smaller partition:** 7g 10% → 3g 19% → 2g 36%. "
+            "Structural HBM bandwidth share scaling, visible as memset time.",
+            "**idle gap shrinks with smaller partition (63% → 42%) but wall-clock "
+            "still grows:** Memset displaces idle as the bottleneck, so smaller "
+            "partition still loses on total latency.",
+        ],
+        "figure_main": "fig_supp_17_normalized_wallclock.png",
+        "figure_aux": "",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
+    },
+    {
+        "slide_num": 7,
         "title": "Mechanism — Arithmetic Proves Queue Wait, Not Throughput",
         "subtitle": "",
         "bullets": [
-            "**Actual Transfer is Negligible:** 60 KB / 640 GB/s = 0.09 µs. "
+            "**Actual transfer is negligible:** 60 KB / 640 GB/s = 0.09 µs. "
             "Bandwidth saturation cannot account for the inflation.",
-            "**Baseline Decomposition:** 4.2 µs alone = launch + runtime overhead; "
-            "transfer contributes essentially nothing.",
-            "**Contended Decomposition:** 14.3 µs = 4.2 µs baseline + ~10 µs queue "
-            "wait. The slow mode is queue wait by construction.",
+            "**Baseline:** 4.2 µs alone = launch + runtime overhead; transfer "
+            "contributes essentially nothing.",
+            "**Contended:** 14.3 µs = 4.2 µs baseline + ~10 µs queue wait. The "
+            "slow mode is queue wait by construction.",
         ],
         "figure_main": "fig_supp_12_time_decomposition.png",
         "figure_aux": "",
@@ -180,74 +198,91 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 7,
-        "title": "Mechanism — Queue at Chip-Wide PCIe/DMA + cudaFree Manifestation",
-        "subtitle": "",
-        "bullets": [
-            "**Queue Location:** memcpy direction breakdown is 89.8% H2D, 9.9% D2H, "
-            "0.12% D2D. D2D ≈ 0 rules out the HBM controller; the queue is at the "
-            "chip-wide PCIe/DMA copy engine.",
-            "**Host-Side Manifestation:** cudaFree average grows 246 µs (alone) → "
-            "3,752 µs (NeuralRx, 15×) → 115,506 µs (sat_hbm MPS, 470×). The same "
-            "call recovers to 279 µs under MPS + NeuralRx.",
-            "**Causal Proof via correlationId:** 60–82% of GPU idle gap time aligns "
-            "temporally with cudaFree blocking — the host-side block is the direct "
-            "cause of the GPU-side gap.",
-        ],
-        "figure_main": "fig_slide7_cudafree_direct_evidence.png",
-        "figure_aux": "fig_slide8_memcpy_direction_breakdown.png",
-        "table_md": "",
-        "footer_ref": "",
-        "transition": "",
-    },
-    {
         "slide_num": 8,
-        "title": "Cross-Platform Mechanism Validation",
+        "title": "Mechanism — Queue Located at Chip-Wide PCIe/DMA Copy Engine",
         "subtitle": "",
         "bullets": [
-            "**Bimodal Signature Reproduced:** Perlmutter no-MIG (different cluster, "
-            "different driver) shows the same 60 KB memcpy bimodal split "
-            "(4.2 ↔ 16.8 µs).",
-            "**cudaFree Scaling Matches:** cudaFree average grows 15× under NeuralRx "
-            "default and 469× under MPS + sat_hbm, mirroring CloudLab.",
-            "**Conclusion:** The mechanism is NVIDIA-stack-wide. It is not specific "
-            "to MIG or to the CloudLab driver.",
+            "**Direction breakdown:** 89.8% H2D, 9.9% D2H, 0.12% D2D across all "
+            "measured memcpy calls.",
+            "**D2D ≈ 0 rules out the HBM controller:** Which would carry D2D "
+            "traffic.",
+            "**Single shared resource:** The PCIe/DMA copy engine is one physical "
+            "unit serving the entire chip; partitioning cannot isolate it.",
         ],
-        "figure_main": "figF14_cudafree_host_blocking.png",
-        "figure_aux": "figF15_memcpy_bimodal.png",
+        "figure_main": "fig_slide8_memcpy_direction_breakdown.png",
+        "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
         "transition": "",
     },
     {
         "slide_num": 9,
-        "title": "MPS Recovers Compute AI, Catastrophic for Memory AI",
+        "title": "Mechanism — cudaFree Host-Blocking is the Direct Cause",
         "subtitle": "",
         "bullets": [
-            "**Compute AI Recovers:** NeuralRx 389 → 40 ms under MPS (below MIG "
-            "cross-partition 197 ms); forecaster 381 → 42 ms; Qwen 185 → 43 ms.",
-            "**Memory AI Becomes Worse:** sat_hbm 426 → 6,985 ms under MPS "
-            "(bistable across runs).",
-            "**Same Mechanism, Different Trigger:** MPS routes through the same "
-            "cudaFree path; memory-bound workloads starve the device and re-engage "
-            "the failure mode.",
+            "**cudaFree inflates with contention:** 246 µs alone → 3,752 µs "
+            "(NeuralRx, 15×) → 115,506 µs (sat_hbm MPS, 470×).",
+            "**Same call recovers under MPS + NeuralRx:** 279 µs. Host blocking "
+            "resolves when the device is freed.",
+            "**Causal proof via correlationId:** 60–82% of GPU idle gap time "
+            "aligns temporally with cudaFree blocking on the host.",
         ],
-        "figure_main": "figF8_mps_vs_default_vs_mig.png",
-        "figure_aux": "figF9_mps_sat_hbm_bistable.png",
+        "figure_main": "fig_slide7_cudafree_direct_evidence.png",
+        "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
         "transition": "",
     },
     {
         "slide_num": 10,
-        "title": "Operational Scaling Law — Each AI Adds ~330 ms",
+        "title": "Verification 1 — Placement Determines an 8× Collapse",
         "subtitle": "",
         "bullets": [
-            "**Linear Cost Model:** L1 = 37.5 + N_AI × 330.6 ms when AI processes "
+            "**Cross-partition is stable:** Five distinct AI workloads (chanpred, "
+            "NeuralRx, xApp, ResNet, forecaster) all keep L1 p99 at ~45 ms on a "
+            "separate MIG partition.",
+            "**Same-partition collapses 8×:** Identical workloads co-located in "
+            "the same partition jump to ~358 ms.",
+            "**Confirms the queue hypothesis:** The contended resource is "
+            "placement-sensitive but workload-invariant, as predicted by a single "
+            "chip-wide queue.",
+        ],
+        "figure_main": "fig_slide_8x_contrast.png",
+        "figure_aux": "",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
+    },
+    {
+        "slide_num": 11,
+        "title": "Verification 2 — NeuralRx PHY-AI Uniqueness",
+        "subtitle": "",
+        "bullets": [
+            "**PHY-AI breaks cross-partition isolation:** NeuralRx in a separate "
+            "partition still inflates L1 p99 by +376% (41 → 197 ms); ChanPred, "
+            "xApp, Qwen on the same setup only inflate L1 by +60–72%.",
+            "**Why NeuralRx specifically:** NeuralRx (TensorRT inline NN) shares "
+            "the cuPHY-style copy/convert traffic pattern with L1, producing "
+            "contention even across MIG partition boundaries.",
+            "**Implication:** Even cross-partition placement does not isolate "
+            "L1 from PHY-AI co-tenants.",
+        ],
+        "figure_main": "fig02_phase4_neuralrx_risk.png",
+        "figure_aux": "",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
+    },
+    {
+        "slide_num": 12,
+        "title": "Verification 3 — N-AI Operational Scaling Law",
+        "subtitle": "",
+        "bullets": [
+            "**Linear cost model:** L1 = 37.5 + N_AI × 330.6 ms when AI processes "
             "share the same MIG partition.",
-            "**A2 Validates Slope:** L1 + 2 AI measures 698 ms (n=900, std=0.42 ms) "
-            "— exactly 2× the single-AI co-location (354 ms).",
-            "**Multi-Tenant Mistakes Compound:** Predicted 1,029 ms at 3 AI and "
+            "**A2 validates the slope:** L1 + 2 AI measures 698 ms (n=900, "
+            "std=0.42 ms) — exactly 2× the single-AI co-location (354 ms).",
+            "**Multi-tenant mistakes compound:** Predicted 1,029 ms at 3 AI and "
             "1,360 ms at 4 AI. Operational error scales linearly, not as a single "
             "step.",
         ],
@@ -258,36 +293,56 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 11,
-        "title": "Cost Decomposition — Two Hardware-Level Costs",
+        "slide_num": 13,
+        "title": "Cross-Platform Validation on Perlmutter",
         "subtitle": "",
         "bullets": [
-            "**Structural Cost (memset):** Tied to partition HBM bandwidth share "
-            "(2/7, 3/7, 4/7); selectable through partition sizing.",
-            "**Contention Cost (memcpy):** Tied to the chip-wide PCIe/DMA copy "
-            "engine; not isolable by any partition choice.",
-            "**Unified Across Three Platforms:** MIG, no-MIG, and MPS each avoid "
-            "one cost while remaining exposed to the other.",
+            "**Bimodal signature reproduced:** Perlmutter no-MIG (different "
+            "cluster, different driver) shows the same 60 KB memcpy bimodal split "
+            "(4.2 ↔ 16.8 µs).",
+            "**cudaFree scaling matches:** cudaFree average grows 15× under "
+            "NeuralRx default and 469× under MPS + sat_hbm, mirroring CloudLab.",
+            "**Conclusion:** The mechanism is NVIDIA-stack-wide, not specific to "
+            "MIG or to the CloudLab driver.",
         ],
-        "figure_main": "fig08_tradeoff_summary.png",
-        "figure_aux": "",
+        "figure_main": "figF14_cudafree_host_blocking.png",
+        "figure_aux": "figF15_memcpy_bimodal.png",
         "table_md": "",
         "footer_ref": "",
         "transition": "",
     },
     {
-        "slide_num": 12,
+        "slide_num": 14,
+        "title": "MPS Recovers Compute AI, Catastrophic for Memory AI",
+        "subtitle": "",
+        "bullets": [
+            "**Compute AI recovers:** NeuralRx 389 → 40 ms under MPS (below MIG "
+            "cross-partition 197 ms); forecaster 381 → 42 ms; Qwen 185 → 43 ms.",
+            "**Memory AI becomes worse:** sat_hbm 426 → 6,985 ms under MPS "
+            "(bistable across runs).",
+            "**Same mechanism, different trigger:** MPS routes through the same "
+            "cudaFree path; memory-bound workloads starve the device and "
+            "re-engage the failure mode.",
+        ],
+        "figure_main": "figF8_mps_vs_default_vs_mig.png",
+        "figure_aux": "figF9_mps_sat_hbm_bistable.png",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
+    },
+    {
+        "slide_num": 15,
         "title": "Design Rules",
         "subtitle": "",
         "bullets": [
-            "**Placement Enforcement is Mandatory:** L1 and AI must reside in "
+            "**Placement enforcement is mandatory:** L1 and AI must reside in "
             "different MIG partitions; one misplacement produces the full 8× "
             "collapse.",
-            "**Partition Sizing Serves Only L1 Budget:** Sizing has no mitigating "
+            "**Partition sizing serves only L1 budget:** Sizing has no mitigating "
             "effect under co-location; choose for L1 SM/HBM headroom only.",
-            "**AI Workload Classification is Required:** Memory-bound AI cannot be "
-            "safely co-located even under MPS.",
-            "**MIG ≠ Chip-Wide Isolation:** MIG isolates per-partition SM/HBM but "
+            "**AI workload classification is required:** Memory-bound AI cannot "
+            "be safely co-located even under MPS.",
+            "**MIG ≠ chip-wide isolation:** MIG isolates per-partition SM/HBM but "
             "not the chip-global PCIe/DMA copy engine.",
         ],
         "figure_main": "",
@@ -297,7 +352,7 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 13,
+        "slide_num": 16,
         "title": "Thank You",
         "subtitle": "",
         "bullets": [],

@@ -165,7 +165,7 @@ def fig_supp_14_activity_decomposition():
     ax.set_xticks(x); ax.set_xticklabels([d[0] for d in data], rotation=25, ha='right')
     ax.set_ylabel("Time (ms)")
     ax.set_title("Supp 14 — GPU Activity Time Decomposition\n"
-                 "각 condition에서 GPU가 무엇으로 시간을 보냈는가 (kernel / memcpy / memset / sync / idle)")
+                 "How GPU spends time per condition (kernel / memcpy / memset / sync / idle)")
     ax.legend(loc='upper left')
     for i, (lbl, b) in enumerate(data):
         ax.text(i, b["wall_ms"] + 30, f"{b['wall_ms']:.0f}ms", ha='center', fontsize=9, fontweight='bold')
@@ -197,8 +197,8 @@ def fig_supp_15_pipeline_stages():
         bottom += vals
     ax.set_xticks(x); ax.set_xticklabels([r[0] for r in rows], rotation=25, ha='right')
     ax.set_ylabel("Kernel time (ms)")
-    ax.set_title("Supp 15 — cuPHY pipeline 별 kernel 시간 분해\n"
-                 "PUSCH RX의 어느 stage가 partition/AI에 의해 늘어나는가")
+    ax.set_title("Supp 15 — cuPHY pipeline stage-level kernel time decomposition\n"
+                 "Which PUSCH RX stage grows under partition/AI variation")
     ax.legend(loc='upper left', ncol=2, fontsize=9)
     for i, (lbl, s) in enumerate(rows):
         total = sum(s.values())
@@ -253,7 +253,7 @@ def fig_supp_16_runtime_api():
     ax.set_xticks(x); ax.set_xticklabels([r[0] for r in rows], rotation=25, ha='right')
     ax.set_ylabel("Runtime API total time (ms)")
     ax.set_title("Supp 16 — CUDA Runtime API host-side time decomposition\n"
-                 "Host CPU가 CUDA driver call에 쓴 시간")
+                 "Time host CPU spent in CUDA driver calls per condition")
     ax.legend(loc='upper right', ncol=2, fontsize=8)
     fig.tight_layout()
     fig.savefig(OUT / "fig_supp_16_runtime_api.png")
@@ -285,8 +285,9 @@ def fig_supp_17_normalized_wallclock():
     ax.set_xticks(x); ax.set_xticklabels([d[0] for d in data], rotation=25, ha='right')
     ax.set_ylabel("% of wall-clock")
     ax.set_ylim(0, 110)
-    ax.set_title("Supp 17 — Wall-clock 정규화 분해: 각 condition에서 GPU 시간 비율\n"
-                 "동일한 cuPHY L1 work인데 시간 비율이 어떻게 다른지 (작은 partition이 idle 비율 증가)")
+    ax.set_title("Supp 17 — Wall-clock normalized decomposition: GPU time ratio per condition\n"
+                 "Same cuPHY L1 work, different time ratios "
+                 "(smaller partition → larger memset fraction)")
     ax.legend(loc='upper right')
     fig.tight_layout()
     fig.savefig(OUT / "fig_supp_17_normalized_wallclock.png")

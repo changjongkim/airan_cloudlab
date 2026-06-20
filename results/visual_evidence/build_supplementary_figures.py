@@ -130,7 +130,7 @@ def fig_supp_02_phase4_phy_ai_compare():
         m = np.mean([r["p99"] for r in vs])
         pct = (m - base_mean) / base_mean * 100
         ax.text(i, m + 5, f"{m:.1f}\n({pct:+.0f}%)", ha='center', fontsize=10, fontweight='bold')
-    ax.set_title("Supp 02 — Phase4 PHY-AI 비교: NeuralRx (+376%) >> ChanPred / xApp (n=20 each)")
+    ax.set_title("Supp 02 — Phase4 PHY-AI comparison: NeuralRx (+376%) >> ChanPred / xApp (n=20 each)")
     ax.legend()
     fig.savefig(OUT / "fig_supp_02_phase4_phy_ai_compare.png")
     plt.close(fig)

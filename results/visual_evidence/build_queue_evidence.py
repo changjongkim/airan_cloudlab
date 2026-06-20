@@ -118,10 +118,13 @@ def fig_supp_12_time_decomposition():
     ax.set_yticks(y); ax.set_yticklabels([c[0] for c in conditions], fontsize=10)
     ax.set_xlabel("Per-call duration (us)")
     ax.set_title("Supp 12 — Per-call duration decomposition (60KB memcpy on 3g L1)\n"
-                 "실제 transfer 시간은 0.09us 무시 가능. 늘어난 10us는 전부 queue wait → throughput 문제 아님")
+                 "actual transfer is 0.09us (negligible); the extra ~10us is entirely queue wait → not a throughput issue")
     ax.legend(loc='lower right')
-    ax.text(0.5, 0.95, "(*) 만약 bandwidth contention이라면 transfer 시간이 늘어야 함. 그런데 transfer 시간은 0.09us → 무시 가능.\n"
-                       "    실제 늘어난 부분은 launch와 transfer 사이의 wait → 단일 memory controller arbitration queue에서 줄서기.",
+    ax.text(0.5, 0.95,
+            "(*) If this were bandwidth contention, transfer time would grow. "
+            "It does not (0.09us, negligible).\n"
+            "    The added time sits between launch and transfer → host waits in "
+            "a single chip-wide arbitration queue.",
             transform=ax.transAxes, va='top', ha='center', fontsize=9,
             bbox=dict(boxstyle='round', facecolor='#FFF9C4', alpha=0.9))
     fig.tight_layout()

@@ -174,20 +174,24 @@ def fig_supp_03_g_coloc_partition_paradox():
     for i, (l, p, s) in enumerate(zip([l for l, _, _ in rows], p99s, sds)):
         ax.text(i, p + s + 8, f"{p:.0f}ms", ha='center', fontsize=10, fontweight='bold')
 
-    # Annotation: 4g paradox
+    # Annotation: 4g paradox (positioned below title, above bars)
     if len(rows) >= 4:
         x3 = next(i for i, (l, _, _) in enumerate(rows) if l == "3g + NRx coloc")
         x4 = next(i for i, (l, _, _) in enumerate(rows) if l == "4g + NRx coloc")
         delta = p99s[x4] - p99s[x3]
         midx = (x3 + x4) / 2
-        ax.annotate(f"4g coloc > 3g coloc\n+{delta:.0f}ms (counterintuitive)",
-                    xy=(midx, max(p99s[x3], p99s[x4])),
-                    xytext=(midx, max(p99s) * 1.15),
-                    ha='center', fontsize=10, color='#C0392B',
-                    arrowprops=dict(arrowstyle="->", color='#C0392B'))
-    ax.set_title("Supp 03 — Coloc partition size paradox: 큰 partition일수록 더 catastrophic\n"
-                 "(가설: NeuralRx가 큰 partition에서 더 많은 SM 점유 → L1과 contention 증폭)")
-    fig.savefig(OUT / "fig_supp_03_g_coloc_partition_paradox.png")
+        ax.annotate(f"4g coloc > 3g coloc by +{delta:.0f}ms (counterintuitive)",
+                    xy=(x4, p99s[x4]),
+                    xytext=(midx + 0.5, max(p99s) * 1.02),
+                    ha='center', fontsize=10, color='#C0392B', fontweight='bold',
+                    arrowprops=dict(arrowstyle="->", color='#C0392B', lw=1.2))
+    ax.set_title("Supp 03 — Coloc partition size paradox: larger partition is MORE catastrophic\n"
+                 "(hypothesis: NeuralRx in larger partition occupies more SMs → amplifies contention with L1)",
+                 fontsize=11)
+    # Allow extra headroom for the annotation
+    ax.set_ylim(0, max(p99s) * 1.18)
+    fig.tight_layout()
+    fig.savefig(OUT / "fig_supp_03_g_coloc_partition_paradox.png", dpi=140, bbox_inches="tight")
     plt.close(fig)
     print(f"  ✓ supp_03 (G coloc 4g paradox)")
 

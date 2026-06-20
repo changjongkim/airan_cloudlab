@@ -97,13 +97,13 @@ SLIDES = [
         "figure_main": "fig04_g_coloc_explosion.png",
         "figure_aux": "",
         "table_md": (
-            "| Workload | Cross-part | Coloc |\n"
-            "|---|---|---|\n"
-            "| chanpred | 45 | 357 |\n"
-            "| NeuralRx | — | 360 |\n"
-            "| qwen | — | 357 |\n"
-            "| xapp | — | 358 |\n"
-            "| ResNet | — | 358 |"
+            "| Workload | Coloc p99 (ms) |\n"
+            "|---|---|\n"
+            "| chanpred | 357 |\n"
+            "| NeuralRx | 360 |\n"
+            "| qwen | 357 |\n"
+            "| xapp | 358 |\n"
+            "| ResNet | 358 |"
         ),
         "footer_ref": "PART A §4 (CloudLab 6/1 G_coloc, n=500/condition)",
         "transition": "큰 partition으로 SM/HBM을 더 주면 해결되나?",
@@ -276,12 +276,12 @@ SLIDES = [
         "figure_main": "figF8_mps_vs_default_vs_mig.png",
         "figure_aux": "figF9_mps_sat_hbm_bistable.png",
         "table_md": (
-            "| Workload | Default | MPS | MIG cross |\n"
-            "|---|---|---|---|\n"
-            "| NeuralRx | 389ms | **40ms** | 197ms |\n"
-            "| forecaster | 381ms | **42ms** | — |\n"
-            "| qwen | 185ms | **43ms** | — |\n"
-            "| sat_hbm | 426ms | **6,985ms** | — |"
+            "| Workload | Default | MPS |\n"
+            "|---|---|---|\n"
+            "| NeuralRx | 389ms | **40ms** |\n"
+            "| forecaster | 381ms | **42ms** |\n"
+            "| qwen | 185ms | **43ms** |\n"
+            "| sat_hbm | 426ms | **6,985ms** |"
         ),
         "footer_ref": "PART F §7–§8 (Perlmutter MPS 5-workload comparison)",
         "transition": "이 모든 발견을 어떻게 하나의 framework로 종합하나?",

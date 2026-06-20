@@ -58,292 +58,262 @@ SLIDES = [
             "Bigdata and HPC Lab",
             "Department of Computer Science and Engineering",
             "Seoul National University of Science and Technology",
-            "2026-06-20",
         ],
         "figure_main": "",
         "figure_aux": "",
         "table_md": "",
-        "footer_ref": "Progress Report 2026-06-20",
-        "transition": "Recap previous results, then drill into the mechanism.",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 1,
-        "title": "Recap & Today's Question",
-        "subtitle": "From overhead measurement to mechanism identification",
+        "title": "Today",
+        "subtitle": "",
         "bullets": [
-            "Previous (5/29): MIG single-tenant overhead **+13–32ms** (Exp1–6)",
-            "Today: AI co-tenant 환경에서 비용은 **어디서, 왜** 발생하는가?",
-            "Scale: **n=500–1000/condition** (vs n=20 last time) — statistical power 25×",
-            "Platforms: CloudLab d8545 driver 550 + **Perlmutter cross-validation**",
-            "Goal: identify the **hardware resource** behind the overhead",
+            "**We extend the previous MIG single-tenant analysis to AI co-tenancy** "
+            "(Exp1–6 on 5/29 covered MIG-alone overhead of +13–32 ms).",
+            "**Question:** Under realistic AI co-location, where does the L1 latency "
+            "cost originate, and through what hardware mechanism?",
+            "**Setup:** n=500–1000 per condition (statistical power 25× over the prior "
+            "n=20 sweep), with CloudLab d8545 + Perlmutter cross-validation.",
         ],
         "figure_main": "fig01_partition_baseline.png",
         "figure_aux": "",
         "table_md": "",
-        "footer_ref": "Recap of 5/29 deck Exp1–6",
-        "transition": "Cross-partition은 봤는데, same-partition은 어떻게 되나?",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 2,
-        "title": "Exp7) Same-Partition Coloc = Catastrophic Collapse",
-        "subtitle": "Cross-partition stable, same-partition collapses 8×",
+        "title": "Exp7) Same-Partition Co-location is Catastrophic",
+        "subtitle": "",
         "bullets": [
-            "Cross-partition stays **~45ms**, same-partition coloc collapses to **~357ms** (**8×**)",
-            "**12+ workloads** (chanpred, NeuralRx, qwen, xapp, ResNet) all collapse to ~357ms",
-            "Workload-invariant → **systemic mechanism**, not a workload-specific trick",
-            "n=500/condition, std=9ms (stable, reproducible)",
-            "First evidence: cost is from **placement**, not the AI's nature",
+            "**Catastrophic Collapse:** Co-locating any AI workload in the same MIG "
+            "partition as L1 inflates p99 latency to ~357 ms — an 8× regression over "
+            "the cross-partition baseline (~45 ms).",
+            "**Workload-Invariant:** chanpred, NeuralRx, Qwen, xApp, and ResNet all "
+            "converge to ~357 ms; the failure is not specific to any single AI workload.",
+            "**Placement, Not Workload, Is the Cost Driver:** Reproducible across "
+            "n=500/condition with std=9 ms — the cost arises from where AI is placed, "
+            "not from what AI is doing.",
         ],
         "figure_main": "fig04_g_coloc_explosion.png",
         "figure_aux": "",
-        "table_md": (
-            "| Workload | Coloc p99 (ms) |\n"
-            "|---|---|\n"
-            "| chanpred | 357 |\n"
-            "| NeuralRx | 360 |\n"
-            "| qwen | 357 |\n"
-            "| xapp | 358 |\n"
-            "| ResNet | 358 |"
-        ),
-        "footer_ref": "PART A §4 (CloudLab 6/1 G_coloc, n=500/condition)",
-        "transition": "큰 partition으로 SM/HBM을 더 주면 해결되나?",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 3,
         "title": "Exp8) Larger Partition = MORE Catastrophic",
-        "subtitle": "Counter-intuitive partition size paradox",
+        "subtitle": "",
         "bullets": [
-            "Larger slice does **NOT** help; **4g coloc (371ms) WORSE than 2g (369ms)**",
-            "Resource bandwidth share is decisive — but **NOT via partition allocation**",
-            "Rejects the obvious 'give more SMs' mitigation hypothesis",
-            "Bottleneck is **outside** the partition boundary",
-            "First hint: the costly resource is **chip-global**, not slice-local",
+            "**Counter-Intuitive Outcome:** 4g co-location (371 ms) is worse than 2g "
+            "co-location (369 ms), inverting the assumption that larger slices dilute "
+            "contention.",
+            "**Resource Allocation Fails as Mitigation:** Adding SMs and HBM to the "
+            "partition does not reduce collapse; bandwidth share is decisive but not "
+            "through MIG’s partition allocation.",
+            "**Bottleneck Lives Outside the Partition Boundary:** The contended "
+            "resource is chip-global and unreachable through the per-partition "
+            "abstraction MIG provides.",
         ],
         "figure_main": "fig_supp_03_g_coloc_partition_paradox.png",
         "figure_aux": "",
-        "table_md": (
-            "| Partition | Coloc latency (ms) |\n"
-            "|---|---|\n"
-            "| 2g.10gb | 369 |\n"
-            "| 3g.20gb | 361 |\n"
-            "| 4g.20gb | **371** |"
-        ),
-        "footer_ref": "PART A §4.1 (CloudLab 6/1 G_coloc 2g/3g/4g comparison)",
-        "transition": "Placement는 binary인가, gradient인가?",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 4,
-        "title": "Exp9) Placement = Binary Decision, No Soft Transition",
-        "subtitle": "One config bit decides 8× collapse",
+        "title": "Exp9) Placement is a Binary Decision",
+        "subtitle": "",
         "bullets": [
-            "Same workload (chanpred), only placement differs: **cross 44ms ↔ coloc 357ms**",
-            "**No middle ground**, no gradient between the two regimes",
-            "One config mistake = **8× collapse** — operational fragility",
-            "Implication: there exists a **single shared resource** flipping state",
-            "Now we must find WHICH resource — switch to NSYS profiling",
+            "**No Soft Transition:** The same chanpred workload yields 44 ms when "
+            "cross-partitioned vs 357 ms when co-located — a single configuration "
+            "switch separates the two regimes.",
+            "**Single Mistake Triggers 8× Penalty:** One placement misconfiguration "
+            "produces the full collapse; no operational tuning recovers intermediate "
+            "values.",
+            "**Operational Implication:** The latency cost model is binary rather than "
+            "gradual; admission control must enforce placement explicitly at deployment "
+            "time.",
         ],
         "figure_main": "fig05_h_dual_sanity.png",
         "figure_aux": "",
-        "table_md": (
-            "| Condition | Placement | Latency (ms) |\n"
-            "|---|---|---|\n"
-            "| H_F1 | cross-partition | **44** |\n"
-            "| H_G1 | same-partition coloc | **357** |"
-        ),
-        "footer_ref": "PART A §5 (CloudLab 6/1 H_dual, 9 conditions)",
-        "transition": "같은 hardware에서 왜 8× 차이? 무엇이 변하는가?",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 5,
-        "title": "NSYS Layer 1 — Gap is at Memcpy/Memset Boundary",
-        "subtitle": "Cost is NOT inside the kernel — it is between kernels",
+        "title": "Mechanism Layer 1 — Gap Aligns to Op Boundaries",
+        "subtitle": "",
         "bullets": [
-            "L1 **kernel duration is unchanged** under coloc",
-            "Inter-kernel **'gap' grows** by exactly the missing latency",
-            "Gap is NOT random idle — concentrated at **memcpy/memset boundaries**",
-            "Aggregated across **30 conditions** → robust, not cherry-picked",
-            "The bottleneck is a **memory-transfer wait**, not compute",
+            "**Kernel Duration is Unchanged:** Per-kernel execution time is identical "
+            "under alone and co-location; only inter-kernel gaps grow.",
+            "**Gaps Are Not Random Idle:** Inter-kernel gaps cluster precisely at "
+            "memcpy and memset boundaries rather than distributing uniformly across "
+            "the timeline.",
+            "**Robust Across 30 Conditions:** The boundary localization holds across "
+            "the full NSYS condition matrix, ruling out a single-capture artifact.",
         ],
         "figure_main": "fig12_nsys_kernel_vs_activity_gap.png",
         "figure_aux": "",
         "table_md": "",
-        "footer_ref": "PART B §12 (CloudLab 5/31 NSYS deep, 30-condition aggregate)",
-        "transition": "Gap이 늘었다면 — op count가 늘었나, op duration이 늘었나?",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 6,
-        "title": "NSYS Layer 2 — Same Ops, Just Slower",
-        "subtitle": "Rejects 'more work' hypothesis — count invariant, duration inflates",
+        "title": "Mechanism Layer 2 — Op Count Stable, Duration Inflates",
+        "subtitle": "",
         "bullets": [
-            "memcpy call count: **5,778 → 5,778 (0% change)**",
-            "memset count: unchanged",
-            "memcpy avg duration: **4.2 → 9.8μs (+133%)**",
-            "AI is NOT giving L1 more work — **same work, blocked longer**",
-            "Confirms: cost is **waiting**, not extra activity",
+            "**Call Count is Invariant:** memcpy and memset issue identical call counts "
+            "(5,778 each) under alone and co-location; AI does not add memory work.",
+            "**Per-Call Duration Grows by 133%:** memcpy average duration rises from "
+            "4.2 μs to 9.8 μs while the workload performs the same number of ops.",
+            "**Rejects ‘More Work’ Hypothesis:** L1 is not asked to do more — it waits "
+            "longer for the same work to complete, ruling out demand-driven "
+            "explanations.",
         ],
         "figure_main": "fig13_nsys_memory_activity_breakdown.png",
         "figure_aux": "",
-        "table_md": (
-            "| Metric | Alone | Coloc | Change |\n"
-            "|---|---|---|---|\n"
-            "| memcpy count | 5,778 | 5,778 | **0%** |\n"
-            "| memcpy avg μs | 4.2 | 9.8 | **+133%** |"
-        ),
-        "footer_ref": "PART C §15.1, §15.1.5",
-        "transition": "왜 같은 op가 더 오래 걸리나? 무엇이 op를 막는가?",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 7,
-        "title": "NSYS Layer 3 — Bimodal Signature = Direct Queue Evidence",
-        "subtitle": "Per-call duration splits into two discrete modes",
+        "title": "Mechanism Layer 3 — Bimodal Queue Arbitration Signature",
+        "subtitle": "",
         "bullets": [
-            "Per-call **60KB memcpy** duration splits into **TWO discrete modes**",
-            "Alone: single gaussian peak at **4.2μs**",
-            "Coloc: **bimodal 4.2μs ↔ 14.3μs** (fast=queue empty, slow=queue waiting)",
-            "Discrete state, not gaussian noise → **arbitration signature**",
-            "This is the smoking gun for a **shared serialized queue**",
+            "**Per-Call Duration Splits:** The 60 KB memcpy per-call distribution "
+            "becomes bimodal under co-location, with discrete fast (~4.2 μs) and slow "
+            "(~14.3 μs) modes.",
+            "**Discrete States, Not Gaussian Noise:** The split is not statistical "
+            "variance; it is the signature of binary queue arbitration — empty vs "
+            "occupied.",
+            "**Direct Mechanism Evidence:** Each call is either served immediately or "
+            "waits for the queue, exposing queue arbitration at the per-operation "
+            "level.",
         ],
         "figure_main": "fig_slide7_60kb_bimodal_histogram.png",
         "figure_aux": "",
-        "table_md": (
-            "| Mode | Alone (μs) | Coloc (μs) |\n"
-            "|---|---|---|\n"
-            "| Fast peak | 4.2 | 4.2 |\n"
-            "| Slow peak | — | **14.3** |\n"
-            "| Distribution | unimodal | **bimodal** |"
-        ),
-        "footer_ref": "PART C §16, §16.1 (CloudLab 5/31 NSYS SQLite per-call extraction)",
-        "transition": "어떤 queue? 위치를 알아야 격리 가능성을 판단한다.",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 8,
-        "title": "NSYS Layer 4 — Chip-Wide PCIe/DMA Copy Engine",
-        "subtitle": "CLIMAX — the shared resource is identified",
+        "title": "Mechanism Layer 4 — Chip-Wide PCIe/DMA Copy Engine",
+        "subtitle": "",
         "bullets": [
-            "Direction breakdown: **H2D 17,334 (89.8%) / D2H 1,920 (9.9%) / D2D 24 (0.12%)**",
-            "**D2D ≈ 0** → queue is NOT at HBM controller (HBM carries D2D)",
-            "**100% host-path** → queue is at **chip-wide PCIe/DMA copy engine**",
-            "This single resource is **shared across the WHOLE chip** — partition cannot isolate it",
-            "Explains: Slide 3 paradox, Slide 4 binary, Slide 7 bimodal — **all consistent**",
+            "**Direction Breakdown:** Across all measured memcpy calls, 89.8% are H2D, "
+            "9.9% are D2H, and only 0.12% are D2D.",
+            "**Queue Location Identified:** With D2D ≈ 0, the contention path is not "
+            "at the HBM controller; it is at the chip-wide PCIe/DMA copy engine.",
+            "**Single Shared Resource:** The PCIe/DMA copy engine is one physical unit "
+            "serving the entire chip — partitioning fundamentally cannot isolate it.",
         ],
         "figure_main": "fig_slide8_memcpy_direction_breakdown.png",
         "figure_aux": "",
-        "table_md": (
-            "| Direction | Count | Share |\n"
-            "|---|---|---|\n"
-            "| H2D | 17,334 | **89.8%** |\n"
-            "| D2H | 1,920 | 9.9% |\n"
-            "| D2D | 24 | **0.12%** |\n"
-            "| Other | 21 | 0.11% |"
-        ),
-        "footer_ref": "PART D §20.1, §23 (NSYS direction breakdown, 4 conditions)",
-        "transition": "이건 MIG 결함인가, 아니면 NVIDIA stack 전체의 문제인가?",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 9,
-        "title": "Cross-Platform Validation — Mechanism is Universal",
-        "subtitle": "Same signature on Perlmutter (no-MIG, different driver, different cluster)",
+        "title": "Cross-Platform Mechanism Validation",
+        "subtitle": "",
         "bullets": [
-            "(A) Bimodal signature **reproduced**: **4.2 ↔ 16.8μs** on Perlmutter",
-            "(B) cudaFree blow-up: alone **246μs** → NeuralRx **3,752μs (15×)** → sat_hbm MPS **115,506μs (115ms!)**",
-            "(C) **correlationId causal proof**: **60–82% of GPU gap** overlaps EXACTLY with cudaFree host-blocking",
-            "Conclusion: PCIe/DMA queue is an **NVIDIA-stack-wide fundamental property**",
-            "Not a MIG bug — **disabling MIG does not escape it**",
+            "**Bimodal Signature Reproduced:** Perlmutter no-MIG (different cluster, "
+            "different driver) exhibits the same 60 KB memcpy bimodal split "
+            "(4.2 ↔ 16.8 μs).",
+            "**cudaFree Host-Blocking Scales with Contention:** cudaFree average grows "
+            "from 246 μs (alone) to 3,752 μs under NeuralRx (15×) and 115,506 μs under "
+            "MPS + sat_hbm (469×).",
+            "**Causal Proof via correlationId:** 60–82% of GPU idle gap time aligns "
+            "temporally with cudaFree blocking, establishing direct causality between "
+            "host-side blocking and GPU stall.",
         ],
-        "figure_main": "figF15_memcpy_bimodal.png",
-        "figure_aux": "figF14_cudafree_host_blocking.png",
-        "table_md": (
-            "| Metric | Alone | NeuralRx default | sat_hbm MPS |\n"
-            "|---|---|---|---|\n"
-            "| cudaFree avg | 246μs | **3,752μs (15×)** | **115,506μs (115ms)** |\n"
-            "| Bimodal peaks | 4.2μs | 4.2 ↔ 16.8μs | — |\n"
-            "| Gap↔cudaFree overlap | — | **60–82%** | — |"
-        ),
-        "footer_ref": "PART F §10.5–10.9 (Perlmutter no-MIG SQLite deep analysis)",
-        "transition": "그럼 MPS는 cudaFree wait을 우회할 수 있나?",
+        "figure_main": "figF14_cudafree_host_blocking.png",
+        "figure_aux": "figF15_memcpy_bimodal.png",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 10,
-        "title": "MPS — Recovers Compute AI, Catastrophic for Memory AI",
-        "subtitle": "Same trap, different trigger",
+        "title": "MPS Recovers Compute AI, Catastrophic for Memory AI",
+        "subtitle": "",
         "bullets": [
-            "Compute AI: MPS **RECOVERS** — NeuralRx **389→40ms**, forecaster **381→42ms**, qwen **185→43ms**",
-            "Memory AI: MPS **CATASTROPHIC** — sat_hbm **426 → 6,985ms** (**bistable 7-sec freeze**)",
-            "Why recover? True concurrent exec → compute parallelizes → cudaFree returns fast",
-            "Why collapse? Memory hog **starves DRAM** → device truly stuck → cudaFree blocks 115ms → 7s",
-            "**No universal escape** — same mechanism, different trigger",
+            "**Compute-Bound AI Recovers Under MPS:** NeuralRx p99 drops from 389 ms "
+            "to 40 ms — below MIG cross-partition (197 ms); forecaster (381→42 ms) and "
+            "Qwen (185→43 ms) show the same pattern.",
+            "**Memory-Bound AI Becomes Catastrophic:** sat_hbm under MPS rises from "
+            "426 ms to 6,985 ms (bistable across runs), worse than any other "
+            "configuration measured.",
+            "**Same Mechanism, Different Trigger:** MPS still routes through the same "
+            "cudaFree host-blocking path; memory-bound workloads starve the device and "
+            "re-engage the failure mode MPS was meant to bypass.",
         ],
         "figure_main": "figF8_mps_vs_default_vs_mig.png",
         "figure_aux": "figF9_mps_sat_hbm_bistable.png",
-        "table_md": (
-            "| Workload | Default | MPS |\n"
-            "|---|---|---|\n"
-            "| NeuralRx | 389ms | **40ms** |\n"
-            "| forecaster | 381ms | **42ms** |\n"
-            "| qwen | 185ms | **43ms** |\n"
-            "| sat_hbm | 426ms | **6,985ms** |"
-        ),
-        "footer_ref": "PART F §7–§8 (Perlmutter MPS 5-workload comparison)",
-        "transition": "이 모든 발견을 어떻게 하나의 framework로 종합하나?",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 11,
-        "title": "Cost Decomposition — 3-Platform Unified Framework",
-        "subtitle": "Two hardware-level costs, not one — the paper contribution",
+        "title": "Cost Decomposition — Two Hardware-Level Costs",
+        "subtitle": "",
         "bullets": [
-            "MIG overhead = **TWO hardware-level costs**, not one monolithic 'overhead'",
-            "**Structural (memset)** = partition HBM bandwidth share — **controllable** by partition choice",
-            "**Contention (memcpy)** = chip-wide PCIe/DMA queue — **NOT controllable**",
-            "3 platforms (MIG / no-MIG / MPS) each **avoid one cost but fail at the other**",
-            "**No universal isolation** exists in current NVIDIA stack",
+            "**Structural Cost (memset):** Tied to partition HBM bandwidth share "
+            "(2/7, 3/7, 4/7); selectable through partition sizing.",
+            "**Contention Cost (memcpy):** Tied to chip-wide PCIe/DMA copy engine "
+            "arbitration; not isolable by any partition choice.",
+            "**Unified Across Three Platforms:** MIG, no-MIG, and MPS each avoid one "
+            "cost while remaining exposed to the other — there is no single "
+            "configuration that escapes both.",
         ],
         "figure_main": "fig08_tradeoff_summary.png",
         "figure_aux": "",
-        "table_md": (
-            "| Cost type | Hardware | MIG isolates? |\n"
-            "|---|---|---|\n"
-            "| Structural | HBM bandwidth | **Yes** |\n"
-            "| Contention | PCIe/DMA copy engine | **NO** |"
-        ),
-        "footer_ref": "PART A §15.2, §15.3, §23 (mechanism decomposition)",
-        "transition": "이 framework의 운영 함의(design rules)는?",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
     },
     {
         "slide_num": 12,
         "title": "Design Rules & Next Steps",
-        "subtitle": "Measurement-validated operational guidance",
+        "subtitle": "",
         "bullets": [
-            "**Rule 1**: L1과 AI는 반드시 **다른 MIG partition** (single mistake → **8× collapse**)",
-            "**Rule 2**: Partition 크기는 **L1 SM/HBM headroom으로만** 결정 (coloc 회피용 무의미)",
-            "**Rule 3**: AI workload **classification 필요** (memory-bound AI는 MPS에도 위험)",
-            "**Rule 4**: **MIG isolation ≠ chip-wide resource isolation** (paper main contribution)",
-            "Next: CloudLab Phase 4 (MIG-off + MPS cross-check), N-AI scaling law, driver 550 baseline",
-        ],
-        "figure_main": "",
-        "figure_aux": "",
-        "table_md": (
-            "| Next Step | Target |\n"
-            "|---|---|\n"
-            "| CloudLab Phase 4 | MIG off + MPS — cross-check Perlmutter on same HW |\n"
-            "| N-AI scaling law | L1 + N AI same-partition, direct measurement |\n"
-            "| Driver 550 baseline | Reproduce on CloudLab d8545 |"
-        ),
-        "footer_ref": "Synthesis across PART A–G + Perlmutter PART F",
-        "transition": "End.",
-    },
-    {
-        "slide_num": 13,
-        "title": "Thank You",
-        "subtitle": "Questions & Discussion",
-        "bullets": [
-            "Changjong Kim",
-            "Bigdata and HPC Lab, SeoulTech",
-            "changjong5238@gmail.com",
+            "**Placement Enforcement is Mandatory:** L1 and AI must reside in different "
+            "MIG partitions; one misplacement produces the full 8× collapse.",
+            "**Partition Sizing Serves Only L1 Budget:** Choose partition size for L1 "
+            "SM/HBM headroom; sizing has no mitigating effect under co-location.",
+            "**AI Workload Classification is Required:** Memory-bound AI cannot be "
+            "safely co-located even under MPS, so the deployment policy must "
+            "distinguish compute-bound from memory-bound tenants.",
+            "**MIG ≠ Chip-Wide Isolation:** MIG isolates per-partition SM/HBM but not "
+            "the chip-global PCIe/DMA copy engine — the dominant contention path "
+            "remains outside its abstraction.",
         ],
         "figure_main": "",
         "figure_aux": "",
         "table_md": "",
-        "footer_ref": "Progress Report 2026-06-20",
+        "footer_ref": "",
+        "transition": "",
+    },
+    {
+        "slide_num": 13,
+        "title": "Thank You",
+        "subtitle": "",
+        "bullets": [],
+        "figure_main": "",
+        "figure_aux": "",
+        "table_md": "",
+        "footer_ref": "",
         "transition": "",
     },
 ]
@@ -458,53 +428,80 @@ def _render_bullets(fig, bullets: list[str], top: float, bottom: float, left: fl
 
 def _render_bullets_richtext(fig, bullets: list[str], top: float, bottom: float,
                              left: float = 0.06) -> None:
-    """Render bullets with **bold** support using sequential text segments."""
+    """Render bullets with **bold** prefix support and automatic word-wrap.
+
+    Each bullet is formatted as `**Headline:** body`. Long bodies wrap onto
+    additional lines aligned with the first text line.
+    """
+    import textwrap
     if not bullets:
         return
-    n = len(bullets)
-    y_top = top - 0.02
-    y_bottom = bottom + 0.01
-    if n == 1:
-        ys = [(y_top + y_bottom) / 2]
-    else:
-        step = (y_top - y_bottom) / max(n - 1, 1)
-        ys = [y_top - i * step for i in range(n)]
 
-    for bullet, y in zip(bullets, ys):
+    fig_w_in, _ = fig.get_size_inches()
+    dpi = fig.dpi
+    renderer = fig.canvas.get_renderer()
+
+    # Estimate characters per line based on a sample average glyph width
+    sample = fig.text(0, 0, "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJ",
+                      fontsize=13.5, alpha=0)
+    sample_w_inches = sample.get_window_extent(renderer=renderer).width / dpi
+    sample.remove()
+    avg_char_inch = sample_w_inches / 46.0
+
+    right_margin = 0.07
+    marker_inset = 0.022
+    text_width_frac = 1.0 - left - marker_inset - right_margin
+    # Bold prefix glyphs and special chars (em-dash, ×, ≈) widen the actual line
+    # vs the sample average; apply a safety factor.
+    safety = 1.18
+    max_chars = max(40, int((text_width_frac * fig_w_in) / (avg_char_inch * safety)))
+
+    # Pre-wrap each bullet; remember bold prefix span for the first line.
+    wrapped: list[dict] = []
+    for bullet in bullets:
         clean, spans = _strip_md_bold(bullet)
-        sub = bullet.startswith("  ") or bullet.startswith("\t")
-        marker_x = left + (0.02 if sub else 0.0)
-        text_x = marker_x + 0.018
+        bold_prefix = ""
+        if spans and spans[0][0] == 0:
+            bold_prefix = clean[:spans[0][1]]
+        lines = textwrap.wrap(clean, width=max_chars) or [clean]
+        wrapped.append({"lines": lines, "bold_prefix": bold_prefix})
 
-        fig.text(marker_x, y, "▪", fontsize=14, color=NAVY, ha="left", va="center",
-                 fontweight="bold")
+    # Vertical layout: lines + gap between bullets
+    avail = top - bottom
+    total_lines = sum(len(b["lines"]) for b in wrapped)
+    n_bullets = len(wrapped)
+    inter_bullet = 0.6  # in line-height units
+    units = total_lines + max(n_bullets - 1, 0) * inter_bullet
+    unit_h = avail / max(units, 1)
 
-        # Segment the text into (text, bold) tokens
-        segments: list[tuple[str, bool]] = []
-        cursor = 0
-        for s, e in spans:
-            if cursor < s:
-                segments.append((clean[cursor:s], False))
-            segments.append((clean[s:e], True))
-            cursor = e
-        if cursor < len(clean):
-            segments.append((clean[cursor:], False))
+    y_cursor = top
+    for wb in wrapped:
+        marker_x = left
+        text_x = marker_x + marker_inset
+        first_y = y_cursor - unit_h / 2.0
 
-        # Convert axes coords to display coords for sequential layout
-        renderer = fig.canvas.get_renderer()
-        cur_x = text_x
-        fig_w_inches = fig.get_size_inches()[0]
-        dpi = fig.dpi
-        for seg, is_bold in segments:
-            if not seg:
-                continue
-            weight = "bold" if is_bold else "normal"
-            color = NAVY if is_bold else GRAY_DARK
-            t = fig.text(cur_x, y, seg, fontsize=13.5, color=color,
-                         ha="left", va="center", fontweight=weight)
-            bbox = t.get_window_extent(renderer=renderer)
-            width_inches = bbox.width / dpi
-            cur_x += width_inches / fig_w_inches
+        # Bullet marker on first line
+        fig.text(marker_x, first_y, "▪", fontsize=14, color=NAVY,
+                 ha="left", va="center", fontweight="bold")
+
+        for i, line in enumerate(wb["lines"]):
+            y_line = y_cursor - unit_h * (i + 0.5)
+            if i == 0 and wb["bold_prefix"] and line.startswith(wb["bold_prefix"]):
+                # Bold prefix + rest on same line
+                bp = wb["bold_prefix"]
+                t = fig.text(text_x, y_line, bp, fontsize=13.5,
+                             color=NAVY, ha="left", va="center", fontweight="bold")
+                bp_w_inch = t.get_window_extent(renderer=renderer).width / dpi
+                rest_x = text_x + bp_w_inch / fig_w_in
+                rest = line[len(bp):]
+                if rest:
+                    fig.text(rest_x, y_line, rest, fontsize=13.5,
+                             color=GRAY_DARK, ha="left", va="center")
+            else:
+                fig.text(text_x, y_line, line, fontsize=13.5,
+                         color=GRAY_DARK, ha="left", va="center")
+
+        y_cursor -= unit_h * len(wb["lines"]) + unit_h * inter_bullet
 
 
 def _place_image(fig, rel_path: str, rect: tuple[float, float, float, float]) -> bool:
@@ -708,16 +705,16 @@ def build_content_slide(slide: dict) -> plt.Figure:
 
     # Bullets: top region (subtitle below underline)
     bullet_top = 0.83
-    bullet_bottom = 0.58  # tightened to give figure area more room
+    bullet_bottom = 0.57  # bullets occupy top ~30% of slide
     _render_bullets_richtext(fig, slide["bullets"], bullet_top, bullet_bottom)
 
     has_main = bool(slide.get("figure_main"))
     has_aux = bool(slide.get("figure_aux"))
     has_table = bool(slide.get("table_md"))
 
-    # Lower region for figure + table (enlarged 20%)
-    lower_top = 0.54
-    lower_bottom = 0.09
+    # Lower region: figure occupies bottom ~45% (matches original PPT proportions)
+    lower_top = 0.53
+    lower_bottom = 0.07
     lower_h = lower_top - lower_bottom
 
     if has_main and has_aux and has_table:
@@ -731,12 +728,12 @@ def build_content_slide(slide: dict) -> plt.Figure:
         _render_table(fig, slide["table_md"],
                       (0.72, lower_bottom + 0.04, 0.25, lower_h - 0.08))
     elif has_main and has_aux:
-        # main + aux side by side, full width
-        each_w = 0.44
+        # main + aux side by side, near full width
+        each_w = 0.45
         _place_image(fig, slide["figure_main"],
-                     (0.04, lower_bottom, each_w, lower_h))
+                     (0.03, lower_bottom, each_w, lower_h))
         _place_image(fig, slide["figure_aux"],
-                     (0.04 + each_w + 0.02, lower_bottom, each_w, lower_h))
+                     (0.03 + each_w + 0.02, lower_bottom, each_w, lower_h))
     elif has_main and has_table:
         # figure on left, table on right — widen figure for wide-aspect images
         _place_image(fig, slide["figure_main"],
@@ -744,9 +741,9 @@ def build_content_slide(slide: dict) -> plt.Figure:
         _render_table(fig, slide["table_md"],
                       (0.69, lower_bottom + 0.04, 0.28, lower_h - 0.08))
     elif has_main:
-        # figure centered, wide
+        # figure centered, near full width (no table, give image maximum space)
         _place_image(fig, slide["figure_main"],
-                     (0.18, lower_bottom, 0.64, lower_h))
+                     (0.10, lower_bottom, 0.80, lower_h))
     elif has_table:
         # large table centered
         _render_table(fig, slide["table_md"],

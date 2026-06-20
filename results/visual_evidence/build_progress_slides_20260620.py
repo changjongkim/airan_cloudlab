@@ -75,8 +75,8 @@ SLIDES = [
             "**Today's approach:** Profile L1 + AI co-tenancy with NSYS "
             "time-decomposition analysis.",
             "**Flow:** cuPHY L1 background → NSYS decomposition (GPU/host/pipeline) "
-            "→ identify the queue → verify with more experiments → cross-validate "
-            "on Perlmutter + MPS.",
+            "→ queue mechanism → verification experiments → Perlmutter default "
+            "→ MPS introduces a paradox → cudaFree unifies the whole story.",
         ],
         "figure_main": "fig01_partition_baseline.png",
         "figure_aux": "",
@@ -217,26 +217,6 @@ SLIDES = [
     },
     {
         "slide_num": 9,
-        "title": "Mechanism — cudaFree Host-Blocking is the Direct Cause",
-        "subtitle": "",
-        "bullets": [
-            "**cudaFree inflates with contention:** alone 246 µs → L1 + "
-            "NeuralRx (default) 3,752 µs — a 15× host-side blow-up on the same "
-            "call, with no change in the cuPHY workload itself.",
-            "**Causal proof via correlationId:** 60–82% of the GPU idle gap "
-            "aligns temporally with cudaFree blocking on the host.",
-            "**Conclusion:** the host waits on cudaFree, and the GPU "
-            "consequently sits idle — this is the mechanism behind the "
-            "kernel-invariant, gap-dominated decomposition we just saw in §17.",
-        ],
-        "figure_main": "fig_slide7_cudafree_direct_evidence.png",
-        "figure_aux": "",
-        "table_md": "",
-        "footer_ref": "",
-        "transition": "",
-    },
-    {
-        "slide_num": 10,
         "title": "Verification 1 — Placement Determines an 8× Collapse",
         "subtitle": "",
         "bullets": [
@@ -256,7 +236,7 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 11,
+        "slide_num": 10,
         "title": "Verification 2 — NeuralRx PHY-AI Uniqueness",
         "subtitle": "",
         "bullets": [
@@ -276,7 +256,7 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 12,
+        "slide_num": 11,
         "title": "Verification 3 — N-AI Operational Scaling Law",
         "subtitle": "",
         "bullets": [
@@ -295,7 +275,7 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 13,
+        "slide_num": 12,
         "title": "Cross-Platform Validation on Perlmutter (Default Mode)",
         "subtitle": "",
         "bullets": [
@@ -316,7 +296,7 @@ SLIDES = [
         "transition": "",
     },
     {
-        "slide_num": 14,
+        "slide_num": 13,
         "title": "MPS Recovers Compute AI, Catastrophic for Memory AI",
         "subtitle": "",
         "bullets": [
@@ -324,12 +304,37 @@ SLIDES = [
             "cross-partition 197 ms); forecaster 381 → 42 ms; Qwen 185 → 43 ms.",
             "**Memory AI becomes worse:** sat_hbm 426 → 6,985 ms under MPS "
             "(bistable across runs).",
-            "**Same mechanism, different trigger:** MPS routes through the same "
-            "cudaFree path; memory-bound workloads starve the device and "
-            "re-engage the failure mode.",
+            "**Open question:** why does MPS help compute-bound AI but break "
+            "memory-bound AI? The next slide answers via the cudaFree mechanism.",
         ],
         "figure_main": "figF8_mps_vs_default_vs_mig.png",
         "figure_aux": "figF9_mps_sat_hbm_bistable.png",
+        "table_md": "",
+        "footer_ref": "",
+        "transition": "",
+    },
+    {
+        "slide_num": 14,
+        "title": "Mechanism — cudaFree Host-Blocking Explains Both MIG and MPS",
+        "subtitle": "",
+        "bullets": [
+            "**Default-mode mechanism:** alone 246 µs → L1 + NeuralRx default "
+            "3,752 µs (15× alone). The host blocks on cudaFree; correlationId "
+            "shows 60–82% of the GPU idle gap overlaps with cudaFree on the host.",
+            "**MPS recovery explained:** L1 + NeuralRx under MPS drops cudaFree "
+            "back to 279 µs (≈ alone), so the GPU stops idling — recovery is the "
+            "cudaFree path being un-blocked, not a new isolation mechanism.",
+            "**MPS catastrophic explained:** L1 + sat_hbm under MPS pushes "
+            "cudaFree to 115,506 µs (470× alone). Memory-bound co-tenants starve "
+            "the device of free-able memory, so cudaFree blocks longer — same "
+            "mechanism, opposite outcome.",
+            "**Unifying conclusion:** kernel-invariant + gap-dominated + cudaFree-"
+            "dominated decomposition from §17 is the host-blocking story all the "
+            "way through — MIG, MPS recover, MPS catastrophic are three points on "
+            "the same curve.",
+        ],
+        "figure_main": "fig_slide7_cudafree_direct_evidence.png",
+        "figure_aux": "",
         "table_md": "",
         "footer_ref": "",
         "transition": "",

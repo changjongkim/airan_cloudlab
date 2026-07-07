@@ -1,0 +1,69 @@
+[2026-07-01 05:34:50] ===== CHAIN 8 START — cudaFreeAsync + cudaMemPool mitigation =====
+[2026-07-01 05:34:50] ### Setup 3g+2g ###
+[2026-07-01 05:34:55]   UUID_3G=MIG-e9ac9f20-a562-5ef3-8e8a-34fd1dc85c4e  UUID_2G=MIG-ab24f84d-a1e2-57ae-a0b9-3ce816c7749c
+[2026-07-01 05:34:55] ##### cells=4 #####
+[2026-07-01 05:34:55] ===== A_c4_alone  cells=4 shim=NONE =====
+  [realL1] saved: ./results/realL1_A_c4_alone_L1_20260701_103458.json
+[2026-07-01 05:35:03] ===== A_c4_nrx_baseline  cells=4 shim=NONE =====
+[2026-07-01 05:35:04]   AI nrx → 92aef55c4dd8
+  [realL1] saved: ./results/realL1_A_c4_nrx_baseline_L1_20260701_103525.json
+[2026-07-01 05:35:58] ===== A_c4_nrx_freeasync  cells=4 shim=/shims/cudaFreeAsync.so =====
+[2026-07-01 05:35:59]   AI nrx → 8e5a4af008e4
+  [realL1] saved: ./results/realL1_A_c4_nrx_freeasync_L1_20260701_103620.json
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+[2026-07-01 05:36:55] ===== A_c4_nrx_pool  cells=4 shim=/shims/cudaMemPool.so =====
+[2026-07-01 05:36:56]   AI nrx → 9912ddeac6f1
+  [realL1] saved: ./results/realL1_A_c4_nrx_pool_L1_20260701_103717.json
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+[2026-07-01 05:37:50] ##### cells=10 #####
+[2026-07-01 05:37:50] ===== A_c10_alone  cells=10 shim=NONE =====
+  [realL1] saved: ./results/realL1_A_c10_alone_L1_20260701_103754.json
+[2026-07-01 05:38:00] ===== A_c10_nrx_baseline  cells=10 shim=NONE =====
+[2026-07-01 05:38:01]   AI nrx → 73f8368129db
+  [realL1] saved: ./results/realL1_A_c10_nrx_baseline_L1_20260701_103826.json
+[2026-07-01 05:38:55] ===== A_c10_nrx_freeasync  cells=10 shim=/shims/cudaFreeAsync.so =====
+[2026-07-01 05:38:55]   AI nrx → fac49d4c9e0e
+  [realL1] saved: ./results/realL1_A_c10_nrx_freeasync_L1_20260701_103921.json
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+[2026-07-01 05:39:52] ===== A_c10_nrx_pool  cells=10 shim=/shims/cudaMemPool.so =====
+[2026-07-01 05:39:52]   AI nrx → 7a96f0767b71
+  [realL1] saved: ./results/realL1_A_c10_nrx_pool_L1_20260701_104018.json
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+[2026-07-01 05:40:47] ##### cells=40 #####
+[2026-07-01 05:40:47] ===== A_c40_alone  cells=40 shim=NONE =====
+  [realL1] saved: ./results/realL1_A_c40_alone_L1_20260701_104053.json
+[2026-07-01 05:41:00] ===== A_c40_nrx_baseline  cells=40 shim=NONE =====
+[2026-07-01 05:41:00]   AI nrx → 1d32aa28f4ee
+  [realL1] saved: ./results/realL1_A_c40_nrx_baseline_L1_20260701_104146.json
+[2026-07-01 05:41:55] ===== A_c40_nrx_freeasync  cells=40 shim=/shims/cudaFreeAsync.so =====
+[2026-07-01 05:41:56]   AI nrx → 1e490d9b008e
+  [realL1] saved: ./results/realL1_A_c40_nrx_freeasync_L1_20260701_104241.json
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+[2026-07-01 05:42:51] ===== A_c40_nrx_pool  cells=40 shim=/shims/cudaMemPool.so =====
+[2026-07-01 05:42:51]   AI nrx → 8bf748cb4c1b
+  [realL1] saved: ./results/realL1_A_c40_nrx_pool_L1_20260701_104337.json
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+[2026-07-01 05:43:46] ##### cells=60 #####
+[2026-07-01 05:43:46] ===== A_c60_alone  cells=60 shim=NONE =====
+  [realL1] saved: ./results/realL1_A_c60_alone_L1_20260701_104355.json
+[2026-07-01 05:44:01] ===== A_c60_nrx_baseline  cells=60 shim=NONE =====
+[2026-07-01 05:44:02]   AI nrx → f00196ff62c9
+  [realL1] measuring...
+[2026-07-01 05:44:57] ===== A_c60_nrx_freeasync  cells=60 shim=/shims/cudaFreeAsync.so =====
+[2026-07-01 05:44:58]   AI nrx → 4d02eff509b6
+  [realL1] measuring...
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+  [cudaFreeAsync_shim] intercepted=0 fallback=0
+[2026-07-01 05:45:53] ===== A_c60_nrx_pool  cells=60 shim=/shims/cudaMemPool.so =====
+[2026-07-01 05:45:54]   AI nrx → 5f009901c0c4
+  [realL1] measuring...
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+  [cudaMemPool_shim] malloc=0 free=0 fallback=0
+[2026-07-01 05:46:49] ===== CHAIN 8 SUMMARY =====
+[2026-07-01 05:46:49] ===== CHAIN 8 DONE =====

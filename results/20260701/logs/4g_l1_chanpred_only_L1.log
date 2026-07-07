@@ -1,0 +1,34 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: CPU IP/backtrace sampling not supported, disabling.
+Try the 'nsys status --environment' command to learn more.
+
+WARNING: CPU context switch tracing not supported, disabling.
+Try the 'nsys status --environment' command to learn more.
+
+[realL1] cells=20 iters=20 prbs=273 mcs=2 tb_size=13576
+[realL1] synthetic rx_slot shape=(3276, 14, 4)
+[realL1] building RX components...
+[realL1] RX components ready
+[realL1] warmup...
+[realL1] measuring...
+[realL1] 4g_l1_chanpred_only_L1: mean=40.264ms p95=40.933ms p99=41.123ms miss1ms=20/20
+[realL1] saved: ./results/realL1_4g_l1_chanpred_only_L1_20260701_040542.json
+Collecting data...
+Generating '/tmp/nsys-report-f8fd.qdstrm'
+[1/1] [0%                          ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [0%                          ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [8%                          ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [===22%                      ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [=======36%                  ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [===========51%              ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [===============65%          ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [=================73%        ] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [========================100%] 4g_l1_chanpred_only_L1.nsys-rep[1/1] [========================100%] 4g_l1_chanpred_only_L1.nsys-rep
+Generated:
+	/out/4g_l1_chanpred_only_L1.nsys-rep

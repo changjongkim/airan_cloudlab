@@ -1,0 +1,34 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: CPU IP/backtrace sampling not supported, disabling.
+Try the 'nsys status --environment' command to learn more.
+
+WARNING: CPU context switch tracing not supported, disabling.
+Try the 'nsys status --environment' command to learn more.
+
+[realL1] cells=20 iters=20 prbs=273 mcs=2 tb_size=13576
+[realL1] synthetic rx_slot shape=(3276, 14, 4)
+[realL1] building RX components...
+[realL1] RX components ready
+[realL1] warmup...
+[realL1] measuring...
+[realL1] 3g_l1_hbm_only_L1: mean=43.944ms p95=44.769ms p99=44.955ms miss1ms=20/20
+[realL1] saved: ./results/realL1_3g_l1_hbm_only_L1_20260701_041032.json
+Collecting data...
+Generating '/tmp/nsys-report-7419.qdstrm'
+[1/1] [0%                          ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [0%                          ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [8%                          ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [===22%                      ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [=======37%                  ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [===========51%              ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [===============65%          ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [=================73%        ] 3g_l1_hbm_only_L1.nsys-rep[1/1] [========================100%] 3g_l1_hbm_only_L1.nsys-rep[1/1] [========================100%] 3g_l1_hbm_only_L1.nsys-rep
+Generated:
+	/out/3g_l1_hbm_only_L1.nsys-rep

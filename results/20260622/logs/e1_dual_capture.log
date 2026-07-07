@@ -1,0 +1,106 @@
+[03:44:38] Configuring MIG split-60-40 (3g + 2g) for stages 1/2/4/5...
+[03:44:41]   UUID_3G=MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:44:41]   UUID_2G=MIG-251bdd14-8242-517e-969c-70e62965761a
+[03:44:41] ===== X1_neuralrx_alone_3g =====
+[03:44:41]   AI script : /workspace/AIRAN_Changjong/experiments/run_neural_rx_stress.py
+[03:44:41]   AI UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:44:41]   L1 UUID   : <none, AI alone>
+[03:44:41]   AI container: 98913e20e4be7c1c958f1b3e8d8a6c62402ca443ce1f26dc8b3f16ee5526c8c8
+[03:45:32]   AI container done.
+[03:45:33]   → X1_neuralrx_alone_3g_AI.sqlite (9.3M)
+[03:45:33]   X1_neuralrx_alone_3g complete.
+
+[03:45:33] ===== X2_neuralrx_2g_L1_3g_crosspart =====
+[03:45:33]   AI script : /workspace/AIRAN_Changjong/experiments/run_neural_rx_stress.py
+[03:45:33]   AI UUID   : MIG-251bdd14-8242-517e-969c-70e62965761a
+[03:45:33]   L1 UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:45:33]   AI container: 30284cbb272b53bad0150d36f79b04533faa4c276cb158896590b6abb2b949b6
+[03:45:33]   Waiting 15s for AI warmup before launching L1...
+[03:45:48]   Launching L1 nsys (capture 30s)...
+Collecting data...
+Generating '/tmp/nsys-report-6a8c.qdstrm'
+[1/1] [0%                          ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [0%                          ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [8%                          ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [==21%                       ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [=======36%                  ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [===========50%              ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [==============64%           ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [=================73%        ] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [========================100%] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [========================100%] X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep
+Generated:
+	/nsys_out/X2_neuralrx_2g_L1_3g_crosspart_L1.nsys-rep
+[03:46:24]   AI container done.
+[03:46:25]   → X2_neuralrx_2g_L1_3g_crosspart_AI.sqlite (11M)
+[03:46:26]   → X2_neuralrx_2g_L1_3g_crosspart_L1.sqlite (5.2M)
+[03:46:26]   X2_neuralrx_2g_L1_3g_crosspart complete.
+
+[03:46:26] ===== X4_chanpred_alone_3g =====
+[03:46:26]   AI script : /workspace/AIRAN_Changjong/experiments/run_channel_prediction.py
+[03:46:26]   AI UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:46:26]   L1 UUID   : <none, AI alone>
+[03:46:26]   AI container: bdfc94190a58c308ecd46c74c1f5866809c1216364af1541a50fc2e8b5695f31
+[03:47:57]   AI container exceeded deadline — killing
+[03:47:58]   AI container done.
+[03:47:58]   X4_chanpred_alone_3g complete.
+
+[03:47:58] ===== X5_chanpred_2g_L1_3g_crosspart =====
+[03:47:58]   AI script : /workspace/AIRAN_Changjong/experiments/run_channel_prediction.py
+[03:47:58]   AI UUID   : MIG-251bdd14-8242-517e-969c-70e62965761a
+[03:47:58]   L1 UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:47:58]   AI container: 3f1cb144a32b0fc6da839ea2e9579d32a814fee5db5b31d4b4cbd8876c39943a
+[03:47:58]   Waiting 15s for AI warmup before launching L1...
+[03:48:13]   Launching L1 nsys (capture 30s)...
+Collecting data...
+Generating '/tmp/nsys-report-25c4.qdstrm'
+[1/1] [0%                          ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [0%                          ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [8%                          ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [===22%                      ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [=======36%                  ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [===========50%              ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [==============64%           ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [=================73%        ] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [========================100%] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep[1/1] [========================100%] X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep
+Generated:
+	/nsys_out/X5_chanpred_2g_L1_3g_crosspart_L1.nsys-rep
+[03:49:49]   AI container done.
+[03:50:16]   → X5_chanpred_2g_L1_3g_crosspart_AI.sqlite (701M)
+[03:50:16]   → X5_chanpred_2g_L1_3g_crosspart_L1.sqlite (5.0M)
+[03:50:16]   X5_chanpred_2g_L1_3g_crosspart complete.
+
+[03:50:16] Configuring MIG single 3g for stages 3/6 (same-partition coloc)...
+[03:50:19]   UUID_3G=MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9  (both AI and L1 will share this)
+[03:50:19] ===== X3_neuralrx_L1_coloc_3g =====
+[03:50:19]   AI script : /workspace/AIRAN_Changjong/experiments/run_neural_rx_stress.py
+[03:50:19]   AI UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:50:19]   L1 UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:50:19]   AI container: cfdbbec963009302233454de4c49cf075af8033a6be2beb6644068efd531308c
+[03:50:19]   Waiting 15s for AI warmup before launching L1...
+[03:50:34]   Launching L1 nsys (capture 30s)...
+Collecting data...
+Generating '/tmp/nsys-report-bfe3.qdstrm'
+[1/1] [0%                          ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [0%                          ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [8%                          ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [===22%                      ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [=======36%                  ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [===========50%              ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [==============64%           ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [=================73%        ] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [========================100%] X3_neuralrx_L1_coloc_3g_L1.nsys-rep[1/1] [========================100%] X3_neuralrx_L1_coloc_3g_L1.nsys-rep
+Generated:
+	/nsys_out/X3_neuralrx_L1_coloc_3g_L1.nsys-rep
+[03:51:10]   AI container done.
+[03:51:11]   → X3_neuralrx_L1_coloc_3g_AI.sqlite (4.6M)
+[03:51:11]   → X3_neuralrx_L1_coloc_3g_L1.sqlite (5.1M)
+[03:51:11]   X3_neuralrx_L1_coloc_3g complete.
+
+[03:51:11] ===== X6_chanpred_L1_coloc_3g =====
+[03:51:11]   AI script : /workspace/AIRAN_Changjong/experiments/run_channel_prediction.py
+[03:51:11]   AI UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:51:11]   L1 UUID   : MIG-5a399dae-8fd8-5bf0-b514-74ad30dd86f9
+[03:51:12]   AI container: 39ffa3362da639d7dfea126bbfe7248be6c15ba3bb72150398c645af2b1614d7
+[03:51:12]   Waiting 15s for AI warmup before launching L1...
+[03:51:27]   Launching L1 nsys (capture 30s)...
+Collecting data...
+Generating '/tmp/nsys-report-a5ba.qdstrm'
+[1/1] [0%                          ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [0%                          ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [8%                          ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [===22%                      ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [=======36%                  ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [===========50%              ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [==============64%           ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [=================73%        ] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [========================100%] X6_chanpred_L1_coloc_3g_L1.nsys-rep[1/1] [========================100%] X6_chanpred_L1_coloc_3g_L1.nsys-rep
+Generated:
+	/nsys_out/X6_chanpred_L1_coloc_3g_L1.nsys-rep
+[03:53:02]   AI container done.
+[03:53:28]   → X6_chanpred_L1_coloc_3g_AI.sqlite (696M)
+[03:53:29]   → X6_chanpred_L1_coloc_3g_L1.sqlite (5.0M)
+[03:53:29]   X6_chanpred_L1_coloc_3g complete.
+
+[03:53:29] =====================================
+[03:53:29] All scenarios complete. Outputs in: /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X1_neuralrx_alone_3g_AI.sqlite (9.2M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X2_neuralrx_2g_L1_3g_crosspart_AI.sqlite (11M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X2_neuralrx_2g_L1_3g_crosspart_L1.sqlite (5.2M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X3_neuralrx_L1_coloc_3g_AI.sqlite (4.6M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X3_neuralrx_L1_coloc_3g_L1.sqlite (5.1M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X5_chanpred_2g_L1_3g_crosspart_AI.sqlite (700M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X5_chanpred_2g_L1_3g_crosspart_L1.sqlite (5.0M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X6_chanpred_L1_coloc_3g_AI.sqlite (695M)
+  /users/sgkim/cloudlab_aerial/results/20260622/s18_ai_nsys/X6_chanpred_L1_coloc_3g_L1.sqlite (5.0M)
+[03:53:29] 
+[03:53:29] Quick sanity (number of AI-side kernels per scenario):
+/users/sgkim/s18_dual_capture.sh: line 206: local: can only be used in a function
+/users/sgkim/s18_dual_capture.sh: line 207: n: unbound variable

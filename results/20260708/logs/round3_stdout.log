@@ -1,0 +1,57 @@
+[06:07:15] === ROUND 3: MIG 4g + MPS fair comparison ===
+[06:07:15] Enabling MIG on GPU 0
+Warning: persistence mode is disabled on device 00000000:01:00.0. See the Known Issues section of the nvidia-smi(1) man page for more information. Run with [--help | -h] switch to get more information on how to enable persistence mode.
+All done.
+[06:07:18] Creating 4g.20gb partition (profile 5)
+Successfully created GPU instance ID  1 on GPU  0 using profile MIG 4g.20gb (ID  5)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  1 using profile MIG 4g.20gb (ID  3)
+[06:07:20] MIG UUID: MIG-954ae2c3-71ae-56e0-bea4-2e81e4c41c02
+[06:07:20] 
+[06:07:20] ===== A. MIG 4g without MPS (temporal, 42 SMs) =====
+[06:07:20] --- MIG4g_alone_noMPS trial 1 ---
+[06:07:32] --- MIG4g_alone_noMPS trial 2 ---
+[06:07:42] --- MIG4g_alone_noMPS trial 3 ---
+[06:07:52] --- MIG4g_nrx_noMPS trial 1 ---
+7eda86da7507
+[06:08:44] --- MIG4g_nrx_noMPS trial 2 ---
+9333d9bc7c4a
+[06:09:36] --- MIG4g_nrx_noMPS trial 3 ---
+662604d1011a
+[06:10:28] 
+[06:10:28] ===== B. MIG 4g with MPS (spatial, 42 SMs) =====
+[06:10:28] Starting MPS server container (target: MIG-954ae2c3-71ae-56e0-bea4-2e81e4c41c02)
+b39ccfd6b8064b0034799b3d13f7bd8e0dc302123b761d25a3fe7bbe5eb6010b
+[06:10:33] --- MIG4g_alone_MPS trial 1 ---
+[06:10:44] --- MIG4g_alone_MPS trial 2 ---
+[06:10:53] --- MIG4g_alone_MPS trial 3 ---
+[06:11:04] --- MIG4g_nrx_MPS trial 1 (★ key measurement) ---
+e5f83a7cd345
+[06:11:31] --- MIG4g_nrx_MPS trial 2 (★ key measurement) ---
+6cc019a1ebc2
+[06:11:57] --- MIG4g_nrx_MPS trial 3 (★ key measurement) ---
+aa9d8ee3f295
+[06:12:24] Stopping MPS server
+mps_srv
+[06:12:27] Destroying MIG instances and disabling MIG mode
+Successfully destroyed compute instance ID  0 from GPU  0 GPU instance ID  1
+Successfully destroyed GPU instance ID  1 from GPU  0
+All done.
+[06:12:29] === ROUND 3 DONE ===
+[06:12:29] Files in /mydata/results/20260708/round3_mig_mps:
+-rw-rw-r-- 1 root  root             5038902 Jul  8 06:10 MIG4g_alone_MPS_t1.nsys-rep
+-rw-rw-r-- 1 root  root             5036497 Jul  8 06:10 MIG4g_alone_MPS_t2.nsys-rep
+-rw-rw-r-- 1 root  root             5052859 Jul  8 06:11 MIG4g_alone_MPS_t3.nsys-rep
+-rw-rw-r-- 1 root  root             5045578 Jul  8 06:07 MIG4g_alone_noMPS_t1.nsys-rep
+-rw-rw-r-- 1 root  root             5055630 Jul  8 06:07 MIG4g_alone_noMPS_t2.nsys-rep
+-rw-rw-r-- 1 root  root             5053383 Jul  8 06:07 MIG4g_alone_noMPS_t3.nsys-rep
+-rw-rw-r-- 1 root  root             5042079 Jul  8 06:11 MIG4g_nrx_MPS_t1.nsys-rep
+-rw-rw-r-- 1 root  root             5043310 Jul  8 06:11 MIG4g_nrx_MPS_t2.nsys-rep
+-rw-rw-r-- 1 root  root             5042233 Jul  8 06:12 MIG4g_nrx_MPS_t3.nsys-rep
+-rw-rw-r-- 1 root  root             3970695 Jul  8 06:08 MIG4g_nrx_noMPS_t1.nsys-rep
+-rw-rw-r-- 1 root  root             3478108 Jul  8 06:09 MIG4g_nrx_noMPS_t2.nsys-rep
+-rw-rw-r-- 1 root  root             3456398 Jul  8 06:10 MIG4g_nrx_noMPS_t3.nsys-rep
+[06:12:29] 
+[06:12:29] === AUTO-CONTINUE: kicking off Matrix v2 in background ===
+[06:12:32] Matrix v2 PID: 15357
+[06:12:32] Log: /mydata/results/matrix_v2_stdout.log
+[06:12:32] Output: /mydata/results/20260708/matrix_v2/

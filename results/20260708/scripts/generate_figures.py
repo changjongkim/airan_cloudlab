@@ -98,24 +98,13 @@ for bar_group in [bars1, bars2]:
                 f"{v:,.0f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
 
 ax.set_ylabel("cudaFree total time (ms, 30s window)", fontsize=12)
-ax.set_title("Figure 2. Round 3 — MIG 4g × MPS fair comparison (same 42 SMs)\nMPS spatial multiplexing eliminates cross-process sync",
+ax.set_title("Figure 2. MIG 4g × MPS on/off at same 42 SMs",
              fontsize=13, fontweight="bold", pad=15)
 ax.set_xticks(x)
 ax.set_xticklabels(r3_labels, fontsize=11)
 ax.set_ylim(0, 22000)
 ax.legend(loc="upper left", fontsize=10)
 ax.grid(axis="y", alpha=0.3)
-
-# Add annotation for the mechanism
-ax.annotate("10.5× penalty\n(temporal sync)",
-            xy=(1 - w/2, noMPS[1]), xytext=(0.6, 15000),
-            fontsize=10, color="#dc2626", fontweight="bold",
-            arrowprops=dict(arrowstyle="->", color="#dc2626"))
-
-ax.annotate("1.02× (mechanism\ncleanly bypassed)",
-            xy=(1 + w/2, withMPS[1]), xytext=(1.5, 8000),
-            fontsize=10, color="#f59e0b", fontweight="bold",
-            arrowprops=dict(arrowstyle="->", color="#f59e0b"))
 
 plt.tight_layout()
 plt.savefig(os.path.join(FIG_DIR, "fig2_round3_fair_comparison.png"), dpi=150, bbox_inches="tight")

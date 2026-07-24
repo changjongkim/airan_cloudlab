@@ -1,0 +1,24 @@
+[10:26:06] loading Qwen/Qwen2.5-3B-Instruct (gpu_mem_util=0.6)
+WARNING 07-24 10:26:07 config.py:2276] Casting torch.bfloat16 to torch.float16.
+INFO 07-24 10:26:11 config.py:510] This model supports multiple tasks: {'reward', 'generate', 'classify', 'embed', 'score'}. Defaulting to 'generate'.
+INFO 07-24 10:26:11 llm_engine.py:234] Initializing an LLM engine (v0.6.6) with config: model='Qwen/Qwen2.5-3B-Instruct', speculative_config=None, tokenizer='Qwen/Qwen2.5-3B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.float16, max_seq_len=2048, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto, quantization_param_path=None, device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='xgrammar'), observability_config=ObservabilityConfig(otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=0, served_model_name=Qwen/Qwen2.5-3B-Instruct, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=False, chunked_prefill_enabled=False, use_async_output_proc=True, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output"],"candidate_compile_sizes":[],"compile_sizes":[],"capture_sizes":[64,56,48,40,32,24,16,8,4,2,1],"max_capture_size":64}, use_cached_outputs=False, 
+INFO 07-24 10:26:12 selector.py:120] Using Flash Attention backend.
+INFO 07-24 10:26:13 model_runner.py:1094] Starting to load model Qwen/Qwen2.5-3B-Instruct...
+INFO 07-24 10:26:13 weight_utils.py:251] Using model weights format ['*.safetensors']
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:00<00:00,  1.80it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.09it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.16it/s]
+
+INFO 07-24 10:26:15 model_runner.py:1099] Loading model weights took 5.7915 GB
+INFO 07-24 10:26:15 worker.py:241] Memory profiling takes 0.46 seconds
+INFO 07-24 10:26:15 worker.py:241] the current vLLM instance can use total_gpu_memory (39.49GiB) x gpu_memory_utilization (0.60) = 23.70GiB
+INFO 07-24 10:26:15 worker.py:241] model weights take 5.79GiB; non_torch_memory takes 7.69GiB; PyTorch activation peak memory takes 0.47GiB; the rest of the memory reserved for KV Cache is 9.75GiB.
+INFO 07-24 10:26:15 gpu_executor.py:76] # GPU blocks: 17742, # CPU blocks: 7281
+INFO 07-24 10:26:15 gpu_executor.py:80] Maximum concurrency for 2048 tokens per request: 138.61x
+INFO 07-24 10:26:18 model_runner.py:1415] Capturing cudagraphs for decoding. This may lead to unexpected consequences if the model is not static. To run the model in eager mode, set 'enforce_eager=True' or use '--enforce-eager' in the CLI. If out-of-memory error occurs during cudagraph capture, consider decreasing `gpu_memory_utilization` or switching to eager mode. You can also reduce the `max_num_seqs` as needed to decrease memory usage.
+Capturing CUDA graph shapes:   0%|          | 0/11 [00:00<?, ?it/s]Capturing CUDA graph shapes:   9%|▉         | 1/11 [00:00<00:03,  3.21it/s]Capturing CUDA graph shapes:  18%|█▊        | 2/11 [00:00<00:02,  3.49it/s]Capturing CUDA graph shapes:  27%|██▋       | 3/11 [00:00<00:02,  3.56it/s]Capturing CUDA graph shapes:  36%|███▋      | 4/11 [00:01<00:01,  3.61it/s]Capturing CUDA graph shapes:  45%|████▌     | 5/11 [00:01<00:01,  3.64it/s]Capturing CUDA graph shapes:  55%|█████▍    | 6/11 [00:01<00:01,  3.66it/s]Capturing CUDA graph shapes:  64%|██████▎   | 7/11 [00:01<00:01,  3.66it/s]Capturing CUDA graph shapes:  73%|███████▎  | 8/11 [00:02<00:00,  3.50it/s]Capturing CUDA graph shapes:  82%|████████▏ | 9/11 [00:02<00:00,  3.52it/s]Capturing CUDA graph shapes:  91%|█████████ | 10/11 [00:02<00:00,  3.59it/s]Capturing CUDA graph shapes: 100%|██████████| 11/11 [00:03<00:00,  3.55it/s]Capturing CUDA graph shapes: 100%|██████████| 11/11 [00:03<00:00,  3.56it/s]
+INFO 07-24 10:26:21 model_runner.py:1535] Graph capturing finished in 3 secs, took -7.39 GiB
+INFO 07-24 10:26:21 llm_engine.py:431] init engine (profile, create kv cache, warmup model) took 6.46 seconds
+[10:26:22] model ready
+[10:26:22] loading dataset HuggingFaceH4/ultrachat_200k

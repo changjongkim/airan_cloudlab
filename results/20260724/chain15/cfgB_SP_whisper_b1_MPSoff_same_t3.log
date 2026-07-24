@@ -1,0 +1,7 @@
+/usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py:127: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+[21:06:08] loading openai/whisper-large-v3 batch=1
+[21:06:10] model ready
+[21:06:11] loading LibriSpeech test-clean (streaming)
+[21:06:12] real audio load failed (To support decoding audio data, please install 'torchcodec'.); using synth
+Due to a bug fix in https://github.com/huggingface/transformers/pull/28687 transcription using a multilingual Whisper will default to language detection followed by transcription instead of translation to English.This might be a breaking change for your use case. If you want to instead always translate your audio to English, make sure to pass `language='en'`.

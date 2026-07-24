@@ -1,0 +1,31 @@
+[16:28:54] allocating 3 × 8.0 GB arrays (n=2,147,483,648)
+Traceback (most recent call last):
+  File "/scripts/run_hbm_stress.py", line 53, in <module>
+    main()
+  File "/scripts/run_hbm_stress.py", line 31, in main
+    c = cp.random.rand(n, dtype=cp.float32)
+  File "/usr/local/lib/python3.10/dist-packages/cupy/random/_sample.py", line 44, in rand
+    return random_sample(size=size, dtype=dtype)
+  File "/usr/local/lib/python3.10/dist-packages/cupy/random/_sample.py", line 156, in random_sample
+    return rs.random_sample(size=size, dtype=dtype)
+  File "/usr/local/lib/python3.10/dist-packages/cupy/random/_generator.py", line 623, in random_sample
+    out = self._random_sample_raw(size, dtype)
+  File "/usr/local/lib/python3.10/dist-packages/cupy/random/_generator.py", line 605, in _random_sample_raw
+    out = cupy.empty(size, dtype=dtype)
+  File "/usr/local/lib/python3.10/dist-packages/cupy/_creation/basic.py", line 32, in empty
+    return cupy.ndarray(shape, dtype, order=order)
+  File "cupy/_core/core.pyx", line 151, in cupy._core.core.ndarray.__new__
+  File "cupy/_core/core.pyx", line 239, in cupy._core.core._ndarray_base._init
+  File "cupy/cuda/memory.pyx", line 738, in cupy.cuda.memory.alloc
+  File "cupy/cuda/memory.pyx", line 1424, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1445, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1116, in cupy.cuda.memory.SingleDeviceMemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1137, in cupy.cuda.memory.SingleDeviceMemoryPool._malloc
+  File "cupy/cuda/memory.pyx", line 1382, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+  File "cupy/cuda/memory.pyx", line 1385, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+cupy.cuda.memory.OutOfMemoryError: Out of memory allocating 8,589,934,592 bytes (allocated so far: 17,179,869,184 bytes).
+Collecting data...
+Generating '/tmp/nsys-report-b9b2.qdstrm'
+[1/1] [0%                          ] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep[1/1] [0%                          ] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep[1/1] [14%                         ] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep[1/1] [============55%             ] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep[1/1] [========================97% ] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep[1/1] [========================98% ] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep[1/1] [========================100%] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep[1/1] [========================100%] cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep
+Generated:
+	/aiout/cfgA_SP_hbm_stress_MPSon_same_t1_ai.nsys-rep

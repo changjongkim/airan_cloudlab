@@ -1,0 +1,24 @@
+[14:15:27] loading Qwen/Qwen2.5-3B-Instruct batch=1 eager=True
+WARNING 07-24 14:15:28 config.py:2276] Casting torch.bfloat16 to torch.float16.
+INFO 07-24 14:15:32 config.py:510] This model supports multiple tasks: {'classify', 'score', 'generate', 'embed', 'reward'}. Defaulting to 'generate'.
+WARNING 07-24 14:15:32 cuda.py:98] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+WARNING 07-24 14:15:32 config.py:642] Async output processing is not supported on the current platform type cuda.
+INFO 07-24 14:15:32 llm_engine.py:234] Initializing an LLM engine (v0.6.6) with config: model='Qwen/Qwen2.5-3B-Instruct', speculative_config=None, tokenizer='Qwen/Qwen2.5-3B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.float16, max_seq_len=1024, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto, quantization_param_path=None, device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='xgrammar'), observability_config=ObservabilityConfig(otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=0, served_model_name=Qwen/Qwen2.5-3B-Instruct, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=False, chunked_prefill_enabled=False, use_async_output_proc=False, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output"],"candidate_compile_sizes":[],"compile_sizes":[],"capture_sizes":[],"max_capture_size":0}, use_cached_outputs=False, 
+INFO 07-24 14:15:33 selector.py:120] Using Flash Attention backend.
+INFO 07-24 14:15:34 model_runner.py:1094] Starting to load model Qwen/Qwen2.5-3B-Instruct...
+INFO 07-24 14:15:34 weight_utils.py:251] Using model weights format ['*.safetensors']
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:00<00:00,  1.50it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.01it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.06it/s]
+
+INFO 07-24 14:15:36 model_runner.py:1099] Loading model weights took 5.7915 GB
+INFO 07-24 14:15:37 worker.py:241] Memory profiling takes 0.44 seconds
+INFO 07-24 14:15:37 worker.py:241] the current vLLM instance can use total_gpu_memory (39.49GiB) x gpu_memory_utilization (0.50) = 19.75GiB
+INFO 07-24 14:15:37 worker.py:241] model weights take 5.79GiB; non_torch_memory takes 7.68GiB; PyTorch activation peak memory takes 0.17GiB; the rest of the memory reserved for KV Cache is 6.11GiB.
+INFO 07-24 14:15:37 gpu_executor.py:76] # GPU blocks: 11113, # CPU blocks: 7281
+INFO 07-24 14:15:37 gpu_executor.py:80] Maximum concurrency for 1024 tokens per request: 173.64x
+INFO 07-24 14:15:40 llm_engine.py:431] init engine (profile, create kv cache, warmup model) took 3.35 seconds
+[14:15:40] model ready
+[14:15:42] loaded 256 real prompts
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]

@@ -1,0 +1,130 @@
+[10:57:22] === chain14 START configs=A B C ===
+[10:57:22] == config A: 4g.20gb + 3g.20gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  2 using profile MIG 4g.20gb (ID  3)
+Successfully created GPU instance ID  1 on GPU  0 using profile MIG 3g.20gb (ID  9)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  1 using profile MIG 3g.20gb (ID  2)
+[10:57:33]   UUID_L1(4g)=MIG-dae3f173-7b15-594b-bc80-6cef80687a56  UUID_CROSS(3g)=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+[10:57:33] ===== SAME-PARTITION cfg=A (L1 + co-tenant in MIG-dae3f173-7b15-594b-bc80-6cef80687a56) =====
+[10:57:33] --- SP-0 baseline cfg=A t=1 ---
+[10:58:08] --- SP-0 baseline cfg=A t=2 ---
+[10:58:43] --- SP-0 baseline cfg=A t=3 ---
+[10:59:17] --- cfgA_SP_nrx_MPSoff ---
+[11:02:36] --- cfgA_SP_nrx_MPSon ---
+[11:05:02] --- cfgA_SP_chanpred_MPSoff ---
+[11:08:23] --- cfgA_SP_chanpred_MPSon ---
+[11:10:48] --- cfgA_SP_qwen_rag_MPSoff ---
+[11:13:25] --- cfgA_SP_qwen_rag_MPSon ---
+[11:15:51] --- cfgA_SP_whisper_MPSoff ---
+[11:18:27] --- cfgA_SP_whisper_MPSon ---
+[11:20:53] --- cfgA_SP_qwen_vl_MPSoff ---
+[11:23:29] --- cfgA_SP_qwen_vl_MPSon ---
+[11:25:55] --- cfgA_SP_hbm_stress_MPSoff ---
+[11:28:32] --- cfgA_SP_hbm_stress_MPSon ---
+[11:30:57] --- cfgA_SP_qwen_chat_b1_MPSoff ---
+[11:33:34] --- cfgA_SP_qwen_chat_b1_MPSon ---
+[11:36:00] --- cfgA_SP_whisper_stream_b1_MPSoff ---
+[11:38:36] --- cfgA_SP_whisper_stream_b1_MPSon ---
+[11:41:03] --- cfgA_SP_bert_b1_MPSoff ---
+[11:43:40] --- cfgA_SP_bert_b1_MPSon ---
+[11:46:05] --- cfgA_SP_embed_lookup_MPSoff ---
+[11:48:53] --- cfgA_SP_embed_lookup_MPSon ---
+[11:51:18] --- cfgA_SP_memcpy_loop_MPSoff ---
+[11:54:10] --- cfgA_SP_memcpy_loop_MPSon ---
+[11:56:36] ===== CROSS-PARTITION cfg=A (L1 alone in MIG-dae3f173-7b15-594b-bc80-6cef80687a56) =====
+[11:56:36] --- cfgA_CP_idle ---
+[11:57:12] --- cfgA_CP_nrx ---
+[11:58:51] --- cfgA_CP_chanpred ---
+[12:00:29] --- cfgA_CP_qwen_rag ---
+[12:02:13] --- cfgA_CP_whisper ---
+[12:03:53] --- cfgA_CP_qwen_vl ---
+[12:05:34] --- cfgA_CP_hbm_stress ---
+[12:07:11] --- cfgA_CP_qwen_chat_b1 ---
+[12:08:56] --- cfgA_CP_whisper_stream_b1 ---
+[12:10:37] --- cfgA_CP_bert_b1 ---
+[12:12:16] --- cfgA_CP_embed_lookup ---
+[12:13:55] --- cfgA_CP_memcpy_loop ---
+[12:15:34] --- cfgA_CP_qwen_llm_cross ---
+[12:17:19] == config B: Full GPU 0 (no MIG) ==
+[12:17:52]   UUID_L1(full)=GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0
+[12:17:52] ===== SAME-PARTITION cfg=B (L1 + co-tenant in GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0) =====
+[12:17:52] --- SP-0 baseline cfg=B t=1 ---
+[12:18:04] --- SP-0 baseline cfg=B t=2 ---
+[12:18:16] --- SP-0 baseline cfg=B t=3 ---
+[12:18:29] --- cfgB_SP_nrx_MPSoff ---
+[12:20:42] --- cfgB_SP_nrx_MPSon ---
+[12:22:07] --- cfgB_SP_chanpred_MPSoff ---
+[12:24:03] --- cfgB_SP_chanpred_MPSon ---
+[12:25:26] --- cfgB_SP_qwen_rag_MPSoff ---
+[12:27:01] --- cfgB_SP_qwen_rag_MPSon ---
+[12:28:30] --- cfgB_SP_whisper_MPSoff ---
+[12:30:00] --- cfgB_SP_whisper_MPSon ---
+[12:31:22] --- cfgB_SP_qwen_vl_MPSoff ---
+[12:32:51] --- cfgB_SP_qwen_vl_MPSon ---
+[12:34:15] --- cfgB_SP_hbm_stress_MPSoff ---
+[12:35:28] --- cfgB_SP_hbm_stress_MPSon ---
+[12:36:37] --- cfgB_SP_qwen_chat_b1_MPSoff ---
+[12:38:11] --- cfgB_SP_qwen_chat_b1_MPSon ---
+[12:39:40] --- cfgB_SP_whisper_stream_b1_MPSoff ---
+[12:41:09] --- cfgB_SP_whisper_stream_b1_MPSon ---
+[12:42:33] --- cfgB_SP_bert_b1_MPSoff ---
+[12:44:02] --- cfgB_SP_bert_b1_MPSon ---
+[12:45:26] --- cfgB_SP_embed_lookup_MPSoff ---
+[12:47:09] --- cfgB_SP_embed_lookup_MPSon ---
+[12:48:33] --- cfgB_SP_memcpy_loop_MPSoff ---
+[12:50:20] --- cfgB_SP_memcpy_loop_MPSon ---
+[12:51:45] no CROSS partition for cfg=B, skip CP
+[12:51:45] == config C: 3g.20gb + 2g.10gb + 2g.10gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  5 using profile MIG 2g.10gb (ID  1)
+Successfully created GPU instance ID  6 on GPU  0 using profile MIG 2g.10gb (ID 14)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  6 using profile MIG 2g.10gb (ID  1)
+[12:51:56]   UUID_L1(3g)=MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0
+[12:51:56]   UUID_CROSS(2g#1)=MIG-b313c3eb-083e-542f-8224-2c491f6b819c
+[12:51:56]   UUID_ALT(2g#2)=MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f
+[12:51:56] ===== SAME-PARTITION cfg=C (L1 + co-tenant in MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0) =====
+[12:51:56] --- SP-0 baseline cfg=C t=1 ---
+[12:52:29] --- SP-0 baseline cfg=C t=2 ---
+[12:53:01] --- SP-0 baseline cfg=C t=3 ---
+[12:53:34] --- cfgC_SP_nrx_MPSoff ---
+[12:56:45] --- cfgC_SP_nrx_MPSon ---
+[12:59:12] --- cfgC_SP_chanpred_MPSoff ---
+[13:02:30] --- cfgC_SP_chanpred_MPSon ---
+[13:04:56] --- cfgC_SP_qwen_rag_MPSoff ---
+[13:07:29] --- cfgC_SP_qwen_rag_MPSon ---
+[13:09:55] --- cfgC_SP_whisper_MPSoff ---
+[13:12:29] --- cfgC_SP_whisper_MPSon ---
+[13:14:55] --- cfgC_SP_qwen_vl_MPSoff ---
+[13:17:30] --- cfgC_SP_qwen_vl_MPSon ---
+[13:19:57] --- cfgC_SP_hbm_stress_MPSoff ---
+[13:22:27] --- cfgC_SP_hbm_stress_MPSon ---
+[13:24:51] --- cfgC_SP_qwen_chat_b1_MPSoff ---
+[13:27:24] --- cfgC_SP_qwen_chat_b1_MPSon ---
+[13:29:52] --- cfgC_SP_whisper_stream_b1_MPSoff ---
+[13:32:26] --- cfgC_SP_whisper_stream_b1_MPSon ---
+[13:34:51] --- cfgC_SP_bert_b1_MPSoff ---
+[13:37:23] --- cfgC_SP_bert_b1_MPSon ---
+[13:39:50] --- cfgC_SP_embed_lookup_MPSoff ---
+[13:42:34] --- cfgC_SP_embed_lookup_MPSon ---
+[13:45:01] --- cfgC_SP_memcpy_loop_MPSoff ---
+[13:47:49] --- cfgC_SP_memcpy_loop_MPSon ---
+[13:50:15] ===== CROSS-PARTITION cfg=C (L1 alone in MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0) =====
+[13:50:15] --- cfgC_CP_idle ---
+[13:50:52] --- cfgC_CP_nrx ---
+[13:52:32] --- cfgC_CP_chanpred ---
+[13:54:12] --- cfgC_CP_qwen_rag ---
+[13:55:49] --- cfgC_CP_whisper ---
+[13:57:29] --- cfgC_CP_qwen_vl ---
+[13:59:11] --- cfgC_CP_hbm_stress ---
+[14:00:48] --- cfgC_CP_qwen_chat_b1 ---
+[14:02:25] --- cfgC_CP_whisper_stream_b1 ---
+[14:04:05] --- cfgC_CP_bert_b1 ---
+[14:05:45] --- cfgC_CP_embed_lookup ---
+[14:07:24] --- cfgC_CP_memcpy_loop ---
+[14:09:03] --- cfgC_CP_qwen_llm_cross ---
+[14:10:40] ===== CROSS-PARTITION cfg=C 1g slot variant =====
+[14:10:40] --- cfgC_CP1g_idle ---
+[14:11:17] --- cfgC_CP1g_nrx ---
+[14:12:56] --- cfgC_CP1g_chanpred ---
+[14:14:35] --- cfgC_CP1g_whisper ---
+[14:16:15] --- cfgC_CP1g_qwen_llm_cross ---
+[14:17:54] --- cfgC_CP1g_hbm_stress ---
+[14:20:05] === chain14 DONE ===

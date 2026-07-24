@@ -1,0 +1,128 @@
+[14:22:53] === chain15 START configs=A B C ===
+[14:22:53] == config A: 4g.20gb + 3g.20gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  2 using profile MIG 4g.20gb (ID  3)
+Successfully created GPU instance ID  1 on GPU  0 using profile MIG 3g.20gb (ID  9)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  1 using profile MIG 3g.20gb (ID  2)
+[14:23:03]   UUID_L1=MIG-dae3f173-7b15-594b-bc80-6cef80687a56  UUID_CROSS=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+[14:23:03] ===== SAME-PARTITION cfg=A (L1 in MIG-dae3f173-7b15-594b-bc80-6cef80687a56) =====
+[14:23:03] --- SP-0 baseline cfg=A t=1 ---
+[14:23:38] --- SP-0 baseline cfg=A t=2 ---
+[14:24:13] --- SP-0 baseline cfg=A t=3 ---
+[14:24:48] --- cfgA_SP_qwen_chat_b1_MPSoff ---
+[14:27:19] --- cfgA_SP_qwen_chat_b2_MPSoff ---
+[14:29:50] --- cfgA_SP_qwen_chat_b4_MPSoff ---
+[14:32:21] --- cfgA_SP_qwen_chat_b8_MPSoff ---
+[14:34:52] --- cfgA_SP_qwen_chat_b16_MPSoff ---
+[14:37:23] --- cfgA_SP_qwen_chat_b32_MPSoff ---
+[14:39:54] --- cfgA_SP_bert_b1_MPSoff ---
+[14:42:25] --- cfgA_SP_bert_b4_MPSoff ---
+[14:44:58] --- cfgA_SP_bert_b16_MPSoff ---
+[14:47:33] --- cfgA_SP_bert_b64_MPSoff ---
+[14:50:03] --- cfgA_SP_whisper_b1_MPSoff ---
+[14:52:34] --- cfgA_SP_whisper_b2_MPSoff ---
+[14:55:05] --- cfgA_SP_whisper_b4_MPSoff ---
+[14:57:38] --- cfgA_SP_whisper_b8_MPSoff ---
+[15:00:10] --- cfgA_SP_vl_b1_MPSoff ---
+[15:02:41] --- cfgA_SP_vl_b2_MPSoff ---
+[15:05:12] --- cfgA_SP_vl_b4_MPSoff ---
+[15:07:50] --- cfgA_SP_qwen_chat_b1_MPSon ---
+[15:10:15] --- cfgA_SP_qwen_chat_b2_MPSon ---
+[15:12:41] --- cfgA_SP_qwen_chat_b4_MPSon ---
+[15:15:09] --- cfgA_SP_qwen_chat_b8_MPSon ---
+[15:17:35] --- cfgA_SP_qwen_chat_b16_MPSon ---
+[15:20:01] --- cfgA_SP_qwen_chat_b32_MPSon ---
+[15:22:28] --- cfgA_SP_bert_b1_MPSon ---
+[15:24:53] --- cfgA_SP_bert_b4_MPSon ---
+[15:27:19] --- cfgA_SP_bert_b16_MPSon ---
+[15:29:44] --- cfgA_SP_bert_b64_MPSon ---
+[15:32:09] --- cfgA_SP_whisper_b1_MPSon ---
+[15:34:34] --- cfgA_SP_whisper_b2_MPSon ---
+[15:36:59] --- cfgA_SP_whisper_b4_MPSon ---
+[15:39:24] --- cfgA_SP_whisper_b8_MPSon ---
+[15:41:50] --- cfgA_SP_vl_b1_MPSon ---
+[15:44:17] --- cfgA_SP_vl_b2_MPSon ---
+[15:46:42] --- cfgA_SP_vl_b4_MPSon ---
+[15:49:08] == config B: Full GPU 0 ==
+[15:49:41]   UUID_L1=GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0
+[15:49:41] ===== SAME-PARTITION cfg=B (L1 in GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0) =====
+[15:49:41] --- SP-0 baseline cfg=B t=1 ---
+[15:49:53] --- SP-0 baseline cfg=B t=2 ---
+[15:50:05] --- SP-0 baseline cfg=B t=3 ---
+[15:50:17] --- cfgB_SP_qwen_chat_b1_MPSoff ---
+[15:51:45] --- cfgB_SP_qwen_chat_b2_MPSoff ---
+[15:53:14] --- cfgB_SP_qwen_chat_b4_MPSoff ---
+[15:54:42] --- cfgB_SP_qwen_chat_b8_MPSoff ---
+[15:56:10] --- cfgB_SP_qwen_chat_b16_MPSoff ---
+[15:57:39] --- cfgB_SP_qwen_chat_b32_MPSoff ---
+[15:59:08] --- cfgB_SP_bert_b1_MPSoff ---
+[16:00:33] --- cfgB_SP_bert_b4_MPSoff ---
+[16:01:57] --- cfgB_SP_bert_b16_MPSoff ---
+[16:03:25] --- cfgB_SP_bert_b64_MPSoff ---
+[16:04:50] --- cfgB_SP_whisper_b1_MPSoff ---
+[16:06:15] --- cfgB_SP_whisper_b2_MPSoff ---
+[16:07:39] --- cfgB_SP_whisper_b4_MPSoff ---
+[16:09:03] --- cfgB_SP_whisper_b8_MPSoff ---
+[16:10:27] --- cfgB_SP_vl_b1_MPSoff ---
+[16:11:52] --- cfgB_SP_vl_b2_MPSoff ---
+[16:13:17] --- cfgB_SP_vl_b4_MPSoff ---
+[16:14:48] --- cfgB_SP_qwen_chat_b1_MPSon ---
+[16:16:16] --- cfgB_SP_qwen_chat_b2_MPSon ---
+[16:17:44] --- cfgB_SP_qwen_chat_b4_MPSon ---
+[16:19:12] --- cfgB_SP_qwen_chat_b8_MPSon ---
+[16:20:40] --- cfgB_SP_qwen_chat_b16_MPSon ---
+[16:22:08] --- cfgB_SP_qwen_chat_b32_MPSon ---
+[16:23:36] --- cfgB_SP_bert_b1_MPSon ---
+[16:24:58] --- cfgB_SP_bert_b4_MPSon ---
+[16:26:22] --- cfgB_SP_bert_b16_MPSon ---
+[16:27:45] --- cfgB_SP_bert_b64_MPSon ---
+[16:29:07] --- cfgB_SP_whisper_b1_MPSon ---
+[16:30:29] --- cfgB_SP_whisper_b2_MPSon ---
+[16:31:53] --- cfgB_SP_whisper_b4_MPSon ---
+[16:33:17] --- cfgB_SP_whisper_b8_MPSon ---
+[16:34:41] --- cfgB_SP_vl_b1_MPSon ---
+[16:36:02] --- cfgB_SP_vl_b2_MPSon ---
+[16:37:26] --- cfgB_SP_vl_b4_MPSon ---
+[16:38:50] == config C: 3g.20gb + 2g.10gb + 2g.10gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  5 using profile MIG 2g.10gb (ID  1)
+Successfully created GPU instance ID  6 on GPU  0 using profile MIG 2g.10gb (ID 14)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  6 using profile MIG 2g.10gb (ID  1)
+[16:39:01]   UUID_L1=MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0  UUID_CROSS=MIG-b313c3eb-083e-542f-8224-2c491f6b819c  UUID_ALT=MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f
+[16:39:01] ===== SAME-PARTITION cfg=C (L1 in MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0) =====
+[16:39:01] --- SP-0 baseline cfg=C t=1 ---
+[16:39:34] --- SP-0 baseline cfg=C t=2 ---
+[16:40:07] --- SP-0 baseline cfg=C t=3 ---
+[16:40:39] --- cfgC_SP_qwen_chat_b1_MPSoff ---
+[16:43:06] --- cfgC_SP_qwen_chat_b2_MPSoff ---
+[16:45:34] --- cfgC_SP_qwen_chat_b4_MPSoff ---
+[16:48:01] --- cfgC_SP_qwen_chat_b8_MPSoff ---
+[16:50:29] --- cfgC_SP_qwen_chat_b16_MPSoff ---
+[16:52:56] --- cfgC_SP_qwen_chat_b32_MPSoff ---
+[16:55:23] --- cfgC_SP_bert_b1_MPSoff ---
+[16:57:52] --- cfgC_SP_bert_b4_MPSoff ---
+[17:00:25] --- cfgC_SP_bert_b16_MPSoff ---
+[17:02:53] --- cfgC_SP_bert_b64_MPSoff ---
+[17:05:24] --- cfgC_SP_whisper_b1_MPSoff ---
+[17:07:52] --- cfgC_SP_whisper_b2_MPSoff ---
+[17:10:20] --- cfgC_SP_whisper_b4_MPSoff ---
+[17:12:47] --- cfgC_SP_whisper_b8_MPSoff ---
+[17:15:14] --- cfgC_SP_vl_b1_MPSoff ---
+[17:17:42] --- cfgC_SP_vl_b2_MPSoff ---
+[17:20:09] --- cfgC_SP_vl_b4_MPSoff ---
+[17:22:42] --- cfgC_SP_qwen_chat_b1_MPSon ---
+[17:25:08] --- cfgC_SP_qwen_chat_b2_MPSon ---
+[17:27:34] --- cfgC_SP_qwen_chat_b4_MPSon ---
+[17:30:00] --- cfgC_SP_qwen_chat_b8_MPSon ---
+[17:32:27] --- cfgC_SP_qwen_chat_b16_MPSon ---
+[17:34:53] --- cfgC_SP_qwen_chat_b32_MPSon ---
+[17:37:19] --- cfgC_SP_bert_b1_MPSon ---
+[17:39:45] --- cfgC_SP_bert_b4_MPSon ---
+[17:42:11] --- cfgC_SP_bert_b16_MPSon ---
+[17:44:36] --- cfgC_SP_bert_b64_MPSon ---
+[17:47:01] --- cfgC_SP_whisper_b1_MPSon ---
+[17:49:25] --- cfgC_SP_whisper_b2_MPSon ---
+[17:51:51] --- cfgC_SP_whisper_b4_MPSon ---
+[17:54:16] --- cfgC_SP_whisper_b8_MPSon ---
+[17:56:42] --- cfgC_SP_vl_b1_MPSon ---
+[17:59:10] --- cfgC_SP_vl_b2_MPSon ---
+[18:01:35] --- cfgC_SP_vl_b4_MPSon ---
+[18:04:34] === chain15 DONE ===

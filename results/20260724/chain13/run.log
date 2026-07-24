@@ -1,0 +1,27 @@
+[03:11:44] === chain13 START ===
+[03:11:44] == enabling MIG on GPU 0 ==
+[03:11:49] == creating 4g.20gb + 3g.20gb ==
+[03:11:52]   UUID_4G=MIG-dae3f173-7b15-594b-bc80-6cef80687a56
+[03:11:52]   UUID_3G=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+[03:11:52] ===== SAME-PARTITION (4g에 L1 + co-tenant, 3g에 Qwen 상주) =====
+[03:11:52] --- SP-0 baseline: L1 alone in 4g, Qwen in 3g ---
+[03:13:36] --- SP_nrx_MPSoff ---
+[03:17:28] --- SP_nrx_MPSon ---
+[03:19:54] --- SP_chanpred_MPSoff ---
+[03:23:15] --- SP_chanpred_MPSon ---
+[03:25:41] --- SP_qwen_rag_MPSoff ---
+[03:28:04] --- SP_qwen_rag_MPSon ---
+[03:30:17] --- SP_whisper_MPSoff ---
+[03:33:21] --- SP_whisper_MPSon ---
+[03:35:48] --- SP_qwen_vl_MPSoff ---
+[03:38:25] --- SP_qwen_vl_MPSon ---
+[03:40:53] ===== CROSS-PARTITION (4g에 L1 alone, 3g에 각 워크로드) =====
+[03:40:53] --- CP_idle ---
+[03:41:31] --- CP_nrx ---
+[03:43:12] --- CP_chanpred ---
+[03:44:50] --- CP_qwen_rag ---
+[03:46:35] --- CP_whisper ---
+[03:48:14] --- CP_qwen_vl ---
+[03:49:55] --- CP_qwen_llm ---
+[03:51:39] == disabling MIG ==
+[03:52:11] === chain13 DONE ===

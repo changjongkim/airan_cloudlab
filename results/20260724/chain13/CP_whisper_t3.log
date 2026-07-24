@@ -1,0 +1,17 @@
+/usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py:127: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+[08:47:53] loading openai/whisper-large-v3
+[08:47:55] model ready
+Due to a bug fix in https://github.com/huggingface/transformers/pull/28687 transcription using a multilingual Whisper will default to language detection followed by transcription instead of translation to English.This might be a breaking change for your use case. If you want to instead always translate your audio to English, make sure to pass `language='en'`.
+Passing a tuple of `past_key_values` is deprecated and will be removed in Transformers v4.43.0. You should pass an instance of `EncoderDecoderCache` instead, e.g. `past_key_values=EncoderDecoderCache.from_legacy_cache(past_key_values)`.
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+[08:47:56] warmup done, entering loop
+[08:47:58] iter=5  elapsed=2.4s
+[08:47:59] iter=10  elapsed=4.0s
+[08:48:01] iter=15  elapsed=5.6s
+[08:48:02] iter=20  elapsed=7.2s
+[08:48:04] iter=25  elapsed=8.8s
+[08:48:06] iter=30  elapsed=10.3s
+[08:48:07] iter=35  elapsed=11.9s
+[08:48:09] iter=40  elapsed=13.5s
+[08:48:10] iter=45  elapsed=15.1s

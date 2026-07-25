@@ -1,0 +1,28 @@
+[07:16:21] loading Qwen/Qwen2.5-3B-Instruct (gpu_mem_util=0.35)
+WARNING 07-25 07:16:22 config.py:2276] Casting torch.bfloat16 to torch.float16.
+INFO 07-25 07:16:26 config.py:510] This model supports multiple tasks: {'reward', 'classify', 'score', 'generate', 'embed'}. Defaulting to 'generate'.
+INFO 07-25 07:16:26 llm_engine.py:234] Initializing an LLM engine (v0.6.6) with config: model='Qwen/Qwen2.5-3B-Instruct', speculative_config=None, tokenizer='Qwen/Qwen2.5-3B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.float16, max_seq_len=2048, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto, quantization_param_path=None, device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='xgrammar'), observability_config=ObservabilityConfig(otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=0, served_model_name=Qwen/Qwen2.5-3B-Instruct, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=False, chunked_prefill_enabled=False, use_async_output_proc=True, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output"],"candidate_compile_sizes":[],"compile_sizes":[],"capture_sizes":[16,8,4,2,1],"max_capture_size":16}, use_cached_outputs=False, 
+INFO 07-25 07:16:27 selector.py:120] Using Flash Attention backend.
+INFO 07-25 07:16:28 model_runner.py:1094] Starting to load model Qwen/Qwen2.5-3B-Instruct...
+INFO 07-25 07:16:28 weight_utils.py:251] Using model weights format ['*.safetensors']
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:00<00:00,  1.60it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.01it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:01<00:00,  1.07it/s]
+
+INFO 07-25 07:16:30 model_runner.py:1099] Loading model weights took 5.7915 GB
+INFO 07-25 07:16:31 worker.py:241] Memory profiling takes 0.52 seconds
+INFO 07-25 07:16:31 worker.py:241] the current vLLM instance can use total_gpu_memory (19.62GiB) x gpu_memory_utilization (0.35) = 6.87GiB
+INFO 07-25 07:16:31 worker.py:241] model weights take 5.79GiB; non_torch_memory takes -0.22GiB; PyTorch activation peak memory takes 0.17GiB; the rest of the memory reserved for KV Cache is 1.13GiB.
+INFO 07-25 07:16:31 gpu_executor.py:76] # GPU blocks: 2064, # CPU blocks: 7281
+INFO 07-25 07:16:31 gpu_executor.py:80] Maximum concurrency for 2048 tokens per request: 16.12x
+INFO 07-25 07:16:34 model_runner.py:1415] Capturing cudagraphs for decoding. This may lead to unexpected consequences if the model is not static. To run the model in eager mode, set 'enforce_eager=True' or use '--enforce-eager' in the CLI. If out-of-memory error occurs during cudagraph capture, consider decreasing `gpu_memory_utilization` or switching to eager mode. You can also reduce the `max_num_seqs` as needed to decrease memory usage.
+Capturing CUDA graph shapes:   0%|          | 0/5 [00:00<?, ?it/s]Capturing CUDA graph shapes:  20%|██        | 1/5 [00:00<00:01,  3.27it/s]Capturing CUDA graph shapes:  40%|████      | 2/5 [00:00<00:00,  3.55it/s]Capturing CUDA graph shapes:  60%|██████    | 3/5 [00:00<00:00,  3.66it/s]Capturing CUDA graph shapes:  80%|████████  | 4/5 [00:01<00:00,  3.72it/s]Capturing CUDA graph shapes: 100%|██████████| 5/5 [00:01<00:00,  3.76it/s]Capturing CUDA graph shapes: 100%|██████████| 5/5 [00:01<00:00,  3.69it/s]
+INFO 07-25 07:16:35 model_runner.py:1535] Graph capturing finished in 1 secs, took 0.06 GiB
+INFO 07-25 07:16:35 llm_engine.py:431] init engine (profile, create kv cache, warmup model) took 4.89 seconds
+[07:16:35] model ready
+[07:16:35] loading dataset HuggingFaceH4/ultrachat_200k
+[07:16:38] loaded 512 real prompts
+Processed prompts:   0%|          | 0/8 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  12%|█▎        | 1/8 [00:02<00:17,  2.47s/it, est. speed input: 141.12 toks/s, output: 70.36 toks/s]Processed prompts:  25%|██▌       | 2/8 [00:04<00:11,  1.97s/it, est. speed input: 89.19 toks/s, output: 113.87 toks/s]Processed prompts:  38%|███▊      | 3/8 [00:07<00:12,  2.46s/it, est. speed input: 109.78 toks/s, output: 137.13 toks/s]Processed prompts: 100%|██████████| 8/8 [00:07<00:00,  1.12it/s, est. speed input: 154.93 toks/s, output: 496.05 toks/s]
+[07:16:45] warmup done, main loop
+Processed prompts:   0%|          | 0/32 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/32 [00:01<00:53,  1.73s/it, est. speed input: 96.59 toks/s, output: 52.05 toks/s]Processed prompts:   6%|▋         | 2/32 [00:04<01:08,  2.27s/it, est. speed input: 119.64 toks/s, output: 78.77 toks/s]Processed prompts:   9%|▉         | 3/32 [00:04<00:43,  1.51s/it, est. speed input: 106.98 toks/s, output: 127.61 toks/s]Processed prompts:  12%|█▎        | 4/32 [00:05<00:30,  1.09s/it, est. speed input: 110.85 toks/s, output: 175.84 toks/s]Processed prompts:  16%|█▌        | 5/32 [00:06<00:27,  1.01s/it, est. speed input: 97.64 toks/s, output: 210.70 toks/s] Processed prompts:  19%|█▉        | 6/32 [00:08<00:37,  1.44s/it, est. speed input: 82.60 toks/s, output: 214.00 toks/s]Processed prompts:  53%|█████▎    | 17/32 [00:10<00:05,  2.90it/s, est. speed input: 187.30 toks/s, output: 739.01 toks/s]

@@ -1,0 +1,18 @@
+[13:26:05] allocating embedding table 32M×128 fp16 = 8.2GB
+Traceback (most recent call last):
+  File "/scripts/run_embed_lookup.py", line 64, in <module>
+    main()
+  File "/scripts/run_embed_lookup.py", line 32, in main
+    table = cp.empty((args.table_rows, args.dim), dtype=cp.float16)
+  File "/usr/local/lib/python3.10/dist-packages/cupy/_creation/basic.py", line 32, in empty
+    return cupy.ndarray(shape, dtype, order=order)
+  File "cupy/_core/core.pyx", line 151, in cupy._core.core.ndarray.__new__
+  File "cupy/_core/core.pyx", line 239, in cupy._core.core._ndarray_base._init
+  File "cupy/cuda/memory.pyx", line 738, in cupy.cuda.memory.alloc
+  File "cupy/cuda/memory.pyx", line 1424, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1445, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1116, in cupy.cuda.memory.SingleDeviceMemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1137, in cupy.cuda.memory.SingleDeviceMemoryPool._malloc
+  File "cupy/cuda/memory.pyx", line 1382, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+  File "cupy/cuda/memory.pyx", line 1385, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+cupy.cuda.memory.OutOfMemoryError: Out of memory allocating 8,192,000,000 bytes (allocated so far: 0 bytes).

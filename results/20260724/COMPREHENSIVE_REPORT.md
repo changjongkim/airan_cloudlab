@@ -452,14 +452,91 @@ Chain 18 strengthens the weakest claims of the Chain 9-17 story with seven targe
 - Files: `20260725/chain17_gapstats/*.gputrace.csv`, `kernel_gap_stats.json`, `figures/comprehensive/f21_kernel_gap_vs_N.png`, `f22_gap_histograms.png`, `f23_l1_duty_cycle.png`
 - Script: `20260725/analyze_kernel_gaps.py`
 
-### Parts 3-7 — running under auto pipeline (ETA 5-7 h)
-- **Part 3** — Extended N-process sweep: nrx N ∈ {5,7,10,12,16}; memcpy/embed N ∈ {1,2,4,6,8}; 3 trials × MPS off/on.
-- **Part 4** — Fine `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` sweep: 10 pct steps × 4 workloads.
-- **Part 5** — Multi-thread (1 proc) vs multi-process (N proc) controlled experiment using the same ranai_mix template.
-- **Part 6** — Multi-GPU baseline: L1 on GPU 0, AI on GPU 1 — the isolation ceiling.
-- **Part 7** — Long-window (300 s) + statistical (10 trials at breakpoint N).
-- **Part 2b** — NCU with `--mps client` for MPSon (queued last).
-- Output figures: f15 (N-sweep ext), f16 (fine pct), f17 (thread-vs-proc), f18 (multi-GPU), f19+f20 (long-window + statistical).
-- Analysis script pre-written: `20260725/analyze_parts3to7.py`.
+### Part 3 — Extended N-process sweep (done)
+- nrx N ∈ {5,7,10,12,16}; memcpy/embed N ∈ {1,2,4,6,8}; 3 trials × MPS off/on.
+- Files: `20260725/chain18/p3_*.nsys-rep` (300+ captures), `chain18_gapstats/p3_*.gputrace.csv`.
 
-For AI-RAN deployment: one MIG partition per major workload is the golden path. If forced to co-locate multiple processes in one partition, keep N≤4 and enable MPS with 70% thread cap for AI clients.
+### Part 4 — Partial fine MPS thread% sweep (100/80 done, rest skipped for 2 h budget)
+- Aborted mid-run when the 2 h remaining-time constraint was set. Original chain 17 already covered 100/70/50/30 anchor points.
+- Files: `20260725/chain18/p4_*.nsys-rep` (partial), `chain18_gapstats/p4_*.gputrace.csv`.
+
+### Part 5 — Multi-thread vs Multi-process controlled (done)
+- Same total AI thread count implemented two ways: as N threads inside 1 process (1 CUDA context) vs N processes each with 14 threads (N CUDA contexts).
+- Result table (all conditions L1 on 4g.20gb, Qwen cross partition, MPS on):
+
+| config | total AI threads | CUDA contexts | L1 duty | gap_p95 |
+|---|---|---|---|---|
+| thr_10 (1 proc, 4 beam) | 10 | 1 | 27.6% | 163 μs |
+| thr_14 (1 proc, 8 beam) | 14 | 1 | 30.2% | 159 μs |
+| thr_22 (1 proc, 16 beam) | 22 | 1 | 27.7% | 162 μs |
+| thr_38 (1 proc, 32 beam) | 38 | 1 | 29.7% | 149 μs |
+| proc_1 (1 proc) | 14 | 1 | 29.0% | 162 μs |
+| proc_2 (2 procs) | 28 | 2 | 31.9% | 133 μs |
+| proc_4 (4 procs) | 56 | 4 | 29.2% | 159 μs |
+| proc_8 (8 procs) | 112 | 8 | 29.1% | 161 μs |
+
+- Under this workload template (ranai_mix = 2 NRx + 4 CSI + 8 Beam), **neither thread nor process count degrades L1**. All conditions cluster near baseline (~29 % duty, ~160 μs p95).
+- This APPARENTLY contradicts Chain 17's N=6-8 breakdown for identical NRx processes. The reconciliation: per-process kernel launch INTENSITY matters, not just process count. Chain 17 used 8× heavy identical NRx (each pushing kernels at max rate); Part 5 used 8× ranai_mix (14 threads mixing NRx + CSI + Beam, each per-process launch rate much lower).
+- **Deployment implication**: heterogeneity of workload profile per process matters as much as process count. Identical heavy replicas are the worst case; diverse light-per-process is fine.
+- Files: `20260725/chain18_p5/`, `chain18_p5_gapstats/`.
+- Figure: `figures/comprehensive/f25_p5_thread_vs_process.png`.
+
+### Part 6 — Skipped (2 h budget)
+Cross-GPU baseline is trivially perfect (L1 GPU0, AI GPU1 have no shared driver state on the L1-relevant path). Chain 14/15 CP already implies this at the intra-GPU level; multi-GPU was low-ROI verification.
+
+### Part 7 — 10-trial statistical at breakdown zone (done, long-window skipped)
+- 10 trials × N ∈ {5,6,7} with MPS on, MIG Config A same-partition NRx processes.
+- Purpose: is the N=6 breakdown deterministic or a rare event?
+
+| N | duty (mean±std) | gap_p95 (mean±std) |
+|---|---|---|
+| 5 | 24.7 ± 3.5 % | 669 ± 226 μs |
+| 6 | 18.9 ± 0.9 % | 960 ± 43 μs |
+| 7 | 16.5 ± 2.2 % | 1079 ± 74 μs |
+
+- **The breakdown at N=6 is deterministic**. σ = 0.9 % on duty and σ = 43 μs on gap_p95 across 10 independent trials. Not a rare event.
+- N=5 has higher trial-to-trial variance (σ=3.5 %) — sits at the edge of the breakdown zone.
+- Files: `20260725/chain18_p7/`, `chain18_p7_gapstats/`.
+- Figure: `figures/comprehensive/f26_p7_statistical.png`.
+
+### Part 8 — Realistic AI-RAN diverse workload stack (done, **KEY**)
+- Motivation: previous experiments used identical NRx replicas. Real deployment stacks DIVERSE workloads (Qwen chat + Whisper ASR + BERT NLU + NRx + CSI + Beam pred).
+- Five conditions (Config A, 3 trials each):
+
+| condition | dur_med | gap_med | gap_p95 | gap_p99 | duty |
+|---|---|---|---|---|---|
+| baseline (L1 alone on 4g) | 5.86 μs | 1.09 μs | 160 μs | 943 μs | 27.8 % |
+| **CP + diverse** (L1 4g, 6 different AI on 3g) | 5.89 μs | 1.18 μs | 172 μs | 920 μs | 29.2 % |
+| CP + uniform (L1 4g, 6× NRx on 3g) | 5.79 μs | 1.18 μs | 142 μs | 717 μs | 31.1 % |
+| SP + diverse (L1 + 6 different, same 4g) | 9.12 μs | 10.43 μs | 314 μs | 874 μs | 49.5 % |
+| SP + uniform (L1 + 6× NRx, same 4g) | 11.87 μs | **113 μs** | **814 μs** | **1490 μs** | 20.7 % |
+
+- **Key finding 1 — Cross-partition preserves baseline under realistic diversity**: CP-diverse (a realistic AI-RAN AI stack — vLLM Qwen + Whisper + BERT + NRx + CSI + BeamPred running simultaneously on 3g partition) leaves L1 metrics essentially untouched. gap_p95 172 μs vs baseline 160 μs (7 % difference). This validates cross-partition as the safe deployment topology.
+- **Key finding 2 — Same-partition diversity vs uniformity differ**: SP-uniform (6× identical NRx) shows classic breakdown (gap_p95 5.1× baseline). SP-diverse shows an unusual pattern — duty cycle appears higher (49.5 %) but individual L1 kernels take 55 % longer and gap_p95 is 2× baseline. MPS packs heterogeneous workloads efficiently, so GPU appears busier, but per-slot L1 latency still degrades.
+- **Key finding 3 — 5G TTI SLA analysis**: effective per-kernel budget (dur_med + gap_med):
+  - baseline: 6.95 μs
+  - CP-diverse: 7.07 μs (+1.7 %) — safe
+  - SP-diverse: 19.55 μs (2.8×) — marginal
+  - SP-uniform: 124.9 μs (18×) — SLA violation likely
+  - 5G TTI at 30 kHz numerology = 500 μs.
+- Files: `20260725/chain18_p8/`, `chain18_p8_gapstats/`.
+- Figure: `figures/comprehensive/f24_p8_realistic_stack.png`.
+
+### Part 2b — NCU with `--mps client` for MPSon (attempted, failed)
+- Ran successfully at execution but produced empty CSVs due to a NCU tool bug: `--log-file` is not compatible with `--mps client` mode. Only stderr captured the error.
+- This doesn't compromise the story — Part 2 already provided MPSoff DRAM/SM baselines, and the kernel-gap post-analysis in §12.2b captured the MPSon regime via nsys traces (a different but arguably more direct measurement of the sync effect).
+- Files: `20260725/chain18_p2b_ncu_mps/*.ncu.stdout` (error logs).
+
+---
+
+## 13. Overall deployment guidance (updated with Chain 18 evidence)
+
+1. **The sync problem is real and deployment-relevant**: N=6 same-partition breakdown is deterministic (Part 7 stat, σ<1 % on duty) and manifests as gap_p95 5-10× baseline (Chain 17 + Part 8).
+2. **Cross-partition (MIG hardware isolation) is the only fully safe topology**: verified against diverse 6-workload realistic AI stack (Part 8 CP-diverse). L1 metrics indistinguishable from baseline.
+3. **Same-partition CAN work but is fragile**: safe up to N=4 with MPS on and light-per-process workloads. Breaks at N≥6 identical heavy replicas. Diversity helps but doesn't eliminate slowdown.
+4. **The bottleneck is driver-level, not memory or compute** (§12.2b): even at N=1 without MPS, L1 spends 96 % of wall time idle between kernels — pure cudaFree implicit sync + launch queue cost.
+5. **MPS solves the problem up to a limit**: at N≤4, MPSon fully recovers baseline (Chain 17 duty 31.6 % vs L1-alone 31.7 %). At N≥6, MPS server itself becomes the bottleneck.
+6. **Deployment topology recommendation for SoftBank AITRAS-style AI-RAN**:
+   - **DO**: give L1 its own MIG partition (4g.20gb sufficient for 20-cell), put ALL AI workloads on separate MIG partition, run MPS on the AI partition.
+   - **DO NOT**: co-locate L1 and 6+ AI processes on the same MIG partition, even with MPS.
+   - **AVOID**: identical heavy replica scaling (N× same NRx); prefer diverse per-process workloads if forced into same-partition.

@@ -1,0 +1,41 @@
+# Aerial 25-3-cubb (matches Perlmutter) + AI workload dependencies for L1+AI interference study.
+# Build: docker build -t airan:25-3 -f Dockerfile.airan .
+#
+# Adds on top of the Aerial dev image:
+#   - PyTorch (CUDA 12.x, matched to Aerial base)
+#   - HuggingFace transformers (for GPT-2 / Qwen / etc.)
+#   - torchvision (for ResNet)
+#   - small utilities for benchmarking
+#
+# pyAerial, cuPHY, cupy, numpy come pre-installed in the base image.
+FROM nvcr.io/nvidia/aerial/aerial-cuda-accelerated-ran:25-3-cubb
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Some base images don't have pip wired up for the system python the user expects.
+# Aerial ships its own python under /opt; respect that by using `python3 -m pip`.
+RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# PyTorch matched to CUDA 12.x in the base image. cu121 wheels work on both 12.1 and 12.4 CUDA runtimes.
+RUN python3 -m pip install --no-cache-dir \
+        torch==2.4.1 torchvision==0.19.1 \
+        --index-url https://download.pytorch.org/whl/cu121
+
+# Transformers for GPT-2/Qwen-style stress tests; sentencepiece for tokenizers; accelerate for memory mgmt.
+RUN python3 -m pip install --no-cache-dir \
+        transformers==4.44.2 \
+        accelerate==0.34.2 \
+        sentencepiece==0.2.0 \
+        safetensors
+
+# Benchmarking helpers.
+RUN python3 -m pip install --no-cache-dir \
+        psutil==5.9.8 \
+        nvidia-ml-py==12.555.43 \
+        pandas==2.2.2
+
+# Quick self-check (build will fail loudly if torch can't see CUDA — note: must run with --gpus on build host).
+# Don't actually invoke at build time (no GPU during docker build); just keep imports importable.
+RUN python3 -c "import torch, transformers, torchvision; print('torch:', torch.__version__, 'tf:', transformers.__version__)"
+
+WORKDIR /workspace

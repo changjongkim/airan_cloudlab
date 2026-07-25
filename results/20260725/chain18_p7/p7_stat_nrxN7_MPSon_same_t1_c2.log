@@ -1,0 +1,9 @@
+[NeuralRx] Building TRT engine from /opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx...
+[NeuralRx] TRT engine built.
+IRuntime::deserializeCudaEngine: Error Code 1: Serialization (Serialization assertion plan.header.size == blobSize failed.)
+Traceback (most recent call last):
+  File "/workspace/AIRAN_Changjong/experiments/run_neural_rx_stress.py", line 56, in <module>
+    trt_engine = TrtEngine(
+  File "/opt/nvidia/cuBB/pyaerial/src/aerial/phy5g/algorithms/trt_engine.py", line 102, in __init__
+    self.trt_engine = pycuphy.TrtEngine(
+RuntimeError: Function cuphyCreateTrtEngine() returned CUPHY_STATUS_INTERNAL_ERROR: Internal error

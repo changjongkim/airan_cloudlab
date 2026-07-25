@@ -1,0 +1,44 @@
+[22:52:28] === chain16 START configs=A B C ===
+[22:52:28] == config A: 4g.20gb + 3g.20gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  2 using profile MIG 4g.20gb (ID  3)
+Successfully created GPU instance ID  1 on GPU  0 using profile MIG 3g.20gb (ID  9)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  1 using profile MIG 3g.20gb (ID  2)
+[22:52:39]   UUID_L1=MIG-dae3f173-7b15-594b-bc80-6cef80687a56 UUID_CROSS=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+[22:52:39] ===== SAME-PART cfg=A (L1 in MIG-dae3f173-7b15-594b-bc80-6cef80687a56) =====
+[22:52:39] --- SP-0 baseline cfg=A t=1 ---
+[22:53:14] --- SP-0 baseline cfg=A t=2 ---
+[22:53:49] --- SP-0 baseline cfg=A t=3 ---
+[22:54:24] --- cfgA_SP_ranai_mix_MPSoff ---
+[22:57:11] --- cfgA_SP_ranai_mix_MPSon ---
+[22:59:37] --- cfgA_SP_ranai_mix_heavy_MPSoff ---
+[23:02:24] --- cfgA_SP_ranai_mix_heavy_MPSon ---
+[23:04:51] --- cfgA_SP_nrx_multi4_MPSoff ---
+[23:08:50] --- cfgA_SP_nrx_multi4_MPSon ---
+[23:11:33] == config B: Full GPU 0 ==
+[23:12:06]   UUID_L1=GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0
+[23:12:06] ===== SAME-PART cfg=B (L1 in GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0) =====
+[23:12:06] --- SP-0 baseline cfg=B t=1 ---
+[23:12:18] --- SP-0 baseline cfg=B t=2 ---
+[23:12:29] --- SP-0 baseline cfg=B t=3 ---
+[23:12:41] --- cfgB_SP_ranai_mix_MPSoff ---
+[23:14:22] --- cfgB_SP_ranai_mix_MPSon ---
+[23:15:46] --- cfgB_SP_ranai_mix_heavy_MPSoff ---
+[23:17:27] --- cfgB_SP_ranai_mix_heavy_MPSon ---
+[23:18:50] --- cfgB_SP_nrx_multi4_MPSoff ---
+[23:21:25] --- cfgB_SP_nrx_multi4_MPSon ---
+[23:23:02] == config C: 3g.20gb + 2g.10gb + 2g.10gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  5 using profile MIG 2g.10gb (ID  1)
+Successfully created GPU instance ID  6 on GPU  0 using profile MIG 2g.10gb (ID 14)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  6 using profile MIG 2g.10gb (ID  1)
+[23:23:13]   UUID_L1=MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0 UUID_CROSS=MIG-b313c3eb-083e-542f-8224-2c491f6b819c UUID_ALT=MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f
+[23:23:13] ===== SAME-PART cfg=C (L1 in MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0) =====
+[23:23:13] --- SP-0 baseline cfg=C t=1 ---
+[23:23:45] --- SP-0 baseline cfg=C t=2 ---
+[23:24:18] --- SP-0 baseline cfg=C t=3 ---
+[23:24:50] --- cfgC_SP_ranai_mix_MPSoff ---
+[23:27:34] --- cfgC_SP_ranai_mix_MPSon ---
+[23:30:02] --- cfgC_SP_ranai_mix_heavy_MPSoff ---
+[23:32:45] --- cfgC_SP_ranai_mix_heavy_MPSon ---
+[23:35:11] --- cfgC_SP_nrx_multi4_MPSoff ---
+[23:39:04] --- cfgC_SP_nrx_multi4_MPSon ---
+[23:42:20] === chain16 DONE ===

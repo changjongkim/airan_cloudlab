@@ -1,0 +1,140 @@
+[00:04:12] === chain17 START configs=A B C parts=A B ===
+[00:04:12] == config A: 4g.20gb + 3g.20gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  2 using profile MIG 4g.20gb (ID  3)
+Successfully created GPU instance ID  1 on GPU  0 using profile MIG 3g.20gb (ID  9)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  1 using profile MIG 3g.20gb (ID  2)
+[00:04:25]   UUID_L1=MIG-dae3f173-7b15-594b-bc80-6cef80687a56 UUID_CROSS=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+[00:04:28] ===== Part A (N-process sweep) cfg=A =====
+[00:04:28] --- cfgA_A_nrxN1_MPSoff ---
+[00:08:26] --- cfgA_A_nrxN1_MPSon ---
+[00:10:59] --- cfgA_A_nrxN2_MPSoff ---
+[00:13:54] --- cfgA_A_nrxN2_MPSon ---
+[00:16:33] --- cfgA_A_nrxN3_MPSoff ---
+[00:19:47] --- cfgA_A_nrxN3_MPSon ---
+[00:22:31] --- cfgA_A_nrxN4_MPSoff ---
+[00:26:08] --- cfgA_A_nrxN4_MPSon ---
+[00:28:59] --- cfgA_A_nrxN6_MPSoff ---
+[00:33:13] --- cfgA_A_nrxN6_MPSon ---
+[00:36:40] --- cfgA_A_nrxN8_MPSoff ---
+[00:41:04] --- cfgA_A_nrxN8_MPSon ---
+[00:45:13] ===== Part B (MPS thread% cap) cfg=A =====
+[00:45:19] --- cfgA_B_nrx_pct100 ---
+[00:48:00] --- cfgA_B_nrx_pct70 ---
+[00:50:42] --- cfgA_B_nrx_pct50 ---
+[00:53:23] --- cfgA_B_nrx_pct30 ---
+[00:56:04] --- cfgA_B_chanpred_pct100 ---
+[00:58:41] --- cfgA_B_chanpred_pct70 ---
+[01:01:21] --- cfgA_B_chanpred_pct50 ---
+[01:04:00] --- cfgA_B_chanpred_pct30 ---
+[01:06:38] --- cfgA_B_memcpy_loop_pct100 ---
+[01:09:18] --- cfgA_B_memcpy_loop_pct70 ---
+[01:11:57] --- cfgA_B_memcpy_loop_pct50 ---
+[01:14:37] --- cfgA_B_memcpy_loop_pct30 ---
+[01:17:16] --- cfgA_B_embed_lookup_pct100 ---
+[01:19:55] --- cfgA_B_embed_lookup_pct70 ---
+[01:22:37] --- cfgA_B_embed_lookup_pct50 ---
+[01:25:17] --- cfgA_B_embed_lookup_pct30 ---
+[01:27:56] --- cfgA_B_ranai_mix_pct100 ---
+[01:30:35] --- cfgA_B_ranai_mix_pct70 ---
+[01:33:13] --- cfgA_B_ranai_mix_pct50 ---
+[01:35:50] --- cfgA_B_ranai_mix_pct30 ---
+[01:38:30] --- cfgA_B_ranai_mix_heavy_pct100 ---
+[01:41:08] --- cfgA_B_ranai_mix_heavy_pct70 ---
+[01:43:46] --- cfgA_B_ranai_mix_heavy_pct50 ---
+[01:46:25] --- cfgA_B_ranai_mix_heavy_pct30 ---
+[01:49:05] --- cfgA_B_nrx_multi4_pct100 ---
+[01:52:02] --- cfgA_B_nrx_multi4_pct70 ---
+[01:54:55] --- cfgA_B_nrx_multi4_pct50 ---
+[01:57:50] --- cfgA_B_nrx_multi4_pct30 ---
+[02:00:38] == config B: Full GPU 0 ==
+[02:01:14]   UUID_L1=GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0
+[02:01:17] ===== Part A (N-process sweep) cfg=B =====
+[02:01:17] --- cfgB_A_nrxN1_MPSoff ---
+[02:03:57] --- cfgB_A_nrxN1_MPSon ---
+[02:05:29] --- cfgB_A_nrxN2_MPSoff ---
+[02:07:13] --- cfgB_A_nrxN2_MPSon ---
+[02:08:48] --- cfgB_A_nrxN3_MPSoff ---
+[02:10:52] --- cfgB_A_nrxN3_MPSon ---
+[02:12:30] --- cfgB_A_nrxN4_MPSoff ---
+[02:14:52] --- cfgB_A_nrxN4_MPSon ---
+[02:16:34] --- cfgB_A_nrxN6_MPSoff ---
+[02:19:35] --- cfgB_A_nrxN6_MPSon ---
+[02:21:25] --- cfgB_A_nrxN8_MPSoff ---
+[02:24:32] --- cfgB_A_nrxN8_MPSon ---
+[02:26:41] ===== Part B (MPS thread% cap) cfg=B =====
+[02:26:46] --- cfgB_B_nrx_pct100 ---
+[02:28:24] --- cfgB_B_nrx_pct70 ---
+[02:30:00] --- cfgB_B_nrx_pct50 ---
+[02:31:37] --- cfgB_B_nrx_pct30 ---
+[02:33:15] --- cfgB_B_chanpred_pct100 ---
+[02:34:51] --- cfgB_B_chanpred_pct70 ---
+[02:36:28] --- cfgB_B_chanpred_pct50 ---
+[02:38:04] --- cfgB_B_chanpred_pct30 ---
+[02:39:38] --- cfgB_B_memcpy_loop_pct100 ---
+[02:41:15] --- cfgB_B_memcpy_loop_pct70 ---
+[02:42:51] --- cfgB_B_memcpy_loop_pct50 ---
+[02:44:25] --- cfgB_B_memcpy_loop_pct30 ---
+[02:45:59] --- cfgB_B_embed_lookup_pct100 ---
+[02:47:35] --- cfgB_B_embed_lookup_pct70 ---
+[02:49:11] --- cfgB_B_embed_lookup_pct50 ---
+[02:50:48] --- cfgB_B_embed_lookup_pct30 ---
+[02:52:22] --- cfgB_B_ranai_mix_pct100 ---
+[02:53:57] --- cfgB_B_ranai_mix_pct70 ---
+[02:55:34] --- cfgB_B_ranai_mix_pct50 ---
+[02:57:09] --- cfgB_B_ranai_mix_pct30 ---
+[02:58:44] --- cfgB_B_ranai_mix_heavy_pct100 ---
+[03:00:20] --- cfgB_B_ranai_mix_heavy_pct70 ---
+[03:01:55] --- cfgB_B_ranai_mix_heavy_pct50 ---
+[03:03:30] --- cfgB_B_ranai_mix_heavy_pct30 ---
+[03:05:04] --- cfgB_B_nrx_multi4_pct100 ---
+[03:06:51] --- cfgB_B_nrx_multi4_pct70 ---
+[03:08:37] --- cfgB_B_nrx_multi4_pct50 ---
+[03:10:23] --- cfgB_B_nrx_multi4_pct30 ---
+[03:12:05] == config C: 3g.20gb + 2g.10gb + 2g.10gb ==
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  5 using profile MIG 2g.10gb (ID  1)
+Successfully created GPU instance ID  6 on GPU  0 using profile MIG 2g.10gb (ID 14)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  6 using profile MIG 2g.10gb (ID  1)
+[03:12:20]   UUID_L1=MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0 UUID_CROSS=MIG-b313c3eb-083e-542f-8224-2c491f6b819c
+[03:12:20] ===== Part A (N-process sweep) cfg=C =====
+[03:12:20] --- cfgC_A_nrxN1_MPSoff ---
+[03:16:08] --- cfgC_A_nrxN1_MPSon ---
+[03:18:36] --- cfgC_A_nrxN2_MPSoff ---
+[03:22:20] --- cfgC_A_nrxN2_MPSon ---
+[03:24:51] --- cfgC_A_nrxN3_MPSoff ---
+[03:28:44] --- cfgC_A_nrxN3_MPSon ---
+[03:31:22] --- cfgC_A_nrxN4_MPSoff ---
+[03:35:11] --- cfgC_A_nrxN4_MPSon ---
+[03:37:56] --- cfgC_A_nrxN6_MPSoff ---
+[03:41:55] --- cfgC_A_nrxN6_MPSon ---
+[03:45:39] --- cfgC_A_nrxN8_MPSoff ---
+[03:49:42] --- cfgC_A_nrxN8_MPSon ---
+[03:53:43] ===== Part B (MPS thread% cap) cfg=C =====
+[03:53:48] --- cfgC_B_nrx_pct100 ---
+[03:56:22] --- cfgC_B_nrx_pct70 ---
+[03:58:54] --- cfgC_B_nrx_pct50 ---
+[04:01:27] --- cfgC_B_nrx_pct30 ---
+[04:04:00] --- cfgC_B_chanpred_pct100 ---
+[04:06:31] --- cfgC_B_chanpred_pct70 ---
+[04:09:05] --- cfgC_B_chanpred_pct50 ---
+[04:11:36] --- cfgC_B_chanpred_pct30 ---
+[04:14:08] --- cfgC_B_memcpy_loop_pct100 ---
+[04:16:39] --- cfgC_B_memcpy_loop_pct70 ---
+[04:19:12] --- cfgC_B_memcpy_loop_pct50 ---
+[04:21:43] --- cfgC_B_memcpy_loop_pct30 ---
+[04:24:13] --- cfgC_B_embed_lookup_pct100 ---
+[04:26:45] --- cfgC_B_embed_lookup_pct70 ---
+[04:29:16] --- cfgC_B_embed_lookup_pct50 ---
+[04:31:49] --- cfgC_B_embed_lookup_pct30 ---
+[04:34:21] --- cfgC_B_ranai_mix_pct100 ---
+[04:36:52] --- cfgC_B_ranai_mix_pct70 ---
+[04:39:24] --- cfgC_B_ranai_mix_pct50 ---
+[04:41:56] --- cfgC_B_ranai_mix_pct30 ---
+[04:44:26] --- cfgC_B_ranai_mix_heavy_pct100 ---
+[04:46:58] --- cfgC_B_ranai_mix_heavy_pct70 ---
+[04:49:29] --- cfgC_B_ranai_mix_heavy_pct50 ---
+[04:52:00] --- cfgC_B_ranai_mix_heavy_pct30 ---
+[04:54:33] --- cfgC_B_nrx_multi4_pct100 ---
+[04:57:23] --- cfgC_B_nrx_multi4_pct70 ---
+[05:00:07] --- cfgC_B_nrx_multi4_pct50 ---
+[05:03:01] --- cfgC_B_nrx_multi4_pct30 ---
+[05:06:18] === chain17 DONE ===

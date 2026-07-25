@@ -1,0 +1,55 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
+   Use the NVIDIA Container Toolkit to start this container with GPU support; see
+   https://docs.nvidia.com/datacenter/cloud-native/ .
+
+Generating SQLite file /data/p3_embedN4_MPSoff_t3.sqlite from /data/p3_embedN4_MPSoff_t3.nsys-rep
+Processing [/data/p3_embedN4_MPSoff_t3.sqlite] with [/opt/nvidia/nsight-systems-cli/2025.3.1/target-linux-x64/reports/cuda_gpu_trace.py]... 
+Start (ns),Duration (ns),CorrId,GrdX,GrdY,GrdZ,BlkX,BlkY,BlkZ,Reg/Trd,StcSMem (MB),DymSMem (MB),Bytes (MB),Throughput (MB/s),SrcMemKd,DstMemKd,Device,Ctx,GreenCtx,Strm,Name
+1138669795,114911,669,,,,,,,,,,1.468,12771.473,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1274960610,2048,1220,,,,,,,,,,0.000,27.344,Pageable,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1433838972,5952,1829,,,,,,,,,,0.028,4741.914,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1434350519,2592,1834,,,,,,,,,,0.007,2777.774,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1434867153,2816,1839,,,,,,,,,,0.008,2838.063,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1435387723,5152,1844,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1435906309,6464,1850,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1438712708,4320,1856,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1439231358,4800,1862,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1439401596,3264,1868,,,,,,,,,,0.028,8647.043,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Host-to-Device]
+1439751032,2592,1874,,,,,,,,,,0.007,2777.774,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Host-to-Device]
+1440267570,2784,1880,,,,,,,,,,0.008,2870.686,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Host-to-Device]
+1440784877,4927,1886,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1441303015,5215,1893,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1441822785,6527,1900,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1442343067,4640,1907,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1443235728,2304,1918,,,,,,,,,,0.028,12249.978,Device,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Device-to-Device]
+1443238960,1696,1920,,,,,,,,,,0.007,4245.278,Device,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Device-to-Device]
+1443241744,1632,1922,,,,,,,,,,0.008,4897.058,Device,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Device-to-Device]
+1443244464,1600,1924,,,,,,,,,,0.000,120.000,Device,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Device-to-Device]
+1443247056,1440,1926,,,,,,,,,,0.000,66.667,Device,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Device-to-Device]
+1443249584,1600,1928,,,,,,,,,,0.000,242.500,Device,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Device-to-Device]
+1443252176,1632,1930,,,,,,,,,,0.000,120.098,Device,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Device-to-Device]
+1443258928,10144,1931,,,,,,,,,,0.135,13321.707,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,13,[CUDA memcpy Host-to-Device]
+1511615165,1440,1941,,,,,,,,,,0.000,38.889,Pageable,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1511619005,4640,1947,,,,,,,,,,0.028,6082.752,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1512130743,2624,1952,,,,,,,,,,0.007,2743.898,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1512648817,2624,1957,,,,,,,,,,0.008,3045.727,Pinned,Device,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,[CUDA memcpy Host-to-Device]
+1513166219,5120,1962,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1513684389,6912,1968,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1514204031,3808,1974,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+1514722649,4608,1980,1,1,1,32,32,1,30,0.000,0.000,,,,,NVIDIA A100-SXM4-40GB MIG 4g.20gb (0),1,,7,"void convert_kernel<__half2, float2>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+

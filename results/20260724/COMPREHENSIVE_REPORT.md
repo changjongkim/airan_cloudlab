@@ -400,18 +400,57 @@ Chain 18 strengthens the weakest claims of the Chain 9-17 story with seven targe
 - Files: `dcgm_stats.json`, `figures/comprehensive/f11_dcgm_timeseries.png`, `f12_dcgm_summary.png`
 
 ### Part 2 — NCU per-kernel DRAM/SM on Full GPU (done, MPS off)
-- 6 workloads × 30 L1 kernels each profiled with `dram__throughput.avg.pct_of_peak_sustained_elapsed`, `smsp__cycles_active.avg.pct_of_peak_sustained_elapsed`, `dram__bytes.sum`.
-- **Figure 13** — per-kernel DRAM & SM boxplot:
-  - L1 alone: DRAM 1.2 % of peak, SM 20.8 % active.
-  - + 1 NRx proc: DRAM 1.3 %, SM 20.8 % — negligible.
-  - + memcpy_loop: DRAM 1.2 %, SM 20.7 %.
-  - + embed_lookup: DRAM 1.2 %, SM 20.7 %.
-  - + RAN-AI mix (14 threads, 1 process): DRAM 1.5 %, SM 20.2 %.
-  - + 4× NRx procs: **DRAM 3.5 %, SM 20.8 %** — 3× jump in DRAM utilization while SM stays flat.
-- **Figure 14** — DRAM bytes / L2 sectors per kernel.
-- Interpretation: L1 kernels are launch-rate bound (SM ~20 %, DRAM ~1 %) rather than compute- or memory-bound; the 3.5 % jump under 4-proc pressure is real evidence of HBM contention appearing precisely in the multi-process regime, consistent with the 2.6× residual sync gap reported in §6.
+- 6 workloads × 30 L1 kernels each profiled with dram/SM/L2 metrics.
+- Numbers (per-kernel means):
+
+| condition | DRAM_BW mean | DRAM_BW p95 | SM active | L2/DRAM ratio | DRAM bytes/kernel |
+|---|---|---|---|---|---|
+| L1 alone | 1.20 % | 8.4 % | 20.8 % | 6.58 | 0.28 MB |
+| +1 NRx | 1.28 % | 9.0 % | 20.8 % | 6.24 | 0.29 MB |
+| +memcpy | 1.20 % | 8.6 % | 20.7 % | 6.51 | 0.28 MB |
+| +embed | 1.19 % | 8.3 % | 20.7 % | 6.47 | 0.28 MB |
+| +RAN-AI mix 14thr | 1.55 % | 11.6 % | 20.2 % | 5.15 | 0.35 MB |
+| +4× NRx procs | 3.49 % | 24.1 % | 20.8 % | 2.58 | 0.71 MB |
+
+- **Kernel duration is unchanged** across all conditions (mean 24.7 μs, sum 0.74 ms for 30 kernels). Individual L1 kernels are NOT slowed by any concurrent workload.
+- **L2 cache pollution IS visible** (L2/DRAM ratio drops 6.58 → 2.58 under 4-proc), but the miss penalty is absorbed within the same kernel duration.
+- **HBM bandwidth is NOT the bottleneck**: even under 4-proc pressure, peak DRAM utilization is 25.9 % — 74 % headroom on the memory subsystem.
+- **What this means for the sync story**: the multi-process sync degradation cannot come from intra-kernel HBM/SM saturation. The bottleneck must live in the space *between kernels* — driver-level serialization, cudaFree implicit sync, launch queue backpressure. This is confirmed by the kernel-gap analysis in §12.2b below.
 - MPSon runs failed (NCU requires `--mps client` flag). Part 2b redoes them and is queued after Parts 3-7 complete.
 - Files: `20260725/chain18_p2_ncu/*.ncu.csv`, `ncu_stats.json`, `figures/comprehensive/f13_ncu_dram_by_workload.png`, `f14_ncu_traffic_by_workload.png`
+
+### Part 2b (post-hoc) — Kernel-gap analysis on Chain 17 N-sweep nsys traces
+- Post-analysis of 12 Chain 17 nsys-rep files (Config A, MPS off/on × N ∈ {1,2,3,4,6,8}) via `nsys stats --report cuda_gpu_trace`.
+- Extracted per-kernel start/duration, computed inter-kernel gap = start[i] − (start[i-1] + dur[i-1]) per stream, filtered memcpy/memset.
+- Total dataset: ~700k kernels across 12 conditions.
+
+| N | MPS | dur_med (μs) | gap_med (μs) | gap_p95 (μs) | gap_p99 (μs) | duty cycle |
+|---|---|---|---|---|---|---|
+| 1 | off | 5.82 | 1.06 | 4804 | 5371 | **3.55 %** |
+| 1 | on  | 5.79 | 1.15 | 134 | 700 | **31.58 %** |
+| 4 | off | 5.95 | 1.06 | 1640 | 7103 | 7.74 % |
+| 4 | on  | 6.43 | 1.12 | 513 | 1060 | 27.95 % |
+| 6 | off | 6.46 | 1.06 | 5215 | 11507 | 3.46 % |
+| 6 | on  | **13.34** | **119.71** | 803 | 1377 | 21.93 % |
+| 8 | off | 6.37 | 1.06 | 6387 | 13953 | 2.79 % |
+| 8 | on  | **15.17** | **379.07** | 1196 | 1860 | 13.84 % |
+
+- **Three findings**:
+  1. **Kernel duration is roughly constant up to N=4** (5.8-6.4 μs) — kernel-internal work is not the bottleneck.
+  2. **MPS off wastes 96 %+ of wall time as inter-kernel idle** at any N. Even N=1 (only the L1 process on the MIG partition) sits at 3.6 % duty cycle. This isolates the pure per-process driver cost: cudaFree implicit sync + kernel launch queue serialization even without cross-process contention.
+  3. **MPS on breakdown at N=6-8**: gap median jumps 1.1 μs → 119.7 μs (×109 at N=6) → 379.1 μs (×345 at N=8), and kernel duration itself grows ×2.6 (5.8 → 15.2 μs). MPS scheduler saturates at 6+ concurrent client contexts.
+
+- **The bottleneck stack**:
+  - HBM bandwidth: NOT bottleneck (peak 25.9 %, mean 3.5 %)
+  - SM compute: NOT bottleneck (~20 % flat)
+  - L2 cache pollution: happens but absorbed inside kernel
+  - **Driver-level (real culprit)**:
+    - cudaFree implicit cross-context sync (4-5 ms tail at N=1 MPSoff)
+    - Kernel launch queue serialization on host
+    - MPS scheduler saturation at N ≥ 6 contexts
+
+- Files: `20260725/chain17_gapstats/*.gputrace.csv`, `kernel_gap_stats.json`, `figures/comprehensive/f21_kernel_gap_vs_N.png`, `f22_gap_histograms.png`, `f23_l1_duty_cycle.png`
+- Script: `20260725/analyze_kernel_gaps.py`
 
 ### Parts 3-7 — running under auto pipeline (ETA 5-7 h)
 - **Part 3** — Extended N-process sweep: nrx N ∈ {5,7,10,12,16}; memcpy/embed N ∈ {1,2,4,6,8}; 3 trials × MPS off/on.

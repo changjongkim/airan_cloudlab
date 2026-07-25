@@ -387,4 +387,40 @@ Plus ~30 GB HuggingFace model downloads and ~11 GB nsys captures.
 
 **Cross-process cudaFree implicit sync in same-partition GPU sharing is a kernel-launch-rate phenomenon.** MIG hardware partitions perfectly isolate; MPS spatial multiplex fully recovers single-process cases but leaves 2.6× residual for multi-process. Breakdown at N=6 concurrent processes even with MPS on. `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=70` reduces multi-process p99 by 42%.
 
+---
+
+## 12. Chain 18 addendum — depth verification (in progress)
+
+Chain 18 strengthens the weakest claims of the Chain 9-17 story with seven targeted follow-up experiments. Parts 1-2 are complete; Parts 3-7 are running under auto-pipeline.
+
+### Part 1 — DCGM real-time utilization time-series (done)
+- 360 tsv files × 100 ms sampling parsed → 240 conditions in `dcgm_stats.json`.
+- **Figure 11**: DRAM/SM utilization overlay for N-process sweep (Config A, MPS on) — shows the trajectory of DRAM_ACTIVE across the full 30 s window as N grows from 1 to 8.
+- **Figure 12**: Aggregate mean DRAM/SM utilization vs N — DRAM saturation zone at N ≥ 6 aligned with the launch-rate breakdown reported in §7.
+- Files: `dcgm_stats.json`, `figures/comprehensive/f11_dcgm_timeseries.png`, `f12_dcgm_summary.png`
+
+### Part 2 — NCU per-kernel DRAM/SM on Full GPU (done, MPS off)
+- 6 workloads × 30 L1 kernels each profiled with `dram__throughput.avg.pct_of_peak_sustained_elapsed`, `smsp__cycles_active.avg.pct_of_peak_sustained_elapsed`, `dram__bytes.sum`.
+- **Figure 13** — per-kernel DRAM & SM boxplot:
+  - L1 alone: DRAM 1.2 % of peak, SM 20.8 % active.
+  - + 1 NRx proc: DRAM 1.3 %, SM 20.8 % — negligible.
+  - + memcpy_loop: DRAM 1.2 %, SM 20.7 %.
+  - + embed_lookup: DRAM 1.2 %, SM 20.7 %.
+  - + RAN-AI mix (14 threads, 1 process): DRAM 1.5 %, SM 20.2 %.
+  - + 4× NRx procs: **DRAM 3.5 %, SM 20.8 %** — 3× jump in DRAM utilization while SM stays flat.
+- **Figure 14** — DRAM bytes / L2 sectors per kernel.
+- Interpretation: L1 kernels are launch-rate bound (SM ~20 %, DRAM ~1 %) rather than compute- or memory-bound; the 3.5 % jump under 4-proc pressure is real evidence of HBM contention appearing precisely in the multi-process regime, consistent with the 2.6× residual sync gap reported in §6.
+- MPSon runs failed (NCU requires `--mps client` flag). Part 2b redoes them and is queued after Parts 3-7 complete.
+- Files: `20260725/chain18_p2_ncu/*.ncu.csv`, `ncu_stats.json`, `figures/comprehensive/f13_ncu_dram_by_workload.png`, `f14_ncu_traffic_by_workload.png`
+
+### Parts 3-7 — running under auto pipeline (ETA 5-7 h)
+- **Part 3** — Extended N-process sweep: nrx N ∈ {5,7,10,12,16}; memcpy/embed N ∈ {1,2,4,6,8}; 3 trials × MPS off/on.
+- **Part 4** — Fine `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` sweep: 10 pct steps × 4 workloads.
+- **Part 5** — Multi-thread (1 proc) vs multi-process (N proc) controlled experiment using the same ranai_mix template.
+- **Part 6** — Multi-GPU baseline: L1 on GPU 0, AI on GPU 1 — the isolation ceiling.
+- **Part 7** — Long-window (300 s) + statistical (10 trials at breakpoint N).
+- **Part 2b** — NCU with `--mps client` for MPSon (queued last).
+- Output figures: f15 (N-sweep ext), f16 (fine pct), f17 (thread-vs-proc), f18 (multi-GPU), f19+f20 (long-window + statistical).
+- Analysis script pre-written: `20260725/analyze_parts3to7.py`.
+
 For AI-RAN deployment: one MIG partition per major workload is the golden path. If forced to co-locate multiple processes in one partition, keep N≤4 and enable MPS with 70% thread cap for AI clients.

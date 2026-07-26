@@ -412,8 +412,15 @@ Chain 18 strengthens the weakest claims of the Chain 9-17 story with seven targe
 
 ### Part 1 — DCGM real-time utilization time-series (done)
 - 360 tsv files × 100 ms sampling parsed → 240 conditions in `dcgm_stats.json`.
-- **Figure 11**: DRAM/SM utilization overlay for N-process sweep (Config A, MPS on) — shows the trajectory of DRAM_ACTIVE across the full 30 s window as N grows from 1 to 8.
-- **Figure 12**: Aggregate mean DRAM/SM utilization vs N — DRAM saturation zone at N ≥ 6 aligned with the launch-rate breakdown reported in §7.
+
+![Figure 11 — DCGM DRAM/SM time-series overlay across N-process sweep](../20260725/figures/comprehensive/f11_dcgm_timeseries.png)
+
+*Figure 11 — DRAM (top) and SM (bottom) utilization traces at 100 ms sampling across N=1..8 concurrent NRx processes on Config A MPS on. DRAM saturation onset at N ≥ 6 (yellow zone).*
+
+![Figure 12 — DCGM aggregate mean DRAM/SM vs N](../20260725/figures/comprehensive/f12_dcgm_summary.png)
+
+*Figure 12 — Mean DRAM and SM utilization plotted against N. MPS on holds SM active while DRAM slowly rises. MPS off shows early DRAM ramp and low SM occupancy.*
+
 - Files: `dcgm_stats.json`, `figures/comprehensive/f11_dcgm_timeseries.png`, `f12_dcgm_summary.png`
 
 ### Part 2 — NCU per-kernel DRAM/SM on Full GPU (done, MPS off)
@@ -434,6 +441,15 @@ Chain 18 strengthens the weakest claims of the Chain 9-17 story with seven targe
 - **HBM bandwidth is NOT the bottleneck**: even under 4-proc pressure, peak DRAM utilization is 25.9 % — 74 % headroom on the memory subsystem.
 - **What this means for the sync story**: the multi-process sync degradation cannot come from intra-kernel HBM/SM saturation. The bottleneck must live in the space *between kernels* — driver-level serialization, cudaFree implicit sync, launch queue backpressure. This is confirmed by the kernel-gap analysis in §12.2b below.
 - MPSon runs failed (NCU requires `--mps client` flag). Part 2b redoes them and is queued after Parts 3-7 complete.
+
+![Figure 13 — Per-kernel DRAM & SM boxplots](../20260725/figures/comprehensive/f13_ncu_dram_by_workload.png)
+
+*Figure 13 — L1 kernel per-kernel DRAM (left, boxplot of 30 kernels) and mean SM utilization (right) across 6 co-tenancy scenarios. DRAM p95 jumps from ~8% to ~24% under 4× NRx; SM stays ~20% flat.*
+
+![Figure 14 — NCU traffic per L1 kernel](../20260725/figures/comprehensive/f14_ncu_traffic_by_workload.png)
+
+*Figure 14 — Mean DRAM bytes per L1 kernel and L2 sectors accessed. Traffic per kernel jumps 0.28 MB → 0.71 MB under 4-proc pressure.*
+
 - Files: `20260725/chain18_p2_ncu/*.ncu.csv`, `ncu_stats.json`, `figures/comprehensive/f13_ncu_dram_by_workload.png`, `f14_ncu_traffic_by_workload.png`
 
 ### Part 2b (post-hoc) — Kernel-gap analysis on Chain 17 N-sweep nsys traces
@@ -466,6 +482,19 @@ Chain 18 strengthens the weakest claims of the Chain 9-17 story with seven targe
     - Kernel launch queue serialization on host
     - MPS scheduler saturation at N ≥ 6 contexts
 
+
+![Figure 21 — Kernel-gap median/p95/p99 vs N](../20260725/figures/comprehensive/f21_kernel_gap_vs_N.png)
+
+*Figure 21 — L1 inter-kernel gap distribution (median, p95, p99) vs number of concurrent NRx processes. MPS on curves (green) show sharp knee at N=6; MPS off curves (red) exhibit ms-scale tails at all N.*
+
+![Figure 22 — Gap histograms 6 conditions](../20260725/figures/comprehensive/f22_gap_histograms.png)
+
+*Figure 22 — Inter-kernel gap histograms (bins ≤ 1 ms) for MPS on/off at N=1, 4, 8. Median, p95, p99 marked. Visual illustration of the tail heaviness shift with MPS.*
+
+![Figure 23 — L1 GPU duty cycle vs N](../20260725/figures/comprehensive/f23_l1_duty_cycle.png)
+
+*Figure 23 — L1 GPU duty cycle = kernel time / (kernel time + gap time). MPS on holds ~30% baseline up to N=4, degrades to 14% at N=8. MPS off stays at 3% at all N.*
+
 - Files: `20260725/chain17_gapstats/*.gputrace.csv`, `kernel_gap_stats.json`, `figures/comprehensive/f21_kernel_gap_vs_N.png`, `f22_gap_histograms.png`, `f23_l1_duty_cycle.png`
 - Script: `20260725/analyze_kernel_gaps.py`
 
@@ -495,8 +524,12 @@ Chain 18 strengthens the weakest claims of the Chain 9-17 story with seven targe
 - Under this workload template (ranai_mix = 2 NRx + 4 CSI + 8 Beam), **neither thread nor process count degrades L1**. All conditions cluster near baseline (~29 % duty, ~160 μs p95).
 - This APPARENTLY contradicts Chain 17's N=6-8 breakdown for identical NRx processes. The reconciliation: per-process kernel launch INTENSITY matters, not just process count. Chain 17 used 8× heavy identical NRx (each pushing kernels at max rate); Part 5 used 8× ranai_mix (14 threads mixing NRx + CSI + Beam, each per-process launch rate much lower).
 - **Deployment implication**: heterogeneity of workload profile per process matters as much as process count. Identical heavy replicas are the worst case; diverse light-per-process is fine.
+
+![Figure 25 — Multi-thread vs Multi-process controlled](../20260725/figures/comprehensive/f25_p5_thread_vs_process.png)
+
+*Figure 25 — Same total AI thread count run as 1 process×N threads (blue) or N processes×14 threads (red). Both curves stay near baseline duty (~29%) regardless of total thread count.*
+
 - Files: `20260725/chain18_p5/`, `chain18_p5_gapstats/`.
-- Figure: `figures/comprehensive/f25_p5_thread_vs_process.png`.
 
 ### Part 6 — Skipped (2 h budget)
 Cross-GPU baseline is trivially perfect (L1 GPU0, AI GPU1 have no shared driver state on the L1-relevant path). Chain 14/15 CP already implies this at the intra-GPU level; multi-GPU was low-ROI verification.
@@ -513,8 +546,12 @@ Cross-GPU baseline is trivially perfect (L1 GPU0, AI GPU1 have no shared driver 
 
 - **The breakdown at N=6 is deterministic**. σ = 0.9 % on duty and σ = 43 μs on gap_p95 across 10 independent trials. Not a rare event.
 - N=5 has higher trial-to-trial variance (σ=3.5 %) — sits at the edge of the breakdown zone.
+
+![Figure 26 — Part 7 statistical boxplots](../20260725/figures/comprehensive/f26_p7_statistical.png)
+
+*Figure 26 — 10 independent trials per N ∈ {5, 6, 7} showing duty cycle (left) and gap p95 (right). Black dots are individual trials. N=6 σ<1% duty confirms deterministic breakdown.*
+
 - Files: `20260725/chain18_p7/`, `chain18_p7_gapstats/`.
-- Figure: `figures/comprehensive/f26_p7_statistical.png`.
 
 ### Part 8 — Realistic AI-RAN diverse workload stack (done, **KEY**)
 - Motivation: previous experiments used identical NRx replicas. Real deployment stacks DIVERSE workloads (Qwen chat + Whisper ASR + BERT NLU + NRx + CSI + Beam pred).
@@ -536,8 +573,12 @@ Cross-GPU baseline is trivially perfect (L1 GPU0, AI GPU1 have no shared driver 
   - SP-diverse: 19.55 μs (2.8×) — marginal
   - SP-uniform: 124.9 μs (18×) — SLA violation likely
   - 5G TTI at 30 kHz numerology = 500 μs.
+
+![Figure 24 — Part 8 realistic stack comparison](../20260725/figures/comprehensive/f24_p8_realistic_stack.png)
+
+*Figure 24 — 5 realistic AI-RAN deployment scenarios. Left: L1 duty cycle. Middle: gap p95. Right: per-kernel budget vs 5G TTI (500 μs red line). CP scenarios preserve baseline; SP scenarios blow past TTI.*
+
 - Files: `20260725/chain18_p8/`, `chain18_p8_gapstats/`.
-- Figure: `figures/comprehensive/f24_p8_realistic_stack.png`.
 
 ### Part 2b — NCU with `--mps client` for MPSon (attempted, failed)
 - Ran successfully at execution but produced empty CSVs due to a NCU tool bug: `--log-file` is not compatible with `--mps client` mode. Only stderr captured the error.
@@ -583,7 +624,10 @@ L1 has ~10 distinct kernel types. Under SP + 6× NRx pressure, they scale differ
 
 Notably, the `convert_kernel` largest-in-absolute (79 → 246 μs, +167 μs) is the worst absolute penalty. This one kernel alone contributes ~167 μs to L1's per-slot latency budget under 6-proc same-partition pressure.
 
-Figure: `figures/comprehensive/f28_per_kernel_duration.png`.
+
+![Figure 28 — Per-cuPHY-kernel duration comparison](../20260725/figures/comprehensive/f28_per_kernel_duration.png)
+
+*Figure 28 — Median duration of top 8 cuPHY kernels across Part 8 scenarios. Every kernel type inflates 1.9-3.1× under SP-uniform pressure, confirming driver-level bottleneck hits all kernels uniformly.*
 
 ### 14.2 Extended N-sweep (N=1 to 16) — does breakdown asymptote?
 
@@ -605,7 +649,10 @@ Combining Chain 17 (N=1,2,3,4,6,8) and Part 3 (N=5,7,10,12,16) gives a continuou
 
 **Duty cycle asymptote**: extended N=10-16 range shows duty cycle continues to decline but not to zero. There is a floor (~5-10 %) representing L1's own irreducible work. This corroborates that MPS scheduler has a hard capacity limit rather than a graceful degradation curve.
 
-Figure: `figures/comprehensive/f29_extended_nsweep.png`.
+
+![Figure 29 — Extended N-sweep asymptote](../20260725/figures/comprehensive/f29_extended_nsweep.png)
+
+*Figure 29 — Chain 17 (N=1..8) combined with Part 3 (N=5..16). Duty cycle asymptotes to ~5-10% floor. Gap p95 grows unboundedly on log scale. Kernel duration doubles between N=4 and N=6.*
 
 ### 14.3 Gap survival function (log-log CDF)
 
@@ -619,7 +666,10 @@ Overlay of P(gap > x) for 7 key conditions on log-log axes:
 
 **Distributional evidence**: MPS on preserves the DISTRIBUTIONAL SHAPE of gap up to N=4. Beyond that, the tail regime shifts to a heavier-tailed process. This is not a shift in mean; it is a change in the underlying stochastic process (light-tailed → heavy-tailed).
 
-Figure: `figures/comprehensive/f30_gap_cdf_loglog.png`.
+
+![Figure 30 — Gap survival function log-log](../20260725/figures/comprehensive/f30_gap_cdf_loglog.png)
+
+*Figure 30 — 1-CDF of L1 inter-kernel gap on log-log axes. MPS on curves collapse into baseline shape until N=6; N=6+ transitions to heavier tail. MPS off has heavy tail at all N.*
 
 ### 14.4 Workload-type dependency (Part 3: nrx vs memcpy vs embed)
 
@@ -633,7 +683,10 @@ Part 3 tested three AI workload archetypes at matched N under MPS on:
 
 **Insight**: the "N=6 breakdown" is not a universal law — it depends on per-process launch intensity. Short-kernel workloads (embed) hit the MPS launch queue earlier; long-kernel workloads (memcpy) hit it later.
 
-Figure: `figures/comprehensive/f31_workload_type_comparison.png`.
+
+![Figure 31 — Workload-type dependency](../20260725/figures/comprehensive/f31_workload_type_comparison.png)
+
+*Figure 31 — L1 duty (left) and gap p95 (right, log) as AI workload type varies (nrx/memcpy/embed) with matched N. Different signatures break L1 at different N values.*
 
 ### 14.5 The Chain 17 vs Part 5 reconciliation (why doesn't Part 5 break?)
 
@@ -657,7 +710,10 @@ Measured L1 kernel launch rate under each:
 - If total AI kernel/sec across processes < 10,000: safe with MPS on.
 - If it approaches ~50,000 (Chain 17 N=6): expect breakdown.
 
-Figure: `figures/comprehensive/f32_launch_rate_reconciliation.png`.
+
+![Figure 32 — Launch rate reconciliation](../20260725/figures/comprehensive/f32_launch_rate_reconciliation.png)
+
+*Figure 32 — L1 launch rate (kernels/sec) as function of concurrent AI configuration. Chain 17 (red) collapses at N=6; Part 5 (green) stays flat. Confirms aggregate CUDA launch rate — not process count — is the predictor.*
 
 ### 14.6 5G L1 SLA budget analysis
 
@@ -678,7 +734,10 @@ Assume 100 L1 kernels per slot (cuPHY PUSCH pipeline heuristic). Compute median 
 
 **Practical SLA reading**: only cross-partition scenarios (CP-diverse, CP-uniform) preserve the baseline per-slot latency. Same-partition beyond N=4 will drop 5G slots.
 
-Figure: `figures/comprehensive/f33_sla_budget.png`.
+
+![Figure 33 — 5G L1 SLA budget analysis](../20260725/figures/comprehensive/f33_sla_budget.png)
+
+*Figure 33 — Estimated 5G L1 per-slot latency (median blue, p95 red bars) across 8 deployment scenarios vs 5G TTI budget (500 μs black dashed, 1000 μs orange dotted). Only CP scenarios stay near the median TTI.*
 
 ### 14.7 Root-cause hypothesis for the N=6 knee
 
@@ -695,6 +754,76 @@ Tuning knobs the data suggests exploring:
 - Redesigning L1 with larger kernels (fewer, longer launches) to be more MPS-friendly
 
 Data does NOT directly implicate any specific knob, but Chain 17 Part B's thread% sweep suggests thread% is the most impactful lever.
+
+### 14.8 Temporal breakdown analysis — is it a startup transient or steady state?
+
+We slice each 30-second nsys trace into 2-second bins and compute per-bin duty cycle. If MPS breakdown were a startup artifact, we would see a bad first bin followed by recovery; if it were steady-state, all bins would show the degradation.
+
+![Figure 34 — Temporal duty cycle over 30s](../20260725/figures/comprehensive/f34_temporal_duty.png)
+
+*Figure 34 — Top: L1 duty cycle per 2s bin over the 30 s trace window for 5 conditions. Bottom: cumulative L1 kernel count vs time. The N=6/8 MPSon degradation persists across all bins — it is a steady-state property of the MPS scheduler at that scale, NOT a startup effect. The cumulative curves show N=8 MPSoff falling far behind baseline throughout the entire window.*
+
+**Finding**: the breakdown is a steady-state property. Once MPS server is saturated, it stays saturated. This has an important implication — the p99 gap tail is not concentrated at trace start; it is distributed across the full run. Any 5G L1 SLA is at risk continuously.
+
+### 14.9 Per-stream analysis — do L1's CUDA streams share load evenly?
+
+cuPHY uses 2 CUDA streams (parallel per-cell pipelines). Under co-tenancy pressure, does load shift to a single stream?
+
+![Figure 35 — Per-stream kernel distribution](../20260725/figures/comprehensive/f35_per_stream.png)
+
+*Figure 35 — L1 kernel count per CUDA stream in 3 conditions. In all cases the 2 streams share load equally (~28.8K + 28.8K = 57.6K). Even under N=6 breakdown, no stream is starved — the pressure is uniform across streams.*
+
+**Finding**: MPS pressure affects both L1 streams equally. The bottleneck is not stream-level scheduling starvation; it's cross-context launch queue saturation that hits the L1 process globally.
+
+### 14.10 Statistical robustness — all 10 trials CDF overlay
+
+For Part 7 stat, we have 10 independent trials per N ∈ {5, 6, 7}. Overlay all 30 CDFs:
+
+![Figure 36 — All 10 trials CDF overlay](../20260725/figures/comprehensive/f36_all_trials_cdf.png)
+
+*Figure 36 — Per-trial gap survival curves for each N. Trials cluster tightly at N=6 (yellow curves nearly overlap → deterministic), moderately at N=5 (some spread → edge of breakdown zone), and vary more at N=7 (worse regime with more chaos).*
+
+**Finding**: the N=6 breakdown is not just deterministic in aggregate statistics — the FULL DISTRIBUTIONAL SHAPE is stable across trials. This makes SLA prediction possible; a deployment predicted to be in N=6 territory can rely on the distribution not fluctuating wildly.
+
+### 14.11 Workload signature dissection — CDF overlay at matched N=4
+
+At fixed N=4 (below breakdown), what does the choice of AI workload type do to L1 sync? Overlay CDFs:
+
+![Figure 37 — Workload signature CDF at N=4](../20260725/figures/comprehensive/f37_workload_signature_cdf.png)
+
+*Figure 37 — Gap survival curves for L1 at N=4 MPSon with 3 different AI workload types. Baseline (black dashed) is the L1-alone reference. NRx (red) matches baseline closely. memcpy (blue) has slightly heavier tail. embed (green) has the heaviest tail — short-kernel workloads stress MPS scheduler more per unit of GPU work.*
+
+**Finding**: even at N=4 (safe zone by our earlier N-sweep), workload type matters. embed_lookup has a p99 that is 2× worse than nrx, despite N being identical. Short-kernel AI workloads are the pathological case for MPS.
+
+### 14.12 All-condition summary heatmap
+
+35 distinct conditions analyzed, sorted by L1 duty cycle:
+
+![Figure 38 — All-condition summary](../20260725/figures/comprehensive/f38_all_conditions_summary.png)
+
+*Figure 38 — Horizontal bars show log(gap median/p95/p99) for 35 conditions sorted by duty cycle (green dots, upper axis). Top: SP-diverse and CP scenarios with highest duty. Middle: MPS on N=1-5. Bottom: MPS on N=6-8 and all MPS off.*
+
+**Finding**: at-a-glance visual proof that (a) MIG cross-partition dominates duty cycle ranking, (b) MPS off is always at the bottom regardless of N, (c) SP-uniform even at N=6 falls into the MPS-off band.
+
+### 14.13 NCU vs nsys per-kernel correlation
+
+Do slow kernels (per NCU) also have long gaps AFTER them (per nsys)?
+
+![Figure 39 — NCU vs nsys per-kernel correlation](../20260725/figures/comprehensive/f39_ncu_vs_nsys_correlation.png)
+
+*Figure 39 — Scatter of per-kernel duration (NCU, Full GPU) vs median gap AFTER that kernel type (nsys, chain17 N=4 MPSoff). Color = NCU DRAM %. Longer kernels DO tend to have longer gaps after them, suggesting the launch queue takes proportionally longer to schedule the next kernel following a big one.*
+
+**Finding**: the driver-level bottleneck has kernel-length dependence. When a big kernel (e.g. `convert_kernel`, 79 μs) finishes, the next kernel takes proportionally longer to appear — this hints that MPS server dispatch is not fully pipelined, so a large kernel monopolizes the dispatch queue briefly.
+
+### 14.14 Part 4 partial pct sweep
+
+Even with only pct=100 and pct=80 captured, we can quantify the top-end sensitivity:
+
+![Figure 40 — Part 4 partial thread% sweep](../20260725/figures/comprehensive/f40_p4_partial_pct.png)
+
+*Figure 40 — L1 duty cycle at CUDA_MPS_ACTIVE_THREAD_PERCENTAGE = 100 vs 80 for 4 workload types (nrx4, ranai_mix, memcpy4, embed4). All workloads show modest sensitivity to the top-end pct cap; nrx4 sees the biggest change.*
+
+**Finding**: even a 20% cap (100 → 80) produces measurable duty cycle change. Combined with Chain 17 Part B (100/70/50/30 anchor points), the full picture is a gently sloping sensitivity — pct=70 remains the sweet spot recommended in §13.
 
 ---
 

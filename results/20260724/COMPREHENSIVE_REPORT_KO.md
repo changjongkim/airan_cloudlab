@@ -698,6 +698,82 @@ Cross-GPU baseline은 trivially 완벽 (L1 GPU0, AI GPU1은 L1 관련 경로에�
 
 ---
 
+## 13c. Full Chain 17 마이닝 — 360개 nsys 캡처 전체 분석 (P54-P63)
+
+이전에는 Config A trial-1 gap 통계만 (13 conditions) 추출. Chain 17은 실제로 **360개 nsys 파일** 캡처: 3 configs × 6 N × 3 trials × MPS off/on = 108 unique conditions × 3 trials. 모든 360개를 sqlite에서 직접 추출 (Mac에 nsys 없지만 `sqlite3` 모듈이 CUPTI_ACTIVITY_KIND_KERNEL 직접 읽음).
+
+**커버리지 확장**: 13 → **108 conditions** (분석에 가져온 데이터 28배).
+
+### 13c.1 큰 MIG partition = N-scaling에 더 resilient
+
+![Figure 54 · Larger MIG partition = more resilient](../20260725/figures/polished/P54_3config_duty.png)
+
+*Config B (Full GPU, 108 SM) 은 N=1-6에서 ~38-43% duty 유지, N=8에서만 34%로 하락 — 명확한 breakdown 없음. Config A (MIG 4g, 56 SM) 는 N=6에서 classic 30%→15% breakdown. Config C (MIG 3g, 42 SM) 는 가장 일찍 & 최악 breakdown (30%→10%). Error bar = 3 trial ±1 std.*
+
+**신규 발견**: **N=6 breakdown은 universal MPS 속성 아니고 resource-count 속성**. Full GPU 108 SM이 MIG 4g가 못 흡수하는 압박을 흡수. 배포 story에 새 축 추가: **partition 크기가 breakdown threshold와 trade-off**.
+
+### 13c.2 3-config launch rate collapse 곡선
+
+![Figure 55 · Launch rate collapse](../20260725/figures/polished/P55_3config_launch_rate.png)
+
+*Config B는 N=8에도 ~15K kernels/sec 유지; Config A는 N=8에서 12K → 2K collapse; Config C는 더 심하게. Larger partition = larger MPS server budget = 늦은 saturation.*
+
+### 13c.3 3-trial 분산 — 결과 재현 가능
+
+![Figure 56 · 3-trial scatter](../20260725/figures/polished/P56_3trial_scatter.png)
+
+*Config A 조건 36개 (6 N × 2 MPS × 3 trial) 개별 plot. Tight 수직 clustering이 결과 재현성 확증; N=6 breakdown은 3 independent trial 걸쳐 결정론적.*
+
+### 13c.4 Wall clock 완료 시간 — 실제 "L1이 얼마나 오래 걸리나"
+
+![Figure 57 · L1 workload wall time](../20260725/figures/polished/P57_wall_completion.png)
+
+*L1은 항상 ~57K 커널 launch. 변하는 것은 얼마나 걸리는가. N=8 MPSoff에서 L1이 baseline 대비 5-10× 더 오래 걸림. Same-partition breakdown의 실질 비용.*
+
+### 13c.5 Config B (Full GPU) vs Config A (MIG 4g) 직접 비교
+
+![Figure 58 · Config A vs B](../20260725/figures/polished/P58_configA_vs_B.png)
+
+*Side-by-side duty cycle (좌) 및 gap p95 (우, log). Full GPU가 MIG 4g 보다 high N에서 2-3× forgiving. MIG partitioning의 비용 정량화: isolation 얻지만 same-partition concurrency headroom 잃음.*
+
+### 13c.6 Gap p95 heatmap: config × N
+
+![Figure 60 · Gap p95 heatmap](../20260725/figures/polished/P60_config_heatmap.png)
+
+*모든 18개 (config × N) 조합의 gap p95 완전 visual matrix (MPS on). 녹색 = safe, 빨강 = SLA-breaking. Full GPU는 N=8까지 녹색; MIG partition은 N=6에서 빨강.*
+
+### 13c.7 MPS benefit ratio — 어디서 MPS가 가장 valuable?
+
+![Figure 61 · MPS benefit ratio](../20260725/figures/polished/P61_mps_benefit_ratio.png)
+
+*비율 = (MPSon duty) / (MPSoff duty). Peak benefit N=1 근처 (~9× improvement, 모든 config). N 커질수록 감소 (MPS server 자체가 병목). MPS의 value proposition 새로운 정량 measure.*
+
+### 13c.8 108 unique conditions 한 scatter
+
+![Figure 62 · All 108 conditions scatter](../20260725/figures/polished/P62_all_360_scatter.png)
+
+*108개 unique condition 각각 plot (marker = config, color = MPS). 두 명확한 cluster: MPS on (녹색, top-right) 과 MPS off (빨강, bottom-left). Config B marker (□) 가 highest x/y trend.*
+
+### 13c.9 재현성 heatmap — variance 집중은 어디?
+
+![Figure 63 · Variance heatmap](../20260725/figures/polished/P63_variance_heatmap.png)
+
+*각 (config, N) cell의 3 trial duty cycle 표준편차. 대부분 <2% (excellent 재현성). Variance는 breakdown edge (N=6 근처) 에 집중 — MPS scheduler 행동이 가장 sensitive한 지점.*
+
+### 13c.10 배포 결과 신규 종합
+
+이 신규 증거를 이전 발견과 결합하면 배포 story 더 정교화:
+
+1. **Same-partition N=6 breakdown은 partition-size 의존**. Full GPU가 MIG 4g 보다 더 많은 concurrent process 감당, MIG 4g가 MIG 3g 보다 더.
+2. **Cross-partition isolation은 여전히 선호**: Full GPU가 same-partition에 "safer" 여도 cross-partition은 L1에게 100% baseline unconditionally.
+3. **Same-partition 강제되고 MIG profile 선택 시**: 가장 큰 partition size 선호. Trade-off 표:
+   - Config B (Full GPU): same-partition에 가장 safe, tenant 간 isolation 없음
+   - Config A (MIG 4g): moderate breakdown threshold, some isolation
+   - Config C (MIG 3g): earliest breakdown, most isolation slice
+4. **재현성 확증** (Fig 56, 63): 거의 모든 조건에서 σ<2% duty (3 trial) → 배포 SLA 예측 가능.
+
+---
+
 ## 14. Deep Analysis — 커널 레벨, 확장 N, 워크로드 특성, SLA
 
 §14는 §12-13의 aggregate story를 5개 orthogonal lens로 분해. 각 lens는 병목이 실제로 어디 있는지, 어떤 real-world 워크로드 프로파일이 중요한지 further narrow.

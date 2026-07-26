@@ -538,6 +538,102 @@ Per-kernel budget (dur_med + gap_med):
 
 ---
 
+## §13b. CUDA-level Deep Dive (개선된 figure P11, P41-P53)
+
+이 섹션은 driver-level bottleneck 스토리를 CUDA 커널 레벨 데이터로 직접 시각 검증. 모든 figure는 dataviz 원칙 적용 (semantic color, direct label, "so what" title).
+
+### §13b.1 DCGM 활용도는 breakdown에서도 낮음
+
+![Figure 11 · DCGM utilization is LOW even at breakdown](../20260725/figures/polished/P11_dcgm_fixed.png)
+
+*N-sweep 조건 별 DCGM DRAM 및 SM active % 평균. 모든 조건에서 5% 이하 — resource-level utilization은 스토리 아님. 이 병목이 표준 GPU utilization metric으로는 안 보인다는 것을 확증.*
+
+### §13b.2 커널 launch cadence 분포 shift
+
+![Figure 41 · Launch cadence bimodal → broad](../20260725/figures/polished/P41_launch_cadence.png)
+
+*Baseline과 N=4 MPSon은 같은 bimodal cadence (~10μs와 ~500μs mode — L1 자연 리듬). N=6 MPSon은 200μs 근처 broad 분포로 smear. N=8 MPSon은 더 오른쪽. Launch process의 형태 자체가 변화 (scale 뿐 아니라).*
+
+### §13b.3 커널 duration 분포가 압박 하에서 wider
+
+![Figure 42 · Duration violin plot](../20260725/figures/polished/P42_kernel_duration_violin.png)
+
+*상위 6개 cuPHY kernel type의 duration full 분포 (median뿐 아니라). 빨간 violin (SP + 6× NRx) 이 더 wide + 우측 shift — 압박 하에서 커널이 평균적으로 오래 걸릴 뿐 아니라 variance도 큼.*
+
+### §13b.4 convert_kernel deep dive — +167μs 커널
+
+![Figure 43 · convert_kernel deep dive](../20260725/figures/polished/P43_convert_kernel_deepdive.png)
+
+*Part 8 시나리오 별 `convert_kernel<__half2, float2>` duration box plot (좌) + CDF (우). Baseline/CP: median 80μs. SP+6×NRx: median 269μs. SP+diverse: median 401μs. 이 하나의 커널 타입이 최대 절대 per-slot penalty 담당.*
+
+### §13b.5 시뮬레이션된 5G L1 per-slot latency 시계열
+
+![Figure 44 · Simulated 5G L1 per-slot latency](../20260725/figures/polished/P44_slot_latency_timeseries.png)
+
+*1개 5G slot을 100개 consecutive L1 kernel로 근사. Baseline: ~10ms/slot; N=6 MPSon: 30-100ms; N=8 MPSon: 지속 50-100ms. 500μs TTI 선이 모든 조건 아래 — 상대 순서가 중요 (100 kernels/slot은 과대추정, 실제 cuPHY는 더 적을 수 있음).*
+
+### §13b.6 MPS context switch stall 개수
+
+![Figure 45 · Major stalls explode 200×](../20260725/figures/polished/P45_mps_context_switches.png)
+
+*Gap ≤ 10μs → likely in-context. 10-100μs → likely MPS context switch. > 100μs → major stall (MPS worker contention or backlog). 우측 패널: major stall 개수가 N=4에서 ~250 → N=8에서 100,000+.*
+
+### §13b.7 어느 kernel type이 긴 gap을 유발?
+
+![Figure 46 · Which kernels precede longest gaps](../20260725/figures/polished/P46_gap_after_by_kernel.png)
+
+*L1 kernel type 별, 직후 gap 분포. cupy_copy와 convert_kernel이 tail 지배 — MPS server backpressure는 이 memory-heavy kernel 직후에 가장 자주 발생.*
+
+### §13b.8 NCU roofline 위치
+
+![Figure 47 · cuPHY kernel roofline](../20260725/figures/polished/P47_ncu_roofline.png)
+
+*NCU per-kernel scatter of DRAM bytes vs instructions executed. 대부분 cuPHY kernel이 low-work zone에 clustered; convert_kernel과 큰 cupy_copy가 outlier. Roofline 배치가 launch-rate (not bandwidth) 병목 이유 설명.*
+
+### §13b.9 Chain 17 launch rate 막대 비교
+
+![Figure 48 · Launch rate collapses 6.4× at N=8](../20260725/figures/polished/P48_launch_rate_bars.png)
+
+*N 별 MPS on vs off 직접 비교. Bar 위 숫자 = exact launch rate. Breakdown zone 빨간 음영.*
+
+### §13b.10 누적 kernel launch 시간별
+
+![Figure 49 · Cumulative launches diverge by ~5s](../20260725/figures/polished/P49_cumulative_launches.png)
+
+*30s trace 창 내 누적 kernel count. 가파른 slope = 높은 throughput. Baseline / N ≤ 4 MPSon은 한 line으로 collapse. N=6 MPSon은 조기 하락. N=8 MPSoff (점선 검정) 절대 catch up 못함.*
+
+### §13b.11 100ms GPU 활동 timeline
+
+![Figure 50 · 100ms GPU activity timeline](../20260725/figures/polished/P50_activity_timeline.png)
+
+*대표 100ms window 안 모든 L1 kernel 그림. Baseline: 1,282 kernel 연속. N=6 MPSon: 528 kernel with 눈에 띄는 white space (MPS scheduler stall). 같은 window, 2.4배 더 적은 kernel.*
+
+### §13b.12 커널 타입 구성
+
+![Figure 51 · convert_kernel dominates L1 GPU time](../20260725/figures/polished/P51_kernel_composition.png)
+
+*Kernel type 별 GPU time 비율 pie chart. Convert_kernel이 L1 전체 GPU 시간의 대부분. 이 한 커널 최적화 (예: fp16↔fp32 변환 회피) 가 최대 영향.*
+
+### §13b.13 29개 분석 조건 전체 launch rate ranking
+
+![Figure 52 · L1 launch rate across ALL 29 conditions](../20260725/figures/polished/P52_all_conditions_rates.png)
+
+*측정된 모든 조건의 L1 launch rate ranking. MPS on (녹색) 이 top, MPS off (빨강) 이 bottom. 모든 워크로드 프로파일에서 MPS on이 safe operating mode 임을 확증.*
+
+### §13b.14 Launch rate vs duty cycle 상관
+
+![Figure 53 · Launch rate과 duty cycle이 함께 움직임](../20260725/figures/polished/P53_rate_vs_duty.png)
+
+*L1 kernel throughput과 duty cycle 사이 강한 양의 상관 scatter. 둘 다 같은 MPS driver saturation 현상의 함수. 대각선 상 clustering → duty cycle이 throughput 요약 metric으로 유효.*
+
+### §13b.15 Per-stream 분석 재프레임
+
+![Figure 35 · L1 uses ONE compute stream](../20260725/figures/polished/P35_per_stream_fixed.png)
+
+*cuPHY L1은 하나의 CUDA stream으로 모든 실제 work dispatch (~57K kernels over 30s); 두 번째 stream은 setup 12개만 수행. N=6 breakdown은 이 하나의 main compute stream에 직접 hit — MPS launch queue serialization이 L1 프로세스 전체를 hit (scheduling starvation 아님).*
+
+---
+
 ## §14. Deep Analysis (§14.1-14.14)
 
 ### 14.1 cuPHY 커널별 duration 비율

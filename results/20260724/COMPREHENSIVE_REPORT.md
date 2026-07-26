@@ -601,6 +601,102 @@ Cross-GPU baseline is trivially perfect (L1 GPU0, AI GPU1 have no shared driver 
 
 ---
 
+## 13b. CUDA-level deep dive (new polished figures P11, P41-P53)
+
+This section provides direct visual proof of the driver-level bottleneck story using CUDA kernel-level data. All figures use dataviz principles (semantic colors, direct labels, "so what" titles).
+
+### 13b.1 DCGM utilization is LOW even at breakdown
+
+![Figure 11 · DCGM utilization is LOW even at breakdown](../20260725/figures/polished/P11_dcgm_fixed.png)
+
+*Mean DRAM and SM active % across N-sweep. Values stay under 5% at every condition — resource-level utilization is not the story. This confirms the bottleneck is invisible to standard GPU utilization metrics.*
+
+### 13b.2 Kernel launch cadence distribution shifts
+
+![Figure 41 · Kernel launch cadence shifts from bimodal (safe) to broad (breakdown)](../20260725/figures/polished/P41_launch_cadence.png)
+
+*Baseline and N=4 MPSon share the same bimodal cadence (~10 μs and ~500 μs modes — L1's natural rhythm). N=6 MPSon smears into a broad distribution centered near 200 μs. N=8 MPSon pushes further right. The shape of the launch process changes, not just its scale.*
+
+### 13b.3 Kernel duration distributions widen under pressure
+
+![Figure 42 · Kernel duration distributions widen dramatically under 6-proc pressure](../20260725/figures/polished/P42_kernel_duration_violin.png)
+
+*Violin plots showing the full duration distribution (not just median) of the 6 dominant cuPHY kernel types. Red violins (SP + 6× NRx) are wider AND shifted right — under pressure, kernels not only run longer on average but have more variance.*
+
+### 13b.4 convert_kernel deep dive — the +167 μs kernel
+
+![Figure 43 · convert_kernel: the single kernel that adds +167 μs to L1 per-slot latency](../20260725/figures/polished/P43_convert_kernel_deepdive.png)
+
+*Box plot (left) and CDF (right) of `convert_kernel<__half2, float2>` duration across Part 8 scenarios. Baseline/CP: median 80 μs. SP+6×NRx: median 269 μs. SP+diverse: median 401 μs. This one kernel type is responsible for the largest absolute per-slot penalty.*
+
+### 13b.5 Simulated 5G L1 per-slot latency time-series
+
+![Figure 44 · Simulated 5G L1 per-slot latency — SLA violations continuous, not spike-like](../20260725/figures/polished/P44_slot_latency_timeseries.png)
+
+*Approximating one 5G slot as 100 consecutive L1 kernels. Baseline stays near ~10 ms per slot; N=6 MPSon jumps to 30-100 ms; N=8 MPSon consistently 50-100 ms. The 500 μs TTI line is far below all conditions — even baseline exceeds TTI by ~20× (a proxy artifact of 100 kernels/slot over-estimate; real cuPHY may bundle fewer kernels/slot, but relative ordering is what matters).*
+
+### 13b.6 MPS context-switch stall counts
+
+![Figure 45 · Major stalls (>100 μs) explode 200× from N=4 to N=8](../20260725/figures/polished/P45_mps_context_switches.png)
+
+*Gaps ≤ 10 μs → likely in-context. 10-100 μs → likely MPS context switch. > 100 μs → major stall (MPS worker contention or scheduling backlog). Right panel: count of major stalls grows from ~250 at N=4 to 100,000+ at N=8.*
+
+### 13b.7 Which kernel types precede the longest gaps?
+
+![Figure 46 · Which kernels precede the longest gaps (N=6 MPSon breakdown)](../20260725/figures/polished/P46_gap_after_by_kernel.png)
+
+*For each L1 kernel type, distribution of gap immediately following it. cupy_copy and convert_kernel dominate the tail — MPS server backpressure triggers most often right after these memory-heavy kernels.*
+
+### 13b.8 NCU roofline placement
+
+![Figure 47 · cuPHY kernel roofline: mostly memory-bound with a few compute-heavy outliers](../20260725/figures/polished/P47_ncu_roofline.png)
+
+*NCU per-kernel scatter of DRAM bytes vs. instructions executed. Most cuPHY kernels cluster in the low-work zone; convert_kernel and the biggest cupy_copy are the outliers. Roofline placement explains why launch-rate (not bandwidth) is the true bottleneck.*
+
+### 13b.9 Chain 17 launch rate bar comparison
+
+![Figure 48 · Chain 17 L1 kernel launch rate collapses 6.4× at N=8 MPS on](../20260725/figures/polished/P48_launch_rate_bars.png)
+
+*Direct MPS on vs MPS off comparison per N. Numbers on bars are exact launch rates. Breakdown zone shaded red.*
+
+### 13b.10 Cumulative kernel launches over time
+
+![Figure 49 · Cumulative L1 kernel launches diverge visibly by ~5 s](../20260725/figures/polished/P49_cumulative_launches.png)
+
+*Cumulative kernel count over the 30 s trace window. Steeper slope = higher throughput. Baseline / N ≤ 4 MPSon collapse into one line. N=6 MPSon breaks below early. N=8 MPSoff (dotted black) never catches up.*
+
+### 13b.11 100 ms GPU activity timeline
+
+![Figure 50 · 100 ms GPU activity timeline — baseline is dense, breakdown has visible gaps](../20260725/figures/polished/P50_activity_timeline.png)
+
+*Every L1 kernel executed in a representative 100 ms window. Baseline: 1,282 kernels packed continuously. N=6 MPSon: 528 kernels with visible white space where MPS scheduler stalled. Same window, 2.4× fewer kernels landed.*
+
+### 13b.12 Kernel type composition
+
+![Figure 51 · convert_kernel dominates L1 GPU time](../20260725/figures/polished/P51_kernel_composition.png)
+
+*Pie chart of GPU time by kernel type. Convert_kernel is the majority of L1's total GPU time. Optimizing this one kernel (e.g., avoiding fp16↔fp32 conversion) would have the biggest impact.*
+
+### 13b.13 L1 launch rate across all 29 analyzed conditions
+
+![Figure 52 · L1 launch rate across ALL 29 analyzed conditions](../20260725/figures/polished/P52_all_conditions_rates.png)
+
+*Complete ranking of every measured condition by L1 kernel launch rate. MPS on (green) tops the chart; MPS off (red) fills the bottom. Confirms MPS on is the safe operating mode across all workload profiles.*
+
+### 13b.14 Launch rate vs duty cycle correlation
+
+![Figure 53 · Launch rate and duty cycle move together — same underlying MPS saturation](../20260725/figures/polished/P53_rate_vs_duty.png)
+
+*Scatter plot showing strong positive correlation between L1 kernel throughput and duty cycle. Both are functions of the same MPS driver saturation phenomenon. Points cluster along a diagonal — validates duty cycle as a summary metric of throughput.*
+
+### 13b.15 Reframed per-stream analysis
+
+![Figure 35 · L1 uses ONE compute stream](../20260725/figures/polished/P35_per_stream_fixed.png)
+
+*cuPHY L1 dispatches all real work through one CUDA stream (~57K kernels over 30 s); a second stream carries only ~12 setup kernels. The N=6 breakdown affects the main compute stream directly — MPS launch queue serialization hits the whole L1 process, not a scheduling starvation issue.*
+
+---
+
 ## 14. Deep analysis — kernel-level, extended N, workload intensity, SLA
 
 Section §14 dissects the aggregate story of §12-13 into five orthogonal lenses. Each is a distinct diagnostic that further narrows where the bottleneck actually lives and which real-world workload profiles matter.

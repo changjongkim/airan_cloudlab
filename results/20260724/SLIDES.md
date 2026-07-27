@@ -25,7 +25,7 @@
 
 ## Slide 2 — TL;DR: 5가지 핵심 발견
 
-![Executive dashboard — 5 key findings visual summary](../20260725/figures/comprehensive/f01_executive_dashboard.png)
+![Executive dashboard — 5 key findings visual summary](figures/comprehensive/f01_executive_dashboard.png)
 
 **Figure 설명**: 3-패널이 5개 finding을 시각적으로 요약. (좌) 커널 launch rate ∝ sync penalty, (중) MIG cross-partition 격리 완벽, (우) MPS on/off 효과 워크로드 클래스별.
 
@@ -37,7 +37,7 @@
 
 ## Slide 3 — 실험 방법론 (Setup)
 
-![Figure 5 · Config × Workload heatmap](../20260725/figures/comprehensive/f05_config_workload_heatmap.png)
+![Figure 5 · Config × Workload heatmap](figures/comprehensive/f05_config_workload_heatmap.png)
 
 **Figure 설명**: 3개 MIG config × 20+ 워크로드의 MPSoff L1 p99 (baseline 배수). 녹색 = safe, 빨강 = catastrophic. Class A (NRx/ChanPred/memcpy/embed) 이 모든 config에서 red; Class B (Qwen/Whisper/BERT/VL) 는 framework fusion 덕에 green.
 
@@ -49,7 +49,7 @@
 
 ## Slide 4 — Finding 2: Cross-partition = 완벽 격리
 
-![Figure 3 · MIG cross-partition isolation across all workloads](../20260725/figures/comprehensive/f03_mig_cross_isolation.png)
+![Figure 3 · MIG cross-partition isolation across all workloads](figures/comprehensive/f03_mig_cross_isolation.png)
 
 **Figure 설명**: L1이 dedicated MIG partition, 다른 partition에 13개 realistic AI 워크로드. L1 cudaFree p99와 baseline 편차. Qwen-7B, Qwen-VL 14GB 대형 모델 포함 모든 워크로드가 baseline band (±20%) 내 유지.
 
@@ -218,9 +218,9 @@
 
 | Slide | Figure 파일 |
 |---|---|
-| 2 | `results/20260725/figures/comprehensive/f01_executive_dashboard.png` |
-| 3 | `results/20260725/figures/comprehensive/f05_config_workload_heatmap.png` |
-| 4 | `results/20260725/figures/comprehensive/f03_mig_cross_isolation.png` |
+| 2 | `results/20260724/figures/comprehensive/f01_executive_dashboard.png` |
+| 3 | `results/20260724/figures/comprehensive/f05_config_workload_heatmap.png` |
+| 4 | `results/20260724/figures/comprehensive/f03_mig_cross_isolation.png` |
 | 5 | `results/20260725/figures/polished/P23_duty_cycle_headline.png` |
 | 6 | `results/20260725/figures/polished/P28_per_kernel_ratios.png` |
 | 7 | `results/20260725/figures/polished/P21_gap_vs_N.png` |

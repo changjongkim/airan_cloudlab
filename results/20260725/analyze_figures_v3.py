@@ -219,7 +219,10 @@ for c in p8c:
 def short(name):
     if "cupy_copy__complex64" in name: return "cupy_copy (complex64)"
     if "cupy_copy__float32" in name: return "cupy_copy (float32)"
-    if "convert_kernel" in name: return "convert_kernel (fp16↔fp32)"
+    if "convert_kernel" in name:
+        if "__half2, float2" in name: return "convert (fp16→fp32)"
+        if "float2, __half2" in name: return "convert (fp32→fp16)"
+        return "convert_kernel"
     if "eqMmseCoefCompLow" in name: return "eqMmseCoef (MMSE coef)"
     if "eqMmseSoftDemap" in name: return "eqMmseSoftDemap"
     if "chEstFilterNoDftSOfdm" in name: return "chEstFilter"

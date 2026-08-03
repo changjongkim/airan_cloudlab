@@ -676,6 +676,67 @@ Per-slot latency (dur_med + gap_med × 100 kernels/slot proxy) 를 273 조건 �
 
 ---
 
+## 17b. Latency + throughput 중심 분석 (SLA-direct metric)
+
+Duty cycle이 §17 cross-experiment 분석에서 과도하게 강조됨. 실제 배포 SLA는 **L1 per-iteration latency** (실제 SLA metric) 와 **AI throughput** (배포 KPI) 이 중요. 이 섹션은 Chain 19를 이 관점으로 재분석 (`realL1_*.json` 실제 per-iter latency + vLLM/ranai_mix logs tok/s, iter/s 사용).
+
+### 17b.1 전체 조건 L1 per-iteration p99 latency ranking
+
+![L1 p99 latency ranking · 12 best + 12 worst](analysis_chain19/figures/e19_lat_p99_ranking.png)
+
+실제 per-iteration L1 latency (duty proxy 아님). Baseline: ~40 ms per iter (20 cells × 100 iters). Best 조건은 baseline 근처, worst는 p99를 100+ ms로 push.
+
+### 17b.2 주요 topology의 L1 latency (mean/p95/p99)
+
+![L1 latency 분포 · 10 key conditions](analysis_chain19/figures/e19_lat_key_conditions.png)
+
+주요 배포 옵션의 direct SLA 비교. Cross-partition과 multi-GPU가 baseline (~40 ms mean) 근처 유지. Same-partition breakdown은 p99 상승.
+
+### 17b.3 Qwen throughput vs N (Config B diverse)
+
+![Qwen aggregate tok/s vs N](analysis_chain19/figures/e19_tokps_configB.png)
+
+Qwen 2.5-3B via vLLM aggregate throughput이 diverse AI 스택 scale 하며 증가. N=8+에서 Qwen 2개 인스턴스로 aggregate throughput 거의 2배.
+
+### 17b.4 L1 latency vs AI throughput trade-off (Pareto 관점)
+
+![Trade-off · latency vs throughput](analysis_chain19/figures/e19_tradeoff_latency_vs_throughput.png)
+
+모든 조건을 (L1 p99, Qwen tok/s) 로 plot. Upper-left = 이상 (low latency + high throughput). 실제 배포 trade-off frontier 시각화.
+
+### 17b.5 MPS thread% 의 L1 latency 영향
+
+![MPS pct × N L1 latency heatmap](analysis_chain19/figures/e19_pct_latency_heatmap.png)
+
+MPS thread% 변화에 따른 direct L1 p99 latency (duty 아님). pct=30 at N=6에서 ~45ms (baseline 41ms 근처) — duty-cycle 발견과 일치하지만 실제 SLA metric으로 표현.
+
+### 17b.6 Cross-partition L1 latency 불변
+
+![CP L1 latency invariant under N=6-16](analysis_chain19/figures/e19_cp_l1_invariance.png)
+
+3g partition에 N=6-16 AI 하 L1 per-iteration mean/p95/p99. 세 metric 모두 flat — SLA-direct metric으로 하드웨어 격리 empirically 확증 (duty 뿐만 아님).
+
+### 17b.7 Config A same-partition vs Config B Full GPU latency
+
+![Config A vs B latency 비교](analysis_chain19/figures/e19_configA_vs_B_latency.png)
+
+Log-scale L1 p99 latency: Config A가 N=6에서 break (13-40ms proxy per slot), Config B가 baseline (~40ms per iter) 유지. AI diversity + light scale 조건에서 Config B가 throughput 관점 numerically 승.
+
+### 17b.8 워크로드 타입별 AI throughput
+
+![AI throughput per type · Config B diverse](analysis_chain19/figures/e19_ai_throughput_by_type.png)
+
+Config B 스택 scale 시 워크로드 별 throughput (Qwen tok/s, CsiNet iter/s, BeamPred iter/s, NRx iter/s). 워크로드 타입 별 co-tenancy 압박 반응 다름.
+
+### Latency + throughput 관점 주요 통찰
+
+1. **L1 latency가 duty cycle story 확증**: baseline ~40ms per iter, breakdown이 p99를 100+ ms로 push — duty cycle degradation pattern 매칭하지만 SLA-direct 해석.
+2. **Trade-off이 실재하고 정량화 가능**: Config B N=1-3이 low latency AND high AI throughput 둘 다 달성. Same-partition N≥6이 두 축에서 모두 loss.
+3. **Cross-partition이 SLA metric 수준에서 검증**: N=6-16 AI 하 L1 p99가 baseline 유지. 가장 강력한 배포 안전 증거.
+4. **`pct=30` 권고가 latency로 검증**: N=6 pct=30에서 45ms p99가 baseline 근처 — duty cycle 발견이 실제 SLA 개선임 확증.
+
+---
+
 ## 18. Chain 9-18 대비 새 발견
 
 ### 18.1 Full GPU + light co-tenancy가 L1 duty 향상 (Exp 1)

@@ -676,6 +676,67 @@ Per-slot latency (dur_med + gap_med × 100 kernels/slot proxy) across all 273 co
 
 ---
 
+## 17b. Latency + throughput focused analysis (SLA-direct metrics)
+
+Duty cycle was over-emphasized in §17 cross-experiment analysis. Real deployment SLAs care about **L1 per-iteration latency** (actual SLA metric) and **AI throughput** (deployment KPI). This section presents Chain 19 through those lenses using `realL1_*.json` (real per-iter latency) and vLLM/ranai_mix logs (tok/s, iter/s).
+
+### 17b.1 L1 per-iteration p99 latency ranking across all conditions
+
+![L1 p99 latency ranking · 12 best + 12 worst](analysis_chain19/figures/e19_lat_p99_ranking.png)
+
+Real per-iteration L1 latency (not duty proxy). Baseline: ~40 ms per iter (20 cells × 100 iters). Best conditions cluster near baseline; worst push p99 to 100+ ms.
+
+### 17b.2 L1 latency (mean/p95/p99) across key topologies
+
+![L1 latency distribution · 10 key conditions](analysis_chain19/figures/e19_lat_key_conditions.png)
+
+Direct SLA comparison of major deployment options. Cross-partition and multi-GPU stay near baseline (~40 ms mean). Same-partition breakdown pushes p99 up.
+
+### 17b.3 Qwen throughput vs N (Config B diverse)
+
+![Qwen aggregate tok/s vs N](analysis_chain19/figures/e19_tokps_configB.png)
+
+Qwen 2.5-3B via vLLM aggregate throughput as diverse AI stack scales. Two Qwen instances at N=8+ nearly doubles aggregate throughput compared to single Qwen at N=1.
+
+### 17b.4 L1 latency vs AI throughput trade-off (Pareto view)
+
+![Trade-off · latency vs throughput](analysis_chain19/figures/e19_tradeoff_latency_vs_throughput.png)
+
+Every condition plotted as (L1 p99, Qwen tok/s). Upper-left = ideal (low latency + high throughput). Reveals the actual deployment trade-off frontier.
+
+### 17b.5 MPS thread% effect on L1 latency
+
+![MPS pct × N L1 latency heatmap](analysis_chain19/figures/e19_pct_latency_heatmap.png)
+
+Direct L1 p99 latency (not duty) as MPS thread% varies. pct=30 at N=6 achieves ~45ms (near baseline 41ms), matching the duty-cycle finding but expressed as actual SLA metric.
+
+### 17b.6 Cross-partition L1 latency invariance
+
+![CP L1 latency invariant under N=6-16](analysis_chain19/figures/e19_cp_l1_invariance.png)
+
+L1 per-iteration mean/p95/p99 across N=6-16 AI on 3g partition. All three metrics flat — hardware isolation empirically confirmed via SLA-direct metric (not just duty).
+
+### 17b.7 Config A same-partition vs Config B Full GPU latency
+
+![Config A vs B latency comparison](analysis_chain19/figures/e19_configA_vs_B_latency.png)
+
+Log-scale L1 p99 latency: Config A breaks at N=6 (13-40ms proxy per slot), Config B holds baseline (~40ms per iter). Config B numerically wins on throughput terms if AI diversity + light scale.
+
+### 17b.8 AI throughput per workload type
+
+![AI throughput per type · Config B diverse](analysis_chain19/figures/e19_ai_throughput_by_type.png)
+
+Per-workload throughput (Qwen tok/s, CsiNet iter/s, BeamPred iter/s, NRx iter/s) as Config B stack scales. Different workload types respond differently to co-tenancy pressure.
+
+### Key insights from latency + throughput view
+
+1. **L1 latency confirms the duty cycle story**: baseline ~40ms per iter, breakdown pushes p99 to 100+ ms — matches duty cycle degradation pattern but with SLA-direct interpretation.
+2. **Trade-off is real and quantifiable**: Config B N=1-3 achieves both low latency AND high AI throughput. Same-partition N≥6 loses on both axes.
+3. **Cross-partition proven at SLA metric level**: L1 p99 stays baseline for N=6-16 AI. This is the strongest deployment safety evidence.
+4. **`pct=30` recommendation validated by latency**: 45ms p99 at N=6 pct=30 is near baseline, confirming duty cycle finding is real SLA improvement.
+
+---
+
 ## 18. Novel findings vs Chain 9-18
 
 ### 18.1 Full GPU + light co-tenancy IMPROVES L1 duty (Exp 1)

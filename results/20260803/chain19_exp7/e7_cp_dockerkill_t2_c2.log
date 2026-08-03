@@ -1,0 +1,12 @@
+[NeuralRx] Building TRT engine from /opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx...
+[NeuralRx] TRT engine built.
+Traceback (most recent call last):
+  File "/workspace/AIRAN_Changjong/experiments/run_neural_rx_stress.py", line 56, in <module>
+    trt_engine = TrtEngine(
+  File "/opt/nvidia/cuBB/pyaerial/src/aerial/phy5g/algorithms/trt_engine.py", line 90, in __init__
+    self._cuda_stream = CudaStream() if cuda_stream is None else cuda_stream
+  File "/opt/nvidia/cuBB/pyaerial/src/aerial/util/cuda.py", line 64, in __init__
+    self._handle = check_cuda_errors(cudart.cudaStreamCreate())
+  File "/opt/nvidia/cuBB/pyaerial/src/aerial/util/cuda.py", line 43, in check_cuda_errors
+    raise RuntimeError(f"CUDA error code={result[0].value}")
+RuntimeError: CUDA error code=46

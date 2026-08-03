@@ -1,0 +1,37 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+[l1cg] e6_with_graph_alone_t1 slots=200 kern/slot=100 graph=True size=128
+Traceback (most recent call last):
+  File "/scripts/run_l1_cudagraph.py", line 110, in <module>
+    main()
+  File "/scripts/run_l1_cudagraph.py", line 68, in main
+    slot_no_graph(a, b, N, stream)
+  File "/scripts/run_l1_cudagraph.py", line 27, in slot_no_graph
+    c = cp.matmul(a, b)  # matmul (dense)
+  File "/usr/local/lib/python3.10/dist-packages/cupy/_core/_gufuncs.py", line 683, in __call__
+    self._apply_func_to_inputs(
+  File "/usr/local/lib/python3.10/dist-packages/cupy/_core/_gufuncs.py", line 397, in _apply_func_to_inputs
+    func(*args, out=outs)
+  File "cupy/_core/_routines_linalg.pyx", line 809, in cupy._core._routines_linalg.matmul
+  File "cupy/_core/_routines_linalg.pyx", line 849, in cupy._core._routines_linalg.matmul
+  File "cupy/_core/_routines_linalg.pyx", line 536, in cupy._core._routines_linalg.dot
+  File "cupy/_core/_routines_linalg.pyx", line 626, in cupy._core._routines_linalg.tensordot_core
+  File "cupy/_core/_routines_linalg.pyx", line 763, in cupy._core._routines_linalg.tensordot_core_v11
+  File "cupy_backends/cuda/libs/cublas.pyx", line 1426, in cupy_backends.cuda.libs.cublas.gemmEx
+  File "cupy_backends/cuda/libs/cublas.pyx", line 1431, in cupy_backends.cuda.libs.cublas.gemmEx
+  File "cupy_backends/cuda/libs/cublas.pyx", line 511, in cupy_backends.cuda.libs.cublas._setStream
+  File "cupy_backends/cuda/libs/cublas.pyx", line 492, in cupy_backends.cuda.libs.cublas.setStream
+NotImplementedError: calling cuBLAS API during stream capture is currently unsupported

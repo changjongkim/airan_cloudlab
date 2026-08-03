@@ -1,0 +1,46 @@
+[23:04:17] loading Qwen/Qwen2.5-3B-Instruct (gpu_mem_util=0.25)
+WARNING 08-02 23:04:17 config.py:2276] Casting torch.bfloat16 to torch.float16.
+INFO 08-02 23:04:22 config.py:510] This model supports multiple tasks: {'generate', 'score', 'reward', 'classify', 'embed'}. Defaulting to 'generate'.
+INFO 08-02 23:04:22 llm_engine.py:234] Initializing an LLM engine (v0.6.6) with config: model='Qwen/Qwen2.5-3B-Instruct', speculative_config=None, tokenizer='Qwen/Qwen2.5-3B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.float16, max_seq_len=2048, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto, quantization_param_path=None, device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='xgrammar'), observability_config=ObservabilityConfig(otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=0, served_model_name=Qwen/Qwen2.5-3B-Instruct, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=False, chunked_prefill_enabled=False, use_async_output_proc=True, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output"],"candidate_compile_sizes":[],"compile_sizes":[],"capture_sizes":[16,8,4,2,1],"max_capture_size":16}, use_cached_outputs=False, 
+INFO 08-02 23:04:23 selector.py:120] Using Flash Attention backend.
+INFO 08-02 23:04:23 model_runner.py:1094] Starting to load model Qwen/Qwen2.5-3B-Instruct...
+INFO 08-02 23:04:24 weight_utils.py:251] Using model weights format ['*.safetensors']
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:01<00:01,  1.23s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:02<00:00,  1.05s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:02<00:00,  1.08s/it]
+
+INFO 08-02 23:04:26 model_runner.py:1099] Loading model weights took 5.7915 GB
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/scripts/run_qwen_rag_hbm.py", line 102, in <module>
+[rank0]:     main()
+[rank0]:   File "/scripts/run_qwen_rag_hbm.py", line 31, in main
+[rank0]:     llm = LLM(
+[rank0]:           ^^^^
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/utils.py", line 986, in inner
+[rank0]:     return fn(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/entrypoints/llm.py", line 230, in __init__
+[rank0]:     self.llm_engine = self.engine_class.from_engine_args(
+[rank0]:                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/engine/llm_engine.py", line 517, in from_engine_args
+[rank0]:     engine = cls(
+[rank0]:              ^^^^
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/engine/llm_engine.py", line 276, in __init__
+[rank0]:     self._initialize_kv_caches()
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/engine/llm_engine.py", line 416, in _initialize_kv_caches
+[rank0]:     self.model_executor.determine_num_available_blocks())
+[rank0]:     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/executor/gpu_executor.py", line 68, in determine_num_available_blocks
+[rank0]:     return self.driver_worker.determine_num_available_blocks()
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/worker/worker.py", line 205, in determine_num_available_blocks
+[rank0]:     self._assert_memory_footprint_increased_during_profiling()
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/vllm/worker/worker.py", line 254, in _assert_memory_footprint_increased_during_profiling
+[rank0]:     assert self.init_gpu_memory - free_gpu_memory > 0, (
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: AssertionError: Error in memory profiling. Initial free memory 34459353088, current free memory 34854993920. This happens when the GPU memory was not properly cleaned up before initializing the vLLM instance.
+[rank0]:[W802 23:04:27.390643937 ProcessGroupNCCL.cpp:1250] Warning: WARNING: process group has NOT been destroyed before we destruct ProcessGroupNCCL. On normal program exit, the application should call destroy_process_group to ensure that any pending NCCL operations have finished in this process. In rare cases this process can exit before this point and block the progress of another member of the process group. This constraint has always been present,  but this warning has only been added since PyTorch 2.4 (function operator())

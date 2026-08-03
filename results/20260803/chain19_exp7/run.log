@@ -1,0 +1,37 @@
+[02:02:42] === chain19 Exp 7 (Fault isolation) START ===
+Successfully created GPU instance ID  2 on GPU  0 using profile MIG 4g.20gb (ID  5)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  2 using profile MIG 4g.20gb (ID  3)
+Successfully created GPU instance ID  1 on GPU  0 using profile MIG 3g.20gb (ID  9)
+Successfully created compute instance ID  0 on GPU  0 GPU instance ID  1 using profile MIG 3g.20gb (ID  2)
+[02:03:24]   UUID_L1=MIG-df36aec3-fd0a-5285-b930-c6567fed1353  UUID_AI=MIG-b020b97c-a42d-5c4e-9eb7-7385882d2a27
+[02:03:24] --- e7_cp_none_t1 ---
+[02:03:55] --- e7_cp_sigkill_t1 ---
+[02:04:27]   injecting fault: sigkill at 15s
+[02:04:31] --- e7_cp_dockerkill_t1 ---
+[02:05:03]   injecting fault: dockerkill at 15s
+[02:05:07] --- e7_sp_none_t1 ---
+[02:05:41] --- e7_sp_sigkill_t1 ---
+[02:06:13]   injecting fault: sigkill at 15s
+[02:06:17] --- e7_sp_dockerkill_t1 ---
+[02:06:49]   injecting fault: dockerkill at 15s
+[02:06:52] --- e7_cp_none_t2 ---
+[02:07:23] --- e7_cp_sigkill_t2 ---
+[02:07:55]   injecting fault: sigkill at 15s
+[02:07:59] --- e7_cp_dockerkill_t2 ---
+[02:08:31]   injecting fault: dockerkill at 15s
+[02:08:39] --- e7_sp_none_t2 ---
+[02:09:14] --- e7_sp_sigkill_t2 ---
+[02:09:46]   injecting fault: sigkill at 15s
+[02:09:50] --- e7_sp_dockerkill_t2 ---
+[02:10:22]   injecting fault: dockerkill at 15s
+[02:10:26] --- e7_cp_none_t3 ---
+[02:10:57] --- e7_cp_sigkill_t3 ---
+[02:11:29]   injecting fault: sigkill at 15s
+[02:11:33] --- e7_cp_dockerkill_t3 ---
+[02:12:05]   injecting fault: dockerkill at 15s
+[02:12:09] --- e7_sp_none_t3 ---
+[02:12:43] --- e7_sp_sigkill_t3 ---
+[02:13:15]   injecting fault: sigkill at 15s
+[02:13:19] --- e7_sp_dockerkill_t3 ---
+[02:13:51]   injecting fault: dockerkill at 15s
+[02:13:54] === chain19 Exp 7 DONE ===

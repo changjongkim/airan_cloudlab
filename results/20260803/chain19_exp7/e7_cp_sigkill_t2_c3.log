@@ -1,0 +1,72 @@
+[NeuralRx] Building TRT engine from /opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx...
+[NeuralRx] TRT engine built.
+[NeuralRx] Warmup done. Running for 60s...
+Traceback (most recent call last):
+  File "/workspace/AIRAN_Changjong/experiments/run_neural_rx_stress.py", line 93, in <module>
+    trt_engine.run(input_tensors)
+  File "/opt/nvidia/cuBB/pyaerial/src/aerial/phy5g/algorithms/trt_engine.py", line 173, in run
+    trt_output[name] = trt_output[name].get(order='F')
+  File "cupy/_core/core.pyx", line 1820, in cupy._core.core._ndarray_base.get
+  File "cupy/_core/core.pyx", line 1910, in cupy._core.core._ndarray_base.get
+  File "cupy/cuda/memory.pyx", line 586, in cupy.cuda.memory.MemoryPointer.copy_to_host_async
+  File "cupy_backends/cuda/api/runtime.pyx", line 607, in cupy_backends.cuda.api.runtime.memcpyAsync
+  File "cupy_backends/cuda/api/runtime.pyx", line 146, in cupy_backends.cuda.api.runtime.check_status
+cupy_backends.cuda.api.runtime.CUDARuntimeError: cudaErrorIllegalAddress: an illegal memory access was encountered
+[graphContext.cpp::~MyelinGraphContext::90] Error Code 1: Myelin ([impl.cpp:unload_cuda:637] Error 700 destroying event '0x56239919d690'.)
+[graphContext.cpp::~MyelinGraphContext::90] Error Code 1: Myelin ([impl.cpp:unload_cuda:637] Error 700 destroying event '0x562399296f70'.)
+[graphContext.cpp::~MyelinGraphContext::90] Error Code 1: Myelin ([impl.cpp:unload_cuda:637] Error 700 destroying event '0x5623993ba340'.)
+[graphContext.cpp::~MyelinGraphContext::90] Error Code 1: Myelin ([impl.cpp:unload_cuda:637] Error 700 destroying event '0x5623995698b0'.)
+[multiStreamContext.cpp::maybeDestroyAuxStream::266] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[defaultAllocator.cpp::deallocate::85] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[defaultAllocator.cpp::deallocate::85] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[cudaResources.cpp::~ScopedCudaStream::35] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[scopedCudaResources.cpp::~ScopedCudaEvent::30] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[defaultAllocator.cpp::deallocate::85] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+[defaultAllocator.cpp::deallocate::85] Error Code 1: Cuda Runtime (an illegal memory access was encountered)
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  an illegal memory access was encountered

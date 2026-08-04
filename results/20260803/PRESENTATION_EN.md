@@ -87,7 +87,19 @@
 
 - **Observation** — Lowering pct helps: 411 → 317 → 233 → **146 ms**. But **even the best (pct=30) is 3× over 50 ms SLA**
 - **Cause** — The pct cap only bounds per-client SM usage. The launch queue is still shared, L1 kernels still wait. With only 56 SMs to begin with, capping AI doesn't leave enough headroom for L1
-- **Conclusion** — **MIG+MPS cannot make SP meet SLA in the current dataset**. This setup fails as an answer for tight L1+AI co-work → **open problem**
+- **Conclusion** — **Diverse-AI mix breaks SP.** But this is the wrong workload composition (heavy LLMs like Qwen/Whisper on the L1 partition). Not a realistic deployment → re-check on the next slide
+
+---
+
+## Slide 6b · Counter-check — SP works when **only L1-adjacent workloads** are co-located
+
+![F_G07_EN](analysis_chain19/figures/mig_mps/F_G07_SP_LADJ_EN.png)
+
+**identical-NRx grid experiment (2026-07 · Chain 17) · MIG SP · L1 + N identical NRx · MPS on**
+
+- **Observation (left panel · measured)** — Config A (MIG 4g SP) L1 kernel gap p99: N=1–4 = 0.7–0.8 ms · N=6 = 1.5 ms · N=8 = 1.8 ms. **gap p99 ≤ 2 ms across the whole range.** Config C (3g) follows the same pattern
+- **Contrast (right panel)** — Same SP topology, **workload is the deciding factor**: L1-adjacent NRx-only gives gap p99 = 1.5 ms; diverse AI mix (LLM included) gives L1 p99 = 146 ms. **100× gap.** SP failure is a workload-mismatch problem, not a topology problem
+- **Alignment with real deployment** — In AI-RAN the workloads that must co-work with L1 are **NRx · ChanPred · BeamPred · CsiNet** — small, short-kernel workloads. Qwen-style LLMs never belong on the L1 partition. **SP + MIG + MPS is viable for the actual use case.** Caveat: per-iter realL1 latency for NRx-only SP is not yet measured → next-experiment candidate
 
 ---
 
@@ -137,7 +149,7 @@
 
 - **Winners** — Multi-GPU and **MIG CP + MPS on AI** are the only topologies that pass SLA on both mean AND worst-case. Full GPU + MPS passes on the mean but fails worst-case (bimodal). SP·MIG fails at every tuning
 - **Deployment recipe** — L1 on the 4g partition alone (MPS not needed). AI on the 3g partition with `nvidia-cuda-mps-control -d`. Pct tuning is for fairness across AI containers, not for L1 protection
-- **Open problem** — **Tight L1+AI co-work (an NRx-like workload on the L1 partition itself) does not meet SLA in the current dataset**. Next experiments: CUDA stream priority · dedicated streams · smaller AI kernels · AI-partition saturation at N > 30
+- **Workload-dependent placement rule** — CP is the answer for **loose co-tenancy** (independent AI like Qwen/Whisper alongside L1). SP is viable when restricted to **L1-adjacent workloads (NRx · ChanPred · BeamPred · CsiNet)** — gap p99 ≤ 2 ms (Slide 6b). Ideal placement: **L1 + NRx co-work on the L1 partition · rest of the AI stack on the AI partition (CP)** → two isolation axes at once. Next experiments: per-iter realL1 for the SP + NRx-only condition · verify the mixed placement
 
 ---
 

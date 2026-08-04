@@ -87,7 +87,19 @@
 
 - **논리 1 (관찰)** — pct 캡을 낮출수록 L1 개선: 411 → 317 → 233 → **146 ms**. 하지만 **최선인 pct=30도 SLA (50ms) 3배 초과**
 - **논리 2 (왜 완전히 안 되나)** — pct 캡은 AI 프로세스별 SM 사용 상한만 강제. 여전히 같은 launch queue라서 L1 kernel은 대기. SM이 이미 56개로 좁으니 캡을 줄여도 L1이 얻는 여유가 부족
-- **논리 3 (결론)** — **SP에서 MIG+MPS 조합으로 SLA를 지키는 데 실패**. 이 셋업은 밀결합 co-work를 위한 답이 되지 못함. 현재 데이터 기준으론 **열린 문제**
+- **논리 3 (결론)** — **다이버스 AI mix로 SP를 스트레스하면 실패.** 하지만 이는 잘못된 워크로드 조합 (Qwen · Whisper 같은 무거운 LLM을 L1 파티션에 넣음). 실제 배치 시나리오와 다름 → 다음 슬라이드에서 재검증
+
+---
+
+## Slide 6b · Counter-check — SP에 **L1-adjacent 워크로드만** 넣으면 동작함
+
+![F_G07](analysis_chain19/figures/mig_mps/F_G07_SP_LADJ.png)
+
+**identical-NRx grid 실험 (2026-07 · Chain 17) · MIG SP · L1 + N identical NRx · MPS on**
+
+- **논리 1 (좌 그림 · 실측)** — Config A (MIG 4g SP) 에서 L1 kernel gap p99: N=1~4 = 0.7~0.8 ms · N=6 = 1.5 ms · N=8 = 1.8 ms. **전 구간 gap p99 ≤ 2 ms**. Config C (3g) 도 유사한 패턴
+- **논리 2 (우 그림 · 대조)** — 같은 SP 위상이지만 **워크로드가 결정**: L1-adjacent NRx-only 는 gap p99 = 1.5 ms, 다이버스 AI mix (LLM 포함) 는 L1 p99 = 146 ms. **100배 이상 차이.** SP 실패는 위상 문제가 아니라 워크로드 매칭 문제
+- **논리 3 (실제 배치와의 정합)** — AI-RAN에서 L1과 co-work 해야 하는 워크로드는 **NRx · ChanPred · BeamPred · CsiNet** 등 kernel이 작고 짧은 것들. Qwen 같은 LLM은 애초에 L1 파티션에 넣을 이유 없음. **SP + MIG + MPS는 우리의 실제 유즈케이스에 유효**. 다만 realL1 per-iter latency는 아직 측정 안 함 → 다음 실험 후보
 
 ---
 
@@ -137,7 +149,7 @@
 
 - **논리 1 (승자)** — Multi-GPU와 **MIG CP + MPS on AI** 만 mean과 worst 모두 SLA 통과. Full GPU + MPS는 mean은 통과하지만 worst-case 실패 (bimodal). SP·MIG는 어떤 튜닝으로도 실패
 - **논리 2 (배치 레시피)** — L1은 4g 파티션 단독 (MPS 불필요). AI는 3g 파티션에서 `nvidia-cuda-mps-control -d`. Pct 튜닝은 AI 파티션 안의 컨테이너간 공정성용 (L1 보호와 무관)
-- **논리 3 (열린 문제)** — **밀결합 co-work (L1 파티션에 NRx같은 워크로드 배치)는 현재 데이터로 SLA 미달성**. 다음 실험: CUDA stream priority · dedicated stream · 더 작은 AI kernel · N=30+ AI 파티션 포화 테스트
+- **논리 3 (워크로드-종속 배치 규칙)** — CP는 **loose co-tenancy** (Qwen · Whisper 같은 독립 AI + L1) 답. SP는 **L1-adjacent 워크로드 (NRx · ChanPred · BeamPred · CsiNet)** 로 제한하면 gap p99 ≤ 2 ms로 작동 (Slide 6b). 이상적 배치: **L1 파티션에 L1+NRx co-work · AI 파티션에 나머지 AI (CP)** → 두 축 동시 격리. 다음 실험: SP + NRx-only 조건의 realL1 per-iter 측정 · 혼합 배치 검증
 
 ---
 

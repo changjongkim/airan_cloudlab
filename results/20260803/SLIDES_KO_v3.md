@@ -60,11 +60,11 @@
 
 ## 슬라이드 6 · 결론 — 배치 규칙으로 답이 갈린다
 
-![F_G06](analysis_chain19/figures/mig_mps/F_G06_VERDICT.png)
+![F_G06](analysis_chain19/figures/mig_mps/F_G06_VERDICT_v2.png)
 
-- **✓ 검증된 답 두 가지**: (i) **SP + L1-adjacent (NRx)** on 4g partition · gap p99 ≤ 2.5ms. (ii) **CP + diverse AI** on 3g partition · L1 p99 ≤ 47ms
-- **이상적 배치 (다음 실험 후보)**: 4g에 **L1+NRx (SP+MPS)** + 3g에 **다이버스 AI (CP+MPS)** — 두 답의 합집합 · 아직 직접 검증 안 됨
-- **금지 규칙**: (a) 무거운 LLM을 L1 파티션에 넣지 말 것 · (b) MPS 절대 끄지 말 것 · (c) Duty cycle을 SLA 게이트로 쓰지 말 것 (worst-case latency로 판단)
+- **✓ 검증 (초록)**: (i) SP + identical NRx · MPS on · N=8 → gap p99 **1.8 ms** (ii) CP + diverse AI · MPS on · N=16 → L1 p99 mean **42.7 · worst 44.1 ms**
+- **△ 경고 (주황)**: Full GPU + Qwen · N=1 → 63.6/64.9 ms · Full GPU + diverse · N=6 → bimodal 54.3/**62.0 ms** worst 실패
+- **✗ 실패 (빨강)**: SP-4g + diverse · pct=30 → 146/160 ms · pct=100 → 411/**420 ms**. **배치 규칙: 무거운 LLM을 L1 파티션에 넣지 말 것 · MPS 절대 끄지 말 것 · worst-case latency로 판단할 것**
 
 ---
 
@@ -79,7 +79,7 @@
 | 4b | `figures/mig_mps/F_G10_SP_TRIAL_VAR.png` | Chain 17 · Config A · 3 trial |
 | 5a | `figures/mig_mps/F13b_duty_cp.png` | Chain 19 Exp 5 · duty |
 | 5b | `figures/mig_mps/F_G05_CP_WIN.png` | Chain 19 Exp 5 · realL1 p99 · 3 trial |
-| 6 | `figures/mig_mps/F_G06_VERDICT.png` | 종합 (Chain 17 + Chain 19 실측) |
+| 6 | `figures/mig_mps/F_G06_VERDICT_v2.png` | 종합 (Chain 17 + Chain 19 실측) |
 
 ---
 

@@ -99,7 +99,43 @@
 
 - **논리 1 (좌 그림 · 실측)** — Config A (MIG 4g SP) 에서 L1 kernel gap p99: N=1~4 = 0.7~0.8 ms · N=6 = 1.5 ms · N=8 = 1.8 ms. **전 구간 gap p99 ≤ 2 ms**. Config C (3g) 도 유사한 패턴
 - **논리 2 (우 그림 · 대조)** — 같은 SP 위상이지만 **워크로드가 결정**: L1-adjacent NRx-only 는 gap p99 = 1.5 ms, 다이버스 AI mix (LLM 포함) 는 L1 p99 = 146 ms. **100배 이상 차이.** SP 실패는 위상 문제가 아니라 워크로드 매칭 문제
-- **논리 3 (실제 배치와의 정합)** — AI-RAN에서 L1과 co-work 해야 하는 워크로드는 **NRx · ChanPred · BeamPred · CsiNet** 등 kernel이 작고 짧은 것들. Qwen 같은 LLM은 애초에 L1 파티션에 넣을 이유 없음. **SP + MIG + MPS는 우리의 실제 유즈케이스에 유효**. 다만 realL1 per-iter latency는 아직 측정 안 함 → 다음 실험 후보
+- **논리 3 (실제 배치와의 정합)** — AI-RAN에서 L1과 co-work 해야 하는 워크로드는 **NRx · ChanPred · BeamPred · CsiNet** 등 kernel이 작고 짧은 것들. Qwen 같은 LLM은 애초에 L1 파티션에 넣을 이유 없음. **SP + MIG + MPS는 우리의 실제 유즈케이스에 유효**. 다음 3개 슬라이드에서 세 가지 다른 각도로 재검증
+
+---
+
+## Slide 6c · SP+NRx 검증 (i) — MPS on/off · 3 config 전체
+
+![F_G08](analysis_chain19/figures/mig_mps/F_G08_SP_MPS_NECESSITY.png)
+
+**identical-NRx grid 실험 · Config A/B/C · MPS on vs off · gap p99 재측정**
+
+- **논리 1 (좌 (a) MPS OFF)** — 세 config 모두 gap p99가 N=8에서 13–17 ms로 상승. Config C (MIG 3g, SM 42) 가 가장 심함 (SM 부족)
+- **논리 2 (우 (b) MPS ON)** — 같은 세 config, MPS 켜는 것만으로 gap p99가 **8~15배 하락 → ≤ 2.5 ms**. Full GPU 는 0.5 ms 대. **MPS가 SP+NRx의 결정 요소**
+- **논리 3 (해석)** — SP 위상 자체는 문제 아님. MPS가 없으면 파티션 안의 프로세스가 시분할 → tail 폭발. MPS 켜면 SM 스케줄러가 kernel 다중화 → NRx같은 작은 kernel은 여유롭게 pack됨
+
+---
+
+## Slide 6d · SP+NRx 검증 (ii) — L1 launch rate · 3-trial 재현성
+
+| (a) L1 launch rate 유지 (starvation 없음) | (b) 3-trial min-max 편차 좁음 |
+| :---: | :---: |
+| ![F_G09](analysis_chain19/figures/mig_mps/F_G09_SP_LAUNCH_RATE.png) | ![F_G10](analysis_chain19/figures/mig_mps/F_G10_SP_TRIAL_VAR.png) |
+
+- **논리 1 (a launch rate)** — SP+NRx+MPS on 에서 L1 launch rate 2~12k kernels/s 유지. Slide 3의 MPS OFF 붕괴 (<1k) 와 대비. **L1이 굶지 않음** = kernel이 정상 발사됨
+- **논리 2 (b trial variance)** — Config A · MPS on 조건 3 trial 반복. mean 0.7~1.8 ms · worst 2.3 ms 이하. min-max 밴드 매우 좁음 → **재현 가능한 안정 상태**
+- **논리 3 (Full GPU + MPS bimodal 과의 대비)** — Slide 4의 Full GPU + diverse AI는 trial간 편차 40~60 ms (unpredictable). SP+NRx는 편차 0.5 ms 이하. **workload가 L1-adjacent면 스케줄이 결정적**
+
+---
+
+## Slide 6e · SP+NRx 검증 (iii) — Workload × Topology 종합표
+
+![F_G11](analysis_chain19/figures/mig_mps/F_G11_SP_MATRIX.png)
+
+**Chain 17 + Chain 19 실측을 하나의 표로 통합**
+
+- **논리 1 (같은 SP · 다른 워크로드)** — 두 번째 행 (SP+NRx 1.5 ms) vs 네 번째 행 (SP+diverse AI 146 ms). **같은 위상에서 100배 차이**. SP 실패의 원인은 위상이 아니라 워크로드 mismatch
+- **논리 2 (실제 배치 시나리오 3개)** — (a) baseline · (b) SP+L1-adjacent (NRx) · (c) CP+독립 AI (Qwen 등). 세 조건 모두 SLA 통과. **AI-RAN의 실제 3가지 배치 요구가 모두 커버됨**
+- **논리 3 (실패 조건들 격리)** — SP+diverse (LLM을 L1 파티션에) 와 Full GPU (격리 없음, bimodal) 는 실패. 이건 **배치 규칙 위반이지 도구 한계 아님**
 
 ---
 

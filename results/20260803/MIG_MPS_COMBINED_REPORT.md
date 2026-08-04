@@ -3,7 +3,10 @@
 **Date**: 2026-08-03
 **Platform**: CloudLab d8545 · NVIDIA A100-SXM4-40GB × 4 · Driver 580.173.02 · CUDA 13.0
 **Workload**: cuPHY 25.3-cubb 5G L1 + diverse AI stack (Qwen 2.5-3B, Whisper large-v3, BERT, Qwen-VL, NRx, CsiNet, BeamPred)
-**Data**: Chain 17 (108 conditions), Chain 18 (multi-part), Chain 19 (273 conditions, 213 per-iter L1 measurements)
+**Datasets**:
+- identical-NRx grid experiment (2026-07 · 108 conditions · 3 MIG configs × 6 N × 2 MPS × 3 trials)
+- fault injection · NCU deep-dive experiment (2026-07 · multi-part)
+- diverse-AI deployment experiment (2026-08-03 · 273 conditions · 13 scenarios · 213 per-iter L1 measurements)
 **Analysis figures**: 30 in `analysis_chain19/figures/mig_mps/`
 
 ---
@@ -35,7 +38,7 @@ Remove either half → the combination breaks. Both together → 5G L1 SLA + ful
 1. **Duty cycle was misleading.** Full GPU + MPS shows 62 % L1 duty (looks "healthy") but actual L1 p99 is 63 ms — 50 % worse than 42 ms baseline. Do not use duty cycle as SLA gate.
 2. **MIG alone loses AI throughput.** MIG cross-partition without MPS on the AI side forces AI processes to serialize on the 3g partition → aggregate throughput drops ~70 %.
 3. **MPS alone loses L1 SLA.** Full GPU + MPS never reaches L1 baseline — even at N=1 diverse AI, L1 p99 climbs 42 → 63 ms. At N=6 same-partition + MPS default, L1 breaks to 150+ ms.
-4. **MIG cross-partition + MPS on AI is invariant.** Chain 19 Exp 5 verified L1 mean/p95/p99 flat at baseline for N ∈ {6, 8, 10, 12, 16}. AI Qwen throughput scales linearly.
+4. **MIG cross-partition + MPS on AI is invariant.** The diverse-AI experiment (Exp 5) verified L1 mean/p95/p99 flat at baseline for N ∈ {6, 8, 10, 12, 16}. AI Qwen throughput scales linearly.
 5. **This maps directly to SoftBank AITRAS-style deployment.** A 5G DU + 6-service AI stack on one A100 is only feasible with MIG CP + MPS on AI. Any other choice violates 5G TTI SLA or wastes AI capacity.
 
 ---
@@ -106,7 +109,7 @@ If we skip MIG entirely (Full GPU, no partition) and rely on MPS, what happens?
 
 ![F11](analysis_chain19/figures/mig_mps/F11_mps_pct_full_gpu.png)
 
-**MPS thread% tuning (Chain 19 Exp 11)** — heatmap of L1 p99 across (pct, N). Best result at pct=30, N=6 is 45 ms. Better than default (150+ ms) but still 12 % worse than MIG CP baseline. **Tuning approaches but never matches** the isolation of MIG cross-partition.
+**MPS thread% tuning (diverse-AI experiment · Exp 11)** — heatmap of L1 p99 across (pct, N). Best result at pct=30, N=6 is 45 ms. Better than default (150+ ms) but still 12 % worse than MIG CP baseline. **Tuning approaches but never matches** the isolation of MIG cross-partition.
 
 ![F12](analysis_chain19/figures/mig_mps/F12_diverse_vs_identical.png)
 
@@ -122,7 +125,7 @@ Now the combination. L1 on a dedicated MIG partition (say 4g.20gb), AI on the ot
 
 ![F13](analysis_chain19/figures/mig_mps/F13_cp_l1_invariance.png)
 
-**Chain 19 Exp 5 — L1 latency invariance under CP + MPS**. Mean/p95/p99 all stay at baseline (~40 ms p99) for N ∈ {6, 8, 10, 12, 16}. **Zero L1 penalty regardless of AI load.**
+**diverse-AI experiment · Exp 5 — L1 latency invariance under CP + MPS**. Mean/p95/p99 all stay at baseline (~40 ms p99) for N ∈ {6, 8, 10, 12, 16}. **Zero L1 penalty regardless of AI load.**
 
 ![F14](analysis_chain19/figures/mig_mps/F14_cp_ai_scaling.png)
 
@@ -256,21 +259,21 @@ Expected outcome:
 | L1 duty cycle (%) | Kernel-time fraction | **NO** — misleading (can look high while SLA fails) |
 | NCU issued warps per SM | Micro-architecture stress | Diagnostic only |
 
-The lesson from Chain 19 is that duty cycle is a GPU-utilization metric, not an SLA metric. Optimize for latency, not for utilization.
+The lesson from the diverse-AI experiment is that duty cycle is a GPU-utilization metric, not an SLA metric. Optimize for latency, not for utilization.
 
 ---
 
 ## What we validated across the campaign
 
-- **Chain 17** (108 conditions): full 3 configs × 6 N × 2 MPS grid with 3 trials → confirmed MPS is necessary for AI multiplexing, MPS-off catastrophic.
-- **Chain 18** (multi-part): fault injection, NCU per-kernel metrics, dynamic scaling → confirmed CP fault isolation, kernel warp-stall causes.
-- **Chain 19** (273 conditions, 213 per-iter measurements): CP invariance up to N=16, SP breakdown at N=6, MPS pct=30 as best SP tuning → confirmed CP + MPS as invariant, tuning of MPS pct as secondary lever within CP.
+- **identical-NRx grid experiment (2026-07 · 108 conditions)**: full 3 configs × 6 N × 2 MPS grid with 3 trials → confirmed MPS is necessary for AI multiplexing, MPS-off catastrophic.
+- **fault·NCU deep-dive experiment (2026-07 · multi-part)**: fault injection, NCU per-kernel metrics, dynamic scaling → confirmed CP fault isolation, kernel warp-stall causes.
+- **diverse-AI deployment experiment (2026-08-03 · 273 conditions · 213 per-iter measurements)**: CP invariance up to N=16, SP breakdown at N=6, MPS pct=30 as best SP tuning → confirmed CP + MPS as invariant, tuning of MPS pct as secondary lever within CP.
 
 ---
 
 ## Next steps
 
-- **Chain 20**: run production replica — cuPHY + Aerial CTL + 6-service AI stack (Qwen/Whisper/BERT/Qwen-VL/NRx/CsiNet) under MIG CP + MPS for 24-hour endurance.
+- **Next endurance experiment (24-hour)**: run production replica — cuPHY + Aerial CTL + 6-service AI stack (Qwen/Whisper/BERT/Qwen-VL/NRx/CsiNet) under MIG CP + MPS.
 - Measure AI service SLO (p99 request latency for Qwen, latency for Whisper, etc.) under MIG CP + MPS vs the SP fallback → quantify per-service throughput cost of choosing the fallback.
 - Test on 80GB variant and MIG Config with 7g partition to see if Full GPU MIG (with a single 7g partition) behaves like Full GPU or gains anything from the MIG scheduler.
 

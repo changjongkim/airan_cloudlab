@@ -1,6 +1,6 @@
 # AI-RAN GPU 격리 전략: 발표 슬라이드
 
-*Chain 17 (지난주) · Chain 18 (지난주) · Chain 19 (어제) 데이터 기반*
+*2026-07 identical-NRx grid + fault·NCU 실험 · 2026-08-03 diverse-AI deployment 실험 데이터 기반*
 
 ---
 
@@ -22,9 +22,9 @@
 - NCU per-kernel metrics (warp stall, occupancy) · 조건당 3 trial 평균
 
 **전체 규모**
-- Chain 17: 108 조건 (identical NRx workload grid)
-- Chain 18: 다중 파트 (fault injection · NCU 심화)
-- Chain 19: **273 조건 + 213 per-iter L1 측정** (다이버스 AI stack)
+- **identical-NRx grid 실험** (2026-07 · 108 조건 · 3 MIG configs × 6 N × 2 MPS × 3 trials)
+- **fault injection · NCU 심화 실험** (2026-07 · 다중 파트)
+- **diverse-AI deployment 실험** (2026-08-03 · **273 조건 + 213 per-iter L1 측정** · 13 시나리오)
 
 ---
 
@@ -44,7 +44,7 @@
 
 ![F05](analysis_chain19/figures/mig_mps/F05_mig_off_mps_effect.png)
 
-**Chain 17 · Config B (Full GPU) · MPS off · N=1~8** 실측
+**identical-NRx grid 실험 · Config B (Full GPU) · MPS off · N=1~8** 실측
 
 - **논리 1 (관찰)** — N=1만 되어도 L1 per-slot 지연이 baseline 대비 수 배로 뜀. N=6+에서는 완전 파괴 (수백 ms)
 - **논리 2 (원인)** — MPS 없이 다중 프로세스가 GPU에 붙으면 CUDA context가 시분할됨. L1 커널이 AI 커널이 끝나기를 기다린다
@@ -54,14 +54,14 @@
 
 ## Slide 4 · Attempt 2 — Full GPU + MPS on: **duty cycle 함정**
 
-**Chain 19 Exp 1 · Full GPU + MPS on · 다이버스 AI N=1~12** 실측 — 두 지표를 나란히
+**diverse-AI 실험 Exp 1 · Full GPU + MPS on · 다이버스 AI N=1~12** 실측 — 두 지표를 나란히
 
 | (a) Duty cycle 관점 — "건강해 보임" | (b) 실제 L1 p99 지연 — "SLA 실패" |
 | :---: | :---: |
 | ![F09b](analysis_chain19/figures/mig_mps/F09b_duty_full_gpu.png) | ![F09](analysis_chain19/figures/mig_mps/F09_mps_alone_full_gpu.png) |
 
 - **논리 1 (a와 b의 모순)** — (a)에서 duty는 baseline 대비 상승해 "GPU 잘 활용" 처럼 보임. (b)에서 실제 L1 p99는 42 ms → **63 ms (50 % 페널티)**. **같은 조건, 다른 결론**
-- **논리 2 (왜 duty가 오도했나)** — Duty cycle은 "GPU가 얼마나 바쁜가"를 재는 utilization 지표. **"L1 커널이 시간 안에 끝났나"를 재는 SLA 지표가 아니다.** 지난주 Chain 17에서 이 함정에 빠져 Config B가 좋아 보였음
+- **논리 2 (왜 duty가 오도했나)** — Duty cycle은 "GPU가 얼마나 바쁜가"를 재는 utilization 지표. **"L1 커널이 시간 안에 끝났나"를 재는 SLA 지표가 아니다.** 2026-07 identical-NRx grid 실험에서 이 함정에 빠져 Config B가 좋아 보였음
 - **논리 3 (근본 원인)** — MPS는 launch queue를 공유. L1 커널과 AI 커널이 같은 스케줄러에 들어가면 L1이 AI 뒤에서 대기하는 게 확률적으로 발생 → duty는 유지되지만 tail latency가 튐
 
 ---
@@ -70,7 +70,7 @@
 
 ![F06](analysis_chain19/figures/mig_mps/F06_mig_same_partition.png)
 
-**Chain 17 · Config A/C · Same-partition · MPS on/off** 실측
+**identical-NRx grid 실험 · Config A/C · Same-partition · MPS on/off** 실측
 
 - **논리 1 (관찰)** — MIG 파티션을 만들어도 **L1과 AI를 같은 파티션 (4g 또는 3g) 에 넣으면** N=6에서 breakdown. Config A · C 둘 다 동일 패턴
 - **논리 2 (왜 안 되나)** — MIG의 격리는 **파티션 경계에서만** 유효. 같은 파티션 안에서는 여전히 launch queue 공유. 파티션이 있어도 없는 것과 다름없다
@@ -82,7 +82,7 @@
 
 ![F11](analysis_chain19/figures/mig_mps/F11_mps_pct_full_gpu.png)
 
-**Chain 19 Exp 11 · Full GPU + MPS pct 30/50/70/100 × N=4/6/8** 실측
+**diverse-AI 실험 Exp 11 · Full GPU + MPS pct 30/50/70/100 × N=4/6/8** 실측
 
 - **논리 1 (관찰)** — pct=30 · N=6에서 L1 p99 = **45 ms**. 기본값 pct=100의 150 ms 대비 큰 개선. 하지만 baseline 40 ms에는 도달 못함
 - **논리 2 (왜 완전히 안 되나)** — pct 캡은 AI 커널이 점유하는 SM 개수를 제한. 하지만 여전히 같은 launch queue라서 L1은 wait가 발생. 5-12 % 페널티는 남는다
@@ -94,7 +94,7 @@
 
 ![F07](analysis_chain19/figures/mig_mps/F07_all_configs_mpsoff.png)
 
-**Chain 17 · 모든 config · MPS off · N=1~8** 실측 (cross-partition 포함 프록시)
+**identical-NRx grid 실험 · 모든 config · MPS off · N=1~8** 실측 (cross-partition 포함 프록시)
 
 - **논리 1 (관찰)** — L1은 자기 파티션에서 살아남지만 **AI 프로세스들이 3g 파티션 위에서 직렬화**. AI 집계 throughput 30% 수준으로 폭락
 - **논리 2 (왜)** — MPS가 없으면 같은 파티션에 붙은 N개의 AI 프로세스가 context switch로 시분할. 4개 컨테이너면 실효 25%씩만 얻음
@@ -104,7 +104,7 @@
 
 ## Slide 8 · The Answer — MIG cross-partition + AI 파티션 MPS on
 
-**Chain 19 Exp 5 · L1은 4g 파티션 · AI는 3g 파티션 · AI측 MPS on · N=6/8/10/12/16** 실측 — 두 지표가 **일치**
+**diverse-AI 실험 Exp 5 · L1은 4g 파티션 · AI는 3g 파티션 · AI측 MPS on · N=6/8/10/12/16** 실측 — 두 지표가 **일치**
 
 | (a) Duty cycle — 안정 | (b) L1 p99 지연 — baseline 고정 |
 | :---: | :---: |
@@ -120,7 +120,7 @@
 
 ![F17](analysis_chain19/figures/mig_mps/F17_cp_extreme_scale.png)
 
-**Chain 19 Exp 5 · N=16 다이버스 AI 컨테이너 동시 실행 · 30분 지속**
+**diverse-AI 실험 Exp 5 · N=16 다이버스 AI 컨테이너 동시 실행 · 30분 지속**
 
 - **논리 1 (숫자)** — L1 p99 = **40.2 ms** (baseline 40.0 ms, 페널티 0.5 %). AI aggregate Qwen throughput ≈ 5,000+ tok/s. Fault-isolated (AI 크래시 → L1 무영향)
 - **논리 2 (왜 이 숫자가 중요?)** — 5G TTI 500 μs × 100 kernel/slot 예산 안에 100% 안착. **실제 셀 사이트 배치에서 SLA 통과 보장.** N=16은 SoftBank AITRAS 목표 (5G + 6 AI 서비스) 를 2.6배 초과 검증
@@ -144,4 +144,4 @@
 
 ---
 
-*발표 · 2026-08-04 · 슬라이드 10장 · 그림 11장 (F09/F13은 duty/지연 (a)(b) 페어) · 데이터: Chain 17 (108 조건) + Chain 18 (fault/NCU) + Chain 19 (273 조건 + 213 per-iter)*
+*발표 · 2026-08-04 · 슬라이드 10장 · 그림 11장 (F09/F13은 duty/지연 (a)(b) 페어) · 데이터: identical-NRx grid (2026-07 · 108 조건) + fault·NCU 실험 (2026-07) + diverse-AI 실험 (2026-08-03 · 273 조건 + 213 per-iter)*

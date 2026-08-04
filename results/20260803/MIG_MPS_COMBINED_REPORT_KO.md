@@ -3,7 +3,10 @@
 **날짜**: 2026-08-03
 **플랫폼**: CloudLab d8545 · NVIDIA A100-SXM4-40GB × 4 · Driver 580.173.02 · CUDA 13.0
 **워크로드**: cuPHY 25.3-cubb 5G L1 + 다양한 AI 스택 (Qwen 2.5-3B, Whisper large-v3, BERT, Qwen-VL, NRx, CsiNet, BeamPred)
-**데이터**: Chain 17 (108 조건), Chain 18 (다중 파트), Chain 19 (273 조건, 213 per-iter L1 측정)
+**데이터셋**:
+- identical-NRx grid 실험 (2026-07 · 108 조건 · 3 MIG configs × 6 N × 2 MPS × 3 trials)
+- fault injection · NCU 심화 실험 (2026-07 · 다중 파트)
+- diverse-AI deployment 실험 (2026-08-03 · 273 조건 · 13 시나리오 · 213 per-iter L1 측정)
 **그림**: 30장 · `analysis_chain19/figures/mig_mps/`
 
 ---
@@ -35,7 +38,7 @@ MPS는 **논리적 다중화** — N개의 AI 프로세스가 `cudaFree` context
 1. **Duty cycle은 오도한다.** Full GPU + MPS는 L1 duty 62 %로 "건강해" 보이지만 실제 L1 p99는 63 ms — baseline 42 ms 대비 50 % 나쁨. Duty cycle을 SLA 게이트로 쓰지 말 것.
 2. **MIG 단독은 AI throughput을 잃는다.** MIG cross-partition에서 AI측 MPS가 없으면 AI 프로세스가 3g 파티션 위에서 직렬화 → 집계 throughput ~70 % 하락.
 3. **MPS 단독은 L1 SLA를 잃는다.** Full GPU + MPS는 baseline에 절대 도달하지 못함. N=1 다이버스 AI에서도 L1 p99 42 → 63 ms. N=6 same-partition + MPS 기본값에서는 150+ ms 파괴.
-4. **MIG cross-partition + AI측 MPS on은 불변이다.** Chain 19 Exp 5에서 N ∈ {6, 8, 10, 12, 16} 전 구간에서 L1 mean/p95/p99가 baseline 고정. Qwen aggregate throughput은 선형 확장.
+4. **MIG cross-partition + AI측 MPS on은 불변이다.** diverse-AI 실험 Exp 5에서 N ∈ {6, 8, 10, 12, 16} 전 구간에서 L1 mean/p95/p99가 baseline 고정. Qwen aggregate throughput은 선형 확장.
 5. **이 결과는 SoftBank AITRAS 스타일 배치에 직접 적용된다.** 1× A100에 5G DU + 6-service AI 스택을 얹으려면 MIG CP + MPS on AI 외에는 답이 없다. 다른 선택은 5G TTI SLA 위반 또는 AI 용량 낭비.
 
 ---
@@ -106,7 +109,7 @@ MIG를 완전히 빼고 (Full GPU, no partition) MPS에만 의존하면?
 
 ![F11](analysis_chain19/figures/mig_mps/F11_mps_pct_full_gpu.png)
 
-**MPS thread% 튜닝 (Chain 19 Exp 11)** — (pct, N) 그리드의 L1 p99 heatmap. 최선은 pct=30, N=6에서 45 ms. 기본값 (150+ ms) 보다는 훨씬 좋으나 MIG CP baseline 대비 여전히 12 % 나쁨. **튜닝은 근접시킬 뿐 격리에 도달하지 못한다.**
+**MPS thread% 튜닝 (diverse-AI 실험 Exp 11)** — (pct, N) 그리드의 L1 p99 heatmap. 최선은 pct=30, N=6에서 45 ms. 기본값 (150+ ms) 보다는 훨씬 좋으나 MIG CP baseline 대비 여전히 12 % 나쁨. **튜닝은 근접시킬 뿐 격리에 도달하지 못한다.**
 
 ![F12](analysis_chain19/figures/mig_mps/F12_diverse_vs_identical.png)
 
@@ -122,7 +125,7 @@ L1은 전용 MIG 파티션 (예: 4g.20gb), AI는 반대 파티션 (3g.20gb) + AI
 
 ![F13](analysis_chain19/figures/mig_mps/F13_cp_l1_invariance.png)
 
-**Chain 19 Exp 5 — CP + MPS 조건에서 L1 지연 불변성**. Mean/p95/p99 모두 N ∈ {6, 8, 10, 12, 16} 전 구간에서 baseline (~40 ms p99) 유지. **AI 부하와 무관하게 L1 페널티 제로.**
+**diverse-AI 실험 Exp 5 — CP + MPS 조건에서 L1 지연 불변성**. Mean/p95/p99 모두 N ∈ {6, 8, 10, 12, 16} 전 구간에서 baseline (~40 ms p99) 유지. **AI 부하와 무관하게 L1 페널티 제로.**
 
 ![F14](analysis_chain19/figures/mig_mps/F14_cp_ai_scaling.png)
 
@@ -256,21 +259,21 @@ AI 측 (3g 파티션):
 | L1 duty cycle (%) | 커널-시간 분율 | **NO** — 오도 (SLA 실패 중에도 높아 보일 수 있음) |
 | NCU issued warps per SM | 마이크로아키텍처 스트레스 | 진단용만 |
 
-Chain 19의 교훈은 duty cycle이 GPU-utilization 지표이지 SLA 지표가 아니라는 것. 지연으로 최적화하라, utilization으로 하지 말라.
+diverse-AI 실험의 교훈은 duty cycle이 GPU-utilization 지표이지 SLA 지표가 아니라는 것. 지연으로 최적화하라, utilization으로 하지 말라.
 
 ---
 
 ## 캠페인 전체를 통해 검증한 것
 
-- **Chain 17** (108 조건): 3 config × 6 N × 2 MPS 전 그리드 × 3 trial → MPS는 AI 다중화에 필수, MPS-off는 파국.
-- **Chain 18** (다중 파트): fault injection, NCU per-kernel 지표, 동적 스케일링 → CP fault 격리, 커널 warp-stall 원인 확인.
-- **Chain 19** (273 조건, 213 per-iter): N=16까지의 CP 불변성, N=6에서 SP breakdown, 최선의 SP 튜닝으로 MPS pct=30 → CP + MPS를 불변 조합으로, CP 내부의 MPS pct 튜닝을 2차 레버로 확인.
+- **identical-NRx grid 실험 (2026-07 · 108 조건)**: 3 config × 6 N × 2 MPS 전 그리드 × 3 trial → MPS는 AI 다중화에 필수, MPS-off는 파국.
+- **fault·NCU 심화 실험 (2026-07 · 다중 파트)**: fault injection, NCU per-kernel 지표, 동적 스케일링 → CP fault 격리, 커널 warp-stall 원인 확인.
+- **diverse-AI deployment 실험 (2026-08-03 · 273 조건 · 213 per-iter)**: N=16까지의 CP 불변성, N=6에서 SP breakdown, 최선의 SP 튜닝으로 MPS pct=30 → CP + MPS를 불변 조합으로, CP 내부의 MPS pct 튜닝을 2차 레버로 확인.
 
 ---
 
 ## 다음 단계
 
-- **Chain 20**: 프로덕션 replica — cuPHY + Aerial CTL + 6-service AI 스택 (Qwen/Whisper/BERT/Qwen-VL/NRx/CsiNet) MIG CP + MPS 하 24시간 endurance.
+- **다음 endurance 실험 (24-hour)**: 프로덕션 replica — cuPHY + Aerial CTL + 6-service AI 스택 (Qwen/Whisper/BERT/Qwen-VL/NRx/CsiNet) MIG CP + MPS 하.
 - MIG CP + MPS vs SP fallback 에서의 AI 서비스 SLO (Qwen p99 요청 지연, Whisper 지연 등) 측정 → fallback 선택 시 서비스당 throughput 비용 정량화.
 - 80GB 변형 및 7g 파티션 MIG config 테스트 — 단일 7g 파티션의 Full GPU MIG가 Full GPU처럼 행동하는지, MIG scheduler에서 뭔가를 얻는지.
 

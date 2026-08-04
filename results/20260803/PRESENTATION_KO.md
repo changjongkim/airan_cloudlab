@@ -16,11 +16,10 @@
 - AI 워크로드 (다이버스 7종): Qwen 2.5-3B (vLLM) · Whisper large-v3 · BERT · Qwen-VL · NRx · CsiNet · BeamPred
 - 격리 도구: MIG (하드웨어 파티션) + CUDA MPS (논리 다중화)
 
-**측정 방법**
-- `nsys profile` → sqlite → gap stats JSON (커널 실행/공백 분석)
-- `realL1_*.json` per-iteration 지연 (mean/p95/p99 ms) — **진짜 5G SLA 지표**
-- NCU per-kernel metrics (warp stall, occupancy, scheduler)
-- 조건당 3 trial 평균
+**측정 방법 — 두 지표를 함께 본다**
+- **Duty cycle** (%) — nsys → sqlite gap stats. GPU가 얼마나 바쁜가 (utilization)
+- **L1 per-iteration p99 지연** (ms) — realL1_*.json. 실제 5G SLA 지표
+- NCU per-kernel metrics (warp stall, occupancy) · 조건당 3 trial 평균
 
 **전체 규모**
 - Chain 17: 108 조건 (identical NRx workload grid)
@@ -53,15 +52,17 @@
 
 ---
 
-## Slide 4 · Attempt 2 — Full GPU + MPS on: duty cycle 함정
+## Slide 4 · Attempt 2 — Full GPU + MPS on: **duty cycle 함정**
 
-![F09](analysis_chain19/figures/mig_mps/F09_mps_alone_full_gpu.png)
+**Chain 19 Exp 1 · Full GPU + MPS on · 다이버스 AI N=1~12** 실측 — 두 지표를 나란히
 
-**Chain 19 Exp 1 · Full GPU + MPS on · 다이버스 AI N=1~12** 실측
+| (a) Duty cycle 관점 — "건강해 보임" | (b) 실제 L1 p99 지연 — "SLA 실패" |
+| :---: | :---: |
+| ![F09b](analysis_chain19/figures/mig_mps/F09b_duty_full_gpu.png) | ![F09](analysis_chain19/figures/mig_mps/F09_mps_alone_full_gpu.png) |
 
-- **논리 1 (기대와 실제)** — Duty cycle만 보면 62%로 "건강해 보였다". 그러나 **L1 p99 = 63 ms** (baseline 42 ms 대비 **50 % 페널티**)
-- **논리 2 (왜 duty가 오도했나)** — Duty cycle은 "GPU가 얼마나 바쁜가"를 재는 utilization 지표. **"L1 커널이 시간 안에 끝났나"를 재는 SLA 지표가 아니다.** 지난주 (Chain 17)에서 이 함정에 빠져 Config B가 좋아 보였다
-- **논리 3 (근본 원인)** — MPS는 launch queue를 공유. L1 커널과 AI 커널이 같은 스케줄러에 들어가면 L1이 AI 뒤에서 대기하는 게 확률적으로 발생. 완전한 격리 불가
+- **논리 1 (a와 b의 모순)** — (a)에서 duty는 baseline 대비 상승해 "GPU 잘 활용" 처럼 보임. (b)에서 실제 L1 p99는 42 ms → **63 ms (50 % 페널티)**. **같은 조건, 다른 결론**
+- **논리 2 (왜 duty가 오도했나)** — Duty cycle은 "GPU가 얼마나 바쁜가"를 재는 utilization 지표. **"L1 커널이 시간 안에 끝났나"를 재는 SLA 지표가 아니다.** 지난주 Chain 17에서 이 함정에 빠져 Config B가 좋아 보였음
+- **논리 3 (근본 원인)** — MPS는 launch queue를 공유. L1 커널과 AI 커널이 같은 스케줄러에 들어가면 L1이 AI 뒤에서 대기하는 게 확률적으로 발생 → duty는 유지되지만 tail latency가 튐
 
 ---
 
@@ -73,7 +74,7 @@
 
 - **논리 1 (관찰)** — MIG 파티션을 만들어도 **L1과 AI를 같은 파티션 (4g 또는 3g) 에 넣으면** N=6에서 breakdown. Config A · C 둘 다 동일 패턴
 - **논리 2 (왜 안 되나)** — MIG의 격리는 **파티션 경계에서만** 유효. 같은 파티션 안에서는 여전히 launch queue 공유. 파티션이 있어도 없는 것과 다름없다
-- **논리 3 (교훈)** — "MIG를 켰다"만으로는 부족. **L1을 자기 전용 파티션에 격리해야** 의미가 있음. 배치 규칙이 중요
+- **논리 3 (교훈)** — "MIG를 켰다"만으로는 부족. **L1을 자기 전용 파티션에 격리해야** 의미가 있음. 배치 규칙이 결정적
 
 ---
 
@@ -103,11 +104,13 @@
 
 ## Slide 8 · The Answer — MIG cross-partition + AI 파티션 MPS on
 
-![F13](analysis_chain19/figures/mig_mps/F13_cp_l1_invariance.png)
+**Chain 19 Exp 5 · L1은 4g 파티션 · AI는 3g 파티션 · AI측 MPS on · N=6/8/10/12/16** 실측 — 두 지표가 **일치**
 
-**Chain 19 Exp 5 · L1은 4g 파티션 · AI는 3g 파티션 · AI측 MPS on · N=6/8/10/12/16** 실측
+| (a) Duty cycle — 안정 | (b) L1 p99 지연 — baseline 고정 |
+| :---: | :---: |
+| ![F13b](analysis_chain19/figures/mig_mps/F13b_duty_cp.png) | ![F13](analysis_chain19/figures/mig_mps/F13_cp_l1_invariance.png) |
 
-- **논리 1 (L1 결과)** — L1 mean/p95/p99 모두 N ∈ {6, 8, 10, 12, 16} 전 구간에서 **baseline 40 ms 고정 (페널티 0.5 %).** AI 부하와 완전 독립
+- **논리 1 (두 지표가 일치)** — 격리가 제대로 되면 (a) duty와 (b) 지연이 **동시에** 안정. Slide 4의 모순이 사라짐. L1 p99 = **40 ms (페널티 0.5 %)** · duty도 baseline 유지
 - **논리 2 (왜 되나)** — MIG가 L1 파티션을 하드웨어로 격리 → launch queue 분리. AI측 MPS가 3g 파티션 안에서 N개 프로세스를 병렬 다중화. **두 역할이 겹치지 않고 상호 보완**
 - **논리 3 (재해석)** — 이전 시도들이 실패한 이유가 여기서 명확해짐: **MIG = 하드웨어 격리 (L1을 위해), MPS = 논리 다중화 (AI를 위해).** 각자 서로 다른 문제를 풀며, 둘 다 필요
 
@@ -125,16 +128,20 @@
 
 ---
 
-## Slide 10 · Deployment Verdict — 실무 결정 매트릭스
+## Slide 10 · Verdict — 판단 지표 재정의 + 실무 결정
+
+**같은 조건, 두 순위** — Duty로 정렬 vs L1 지연으로 정렬. 순서가 뒤집힌다
+
+![F04b](analysis_chain19/figures/mig_mps/F04b_duty_vs_latency_ranking.png)
+
+**5개 축 (L1 지연 · AI throughput · fault 격리 · N≥6 확장 · SLA 준수) 종합 채점**
 
 ![F28](analysis_chain19/figures/mig_mps/F28_master_decision.png)
 
-**5개 축 (L1 지연 · AI throughput · fault 격리 · N≥6 확장 · SLA 준수)** 종합 채점
-
-- **논리 1 (승자)** — Multi-GPU와 **MIG CP + MPS on AI** 만 5/5 만점. 다른 모든 조합은 최소 1개 축에서 실점
-- **논리 2 (배치 레시피)** — L1은 4g 파티션 단독 (MPS 불필요). AI는 3g 파티션에서 `nvidia-cuda-mps-control -d` + 클라이언트별 `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` 튜닝
-- **논리 3 (교훈 3줄)** — ① Duty cycle이 아니라 **L1 p99 latency**로 판단하라. ② MIG와 MPS는 **역할이 다르므로 결합해야** 한다. ③ **L1은 반드시 전용 파티션**, MPS는 **AI 파티션에만**
+- **논리 1 (지표 선택)** — 위 그림 (좌) duty 1등이 (우) 지연 순위에서 **꼴찌**가 되는 경우가 발생. **Duty cycle을 SLA 게이트로 쓰지 마라. L1 p99 지연으로 판단하라**
+- **논리 2 (승자)** — Multi-GPU와 **MIG CP + MPS on AI** 만 5/5 만점. 다른 모든 조합은 최소 1개 축에서 실점
+- **논리 3 (배치 레시피)** — L1은 4g 파티션 단독 (MPS 불필요). AI는 3g 파티션에서 `nvidia-cuda-mps-control -d` + 클라이언트별 `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` 튜닝. **MIG와 MPS는 역할이 다르므로 결합해야 한다**
 
 ---
 
-*발표 · 2026-08-04 · 슬라이드 10장 · 그림 8장 · 데이터: Chain 17 (108 조건) + Chain 18 (fault/NCU) + Chain 19 (273 조건 + 213 per-iter)*
+*발표 · 2026-08-04 · 슬라이드 10장 · 그림 11장 (F09/F13은 duty/지연 (a)(b) 페어) · 데이터: Chain 17 (108 조건) + Chain 18 (fault/NCU) + Chain 19 (273 조건 + 213 per-iter)*

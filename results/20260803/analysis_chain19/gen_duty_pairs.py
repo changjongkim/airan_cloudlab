@@ -9,7 +9,7 @@ Pairs generated:
   F13b — MIG CP + MPS, duty cycle across N (companion to F13 latency invariance)
   F28b — Duty ranking vs latency ranking mismatch (for verdict slide 10)
 """
-import os, json, glob, re
+import os, json, glob
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -64,25 +64,27 @@ def l1_p99(cond_prefix):
 # F09b — Full GPU duty cycle (companion to F09 latency)
 # =========================
 def fig09b():
-    """Duty cycle for Full GPU + MPS on, N sweep. Should look 'healthy'."""
+    """Duty cycle for Full GPU + MPS on, N sweep — BAR chart (each N discrete)."""
     Ns = [1, 3, 6, 8, 10, 12]
     duties = [duty_mean(f"e1_cfgB_diverseN{N}") or 0 for N in Ns]
     baseline = duty_mean("e1_baseline") or 25
     fig, ax = plt.subplots(figsize=(13, 6.5))
+    xs = np.arange(len(Ns))
+    ax.bar(xs, duties, color=COL_NOMIG, alpha=0.85, edgecolor="white", linewidth=2, width=0.65)
     ax.axhline(baseline, color=INK_MUT, linestyle="--", linewidth=2, alpha=0.7)
-    ax.text(0.02, baseline+1.5, f"L1 alone duty: {baseline:.0f}%", transform=ax.get_yaxis_transform(),
-            color=INK_SEC, fontsize=11, style="italic")
-    ax.plot(Ns, duties, "o-", color=COL_NOMIG, linewidth=3, markersize=13,
-            markerfacecolor="white", markeredgewidth=2.5)
-    for N, d in zip(Ns, duties):
-        ax.text(N, d+1.5, f"{d:.0f}%", ha="center", fontsize=11, color=COL_NOMIG, fontweight="bold")
-    ax.set_xlabel("N (다이버스 AI 컨테이너)")
+    ax.text(len(Ns)-0.5, baseline+1.5, f"L1 alone baseline: {baseline:.0f}%",
+            color=INK_SEC, fontsize=11, style="italic", ha="right")
+    for i, d in enumerate(duties):
+        ax.text(i, d+1.2, f"{d:.0f}%", ha="center", fontsize=12, color=COL_NOMIG, fontweight="bold")
+    ax.set_xticks(xs); ax.set_xticklabels([f"N={n}" for n in Ns])
+    ax.set_xlabel("다이버스 AI 컨테이너 수 (각 막대는 독립 조건)")
     ax.set_ylabel("L1 duty cycle (%)")
-    ax.set_xticks(Ns); ax.grid(alpha=0.5)
-    ax.set_title("F09b · Full GPU + MPS on — duty cycle (건강해 '보이는' 지표)",
+    ax.grid(axis="y", alpha=0.5)
+    ax.set_title("F09b · Full GPU + MPS on — duty cycle (건강해 '보이는' 지표, 조건별 이산 측정)",
                  fontweight="bold", pad=18, loc="left")
     fig.text(0.02, 0.008,
-             "Duty cycle이 baseline 대비 상승 → GPU가 바쁘게 돌아간다는 뜻. 하지만 F09a를 보면 실제 L1 p99 지연은 나빠짐.",
+             "각 막대는 독립된 N 조건. Duty가 baseline 이상으로 유지 → GPU가 바쁨. "
+             "하지만 이 지표는 L1 SLA를 보장하지 않는다 (실제 지연은 옆 그림 참조).",
              fontsize=11, color=INK_SEC, style="italic")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     plt.savefig(f"{FIG}/F09b_duty_full_gpu.png"); plt.close()
@@ -92,24 +94,29 @@ def fig09b():
 # F13b — CP + MPS duty across N (companion to F13 latency invariance)
 # =========================
 def fig13b():
-    """CP + MPS duty across N. Should also be stable — both metrics agree here."""
+    """CP + MPS duty across N — BAR chart. Each N is a discrete condition."""
     Ns = [0, 6, 8, 10, 12, 16]
     duties = []
+    labels = []
     for N in Ns:
         cond = "e5_baseline" if N == 0 else f"e5_cpN{N}"
         duties.append(duty_mean(cond) or 0)
+        labels.append("baseline\n(L1 alone)" if N == 0 else f"N={N}")
     fig, ax = plt.subplots(figsize=(13, 6.5))
-    ax.plot(Ns, duties, "o-", color=COL_GOOD, linewidth=3, markersize=13,
-            markerfacecolor="white", markeredgewidth=2.5)
-    for N, d in zip(Ns, duties):
-        ax.text(N, d+1, f"{d:.0f}%", ha="center", fontsize=11, color=COL_GOOD, fontweight="bold")
-    ax.set_xlabel("N (AI on 3g 파티션)")
+    xs = np.arange(len(Ns))
+    colors = [INK_MUT] + [COL_GOOD]*(len(Ns)-1)
+    ax.bar(xs, duties, color=colors, alpha=0.85, edgecolor="white", linewidth=2, width=0.65)
+    for i, d in enumerate(duties):
+        ax.text(i, d+0.8, f"{d:.0f}%", ha="center", fontsize=12, color=colors[i], fontweight="bold")
+    ax.set_xticks(xs); ax.set_xticklabels(labels)
+    ax.set_xlabel("AI on 3g 파티션 (각 막대는 독립 조건)")
     ax.set_ylabel("L1 duty cycle (%, L1 on 4g 파티션)")
-    ax.set_xticks(Ns); ax.grid(alpha=0.5)
-    ax.set_title("F13b · MIG CP + MPS — duty cycle도 안정 (지연과 일치)",
+    ax.grid(axis="y", alpha=0.5)
+    ax.set_title("F13b · MIG CP + MPS — duty cycle 조건별 이산 측정",
                  fontweight="bold", pad=18, loc="left")
     fig.text(0.02, 0.008,
-             "CP 토폴로지에서는 duty와 지연 두 지표가 모두 안정. 격리가 제대로 되면 두 지표가 일치한다.",
+             "각 막대는 독립된 N 조건. Duty는 안정적으로 보이지만 이것만으로 L1 SLA를 보장하지 않는다. "
+             "옆 그림의 L1 p99 지연이 실제 근거.",
              fontsize=11, color=INK_SEC, style="italic")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     plt.savefig(f"{FIG}/F13b_duty_cp.png"); plt.close()

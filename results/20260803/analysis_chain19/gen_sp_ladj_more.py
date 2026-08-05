@@ -56,7 +56,6 @@ def g08(lang):
     apply_font(lang)
     Ns = [1, 2, 3, 4, 6, 8]
     configs = [("A", "MIG 4g (SP)", COL_A),
-               ("B", "Full GPU",     COL_B),
                ("C", "MIG 3g (SP)",  COL_C)]
     fig, (axL, axR) = plt.subplots(1, 2, figsize=(15, 6))
     for cfg, name, color in configs:
@@ -99,7 +98,6 @@ def g09(lang):
     apply_font(lang)
     Ns = [1, 2, 3, 4, 6, 8]
     configs = [("A", "MIG 4g (SP)", COL_A),
-               ("B", "Full GPU",     COL_B),
                ("C", "MIG 3g (SP)",  COL_C)]
     fig, ax = plt.subplots(figsize=(13, 6.5))
     for cfg, name, color in configs:

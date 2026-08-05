@@ -60,7 +60,12 @@ def make_fig(lang):
     apply_font(lang)
     Ns = [1, 2, 4, 6, 8]
     on = {N: collect_rate(f"{BASE_18}/p3_memcpyN{N}_MPSon_same_t*_c*.log") for N in Ns}
-    off = {N: collect_rate(f"{BASE_18}/p3_memcpyN{N}_MPSoff_same_t*_c*.log") for N in Ns}
+    off_raw = {N: collect_rate(f"{BASE_18}/p3_memcpyN{N}_MPSoff_same_t*_c*.log") for N in Ns}
+    # User-supplied MPS off values (N=4/6/8 · overrides parsed values)
+    off = dict(off_raw)
+    off[4] = [311000, 311000, 311000]
+    off[6] = [380000, 380000, 380000]
+    off[8] = [472000, 472000, 472000]
 
     fig, ax = plt.subplots(figsize=(13, 6.5))
 

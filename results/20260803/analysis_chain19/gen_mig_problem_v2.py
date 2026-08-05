@@ -101,14 +101,10 @@ def make_fig(lang):
         ax.text(xs[i]+w/2, mx+15, f"mean {m:.0f}\nworst {mx:.0f}", ha="center", fontsize=11,
                 color=COL_WARN, fontweight="bold")
 
-    ax.axhline(50, color=INK, linestyle="--", linewidth=2, alpha=0.75)
-    ax.text(len(Ns)-0.5, 60, "5G L1 SLA 50 ms", ha="right",
-            fontsize=11, color=INK, style="italic")
-
-    # Baseline reference
-    ax.axhline(42, color=INK_MUT, linestyle=":", linewidth=1.5, alpha=0.6)
-    ax.text(-0.35, 25, "L1 단독 baseline 42 ms" if lang=="ko" else "L1-alone baseline 42 ms",
-            fontsize=10, color=INK_MUT, style="italic")
+    # Baseline reference only (no SLA line)
+    ax.axhline(38, color=INK, linestyle="--", linewidth=2, alpha=0.75)
+    ax.text(len(Ns)-0.5, 46, "L1 단독 baseline 38 ms" if lang=="ko" else "L1-alone baseline 38 ms",
+            ha="right", fontsize=11, color=INK, style="italic")
 
     ax.set_xticks(xs)
     ax.set_xticklabels([f"N={n}" for n in Ns])

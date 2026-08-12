@@ -1,0 +1,189 @@
+{
+  "engine": "/results/engines/neural_rx_fp16_4g.trt",
+  "replica_counts": [
+    1,
+    2
+  ],
+  "arrival_rates_slots_per_s": [
+    700.0,
+    1000.0
+  ],
+  "closed_loop_requests_target": 200,
+  "open_loop_duration_s": 0.5,
+  "configurations": [
+    {
+      "replicas": 1,
+      "closed_loop": {
+        "requests": 200,
+        "rounds": 200,
+        "wall_s": 0.285707783,
+        "throughput_slots_per_s": 700.0159320126047,
+        "service_ms": {
+          "n": 200,
+          "mean": 1.4259609407186509,
+          "p50": 1.4520319700241089,
+          "p95": 1.4551039934158325,
+          "p99": 1.457152009010315,
+          "min": 1.3352960348129272,
+          "max": 1.4581760168075562
+        }
+      },
+      "open_loop": [
+        {
+          "arrival_rate_slots_per_s": 700.0,
+          "duration_s": 0.5,
+          "requests": 350,
+          "latency_ms": {
+            "n": 350,
+            "mean": 1.3524262990270342,
+            "p50": 1.3523822578125078,
+            "p95": 1.3569251601562655,
+            "p99": 1.3586283730468518,
+            "min": 1.3452622001037602,
+            "max": 1.3591487265625233
+          },
+          "scheduler_lateness_us": {
+            "n": 350,
+            "mean": 0.4276028571428572,
+            "p50": 0.3195,
+            "p95": 0.73575,
+            "p99": 0.8086899999999998,
+            "min": 0.164,
+            "max": 3.587
+          },
+          "deadline_miss_ratio": {
+            "1ms": 1.0,
+            "2ms": 0.0,
+            "5ms": 0.0,
+            "10ms": 0.0
+          },
+          "completion_span_ms": 499.9280700683594,
+          "drain_after_last_arrival_ms": 1.3566410683593517,
+          "max_outstanding": 1,
+          "backlog_at_window_end": 0
+        },
+        {
+          "arrival_rate_slots_per_s": 1000.0,
+          "duration_s": 0.5,
+          "requests": 500,
+          "latency_ms": {
+            "n": 500,
+            "mean": 86.03039201617241,
+            "p50": 86.0386962890625,
+            "p95": 162.25067443847655,
+            "p99": 169.0270245361328,
+            "min": 1.3547519445419312,
+            "max": 170.7205810546875
+          },
+          "scheduler_lateness_us": {
+            "n": 500,
+            "mean": 0.23710600000000004,
+            "p50": 0.229,
+            "p95": 0.3031999999999998,
+            "p99": 0.3693099999999997,
+            "min": 0.15,
+            "max": 2.475
+          },
+          "deadline_miss_ratio": {
+            "1ms": 1.0,
+            "2ms": 0.996,
+            "5ms": 0.978,
+            "10ms": 0.948
+          },
+          "completion_span_ms": 669.7205810546875,
+          "drain_after_last_arrival_ms": 170.7205810546875,
+          "max_outstanding": 128,
+          "backlog_at_window_end": 127
+        }
+      ],
+      "outputs_finite": true
+    },
+    {
+      "replicas": 2,
+      "closed_loop": {
+        "requests": 200,
+        "rounds": 100,
+        "wall_s": 0.328773276,
+        "throughput_slots_per_s": 608.3219488922208,
+        "service_ms": {
+          "n": 200,
+          "mean": 3.2788787138462068,
+          "p50": 3.1155200004577637,
+          "p95": 3.6730880737304688,
+          "p99": 3.683942298889158,
+          "min": 1.6209919452667236,
+          "max": 4.0273919105529785
+        }
+      },
+      "open_loop": [
+        {
+          "arrival_rate_slots_per_s": 700.0,
+          "duration_s": 0.5,
+          "requests": 350,
+          "latency_ms": {
+            "n": 350,
+            "mean": 1.3542102292605809,
+            "p50": 1.3543659003906328,
+            "p95": 1.3579104670898487,
+            "p99": 1.3594211658789062,
+            "min": 1.345847681396485,
+            "max": 1.3660160303115845
+          },
+          "scheduler_lateness_us": {
+            "n": 350,
+            "mean": 0.6573371428571428,
+            "p50": 0.663,
+            "p95": 0.8382000000000001,
+            "p99": 0.91553,
+            "min": 0.15,
+            "max": 3.807
+          },
+          "deadline_miss_ratio": {
+            "1ms": 1.0,
+            "2ms": 0.0,
+            "5ms": 0.0,
+            "10ms": 0.0
+          },
+          "completion_span_ms": 499.9280700683594,
+          "drain_after_last_arrival_ms": 1.3566410683593517,
+          "max_outstanding": 1,
+          "backlog_at_window_end": 0
+        },
+        {
+          "arrival_rate_slots_per_s": 1000.0,
+          "duration_s": 0.5,
+          "requests": 500,
+          "latency_ms": {
+            "n": 500,
+            "mean": 133.20364723062517,
+            "p50": 133.39305114746094,
+            "p95": 250.87526550292966,
+            "p99": 261.6186254882812,
+            "min": 1.7500159740447998,
+            "max": 264.18060302734375
+          },
+          "scheduler_lateness_us": {
+            "n": 500,
+            "mean": 0.6366499999999998,
+            "p50": 0.6185,
+            "p95": 0.7482999999999997,
+            "p99": 0.8530099999999999,
+            "min": 0.459,
+            "max": 5.681
+          },
+          "deadline_miss_ratio": {
+            "1ms": 1.0,
+            "2ms": 0.998,
+            "5ms": 0.988,
+            "10ms": 0.968
+          },
+          "completion_span_ms": 762.4417114257812,
+          "drain_after_last_arrival_ms": 263.44171142578125,
+          "max_outstanding": 174,
+          "backlog_at_window_end": 173
+        }
+      ],
+      "outputs_finite": true
+    }
+  ]
+}

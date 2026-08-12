@@ -1,0 +1,67 @@
+GPU 0: NVIDIA A100-SXM4-40GB (UUID: GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0)
+  MIG 3g.20gb     Device  0: (UUID: MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0)
+  MIG 2g.10gb     Device  1: (UUID: MIG-b313c3eb-083e-542f-8224-2c491f6b819c)
+  MIG 2g.10gb     Device  2: (UUID: MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f)
+GPU 1: NVIDIA A100-SXM4-40GB (UUID: GPU-86123961-c0e3-6d2b-4aeb-b08504fe6647)
+GPU 2: NVIDIA A100-SXM4-40GB (UUID: GPU-7cfa813b-475f-c71a-5b15-7e352d2ded67)
+GPU 3: NVIDIA A100-SXM4-40GB (UUID: GPU-ee09d6cb-2e38-e9e1-9b76-bbc0f8f79b1a)
+[NRX-SWEEP-RUNNER] NRx MIG=MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+[NRX-SWEEP] replicas=1 initializing
+[NRX-SWEEP] replicas=1 throughput=334.887 slots/s
+[NRX-SWEEP] replicas=1 rate=250.0 p99=3.037ms backlog=0
+[NRX-SWEEP] replicas=1 rate=400.0 p99=574.995ms backlog=194
+[NRX-SWEEP] replicas=1 rate=500.0 p99=1460.249ms backlog=494
+[NRX-SWEEP] replicas=1 rate=750.0 p99=3673.355ms backlog=1244
+[NRX-SWEEP] replicas=1 rate=1000.0 p99=5887.325ms backlog=1995
+[NRX-SWEEP] replicas=2 initializing
+[NRX-SWEEP] replicas=2 throughput=309.774 slots/s
+[NRX-SWEEP] replicas=2 rate=250.0 p99=3.034ms backlog=0
+[NRX-SWEEP] replicas=2 rate=400.0 p99=789.992ms backlog=252
+[NRX-SWEEP] replicas=2 rate=500.0 p99=1731.237ms backlog=553
+[NRX-SWEEP] replicas=2 rate=750.0 p99=4072.461ms backlog=1301
+[NRX-SWEEP] replicas=2 rate=1000.0 p99=6414.450ms backlog=2052
+[NRX-SWEEP] replicas=4 initializing
+[NRX-SWEEP] replicas=4 throughput=312.150 slots/s
+[NRX-SWEEP] replicas=4 rate=250.0 p99=3.035ms backlog=0
+[NRX-SWEEP] replicas=4 rate=400.0 p99=829.965ms backlog=262
+[NRX-SWEEP] replicas=4 rate=500.0 p99=1780.804ms backlog=564
+[NRX-SWEEP] replicas=4 rate=750.0 p99=4163.943ms backlog=1315
+[NRX-SWEEP] replicas=4 rate=1000.0 p99=6545.359ms backlog=2064
+[NRX-SWEEP] replicas=8 initializing
+[NRX-SWEEP] replicas=8 throughput=311.445 slots/s
+[NRX-SWEEP] replicas=8 rate=250.0 p99=3.035ms backlog=0
+[NRX-SWEEP] replicas=8 rate=400.0 p99=845.138ms backlog=267
+[NRX-SWEEP] replicas=8 rate=500.0 p99=1797.520ms backlog=567
+[NRX-SWEEP] replicas=8 rate=750.0 p99=4183.129ms backlog=1317
+[NRX-SWEEP] replicas=8 rate=1000.0 p99=6573.755ms backlog=2069
+[NRX-SWEEP] replicas=16 initializing
+[NRX-SWEEP] replicas=16 throughput=311.388 slots/s
+[NRX-SWEEP] replicas=16 rate=250.0 p99=3.034ms backlog=0
+[NRX-SWEEP] replicas=16 rate=400.0 p99=845.292ms backlog=267
+[NRX-SWEEP] replicas=16 rate=500.0 p99=1801.379ms backlog=567
+[NRX-SWEEP] replicas=16 rate=750.0 p99=4184.775ms backlog=1318
+[NRX-SWEEP] replicas=16 rate=1000.0 p99=6571.300ms backlog=2070
+[NRX-SWEEP] OK output=/results/nrx_replica_sweep_2g.json
+[NRX-SWEEP-RUNNER] restoring Topology A (4g+3g)
+GPU 0: NVIDIA A100-SXM4-40GB (UUID: GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0)
+  MIG 3g.20gb     Device  0: (UUID: MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3)
+  MIG 4g.20gb     Device  1: (UUID: MIG-dae3f173-7b15-594b-bc80-6cef80687a56)
+GPU 1: NVIDIA A100-SXM4-40GB (UUID: GPU-86123961-c0e3-6d2b-4aeb-b08504fe6647)
+GPU 2: NVIDIA A100-SXM4-40GB (UUID: GPU-7cfa813b-475f-c71a-5b15-7e352d2ded67)
+GPU 3: NVIDIA A100-SXM4-40GB (UUID: GPU-ee09d6cb-2e38-e9e1-9b76-bbc0f8f79b1a)
+[NRX-SWEEP-RUNNER] OK

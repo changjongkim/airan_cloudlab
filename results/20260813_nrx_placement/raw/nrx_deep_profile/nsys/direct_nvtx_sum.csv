@@ -1,0 +1,76 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Style,Range
+26.7,10008553,22,454934.2,338323.0,321586,2612176,484188.5,PushPop,TensorRT:ExecutionContext::enqueue
+21.5,8067824,4,2016956.0,1970486.0,1468900,2657952,490097.6,StartEnd,:myelinGraphDeserializeBinary
+11.5,4295019,4,1073754.8,1034461.0,631330,1594767,441643.7,StartEnd,myelin-exec:myelinGraphLoadPersistent
+7.7,2874184,88,32661.2,28263.5,22663,86663,10734.8,StartEnd,myelin-exec:myelinGraphExecute 
+3.8,1429856,4,357464.0,359989.0,210407,499471,118578.3,StartEnd,myelin-exec:myelinGraphUnloadPersistent
+3.6,1342231,22,61010.5,50295.0,45776,245984,42625.5,PushPop,TensorRT:{ForeignNode[neural_receiver_onnx/cgnn/readout_ch_est/dense_6/Tensordot_1/ReadVariableOp:0...neural_receiver_onnx/transpose]}
+2.2,831812,22,37809.6,35802.5,32332,67758,7394.0,PushPop,TensorRT:{ForeignNode[ONNXTRT_Broadcast_164...neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_2/separable_conv2d/depthwise__330]}
+2.1,789923,22,35905.6,32927.5,29255,79901,10546.9,PushPop,TensorRT:{ForeignNode[neural_receiver_onnx/cgnn/cgnn_it/aggregate_user_states/Equal/y:0...neural_receiver_onnx/cgnn/state_init/separable_conv2d/separable_conv2d/depthwise__234]}
+2.0,765754,22,34807.0,32266.0,29806,77245,9918.2,PushPop,TensorRT:{ForeignNode[neural_receiver_onnx/cgnn/cgnn_it_1/aggregate_user_states_1/dense_2/Tensordot/ReadVariableOp:0...neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_5/separable_conv2d/depthwise__423]}
+1.2,451712,22,20532.4,17307.5,16662,82286,13834.9,PushPop,TensorRT:Reformatting CopyNode for Input Tensor 0 to neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_2/separable_conv2d/depthwise
+0.9,323924,22,14723.8,14227.5,13705,23214,1968.5,PushPop,TensorRT:Reformatting CopyNode for Input Tensor 0 to neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_5/separable_conv2d/depthwise
+0.5,199124,22,9051.1,8701.0,8226,13065,1123.7,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_3/separable_conv2d/depthwise
+0.5,196470,22,8930.5,8150.0,7785,16121,2078.7,PushPop,TensorRT:neural_receiver_onnx/cgnn/state_init/separable_conv2d_1/separable_conv2d/depthwise
+0.5,180901,22,8222.8,8070.0,7634,11421,762.9,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_6/separable_conv2d/depthwise
+0.5,175139,22,7960.9,6447.0,5811,38232,6776.2,PushPop,TensorRT:Reformatting CopyNode for Output Tensor 0 to {ForeignNode[neural_receiver_onnx/cgnn/cgnn_it/aggregate_user_states/Equal/y:0...neural_receiver_onnx/cgnn/state_init/separable_conv2d/separable_conv2d/depthwise__234]}
+0.5,171774,22,7807.9,7554.5,7224,10731,745.0,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_4/separable_conv2d/depthwise
+0.5,169170,22,7689.5,7584.0,7173,11121,808.4,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_7/separable_conv2d/depthwise
+0.4,161374,22,7335.2,6678.0,6092,20960,3070.6,PushPop,TensorRT:neural_receiver_onnx/cgnn/state_init/separable_conv2d/separable_conv2d/depthwise
+0.4,148813,22,6764.2,6332.0,5971,14007,1651.3,PushPop,TensorRT:Reformatting CopyNode for Output Tensor 1 to {ForeignNode[neural_receiver_onnx/cgnn/readout_ch_est/dense_6/Tensordot_1/ReadVariableOp:0...neural_receiver_onnx/transpose]}
+0.4,147070,22,6685.0,6202.0,5720,15930,2096.7,PushPop,TensorRT:neural_receiver_onnx/cgnn/state_init/separable_conv2d_1/BiasAdd
+0.4,145965,22,6634.8,5696.0,5310,24557,4023.9,PushPop,myelin-exec:neural_receiver_onnx/cgnn/cgnn_it_1/aggregate_user_states_1/dense_2/Tensordot/MatMul_myl18_1
+0.4,145198,22,6599.9,5911.0,5189,18505,2750.0,PushPop,myelin-exec:__myl_Move_myl0_0
+0.4,144782,22,6581.0,5806.0,5380,14938,2461.3,PushPop,myelin-exec:neural_receiver_onnx/cgnn/cgnn_it/aggregate_user_states/dense/Tensordot/MatMul_myl9_2
+0.4,142220,22,6464.5,5695.5,5180,22743,3651.6,PushPop,TensorRT:Reformatting CopyNode for Input Tensor 0 to neural_receiver_onnx/cgnn/state_init/separable_conv2d/separable_conv2d/depthwise
+0.4,140945,22,6406.6,6146.5,5790,11322,1124.9,PushPop,TensorRT:Reformatting CopyNode for Output Tensor 0 to {ForeignNode[neural_receiver_onnx/cgnn/readout_ch_est/dense_6/Tensordot_1/ReadVariableOp:0...neural_receiver_onnx/transpose]}
+0.4,138425,22,6292.0,5610.0,5320,16371,2312.5,PushPop,TensorRT:Reformatting CopyNode for Input Tensor 0 to {ForeignNode[ONNXTRT_Broadcast_164...neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_2/separable_conv2d/depthwise__330]}
+0.3,128655,22,5848.0,5736.0,5470,8486,611.5,PushPop,TensorRT:Reformatting CopyNode for Input Tensor 1 to {ForeignNode[neural_receiver_onnx/cgnn/cgnn_it_1/aggregate_user_states_1/dense_2/Tensordot/ReadVariableOp:0...neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_5/separable_conv2d/depthwise__423]}
+0.3,128491,22,5840.5,5420.0,5110,13295,1692.9,PushPop,myelin-exec:neural_receiver_onnx/cgnn/readout_ll_rs/dense_4/Tensordot_1/MatMul+neural_receiver_onnx/cgnn/readout_ch_est/dense_6/Tensordot_1/MatMul_myl27_1
+0.3,127930,22,5815.0,5631.0,5310,9238,787.5,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_5/separable_conv2d/depthwise
+0.3,126528,22,5751.3,5505.5,5110,9739,925.0,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_2/separable_conv2d/depthwise
+0.3,123704,22,5622.9,5490.0,5210,7795,541.6,PushPop,TensorRT:Reformatting CopyNode for Input Tensor 1 to {ForeignNode[neural_receiver_onnx/cgnn/readout_ch_est/dense_6/Tensordot_1/ReadVariableOp:0...neural_receiver_onnx/transpose]}
+0.3,121822,22,5537.4,5310.0,4970,9718,969.1,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_2/BiasAdd + neural_receiver_onnx/cgnn/cgnn_it/update_state/Relu
+0.3,121768,22,5534.9,5421.0,5119,8186,633.1,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_5/BiasAdd + neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/Relu
+0.3,119384,22,5426.5,5134.0,4859,10109,1074.4,PushPop,TensorRT:Reformatting CopyNode for Input Tensor 1 to {ForeignNode[ONNXTRT_Broadcast_164...neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_2/separable_conv2d/depthwise__330]}
+0.3,118925,22,5405.7,4894.0,4559,10911,1481.2,PushPop,TensorRT:neural_receiver_onnx/cgnn/state_init/separable_conv2d/BiasAdd + neural_receiver_onnx/cgnn/state_init/Relu
+0.3,115397,22,5245.3,4844.0,4449,10029,1286.3,PushPop,myelin-exec:neural_receiver_onnx/cgnn/readout_ch_est/dense_7/Tensordot_1/MatMul_myl27_6
+0.3,108463,22,4930.1,4423.0,4068,11833,1720.3,PushPop,myelin-exec:neural_receiver_onnx/cgnn/cgnn_it_1/aggregate_user_states_1/dense_3/Tensordot/MatMul_myl18_3
+0.3,102962,22,4680.1,4328.0,4128,8365,1061.3,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_3/BiasAdd + neural_receiver_onnx/cgnn/cgnn_it/update_state/Relu_1
+0.3,100871,22,4585.0,4368.5,4067,7855,863.1,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_6/BiasAdd + neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/Relu_1
+0.3,100418,22,4564.5,4293.0,4038,8325,887.1,PushPop,myelin-exec:neural_receiver_onnx/cgnn/readout_ll_rs/dense_5/Tensordot_1/MatMul_myl27_7
+0.3,99411,22,4518.7,4363.0,4158,7104,611.8,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it/update_state/separable_conv2d_4/BiasAdd
+0.3,98989,22,4499.5,4368.0,4177,6412,452.6,PushPop,TensorRT:neural_receiver_onnx/cgnn/cgnn_it_1/update_state_1/separable_conv2d_7/BiasAdd
+0.3,98117,22,4459.9,4228.0,3927,6753,765.9,PushPop,myelin-exec:neural_receiver_onnx/cgnn/cgnn_it/aggregate_user_states/dense_1/Tensordot/MatMul_myl9_4
+0.2,89216,22,4055.3,3691.5,3346,9087,1223.6,PushPop,myelin-exec:__myl_TranAddTran_myl27_0
+0.2,88922,22,4041.9,3767.0,3447,9969,1338.0,PushPop,myelin-exec:__myl_TranAddTranResh_myl18_0
+0.2,87005,88,988.7,881.5,701,3897,426.0,StartEnd,myelin-exec:myelinGraphUnload
+0.2,86138,22,3915.4,3662.0,3256,9187,1201.7,PushPop,myelin-exec:__myl_Resh_myl9_0
+0.2,86012,22,3909.6,3406.5,3156,7815,1319.7,PushPop,myelin-exec:__myl_ReplReshReplReshConcReshSubAbsMoveMinrSlicSlicAdd_myl0_2
+0.2,83280,22,3785.5,3577.0,3166,7985,982.5,PushPop,myelin-exec:__myl_ConcMulMean_myl0_1
+0.2,81922,22,3723.7,3366.0,3156,10129,1444.4,PushPop,myelin-exec:__myl_ReshAddRelu_myl27_5
+0.2,79648,22,3620.4,3356.5,3105,5801,604.8,PushPop,myelin-exec:__myl_SqrtEqlReshSqrtGtrCastReshNotCastReshMulReshDivMulMulAddReshSqrtGtrCastReshNotCastReshMulEtc_myl0_5
+0.2,77735,22,3533.4,3341.0,3035,5851,636.8,PushPop,myelin-exec:__myl_ReshCastTranSlicMeanSubMeanSubMulMeanSlicMeanSubMeanSubMulMean_myl0_3
+0.2,77176,22,3508.0,3246.0,3005,5871,781.1,PushPop,myelin-exec:__myl_AddMulSumSub_myl18_4
+0.2,76294,22,3467.9,3266.0,3016,6002,618.2,PushPop,myelin-exec:__myl_AddRelu_myl18_2
+0.2,76062,22,3457.4,3276.0,3016,5591,694.4,PushPop,myelin-exec:__myl_AddMulTran_myl27_10
+0.2,75763,22,3443.8,3361.0,3026,5220,522.0,PushPop,myelin-exec:__myl_AddMulSumSub_myl9_5
+0.2,74921,22,3405.5,3125.5,2895,6252,766.2,PushPop,myelin-exec:__myl_Add_myl27_9
+0.2,74603,22,3391.0,3261.0,2976,5270,477.3,PushPop,myelin-exec:__myl_AddReluEqlCastNotCastDivSeleMulAddMulReshConcTran_myl9_6
+0.2,74532,22,3387.8,3141.5,2935,5460,623.0,PushPop,myelin-exec:__myl_AddRelu_myl9_3
+0.2,74501,22,3386.4,3216.0,3055,6202,655.1,PushPop,myelin-exec:__myl_Slic_myl27_8
+0.2,74372,22,3380.5,3186.5,2926,5851,622.7,PushPop,myelin-exec:__myl_TranResh_myl9_1
+0.2,73639,22,3347.2,3206.0,2985,5601,542.6,PushPop,myelin-exec:__myl_ReshAddRelu_myl27_3
+0.2,73311,88,833.1,721.5,581,4218,494.6,StartEnd,myelin-exec:myelinGraphLoad
+0.2,72428,22,3292.2,3150.5,2896,5570,551.1,PushPop,myelin-exec:__myl_ReshBott_myl0_4
+0.2,71364,22,3243.8,3130.5,2876,4869,414.1,PushPop,myelin-exec:__myl_MulReshConcTran_myl18_5
+0.1,42647,88,484.6,360.5,251,3738,532.7,StartEnd,myelin-exec:myelinTensorGetInputMemoryBatch
+0.1,35347,22,1606.7,1493.0,1392,3718,476.7,PushPop,myelin-exec:__mye6024_myl27_4
+0.1,31442,22,1429.2,1357.5,1202,2325,267.5,PushPop,myelin-exec:__mye6022_myl27_2
+0.1,27035,88,307.2,240.0,170,3457,359.7,StartEnd,myelin-exec:myelinTensorGetOutputMemoryBatch
+0.1,25888,88,294.2,191.0,160,4789,572.1,StartEnd,myelin-exec:myelinTensorSetOutputMemoryBatch
+0.1,21821,88,248.0,200.0,160,3457,349.5,StartEnd,myelin-exec:myelinTensorSetInputMemoryBatch
+0.0,17388,22,790.4,766.5,661,1002,96.6,PushPop,myelin-exec:exit^bb^wait^1_myl27_12
+0.0,17104,22,777.5,736.5,661,1323,135.5,PushPop,myelin-exec:exit^bb^signal^1_myl27_11
+0.0,9908,4,2477.0,2118.5,1483,4188,1285.5,StartEnd,:myelinBinaryGraphCreate
+0.0,3094,4,773.5,460.0,441,1733,639.8,StartEnd,myelin-exec:myelinGraphResolveShapes 

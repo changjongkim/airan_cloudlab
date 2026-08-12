@@ -1,9 +1,9 @@
-"""Neural Receiver consumer using staging-based GPUDirect RDMA.
+"""Neural Receiver consumer using zero-copy GPUDirect RDMA bindings.
 
 The forward registered GPU allocation is viewed directly as the four TRT
-inputs. The public TrtEngine wrapper still performs its internal F-order input
-copies. Its LLR output is copied on GPU into a persistent registered backward
-staging allocation; no payload traverses host memory.
+inputs. Caller-owned TensorRT bindings write LLRs directly into the registered
+backward allocation. CUDA Graph replay has no layout-conversion or staging
+copy, and no payload traverses host memory.
 
 Usage: nrx_consumer_gdr.py <channel_tag>
 """
@@ -17,10 +17,9 @@ import numpy as np
 
 sys.path.insert(0, "/opt/nvidia/cuBB/pyaerial/src")
 
-from aerial.phy5g.algorithms import TrtEngine, TrtTensorPrms
-from aerial.util.cuda import get_cuda_stream
 from cuda.bindings import runtime as cudart
 from gdr_rdma_channel import GdrRdmaEndpoint, flush_gpudirect_writes
+from nrx_trt_direct import DirectNrx
 
 
 CHANNEL_TAG = sys.argv[1] if len(sys.argv) > 1 else "airan"
@@ -33,7 +32,7 @@ num_symbols = 12
 NUM_SC = num_prbs * 12
 RX_SHAPE = (1, NUM_SC, num_symbols, num_rx_ant)
 CE_SHAPE = (1, 4914, 1, num_rx_ant)
-LLR_SHAPE = (8, 1, NUM_SC, num_symbols)
+LLR_SHAPE = (2, 1, NUM_SC, num_symbols)
 RX_ELEMS = int(np.prod(RX_SHAPE))
 CE_ELEMS = int(np.prod(CE_SHAPE))
 LLR_ELEMS = int(np.prod(LLR_SHAPE))
@@ -42,7 +41,7 @@ FWD_DATA_SIZE = 2 * RX_ELEMS * F32 + 2 * CE_ELEMS * F32
 BWD_DATA_SIZE = LLR_ELEMS * F32
 
 assert FWD_DATA_SIZE == 1_415_232, FWD_DATA_SIZE
-assert BWD_DATA_SIZE == 1_257_984, BWD_DATA_SIZE
+assert BWD_DATA_SIZE == 314_496, BWD_DATA_SIZE
 
 fwd_ep = None
 bwd_ep = None
@@ -96,68 +95,21 @@ fwd_ce_im = _section(fwd_flat, offset, CE_ELEMS, CE_SHAPE, "ce_imag")
 offset += CE_ELEMS
 assert offset * F32 == FWD_DATA_SIZE
 
-# The public TrtEngine output is flattened in logical C order to preserve the
-# CPU-RDMA payload contract. L1 creates the matching C-order LLR view.
 bwd_llrs = _section(bwd_flat, 0, LLR_ELEMS, LLR_SHAPE, "llrs")
+bwd_output = bwd_llrs.reshape((1,) + LLR_SHAPE, order="C")
 
 cudart.cudaSetDevice(0)
-stream = get_cuda_stream()
-external_stream = cp.cuda.ExternalStream(int(stream))
-
-trt_file = "/tmp/nrx.trt"
-onnx_file = "/opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx"
-if not os.path.exists(trt_file):
-    print(f"[NRx-GDR] building TRT engine ({onnx_file})", flush=True)
-    command = (
-        f"trtexec --onnx={onnx_file} --saveEngine={trt_file} "
-        f"--skipInference --fp16 --memPoolSize=workspace:4096 "
-        f"--inputIOFormats="
-        f"fp32:chw,fp32:chw,fp32:chw,fp32:chw,fp32:chw,int32:chw,int32:chw "
-        f"--outputIOFormats=fp32:chw,fp32:chw "
-        f"--shapes=rx_slot_real:1x3276x12x4,"
-        f"rx_slot_imag:1x3276x12x4,"
-        f"h_hat_real:1x4914x1x4,h_hat_imag:1x4914x1x4 "
-        f"> /tmp/trtexec.log 2>&1"
-    )
-    if os.system(command) != 0:
-        sys.exit("[NRx-GDR] trtexec build failed; see /tmp/trtexec.log")
-
-trt_engine = TrtEngine(
-    trt_model_file=trt_file,
-    max_batch_size=1,
-    cuda_stream=stream,
-    input_tensors=[
-        TrtTensorPrms("rx_slot_real", (3276, 12, 4), np.float32),
-        TrtTensorPrms("rx_slot_imag", (3276, 12, 4), np.float32),
-        TrtTensorPrms("h_hat_real", (4914, 1, 4), np.float32),
-        TrtTensorPrms("h_hat_imag", (4914, 1, 4), np.float32),
-        TrtTensorPrms("active_dmrs_ports", (1,), np.float32),
-        TrtTensorPrms("dmrs_ofdm_pos", (3,), np.int32),
-        TrtTensorPrms("dmrs_subcarrier_pos", (6,), np.int32),
-    ],
-    output_tensors=[
-        TrtTensorPrms("output_1", (8, 1, 3276, 12), np.float32),
-        TrtTensorPrms("output_2", (1, 3276, 12, 8), np.float32),
-    ],
-)
-active = cp.ones((1, 1), dtype=cp.float32)
-dofdm = cp.array([[2, 2, 2]], dtype=cp.int32)
-dsub = cp.array([[0, 2, 4, 6, 8, 10]], dtype=cp.int32)
-
-# Warm the public wrapper and TRT engine before consuming the first slot.
-dummy_rx = cp.zeros(RX_SHAPE, dtype=cp.float32)
-dummy_ce = cp.zeros(CE_SHAPE, dtype=cp.float32)
+trt_file = os.environ.get("NRX_ENGINE", "/engines/neural_rx_fp16_4g.trt")
+trt_engine = DirectNrx(trt_file)
+trt_engine.bind_tensor("rx_slot_real", fwd_rx_re)
+trt_engine.bind_tensor("rx_slot_imag", fwd_rx_im)
+trt_engine.bind_tensor("h_hat_real", fwd_ce_re)
+trt_engine.bind_tensor("h_hat_imag", fwd_ce_im)
+trt_engine.bind_tensor("output_1", bwd_output)
+trt_engine.capture_graph()
 for _ in range(20):
-    trt_engine.run({
-        "rx_slot_real": dummy_rx,
-        "rx_slot_imag": dummy_rx,
-        "h_hat_real": dummy_ce,
-        "h_hat_imag": dummy_ce,
-        "active_dmrs_ports": active,
-        "dmrs_ofdm_pos": dofdm,
-        "dmrs_subcarrier_pos": dsub,
-    })
-cp.cuda.runtime.deviceSynchronize()
+    trt_engine.launch(use_graph=True)
+trt_engine.stream.synchronize()
 
 print(
     f"[NRx-GDR] ready; fwd={FWD_DATA_SIZE} B bwd={BWD_DATA_SIZE} B",
@@ -185,39 +137,16 @@ try:
         # The host marker follows the completed GPU payload WRITE on the same
         # RC QP. Flush peer writes before CUDA consumes the registered views.
         flush_gpudirect_writes()
-        output = trt_engine.run({
-            "rx_slot_real": fwd_rx_re,
-            "rx_slot_imag": fwd_rx_im,
-            "h_hat_real": fwd_ce_re,
-            "h_hat_imag": fwd_ce_im,
-            "active_dmrs_ports": active,
-            "dmrs_ofdm_pos": dofdm,
-            "dmrs_subcarrier_pos": dsub,
-        })
-        llrs = output["output_1"]
-        if llrs.dtype != cp.float32 or llrs.size != LLR_ELEMS:
+        trt_engine.launch(use_graph=True)
+        trt_engine.stream.synchronize()
+        if bwd_output.dtype != cp.float32 or bwd_output.size != LLR_ELEMS:
             raise ValueError(
-                f"LLR output mismatch: shape={llrs.shape} dtype={llrs.dtype} "
-                f"size={llrs.size}, expected size={LLR_ELEMS}")
+                f"LLR output mismatch: shape={bwd_output.shape} "
+                f"dtype={bwd_output.dtype} size={bwd_output.size}, "
+                f"expected size={LLR_ELEMS}")
 
-        # Public TrtEngine has no caller-provided output buffer. Preserve the
-        # baseline's logical C flattening and copy only GPU→GPU into the
-        # persistent registered backward allocation.
-        with external_stream:
-            llrs_c_flat = cp.ravel(llrs, order="C")
-            if (
-                llrs_c_flat.dtype != cp.float32
-                or llrs_c_flat.size != LLR_ELEMS
-                or llrs_c_flat.nbytes != BWD_DATA_SIZE
-                or not llrs_c_flat.flags.c_contiguous
-            ):
-                raise ValueError("invalid flattened LLR output")
-            cp.copyto(bwd_flat, llrs_c_flat)
-
-        # Completion here guarantees both that TRT consumed fwd_flat and that
-        # the NIC sees a finished bwd_flat. The backward response is therefore
-        # the ACK allowing L1 to reuse its forward staging on the next slot.
-        external_stream.synchronize()
+        # The graph completion guarantees TRT consumed fwd_flat and directly
+        # finished bwd_flat before the NIC reads the response payload.
         bwd_ep.write_payload()
         bwd_ep.write_sequence(seq)
         last_seen = seq

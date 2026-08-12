@@ -1,0 +1,128 @@
+{
+  "engine": "/results/engines/neural_rx_fp16_4g.trt",
+  "warmup": 100,
+  "iterations": 1000,
+  "tensor_contract": {
+    "inputs": {
+      "rx_slot_real": {
+        "shape": [
+          1,
+          3276,
+          12,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "rx_slot_imag": {
+        "shape": [
+          1,
+          3276,
+          12,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "h_hat_real": {
+        "shape": [
+          1,
+          4914,
+          1,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "h_hat_imag": {
+        "shape": [
+          1,
+          4914,
+          1,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "active_dmrs_ports": {
+        "shape": [
+          1,
+          1
+        ],
+        "dtype": "float32"
+      },
+      "dmrs_ofdm_pos": {
+        "shape": [
+          1,
+          3
+        ],
+        "dtype": "int32"
+      },
+      "dmrs_subcarrier_pos": {
+        "shape": [
+          1,
+          6
+        ],
+        "dtype": "int32"
+      }
+    },
+    "outputs": {
+      "output_1": {
+        "shape": [
+          1,
+          2,
+          1,
+          3276,
+          12
+        ],
+        "dtype": "float32"
+      },
+      "output_2": {
+        "shape": [
+          1,
+          1,
+          3276,
+          12,
+          8
+        ],
+        "dtype": "float32"
+      }
+    }
+  },
+  "cuda_graph": true,
+  "direct": {
+    "gpu_ms": {
+      "n": 1000,
+      "mean": 0.8921169896125793,
+      "p50": 0.869376003742218,
+      "p95": 1.090559959411621,
+      "p99": 1.0926079750061035,
+      "min": 0.8663039803504944,
+      "max": 1.0956799983978271
+    },
+    "enqueue_us": {
+      "n": 1000,
+      "mean": 3.055803,
+      "p50": 2.9505,
+      "p95": 3.356,
+      "p99": 4.797109999999992,
+      "min": 2.786,
+      "max": 17.884
+    },
+    "wall_ms": {
+      "n": 1000,
+      "mean": 0.904314408,
+      "p50": 0.8790830000000001,
+      "p95": 1.10100895,
+      "p99": 1.1039728,
+      "min": 0.875781,
+      "max": 2.183438
+    }
+  },
+  "output_integrity": {
+    "output_1": {
+      "finite": true,
+      "checksum": -1156.7769165039062
+    },
+    "output_2": {
+      "finite": true,
+      "checksum": -11672.118263244629
+    }
+  }
+}

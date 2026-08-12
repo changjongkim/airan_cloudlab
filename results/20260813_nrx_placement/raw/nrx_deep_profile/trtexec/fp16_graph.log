@@ -1,0 +1,103 @@
+&&&& RUNNING TensorRT.trtexec [TensorRT v101200] [b36] # trtexec --loadEngine=/results/engines/neural_rx_fp16_4g.trt --shapes=rx_slot_real:1x3276x12x4,rx_slot_imag:1x3276x12x4,h_hat_real:1x4914x1x4,h_hat_imag:1x4914x1x4 --warmUp=2000 --duration=10 --iterations=100 --useCudaGraph --noDataTransfers --percentile=50,95,99 --exportTimes=/results/trtexec/fp16_graph_times.json --exportProfile=/results/trtexec/fp16_graph_layers.json
+[08/12/2026-16:33:09] [I] TF32 is enabled by default. Add --noTF32 flag to further improve accuracy with some performance cost.
+[08/12/2026-16:33:09] [I] === Model Options ===
+[08/12/2026-16:33:09] [I] Format: *
+[08/12/2026-16:33:09] [I] Model: 
+[08/12/2026-16:33:09] [I] Output:
+[08/12/2026-16:33:09] [I] 
+[08/12/2026-16:33:09] [I] === System Options ===
+[08/12/2026-16:33:09] [I] Device: 0
+[08/12/2026-16:33:09] [I] DLACore: 
+[08/12/2026-16:33:09] [I] Plugins:
+[08/12/2026-16:33:09] [I] setPluginsToSerialize:
+[08/12/2026-16:33:09] [I] dynamicPlugins:
+[08/12/2026-16:33:09] [I] ignoreParsedPluginLibs: 0
+[08/12/2026-16:33:09] [I] 
+[08/12/2026-16:33:09] [I] === Inference Options ===
+[08/12/2026-16:33:09] [I] Batch: Explicit
+[08/12/2026-16:33:09] [I] Input inference shape : h_hat_imag=1x4914x1x4
+[08/12/2026-16:33:09] [I] Input inference shape : h_hat_real=1x4914x1x4
+[08/12/2026-16:33:09] [I] Input inference shape : rx_slot_imag=1x3276x12x4
+[08/12/2026-16:33:09] [I] Input inference shape : rx_slot_real=1x3276x12x4
+[08/12/2026-16:33:09] [I] Iterations: 100
+[08/12/2026-16:33:09] [I] Duration: 10s (+ 2000ms warm up)
+[08/12/2026-16:33:09] [I] Sleep time: 0ms
+[08/12/2026-16:33:09] [I] Idle time: 0ms
+[08/12/2026-16:33:09] [I] Inference Streams: 1
+[08/12/2026-16:33:09] [I] ExposeDMA: Disabled
+[08/12/2026-16:33:09] [I] Data transfers: Disabled
+[08/12/2026-16:33:09] [I] Spin-wait: Disabled
+[08/12/2026-16:33:09] [I] Multithreading: Disabled
+[08/12/2026-16:33:09] [I] CUDA Graph: Enabled
+[08/12/2026-16:33:09] [I] Separate profiling: Disabled
+[08/12/2026-16:33:09] [I] Time Deserialize: Disabled
+[08/12/2026-16:33:09] [I] Time Refit: Disabled
+[08/12/2026-16:33:09] [I] NVTX verbosity: 0
+[08/12/2026-16:33:09] [I] Persistent Cache Ratio: 0
+[08/12/2026-16:33:09] [I] Optimization Profile Index: 0
+[08/12/2026-16:33:09] [I] Weight Streaming Budget: 100.000000%
+[08/12/2026-16:33:09] [I] Inputs:
+[08/12/2026-16:33:09] [I] Debug Tensor Save Destinations:
+[08/12/2026-16:33:09] [I] Dump All Debug Tensor in Formats: 
+[08/12/2026-16:33:09] [I] === Reporting Options ===
+[08/12/2026-16:33:09] [I] Verbose: Disabled
+[08/12/2026-16:33:09] [I] Averages: 10 inferences
+[08/12/2026-16:33:09] [I] Percentiles: 50,95,99
+[08/12/2026-16:33:09] [I] Dump refittable layers:Disabled
+[08/12/2026-16:33:09] [I] Dump output: Disabled
+[08/12/2026-16:33:09] [I] Profile: Disabled
+[08/12/2026-16:33:09] [I] Export timing to JSON file: /results/trtexec/fp16_graph_times.json
+[08/12/2026-16:33:09] [I] Export output to JSON file: 
+[08/12/2026-16:33:09] [I] Export profile to JSON file: /results/trtexec/fp16_graph_layers.json
+[08/12/2026-16:33:09] [I] 
+[08/12/2026-16:33:09] [I] === Device Information ===
+[08/12/2026-16:33:09] [I] Available Devices: 
+[08/12/2026-16:33:09] [I]   Device 0: "NVIDIA A100-SXM4-40GB MIG 4g.20gb" UUID: GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0
+[08/12/2026-16:33:09] [I] Selected Device: NVIDIA A100-SXM4-40GB MIG 4g.20gb
+[08/12/2026-16:33:09] [I] Selected Device ID: 0
+[08/12/2026-16:33:09] [I] Selected Device UUID: GPU-631b099e-0d93-0e13-1329-3d9aa83d9fd0
+[08/12/2026-16:33:09] [I] Compute Capability: 8.0
+[08/12/2026-16:33:09] [I] SMs: 56
+[08/12/2026-16:33:09] [I] Device Global Memory: 20096 MiB
+[08/12/2026-16:33:09] [I] Shared Memory per SM: 164 KiB
+[08/12/2026-16:33:09] [I] Memory Bus Width: 2560 bits (ECC enabled)
+[08/12/2026-16:33:09] [I] Application Compute Clock Rate: 1.41 GHz
+[08/12/2026-16:33:09] [I] Application Memory Clock Rate: 1.215 GHz
+[08/12/2026-16:33:09] [I] 
+[08/12/2026-16:33:09] [I] Note: The application clock rates do not reflect the actual clock rates that the GPU is currently running at.
+[08/12/2026-16:33:09] [I] 
+[08/12/2026-16:33:09] [I] TensorRT version: 10.12.0
+[08/12/2026-16:33:09] [I] Loading standard plugins
+[08/12/2026-16:33:09] [I] [TRT] Loaded engine size: 1 MiB
+[08/12/2026-16:33:09] [I] Engine deserialized in 0.389604 sec.
+[08/12/2026-16:33:09] [I] [TRT] [MS] Running engine with multi stream info
+[08/12/2026-16:33:09] [I] [TRT] [MS] Number of aux streams is 1
+[08/12/2026-16:33:09] [I] [TRT] [MS] Number of total worker streams is 2
+[08/12/2026-16:33:09] [I] [TRT] [MS] The main stream provided by execute/enqueue calls is the first worker stream
+[08/12/2026-16:33:09] [I] [TRT] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +0, GPU +68, now: CPU 0, GPU 68 (MiB)
+[08/12/2026-16:33:09] [W] [TRT] CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[08/12/2026-16:33:09] [I] Setting persistentCacheLimit to 0 bytes.
+[08/12/2026-16:33:09] [I] Created execution context with device memory size: 67.9351 MiB
+[08/12/2026-16:33:09] [I] Using random values for input rx_slot_real
+[08/12/2026-16:33:09] [I] Input binding for rx_slot_real with dimensions 1x3276x12x4 is created.
+[08/12/2026-16:33:09] [I] Using random values for input rx_slot_imag
+[08/12/2026-16:33:09] [I] Input binding for rx_slot_imag with dimensions 1x3276x12x4 is created.
+[08/12/2026-16:33:09] [I] Using random values for input h_hat_real
+[08/12/2026-16:33:09] [I] Input binding for h_hat_real with dimensions 1x4914x1x4 is created.
+[08/12/2026-16:33:09] [I] Using random values for input h_hat_imag
+[08/12/2026-16:33:09] [I] Input binding for h_hat_imag with dimensions 1x4914x1x4 is created.
+[08/12/2026-16:33:09] [I] Using random values for input active_dmrs_ports
+[08/12/2026-16:33:09] [I] Input binding for active_dmrs_ports with dimensions 1x1 is created.
+[08/12/2026-16:33:09] [I] Using random values for input dmrs_ofdm_pos
+[08/12/2026-16:33:09] [I] Input binding for dmrs_ofdm_pos with dimensions 1x3 is created.
+[08/12/2026-16:33:09] [I] Using random values for input dmrs_subcarrier_pos
+[08/12/2026-16:33:09] [I] Input binding for dmrs_subcarrier_pos with dimensions 1x6 is created.
+[08/12/2026-16:33:09] [I] Output binding for output_1 with dimensions 1x2x1x3276x12 is created.
+[08/12/2026-16:33:09] [I] Output binding for output_2 with dimensions 1x1x3276x12x8 is created.
+[08/12/2026-16:33:09] [I] Starting inference
+[08/12/2026-16:33:09] [I] Capturing CUDA graph for the current execution context
+[08/12/2026-16:33:09] [I] Successfully captured CUDA graph for the current execution context
+[08/12/2026-16:33:21] [I] The e2e network timing is not reported since it is inaccurate due to the extra synchronizations when the profiler is enabled.
+[08/12/2026-16:33:21] [I] To show e2e network timing report, add --separateProfileRun to profile layer timing in a separate run or remove --dumpProfile to disable the profiler.
+[08/12/2026-16:33:21] [W] The engine uses 1 auxiliary streams, so the "Total" latency may not be accurate because some layers may have run in parallel!
+&&&& PASSED TensorRT.trtexec [TensorRT v101200] [b36] # trtexec --loadEngine=/results/engines/neural_rx_fp16_4g.trt --shapes=rx_slot_real:1x3276x12x4,rx_slot_imag:1x3276x12x4,h_hat_real:1x4914x1x4,h_hat_imag:1x4914x1x4 --warmUp=2000 --duration=10 --iterations=100 --useCudaGraph --noDataTransfers --percentile=50,95,99 --exportTimes=/results/trtexec/fp16_graph_times.json --exportProfile=/results/trtexec/fp16_graph_layers.json

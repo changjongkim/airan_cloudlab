@@ -1,4 +1,4 @@
-"""L1 producer using GPU-resident staging and GPUDirect RDMA.
+"""L1 producer using registered GPU buffers and GPUDirect RDMA.
 
 The forward path packs cuPHY tensors into a persistent registered CuPy
 allocation.  The backward path consumes a persistent registered CuPy
@@ -67,10 +67,10 @@ pusch_configs = [PuschConfig(
 
 # --- Registered GPU payload layouts ----------------------------------------
 # Forward uses the same logical C-order section serialization as CPU-RDMA.
-# The public TrtEngine wrapper on NRx converts these inputs to F-order.
+# The NRx direct TensorRT context binds these C-order sections in place.
 RX_SHAPE = (1, NUM_SC, num_symbols, num_rx_ant)
 CE_SHAPE = (1, 4914, 1, num_rx_ant)
-LLR_SHAPE = (8, 1, NUM_SC, num_symbols)
+LLR_SHAPE = (2, 1, NUM_SC, num_symbols)
 RX_ELEMS = int(np.prod(RX_SHAPE))
 CE_ELEMS = int(np.prod(CE_SHAPE))
 LLR_ELEMS = int(np.prod(LLR_SHAPE))
@@ -79,7 +79,7 @@ FWD_DATA_SIZE = 2 * RX_ELEMS * F32 + 2 * CE_ELEMS * F32
 BWD_DATA_SIZE = LLR_ELEMS * F32
 
 assert FWD_DATA_SIZE == 1_415_232, FWD_DATA_SIZE
-assert BWD_DATA_SIZE == 1_257_984, BWD_DATA_SIZE
+assert BWD_DATA_SIZE == 314_496, BWD_DATA_SIZE
 
 fwd_ep = None
 bwd_ep = None
@@ -235,7 +235,9 @@ try:
     result = {
         "label": LABEL,
         "iterations": ITERATIONS,
-        "transport": "gpudirect_rdma_staging",
+        "transport": "gpudirect_rdma_zero_copy_direct_trt",
+        "fwd_bytes": FWD_DATA_SIZE,
+        "bwd_bytes": BWD_DATA_SIZE,
         "mean_ms": float(arr.mean()),
         "p50_ms": float(np.percentile(arr, 50)),
         "p95_ms": float(np.percentile(arr, 95)),

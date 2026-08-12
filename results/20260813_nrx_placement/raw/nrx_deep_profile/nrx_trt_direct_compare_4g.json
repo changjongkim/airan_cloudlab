@@ -1,0 +1,139 @@
+{
+  "engine": "/results/engines/neural_rx_fp16_4g.trt",
+  "warmup": 5,
+  "iterations": 10,
+  "tensor_contract": {
+    "inputs": {
+      "rx_slot_real": {
+        "shape": [
+          1,
+          3276,
+          12,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "rx_slot_imag": {
+        "shape": [
+          1,
+          3276,
+          12,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "h_hat_real": {
+        "shape": [
+          1,
+          4914,
+          1,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "h_hat_imag": {
+        "shape": [
+          1,
+          4914,
+          1,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "active_dmrs_ports": {
+        "shape": [
+          1,
+          1
+        ],
+        "dtype": "float32"
+      },
+      "dmrs_ofdm_pos": {
+        "shape": [
+          1,
+          3
+        ],
+        "dtype": "int32"
+      },
+      "dmrs_subcarrier_pos": {
+        "shape": [
+          1,
+          6
+        ],
+        "dtype": "int32"
+      }
+    },
+    "outputs": {
+      "output_1": {
+        "shape": [
+          1,
+          2,
+          1,
+          3276,
+          12
+        ],
+        "dtype": "float32"
+      },
+      "output_2": {
+        "shape": [
+          1,
+          1,
+          3276,
+          12,
+          8
+        ],
+        "dtype": "float32"
+      }
+    }
+  },
+  "direct": {
+    "gpu_ms": {
+      "n": 10,
+      "mean": 1.4180351972579956,
+      "p50": 1.4172159433364868,
+      "p95": 1.4225407838821411,
+      "p99": 1.4240153551101684,
+      "min": 1.415168046951294,
+      "max": 1.4243839979171753
+    },
+    "enqueue_us": {
+      "n": 10,
+      "mean": 234.80450000000002,
+      "p50": 234.287,
+      "p95": 243.86685,
+      "p99": 246.98696999999999,
+      "min": 226.837,
+      "max": 247.767
+    },
+    "wall_ms": {
+      "n": 10,
+      "mean": 1.430199,
+      "p50": 1.4295655,
+      "p95": 1.4357845,
+      "p99": 1.4358025,
+      "min": 1.425688,
+      "max": 1.435807
+    }
+  },
+  "output_integrity": {
+    "output_1": {
+      "finite": true,
+      "checksum": -706.3704223632812
+    },
+    "output_2": {
+      "finite": true,
+      "checksum": -4607.772520065308
+    }
+  },
+  "pycuphy_comparison": {
+    "output_1": {
+      "max_abs_difference": 0.0,
+      "mean_abs_difference": 0.0,
+      "allclose_rtol_1e-3_atol_1e-3": true
+    },
+    "output_2": {
+      "max_abs_difference": 0.0,
+      "mean_abs_difference": 0.0,
+      "allclose_rtol_1e-3_atol_1e-3": true
+    }
+  }
+}

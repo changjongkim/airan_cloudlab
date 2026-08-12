@@ -1,0 +1,22 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[NRX-PROFILE] pack_c_to_f gpu_mean=4.585ms wall_mean=4.596ms
+[NRX-PROFILE] raw_pycuphy gpu_mean=105.150ms wall_mean=105.168ms
+[NRX-PROFILE] raw_plus_output_conversion gpu_mean=105.201ms wall_mean=105.217ms
+[NRX-PROFILE] public_wrapper_c_input gpu_mean=103.248ms wall_mean=103.263ms
+[NRX-PROFILE] public_wrapper_f_input gpu_mean=105.667ms wall_mean=105.682ms
+[NRX-PROFILE] OK output=/results/nrx_deep_profile_4g.json

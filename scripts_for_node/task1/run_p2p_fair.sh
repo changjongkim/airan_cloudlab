@@ -7,11 +7,13 @@ set -u
 
 SDK_HOST=/mydata/aerial-cuda-accelerated-ran
 SDK_MNT=/opt/nvidia/cuBB
-RESULTS_ROOT="${RESULTS_ROOT:-/mydata/results/p2p_fair/final}"
+RESULTS_ROOT="${RESULTS_ROOT:-/mydata/results/p2p_fair/direct_trt}"
+ENGINE_HOST=/mydata/results/nrx_deep_profile/engines
 IMG=airan:25-3-final
-ITERS="${ITERS:-30}"
-WARMUP="${WARMUP:-20}"
+ITERS="${ITERS:-1000}"
+WARMUP="${WARMUP:-100}"
 RING_DEPTH="${RING_DEPTH:-2}"
+TRIALS="${TRIALS:-3}"
 QWEN_DUR="${QWEN_DUR:-300}"
 QWEN_WARMUP="${QWEN_WARMUP:-60}"
 TOPOLOGY_NEEDS_RESTORE=0
@@ -99,8 +101,10 @@ run_bench() {
     log "run $label mode=$mode visible=$visible"
     docker run --rm --name p2p_fair_bench --runtime=nvidia \
         -e NVIDIA_VISIBLE_DEVICES="$visible" \
+        -e NRX_ENGINE=/engines/neural_rx_fp16_4g.trt \
         -e RESULTS_DIR=/results \
         -v "$SDK_HOST:$SDK_MNT" -v "$outdir:/results" \
+        -v "$ENGINE_HOST:/engines:ro" \
         -w "$SDK_MNT/pyaerial" "$IMG" \
         python3 p2p_overlap_bench.py "$mode" "$label" \
         --iterations "$ITERS" --warmup "$WARMUP" --ring-depth "$RING_DEPTH" \
@@ -159,15 +163,19 @@ log "Topology A 4g=$MIG_4G AI3g=$MIG_AI"
 mkdir -p "$RESULTS_ROOT/topology_a"; chmod 777 "$RESULTS_ROOT/topology_a"
 start_qwen p2p_fair_qwen_a "$MIG_AI" "$RESULTS_ROOT/topology_a" \
     || fail "Topology A Qwen warm-up failed"
-run_bench standalone l1_only_4g "$MIG_4G" \
-    "$RESULTS_ROOT/topology_a/l1_only_4g" || fail "4g L1-only failed"
-run_bench same same_overlap_4g "$MIG_4G" \
-    "$RESULTS_ROOT/topology_a/same_overlap_4g" || fail "4g same overlap failed"
+for trial in $(seq 1 "$TRIALS"); do
+    run_bench standalone "l1_only_4g_t${trial}" "$MIG_4G" \
+        "$RESULTS_ROOT/topology_a/trial${trial}/l1_only_4g" \
+        || fail "4g L1-only trial $trial failed"
+    run_bench same "same_overlap_4g_t${trial}" "$MIG_4G" \
+        "$RESULTS_ROOT/topology_a/trial${trial}/same_overlap_4g" \
+        || fail "4g same overlap trial $trial failed"
+    validate_pair "$RESULTS_ROOT/topology_a/trial${trial}/l1_only_4g" \
+        "$RESULTS_ROOT/topology_a/trial${trial}/same_overlap_4g" \
+        | tee "$RESULTS_ROOT/topology_a/trial${trial}/validation.txt"
+done
 stop_qwen p2p_fair_qwen_a "$RESULTS_ROOT/topology_a" \
     || fail "Topology A Qwen progress missing"
-validate_pair "$RESULTS_ROOT/topology_a/l1_only_4g" \
-    "$RESULTS_ROOT/topology_a/same_overlap_4g" \
-    | tee "$RESULTS_ROOT/topology_a/validation.txt"
 
 TOPOLOGY_NEEDS_RESTORE=1
 setup_topology_b || fail "Topology B setup failed"
@@ -176,15 +184,19 @@ log "Topology B L1=$MIG_L1 NRx=$MIG_NRX AI=$MIG_AI"
 mkdir -p "$RESULTS_ROOT/topology_b"; chmod 777 "$RESULTS_ROOT/topology_b"
 start_qwen p2p_fair_qwen_b "$MIG_AI" "$RESULTS_ROOT/topology_b" \
     || fail "Topology B Qwen warm-up failed"
-run_bench standalone l1_only_2g "$MIG_L1" \
-    "$RESULTS_ROOT/topology_b/l1_only_2g" || fail "2g L1-only failed"
-run_bench p2p cross_p2p_2g2g "$MIG_L1,$MIG_NRX" \
-    "$RESULTS_ROOT/topology_b/cross_p2p_2g2g" || fail "2g+2g P2P failed"
+for trial in $(seq 1 "$TRIALS"); do
+    run_bench standalone "l1_only_2g_t${trial}" "$MIG_L1" \
+        "$RESULTS_ROOT/topology_b/trial${trial}/l1_only_2g" \
+        || fail "2g L1-only trial $trial failed"
+    run_bench p2p "cross_p2p_2g2g_t${trial}" "$MIG_L1,$MIG_NRX" \
+        "$RESULTS_ROOT/topology_b/trial${trial}/cross_p2p_2g2g" \
+        || fail "2g+2g P2P trial $trial failed"
+    validate_pair "$RESULTS_ROOT/topology_b/trial${trial}/l1_only_2g" \
+        "$RESULTS_ROOT/topology_b/trial${trial}/cross_p2p_2g2g" \
+        | tee "$RESULTS_ROOT/topology_b/trial${trial}/validation.txt"
+done
 stop_qwen p2p_fair_qwen_b "$RESULTS_ROOT/topology_b" \
     || fail "Topology B Qwen progress missing"
-validate_pair "$RESULTS_ROOT/topology_b/l1_only_2g" \
-    "$RESULTS_ROOT/topology_b/cross_p2p_2g2g" \
-    | tee "$RESULTS_ROOT/topology_b/validation.txt"
 
 restore_topology_a || fail "normal Topology A restore failed"
 TOPOLOGY_NEEDS_RESTORE=0

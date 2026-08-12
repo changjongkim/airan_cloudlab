@@ -1,0 +1,206 @@
+{
+  "engine": "/results/engines/neural_rx_fp16_4g.trt",
+  "iterations": 3,
+  "warmup": 2,
+  "output_bits": 2,
+  "cuda_device_count": 1,
+  "input_layout": {
+    "rx_slot_real": {
+      "shape": [
+        1,
+        3276,
+        12,
+        4
+      ],
+      "dtype": "float32",
+      "c_contiguous": false,
+      "f_contiguous": true
+    },
+    "rx_slot_imag": {
+      "shape": [
+        1,
+        3276,
+        12,
+        4
+      ],
+      "dtype": "float32",
+      "c_contiguous": false,
+      "f_contiguous": true
+    },
+    "h_hat_real": {
+      "shape": [
+        1,
+        4914,
+        1,
+        4
+      ],
+      "dtype": "float32",
+      "c_contiguous": false,
+      "f_contiguous": true
+    },
+    "h_hat_imag": {
+      "shape": [
+        1,
+        4914,
+        1,
+        4
+      ],
+      "dtype": "float32",
+      "c_contiguous": false,
+      "f_contiguous": true
+    },
+    "active_dmrs_ports": {
+      "shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "c_contiguous": true,
+      "f_contiguous": true
+    },
+    "dmrs_ofdm_pos": {
+      "shape": [
+        1,
+        3
+      ],
+      "dtype": "int32",
+      "c_contiguous": true,
+      "f_contiguous": true
+    },
+    "dmrs_subcarrier_pos": {
+      "shape": [
+        1,
+        6
+      ],
+      "dtype": "int32",
+      "c_contiguous": true,
+      "f_contiguous": true
+    }
+  },
+  "metrics": {
+    "pack_c_to_f": {
+      "gpu_ms": {
+        "n": 3,
+        "mean": 61.59995842476686,
+        "p50": 0.6964160203933716,
+        "p95": 165.60910693407058,
+        "p99": 180.26801279306412,
+        "min": 0.17071999609470367,
+        "max": 183.9327392578125
+      },
+      "wall_ms": {
+        "n": 3,
+        "mean": 61.619473,
+        "p50": 0.711973,
+        "p95": 165.63743829999999,
+        "p99": 180.29747966,
+        "min": 0.183956,
+        "max": 183.96249
+      }
+    },
+    "raw_pycuphy": {
+      "gpu_ms": {
+        "n": 3,
+        "mean": 104.58258056640625,
+        "p50": 104.59490966796875,
+        "p95": 104.62425689697265,
+        "p99": 104.62686553955078,
+        "min": 104.52531433105469,
+        "max": 104.62751770019531
+      },
+      "wall_ms": {
+        "n": 3,
+        "mean": 104.599328,
+        "p50": 104.610485,
+        "p95": 104.6416754,
+        "p99": 104.64444788,
+        "min": 104.542358,
+        "max": 104.645141
+      }
+    },
+    "raw_plus_output_conversion": {
+      "gpu_ms": {
+        "n": 3,
+        "mean": 104.6772689819336,
+        "p50": 104.67330932617188,
+        "p95": 104.76089096069336,
+        "p99": 104.76867599487305,
+        "min": 104.58787536621094,
+        "max": 104.77062225341797
+      },
+      "wall_ms": {
+        "n": 3,
+        "mean": 104.714699,
+        "p50": 104.716305,
+        "p95": 104.811624,
+        "p99": 104.8200968,
+        "min": 104.605577,
+        "max": 104.822215
+      }
+    },
+    "public_wrapper_c_input": {
+      "gpu_ms": {
+        "n": 3,
+        "mean": 102.80048116048177,
+        "p50": 102.78173065185547,
+        "p95": 102.83958740234375,
+        "p99": 102.84473022460938,
+        "min": 102.77369689941406,
+        "max": 102.84601593017578
+      },
+      "wall_ms": {
+        "n": 3,
+        "mean": 102.81692666666667,
+        "p50": 102.796074,
+        "p95": 102.8597697,
+        "p99": 102.86543154,
+        "min": 102.787859,
+        "max": 102.866847
+      }
+    },
+    "public_wrapper_f_input": {
+      "gpu_ms": {
+        "n": 3,
+        "mean": 135.18923950195312,
+        "p50": 102.79462432861328,
+        "p95": 190.35167007446287,
+        "p99": 198.1345185852051,
+        "min": 102.69286346435547,
+        "max": 200.08023071289062
+      },
+      "wall_ms": {
+        "n": 3,
+        "mean": 135.210455,
+        "p50": 102.814789,
+        "p95": 190.37223759999998,
+        "p99": 198.15512192,
+        "min": 102.715733,
+        "max": 200.100843
+      }
+    }
+  },
+  "correctness": {
+    "output_1": {
+      "shape": [
+        1,
+        2,
+        1,
+        3276,
+        12
+      ],
+      "dtype": "float32",
+      "max_abs_difference": 0.0
+    },
+    "output_2": {
+      "shape": [
+        1,
+        1,
+        3276,
+        12,
+        8
+      ],
+      "dtype": "float32",
+      "max_abs_difference": 0.0
+    }
+  }
+}

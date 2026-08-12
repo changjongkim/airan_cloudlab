@@ -1,10 +1,36 @@
 # 다음 실험 세션 계획 · AI-RAN GPU 격리 · NIC RDMA 검증
 
-**작성일**: 2026-08-05 · **업데이트**: 2026-08-13 (Task 1/2 · fair direct-P2P overlap 검증 완료)
+**작성일**: 2026-08-05 · **업데이트**: 2026-08-13 (direct TensorRT·P2P/GDR·MPS·queue sweep 완료)
 **작성 배경**: Chain 17 · 18 · 19 실험 완료 후 · 논문 novelty 완성을 위한 추가 실측 필요
 **전제**: 각 Phase의 검증 gate · 통과 못 하면 다음 진행 안 함 · 원인 파악까지 stop
 
-## 지금까지 최종 결과 · 2026-08-12 세션
+## 2026-08-13 optimized-path 결과 · 현재 authoritative
+
+- `pycuphy` wrapper NRx 104.456ms의 98.4%는 generic layout-conversion kernel이었다.
+- caller-owned TensorRT binding은 4g에서 1.413ms, CUDA Graph 적용 후 1.340ms다.
+  wrapper와 두 output 모두 `max_abs_difference=0`으로 일치한다.
+- 실제 MCS2/QPSK LLR은 2-bit output이며 backward payload는 314,496B다.
+- ring depth 2, Qwen 별도 3g 조건:
+  - MIG same 4g: L1 slowdown 1.621×, e2e 6.191ms, 322.8 slot/s
+  - Cross P2P 2g|2g: L1 slowdown **1.043×**, e2e 6.383ms,
+    P2P round-trip 76.84μs, 312.9 slot/s
+  - MIG+MPS same 4g: L1 slowdown 1.702×, e2e 6.383ms
+- 동일 depth 1의 Cross P2P/NIC GDR: 5.888/6.326ms e2e,
+  169.8/158.1 slot/s. NIC loopback이 P2P보다 0.438ms 느렸다.
+- NRx N=1 capacity: 2g 334.9, 4g 745.1, full A100 1,130.5 slot/s.
+  같은 slice의 replica N=2~16은 capacity를 늘리지 못했다. 1,000 slot/s
+  open-loop는 full A100만 안정적이었다.
+- 2g/full native-build TensorRT engine sensitivity는 4g-built shared engine보다
+  0.8%/2.9% 빨랐지만 stability와 placement 결론을 바꾸지 않았다.
+- Full MPS Qwen cap 30/50/70/100%는 e2e 5.865/6.226/6.656/8.569ms와
+  Qwen 7.92/11.14/17.24/21.11 it/s의 Pareto trade-off를 만들었다.
+- 해석과 raw bundle: `results/20260813_nrx_placement/REPORT_KO.md`
+
+## Legacy wrapper-path 결과 · 2026-08-12 세션
+
+아래 14-row는 구현·transport bring-up 이력으로 보존한다. 약 105ms NRx wrapper
+artifact와 잘못된 8-bit LLR payload 가정을 포함하므로 optimized placement의
+최종 성능 결론에는 위 direct-TensorRT 결과를 사용한다.
 
 **Task 1 완료 ✅** — real cuPHY↔NRx 통합 파이프라인 · 최종 14-row 결과 완료
 
@@ -50,25 +76,17 @@
 - Config 4/7 GDR staging N=30 완료: mean/p95/p99 **109.687/109.861/110.223ms**, **109.526/109.778/110.349ms** · Qwen 각 10.23 it/s
 - payload는 host memory를 경유하지 않지만 public `TrtEngine` wrapper의 내부 F-order input copy와 LLR output→registered GPU staging copy가 남는다. 따라서 **end-to-end zero-copy로 부르지 않는다**
 
-**Fair direct-P2P overlap 검증 완료 ✅ (2026-08-13)**
-- 기존 14-row 실험은 같은 slot을 `CE → NRx → LDPC`로 직렬 실행해 같은 MIG의
-  L1/NRx kernel overlap contention이 없었다. 따라서 cross-MIG가 4g co-location과
-  비슷한 약 110ms였던 것은 MIG 격리 실패가 아니라 NRx 약 105ms가 지배한 결과다
-- Config 5의 39ms는 20-cell `real_l1.py`, Config 1/6은 1-cell integrated
-  L1+NRx이므로 동일 workload baseline이 아니었다
-- 교정 실험: same 4g 대 L1 2g + NRx 2g (총 4g 동일), Qwen 별도 3g,
-  FP16 NRx/ring depth 2/warm-up 20/N=30 동일, 각 topology 자체 L1-only baseline,
-  독립 3회 반복
-- R580에서 sibling MIG direct CUDA P2P 양방향 지원 확인. 실제 forward 1,415,232B
-  및 backward 1,257,984B를 실제 2g↔2g에서 checksum 10/10 통과;
-  mean **64.93/59.15μs**
-- 3-trial L1 CUDA-stream elapsed: same 4g **96.935ms, 61.12× baseline**;
-  cross 2g+2g P2P **3.316ms, 1.49×**. p99는 197.823ms 대 3.695ms
-- NRx가 여전히 약 105ms 병목이라 throughput은 9.508 대 9.421 slot/s로 거의 같다.
-  즉 P2P의 이득은 전체 NRx service time이 아니라 **L1 isolation과 E2E tail 안정화**다
-- direct P2P 구현은 한 process가 두 MIG context를 소유한다. 강한 process/container
-  분리가 필요하면 cross-MIG CUDA IPC 제약 때문에 NIC GDR 경로가 여전히 필요하다
-- 결과: `cloudlab_results/task1_p2p_fair/`
+**Fair direct-P2P overlap 최종 검증 완료 ✅ (2026-08-13)**
+- 교정 실험은 caller-owned TensorRT, correct 2-bit LLR, CUDA Graph, warm-up 100,
+  N=1,000, 각 topology 3 trials로 다시 수행했다.
+- depth 2 same 4g는 L1 active 2.975ms/slowdown 1.621×, e2e 6.191ms다.
+  Cross 2g|2g P2P는 L1 active 2.533ms/slowdown **1.043×**, e2e 6.383ms다.
+- 즉 P2P는 L1 isolation을 거의 복구하지만 2g NRx service 3.114ms가 4g의
+  1.782ms보다 느려 end-to-end 이득을 상쇄한다. 통신 76.84μs가 주 병목이 아니다.
+- depth 1 보정에서 Cross P2P 5.888ms/169.8 slot/s, NIC GDR
+  6.326ms/158.1 slot/s다. GDR은 P2P보다 0.438ms 느렸으며 5~10μs 예상은
+  관측되지 않았다.
+- 결과: `results/20260813_nrx_placement/raw/p2p_direct_trt*`
 
 ## 진행 로그
 
@@ -481,7 +499,17 @@ CPU payload bounce를 우회하는 MIG 파티션 간 GPU-memory RDMA 경로를 �
 - GPUDirect RDMA loopback · MIG 파티션 간 payload별 실측 완료
 - L1↔NRx GPU-MR staging 통신 functional 확인 · Config 4/7 N=30 완료
 - shm · CPU-buffer RDMA · GDR staging의 반복 평균 비교 완료
-- 남은 항목: public TRT 내부 복사를 제거한 엄밀한 end-to-end zero-copy와 별도 profiler 검증
+- public TRT 내부 복사를 제거한 end-to-end zero-copy와 별도 profiler 검증도
+  2026-08-13 direct-TensorRT follow-up에서 완료했다.
+
+### Phase 2.5 · direct TensorRT zero-copy follow-up · 완료
+
+- caller-owned forward input과 `output_1`을 GDR-registered GPU MR에 직접 binding
+- CUDA Graph capture/replay 적용, host payload bounce와 wrapper layout copy 제거
+- wrapper 대비 output bit-for-bit 일치 검증
+- Cross NIC GDR depth 1: mean/p99 6.326/6.846ms, Qwen 10.24 it/s
+- 동일 depth Cross P2P: mean/p99 5.888/6.224ms, Qwen 10.22 it/s
+- 상세 결과: `results/20260813_nrx_placement/`
 
 ---
 

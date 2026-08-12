@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fair same-MIG vs cross-MIG P2P overlap benchmark.
+"""Fair same-MIG vs cross-MIG P2P overlap benchmark with direct TensorRT.
 
 The previous request/response benchmark serialized L1 and NRx, so there was no
 same-partition overlap for MIG isolation to remove.  This benchmark keeps two
@@ -12,8 +12,8 @@ Modes:
   p2p         L1 on device 0 and NRx on device 1, using cudaMemcpyPeerAsync.
 
 The runner exposes either one 4g MIG (same) or two 2g MIGs (p2p).  Both overlap
-modes use the same FP16 TensorRT engine, tensor contract, warm-up count, ring
-depth, and wall/CUDA timing code.
+modes use the same caller-owned FP16 TensorRT engine, correct QPSK 2-bit LLR
+contract, CUDA Graph, warm-up count, ring depth, and wall/CUDA timing code.
 """
 
 import argparse
@@ -32,7 +32,7 @@ from cuda.bindings import runtime as cudart
 
 sys.path.insert(0, "/opt/nvidia/cuBB/pyaerial/src")
 
-from aerial.phy5g.algorithms import ChannelEstimator, TrtEngine, TrtTensorPrms
+from aerial.phy5g.algorithms import ChannelEstimator
 from aerial.phy5g.config import PuschConfig, PuschUeConfig
 from aerial.phy5g.ldpc import (
     CrcChecker,
@@ -42,6 +42,7 @@ from aerial.phy5g.ldpc import (
     get_tb_size,
 )
 from aerial.util.cuda import get_cuda_stream
+from nrx_trt_direct import DirectNrx
 
 
 NUM_PRBS = 273
@@ -51,7 +52,7 @@ START_SYM = 2
 NUM_SYMBOLS = 12
 RX_SHAPE = (1, NUM_SC, NUM_SYMBOLS, NUM_RX_ANT)
 CE_SHAPE = (1, 4914, 1, NUM_RX_ANT)
-LLR_SHAPE = (8, 1, NUM_SC, NUM_SYMBOLS)
+LLR_SHAPE = (2, 1, NUM_SC, NUM_SYMBOLS)
 RX_ELEMS = int(np.prod(RX_SHAPE))
 CE_ELEMS = int(np.prod(CE_SHAPE))
 LLR_ELEMS = int(np.prod(LLR_SHAPE))
@@ -64,7 +65,7 @@ DEFAULT_RING_DEPTH = 2
 QUEUE_TIMEOUT_S = 600.0
 
 assert FWD_BYTES == 1_415_232, FWD_BYTES
-assert BWD_BYTES == 1_257_984, BWD_BYTES
+assert BWD_BYTES == 314_496, BWD_BYTES
 
 
 def make_pusch_config():
@@ -224,49 +225,13 @@ class NRxOps:
         self.device = device
         with cp.cuda.Device(device):
             cudart.cudaSetDevice(device)
-            self.stream_handle = get_cuda_stream()
-            self.stream = cp.cuda.ExternalStream(int(self.stream_handle))
-            engine_path = "/tmp/nrx_p2p_fp16.trt"
-            onnx_path = "/opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx"
-            if not os.path.exists(engine_path):
-                print(f"[P2P-BENCH] building FP16 TRT engine on device {device}", flush=True)
-                command = (
-                    f"CUDA_VISIBLE_DEVICES={device} trtexec "
-                    f"--onnx={onnx_path} --saveEngine={engine_path} "
-                    f"--skipInference --fp16 --memPoolSize=workspace:4096 "
-                    f"--inputIOFormats="
-                    f"fp32:chw,fp32:chw,fp32:chw,fp32:chw,fp32:chw,int32:chw,int32:chw "
-                    f"--outputIOFormats=fp32:chw,fp32:chw "
-                    f"--shapes=rx_slot_real:1x3276x12x4,"
-                    f"rx_slot_imag:1x3276x12x4,"
-                    f"h_hat_real:1x4914x1x4,h_hat_imag:1x4914x1x4 "
-                    f"> /tmp/trtexec_p2p.log 2>&1"
-                )
-                if os.system(command) != 0:
-                    raise RuntimeError(
-                        "FP16 TRT engine build failed; see /tmp/trtexec_p2p.log")
-            self.engine = TrtEngine(
-                trt_model_file=engine_path,
-                max_batch_size=1,
-                cuda_stream=self.stream_handle,
-                input_tensors=[
-                    TrtTensorPrms("rx_slot_real", (3276, 12, 4), np.float32),
-                    TrtTensorPrms("rx_slot_imag", (3276, 12, 4), np.float32),
-                    TrtTensorPrms("h_hat_real", (4914, 1, 4), np.float32),
-                    TrtTensorPrms("h_hat_imag", (4914, 1, 4), np.float32),
-                    TrtTensorPrms("active_dmrs_ports", (1,), np.float32),
-                    TrtTensorPrms("dmrs_ofdm_pos", (3,), np.int32),
-                    TrtTensorPrms("dmrs_subcarrier_pos", (6,), np.int32),
-                ],
-                output_tensors=[
-                    TrtTensorPrms("output_1", (8, 1, 3276, 12), np.float32),
-                    TrtTensorPrms("output_2", (1, 3276, 12, 8), np.float32),
-                ],
-            )
-            self.active = cp.ones((1, 1), dtype=cp.float32)
-            self.dmrs_ofdm = cp.asarray([[2, 2, 2]], dtype=cp.int32)
-            self.dmrs_subcarrier = cp.asarray(
-                [[0, 2, 4, 6, 8, 10]], dtype=cp.int32)
+            engine_path = os.environ.get(
+                "NRX_ENGINE", "/engines/neural_rx_fp16_4g.trt")
+            if not os.path.isfile(engine_path):
+                raise RuntimeError(f"TensorRT engine not found: {engine_path}")
+            self.engine = DirectNrx(engine_path)
+            self.engine.capture_graph()
+            self.stream = self.engine.stream
 
     def infer(self, fwd_flat, bwd_staging=None):
         offset = 0
@@ -279,16 +244,12 @@ class NRxOps:
         ce_imag = flat_section(fwd_flat, offset, CE_ELEMS, CE_SHAPE)
 
         def work():
-            output = self.engine.run({
-                "rx_slot_real": rx_real,
-                "rx_slot_imag": rx_imag,
-                "h_hat_real": ce_real,
-                "h_hat_imag": ce_imag,
-                "active_dmrs_ports": self.active,
-                "dmrs_ofdm_pos": self.dmrs_ofdm,
-                "dmrs_subcarrier_pos": self.dmrs_subcarrier,
-            })
-            llrs = cp.ravel(output["output_1"], order="C")
+            cp.copyto(self.engine.inputs["rx_slot_real"], rx_real)
+            cp.copyto(self.engine.inputs["rx_slot_imag"], rx_imag)
+            cp.copyto(self.engine.inputs["h_hat_real"], ce_real)
+            cp.copyto(self.engine.inputs["h_hat_imag"], ce_imag)
+            self.engine.launch(use_graph=True)
+            llrs = cp.ravel(self.engine.outputs["output_1"], order="C")
             if llrs.dtype != cp.float32 or llrs.size != LLR_ELEMS:
                 raise RuntimeError(
                     f"invalid NRx output shape={llrs.shape} dtype={llrs.dtype}")
@@ -554,6 +515,7 @@ def make_result(
         "visible_cuda_devices": cp.cuda.runtime.getDeviceCount(),
         "fwd_bytes": FWD_BYTES,
         "bwd_bytes": BWD_BYTES,
+        "nrx_implementation": "caller_owned_tensorrt_cuda_graph",
         "wall_seconds": wall_seconds,
         "completion_throughput_slots_s": iterations / wall_seconds,
         "completion_interval_ms": percentile_summary(completion_intervals_ms),

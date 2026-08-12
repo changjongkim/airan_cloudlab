@@ -1,0 +1,128 @@
+{
+  "engine": "/results/engines/neural_rx_fp16_2g.trt",
+  "warmup": 100,
+  "iterations": 1000,
+  "tensor_contract": {
+    "inputs": {
+      "rx_slot_real": {
+        "shape": [
+          1,
+          3276,
+          12,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "rx_slot_imag": {
+        "shape": [
+          1,
+          3276,
+          12,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "h_hat_real": {
+        "shape": [
+          1,
+          4914,
+          1,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "h_hat_imag": {
+        "shape": [
+          1,
+          4914,
+          1,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "active_dmrs_ports": {
+        "shape": [
+          1,
+          1
+        ],
+        "dtype": "float32"
+      },
+      "dmrs_ofdm_pos": {
+        "shape": [
+          1,
+          3
+        ],
+        "dtype": "int32"
+      },
+      "dmrs_subcarrier_pos": {
+        "shape": [
+          1,
+          6
+        ],
+        "dtype": "int32"
+      }
+    },
+    "outputs": {
+      "output_1": {
+        "shape": [
+          1,
+          2,
+          1,
+          3276,
+          12
+        ],
+        "dtype": "float32"
+      },
+      "output_2": {
+        "shape": [
+          1,
+          1,
+          3276,
+          12,
+          8
+        ],
+        "dtype": "float32"
+      }
+    }
+  },
+  "cuda_graph": true,
+  "direct": {
+    "gpu_ms": {
+      "n": 1000,
+      "mean": 2.960827363014221,
+      "p50": 2.960383892059326,
+      "p95": 2.9675519466400146,
+      "p99": 2.969599962234497,
+      "min": 2.9480960369110107,
+      "max": 2.9900801181793213
+    },
+    "enqueue_us": {
+      "n": 1000,
+      "mean": 2.7860489999999998,
+      "p50": 2.6355,
+      "p95": 3.106999999999999,
+      "p99": 6.4168399999999854,
+      "min": 2.274,
+      "max": 29.035
+    },
+    "wall_ms": {
+      "n": 1000,
+      "mean": 2.9705467010000004,
+      "p50": 2.9696559999999996,
+      "p95": 2.976505,
+      "p99": 2.9808183099999996,
+      "min": 2.957759,
+      "max": 3.432393
+    }
+  },
+  "output_integrity": {
+    "output_1": {
+      "finite": true,
+      "checksum": -609.6140747070312
+    },
+    "output_2": {
+      "finite": true,
+      "checksum": -3877.9919090270996
+    }
+  }
+}

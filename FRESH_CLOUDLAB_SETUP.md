@@ -450,31 +450,38 @@ GPU staging buffer로 한 번 GPU→GPU copy한다. 따라서 **end-to-end zero-
 부르지 않는다**. 위 ms 값은 전체 pipeline 실측이며 Step 2.5-6의 μs transport
 값과 직접 등치하지 않는다.
 
-**Fair direct-P2P overlap 재현 (별도 follow-up)**:
-기존 Phase C는 slot마다 `L1→NRx→L1` request/response를 직렬 실행하므로 MIG가
-제거할 same-partition L1/NRx overlap이 없다. 아래 runner는 총 4g 자원을 맞춰
-`same 4g`와 `L1 2g + NRx 2g direct CUDA P2P`를 ring depth 2로 비교한다.
+**Optimized direct-TensorRT·P2P/GDR follow-up 재현**:
+
+기존 약 105ms NRx는 public `pycuphy` wrapper의 layout conversion이 지배했다.
+`nrx_deep_profile.py`와 Nsight Systems로 이를 분리했고, caller-owned binding과
+CUDA Graph를 사용하는 `nrx_trt_direct.py`에서 4g 1.340ms, full GPU 0.892ms를
+측정했다. MCS2/QPSK의 실제 backward LLR은 314,496B다.
+
+아래 runner는 총 4g 자원을 맞춰 `same 4g`와
+`L1 2g + NRx 2g direct CUDA P2P`를 ring depth 2로 비교한다.
 
 ```bash
-sudo mkdir -p /mydata/results/p2p_fair/final
+sudo mkdir -p /mydata/results/p2p_fair/direct_trt
 cd /mydata/results/p2p_fair
-RESULTS_ROOT=/mydata/results/p2p_fair/final \
+RESULTS_ROOT=/mydata/results/p2p_fair/direct_trt \
   nohup bash run_p2p_fair.sh </dev/null >run_p2p_fair.log 2>&1 &
 ```
 
 Runner는 Topology A에서 4g standalone/same-overlap을 측정하고, Topology B
 (`3g+2g+2g`)에서 2g standalone/cross-P2P를 측정한 뒤 Topology A를 복구한다.
-양쪽 모두 Qwen은 별도 3g에서 60초 warm-up한다. 기본은 warm-up 20, N=30,
-ring depth 2이며 stale `COMPLETE` 경로를 덮어쓰지 않는다.
+양쪽 모두 Qwen은 별도 3g에서 60초 warm-up한다. 기본은 warm-up 100,
+N=1,000, ring depth 2, 3 trials이며 stale `COMPLETE` 경로를 덮어쓰지 않는다.
 
-세 반복 aggregate: same 4g L1 CUDA-stream elapsed 96.935ms (자체 baseline 대비
-61.12×), cross 2g+2g P2P 3.316ms (1.49×); p99 197.823ms 대 3.695ms.
-P2P 실제 2g↔2g payload gate는 forward/backward mean 64.93/59.15μs와 checksum 10/10을
-확인했다. raw 결과/validator: `cloudlab_results/task1_p2p_fair/`.
+세 반복 aggregate: same 4g L1 active 2.975ms/slowdown 1.621×/e2e 6.191ms,
+cross 2g|2g P2P L1 active 2.533ms/slowdown 1.043×/e2e 6.383ms.
+P2P transport round-trip은 76.84μs다. 동일 depth 1에서는 P2P 5.888ms,
+NIC GDR 6.326ms로 GDR이 0.438ms 느렸다. raw 결과와 분석은
+`cloudlab_results/results/20260813_nrx_placement/`에 있다.
 
 이 direct-P2P benchmark는 단일 process가 두 MIG CUDA context를 소유한다. 별도
-process/container endpoint가 필수면 cross-MIG CUDA IPC가 안 되므로 위 NIC GDR
-staging 구조를 사용한다.
+process/container endpoint가 필수면 NIC GDR zero-copy direct-TensorRT 구조를
+사용한다. 단, 현재 GDR pipeline은 depth 1이므로 depth-2 P2P 처리량과 직접
+비교하지 않는다.
 
 **시퀀스 · 실패 시**:
 1. Qwen 컨테이너 먼저 · 60초 warmup → NRx 컨테이너 · 15초 안에 CPU-RDMA는 `/dev/shm/rdma_<tag>_fwd_cons.info`, GDR은 `/dev/shm/gdr_rdma_<tag>_fwd_cons.info`가 나와야 함

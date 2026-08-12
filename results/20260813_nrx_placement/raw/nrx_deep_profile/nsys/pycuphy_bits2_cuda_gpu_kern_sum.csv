@@ -1,0 +1,51 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+98.4,1427573810,84,16994926.3,1642683.0,146750,85628300,31167523.9,"void convert_kernel<float, float>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+0.2,2585408,15,172360.5,172414.0,171965,172766,297.7,__myl_AddMulSumSub_0x0e621f3620960cbfd8501720accf6ff0
+0.2,2582303,15,172153.5,172286.0,171805,172414,250.6,__myl_AddMulSumSub_0xd230df01303305a73d1c0d6ac998d13a
+0.1,2032614,75,27101.5,27104.0,26847,27264,105.5,sm80_xmma_depthwise_convolution_fprop_tiling_f16f16_f16f16_f16_nhwckrsc_nhwc_tilesize1x6x6_1x3x3_1x1x1_1x1x1_stage4_warpsize4x1x1_g64_betaFalse_execute_kernel_trt
+0.1,1689803,45,37551.2,50015.0,12192,50495,18016.2,sm50_xmma_convolution_depthwiseHMMA_FP16NHWCx8_TR3_TS3_STRIDEH1_STRIDEW1_execute_kernel_trt
+0.1,1515115,15,101007.7,101023.0,100735,101502,218.7,__myl_MulReshConcTran_0xb7a17b255f4322f573065048adb59b68
+0.1,1463759,15,97583.9,97599.0,97374,97823,126.3,__myl_AddReluEqlCastNotCastDivSeleMulAddMulReshConcTran_0x972db51376c2a1f86a9afe9eda536aac
+0.1,999474,45,22210.5,14304.0,12800,208605,29222.1,sm80_xmma_gemm_f16f16_f16f16_f16_tn_n_tilesize256x64x32_stage3_warpsize4x1x1_tensor16x8x16_execute_kernel_trt
+0.1,967956,30,32265.2,32368.0,30048,34528,1590.1,__myl_ReshAddRelu_0x54fd10a5bd05f87cea32397121f8c6e9
+0.1,898484,30,29949.5,30015.0,28256,31872,1257.9,"void CUTENSOR_NAMESPACE::permutationKernelPLC3<CUTENSOR_NAMESPACE::VectorWrite2DTensorView<(unsigned char)0, (unsigned char)1, (bool)0, (unsigned int)8, float, __half, CUTENSOR_NAMESPACE::GeneralUnarySmall<float>>, CUTENSOR_NAMESPACE::VectorRead2DTensorView<(unsigned char)1, (unsigned char)0, (bool)0, (unsigned int)8, float, __half, CUTENSOR_NAMESPACE::GeneralUnarySmall<float>>, CUTENSOR_NAMESPACE::ThreadLevelElementwise<CUTENSOR_NAMESPACE::ElementwiseConfig2DCommonCase<CUTENSOR_NAMESPACE::GeneralUnarySmall<float>, CUTENSOR_NAMESPACE::GeneralBinary<float>, (int)2, (int)16, (int)128, (int)128, (signed char)8, (bool)0, (bool)0, (bool)1, (bool)0, (bool)0>, float>, CUTENSOR_NAMESPACE::ElementwiseRuntimePLC3<__half, float, __half, float>::Params>(T4)"
+0.1,869876,30,28995.9,29023.5,28128,29600,367.1,sm80_xmma_gemm_f16f16_f16f16_f16_nn_n_tilesize128x128x32_stage4_warpsize2x2x1_tensor16x8x16_execute_kernel_trt
+0.1,781332,45,17362.9,17600.0,16384,18272,610.6,sm80_xmma_gemm_f16f16_f16f16_f16_nn_n_tilesize256x64x32_stage3_warpsize4x1x1_tensor16x8x16_execute_kernel_trt
+0.1,771291,93,8293.5,3712.0,1536,20319,7101.6,cupy_copy__float32_float32
+0.1,744567,30,24818.9,24911.5,23776,26336,618.4,sm80_xmma_gemm_f16f16_f16f16_f16_tn_n_tilesize128x128x32_stage4_warpsize2x2x1_tensor16x8x16_execute_kernel_trt
+0.0,552983,15,36865.5,36895.0,36639,37087,116.7,trt_ampere_fp16_s16816gemm_fp16_128x128_ldg8_f2f_tn_v1
+0.0,540794,45,12017.6,11936.0,11680,12512,208.9,"void cuInt8::nhwcTonchw<__half, (int)32, (int)32, (int)2>(const __half *, T1 *, int, int, int, int, int, int)"
+0.0,406141,15,27076.1,26624.0,25728,28575,1112.7,sm80_xmma_gemm_f16f16_f16f32_f32_tn_n_tilesize64x16x64_stage7_warpsize4x1x1_tensor16x8x16_execute_kernel_trt
+0.0,388153,15,25876.9,25887.0,25376,26272,253.8,__myl_TranAddTranResh_0x79f01a5c7c38d7bac7b47a6a8dfc6c37
+0.0,285405,15,19027.0,19040.0,18816,19264,133.4,trt_ampere_h16816gemm_128x128_ldg8_stages_32x5_nn_v1
+0.0,277180,15,18478.7,18432.0,18111,18944,280.9,trt_ampere_h16816gemm_64x128_ldg8_stages_32x6_nn_v1
+0.0,275646,15,18376.4,18368.0,18335,18464,44.5,__myl_TranResh_0xbfd57b61a326dc761957a74e01b40cd9
+0.0,260285,15,17352.3,17344.0,17248,17503,69.7,__myl_TranAddTran_0xbbefff6588bda9e9185928db98bcc0c7
+0.0,251005,15,16733.7,16768.0,16543,16864,115.2,sm75_xmma_fprop_implicit_gemm_f16f16_f16f16_f16_nhwckrsc_nhwc_tilesize64x128x32_stage1_warpsize2x2x1_g1_tensor16x8x8_simple_t1r1s1_execute_kernel_trt
+0.0,248349,15,16556.6,16384.0,16320,18783,617.4,__myl_SqrtEqlReshSqrtGtrCastReshNotCastReshMulReshDivMulMulAddReshSqrtGtrCastReshNotCastReshMulEtc_0x12d817f2d01f5836cfd047175e3c65b3
+0.0,186206,1,186206.0,186206.0,186206,186206,0.0,"void generate_seed_pseudo<rng_config<curandStateXORWOW, (curandOrdering)101>>(unsigned long long, unsigned long long, unsigned long long, curandOrdering, curandStateXORWOW *, unsigned int *)"
+0.0,183965,75,2452.9,2528.0,1887,2816,276.4,sm80_xmma_depthwise_convolution_fprop_tiling_f16f16_f16f16_f16_nhwckrsc_nhwc_tilesize1x6x6_1x3x3_1x1x1_1x1x1_stage4_warpsize4x1x1_g64_betaFalse_execute_helper_kernel_trt
+0.0,174589,15,11639.3,11584.0,11423,11904,143.0,__myl_AddRelu_0x05d02ab51fb01c643982cd9023c803c5
+0.0,126784,15,8452.3,8448.0,8416,8480,23.8,"void cuInt8::nchwTonhwc<float, (int)32, (int)16, (int)2>(const T1 *, __half *, int, int, int, int, int, int, int, int)"
+0.0,102398,15,6826.5,6528.0,6400,10688,1072.0,__myl_ConcMulMean_0xe91ee1325e8f6a3eacc64255c88ed109
+0.0,99966,15,6664.4,6719.0,6496,6784,95.6,__myl_AddRelu_0x5b628ef3b82f191b42de06768cc043f9
+0.0,64894,15,4326.3,4320.0,4032,4544,146.2,__myl_Add_0xe2cc193538990d8d90177daa2530cbf5
+0.0,56095,28,2003.4,2016.0,1760,2144,71.4,"void convert_kernel<int, int>(tensor_layout_any, T1 *, tensor_layout_any, const T2 *)"
+0.0,52768,15,3517.9,3520.0,3488,3616,33.0,__myl_ReshCastTranSlicMeanSubMeanSubMulMeanSlicMeanSubMeanSubMulMean_0x5dfe186a7fa85624f9bf7f0995f1e901
+0.0,48447,15,3229.8,2464.0,2176,4704,1005.7,__myl_Slic_0x818b78336c4444710c8f2b82f603f635
+0.0,46656,15,3110.4,3104.0,3072,3296,54.4,"void cuInt8::nchwTonchw<__half, float, (int)4>(const T1 *, T2 *, int, int, int, const float *, const float *, cuInt8::ReducedDivisorParameters)"
+0.0,45471,15,3031.4,3040.0,2976,3104,40.9,"void genericReformat::copyVectorizedKernel<double, __half, float, (bool)1, (bool)0, (int)1>(unsigned int, const void *, genericReformat::ArrayN<T6>, genericReformat::ArrayNWithReducedDivisors<T6>, genericReformat::ArrayN<T6>, int, const float *, void *, genericReformat::ArrayN<T6>, genericReformat::ArrayNWithReducedDivisors<T6>, genericReformat::ArrayN<T6>, int, const float *)"
+0.0,41984,15,2798.9,2688.0,2656,3008,135.2,__myl_AddMulTran_0x402676d62c91cd5b6863c1f4fde73b38
+0.0,37790,15,2519.3,2528.0,2496,2528,14.6,__myl_ReshBott_0x3ce0ac289c216ed9c1b98102734ff729
+0.0,33856,15,2257.1,2208.0,2144,2848,175.2,__myl_ReplReshReplReshConcReshSubAbsMoveMinrSlicSlicAdd_0xf505d4d758008e0b5fca1b7f9471e259
+0.0,30912,15,2060.8,2048.0,2016,2272,81.0,"void genericReformat::copyVectorizedKernel<double, float, __half, (bool)1, (bool)0, (int)1>(unsigned int, const void *, genericReformat::ArrayN<T6>, genericReformat::ArrayNWithReducedDivisors<T6>, genericReformat::ArrayN<T6>, int, const float *, void *, genericReformat::ArrayN<T6>, genericReformat::ArrayNWithReducedDivisors<T6>, genericReformat::ArrayN<T6>, int, const float *)"
+0.0,30719,18,1706.6,1728.0,1536,1792,98.1,cupy_copy__int32_int32
+0.0,27936,15,1862.4,1824.0,1600,2304,221.4,"void genericReformat::copyPackedKernel<float, __half, (bool)1, (bool)1, genericReformat::IdentityCoordMapper<(int)1>, (int)1>(unsigned int, unsigned int, const void *, genericReformat::ArrayN<T6>, genericReformat::ArrayNWithReducedDivisors<T6>, genericReformat::ArrayN<T6>, int, int, int, const float *, void *, genericReformat::ArrayN<T6>, genericReformat::ArrayNWithReducedDivisors<T6>, genericReformat::ArrayNWithReducedDivisors<T6>, genericReformat::ArrayN<T6>, int, int, int, const float *, T5)"
+0.0,24799,15,1653.3,1632.0,1631,1792,50.9,__myl_Resh_0xdb535670b69e2f380466d9c13d35bd19
+0.0,20352,15,1356.8,1312.0,1280,1696,110.7,__myl_Move_0x4ded5ad1be2d100f9c01e61d88d2ff4f
+0.0,17184,4,4296.0,4160.0,2464,6400,2076.9,"void gen_sequenced<curandStateXORWOW, float2, normal_args_st, &curand_normal_scaled2<curandStateXORWOW>, rng_config<curandStateXORWOW, (curandOrdering)101>>(T1 *, T2 *, unsigned long, unsigned long, T3)"
+0.0,14816,2,7408.0,7408.0,4032,10784,4774.4,cupy_subtract__float32_float32_float32
+0.0,9376,2,4688.0,4688.0,3776,5600,1289.8,"void cub::CUB_200800_SM_500_520_600_610_700_750_800_860_890_900_1000_1200::DeviceReduceKernel<cub::CUB_200800_SM_500_520_600_610_700_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<float, unsigned int, nan_handling_max<float>>::Policy600, float *, unsigned int, nan_handling_max<float>, float, cuda::std::__4::__identity>(T2, T5 *, T3, cub::CUB_200800_SM_500_520_600_610_700_750_800_860_890_900_1000_1200::GridEvenShare<T3>, T4, T6)"
+0.0,6656,2,3328.0,3328.0,2624,4032,995.6,cupy_absolute__float32_float32
+0.0,4832,2,2416.0,2416.0,2112,2720,429.9,"void cub::CUB_200800_SM_500_520_600_610_700_750_800_860_890_900_1000_1200::DeviceReduceSingleTileKernel<cub::CUB_200800_SM_500_520_600_610_700_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<float, unsigned int, nan_handling_max<float>>::Policy600, float *, float *, int, nan_handling_max<float>, float, float, cuda::std::__4::__identity>(T2, T3, T4, T5, T6, T8)"
+0.0,1440,1,1440.0,1440.0,1440,1440,0.0,cupy_fill

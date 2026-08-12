@@ -16,7 +16,6 @@ import os
 import sys
 import json
 import datetime
-import time
 
 import numpy as np
 import cupy as cp
@@ -34,23 +33,13 @@ from aerial.phy5g.config import (
     PuschConfig, PuschUeConfig,
     AerialPdschTxConfig,
 )
-try:
-    # Older pyaerial (CloudLab 25-3 build): module-level helper.
-    from aerial.util.cuda import get_cuda_stream
-except ImportError:
-    # Newer pyaerial (Perlmutter open-source build): CudaStream class.
-    from aerial.util.cuda import CudaStream
-    def get_cuda_stream():
-        return CudaStream()
+from aerial.util.cuda import get_cuda_stream
+from cuda.bindings import runtime as cudart
 
 LABEL = sys.argv[1] if len(sys.argv) > 1 else "real_l1"
 NUM_CELLS = int(sys.argv[2]) if len(sys.argv) > 2 else 20
 ITERATIONS = int(sys.argv[3]) if len(sys.argv) > 3 else 100
 NUM_WARMUP = 20
-# Optional wall-time cap (seconds) for the measurement loop. 0 = no cap (default,
-# fixed ITERATIONS). Used by the P5 sustained test to bound each run to ~5 min
-# regardless of how much contention slows each iteration.
-MAX_SECONDS = float(os.environ.get("MAX_SECONDS", "0"))
 
 RESULTS_DIR = os.environ.get("RESULTS_DIR", "./results")
 os.makedirs(RESULTS_DIR, exist_ok=True)
@@ -86,6 +75,7 @@ tb_size = get_tb_size(
 )
 print(f"[realL1] cells={NUM_CELLS} iters={ITERATIONS} prbs={num_prbs} mcs={mcs_index} tb_size={tb_size}", flush=True)
 
+cudart.cudaSetDevice(0)
 cuda_stream = get_cuda_stream()
 
 # PdschTxPipeline crashes on this build (binding-level segfault). We skip it and
@@ -153,7 +143,6 @@ print("[realL1] measuring...", flush=True)
 latencies = []
 start_event = cp.cuda.Event()
 end_event = cp.cuda.Event()
-_t0 = time.time()
 for i in range(ITERATIONS):
     start_event.record()
     for _ in range(NUM_CELLS):
@@ -161,15 +150,13 @@ for i in range(ITERATIONS):
     end_event.record()
     end_event.synchronize()
     latencies.append(cp.cuda.get_elapsed_time(start_event, end_event))
-    if MAX_SECONDS and (time.time() - _t0) >= MAX_SECONDS:
-        break
 
 arr = np.array(latencies)
 miss_1ms = int(np.sum(arr > 1.0))
 result = {
     "label": LABEL,
     "num_cells": NUM_CELLS,
-    "iterations": len(latencies),
+    "iterations": ITERATIONS,
     "num_rx_ant": num_rx_ant,
     "num_tx_ant": num_tx_ant,
     "num_prbs": num_prbs,

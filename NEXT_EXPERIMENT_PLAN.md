@@ -6,29 +6,40 @@
 
 ## 진행 로그
 
-**2026-08-12 · Phase 0 진행 상태** (CloudLab d8545 · node0.sgkim-312839)
+**2026-08-12 · Phase 0 최종 상태** (CloudLab d8545 · node0.sgkim-312839)
 
 - [x] 0.1 노드 예약 · SSH · sudo · Ubuntu 22.04.2
 - [x] 0.2 NVIDIA driver 580.173.02 · CUDA 13.0 · 4× A100 인식
 - [x] 0.3 Docker CE 29.7.2 · nvidia-container-toolkit · /mydata/docker data-root
-- [ ] 0.4 cuPHY · pyaerial (Aerial 이미지 pull 완료 · airan container 빌드 중 · pyaerial build 대기)
+- [x] 0.4 cuPHY · pyaerial · Aerial 이미지 pull · airan:25-3-final 빌드 · pyaerial C++ 바인딩 build 완료 · import OK
 - [x] 0.5 MIG mode enabled GPU 0 · Config A partitions (4g + 3g) 생성 완료
-  - MIG L1 UUID: MIG-dae3f173-7b15-594b-bc80-6cef80687a56
-  - MIG AI UUID: MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
-- [x] 0.6 MPS daemon L1 partition 시작 정상
+  - MIG L1 UUID: `MIG-dae3f173-7b15-594b-bc80-6cef80687a56`
+  - MIG AI UUID: `MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3`
+- [x] 0.6 MPS daemon L1 partition 시작 정상 (pid 5806)
 - [x] 0.7 MOFED 24.10-3.2.5.0 설치 완료 · openibd load
-- [x] 0.8 nvidia_peermem · mlx5_ib · ib_uverbs 커널 로드 · 재부팅 후 auto-load (persistent)
-- [ ] 0.9 Sanity 재현 (airan container + pyaerial build 완료 후 진행)
-- [x] 0.10 /mydata (1.5T NVMe) · /mydata/results/20260812/
+- [x] 0.8 nvidia_peermem · mlx5_ib · ib_uverbs 커널 로드 · 재부팅 후 auto-load (persistent · `/etc/modules-load.d/nvidia_peermem.conf`)
+- [x] 0.9 **Sanity 재현 성공** · `real_l1.py sanity_baseline 20 30`
+  - **mean 37.4 ms · p95 37.7 ms · p99 37.9 ms · miss1ms 30/30**
+  - 이전 baseline (38.5 ms) 과 완전 일치 · 환경 동등성 검증
+  - 저장: `/mydata/results/20260812/sanity/realL1_sanity_baseline_20260812_080106.json`
+- [x] 0.10 /mydata (1.5T NVMe · 54GB used / 1.4T avail) · `/mydata/results/20260812/`
 
-**Phase 0 미결 · 이슈**:
-- **NIC port 물리 링크 DOWN** · CloudLab experiment interface에 external link partner 없음 → mlxlink polling 상태 계속 · Task 2 (RDMA loopback) 진행 전 · **CloudLab experiment profile 재설정 필요** (LAN link 추가 또는 physical loopback cable)
-- 대안 · Soft-RoCE (`rxe`) 모듈 · MOFED와 conflict로 로드 안 됨
-- 조치 · NIC 요구사항 명시 · Task 1 (L1↔NRx 파이프라인 · NIC 무관) 먼저 진행
+**Task 1 시작 준비 · 완료** ✅
+- 모든 하드웨어 · 소프트웨어 · MIG · MPS · sanity 재현 · gate 통과
 
-**진행 중 · Background jobs**:
-- airan:25-3-final Docker build (`~/cloudlab_aerial/Dockerfile.airan`)
-- 완료 후 · pyaerial build · sanity 재현
+**Task 2 (NIC RDMA) 시작 조건 · 미충족** ⚠
+- **NIC port 물리 링크 DOWN** · CloudLab experiment에 LAN link 없음 · mlxlink polling 상태 계속
+- Soft-RoCE (`rxe`) · MOFED ib_core와 심볼 conflict · load 불가
+- 필요한 조치:
+  1. **Option A**: CloudLab profile 재설정 · Mellanox 포트를 LAN에 연결 (self-loop 또는 두 번째 노드 예약)
+  2. **Option B**: Physical loopback cable (원격 불가)
+  3. **Option C**: 다른 testbed 이용 (Chameleon 등 · ConnectX-6 RDMA 지원)
+- Task 1 부터 진행 · Task 2는 위 옵션 중 하나 해결 시 · Phase 2.1로 진행
+
+**Fixes 필요했던 것들 (다음 세션 참고)**:
+- Docker.io 29.x containerd metadata 이슈 → docker-ce로 교체
+- Aerial repo에서 HDF5 파일이 Git LFS pointer → `git lfs install; git lfs pull` 필요
+- pyaerial API 변경 · `CudaStream` → `get_cuda_stream` (real_l1.py 수정 후 로컬 리포에도 push)
 
 ---
 

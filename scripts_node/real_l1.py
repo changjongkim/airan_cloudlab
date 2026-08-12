@@ -33,7 +33,7 @@ from aerial.phy5g.config import (
     PuschConfig, PuschUeConfig,
     AerialPdschTxConfig,
 )
-from aerial.util.cuda import CudaStream
+from aerial.util.cuda import get_cuda_stream
 from cuda.bindings import runtime as cudart
 
 LABEL = sys.argv[1] if len(sys.argv) > 1 else "real_l1"
@@ -76,7 +76,7 @@ tb_size = get_tb_size(
 print(f"[realL1] cells={NUM_CELLS} iters={ITERATIONS} prbs={num_prbs} mcs={mcs_index} tb_size={tb_size}", flush=True)
 
 cudart.cudaSetDevice(0)
-cuda_stream = CudaStream()
+cuda_stream = get_cuda_stream()
 
 # PdschTxPipeline crashes on this build (binding-level segfault). We skip it and
 # feed the RX components a random tensor of the expected shape directly.

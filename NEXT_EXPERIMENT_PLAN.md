@@ -26,7 +26,163 @@
 
 ---
 
+## Phase 0 · 전체 환경 셋업 (MUST COMPLETE BEFORE Task 1 · Task 2)
+
+### 원칙
+**Task 1 · Task 2 어느 것도 · Phase 0의 모든 체크박스가 통과되기 전에는 시작 안 함**. 셋업 도중 실패 · 원인 파악까지 stop · 무리하게 다음 단계 안 함. 이 gate가 가장 중요.
+
+### 0.1 · CloudLab 노드 예약 · 초기 확보
+
+- [ ] **d8545 노드 예약 확정** (Wisconsin cluster · AIRANSLICING project)
+- [ ] SSH 접근 확인 · sudo 권한 자동 부여 확인
+- [ ] 노드 상태 · 이전 세션 잔여물 없는지 · 필요 시 clean reboot
+
+### 0.2 · Base OS · 드라이버 · CUDA 스택
+
+- [ ] **Ubuntu 22.04** (또는 CloudLab 기본 이미지) 확인
+- [ ] **NVIDIA Driver 550+ 설치 · 정상 동작**
+  ```bash
+  nvidia-smi
+  cat /proc/driver/nvidia/version
+  ```
+- [ ] **CUDA 12.x 설치**
+  ```bash
+  nvcc --version
+  ```
+- [ ] **GPU 4× A100-SXM4-40GB 전체 정상 인식**
+
+### 0.3 · Docker · Container 이미지
+
+- [ ] **Docker · nvidia-container-toolkit 설치 · 정상 동작**
+  ```bash
+  docker --version
+  docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
+  ```
+- [ ] **필수 이미지 pull 완료**
+  - `airan:25-3-final` · cuPHY container
+  - `vllm/vllm-openai:v0.6.6` · Qwen 서빙
+  - `nvcr.io/nvidia/pytorch:24.10-py3` · AI 워크로드
+- [ ] Docker storage · `/mydata` symlink · 디스크 여유 충분
+
+### 0.4 · cuPHY / pyaerial SDK
+
+- [ ] **cuPHY 25.3-cubb · pyaerial 2026.1.dev1 설치 · 정상 동작**
+  ```bash
+  # 컨테이너 안에서
+  python3 -c "import pyaerial; print(pyaerial.__version__)"
+  ```
+- [ ] **`neural_rx.onnx` 모델 파일 존재 확인**
+  ```bash
+  ls /opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx
+  ```
+- [ ] **`real_l1.py` · 기존 실험 스크립트 실행 · baseline latency 재현 (~40 ms)**
+
+### 0.5 · MIG 설정 · Config A/C 검증
+
+- [ ] **MIG mode 활성화 · 재시작 후 유지**
+  ```bash
+  sudo nvidia-smi -mig 1
+  ```
+- [ ] **Config A (4g + 3g) 파티션 생성 · 정상 동작**
+  ```bash
+  sudo nvidia-smi mig -cgi 4g.20gb,3g.20gb -C
+  nvidia-smi -L | grep MIG
+  ```
+- [ ] **Config C (3g + 2g + 2g) 파티션 생성 · 정상 동작**
+- [ ] **각 MIG partition에서 CUDA 컨텍스트 · cudaMalloc · 정상 동작 검증**
+- [ ] **파티션 UUID 기록** · 실험 스크립트에서 사용
+
+### 0.6 · MPS 데몬 · pct 설정 검증
+
+- [ ] **`nvidia-cuda-mps-control` daemon 정상 시작**
+  ```bash
+  echo start_server -uid 0 | nvidia-cuda-mps-control
+  ```
+- [ ] **`CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` 환경변수 적용 확인**
+- [ ] **각 MIG partition에서 MPS server 독립 실행 가능** (pipe · log 경로 분리)
+- [ ] **N=2 프로세스로 MPS on/off 정상 동작 sanity 확인**
+
+### 0.7 · MOFED · RDMA 스택 (Task 2 필수)
+
+- [ ] **MOFED (Mellanox OFED) 설치 · 버전 확인**
+  ```bash
+  ofed_info -s
+  # 없으면 · 공식 사이트에서 Ubuntu 22.04용 MOFED download · install
+  ```
+- [ ] **NIC 하드웨어 인식 · ConnectX-6 DX 확인**
+  ```bash
+  lspci | grep -i mellanox
+  sudo mst status
+  ibstat
+  ibv_devinfo
+  ```
+- [ ] **NIC port state · ACTIVE · link 확인**
+  ```bash
+  ibstatus
+  # State: 4: ACTIVE 여야 함
+  ```
+- [ ] **NIC firmware · RoCE mode · loopback 활성 설정**
+  ```bash
+  sudo mlxconfig -d <PCI> query | grep -E "ROCE|LINK"
+  sudo mlxconfig -d <PCI> set ROCE_CONTROL=1
+  # 필요 시 firmware reset
+  sudo mlxfwreset -d <PCI> reset
+  ```
+- [ ] **rdma-core · libibverbs · perftest 설치 · 정상 동작**
+  ```bash
+  apt list --installed 2>/dev/null | grep -E "rdma|ibverbs|perftest"
+  ib_write_lat --version
+  ```
+
+### 0.8 · nvidia-peermem · GPUDirect 스택
+
+- [ ] **`nvidia-peermem` 커널 모듈 로드 · 정상 등록**
+  ```bash
+  sudo modprobe nvidia_peermem
+  lsmod | grep nvidia_peermem
+  dmesg | grep -i peermem
+  ```
+- [ ] **`mlx5_ib` · `ib_uverbs` 등 관련 모듈 로드 확인**
+- [ ] **IOMMU 설정 · GRUB 옵션 확인 (`iommu=pt intel_iommu=on` 또는 AMD 등가)**
+- [ ] **PCIe P2P 허용 여부 확인** (BIOS · kernel parameters)
+
+### 0.9 · 기본 sanity 실험 · 이전 결과 재현
+
+- [ ] **Chain 19 Exp 5 (CP + MPS on AI · N=6) 재현 실행**
+  - 예상 결과: L1 p99 ~42 ms · baseline 유지
+  - 이전 데이터와 일치하는지 확인 · 환경이 이전과 동일함을 검증
+- [ ] **Chain 19 Exp 11 (SP + NRx · MPS pct=30 · N=6) 재현 실행**
+  - 예상 결과: L1 p99 ~146 ms
+  - 이전 데이터와 일치 확인
+
+### 0.10 · Storage · results 디렉토리 준비
+
+- [ ] `/mydata/results/20260812/` (또는 다음 세션 날짜) 디렉토리 생성 · 권한 777
+- [ ] Analysis 스크립트 위치 확인 · git pull로 최신
+- [ ] 이전 세션 데이터 접근 가능 · 비교 baseline 확보
+
+### Phase 0 · 최종 Gate
+
+**아래 모두 통과되어야 Task 1 · Task 2 시작 가능**:
+
+- [ ] 0.1 ~ 0.10 · 전 항목 체크박스 완료
+- [ ] Sanity 재현 실험 (0.9) 이전 데이터와 일치
+- [ ] Task 2 필수 · `ib_write_lat` 기본 loopback 성공 (아직 GPU memory 아님 · CPU RDMA만이라도)
+- [ ] `nvidia-peermem` 모듈 로드 확인 · GPU memory pinning 가능한 상태
+- [ ] 실험 로그 저장 위치 · 권한 확인
+- [ ] Git working directory clean · 이전 변경사항 다 push됨
+
+**Phase 0 통과 못하면**:
+- 원인 항목 파악 · 문서화
+- 필요 시 CloudLab 이미지 재설치 · MOFED 재설치
+- 무리하게 Task 진행 하지 말 것
+- Setup 실패 자체가 결과이므로 · plan에 기록 · 다음 시도 시 활용
+
+---
+
 ## Task 1 · NRx-L1 실제 통신 파이프라인 구성
+
+**전제**: Phase 0 완전 통과 확인.
 
 ### 목적
 현재 dummy input NRx를 · 실제 L1 output을 입력받아 처리하고 · 결과를 L1로 반환하는 **end-to-end 파이프라인**으로 재구성.
@@ -100,6 +256,8 @@
 ---
 
 ## Task 2 · NIC-based GPUDirect RDMA · MIG 간 통신 구현
+
+**전제**: Phase 0 완전 통과 확인.
 
 ### 목적
 CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예상 5-40 μs latency로 5G TTI 예산 만족.
@@ -209,7 +367,16 @@ CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예�
 ## 실험 순서 · 의존성
 
 ```
-Phase 1.1 (조사)          Phase 2.1 (환경 확인)
+┌──────────────────────────────────────────────────┐
+│  Phase 0 · 전체 환경 셋업 (Gate · MUST PASS)      │
+│  0.1 노드 · 0.2 OS/CUDA · 0.3 Docker · 0.4 cuPHY │
+│  0.5 MIG · 0.6 MPS · 0.7 MOFED · 0.8 peermem     │
+│  0.9 sanity 재현 · 0.10 storage                   │
+└─────────────────┬────────────────────────────────┘
+                  ↓ (all boxes checked)
+     ┌────────────┴────────────┐
+     ↓                          ↓
+Phase 1.1 (조사)          Phase 2.1 (환경 확인 · 이미 0.7에서 커버)
      ↓                          ↓
 Phase 1.2 (파이프라인)     Phase 2.2 (RDMA 기본 검증)
      ↓                          ↓
@@ -222,6 +389,7 @@ Phase 1.4 (SP·CP · CPU bounce)     ↓
                             Phase 2.4 (비교 · 최종 결과)
 ```
 
+**Phase 0 이 최우선 · 완전 통과 후에만 Task 1 · Task 2 시작**.
 Task 1 · Task 2 상당 부분 병렬 진행 가능. 최종 Phase 2.4에서 통합.
 
 ---
@@ -265,12 +433,18 @@ Task 1 · Task 2 상당 부분 병렬 진행 가능. 최종 Phase 2.4에서 통�
 
 ## 우선순위 (주별)
 
-- **1주차** · Phase 1.1 · 2.1 · 2.2 (조사 · 환경 · 기본 검증)
-- **2주차** · Phase 1.2 · 1.3 (L1↔NRx 파이프라인 · 검증 gate)
-- **3주차** · Phase 1.4 · 2.3 (실측 · RDMA 통합)
-- **4주차** · Phase 2.4 (최종 비교 · 결과 정리)
+- **1주차 · Phase 0 · 전체 환경 셋업 완료 (Gate)**
+  - 0.1-0.10 · sanity 재현까지 · 모든 체크박스 통과
+  - 통과 못 하면 여기서 stop · 원인 파악 · 재시도
+  - **Task 1 · Task 2 시작 안 함**
+- **2주차** · Phase 1.1 · 1.2 · 2.2 (조사 · L1↔NRx 파이프라인 시작 · RDMA 기본 검증 병렬)
+- **3주차** · Phase 1.3 · 1.4 (파이프라인 검증 gate · SP·CP CPU bounce 실측)
+- **4주차** · Phase 2.3 · 2.4 (RDMA 파이프라인 · 최종 비교 · 결과 정리)
 
-**Gate 규칙 준수**: 각 Phase의 검증 단계 · 통과 못 하면 · 다음 phase 진행 안 함 · 원인 파악까지.
+**Gate 규칙 준수** (사용자 지시):
+- 각 Phase의 검증 단계 · 통과 못 하면 · 다음 phase 진행 안 함
+- Phase 0 실패 시 · Task 1 · Task 2 아예 시작 안 함
+- 원인 파악까지 stop · 무리하게 다음 진행 안 함
 
 ---
 

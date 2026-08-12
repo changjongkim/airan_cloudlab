@@ -35,6 +35,15 @@ GDR staging은 CPU-buffer RDMA 평균보다 1.630 ms 낮았다. Paired 결과는
 
 동일한 Qwen 처리량 약 10.2 it/s에서 monolithic MIG는 약 106 ms를 유지했지만 Full-GPU MPS는 약 205–208 ms였다. 가장 강한 결론은 RDMA transport 자체보다 MIG의 resource isolation 효과다.
 
+주의: config5의 39ms는 `real_l1.py` 20-cell loop이고 config1/6의 약 106ms는
+single-cell `CE→NRx→LDPC` pipeline이다. 둘은 동일 workload baseline이 아니므로
+39ms→106ms를 L1 slowdown으로 해석하지 않는다. 또한 이 14-row pipeline은 같은
+slot의 세 stage를 직렬 실행해 L1/NRx overlap contention을 직접 측정하지 않았다.
+
+이를 교정한 equal-aggregate-4g, ring-depth-2 direct-P2P 실험은 3회 반복에서
+same-4g L1 slowdown **61.12×** 대 cross-2g+2g **1.49×**를 관측했다. 상세 raw
+data와 해석은 [`../task1_p2p_fair/`](../task1_p2p_fair/)에 있다.
+
 ## Transport gates
 
 | Test | Payload | Cold seq 1 | Steady mean, seq 2–10 |

@@ -1,0 +1,14 @@
+[2026-08-12T16:02:38Z] ==== P2P fair overlap experiment start ====
+[2026-08-12T16:02:38Z] Topology A 4g=MIG-dae3f173-7b15-594b-bc80-6cef80687a56 AI3g=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+[2026-08-12T16:03:39Z] run l1_only_4g mode=standalone visible=MIG-dae3f173-7b15-594b-bc80-6cef80687a56
+[2026-08-12T16:03:42Z] run same_overlap_4g mode=same visible=MIG-dae3f173-7b15-594b-bc80-6cef80687a56
+same_overlap_4g l1_slowdown= 59.881606535920106
+[2026-08-12T16:04:16Z] create Topology B: 3g + 2g + 2g
+[2026-08-12T16:04:16Z] MIG teardown GPU0
+[2026-08-12T16:04:22Z] Topology B L1=MIG-b313c3eb-083e-542f-8224-2c491f6b819c NRx=MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f AI=MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0
+[2026-08-12T16:05:23Z] run l1_only_2g mode=standalone visible=MIG-b313c3eb-083e-542f-8224-2c491f6b819c
+[2026-08-12T16:05:26Z] run cross_p2p_2g2g mode=p2p visible=MIG-b313c3eb-083e-542f-8224-2c491f6b819c,MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f
+cross_p2p_2g2g l1_slowdown= 1.5417138388884302
+[2026-08-12T16:06:04Z] restore Topology A: 4g + 3g
+[2026-08-12T16:06:04Z] MIG teardown GPU0
+[2026-08-12T16:06:10Z] ==== P2P fair overlap experiment complete ====

@@ -1,6 +1,6 @@
 # 다음 실험 세션 계획 · AI-RAN GPU 격리 · NIC RDMA 검증
 
-**작성일**: 2026-08-05 · **업데이트**: 2026-08-13 (Task 1 · Task 2 CPU-buffer RDMA · GPUDirect RDMA staging 완료)
+**작성일**: 2026-08-05 · **업데이트**: 2026-08-13 (Task 1/2 · fair direct-P2P overlap 검증 완료)
 **작성 배경**: Chain 17 · 18 · 19 실험 완료 후 · 논문 novelty 완성을 위한 추가 실측 필요
 **전제**: 각 Phase의 검증 gate · 통과 못 하면 다음 진행 안 함 · 원인 파악까지 stop
 
@@ -49,6 +49,26 @@
 - transport steady-state(seq 2~10) 평균: 64KiB **61.38μs**, 1,415,232B forward **758.44μs**, 1,257,984B backward **665.29μs**. 측정 범위는 GPU payload WRITE + CPU sequence-marker WRITE이며 whole-pipeline overhead가 아니다
 - Config 4/7 GDR staging N=30 완료: mean/p95/p99 **109.687/109.861/110.223ms**, **109.526/109.778/110.349ms** · Qwen 각 10.23 it/s
 - payload는 host memory를 경유하지 않지만 public `TrtEngine` wrapper의 내부 F-order input copy와 LLR output→registered GPU staging copy가 남는다. 따라서 **end-to-end zero-copy로 부르지 않는다**
+
+**Fair direct-P2P overlap 검증 완료 ✅ (2026-08-13)**
+- 기존 14-row 실험은 같은 slot을 `CE → NRx → LDPC`로 직렬 실행해 같은 MIG의
+  L1/NRx kernel overlap contention이 없었다. 따라서 cross-MIG가 4g co-location과
+  비슷한 약 110ms였던 것은 MIG 격리 실패가 아니라 NRx 약 105ms가 지배한 결과다
+- Config 5의 39ms는 20-cell `real_l1.py`, Config 1/6은 1-cell integrated
+  L1+NRx이므로 동일 workload baseline이 아니었다
+- 교정 실험: same 4g 대 L1 2g + NRx 2g (총 4g 동일), Qwen 별도 3g,
+  FP16 NRx/ring depth 2/warm-up 20/N=30 동일, 각 topology 자체 L1-only baseline,
+  독립 3회 반복
+- R580에서 sibling MIG direct CUDA P2P 양방향 지원 확인. 실제 forward 1,415,232B
+  및 backward 1,257,984B를 실제 2g↔2g에서 checksum 10/10 통과;
+  mean **64.93/59.15μs**
+- 3-trial L1 CUDA-stream elapsed: same 4g **96.935ms, 61.12× baseline**;
+  cross 2g+2g P2P **3.316ms, 1.49×**. p99는 197.823ms 대 3.695ms
+- NRx가 여전히 약 105ms 병목이라 throughput은 9.508 대 9.421 slot/s로 거의 같다.
+  즉 P2P의 이득은 전체 NRx service time이 아니라 **L1 isolation과 E2E tail 안정화**다
+- direct P2P 구현은 한 process가 두 MIG context를 소유한다. 강한 process/container
+  분리가 필요하면 cross-MIG CUDA IPC 제약 때문에 NIC GDR 경로가 여전히 필요하다
+- 결과: `cloudlab_results/task1_p2p_fair/`
 
 ## 진행 로그
 

@@ -1,0 +1,20 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+[P2P-BENCH] mode=p2p label=cross_p2p_2g2g devices=2 iterations=30 warmup=20 ring=2
+[P2P-BENCH] building FP16 TRT engine on device 1
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[P2P-BENCH] RESULT label=cross_p2p_2g2g mode=p2p l1_active_mean=3.331ms l1_active_p99=3.767ms e2e_mean=208.770ms nrx_mean=105.943ms transport_mean=111.54us throughput=9.419slot/s
+[P2P-BENCH] saved /results/p2p_overlap_cross_p2p_2g2g_20260812_160230.json

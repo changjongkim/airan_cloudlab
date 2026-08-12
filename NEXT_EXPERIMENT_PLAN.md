@@ -1,8 +1,36 @@
 # 다음 실험 세션 계획 · AI-RAN GPU 격리 · NIC RDMA 검증
 
-**작성일**: 2026-08-05
+**작성일**: 2026-08-05 · **업데이트**: 2026-08-12 (Phase 0 진행 중)
 **작성 배경**: Chain 17 · 18 · 19 실험 완료 후 · 논문 novelty 완성을 위한 추가 실측 필요
 **전제**: 각 Phase의 검증 gate · 통과 못 하면 다음 진행 안 함 · 원인 파악까지 stop
+
+## 진행 로그
+
+**2026-08-12 · Phase 0 진행 상태** (CloudLab d8545 · node0.sgkim-312839)
+
+- [x] 0.1 노드 예약 · SSH · sudo · Ubuntu 22.04.2
+- [x] 0.2 NVIDIA driver 580.173.02 · CUDA 13.0 · 4× A100 인식
+- [x] 0.3 Docker CE 29.7.2 · nvidia-container-toolkit · /mydata/docker data-root
+- [ ] 0.4 cuPHY · pyaerial (Aerial 이미지 pull 완료 · airan container 빌드 중 · pyaerial build 대기)
+- [x] 0.5 MIG mode enabled GPU 0 · Config A partitions (4g + 3g) 생성 완료
+  - MIG L1 UUID: MIG-dae3f173-7b15-594b-bc80-6cef80687a56
+  - MIG AI UUID: MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+- [x] 0.6 MPS daemon L1 partition 시작 정상
+- [x] 0.7 MOFED 24.10-3.2.5.0 설치 완료 · openibd load
+- [x] 0.8 nvidia_peermem · mlx5_ib · ib_uverbs 커널 로드 · 재부팅 후 auto-load (persistent)
+- [ ] 0.9 Sanity 재현 (airan container + pyaerial build 완료 후 진행)
+- [x] 0.10 /mydata (1.5T NVMe) · /mydata/results/20260812/
+
+**Phase 0 미결 · 이슈**:
+- **NIC port 물리 링크 DOWN** · CloudLab experiment interface에 external link partner 없음 → mlxlink polling 상태 계속 · Task 2 (RDMA loopback) 진행 전 · **CloudLab experiment profile 재설정 필요** (LAN link 추가 또는 physical loopback cable)
+- 대안 · Soft-RoCE (`rxe`) 모듈 · MOFED와 conflict로 로드 안 됨
+- 조치 · NIC 요구사항 명시 · Task 1 (L1↔NRx 파이프라인 · NIC 무관) 먼저 진행
+
+**진행 중 · Background jobs**:
+- airan:25-3-final Docker build (`~/cloudlab_aerial/Dockerfile.airan`)
+- 완료 후 · pyaerial build · sanity 재현
+
+---
 
 ---
 

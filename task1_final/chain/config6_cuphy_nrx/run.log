@@ -1,0 +1,25 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+[realL1NRx] cells=1 iters=30 prbs=273 mcs=2 tb_size=11016 rx_ant=4
+[realL1NRx] Building TRT engine from /opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx
+[realL1NRx] TRT engine built.
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[realL1NRx] cuPHY components + TRT engine ready
+[realL1NRx] synthetic rx_slot shape=(3276, 14, 4)
+[realL1NRx] warmup...
+[realL1NRx] measuring...
+[realL1NRx] config6_baseline: mean=108.128ms p95=108.500ms p99=108.604ms miss1ms=30/30
+[realL1NRx] saved: /results/realL1NRx_config6_baseline_20260812_133644.json

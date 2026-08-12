@@ -1,0 +1,64 @@
+[2026-08-12T13:36:12Z] ==== AI-RAN experiment chain start ====
+[2026-08-12T13:36:12Z] L1_ITERS=30  QWEN_DUR=300  MPS_PCTS='30 50 70 100'
+
+[2026-08-12T13:36:12Z] === PHASE A: Topology A (4g + 3g) ===
+[2026-08-12T13:36:12Z] MIG topology A: 4g.20gb + 3g.20gb on GPU 0
+[2026-08-12T13:36:12Z] MIG teardown on GPU 0 (kill MPS first — it holds the GPU handle)
+run_chain.sh: line 34: 68338 Killed                  sudo pkill -9 -f nvidia-cuda-mps > /dev/null 2>&1
+[2026-08-12T13:36:18Z] MIG_L1(4g)=MIG-dae3f173-7b15-594b-bc80-6cef80687a56  MIG_AI(3g)=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+
+[2026-08-12T13:36:18Z] === Config 5: cuPHY baseline (GPU 3, no other workload) ===
+[2026-08-12T13:36:22Z] Config 5: mean=38.958ms p95=39.368ms p99=39.416ms
+
+[2026-08-12T13:36:22Z] === Config 6: cuPHY+NRx baseline (GPU 3, no other workload) ===
+[2026-08-12T13:36:45Z] Config 6: mean=108.128ms p95=108.500ms p99=108.604ms
+
+[2026-08-12T13:36:45Z] === Config 1: L1+NRx co-located on 4g, Qwen on 3g, MIG only ===
+[2026-08-12T13:38:10Z] Config 1: L1 mean=105.725ms p95=106.041ms p99=106.127ms  Qwen iters=
+
+[2026-08-12T13:38:10Z] === Config 3: MIG+MPS collapses to Config 1 (single workload / partition; MPS pct N/A) ===
+[2026-08-12T13:39:35Z] Config 3: L1 mean=105.859ms p95=106.109ms p99=106.476ms  Qwen=
+
+[2026-08-12T13:39:35Z] === PHASE B: Topology C (no MIG) + MPS ===
+
+[2026-08-12T13:39:35Z] === Config 2: GPU 3 (MIG-free), full GPU via MPS ===
+[2026-08-12T13:39:35Z] starting MPS control daemon (scoped to GPU-ee09d6cb-2e38-e9e1-9b76-bbc0f8f79b1a)
+run_chain.sh: line 81: 72061 Killed                  sudo pkill -9 -f nvidia-cuda-mps 2> /dev/null
+
+[2026-08-12T13:39:40Z] === Config 2: MPS pct=30 (Qwen cap) ===
+[2026-08-12T13:41:10Z] Config 2 pct=30: L1 mean=205.327ms p95=210.017ms p99=210.109ms  Qwen=
+
+[2026-08-12T13:41:10Z] === Config 2: MPS pct=50 (Qwen cap) ===
+[2026-08-12T13:42:40Z] Config 2 pct=50: L1 mean=207.511ms p95=210.335ms p99=214.291ms  Qwen=
+
+[2026-08-12T13:42:40Z] === Config 2: MPS pct=70 (Qwen cap) ===
+[2026-08-12T13:44:12Z] Config 2 pct=70: L1 mean=218.211ms p95=221.064ms p99=221.323ms  Qwen=
+
+[2026-08-12T13:44:12Z] === Config 2: MPS pct=100 (Qwen cap) ===
+[2026-08-12T13:45:50Z] Config 2 pct=100: L1 mean=291.961ms p95=393.196ms p99=395.608ms  Qwen=
+[2026-08-12T13:45:50Z] [ALERT] config2 pct=100: L1 mean=291.961ms exceeds 250ms threshold
+[2026-08-12T13:45:50Z] stopping MPS control daemon
+
+[2026-08-12T13:45:52Z] === PHASE C: Topology B (3g+3g+1g) ===
+[2026-08-12T13:45:52Z] MIG topology B: 3g + 3g + 1g on GPU 0
+[2026-08-12T13:45:52Z] MIG teardown on GPU 0 (kill MPS first — it holds the GPU handle)
+run_chain.sh: line 34: 77270 Killed                  sudo pkill -9 -f nvidia-cuda-mps > /dev/null 2>&1
+[2026-08-12T13:45:58Z] [ALERT] Topology B creation failed; see /tmp/mig_B.log
+[2026-08-12T13:45:58Z] [ALERT] Topology B setup failed, skipping Configs 4/7
+
+[2026-08-12T13:45:58Z] === CLEANUP: restore Topology A ===
+[2026-08-12T13:45:58Z] MIG topology A: 4g.20gb + 3g.20gb on GPU 0
+[2026-08-12T13:45:58Z] MIG teardown on GPU 0 (kill MPS first — it holds the GPU handle)
+run_chain.sh: line 34: 77297 Killed                  sudo pkill -9 -f nvidia-cuda-mps > /dev/null 2>&1
+[2026-08-12T13:46:04Z] MIG_L1(4g)=MIG-dae3f173-7b15-594b-bc80-6cef80687a56  MIG_AI(3g)=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+[2026-08-12T13:46:04Z] ==== chain complete ====
+[2026-08-12T13:46:04Z] summary: /mydata/results/chain/SUMMARY.txt
+config,pct,mean_ms,p95_ms,p99_ms,qwen_iters,qwen_itps,notes
+config5,-,38.958,39.368,39.416,,,
+config6,-,108.128,108.500,108.604,,,
+config1,-,105.725,106.041,106.127,722,10.23,
+config3,-,105.859,106.109,106.476,722,10.23,
+config2,30,205.327,210.017,210.109,567,8.05,
+config2,50,207.511,210.335,214.291,792,11.29,
+config2,70,218.211,221.064,221.323,1221,17.38,
+config2,100,291.961,393.196,395.608,1705,21.26,

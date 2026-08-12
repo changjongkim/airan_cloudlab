@@ -1,0 +1,15 @@
+[2026-08-12T14:42:23Z] ==== PHASE C RDMA start (Topology B: 3g+2g+2g) ====
+[2026-08-12T14:42:23Z] MIG topology B: 3g + 2g + 2g on GPU 0
+[2026-08-12T14:42:23Z] MIG teardown on GPU 0 (kill MPS first)
+run_phase_c.sh: line 57: 115283 Killed                  sudo pkill -9 -f nvidia-cuda-mps > /dev/null 2>&1
+[2026-08-12T14:42:29Z] MIG_L1(2g)=MIG-b313c3eb-083e-542f-8224-2c491f6b819c  MIG_NRX(2g)=MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f  MIG_AI(3g)=MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0
+
+[2026-08-12T14:42:29Z] === Config 4 RDMA: L1(2g)<->NRx(2g) + Qwen(3g) ===
+[2026-08-12T14:43:30Z] [ALERT] config4_rdma: Qwen died during warmup
+
+[2026-08-12T14:43:30Z] === Config 7 RDMA: cross-partition repeat + Qwen(3g) ===
+Terminated
+[2026-08-12T14:43:58Z] [ALERT] PHASE C stopped by SIGTERM
+[2026-08-12T14:43:58Z] restoring Topology A (4g + 3g)
+[2026-08-12T14:43:58Z] MIG teardown on GPU 0 (kill MPS first)
+run_phase_c.sh: line 57: 116617 Killed                  sleep 60

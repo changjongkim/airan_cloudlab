@@ -1,0 +1,28 @@
+# airan:25-3-rdma — adds pyverbs (RDMA) on top of airan:25-3-final.
+# Requires libibverbs-dev, cython, and build tools for the pyverbs wheel.
+FROM airan:25-3-final
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libibverbs-dev \
+        librdmacm-dev \
+        libnl-3-dev \
+        libnl-route-3-dev \
+        pkg-config \
+        cython3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# pyverbs comes from rdma-core; pip wheels sometimes fail because they need
+# libibverbs headers at build time. Now that libibverbs-dev is in place,
+# pyverbs build should succeed.
+# pyverbs 57.0 matches container's libibverbs (PRIVATE_57); 59.0 needs newer libs.
+RUN python3 -m pip install --no-cache-dir \
+        cython \
+        pyverbs==57.0
+
+RUN python3 -c "import pyverbs.device; print('pyverbs OK')"
+
+WORKDIR /workspace

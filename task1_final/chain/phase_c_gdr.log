@@ -1,0 +1,18 @@
+[2026-08-12T15:12:32Z] ==== PHASE C GPUDirect RDMA staging start (Topology B: 3g+2g+2g) ====
+[2026-08-12T15:12:32Z] MIG topology B: 3g + 2g + 2g on GPU 0
+[2026-08-12T15:12:32Z] MIG teardown on GPU 0 (kill MPS first)
+[2026-08-12T15:12:39Z] MIG_L1(2g)=MIG-b313c3eb-083e-542f-8224-2c491f6b819c  MIG_NRX(2g)=MIG-556cefb8-7bca-53f7-a57b-7a9804b1ee3f  MIG_AI(3g)=MIG-e83d1b58-5c9d-5f78-bc4a-38bb1f8c7ef0
+
+[2026-08-12T15:12:39Z] === Config 4 GPUDirect RDMA staging: L1(2g)<->NRx(2g) + Qwen(3g) ===
+[2026-08-12T15:14:20Z] config4_gdr: L1 mean=109.687ms p95=109.861ms p99=110.223ms
+
+[2026-08-12T15:14:20Z] === Config 7 GPUDirect RDMA staging: cross-partition repeat + Qwen(3g) ===
+[2026-08-12T15:16:01Z] config7_gdr: L1 mean=109.526ms p95=109.778ms p99=110.349ms
+
+[2026-08-12T15:16:01Z] === restore Topology A ===
+[2026-08-12T15:16:01Z] restoring Topology A (4g + 3g)
+[2026-08-12T15:16:01Z] MIG teardown on GPU 0 (kill MPS first)
+[2026-08-12T15:16:07Z] ==== PHASE C GPUDirect RDMA staging done ====
+config7_rdma,-,111.375,111.694,111.802,825,10.23,
+config4_gdr,-,109.687,109.861,110.223,825,10.23,
+config7_gdr,-,109.526,109.778,110.349,825,10.23,

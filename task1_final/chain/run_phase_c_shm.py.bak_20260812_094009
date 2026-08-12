@@ -1,0 +1,159 @@
+#!/bin/bash
+# Run ONLY Phase C (Configs 4 and 7) with Topology B (3g+2g+2g).
+# Appends results to /mydata/results/chain/SUMMARY.txt.
+set -u
+
+SDK_HOST=/mydata/aerial-cuda-accelerated-ran
+SDK_MNT=/opt/nvidia/cuBB
+RESULTS_ROOT=/mydata/results/chain
+IMG=airan:25-3-final
+L1_ITERS="${L1_ITERS:-30}"
+QWEN_DUR="${QWEN_DUR:-300}"
+SUMMARY_FILE="$RESULTS_ROOT/SUMMARY.txt"
+STATUS_FILE="$RESULTS_ROOT/STATUS.txt"
+
+log()   { echo "[$(date -u +%FT%TZ)] $*"; }
+alert() { echo "[$(date -u +%FT%TZ)] [ALERT] $*"; echo "[ALERT] $*" >> "$STATUS_FILE"; }
+step()  { echo ""; log "=== $* ==="; echo "$*" >> "$STATUS_FILE"; }
+
+parse_and_record() {
+    local cfg="$1" pct="$2" log_file="$3" qwen_log="${4:-}"
+    local line mean p95 p99 qiters qitps qwen_line
+    line=$(grep -E 'mean=[0-9.]+ms +p95=' "$log_file" | tail -1)
+    mean=$(echo "$line" | grep -oE 'mean=[0-9.]+' | head -1 | cut -d= -f2)
+    p95=$(echo "$line" | grep -oE 'p95=[0-9.]+' | head -1 | cut -d= -f2)
+    p99=$(echo "$line" | grep -oE 'p99=[0-9.]+' | head -1 | cut -d= -f2)
+    qiters=""; qitps=""
+    if [ -n "$qwen_log" ] && [ -f "$qwen_log" ]; then
+        qwen_line=$(grep -E 'done: [0-9]+ iters' "$qwen_log" | tail -1)
+        [ -z "$qwen_line" ] && qwen_line=$(grep -E 'progress: [0-9]+ iters' "$qwen_log" | tail -1)
+        qiters=$(echo "$qwen_line" | grep -oE '[0-9]+ iters' | head -1 | awk '{print $1}')
+        qitps=$(echo "$qwen_line" | grep -oE '[0-9.]+ it/s' | head -1 | awk '{print $1}')
+    fi
+    echo "$cfg,$pct,$mean,$p95,$p99,$qiters,$qitps," >> "$SUMMARY_FILE"
+    if [ -n "$mean" ] && awk -v m="$mean" 'BEGIN{exit !(m>250)}'; then
+        alert "$cfg pct=$pct: L1 mean=${mean}ms exceeds 250ms threshold"
+    fi
+}
+
+cleanup_containers() {
+    docker ps -aq --filter "name=airan_" | xargs -r docker rm -f > /dev/null 2>&1 || true
+    sudo rm -f /dev/shm/airan_* 2>/dev/null || true
+}
+
+destroy_mig() {
+    log "MIG teardown on GPU 0 (kill MPS first)"
+    sudo pkill -9 -f nvidia-cuda-mps > /dev/null 2>&1 || true
+    sleep 2
+    sudo nvidia-smi mig -dci -i 0 > /dev/null 2>&1 || true
+    sudo nvidia-smi mig -dgi -i 0 > /dev/null 2>&1 || true
+    sleep 1
+}
+
+setup_topology_B() {
+    log "MIG topology B: 3g + 2g + 2g on GPU 0"
+    destroy_mig
+    sudo nvidia-smi -i 0 -mig 1 > /dev/null 2>&1
+    sleep 2
+    sudo nvidia-smi mig -cgi 9,14,14 -C -i 0 > /tmp/mig_B.log 2>&1
+    if [ $? -ne 0 ]; then
+        alert "Topology B failed; see /tmp/mig_B.log"; return 1
+    fi
+    MIG_AI=$(nvidia-smi -L | awk '/MIG 3g/{print $6}' | tr -d ')' | head -1)
+    MIGS_2g=($(nvidia-smi -L | awk '/MIG 2g/{print $6}' | tr -d ')'))
+    MIG_L1=${MIGS_2g[0]}
+    MIG_NRX=${MIGS_2g[1]}
+    log "MIG_L1(2g)=$MIG_L1  MIG_NRX(2g)=$MIG_NRX  MIG_AI(3g)=$MIG_AI"
+    export MIG_L1 MIG_AI MIG_NRX
+}
+
+restore_topology_A() {
+    log "restoring Topology A (4g + 3g)"
+    destroy_mig
+    sudo nvidia-smi -i 0 -mig 1 > /dev/null 2>&1
+    sleep 2
+    sudo nvidia-smi mig -cgi 5,9 -C -i 0 > /dev/null 2>&1 || alert "restore Topology A failed"
+}
+
+run_config4() {
+    step "Config 4: Cross-partition L1(2g)<->NRx(2g) via shm + Qwen(3g)"
+    outdir="$RESULTS_ROOT/config4_cross_mig"
+    mkdir -p "$outdir"; chmod 777 "$outdir"
+
+    docker run -d --name airan_c4_nrx --gpus "\"device=$MIG_NRX\"" --ipc=host \
+        -v "$SDK_HOST:$SDK_MNT" -w "$SDK_MNT/pyaerial" "$IMG" \
+        python3 nrx_consumer.py config4 > /dev/null 2>&1
+    docker run -d --name airan_c4_qwen --gpus "\"device=$MIG_AI\"" \
+        -v /mydata/hf_cache:/mydata/hf_cache \
+        -e HF_HOME=/mydata/hf_cache -e TRANSFORMERS_OFFLINE=1 \
+        -v "$SDK_HOST/pyaerial:/work" -w /work "$IMG" \
+        python3 qwen7b_stress.py "$QWEN_DUR" > /dev/null 2>&1
+    sleep 60
+    docker logs airan_c4_nrx > "$outdir/nrx_startup.log" 2>&1
+    if ! docker logs airan_c4_nrx 2>&1 | grep -q '\[NRx\] ready'; then
+        alert "Config 4: NRx not ready after 60s"
+    fi
+    if ! docker ps --filter name=airan_c4_qwen --format '{{.Names}}' | grep -q airan_c4_qwen; then
+        alert "Config 4: Qwen died before L1 start"
+    fi
+
+    docker run --rm --name airan_c4_l1 --gpus "\"device=$MIG_L1\"" --ipc=host \
+        -v "$SDK_HOST:$SDK_MNT" -v "$outdir:/results" -e RESULTS_DIR=/results \
+        -w "$SDK_MNT/pyaerial" "$IMG" \
+        python3 l1_producer.py config4_l1 "$L1_ITERS" config4 > "$outdir/l1.log" 2>&1
+    rc=$?
+    docker logs airan_c4_qwen > "$outdir/qwen.log" 2>&1 || true
+    docker logs airan_c4_nrx > "$outdir/nrx.log" 2>&1 || true
+    docker rm -f airan_c4_nrx airan_c4_qwen > /dev/null 2>&1
+    sudo rm -f /dev/shm/airan_config4_* 2>/dev/null
+
+    if [ $rc -ne 0 ]; then alert "Config 4: L1 failed rc=$rc"; return 1; fi
+    stats=$(grep -oE 'mean=[0-9.]+ms p95=[0-9.]+ms p99=[0-9.]+ms' "$outdir/l1.log" | tail -1)
+    log "Config 4: L1 $stats"
+    parse_and_record "config4" "-" "$outdir/l1.log" "$outdir/qwen.log"
+}
+
+run_config7() {
+    step "Config 7: same as Config 4 (MIG+MPS with 1 workload/partition = no-op)"
+    outdir="$RESULTS_ROOT/config7_cross_repeat"
+    mkdir -p "$outdir"; chmod 777 "$outdir"
+
+    docker run -d --name airan_c7_nrx --gpus "\"device=$MIG_NRX\"" --ipc=host \
+        -v "$SDK_HOST:$SDK_MNT" -w "$SDK_MNT/pyaerial" "$IMG" \
+        python3 nrx_consumer.py config7_repeat > /dev/null 2>&1
+    docker run -d --name airan_c7_qwen --gpus "\"device=$MIG_AI\"" \
+        -v /mydata/hf_cache:/mydata/hf_cache \
+        -e HF_HOME=/mydata/hf_cache -e TRANSFORMERS_OFFLINE=1 \
+        -v "$SDK_HOST/pyaerial:/work" -w /work "$IMG" \
+        python3 qwen7b_stress.py "$QWEN_DUR" > /dev/null 2>&1
+    sleep 60
+
+    docker run --rm --name airan_c7_l1 --gpus "\"device=$MIG_L1\"" --ipc=host \
+        -v "$SDK_HOST:$SDK_MNT" -v "$outdir:/results" -e RESULTS_DIR=/results \
+        -w "$SDK_MNT/pyaerial" "$IMG" \
+        python3 l1_producer.py config7_repeat "$L1_ITERS" config7_repeat > "$outdir/l1.log" 2>&1
+    rc=$?
+    docker logs airan_c7_qwen > "$outdir/qwen.log" 2>&1 || true
+    docker logs airan_c7_nrx > "$outdir/nrx.log" 2>&1 || true
+    docker rm -f airan_c7_nrx airan_c7_qwen > /dev/null 2>&1
+    sudo rm -f /dev/shm/airan_config7_* 2>/dev/null
+
+    if [ $rc -ne 0 ]; then alert "Config 7: L1 failed rc=$rc"; return 1; fi
+    stats=$(grep -oE 'mean=[0-9.]+ms p95=[0-9.]+ms p99=[0-9.]+ms' "$outdir/l1.log" | tail -1)
+    log "Config 7: L1 $stats"
+    parse_and_record "config7" "-" "$outdir/l1.log" "$outdir/qwen.log"
+}
+
+# ============================================================== main
+trap 'alert "PHASE C stopped by signal"; cleanup_containers; exit 1' INT TERM
+log "==== PHASE C ONLY start (Topology B: 3g+2g+2g) ===="
+cleanup_containers
+setup_topology_B || { alert "Topology B setup failed, aborting"; exit 1; }
+if [ -n "${MIG_L1:-}" ] && [ -n "${MIG_NRX:-}" ] && [ -n "${MIG_AI:-}" ]; then
+    run_config4
+    run_config7
+fi
+step "restore Topology A"
+restore_topology_A
+log "==== PHASE C done ===="
+tail -3 "$SUMMARY_FILE"

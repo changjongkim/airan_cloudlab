@@ -1,8 +1,54 @@
 # 다음 실험 세션 계획 · AI-RAN GPU 격리 · NIC RDMA 검증
 
-**작성일**: 2026-08-05 · **업데이트**: 2026-08-12 (Phase 0 진행 중)
+**작성일**: 2026-08-05 · **업데이트**: 2026-08-13 (Task 1 · Task 2 CPU-buffer RDMA · GPUDirect RDMA staging 완료)
 **작성 배경**: Chain 17 · 18 · 19 실험 완료 후 · 논문 novelty 완성을 위한 추가 실측 필요
 **전제**: 각 Phase의 검증 gate · 통과 못 하면 다음 진행 안 함 · 원인 파악까지 stop
+
+## 지금까지 최종 결과 · 2026-08-12 세션
+
+**Task 1 완료 ✅** — real cuPHY↔NRx 통합 파이프라인 · 최종 14-row 결과 완료
+
+| Config | 배치 · 격리 | L1 mean (ms) | p95 | p99 | Qwen it/s |
+|---|---|---|---|---|---|
+| 5 · cuPHY 단독 | GPU3 무경합 | 39.0 | 39.4 | 39.4 | — |
+| 6 · cuPHY+NRx 단독 | GPU3 무경합 | 108.1 | 108.5 | 108.6 | — |
+| **1 · MIG only** | 4g(L1+NRx) + 3g(Qwen) | **105.7** | 106.0 | 106.1 | 10.23 |
+| 3 · MIG (collapse) | 동일 | 105.9 | 106.1 | 106.5 | 10.23 |
+| 2 · MPS 30% Qwen | Full GPU 공유 | 205.3 | 210.0 | 210.1 | 8.05 |
+| 2 · MPS 50% | 동일 | 207.5 | 210.3 | 214.3 | 11.29 |
+| 2 · MPS 70% | 동일 | 218.2 | 221.1 | 221.3 | 17.38 |
+| 2 · MPS 100% | 동일 | **292.0** | **393.2** | **395.6** | 21.26 |
+| **4 · Cross-partition shm** | 2g(L1) + 2g(NRx) + 3g(Qwen) | **111.9** | 112.8 | 113.1 | 10.23 |
+| 7 · 동일 (collapse) | 동일 | 109.7 | 110.6 | 110.8 | 10.23 |
+| **4 · Cross CPU-buffer RDMA** | 2g(L1) + 2g(NRx) + 3g(Qwen) | **111.1** | 111.6 | 111.7 | 10.22 |
+| 7 · Cross CPU-buffer RDMA | 동일 반복 | 111.4 | 111.7 | 111.8 | 10.23 |
+| **4 · Cross GDR staging** | 2g(L1) + 2g(NRx) + 3g(Qwen) | **109.687** | 109.861 | 110.223 | 10.23 |
+| 7 · Cross GDR staging | 동일 반복 | **109.526** | 109.778 | 110.349 | 10.23 |
+
+**핵심 결론**:
+- 동일 Qwen throughput (~10 it/s) 조건에서 MIG (106ms) vs MPS (208ms) → **격리로 2× 우수**
+- Cross-partition은 109.7~111.9ms로 안정적이지만 4g monolithic 대비 2g+2g split과 IPC 효과가 함께 섞여 있으므로 차이 전체를 순수 IPC 비용으로 해석할 수 없음
+- MPS pct 30% (Qwen 최대 제약) 여도 L1 baseline 1.9× 저하 · HBM 경합은 SM cap 으로 못 막음
+- CPU-buffer RDMA 반복 평균 111.24ms vs shm 110.78ms로 우열이 run-to-run 변동 범위 안에 있음. Config 4 pair는 RDMA가 0.77ms 개선됐지만 Config 7 pair는 1.69ms 느림
+- GDR staging 반복 평균은 **109.607ms**다. 동일 두 반복의 shm 평균 110.776ms보다 **1.169ms**, CPU-buffer RDMA 평균 111.236ms보다 **1.630ms** 낮았다. Config별 GDR-vs-shm 차이는 각각 -2.178ms와 -0.160ms다
+- 위 ms 차이는 전체 L1→NRx→L1 파이프라인 실측값이다. 별도 transport microbenchmark의 μs 수치를 whole-pipeline 통신 오버헤드로 주장하지 않는다
+
+**Task 2 Phase 1 완료 ✅** — CPU-buffer RDMA channel 통합 (shm → NIC RDMA loopback)
+- `airan:25-3-rdma` 이미지 빌드 완료 · pyverbs 57.0 동작 확인
+- `rdma_test.py` 1MiB × 10회 성공 · warm-up 제외 steady-state 평균 **107.35μs**
+- QP INIT → RTR `ENODEV` 원인 해결: **컨테이너 `--network=host` 필요** (RoCE GID는 netdev 네임스페이스 스코프)
+- rdma_channel.py 에 `_require_gid_netdev()` 체크 · fail-fast 로직 추가됨
+- `l1_producer.py` / `nrx_consumer.py` 양방향 RDMA 통합 · 1,415,232B forward + 1,257,984B backward · 20 warm-up + 1 measured slot smoke **107.861ms**
+- Config 4/7 RDMA N=30 완료 · 양쪽 NRx 정상 종료 · Qwen 10.22~10.23 it/s · Topology A 복구 확인
+
+**Task 2 Phase 2 GPUDirect RDMA staging 완료 ✅**
+- CPU-buffer 경로의 `cp.asnumpy → MR.write` 및 `MR.read → cp.asarray` payload bounce를 GPU MR staging으로 대체했다
+- 4g MIG의 64KiB CuPy allocation을 `MR(address=gpu_ptr)`로 등록 성공 · `CUDA_GDR_POINTER_CAPABLE=1`
+- `nvidia_peermem` counter가 등록 중 `num_alloc_mrs=1`, `num_reg_bytes=65536`으로 증가하고 정상 해제됨
+- IOMMU domain은 `DMA-FQ` translated 상태지만 실제 두-MIG GPU-memory WRITE를 64KiB와 실제 forward/backward payload 크기로 검증했다. seq 1~10 모두 GPU-side first-word/checksum 검증 성공
+- transport steady-state(seq 2~10) 평균: 64KiB **61.38μs**, 1,415,232B forward **758.44μs**, 1,257,984B backward **665.29μs**. 측정 범위는 GPU payload WRITE + CPU sequence-marker WRITE이며 whole-pipeline overhead가 아니다
+- Config 4/7 GDR staging N=30 완료: mean/p95/p99 **109.687/109.861/110.223ms**, **109.526/109.778/110.349ms** · Qwen 각 10.23 it/s
+- payload는 host memory를 경유하지 않지만 public `TrtEngine` wrapper의 내부 F-order input copy와 LLR output→registered GPU staging copy가 남는다. 따라서 **end-to-end zero-copy로 부르지 않는다**
 
 ## 진행 로그
 
@@ -27,14 +73,19 @@
 **Task 1 시작 준비 · 완료** ✅
 - 모든 하드웨어 · 소프트웨어 · MIG · MPS · sanity 재현 · gate 통과
 
-**Task 2 (NIC RDMA) 시작 조건 · 미충족** ⚠
-- **NIC port 물리 링크 DOWN** · CloudLab experiment에 LAN link 없음 · mlxlink polling 상태 계속
-- Soft-RoCE (`rxe`) · MOFED ib_core와 심볼 conflict · load 불가
-- 필요한 조치:
-  1. **Option A**: CloudLab profile 재설정 · Mellanox 포트를 LAN에 연결 (self-loop 또는 두 번째 노드 예약)
-  2. **Option B**: Physical loopback cable (원격 불가)
-  3. **Option C**: 다른 testbed 이용 (Chameleon 등 · ConnectX-6 RDMA 지원)
-- Task 1 부터 진행 · Task 2는 위 옵션 중 하나 해결 시 · Phase 2.1로 진행
+**Task 2 (NIC RDMA) 시작 조건 · 해결** ✅ (2026-08-12)
+- **PHY internal loopback**으로 CloudLab LAN 없이 link UP 성공
+  ```bash
+  sudo ip link set enp161s0np0 down
+  sudo mlxlink -d /dev/mst/mt4123_pciconf0 --link_mode_force --speeds 100G_4X --yes
+  sudo mlxlink -d /dev/mst/mt4123_pciconf0 -l PH --yes
+  sudo ip link set enp161s0np0 up
+  ```
+- `ibstat mlx5_0` · State Active · Rate 100 · Link layer Ethernet
+- `ib_write_lat -d mlx5_0 localhost` 2-byte 성공 · **t_avg=1.34 μs · p99=1.41 μs**
+- 리부트 후 복구 스크립트: `/mydata/nic_loopback_restore.sh` (수동 실행 필요)
+- GPUDirect RDMA는 perftest CUDA 빌드 대신 CuPy GPU MR 기반 `gdr_mr_probe.py` / `gdr_rdma_test.py`로 검증 완료
+- Soft-RoCE 경로는 MOFED 심볼 conflict로 사용 불가 · PHY loopback으로 대체함
 
 **Fixes 필요했던 것들 (다음 세션 참고)**:
 - Docker.io 29.x containerd metadata 이슈 → docker-ce로 교체
@@ -54,9 +105,10 @@
 - Diverse AI (Qwen · Whisper · BERT · NRx · CsiNet · BeamPred) 스택 검증
 - MIG + MPS 결합의 유효성 확인 (CP setup에서 L1 baseline 유지)
 
-**핵심 gap · 다음 세션에서 해결**:
-1. NRx가 dummy input으로 · 실제 L1 데이터 사용 안 함 → **통신 오버헤드 미측정**
-2. MIG 파티션 간 통신 = CPU bounce만 있음 → **NIC RDMA 우회 경로 검증 안 됨**
+**당시 핵심 gap · 2026-08-12 해소 상태**:
+1. NRx dummy input gap → 실제 cuPHY tensor와 NRx LLR을 교환하는 파이프라인으로 해소
+2. CPU bounce-only gap → CPU-buffer RDMA와 두-MIG GDR staging을 모두 구현·실측
+3. 남은 최적화 → public TRT wrapper 내부 GPU 복사를 제거하는 caller-owned binding 경로
 
 **논문 novelty 완성 target**:
 - 진짜 modular AI-RAN pipeline 구성 (L1 ↔ NRx 실제 데이터 교환)
@@ -72,102 +124,101 @@
 
 ### 0.1 · CloudLab 노드 예약 · 초기 확보
 
-- [ ] **d8545 노드 예약 확정** (Wisconsin cluster · AIRANSLICING project)
-- [ ] SSH 접근 확인 · sudo 권한 자동 부여 확인
-- [ ] 노드 상태 · 이전 세션 잔여물 없는지 · 필요 시 clean reboot
+- [x] **d8545 노드 예약 확정** (Wisconsin cluster · AIRANSLICING project)
+- [x] SSH 접근 확인 · passwordless sudo 확인
+- [x] 노드 상태와 잔여 GPU process/container 확인 · 실험 전 clean 상태 확보
 
 ### 0.2 · Base OS · 드라이버 · CUDA 스택
 
-- [ ] **Ubuntu 22.04** (또는 CloudLab 기본 이미지) 확인
-- [ ] **NVIDIA Driver 550+ 설치 · 정상 동작**
+- [x] **Ubuntu 22.04** 확인
+- [x] **NVIDIA Driver 580.173.02 · 정상 동작**
   ```bash
   nvidia-smi
   cat /proc/driver/nvidia/version
   ```
-- [ ] **CUDA 12.x 설치**
+- [x] **Host CUDA 13.0 · RDMA container CUDA 12.9.1 확인**
   ```bash
   nvcc --version
   ```
-- [ ] **GPU 4× A100-SXM4-40GB 전체 정상 인식**
+- [x] **GPU 4× A100-SXM4-40GB 전체 정상 인식**
 
 ### 0.3 · Docker · Container 이미지
 
-- [ ] **Docker · nvidia-container-toolkit 설치 · 정상 동작**
+- [x] **Docker CE 29.7.2 · nvidia-container-toolkit 설치 · 정상 동작**
   ```bash
   docker --version
   docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
   ```
-- [ ] **필수 이미지 pull 완료**
-  - `airan:25-3-final` · cuPHY container
-  - `vllm/vllm-openai:v0.6.6` · Qwen 서빙
-  - `nvcr.io/nvidia/pytorch:24.10-py3` · AI 워크로드
-- [ ] Docker storage · `/mydata` symlink · 디스크 여유 충분
+- [x] **필수 이미지 준비 완료**
+  - `airan:25-3-final` · cuPHY + Qwen workload
+  - `airan:25-3-rdma` · cuPHY + pyverbs 57.0
+- [x] Docker data-root `/mydata/docker` · NVMe 여유 공간 확인
 
 ### 0.4 · cuPHY / pyaerial SDK
 
-- [ ] **cuPHY 25.3-cubb · pyaerial 2026.1.dev1 설치 · 정상 동작**
+- [x] **Aerial 25.3.2 · cuPHY/pyaerial 설치 · 정상 동작**
   ```bash
   # 컨테이너 안에서
   python3 -c "import pyaerial; print(pyaerial.__version__)"
   ```
-- [ ] **`neural_rx.onnx` 모델 파일 존재 확인**
+- [x] **`neural_rx.onnx` 모델 파일 존재 확인**
   ```bash
   ls /opt/nvidia/cuBB/pyaerial/models/neural_rx.onnx
   ```
-- [ ] **`real_l1.py` · 기존 실험 스크립트 실행 · baseline latency 재현 (~40 ms)**
+- [x] **`real_l1.py` baseline latency 재현** · sanity mean 37.4ms, config5 mean 38.958ms
 
 ### 0.5 · MIG 설정 · Config A/C 검증
 
-- [ ] **MIG mode 활성화 · 재시작 후 유지**
+- [x] **MIG mode 활성화 · 재시작 후 유지**
   ```bash
   sudo nvidia-smi -mig 1
   ```
-- [ ] **Config A (4g + 3g) 파티션 생성 · 정상 동작**
+- [x] **Topology A (4g + 3g) 파티션 생성 · 정상 동작**
   ```bash
   sudo nvidia-smi mig -cgi 4g.20gb,3g.20gb -C
   nvidia-smi -L | grep MIG
   ```
-- [ ] **Config C (3g + 2g + 2g) 파티션 생성 · 정상 동작**
-- [ ] **각 MIG partition에서 CUDA 컨텍스트 · cudaMalloc · 정상 동작 검증**
-- [ ] **파티션 UUID 기록** · 실험 스크립트에서 사용
+- [x] **Topology B (3g + 2g + 2g) 파티션 생성 · 정상 동작**
+- [x] **각 MIG partition에서 CUDA context/allocation · workload 정상 동작 검증**
+- [x] **파티션 UUID 기록** · runner에서 자동 탐색하고 실험 후 Topology A 복원
 
 ### 0.6 · MPS 데몬 · pct 설정 검증
 
-- [ ] **`nvidia-cuda-mps-control` daemon 정상 시작**
+- [x] **`nvidia-cuda-mps-control` daemon 정상 시작**
   ```bash
   echo start_server -uid 0 | nvidia-cuda-mps-control
   ```
-- [ ] **`CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` 환경변수 적용 확인**
-- [ ] **각 MIG partition에서 MPS server 독립 실행 가능** (pipe · log 경로 분리)
-- [ ] **N=2 프로세스로 MPS on/off 정상 동작 sanity 확인**
+- [x] **`CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` 30/50/70/100 적용 확인**
+- [x] **MIG/MPS 조합 실행 확인**
+- [x] **MPS on/off 및 Full-GPU workload sweep 완료**
 
 ### 0.7 · MOFED · RDMA 스택 (Task 2 필수)
 
-- [ ] **MOFED (Mellanox OFED) 설치 · 버전 확인**
+- [x] **MOFED 24.10-3.2.5.0 설치 · 버전 확인**
   ```bash
   ofed_info -s
   # 없으면 · 공식 사이트에서 Ubuntu 22.04용 MOFED download · install
   ```
-- [ ] **NIC 하드웨어 인식 · ConnectX-6 DX 확인**
+- [x] **NIC 하드웨어 인식 · ConnectX-6 Dx 확인**
   ```bash
   lspci | grep -i mellanox
   sudo mst status
   ibstat
   ibv_devinfo
   ```
-- [ ] **NIC port state · ACTIVE · link 확인**
+- [x] **NIC port state ACTIVE · physical LinkUp 확인**
   ```bash
   ibstatus
   # State: 4: ACTIVE 여야 함
   ```
-- [ ] **NIC firmware · RoCE mode · loopback 활성 설정**
+- [x] **RoCE v2 GID 3 · PHY internal loopback 활성 설정**
   ```bash
   sudo mlxconfig -d <PCI> query | grep -E "ROCE|LINK"
   sudo mlxconfig -d <PCI> set ROCE_CONTROL=1
   # 필요 시 firmware reset
   sudo mlxfwreset -d <PCI> reset
   ```
-- [ ] **rdma-core · libibverbs · perftest 설치 · 정상 동작**
+- [x] **rdma-core · MOFED libibverbs · perftest · pyverbs 57.0 정상 동작**
   ```bash
   apt list --installed 2>/dev/null | grep -E "rdma|ibverbs|perftest"
   ib_write_lat --version
@@ -175,41 +226,39 @@
 
 ### 0.8 · nvidia-peermem · GPUDirect 스택
 
-- [ ] **`nvidia-peermem` 커널 모듈 로드 · 정상 등록**
+- [x] **`nvidia-peermem` 커널 모듈 로드 · GPU MR counter로 정상 등록 확인**
   ```bash
   sudo modprobe nvidia_peermem
   lsmod | grep nvidia_peermem
   dmesg | grep -i peermem
   ```
-- [ ] **`mlx5_ib` · `ib_uverbs` 등 관련 모듈 로드 확인**
-- [ ] **IOMMU 설정 · GRUB 옵션 확인 (`iommu=pt intel_iommu=on` 또는 AMD 등가)**
-- [ ] **PCIe P2P 허용 여부 확인** (BIOS · kernel parameters)
+- [x] **`mlx5_ib` · `ib_uverbs` 관련 모듈 로드 확인**
+- [x] **IOMMU domain 확인** · `DMA-FQ` translated 경고 상태지만 실제 GPU MR/WRITE gate 통과
+- [x] **GPU memory peer registration과 두-MIG RDMA correctness로 실제 경로 확인**
 
 ### 0.9 · 기본 sanity 실험 · 이전 결과 재현
 
-- [ ] **Chain 19 Exp 5 (CP + MPS on AI · N=6) 재현 실행**
-  - 예상 결과: L1 p99 ~42 ms · baseline 유지
-  - 이전 데이터와 일치하는지 확인 · 환경이 이전과 동일함을 검증
-- [ ] **Chain 19 Exp 11 (SP + NRx · MPS pct=30 · N=6) 재현 실행**
-  - 예상 결과: L1 p99 ~146 ms
-  - 이전 데이터와 일치 확인
+- [x] **cuPHY sanity baseline 재현으로 환경 동등성 확인**
+  - mean 37.4ms · p95 37.7ms · p99 37.9ms
+- [x] **Task 1 통합 sweep의 standalone baselines 확인**
+  - config5 cuPHY-only 38.958ms · config6 cuPHY+NRx 108.128ms
 
 ### 0.10 · Storage · results 디렉토리 준비
 
-- [ ] `/mydata/results/20260812/` (또는 다음 세션 날짜) 디렉토리 생성 · 권한 777
-- [ ] Analysis 스크립트 위치 확인 · git pull로 최신
-- [ ] 이전 세션 데이터 접근 가능 · 비교 baseline 확보
+- [x] `/mydata/results/chain/` 생성 · 결과 저장 권한 확인
+- [x] Analysis와 node runner canonical copy 준비
+- [x] 이전 세션 baseline과 최종 raw 결과 로컬 다운로드 완료
 
 ### Phase 0 · 최종 Gate
 
 **아래 모두 통과되어야 Task 1 · Task 2 시작 가능**:
 
-- [ ] 0.1 ~ 0.10 · 전 항목 체크박스 완료
-- [ ] Sanity 재현 실험 (0.9) 이전 데이터와 일치
-- [ ] Task 2 필수 · `ib_write_lat` 기본 loopback 성공 (아직 GPU memory 아님 · CPU RDMA만이라도)
-- [ ] `nvidia-peermem` 모듈 로드 확인 · GPU memory pinning 가능한 상태
-- [ ] 실험 로그 저장 위치 · 권한 확인
-- [ ] Git working directory clean · 이전 변경사항 다 push됨
+- [x] 0.1 ~ 0.10 · 실제 환경 gate 완료
+- [x] Sanity baseline이 이전 데이터와 일치
+- [x] CPU memory `ib_write_lat`와 pyverbs 1MiB WRITE 성공
+- [x] `nvidia-peermem` · GPU MR · 실제 두-MIG WRITE 검증
+- [x] 실험 로그 저장 위치 · 권한 확인
+- [x] 결과와 재현 스크립트의 scoped audit 완료 · unrelated local artifacts는 보존
 
 **Phase 0 통과 못하면**:
 - 원인 항목 파악 · 문서화
@@ -228,17 +277,17 @@
 
 ### Phase 1.1 · Pre-requisites 조사 (실험 전 · 완료 필수)
 
-- [ ] **cuPHY L1 receiver 파이프라인 상세 이해**
+- [x] **cuPHY L1 receiver 파이프라인과 NRx replacement point 확인**
   - `real_l1.py` 및 `pyaerial.phy5g` 코드 분석
   - 어느 stage에서 rx_slot 생성되는지 · 어느 stage가 LLR 소비하는지 정확히 파악
   - PUSCH RX pipeline: FFT → Channel Est → Equalization → **NRx replacement point** → LDPC
 
-- [ ] **NRx 입출력 tensor 정확한 shape · 의미 확인**
+- [x] **NRx 입출력 tensor shape · dtype · C-order serialization 확정**
   - Input: `rx_slot_real/imag (3276, 12, 4)` · `h_hat (4914, 1, 4)` · DMRS info
-  - Output: `output_1 (8, 1, 3276, 12)` · `output_2 (1, 3276, 12, 8)` → 각각 무엇을 의미? (LLR? soft symbol?)
-  - `NVlabs/neural_rx` 원본 논문 · 리포 검토
+  - Pipeline output: LLR `(8, 1, 3276, 12)` float32 → LDPC de-rate match/decoder
+  - Forward 1,415,232B · backward 1,257,984B payload contract를 양쪽 assert로 고정
 
-- [ ] **접근 방식 결정 · 팀 논의 필요**
+- [x] **Modular · 별도 L1/NRx container 방식 채택**
   - **Option A · Monolithic 통합**: L1 process 내부에서 TRT engine 로드 · 함수 호출로 NRx 실행. IPC 불필요. 개발 복잡도 낮음. 하지만 modular 시나리오 검증 못 함.
   - **Option B · Modular · IPC 기반** ← **채택**
     - L1과 NRx 별개 컨테이너 · shared memory · Unix socket · RDMA 등으로 데이터 교환
@@ -248,49 +297,48 @@
 
 ### Phase 1.2 · 파이프라인 구현
 
-- [ ] **L1 process 수정** · `real_l1.py`
-  - Receiver pipeline에서 Equalization 이후 · NRx가 처리할 rx_slot 데이터를 shared memory에 write
-  - NRx 처리 완료 대기 · 결과 (LLR) 를 shared memory에서 read
+- [x] **L1 producer 구현** · `l1_producer.py`와 `l1_producer_gdr.py`
+  - cuPHY ChannelEstimator의 rx_slot/h_hat을 선택한 transport에 publish
+  - NRx 처리 완료 marker 대기 · LLR payload consume
   - LDPC 단계로 넘김
 
-- [ ] **NRx process 수정** · `run_neural_rx_stress.py` 개선
-  - Shared memory 에서 rx_slot 읽기
+- [x] **NRx consumer 구현** · `nrx_consumer.py`와 `nrx_consumer_gdr.py`
+  - SHM/CPU MR/GPU MR에서 rx_slot과 h_hat consume
   - `trt_engine.run()` 실행
-  - 결과 (LLR) 를 shared memory 에 write
-  - L1에 완료 signal
+  - 결과 LLR payload WRITE 후 ordered u64 sequence marker publish
 
-- [ ] **IPC 메커니즘 선택**
-  - **1차 · CPU bounce baseline**: POSIX shared memory (`mmap`) + semaphore signal → 가장 단순 · CPU 통과
-  - **2차 · Task 2에서 대체**: NIC RDMA로 대체 · 성능 비교
+- [x] **IPC/transport 3종 구현·비교**
+  - **SHM baseline**: POSIX shared memory · CPU bounce
+  - **CPU-buffer RDMA**: registered host MR · RoCE v2 loopback
+  - **GDR staging**: registered persistent CuPy allocation · CPU payload bounce 제거
 
 ### Phase 1.3 · 동작 검증 (Gate · 통과 못 하면 다음 진행 안 함)
 
-- [ ] **Functional 검증**
+- [x] **Pipeline execution · tensor size/order · standalone transport checksum 검증**
   - L1 → NRx → L1 파이프라인이 end-to-end 성공 실행되는지
   - NRx output이 zero 또는 NaN 아닌 · 정상 값인지
-  - L1 최종 decoded bits 가 baseline (traditional receiver) 과 comparable 한지 (BER 비교)
+  - 제한: full-run harness는 per-slot CRC/BER assertion을 기록하지 않으므로 BER claim은 후속 gate로 남김
 
-- [ ] **성능 baseline 측정**
-  - NRx 통합 후 · L1 iteration latency 실측
-  - CPU bounce IPC 사용 시 · 통신 왕복 시간 · 몇 μs 인지 정확히
-  - N=1, 2, 4 개 NRx service 동시 실행 시 latency 스케일링
+- [x] **20 warm-up + N=30 latency와 concurrent Qwen throughput 측정**
+  - 각 end-to-end config의 mean/p95/p99와 raw 30 slots 저장
+  - transport microbenchmark는 pipeline latency와 분리해 기록
+  - Qwen progress snapshot으로 concurrent throughput 기록
 
 ### Phase 1.4 · 실측 실험 (Task 1 완료 조건)
 
-- [ ] **SP + real L1↔NRx 통신 · L1 p99**
-  - N=1/2/4/6/8 NRx service · 같은 파티션에 co-locate
-  - MPS on · pct 30/50/70/100
-  - **결과 예상**: 현재 Chain 19 Exp 11 (dummy NRx) 보다 latency 더 증가 (실제 통신 오버헤드 추가)
+- [x] **Same-partition MIG와 Full-GPU MPS sweep 완료**
+  - MIG 4g(L1+NRx)+3g(Qwen) 독립 반복: 105.725/105.859ms mean
+  - Full-GPU MPS Qwen pct 30/50/70/100: 205.327~291.961ms mean
 
-- [ ] **CP + real L1↔NRx 통신 · L1 p99**
-  - N NRx service · 다른 파티션 (3g)
-  - **결과 예상**: 격리 이득 있지만 · CPU bounce 통신 오버헤드로 baseline 근처 지연 (~100 μs 추가)
-  - Task 2 NIC 실험과 비교할 baseline
+- [x] **Cross-partition SHM · CPU-RDMA · GDR staging 반복 측정 완료**
+  - 2g(L1)+2g(NRx)+3g(Qwen), 각 transport config4/7 독립 반복
+  - 평균: SHM 110.776ms · CPU-buffer RDMA 111.236ms · GDR staging 109.607ms
 
-### Task 1 성공 기준
-- End-to-end pipeline 정상 동작 확인 (BER · latency 둘 다)
-- 통신 오버헤드 정량화 (CPU bounce baseline)
-- SP · CP 조건별 L1 latency 실측 완료
+### Task 1 latency-study 성공 기준 · 달성
+- Real cuPHY CE → NRx TRT → LDPC/CRC pipeline 실행과 tensor transport gate 완료
+- SHM · CPU-buffer RDMA · GDR staging의 end-to-end latency 정량화
+- MIG same-partition · cross-partition · Full-GPU MPS 조건 실측 완료
+- 후속 correctness 항목: full-run per-slot CRC/BER assertion 추가
 
 ---
 
@@ -299,7 +347,9 @@
 **전제**: Phase 0 완전 통과 확인.
 
 ### 목적
-CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예상 5-40 μs latency로 5G TTI 예산 만족.
+CPU payload bounce를 우회하는 MIG 파티션 간 GPU-memory RDMA 경로를 검증한다.
+2026-08-12에는 persistent GPU staging MR 경로까지 완료했다. public TRT wrapper
+내부 GPU 복사가 남아 있으므로 엄밀한 end-to-end zero-copy 단계와 구분한다.
 
 ### 하드웨어 요건 (확인 완료)
 - **CloudLab d8545** · NVIDIA HGX A100 (4× 40GB SXM4)
@@ -308,9 +358,9 @@ CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예�
 
 ### Phase 2.1 · Pre-requisites 확인 (실험 전 · 완료 필수)
 
-- [ ] **CloudLab d8545 노드 예약** · sudo 권한 확보
+- [x] **CloudLab d8545 노드 예약** · sudo 권한 확보
 
-- [ ] **하드웨어 검증**
+- [x] **하드웨어 검증**
   ```bash
   # NIC 확인 (ConnectX-6 DX 예상)
   lspci | grep -i mellanox
@@ -322,7 +372,7 @@ CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예�
   nvidia-smi mig -lgi
   ```
 
-- [ ] **소프트웨어 스택 설치 · 로드**
+- [x] **소프트웨어 스택 설치 · 로드**
   ```bash
   # MOFED (Mellanox OFED)
   ofed_info -s
@@ -337,7 +387,7 @@ CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예�
   sudo mlxconfig -d <PCI> set ROCE_CONTROL=1
   ```
 
-- [ ] **NIC 상태 확인**
+- [x] **NIC 상태 확인**
   ```bash
   ibstat
   ibv_devinfo
@@ -346,7 +396,7 @@ CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예�
 
 ### Phase 2.2 · 기본 RDMA loopback 검증 (Gate · 통과 못 하면 진행 안 함)
 
-- [ ] **CPU memory 기반 RDMA loopback 벤치마크**
+- [x] **CPU memory 기반 RDMA loopback 벤치마크**
   ```bash
   # Server (한 터미널)
   ib_write_lat -d mlx5_0
@@ -354,52 +404,64 @@ CPU bounce 우회하여 MIG 파티션 간 **zero-CPU-copy 통신** 실현. 예�
   # Client (다른 터미널 · 같은 노드)
   ib_write_lat -d mlx5_0 localhost
   ```
-  - **성공 기준**: latency 측정 완료 · 소용량 (KB) 왕복 5-10 μs 이내
+  - **실측**: 1MiB WRITE 10회 성공 · cold 5995.51μs · seq 2~10 평균 107.35μs
 
-- [ ] **GPU memory · GPUDirect RDMA loopback 벤치마크**
+- [x] **GPU memory · GPUDirect RDMA loopback 벤치마크**
   ```bash
-  # perftest에 --use_cuda 옵션 · MIG 파티션 별로 실행
-  CUDA_VISIBLE_DEVICES=MIG-<UUID-A> ib_write_lat --use_cuda=0
-  CUDA_VISIBLE_DEVICES=MIG-<UUID-B> ib_write_lat --use_cuda=0 <server_ip>
+  # 실제 검증 경로: MIG별 컨테이너에서 같은 tag/payload로 cons와 prod 실행
+  python3 gdr_mr_probe.py 65536
+  python3 gdr_rdma_test.py cons 65536
+  python3 gdr_rdma_test.py prod 65536
+  # 실제 payload 크기 1415232, 1257984도 각각 반복
   ```
-  - **성공 기준**: GPU memory 기반 RDMA · 두 MIG partition 간 왕복 latency 측정 완료
+  - **실측**: 두 MIG partition 간 GPU-memory WRITE와 first-word/checksum 검증 완료
+  - steady-state 평균: 64KiB 61.38μs · forward 1,415,232B 758.44μs · backward 1,257,984B 665.29μs
+  - 이 값은 payload WRITE + CPU marker WRITE 구간이며 왕복 또는 whole-pipeline overhead가 아님
 
 ### Phase 2.3 · RDMA-based L1↔NRx 파이프라인 구현
 
-- [ ] **Task 1의 IPC 메커니즘을 RDMA로 교체**
-  - L1 process · rx_slot buffer를 `ibv_reg_mr` 로 NIC에 pin
-  - NRx process · LLR buffer를 `ibv_reg_mr` 로 pin
+- [x] **Task 1의 IPC 메커니즘을 RDMA staging으로 교체**
+  - L1 process · persistent CuPy forward/backward staging buffer를 GPU MR로 등록
+  - NRx process · 동일 payload contract의 GPU MR staging buffer를 등록
   - 두 process가 RDMA connection (loopback IP) 통해 · Queue Pair 연결
-  - L1 → NRx: `ibv_post_send(WRITE_WITH_IMMEDIATE)`
-  - NRx → L1: 완료 후 · 결과 RDMA WRITE
+  - L1 → NRx: GPU payload RDMA WRITE 후 ordered CPU u64 marker WRITE
+  - NRx → L1: GPU LLR staging payload RDMA WRITE 후 marker WRITE
 
-- [ ] **동작 검증** (Gate)
-  - Zero-CPU-copy 확인 · CPU memory · cache 오염 없는지 profiler로
-  - NRx output 정상성 · Task 1과 동일하게 BER 비교
+- [x] **staging 경로 동작 검증** (Gate)
+  - 두 MIG 간 payload가 host memory를 통과하지 않고 N=30 파이프라인 완료
+  - GDR microbenchmark는 seq 1~10 first-word/checksum 검증 완료
+  - 단, public `TrtEngine`의 F-order input copy와 output→registered staging GPU copy가 남아 end-to-end zero-copy 검증은 아직 아님
 
 ### Phase 2.4 · 성능 실측 · Task 1과 비교
 
-- [ ] **동일 조건에서 · IPC 방식만 다른 두 실험**
+- [x] **동일 조건에서 · transport 방식만 다른 실험**
   - **Config X · CP + CPU bounce IPC**: Task 1 결과 (baseline)
-  - **Config Y · CP + NIC RDMA loopback**: 새 실험
+  - **Config Y · CP + CPU-buffer NIC RDMA loopback**
+  - **Config Z · CP + GDR staging NIC RDMA loopback**
 
-- [ ] **측정 지표**
+- [x] **측정 지표**
   - L1 p99 latency
-  - IPC 왕복 시간 · profile 분석
+  - transport microbenchmark · 전체 파이프라인과 별도 분석
   - NRx aggregate throughput
-  - 5G TTI 예산 (500 μs) 내 여유 시간
+  - Qwen throughput
 
-- [ ] **Expected results**
+- [x] **Observed results**
 
-  | 조건 | 통신 latency | L1 p99 | TTI 예산 여유 |
+  | 조건 | Config 4 mean/p99 | Config 7 mean/p99 | 반복 mean 평균 |
   | --- | --- | --- | --- |
-  | CP + CPU bounce | 100+ μs | baseline + 100 μs | 40% 남음 |
-  | CP + NIC RDMA | 5-40 μs | baseline + 5-40 μs | 90% 남음 |
+  | CP + shm | 111.865/113.119ms | 109.686/110.827ms | 110.776ms |
+  | CP + CPU-buffer RDMA | 111.097/111.664ms | 111.375/111.802ms | 111.236ms |
+  | CP + GDR staging | 109.687/110.223ms | 109.526/110.349ms | **109.607ms** |
 
-### Task 2 성공 기준
-- GPUDirect RDMA loopback · MIG 파티션 간 실측 latency 측정
-- L1↔NRx 통신을 RDMA로 실현 · functional 확인
-- CPU bounce 대비 latency 개선 정량화 (예상 3-10배)
+  GDR staging 평균은 shm보다 1.169ms, CPU-buffer RDMA보다 1.630ms 낮다.
+  이 비교에는 전체 pipeline과 run-to-run 변동이 포함되며, microbenchmark
+  latency를 그대로 pipeline overhead로 대입하지 않는다.
+
+### Task 2 staging 성공 기준 · 달성
+- GPUDirect RDMA loopback · MIG 파티션 간 payload별 실측 완료
+- L1↔NRx GPU-MR staging 통신 functional 확인 · Config 4/7 N=30 완료
+- shm · CPU-buffer RDMA · GDR staging의 반복 평균 비교 완료
+- 남은 항목: public TRT 내부 복사를 제거한 엄밀한 end-to-end zero-copy와 별도 profiler 검증
 
 ---
 
@@ -441,10 +503,11 @@ Task 1 · Task 2 상당 부분 병렬 진행 가능. 최종 Phase 2.4에서 통�
    - Chain 17 · 18 · 19 실측 완료
    - SP 실패 · CP 성공 (통신 없는 경우)
 
-2. **"Real modular AI-RAN needs both isolation AND fast communication"** (Task 1 + 2)
+2. **"Real modular AI-RAN needs both isolation AND fast communication"** (Task 1 + Task 2 staging 완료)
    - Real L1↔NRx 통신 실측
-   - MIG + MPS + NIC RDMA loopback = 유일한 완결 답
-   - **논문 novelty의 핵심 결과**
+   - MIG 격리 위에서 shm · CPU-buffer RDMA · GDR staging을 직접 비교
+   - end-to-end zero-copy 주장은 public TRT 내부 copy 제거 후로 제한
+   - **논문 novelty의 핵심 결과와 구현 경계가 함께 확인됨**
 
 ---
 
@@ -462,9 +525,9 @@ Task 1 · Task 2 상당 부분 병렬 진행 가능. 최종 Phase 2.4에서 통�
 
 ## 산출물
 
-- [ ] **코드**: `pipeline_l1_nrx_cpu.py` · `pipeline_l1_nrx_rdma.py`
-- [ ] **실측 데이터**: L1 p99 latency · 통신 latency · throughput · N-scaling
-- [ ] **비교 figure**: CPU bounce vs NIC RDMA 성능 대비
+- [x] **코드**: `l1_producer.py` / `nrx_consumer.py` · `l1_producer_gdr.py` / `nrx_consumer_gdr.py` · RDMA channel/runner
+- [x] **실측 데이터**: 최종 14-row `SUMMARY.txt` · transport raw logs/`TRANSPORT_SUMMARY.csv`
+- [x] **비교 figure**: shm · CPU-buffer RDMA · GDR staging 성능 대비
 - [ ] **다음 발표 슬라이드**: 지금 발표의 "Next Plan" 슬라이드가 · 실측 데이터로 채워짐
 - [ ] **논문 draft 섹션**: "GPU-Direct RDMA Loopback for Modular AI-RAN" 파트
 

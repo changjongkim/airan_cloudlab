@@ -1,0 +1,28 @@
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 12.9.1
+
+Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+[L1] shm fwd=airan_config4_fwd (1415256 B)  bwd=airan_config4_bwd (1258008 B)
+[L1] waiting for NRx consumer...
+[L1] consumer online, starting
+[L1] warmup...
+[L1] measuring...
+[L1] config4_l1: mean=111.865ms p95=112.808ms p99=113.119ms  n=30
+[L1] saved: /results/l1prod_config4_l1_20260812_135539.json
+/usr/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 2 leaked shared_memory objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/usr/lib/python3.10/multiprocessing/resource_tracker.py:237: UserWarning: resource_tracker: '/airan_config4_fwd': [Errno 2] No such file or directory: '/airan_config4_fwd'
+  warnings.warn('resource_tracker: %r: %s' % (name, e))
+/usr/lib/python3.10/multiprocessing/resource_tracker.py:237: UserWarning: resource_tracker: '/airan_config4_bwd': [Errno 2] No such file or directory: '/airan_config4_bwd'
+  warnings.warn('resource_tracker: %r: %s' % (name, e))

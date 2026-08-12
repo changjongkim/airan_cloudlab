@@ -1,0 +1,21 @@
+[2026-08-12T10:15:52Z] ==== AI-RAN experiment chain start ====
+[2026-08-12T10:15:52Z] L1_ITERS=30  QWEN_DUR=300  MPS_PCTS='30 50 70 100'
+
+[2026-08-12T10:15:52Z] === PHASE A: Topology A (4g + 3g) ===
+[2026-08-12T10:15:52Z] MIG topology A: 4g.20gb + 3g.20gb on GPU 0
+[2026-08-12T10:15:52Z] MIG teardown on GPU 0 (kill MPS first — it holds the GPU handle)
+./run_chain.sh: line 34: 36907 Killed                  sudo pkill -9 -f nvidia-cuda-mps > /dev/null 2>&1
+[2026-08-12T10:15:59Z] MIG_L1(4g)=MIG-dae3f173-7b15-594b-bc80-6cef80687a56  MIG_AI(3g)=MIG-80a4659b-f06f-540b-9f4b-1c91f78aaaf3
+
+[2026-08-12T10:15:59Z] === Config 5: cuPHY baseline (GPU 3, no other workload) ===
+[2026-08-12T10:16:03Z] Config 5: mean=34.735ms p95=35.492ms p99=36.185ms
+
+[2026-08-12T10:16:03Z] === Config 6: cuPHY+NRx baseline (GPU 3, no other workload) ===
+[2026-08-12T10:16:26Z] Config 6: mean=108.223ms p95=108.478ms p99=108.588ms
+
+[2026-08-12T10:16:26Z] === Config 1: L1+NRx co-located on 4g, Qwen on 3g, MIG only ===
+[2026-08-12T10:17:26Z] [ALERT] Config 1: Qwen container died during load
+
+[2026-08-12T10:17:26Z] === Config 3: same as Config 1 + MPS (30% Qwen cap) ===
+[2026-08-12T10:18:30Z] CHAIN STOPPED (signal); cleaning up
+[2026-08-12T10:18:30Z] stopping MPS control daemon

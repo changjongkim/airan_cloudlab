@@ -1,0 +1,30 @@
+
+PHASE A: Topology A (4g + 3g)
+Config 5: cuPHY baseline (GPU 3, no other workload)
+Config 6: cuPHY+NRx baseline (GPU 3, no other workload)
+Config 1: L1+NRx co-located on 4g, Qwen on 3g, MIG only
+Config 3: MIG+MPS collapses to Config 1 (single workload / partition; MPS pct N/A)
+PHASE B: Topology C (no MIG) + MPS
+Config 2: GPU 3 (MIG-free), full GPU via MPS
+Config 2: MPS pct=30 (Qwen cap)
+Config 2: MPS pct=50 (Qwen cap)
+Config 2: MPS pct=70 (Qwen cap)
+Config 2: MPS pct=100 (Qwen cap)
+[ALERT] config2 pct=100: L1 mean=291.961ms exceeds 250ms threshold
+PHASE C: Topology B (3g+3g+1g)
+[ALERT] Topology B creation failed; see /tmp/mig_B.log
+[ALERT] Topology B setup failed, skipping Configs 4/7
+CLEANUP: restore Topology A
+Config 4: Cross-partition L1(2g)<->NRx(2g) via shm + Qwen(3g)
+Config 7: same as Config 4 (MIG+MPS with 1 workload/partition = no-op)
+restore Topology A
+Config 4 RDMA: L1(2g)<->NRx(2g) + Qwen(3g)
+[ALERT] config4_rdma: Qwen died during warmup
+Config 7 RDMA: cross-partition repeat + Qwen(3g)
+[ALERT] PHASE C stopped by SIGTERM
+Config 4 RDMA: L1(2g)<->NRx(2g) + Qwen(3g)
+Config 7 RDMA: cross-partition repeat + Qwen(3g)
+restore Topology A
+Config 4 GPUDirect RDMA staging: L1(2g)<->NRx(2g) + Qwen(3g)
+Config 7 GPUDirect RDMA staging: cross-partition repeat + Qwen(3g)
+restore Topology A

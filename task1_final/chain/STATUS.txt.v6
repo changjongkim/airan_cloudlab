@@ -1,0 +1,11 @@
+
+PHASE A: Topology A (4g + 3g)
+Config 5: cuPHY baseline (GPU 3, no other workload)
+Config 6: cuPHY+NRx baseline (GPU 3, no other workload)
+Config 1: L1+NRx co-located on 4g, Qwen on 3g, MIG only
+Config 3: MIG+MPS collapses to Config 1 (single workload / partition; MPS pct N/A)
+PHASE B: Topology C (no MIG) + MPS
+Config 2: MIG disabled, everything on full GPU 0 via MPS
+Config 2: MPS pct=30 (Qwen cap)
+[ALERT] Config 2 pct=30: Qwen died
+Config 2: MPS pct=50 (Qwen cap)

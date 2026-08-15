@@ -1,0 +1,78 @@
+id,priority,phase,question,topology,foreground,background,variant,load_sweep,profiler,trials,duration_or_samples,dependency,primary_metric,pass_condition,artifact
+F00,P0,P0,environment,"GPU0 4g+3g; GPU1-3 full",idle,none,manifest,none,none,1,snapshot,none,"hashes; clocks; topology","all hardware software model data identifiers resolved",00_manifest/
+F01,P0,P0,capability,4g MIG,CUDA microtest,none,device graph launch,none,Nsys,3,10000 launches,F00,"supported; launch p99","capability and restrictions empirically recorded",01_cap/device_graph/
+F02,P0,P0,capability,4g MIG,CUDA microtest,none,conditional graph,none,Nsys,3,10000 branches,F00,"correct branch; p99","zero wrong branch; support status recorded",01_cap/conditional/
+F03,P0,P0,capability,4g+3g,control ring,none,GPU-visible doorbell,none,Nsys,5,100000 events,F00,"publish-to-observe p99.9","ordering correct and tail measured",01_cap/doorbell/
+F04,P0,P0,transport gate,4g+3g,same-GPU MIG,none,P2P,64KiB-current payload,none,5,10000 writes,F00,"correctness; latency","all capability paths resolved",01_cap/p2p/
+F05,P0,P0,transport gate,4g+NIC+GPU1,GPU memory,none,GDR,64KiB-current payload,none,5,10000 writes,F00,"correctness; latency","all payload checks pass",01_cap/gdr/
+N00,P0,P1,NRx stack,4g NRx,same tensor,none,public wrapper,one shape,Nsys graph,5,10000 slots,F00,"p50/p99; copies; sync","output reference captured",02_nrx/wrapper/
+N01,P0,P1,NRx stack,4g NRx,same tensor,none,raw TensorRT,one shape,Nsys graph,5,10000 slots,N00,"enqueue and GPU p99","allclose to reference",02_nrx/raw/
+N02,P0,P1,NRx stack,4g NRx,same tensor,none,caller-owned input,one shape,Nsys graph,5,10000 slots,N01,"copy bytes; p99","allclose and stable pointer",02_nrx/input_binding/
+N03,P0,P1,NRx stack,4g NRx,same tensor,none,caller-owned input+output,one shape,Nsys graph,5,10000 slots,N02,"copy bytes; p99","allclose and no hidden payload copy",02_nrx/io_binding/
+N04,P0,P1,NRx stack,4g NRx,same tensor,none,persistent buffers+CUDA Graph,one shape,Nsys graph,5,10000 slots,N03,"launch gap; GPU p99","allclose and graph stable",02_nrx/graph/
+N05,P0,P1,kernel cause,4g NRx,same tensor,none,direct graph,one shape,NCU,3,top 5 kernels,N04,"SOL; memory; occupancy; stalls","dominant kernels classified",02_nrx/ncu/
+N06,P0,P1,service profile,4g NRx,mixed tensor classes,none,direct graph,"MCS; PRB; layers",none,5,10000 per class,N04,"class p99/p99.9","profile table covers replay classes",02_nrx/profile/
+N07,P0,P1,replica scale,4g NRx,NRx contexts,none,replica 1|2|4|8,"batch 1|2|4",Nsys short,5,60s each,N04,"slots/s; p99; memory","serialization source resolved",02_nrx/replicas_4g/
+N08,P1,P1,replica scale,full GPU,NRx contexts,none,replica 1|2|4|8,"batch 1|2|4",Nsys short,5,60s each,N04,"slots/s; p99; memory","endpoint capacity curve produced",02_nrx/replicas_full/
+X00,P0,P3,five-way compute,full A100,L1+NRx,none,MPS,"NRx load 50|85|95|105%",none,5,3min each,N04,"absolute and normalized L1 p99.9; miss","full-GPU compute baseline",05_fiveway/compute_mps/
+X01,P0,P3,five-way compute,4g+3g,"L1+NRx one graph on 4g",none,MIG local,"NRx load 50|85|95|105%",none,5,3min each,N04,"absolute and normalized L1 p99.9; miss","local-MIG compute baseline",05_fiveway/compute_mig/
+X02,P0,P3,five-way compute,4g+3g,"L1 and NRx processes on 4g",none,MIG+MPS,"NRx load 50|85|95|105%",none,5,3min each,N04,"absolute and normalized L1 p99.9; miss","hierarchical-sharing compute baseline",05_fiveway/compute_migmps/
+X03,P0,P3,five-way compute,4g+3g,"L1 4g; NRx 3g",none,P2P,"NRx load 50|85|95|105%",none,5,3min each,F04|N04,"absolute and normalized L1 p99.9; miss","cross-MIG P2P compute baseline",05_fiveway/compute_p2p/
+X04,P0,P3,five-way compute,4g+3g,"L1 4g; NRx 3g",none,GDR,"NRx load 50|85|95|105%",none,5,3min each,F05|N04,"absolute and normalized L1 p99.9; miss","paired GDR compute baseline",05_fiveway/compute_gdr/
+X05,P0,P7,five-way contention,full A100,L1+NRx,"Qwen|video|speech|training",MPS,"BE 50|90%; NRx 50|95|105%",none,5,3min each,X00,"PHY and application joint SLO","same offered traces complete",05_fiveway/bg_mps/
+X06,P0,P7,five-way contention,4g+3g,"L1+NRx 4g","Qwen|video|speech|training on 3g",MIG local,"BE 50|90%; NRx 50|95|105%",none,5,3min each,X01,"PHY and application joint SLO","same offered traces complete",05_fiveway/bg_mig/
+X07,P0,P7,five-way contention,4g+3g,"L1 and NRx processes on 4g","Qwen|video|speech|training on 3g",MIG+MPS,"BE 50|90%; NRx 50|95|105%",none,5,3min each,X02,"PHY and application joint SLO","same offered traces complete",05_fiveway/bg_migmps/
+X08,P0,P7,five-way contention,4g+3g,"L1 4g; NRx 3g","Qwen|video|speech|training sharing 3g",P2P,"BE 50|90%; NRx 50|95|105%",none,5,3min each,X03,"PHY and application joint SLO","same offered traces complete",05_fiveway/bg_p2p/
+X09,P0,P7,five-way contention,4g+3g,"L1 4g; NRx 3g","Qwen|video|speech|training sharing 3g",GDR,"BE 50|90%; NRx 50|95|105%",none,5,3min each,X04,"PHY and application joint SLO","same offered traces complete",05_fiveway/bg_gdr/
+X10,P0,P7,five-way DART,4g+3g+remote endpoints,"L1 4g; elastic NRx pool","Qwen|video|speech|training",DART-P2P,"BE 50|90%; burst NRx",none,5,5min each,D04,"deadline; utility; application SLO; idle GPU-s","P2P DART frontier produced",05_fiveway/dart_p2p/
+X11,P0,P7,five-way DART,4g+3g+remote endpoints,"L1 4g; elastic NRx pool","Qwen|video|speech|training",DART-GDR,"BE 50|90%; burst NRx",none,5,5min each,D04,"deadline; utility; application SLO; idle GPU-s","GDR DART frontier produced",05_fiveway/dart_gdr/
+A00,P0,P2,non-preemption,full GPU MPS,NRx injection,Qwen decode,default priority,"offset uniform",Nsys,5,1000 injections,N04,"dispatch delay vs residual","correlation and residual quantified",03_block/qwen_decode/
+A01,P0,P2,non-preemption,full GPU MPS,NRx injection,Qwen prefill,default priority,"prompt 128|512|2048",Nsys,5,1000 injections,N04,"dispatch delay vs residual","long blocking kernels identified",03_block/qwen_prefill/
+A02,P0,P2,non-preemption,full GPU MPS,NRx injection,online training,default priority,"microbatch 1|2|4|8",Nsys,5,1000 injections,N04,"dispatch delay vs residual","backward blocking quantified",03_block/training/
+A03,P1,P2,non-preemption,full GPU MPS,NRx injection,video TRT,default priority,"1|4|8 streams",Nsys,5,1000 injections,N04,"dispatch delay vs residual","vision blocking quantified",03_block/video/
+A04,P1,P2,non-preemption,full GPU MPS,NRx injection,stream speech,default priority,"1|4|8 streams",Nsys,5,1000 injections,N04,"dispatch delay vs residual","speech blocking quantified",03_block/speech/
+A05,P0,P2,priority gap,full GPU MPS,NRx injection,Qwen+training,high CUDA priority,"same as A00-A02",Nsys,5,1000 injections,A00|A02,"p99 improvement; residual","priority limitation isolated",03_block/priority/
+A06,P0,P2,true quantum,full GPU MPS,NRx,Qwen,layer groups 1|2|4|8,"30|60|90% BE load",Nsys,5,60s each,A01,"max quantum; NRx p99; token/s","real graph partition measured",03_quantum/qwen/
+A07,P0,P2,true quantum,full GPU MPS,NRx,training,microbatch 1|2|4|8,"30|60|90% BE load",Nsys,5,60s each,A02,"max quantum; NRx p99; samples/s","lease curve measured",03_quantum/train/
+C00,P0,P2,control path,4g+3g,descriptor-to-graph,none,Python host router,none,Nsys,5,100000 requests,F03|N04,"p99.9 control delay","complete breakdown",04_control/python/
+C01,P0,P2,control path,4g+3g,descriptor-to-graph,none,C++ host router,none,Nsys,5,100000 requests,C00,"p99.9 control delay","complete breakdown",04_control/cpp/
+C02,P0,P2,control path,4g+3g,descriptor-to-graph,none,persistent GPU polling,none,Nsys,5,100000 requests,F01|F03,"p99.9; SM cost","event ordering correct",04_control/device/
+K00,P0,P3,problem existence,4g+3g,open-loop multi-cell,none,static 1 replica,"cells 1|2|4|8; load 30-120%",none,5,5min each,N06|N07,"miss; queue; idle GPU-s","same-trace baseline produced",05_killer/static1/
+K01,P0,P3,problem existence,4g+3g,open-loop multi-cell,none,static peak replicas,"cells 1|2|4|8; load 30-120%",none,5,5min each,N07,"miss; idle GPU-s","overprovision frontier produced",05_killer/static_peak/
+K02,P0,P3,problem existence,full GPU MPS,open-loop multi-cell,Qwen,MPS shared,"cells 1|2|4|8; load 30-120%",Nsys short,5,5min each,A05|N07,"miss; Qwen SLO","interference frontier produced",05_killer/mps/
+K03,P0,P3,problem existence,4g+3g,open-loop multi-cell,Qwen,fixed isolated pool,"cells 1|2|4|8; load 30-120%",none,5,5min each,K00,"miss; idle GPU-s; AI SLO","idle and miss overlap tested",05_killer/isolated_pool/
+K04,P0,P3,reconfiguration,variable MIG,open-loop transition,Qwen,dynamic MIG drain,"30-120-30%",none,3,10 transitions,F00,"outage; reload; lost slots","true drain cost recorded",05_killer/reconfig/
+K05,P0,P3,demand transition,4g+3g+full endpoints,open-loop burst,Qwen,fixed topology,"burst 2|5|10|20ms",none,5,100 bursts,K03,"activation; miss; idle","burst contradiction visualized",05_killer/burst/
+T00,P0,P4,transport,4g+3g,current QPSK payload,none,CPU shared memory,"depth 1|2|4|8|16|32",none,5,10000 slots,F00,"full boundary p99; CPU bytes","correct output; fair timer",06_transport/shm/
+T01,P0,P4,transport,4g+3g,current QPSK payload,none,CPU-buffer RDMA,"depth 1|2|4|8|16|32",none,5,10000 slots,F05,"full boundary p99; CPU bytes","correct output; fair timer",06_transport/cpu_rdma/
+T02,P0,P4,transport,4g+3g,current QPSK payload,none,same-GPU P2P,"depth 1|2|4|8|16|32",Nsys short,5,10000 slots,F04,"full boundary p99; overlap","correct output; current payload",06_transport/p2p/
+T03,P0,P4,transport,4g+NIC+GPU1,current QPSK payload,none,GDR staging,"depth 1|2|4|8|16|32",Nsys short,5,10000 slots,F05,"full boundary p99; overlap","correct output; current payload",06_transport/gdr_stage/
+T04,P1,P4,transport,4g+NIC+GPU1,current QPSK payload,none,GDR caller-owned binding,"depth 1|2|4|8|16|32",Nsys short,5,10000 slots,N03|F05,"copy bytes; full p99","payload CPU copy zero",06_transport/gdr_direct/
+D00,P0,P5,mechanism,4g+3g,open-loop NRx,Qwen,p99 predicted-finish admission,"load 50|85|95|105|120%",none,5,5min each,K03|C01,"miss; prediction error; utilization","deterministic decision replay",07_dart/predfinish/
+D00R,P0,P5,mechanism,4g+3g,open-loop concurrent NRx,Qwen,predfinish + atomic reservation,"same D00; submit concurrency 1|2|4|8",none,5,5min each,D00,"over-admission; credit; miss","no double reservation or negative credit",07_dart/reservation/
+D00C,P0,P5,mechanism,4g+3g,open-loop NRx,Qwen,reservation + epoch commit,"same D00; stale|duplicate|delay",none,5,1000 faults,D00R,"wrong commit; late drop","wrong or stale commit zero",07_dart/epoch_commit/
+D01,P0,P5,mechanism,4g+3g,open-loop NRx,Qwen,epoch commit + JIT fallback,"same D00",none,5,5min each,D00C,"miss; duplicate work; fallback","stale commit zero and bounded fallback",07_dart/host_jit/
+D02,P0,P5,mechanism,4g+3g,open-loop NRx,Qwen,device DART + commit,"same D00",Nsys short,5,5min each,C02|D01,"control p99; miss; SM cost","stale commit zero",07_dart/device/
+D02Q,P0,P5,mechanism,4g+3g,open-loop NRx,Qwen,device DART + fixed quantum,"same D00; quantum sweep",none,5,5min each,A06|D02,"miss; token/s; blocking","fixed-quantum baseline produced",07_dart/fixed_quantum/
+D03,P0,P5,mechanism,4g+3g,open-loop NRx,Qwen,device DART + grant-ahead lease,"same D00; lookahead 0|1|2|4 slots",none,5,5min each,D02Q,"miss; token/s; idle; lease waste","Pareto improves over D02Q",07_dart/grant_lease/
+D04,P0,P5,policy,4g+3g+GPU1,open-loop NRx,Qwen,roundrobin|SQ|predfinish|utility,"cells 1|2|4|8",none,5,5min each,D02|T02|T03,"miss; utility; balance","strongest policy selected",07_dart/policy/
+D05,P0,P5,fallback,4g+3g+GPU1,recorded channel,Qwen,block|dual|JIT|oracle,"SNR and load sweep",none,5,5min each,D04,"miss; goodput; GPU work","JIT safety and saving quantified",07_dart/fallback/
+D06,P0,P5,fault safety,4g+3g+GPU1,open-loop NRx,Qwen,"hang|delay|duplicate|stale|error","underprediction 5|10|20|50%",none,5,1000 faults,D05,"wrong commit; fallback miss","wrong or stale commit zero",07_dart/fault/
+H00,P0,P6,hardware model,trace replay,DART traces,heterogeneous AI,DART-Q SRT sweep,"depth 16|32|64|128",none,5,all captured traces,D02,"model error; p99; occupancy","validated against hardware events",08_hw/sim/
+H01,P0,P6,hardware model,trace replay,DART traces,heterogeneous AI,doorbell sweep,"0.1|1|5|10|25|50us",none,5,all captured traces,H00,"deadline frontier","hardware latency target derived",08_hw/doorbell/
+H02,P0,P6,hardware ablation,trace replay,DART traces,heterogeneous AI,"no credit|deadline|epoch|fallback|lease",full load matrix,none,5,all captured traces,H00,"miss; wrong commit; AI SLO","each mechanism contribution isolated",08_hw/ablation/
+H03,P0,P6,RTL,queue RTL,synthetic+trace vectors,none,DART-Q 64|128 entry,corner cases,simulation,3,all vectors,H00,"functional correctness; cycles","RTL matches model",08_hw/rtl/
+H04,P0,P6,synthesis,queue RTL,none,none,DART-Q,frequency corners,synthesis,1,one design,H03,"area; SRAM; power; fmax","overhead and timing reported",08_hw/synth/
+W00,P0,P7,generality,4g+expert fabric,multi-cell NRx,real Qwen trace,DART vs strongest,"cells 1|4|8; load 50-120%",none,5,10min each,D04,"PHY SLO; TTFT; TPOT","joint Pareto measured",09_workloads/qwen/
+W01,P0,P7,generality,4g+expert fabric,multi-cell NRx,real video streams,DART vs strongest,"streams 1|4|8; load 50-120%",none,5,10min each,D04,"PHY SLO; frame p99; FPS","joint Pareto measured",09_workloads/video/
+W02,P0,P7,generality,4g+expert fabric,multi-cell NRx,streaming speech,DART vs strongest,"streams 1|4|8; load 50-120%",none,5,10min each,D04,"PHY SLO; chunk p99; RTF","joint Pareto measured",09_workloads/speech/
+W03,P0,P7,generality,4g+expert fabric,multi-cell NRx,online training,DART vs strongest,"microbatch 1|2|4|8",none,5,10min each,D04,"PHY SLO; samples/s","joint Pareto measured",09_workloads/training/
+W04,P1,P7,generality,4g+expert fabric,multi-cell NRx,RAN-native predictor,DART vs strongest,"cells 1|4|8",none,5,10min each,D04,"PHY SLO; predictor metric","secondary case measured",09_workloads/ran_native/
+M00,P0,P7,mixed site,all GPUs,4-cell NRx,video 4 streams,DART vs strongest,"load transitions",none,3,30min each,W01,"joint SLO; power","site A completed",10_mixed/site_a/
+M01,P0,P7,mixed site,all GPUs,4-cell NRx,"speech+RAN-native",DART vs strongest,"load transitions",none,3,30min each,W02|W04,"joint SLO; power","site B completed",10_mixed/site_b/
+M02,P0,P7,mixed site,all GPUs,bursty 8-cell NRx,"Qwen or training",DART vs strongest,"bursts 2-20ms",none,3,30min each,W00|W03,"joint SLO; power","site C completed",10_mixed/site_c/
+R00,P0,P8,radio utility,4g,recorded channel,none,conventional receiver,"SNR|MCS|channel",none,5,trace set,none,"BLER; CRC; goodput; p99","fallback profile produced",11_radio/conventional/
+R01,P0,P8,radio utility,4g,recorded channel,none,NRx,"SNR|MCS|channel",none,5,trace set,N04,"BLER; CRC; goodput; p99","utility map produced",11_radio/nrx/
+R02,P0,P8,radio policy,expert fabric,recorded channel,heterogeneous AI,deadline-only|utility-DART,"load and channel sweep",none,5,10min each,D05|R00|R01,"goodput; miss; GPU energy","utility frontier improves",11_radio/policy/
+L00,P0,P7,long run,all GPUs,multi-cell NRx,mixed site,strongest baseline,representative peak,none,3,2h each,M00|M01|M02,"p99.9; consecutive miss; leak","stable baseline",12_long/baseline/
+L01,P0,P7,long run,all GPUs,multi-cell NRx,mixed site,DART best,representative peak,none,3,2h each,M00|M01|M02,"p99.9; consecutive miss; leak","stable DART and correctness zero-error",12_long/dart/

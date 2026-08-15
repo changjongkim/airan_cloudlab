@@ -1,0 +1,36 @@
+order,id,stage,kind,approach,foreground,background,load,trial_plan,estimated_min,status_before_day,dependency,required_artifact
+1,DAY00,preflight,manifest,all,idle,none,none,1 snapshot,20,READY,none,MANIFEST.json
+2,DAY01,design,capability,4g,CUDA graph probe,none,none,"3x10000",20,BUILD,DAY00,CAPABILITY.json
+3,DAY02,design,control,4g+3g,descriptor doorbell,none,none,"5x100000",25,BUILD,DAY01,CONTROL_PATH.csv
+4,DAY03,design,correctness,4g+3g,epoch commit faults,none,"delay duplicate stale",1000 faults,20,BUILD,DAY02,COMMIT_CORRECTNESS.json
+5,DAY04,nrx,stack,4g,wrapper|raw|binding|graph,none,isolated,"3x5000",35,PARTIAL,DAY00,NRX_STACK.csv
+6,DAY05,nrx,capacity,4g|3g|full,NRx replica 1|2|4|8,none,closed+open,"3x60s",45,PARTIAL,DAY04,NRX_CAPACITY.csv
+6.5,SCH01,scheme,profile,DART-P/F,NRx+transport measurements,none,"mean|p95|p99|p99.9; guard 0|5|10|20%",trace replay,15,BUILD,DAY02|DAY04|DAY05,DART_PROFILE_V0.json
+7,DAY06,background,qualification,3g|full,none,Qwen real prompts,"prefill|decode; offered 50|90%","3x90s",35,BUILD,DAY00,BG_QWEN.csv
+8,DAY07,background,qualification,3g|full,none,online training,"mb1|4; offered 50|90%","3x90s",35,BUILD,DAY00,BG_TRAIN.csv
+9,DAY08,background,qualification,3g|full,none,video,"1|4 streams; offered 50|90%","smoke+3x90s",40,NEEDS_DATA,DAY00,BG_VIDEO.csv
+10,DAY09,background,qualification,3g|full,none,speech,"1|4 streams; offered 50|90%","smoke+3x90s",40,NEEDS_DATA,DAY00,BG_SPEECH.csv
+10.5,SCH02,scheme,lease profile,DART-L,Qwen step|training microbatch,grant lookahead,"unit p99; Qmax 25|50|100|250|500us",trace replay,15,BUILD,DAY06|DAY07,DART_LEASE_PROFILE_V0.json
+11,DAY10,fiveway,compute,MPS,L1+NRx,none,"50|85|95|105% normalized","3x60s",20,PARTIAL,DAY04|DAY05,FIVEWAY_COMPUTE_MPS.csv
+12,DAY11,fiveway,compute,MIG,L1+NRx local graph,none,"50|85|95|105% normalized","3x60s",20,PARTIAL,DAY04|DAY05,FIVEWAY_COMPUTE_MIG.csv
+13,DAY12,fiveway,compute,MIG+MPS,L1 and NRx processes,none,"50|85|95|105% normalized","3x60s",25,PARTIAL,DAY04|DAY05,FIVEWAY_COMPUTE_MIGMPS.csv
+14,DAY13,fiveway,compute,P2P,L1 4g and NRx 3g,none,"50|85|95|105% normalized","3x60s",25,PARTIAL,DAY04|DAY05,FIVEWAY_COMPUTE_P2P.csv
+15,DAY14,fiveway,compute,GDR,L1 4g and NRx 3g,none,"50|85|95|105% normalized","3x60s",30,PARTIAL,DAY04|DAY05,FIVEWAY_COMPUTE_GDR.csv
+15.5,SCH03,scheme,reservation,DART-R,P2P|GDR endpoints,none,"simultaneous submits; depth 1|2|4|8|16","1000 bursts",20,BUILD,DAY03|DAY13|DAY14|SCH01,DART_RESERVATION.csv
+16,DAY15,cause,injection,MPS,NRx,Qwen decode|prefill,"500 offsets each; priority off|on","3 runs",30,BUILD,DAY06|DAY10,RESIDUAL_QWEN.csv
+17,DAY16,cause,injection,MPS,NRx,training forward|backward,"500 offsets each; priority off|on","3 runs",30,BUILD,DAY07|DAY10,RESIDUAL_TRAIN.csv
+18,DAY17,cause,injection,MPS,NRx,video,"500 offsets; priority off|on","3 runs",20,NEEDS_DATA,DAY08|DAY10,RESIDUAL_VIDEO.csv
+19,DAY18,cause,injection,MPS,NRx,speech,"500 offsets; priority off|on","3 runs",20,NEEDS_DATA,DAY09|DAY10,RESIDUAL_SPEECH.csv
+19.5,SCH04,scheme,lease controller,DART-L,NRx,Qwen|training,"fixed gate|fixed quantum|grant lease","3x90s",20,BUILD,DAY15|DAY16|SCH02,DART_LEASE_V0.csv
+20,DAY19,fiveway,contention,MPS,L1+NRx,Qwen|training,"BE 50|90%; NRx low|burst|high","3x90s",35,BUILD,DAY06|DAY07|DAY10,FIVEWAY_BG_MPS.csv
+21,DAY20,fiveway,contention,MIG,L1+NRx local,Qwen|training isolated,"BE 50|90%; NRx low|burst|high","3x90s",35,BUILD,DAY06|DAY07|DAY11,FIVEWAY_BG_MIG.csv
+22,DAY21,fiveway,contention,MIG+MPS,L1 and NRx processes,Qwen|training isolated,"BE 50|90%; NRx low|burst|high","3x90s",35,BUILD,DAY06|DAY07|DAY12,FIVEWAY_BG_MIGMPS.csv
+23,DAY22,fiveway,contention,P2P,L1 4g and NRx 3g,Qwen|training sharing 3g,"BE 50|90%; NRx low|burst|high","3x90s",40,BUILD,DAY06|DAY07|DAY13,FIVEWAY_BG_P2P.csv
+24,DAY23,fiveway,contention,GDR,L1 4g and NRx 3g,Qwen|training sharing 3g,"BE 50|90%; NRx low|burst|high","3x90s",45,BUILD,DAY06|DAY07|DAY14,FIVEWAY_BG_GDR.csv
+25,DAY24,problem,killer,static one,resident endpoint,Qwen|training,"30-85-105burst-60%","3x250s",25,PARTIAL,DAY19|DAY23,KILLER_STATIC.json
+26,DAY25,problem,killer,dedicated peak,resident endpoints,Qwen|training,"same trace","3x250s",25,PARTIAL,DAY24,KILLER_DEDICATED.json
+27,DAY26,problem,killer,shortest queue,resident endpoint pool,Qwen|training,"same trace","3x250s",25,PARTIAL,DAY24,KILLER_SQ.json
+28,DAY27,dart,policy,predicted finish,resident endpoint pool,Qwen|training,"same trace","3x250s",30,PARTIAL,DAY24|SCH01|SCH03,DART_HOST.json
+29,DAY28,dart,commit,predfinish+epoch+JIT,resident endpoint pool,Qwen|training,"same trace; fault injection","3x250s+1000 faults",35,BUILD,DAY03|DAY27,DART_JIT.json
+29.5,SCH05,scheme,cumulative,DART-F/R/C/J/L,resident endpoint pool,Qwen|training,"same killer trace; P2P|GDR","3x250s",30,BUILD,DAY28|SCH04,DART_CUMULATIVE_ABLATION.csv
+30,DAY29,analysis,figures,all,all,all,all,one synthesis,45,BUILD,DAY15|DAY16|DAY19|DAY20|DAY21|DAY22|DAY23|DAY24|DAY25|DAY26|DAY27|DAY28|SCH05,DAY1_VERDICT.md

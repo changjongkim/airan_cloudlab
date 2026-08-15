@@ -31,6 +31,16 @@ from gdr_rdma_channel import GdrRdmaEndpoint, flush_gpudirect_writes
 LABEL = sys.argv[1] if len(sys.argv) > 1 else "l1_prod_gdr"
 ITERATIONS = int(sys.argv[2]) if len(sys.argv) > 2 else 100
 CHANNEL_TAG = sys.argv[3] if len(sys.argv) > 3 else "airan"
+ARRIVAL_RATE = float(os.environ["ARRIVAL_RATE_SLOTS_S"]) \
+    if "ARRIVAL_RATE_SLOTS_S" in os.environ else None
+ARRIVAL_DURATION_S = float(os.environ["ARRIVAL_DURATION_S"]) \
+    if "ARRIVAL_DURATION_S" in os.environ else None
+if (ARRIVAL_RATE is None) != (ARRIVAL_DURATION_S is None):
+    raise ValueError("ARRIVAL_RATE_SLOTS_S and ARRIVAL_DURATION_S are paired")
+if ARRIVAL_RATE is not None:
+    if ARRIVAL_RATE <= 0 or ARRIVAL_DURATION_S <= 0:
+        raise ValueError("arrival rate and duration must be positive")
+    ITERATIONS = int(round(ARRIVAL_RATE * ARRIVAL_DURATION_S))
 NUM_WARMUP = 20
 WAIT_TIMEOUT_S = float(os.environ.get("RDMA_SLOT_TIMEOUT_S", "600"))
 TERMINATE_SEQ = (1 << 64) - 1
@@ -122,6 +132,15 @@ def _wait_for_sequence(endpoint, expected):
                 f"sequence skipped: expected={expected} observed={observed}")
     raise TimeoutError(
         f"timed out waiting for sequence {expected}; observed={observed}")
+
+
+def _wait_until(target_ns):
+    while True:
+        remaining = target_ns - time.perf_counter_ns()
+        if remaining <= 0:
+            return
+        if remaining > 200_000:
+            time.sleep((remaining - 100_000) / 1e9)
 
 
 # Both processes construct forward and then backward, preventing a two-channel
@@ -225,16 +244,29 @@ try:
     print("[L1-GDR] measuring...", flush=True)
 
     latencies = []
+    sojourn = []
     base = NUM_WARMUP
+    measurement_start_ns = time.perf_counter_ns()
     for i in range(ITERATIONS):
+        target_ns = None
+        if ARRIVAL_RATE is not None:
+            target_ns = measurement_start_ns + round(i * 1e9 / ARRIVAL_RATE)
+            _wait_until(target_ns)
         t0 = time.perf_counter_ns()
         run_one_slot(base + i + 1)
-        latencies.append((time.perf_counter_ns() - t0) / 1e6)
+        completed_ns = time.perf_counter_ns()
+        latencies.append((completed_ns - t0) / 1e6)
+        if target_ns is not None:
+            sojourn.append((completed_ns - target_ns) / 1e6)
 
     arr = np.asarray(latencies)
     result = {
         "label": LABEL,
+        "trial": int(os.environ.get("EXPERIMENT_TRIAL", "0")),
         "iterations": ITERATIONS,
+        "arrival_rate_slots_per_s": ARRIVAL_RATE,
+        "duration_target_s": ARRIVAL_DURATION_S,
+        "timing_boundary": "l1_front_start_to_ldpc_crc_complete",
         "transport": "gpudirect_rdma_zero_copy_direct_trt",
         "fwd_bytes": FWD_DATA_SIZE,
         "bwd_bytes": BWD_DATA_SIZE,
@@ -242,9 +274,20 @@ try:
         "p50_ms": float(np.percentile(arr, 50)),
         "p95_ms": float(np.percentile(arr, 95)),
         "p99_ms": float(np.percentile(arr, 99)),
+        "p99_9_ms": float(np.percentile(arr, 99.9)),
         "miss_1ms": int(np.sum(arr > 1.0)),
         "raw_ms": [float(value) for value in latencies],
+        "pass": True,
     }
+    if sojourn:
+        sojourn_arr = np.asarray(sojourn)
+        result.update({
+            "sojourn_mean_ms": float(sojourn_arr.mean()),
+            "sojourn_p95_ms": float(np.percentile(sojourn_arr, 95)),
+            "sojourn_p99_ms": float(np.percentile(sojourn_arr, 99)),
+            "sojourn_p99_9_ms": float(np.percentile(sojourn_arr, 99.9)),
+            "raw_sojourn_ms": [float(value) for value in sojourn],
+        })
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_path = os.path.join(
         RESULTS_DIR, f"l1prod_{LABEL}_{timestamp}.json")

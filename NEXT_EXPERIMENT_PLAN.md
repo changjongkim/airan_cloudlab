@@ -1,5 +1,10 @@
 # 다음 실험 세션 계획 · AI-RAN GPU 격리 · NIC RDMA 검증
 
+> **2026-08-13 연구 방향 갱신**: 이 문서는 완료된 placement/transport 실험 기록으로
+> 보존한다. 후속 central experiment는 dynamic MIG reconfiguration을 전제로 하지 않으며,
+> [`DRAIN_FREE_NRX_EXPERIMENT_PLAN.md`](DRAIN_FREE_NRX_EXPERIMENT_PLAN.md)의 고정 MIG
+> topology · independent NRx endpoint routing · conventional fallback 설계를 따른다.
+
 **작성일**: 2026-08-05 · **업데이트**: 2026-08-13 (direct TensorRT·P2P/GDR·MPS·queue sweep 완료)
 **작성 배경**: Chain 17 · 18 · 19 실험 완료 후 · 논문 novelty 완성을 위한 추가 실측 필요
 **전제**: 각 Phase의 검증 gate · 통과 못 하면 다음 진행 안 함 · 원인 파악까지 stop

@@ -1,15 +1,16 @@
 #!/bin/bash
-# Run ONLY Phase C GPUDirect RDMA staging variants (Configs 4 and 7) with
+# Run Phase C zero-copy GPUDirect RDMA + direct TRT variants with
 # Topology B (3g+2g+2g).
 # Appends results to /mydata/results/chain/SUMMARY.txt.
 set -u
 
 SDK_HOST=/mydata/aerial-cuda-accelerated-ran
 SDK_MNT=/opt/nvidia/cuBB
+ENGINE_HOST=/mydata/results/nrx_deep_profile/engines
 RESULTS_ROOT=/mydata/results/chain
 RDMA_IMG=airan:25-3-rdma
 QWEN_IMG=airan:25-3-final
-L1_ITERS="${L1_ITERS:-30}"
+L1_ITERS="${L1_ITERS:-1000}"
 QWEN_DUR="${QWEN_DUR:-300}"
 SUMMARY_FILE="$RESULTS_ROOT/SUMMARY.txt"
 STATUS_FILE="$RESULTS_ROOT/STATUS.txt"
@@ -51,9 +52,11 @@ cleanup_containers() {
     docker rm -f \
         airan_c4_gdr_l1 airan_c4_gdr_nrx airan_c4_gdr_qwen \
         airan_c7_gdr_l1 airan_c7_gdr_nrx airan_c7_gdr_qwen \
+        airan_c4d_gdr_l1 airan_c4d_gdr_nrx airan_c4d_gdr_qwen \
+        airan_c7d_gdr_l1 airan_c7d_gdr_nrx airan_c7d_gdr_qwen \
         > /dev/null 2>&1 || true
-    cleanup_gdr_tag config4_gdr
-    cleanup_gdr_tag config7_gdr
+    cleanup_gdr_tag config4_gdr_direct
+    cleanup_gdr_tag config7_gdr_direct
 }
 
 destroy_mig() {
@@ -150,6 +153,8 @@ run_gdr_config() {
 
     if ! docker run -d --name "$nrx_name" --gpus "\"device=$MIG_NRX\"" \
         "${RDMA_ARGS[@]}" \
+        -e NRX_ENGINE=/engines/neural_rx_fp16_4g.trt \
+        -v "$ENGINE_HOST:/engines:ro" \
         -v "$SDK_HOST:$SDK_MNT" -w "$SDK_MNT/pyaerial" "$RDMA_IMG" \
         python3 nrx_consumer_gdr.py "$tag" > /dev/null 2>&1; then
         collect_logs "$outdir" "$nrx_name" "$qwen_name"
@@ -235,8 +240,8 @@ trap on_exit EXIT
 trap 'alert "PHASE C GDR stopped by SIGINT"; exit 130' INT
 trap 'alert "PHASE C GDR stopped by SIGTERM"; exit 143' TERM
 
-log "==== PHASE C GPUDirect RDMA staging start (Topology B: 3g+2g+2g) ===="
-for cfg in config4_gdr config7_gdr; do
+log "==== PHASE C zero-copy GPUDirect RDMA direct-TRT start (Topology B: 3g+2g+2g) ===="
+for cfg in config4_gdr_direct config7_gdr_direct; do
     if grep -q "^${cfg}," "$SUMMARY_FILE"; then
         alert "$cfg already exists in SUMMARY.txt; refusing duplicate append"
         exit 1
@@ -247,12 +252,14 @@ TOPOLOGY_NEEDS_RESTORE=1
 setup_topology_B || { alert "Topology B setup failed, aborting"; exit 1; }
 if [ -n "${MIG_L1:-}" ] && [ -n "${MIG_NRX:-}" ] && [ -n "${MIG_AI:-}" ]; then
     run_gdr_config \
-        config4_gdr config4_gdr_l1 config4_gdr config4_cross_mig_gdr c4 \
-        "Config 4 GPUDirect RDMA staging: L1(2g)<->NRx(2g) + Qwen(3g)"
+        config4_gdr_direct config4_gdr_direct_l1 config4_gdr_direct \
+        config4_cross_mig_gdr_direct c4d \
+        "Config 4 zero-copy GPUDirect RDMA + direct TRT: L1(2g)<->NRx(2g) + Qwen(3g)"
     rc4=$?
     run_gdr_config \
-        config7_gdr config7_gdr_l1 config7_gdr config7_cross_repeat_gdr c7 \
-        "Config 7 GPUDirect RDMA staging: cross-partition repeat + Qwen(3g)"
+        config7_gdr_direct config7_gdr_direct_l1 config7_gdr_direct \
+        config7_cross_repeat_gdr_direct c7d \
+        "Config 7 zero-copy GPUDirect RDMA + direct TRT repeat: cross-partition + Qwen(3g)"
     rc7=$?
     if [ "$rc4" -ne 0 ] || [ "$rc7" -ne 0 ]; then
         alert "PHASE C GDR failed (config4_rc=$rc4 config7_rc=$rc7)"
@@ -269,5 +276,5 @@ else
     alert "normal completion could not restore Topology A"
     exit 1
 fi
-log "==== PHASE C GPUDirect RDMA staging done ===="
+log "==== PHASE C zero-copy GPUDirect RDMA direct-TRT done ===="
 tail -3 "$SUMMARY_FILE"

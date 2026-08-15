@@ -1,0 +1,12 @@
+variant,parent,router,reservation,commit,fallback,background_control,control_path,transport,primary_question,required_metrics,artifact
+S0,none,static_one,none,direct_shared_output,block_on_nrx,uncontrolled,host,P2P|GDR,"fixed isolation limit","miss; queue; idle_gpu_s; bg_slo",scheme/s0_static/
+S1,S0,round_robin,none,direct_shared_output,block_on_nrx,uncontrolled,host,P2P|GDR,"capacity alone sufficient","miss; endpoint_balance; bg_slo",scheme/s1_rr/
+S2,S1,shortest_queue,none,direct_shared_output,block_on_nrx,uncontrolled,host,P2P|GDR,"observed queue sufficient","miss; queue_error; endpoint_balance",scheme/s2_sq/
+S3,S2,p99_predicted_finish,none,direct_shared_output,block_on_nrx,uncontrolled,host,P2P|GDR,"deadline feasibility value","miss; prediction_error; reject_rate",scheme/s3_predfinish/
+S4,S3,p99_predicted_finish,atomic_tail_and_slots,direct_shared_output,block_on_nrx,uncontrolled,host,P2P|GDR,"over-admission elimination","double_reserve; negative_credit; miss",scheme/s4_reservation/
+S5,S4,p99_predicted_finish,atomic_tail_and_slots,private_epoch_cas,block_on_nrx,uncontrolled,host,P2P|GDR,"late/stale safety","wrong_commit; stale_drop; miss",scheme/s5_epoch/
+S6,S5,p99_predicted_finish,atomic_tail_and_slots,private_epoch_cas,jit_latest_safe_start,uncontrolled,host,P2P|GDR,"deadline safety vs duplicate work","miss; fallback_rate; duplicate_gpu_us",scheme/s6_jit/
+S7,S6,p99_predicted_finish,atomic_tail_and_slots,private_epoch_cas,jit_latest_safe_start,fixed_quantum,host,P2P|GDR,"cooperative quantum baseline","miss; max_blocking; bg_slo",scheme/s7_fixed_quantum/
+S8,S6,p99_predicted_finish,atomic_tail_and_slots,private_epoch_cas,jit_latest_safe_start,grant_ahead_lease,host,P2P|GDR,"RAN lookahead lease value","miss; lease_waste; bg_slo; idle_gpu_s",scheme/s8_grant_lease/
+S9,S8,p99_predicted_finish,atomic_tail_and_slots,private_epoch_cas,jit_latest_safe_start,grant_ahead_lease,device_emulated,P2P|GDR,"host control tail removal","doorbell_to_start; commit_p99; reserved_sm",scheme/s9_device/
+S10,S9,p99_predicted_finish,atomic_tail_and_slots,private_epoch_cas,jit_latest_safe_start,grant_ahead_lease,DART_Q_model,P2P|GDR,"hardware assist value","control_p99; miss; area; power; sram",scheme/s10_dartq/

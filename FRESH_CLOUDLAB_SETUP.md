@@ -1,5 +1,10 @@
 # CloudLab d8545 · Fresh Node → Task 1/2 실험 준비 완전 가이드
 
+> **2026-08-14 canonical 복구 문서**: 완전히 빈 새 노드에서 최종
+> DART-Rx/GDR 환경과 모든 검증 gate를 복원할 때는
+> `CLOUDLAB_EMPTY_NODE_RESTORE_RUNBOOK_KO.md`를 먼저 사용한다. 이 문서는
+> 초기 Task 1/2 설치 이력과 상세 troubleshooting reference로 유지한다.
+
 **목적**: 새 CloudLab 노드를 예약했을 때 · 이 문서만 있으면 30~90분 안에
 `SUMMARY.txt` 결과가 나오는 상태까지 복원.
 

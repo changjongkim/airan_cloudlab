@@ -6,7 +6,7 @@
 
 ## 0. 한눈에 보기 — Critical Summary
 
-![Critical Summary](charts/X_critical_summary.png)
+![Critical Summary](../../charts/X_critical_summary.png)
 
 | 측면 | 발견 | 결론 | 메커니즘 (섹션) |
 |---|---|---|---|
@@ -35,7 +35,7 @@
 
 ### 워크로드 크기 비교
 
-![v1 vs v2 Critical](charts/X_v1_vs_v2_critical.png)
+![v1 vs v2 Critical](../../charts/X_v1_vs_v2_critical.png)
 
 **핵심**: v1에서 워크로드가 너무 작았다. 실제 production AI-RAN 시나리오에는 v2 데이터가 representative.
 
@@ -45,7 +45,7 @@
 
 ### v2 heavy AI 측정
 
-![MIG vs no-mig heavy](charts/v2_04_mig_vs_nomig_heavy.png)
+![MIG vs no-mig heavy](../../charts/v2_04_mig_vs_nomig_heavy.png)
 
 ```
 no-mig + Qwen-7B (full GPU 공유):  57.89 ms
@@ -115,7 +115,7 @@ production AI-RAN 시나리오는 **반드시 Qwen-급 모델** (수십 GB)을 �
 
 ### 3.1 측정: split-60-40 + Qwen-7B, N=4 반복
 
-![Bimodal](charts/v2_03_bimodal_detail.png)
+![Bimodal](../../charts/v2_03_bimodal_detail.png)
 
 ```
 Run 1 (08:48): 52.80 ms (HIGH mode, +6.66 ms vs baseline)
@@ -132,8 +132,8 @@ Run 4 (09:55): 52.86 ms (HIGH mode, +6.72 ms)
 
 ### 3.2 다른 split들과 비교 — **partition-aware baseline**
 
-![Splits with Qwen](charts/v2_02_splits_with_qwen.png)
-![Partition-aware leakage](charts/v2_08_partition_aware_leakage.png)
+![Splits with Qwen](../../charts/v2_02_splits_with_qwen.png)
+![Partition-aware leakage](../../charts/v2_08_partition_aware_leakage.png)
 
 leakage는 **각 split의 L1이 어느 partition에 있는지**에 따라 baseline이 달라져야 함. 그렇게 보면:
 
@@ -223,7 +223,7 @@ NVIDIA MIG documentation: *"each MIG instance has dedicated and isolated memory 
 
 ### 4.1 측정 데이터 (L1 alone, no AI)
 
-![Partition Baselines](charts/v2_01_partition_baselines.png)
+![Partition Baselines](../../charts/v2_01_partition_baselines.png)
 
 ```
 1g.5gb:  OOM   (cuPHY 초기화 자체 실패)
@@ -300,7 +300,7 @@ cuPHY 한 slot 처리의 HBM read 패턴 (channel-est + equalizer 기준):
 
 ### 4.5 v1 partition 비교 (잘못 해석된 데이터)
 
-![v1 partitions](charts/v1_11_partition_v1.png)
+![v1 partitions](../../charts/v1_11_partition_v1.png)
 
 v1에서는 no-mig가 375 ms로 보이지만, 이건 **SM 경합 artifact** (섹션 2.2 참조). 워크로드가 HBM에 닿지 않으니 진짜 isolation 측정이 아님. v2 data와 일치하지 않음.
 
@@ -312,7 +312,7 @@ v2 heavy workload 실험은 reservation 시간 부족으로 **각 split마다 �
 
 ### Coverage matrix
 
-![v2 coverage matrix](charts/v2_06_coverage_matrix.png)
+![v2 coverage matrix](../../charts/v2_06_coverage_matrix.png)
 
 ```
                      none   Qwen   HBM16   ResNet   Multi-AI
@@ -326,7 +326,7 @@ B baselines (alone)   N=3   —      —       —        —      ← B/B2/B4
 
 ### 모든 v2 측정 한눈에
 
-![v2 all splits](charts/v2_07_all_splits.png)
+![v2 all splits](../../charts/v2_07_all_splits.png)
 
 **솔직히 인정해야 할 점**:
 - **split-40-60은 단 1개 측정 (66.55ms)** → 진짜 그 값인지 outlier인지 모름
@@ -347,7 +347,7 @@ B baselines (alone)   N=3   —      —       —        —      ← B/B2/B4
 
 ### v1 split-50-50 cells=20 의 29 runs
 
-![Multimodal](charts/v1_08_multimodal.png)
+![Multimodal](../../charts/v1_08_multimodal.png)
 
 같은 MIG split, 같은 cell 수, sub-parameter (PRB, antenna, MCS, AI type) 만 다른데도:
 - ~32-46 ms 범위
@@ -362,7 +362,7 @@ B baselines (alone)   N=3   —      —       —        —      ← B/B2/B4
 
 ### v1 (light AI, GPT-2 124M)
 
-![Cell scaling](charts/v1_01_cell_scaling_4presets.png)
+![Cell scaling](../../charts/v1_01_cell_scaling_4presets.png)
 
 v1에서는 MIG가 cell-count linear scaling 보였지만 — 이건 light AI 데이터.
 
@@ -383,7 +383,7 @@ MIG split-50-50: 2.18, 8.37, 17.29, 34.64, 68.96 (linear)
 
 ### v1 HBM 32× 안정 — 진짜 격리인가?
 
-![HBM sweep](charts/v1_03_hbm_intensity.png)
+![HBM sweep](../../charts/v1_03_hbm_intensity.png)
 
 ```
 HBM 0.5GB → 41ms
@@ -396,14 +396,14 @@ HBM 16GB  → 41ms (변동 ±2ms)
 
 ### v1 stability — 짧은 측정 한정
 
-![Stability](charts/v1_10_stability.png)
+![Stability](../../charts/v1_10_stability.png)
 
 1000 iters까지는 stable했지만 — 분 단위, 시간 단위 stability 미검증.
 실제 deployment는 hours~days continuous. drift/thermal/power throttling 영향 미측정.
 
 ### v1 AI type 무관 — small workload artifact
 
-![AI type](charts/v1_02_ai_type_compare.png)
+![AI type](../../charts/v1_02_ai_type_compare.png)
 
 GPT-2/ResNet/HBM 모두 비슷한 41ms — 모두 light라서 HBM 안 씀.
 v2 Qwen에서는 다른 결과 (57.89ms no-mig vs 46.47 MIG).
@@ -414,25 +414,25 @@ v2 Qwen에서는 다른 결과 (57.89ms no-mig vs 46.47 MIG).
 
 ### ResNet batch sweep
 
-![ResNet batch](charts/v1_04_resnet_batch.png)
+![ResNet batch](../../charts/v1_04_resnet_batch.png)
 
 bs=8 → 34.65, bs=64 → 41.33. ResNet이 batch 8× 커져도 L1 변동 작음 (~7ms). 격리 성공처럼 보이나 **bs=64조차 16GB ResNet 가중치 + 활성화는 ~1GB 미만** — 여전히 light.
 
 ### PRB sweep
 
-![PRB sweep](charts/v1_05_prb_sweep.png)
+![PRB sweep](../../charts/v1_05_prb_sweep.png)
 
 PRB 51→273 (5×) 변화 → L1 거의 무변 (33-35ms). cuPHY 내부 fixed overhead가 dominant. PRB는 L1 부하 측정 지표로 부적합.
 
 ### Antenna sweep
 
-![Antenna sweep](charts/v1_06_antenna_sweep.png)
+![Antenna sweep](../../charts/v1_06_antenna_sweep.png)
 
 2T2R → 31.84, 8T8R → 46.27. 안테나 증가에 따라 비례 — 채널추정 부하가 커짐. **8T8R 부하가 v1에서는 1.5× 무거움**. v2가 8T8R 쓴 이유.
 
 ### MCS sweep
 
-![MCS sweep](charts/v1_07_mcs_sweep.png)
+![MCS sweep](../../charts/v1_07_mcs_sweep.png)
 
 MCS 0~24 → L1 34-41ms, **비단조 (non-monotonic)**. MCS 효과보다 measurement variance가 큼. → multimodal 한 번 더 확인.
 
@@ -440,7 +440,7 @@ MCS 0~24 → L1 34-41ms, **비단조 (non-monotonic)**. MCS 효과보다 measure
 
 ## 9. 14개 OOM 실패 — 1g.5gb partition은 useless
 
-![OOM](charts/v1_09_oom_1g5gb.png)
+![OOM](../../charts/v1_09_oom_1g5gb.png)
 
 v1의 14개 fail은 **전부 L1을 1g.5gb partition에 배치**:
 - split-20-80 (L1=1g.5gb): 11 fails

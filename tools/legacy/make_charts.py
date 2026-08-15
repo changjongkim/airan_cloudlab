@@ -7,8 +7,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CHARTS = os.path.join(BASE_DIR, "charts")
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CHARTS = os.path.join(REPO_ROOT, "charts")
 os.makedirs(CHARTS, exist_ok=True)
 
 plt.rcParams.update({

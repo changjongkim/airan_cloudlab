@@ -1,7 +1,7 @@
 # DART-Rx final architecture · measurement-backed specification
 
 > **동결된 후보안:** 이 문서는 현재 canonical architecture가 아니다. MIG 중심 문제와
-> 진행 중인 causal campaign의 기준은 `MIG_NRX_RESEARCH_CHECKPOINT_KO.md`를 따른다.
+> 진행 중인 causal campaign의 기준은 `../current/MIG_NRX_RESEARCH_CHECKPOINT_KO.md`를 따른다.
 > Multi-endpoint fixed-MIG problem existence가 확인되기 전에는 아래 transaction/pool
 > mechanism을 최종 설계 또는 novelty로 간주하지 않는다.
 

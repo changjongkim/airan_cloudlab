@@ -2,7 +2,7 @@
 
 > **2026-08-13 연구 방향 갱신**: 이 문서는 완료된 placement/transport 실험 기록으로
 > 보존한다. 후속 central experiment는 dynamic MIG reconfiguration을 전제로 하지 않으며,
-> [`DRAIN_FREE_NRX_EXPERIMENT_PLAN.md`](DRAIN_FREE_NRX_EXPERIMENT_PLAN.md)의 고정 MIG
+> [`DRAIN_FREE_NRX_EXPERIMENT_PLAN.md`](../experiments/DRAIN_FREE_NRX_EXPERIMENT_PLAN.md)의 고정 MIG
 > topology · independent NRx endpoint routing · conventional fallback 설계를 따른다.
 
 **작성일**: 2026-08-05 · **업데이트**: 2026-08-13 (direct TensorRT·P2P/GDR·MPS·queue sweep 완료)

@@ -43,14 +43,14 @@ NeuralRx / chanpred × {alone, cross-partition, same-partition coloc} = 6 condit
 
 ### 2.2 결과
 
-![Figure 1 — L1 vs AI cudaFree asymmetric caller](results/20260622/figures/fig1_asymmetric_victim.png)
+![Figure 1 — L1 vs AI cudaFree asymmetric caller](../../results/20260622/figures/fig1_asymmetric_victim.png)
 
 **L1은 대칭 victim이 아니라 asymmetric caller**:
 - L1 (cuPHY): 30초 window에 **2,463회 cudaFree 호출** (프레임당 130회 패턴)
 - AI (NeuralRx coloc): 3회
 - AI (chanpred): **0회** (pre-allocated pool 사용)
 
-![Figure 2 — cudaFree bimodal distribution](results/20260622/figures/fig2_bimodal_distribution.png)
+![Figure 2 — cudaFree bimodal distribution](../../results/20260622/figures/fig2_bimodal_distribution.png)
 
 **cudaFree per-call duration이 bimodal**:
 | condition | fast (<100µs) | slow (>1ms) |
@@ -70,7 +70,7 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ### 3.2 결과 (스모킹건 발견)
 
-![Figure 3 — Cross-process implicit sync (r²=0.94)](results/20260622/figures/fig3_cross_process_sync_proof.png)
+![Figure 3 — Cross-process implicit sync (r²=0.94)](../../results/20260622/figures/fig3_cross_process_sync_proof.png)
 
 **X3 NeuralRx coloc (왼쪽)**:
 - N = 2,271 (slow mode)
@@ -96,7 +96,7 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ### 4.2 결과
 
-![Figure 4 — Sync wait conservation (PROOF 6)](results/20260622/figures/fig4_sync_conservation.png)
+![Figure 4 — Sync wait conservation (PROOF 6)](../../results/20260622/figures/fig4_sync_conservation.png)
 
 | API | Baseline | Defer shim | Delta |
 |---|---|---|---|
@@ -116,7 +116,7 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ## 5. Stage 3.5 — chanpred anomaly (production pattern)
 
-![Figure 5 — chanpred zero cudaFree](results/20260622/figures/fig5_chanpred_no_cudafree.png)
+![Figure 5 — chanpred zero cudaFree](../../results/20260622/figures/fig5_chanpred_no_cudafree.png)
 
 **chanpred**는 3.4M kernel launch를 하는데도 **cudaFree 0회 호출** — persistent buffer pool 사용. 그래서 L1과 coloc해도 **cudaFree contention 유발 안 함**.
 
@@ -133,7 +133,7 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ### 6.2 결과 — Partition size 무관
 
-![Figure 6 — Partition size doesn't matter](results/20260622/figures/fig6_partition_sweep.png)
+![Figure 6 — Partition size doesn't matter](../../results/20260622/figures/fig6_partition_sweep.png)
 
 | L1 partition | NRx coloc cudaFree total |
 |---|---|
@@ -145,7 +145,7 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ### 6.3 결과 — Cross-partition workload type 효과 zero
 
-![Figure 7 — Cross-part workload variation](results/20260622/figures/fig7_crosspart_workload_variation.png)
+![Figure 7 — Cross-part workload variation](../../results/20260622/figures/fig7_crosspart_workload_variation.png)
 
 3g L1+NRx coloc에 2g sidecar에 Qwen/HBM/CHP/ResNet 추가:
 - Baseline: 9,058 ms
@@ -156,19 +156,19 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 **모든 workload type에서 ±2% 이내** ⇒ **chip-wide contention 가설 기각**.
 
-![Figure 8 — Distribution by partition](results/20260622/figures/fig8_distribution_by_partition.png)
+![Figure 8 — Distribution by partition](../../results/20260622/figures/fig8_distribution_by_partition.png)
 
 **cudaFree per-call 분포가 7g/4g/3g에서 완전히 동일** — partition 크기와 무관.
 
 ### 6.4 2g 특수 케이스
 
-![Figure 9 — 2g anomaly (SM contention)](results/20260622/figures/fig9_2g_anomaly.png)
+![Figure 9 — 2g anomaly (SM contention)](../../results/20260622/figures/fig9_2g_anomaly.png)
 
 가장 작은 2g partition은 SM 부족으로 AI process 자체가 starved → cudaFree 시간 오히려 줄어듦. **실용적으로 무의미**.
 
 ### 6.5 Chain 5 재확인 (20260701 rerun)
 
-![Figure 10 — Chain 5 sidecar sweep](results/20260701/figures/fig10_chain5_sidecar_sweep.png)
+![Figure 10 — Chain 5 sidecar sweep](../../results/20260701/figures/fig10_chain5_sidecar_sweep.png)
 
 **No-coloc sidecar만 있을 때**: 3g/4g는 ~600ms 상수, 2g는 ~1100ms 상승. **Cross-partition isolation 완벽 재확인**.
 
@@ -182,7 +182,7 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ### 7.1 Chain 6 — Cell size sweep (3g × cells {4, 10, 40})
 
-![Figure 11 — Cell sweep scaling](results/20260701/figures/fig11_chain6_cell_sweep.png)
+![Figure 11 — Cell sweep scaling](../../results/20260701/figures/fig11_chain6_cell_sweep.png)
 
 **Scaling Law #1**: cudaFree count = **130 × cells** (linear, 모든 scenario에서 identical)
 
@@ -192,7 +192,7 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ### 7.2 Coloc penalty ratio 상수
 
-![Figure 12 — Coloc penalty invariant](results/20260701/figures/fig12_chain6_coloc_ratio.png)
+![Figure 12 — Coloc penalty invariant](../../results/20260701/figures/fig12_chain6_coloc_ratio.png)
 
 | cells | NRx coloc/alone | chanpred coloc/alone |
 |---|---|---|
@@ -204,18 +204,18 @@ X3 (NRx coloc) 조건의 cudaFree sqlite와 AI process sqlite를 **timestamp cro
 
 ### 7.3 Chain 7 §18 X-style 재검증
 
-![Figure 13 — Chain 7 X-style × cells](results/20260701/figures/fig13_chain7_x_sweep.png)
+![Figure 13 — Chain 7 X-style × cells](../../results/20260701/figures/fig13_chain7_x_sweep.png)
 
 X2/X3/X5/X6를 cells={4, 10, 40, 60}에 걸쳐 재실행. Chain 4 pattern이 cell size에 무관하게 성립.
 
-![Figure 14 — Chain 7 penalty ratio](results/20260701/figures/fig14_chain7_penalty_ratio.png)
+![Figure 14 — Chain 7 penalty ratio](../../results/20260701/figures/fig14_chain7_penalty_ratio.png)
 
 - **X3/X2 (NRx): ~10× 상수** across all cells
 - **X6/X5 (chanpred): ~7× 상수** across all cells
 
 ### 7.4 Shim mechanism 검증
 
-![Figure 15 — Shim intercept verification](results/20260701/figures/fig15_chain7_shim_verify.png)
+![Figure 15 — Shim intercept verification](../../results/20260701/figures/fig15_chain7_shim_verify.png)
 
 | Test | cudaFree count | 의미 |
 |---|---|---|
@@ -265,7 +265,7 @@ cudaFree(ptr)        → cudaFreeAsync(ptr, stream);
 
 ### 8.2 결과 — Sync Conservation 결정적 증명
 
-![Figure 16 — Chain 8 sync conservation](results/20260701/figures/fig16_chain8_sync_conservation.png)
+![Figure 16 — Chain 8 sync conservation](../../results/20260701/figures/fig16_chain8_sync_conservation.png)
 
 **cells=40, NRx coloc 상세**:
 
@@ -284,7 +284,7 @@ cudaFree(ptr)        → cudaFreeAsync(ptr, stream);
 
 ### 8.3 L1 frame latency 실질 개선 zero
 
-![Figure 17 — Mitigation ineffective across cells](results/20260701/figures/fig17_chain8_mitigation_across_cells.png)
+![Figure 17 — Mitigation ineffective across cells](../../results/20260701/figures/fig17_chain8_mitigation_across_cells.png)
 
 **L1 mean frame latency (ms)**:
 

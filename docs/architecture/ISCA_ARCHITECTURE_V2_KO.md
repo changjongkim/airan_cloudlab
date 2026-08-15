@@ -1,7 +1,7 @@
 # DART-Rx: ISCA 방향의 AI-RAN accelerator architecture
 
 > **동결된 exploratory design:** 현재 연구의 authoritative checkpoint는
-> `MIG_NRX_RESEARCH_CHECKPOINT_KO.md`다. 아래 DART-Q/ISA 설계는 causal experiment가
+> `../current/MIG_NRX_RESEARCH_CHECKPOINT_KO.md`다. 아래 DART-Q/ISA 설계는 causal experiment가
 > architecture gap을 입증할 때만 재검토하며, 현재 구현 목표로 간주하지 않는다.
 
 작성일: 2026-08-13  

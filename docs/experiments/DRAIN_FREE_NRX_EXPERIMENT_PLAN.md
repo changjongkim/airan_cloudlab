@@ -1,7 +1,7 @@
 # Drain-Free Elastic NRx 실험 설계
 
 > **상태 주의:** 현재 문제 정의와 실행 체크포인트는
-> `MIG_NRX_RESEARCH_CHECKPOINT_KO.md`가 authoritative하다. 본 문서의 routing,
+> `../current/MIG_NRX_RESEARCH_CHECKPOINT_KO.md`가 authoritative하다. 본 문서의 routing,
 > fallback 및 reclaim 정책은 causal campaign 결과가 Branch A를 지지할 때만 후속
 > 설계 후보로 사용한다.
 

@@ -6,13 +6,13 @@ Updated from v1 (light workload) — v1 over-estimated MIG benefit because workl
 
 ## 📊 한눈에 보기 (세 표 = 한 차트)
 
-![Key findings summary](charts/v2_09_keyfindings_summary.png)
+![Key findings summary](../../charts/v2_09_keyfindings_summary.png)
 
 ## 🎯 Key measurements
 
 ### L1 baseline (no AI)
 
-![Baselines with p99](charts/v2_01_partition_baselines.png)
+![Baselines with p99](../../charts/v2_01_partition_baselines.png)
 
 | Partition | SM | HBM | HBM BW | L1 mean (ms) | p99 |
 |---|---|---|---|---|---|
@@ -28,7 +28,7 @@ Observations:
 
 ### L1 + AI on MIG (heavy AI: Qwen-7B) — **partition-aware leakage**
 
-![Partition-aware leakage](charts/v2_08_partition_aware_leakage.png)
+![Partition-aware leakage](../../charts/v2_08_partition_aware_leakage.png)
 
 | Config | L1 partition | AI partition | L1 mean | vs B baseline | leakage |
 |---|---|---|---|---|---|

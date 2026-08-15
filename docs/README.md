@@ -2,6 +2,7 @@
 
 ## Current — 먼저 읽을 문서
 
+- [그림으로 읽는 연구 전체 설명](current/RESEARCH_WALKTHROUGH_KO.md): background, DART-Rx 전체 구조, setup, 평가 결과와 claim 경계를 한 문서로 설명
 - [연구 종합본](current/MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md): 문제, 실측, 설계, novelty, 남은 gate
 - [연구 체크포인트](current/MIG_NRX_RESEARCH_CHECKPOINT_KO.md): 완료 실험의 수치와 claim 경계
 - [GDR pool 실행 계획](current/MIG_NRX_GDR_POOL_EXECUTION_PLAN_KO.md): 완료된 multi-endpoint campaign 구성

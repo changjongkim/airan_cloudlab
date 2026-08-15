@@ -2,10 +2,11 @@
 
 이 디렉터리의 단일 진입점이다. 새로 작업을 시작할 때는 아래 순서로 읽는다.
 
-1. [현재 연구 종합본](docs/current/MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md)
-2. [현재 문서 인덱스](docs/current/CURRENT_RESEARCH_INDEX_KO.md)
-3. [실험 데이터 카탈로그](data/README.md)
-4. [빈 CloudLab 노드 복구 절차](docs/setup/CLOUDLAB_EMPTY_NODE_RESTORE_RUNBOOK_KO.md)
+1. [그림으로 읽는 연구 전체 설명](docs/current/RESEARCH_WALKTHROUGH_KO.md): background → design → setup → evaluation
+2. [현재 연구 종합본](docs/current/MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md)
+3. [현재 문서 인덱스](docs/current/CURRENT_RESEARCH_INDEX_KO.md)
+4. [실험 데이터 카탈로그](data/README.md)
+5. [빈 CloudLab 노드 복구 절차](docs/setup/CLOUDLAB_EMPTY_NODE_RESTORE_RUNBOOK_KO.md)
 
 ## 디렉터리 구조
 

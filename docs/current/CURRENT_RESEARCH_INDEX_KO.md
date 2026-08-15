@@ -6,17 +6,19 @@
 
 ## 먼저 읽을 문서
 
-1. [`MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md`](MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md)
+1. [`RESEARCH_WALKTHROUGH_KO.md`](RESEARCH_WALKTHROUGH_KO.md)
+   - 실험 figure를 따라 background/problem → DART-Rx design → setup → evaluation을 읽는 대표 문서
+2. [`MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md`](MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md)
    - 현재 문제, 실측, DART-Rx 설계, 효과, novelty, 남은 gate의 단일 종합본
-2. [`MIG_NRX_GDR_POOL_EXECUTION_PLAN_KO.md`](MIG_NRX_GDR_POOL_EXECUTION_PLAN_KO.md)
+3. [`MIG_NRX_GDR_POOL_EXECUTION_PLAN_KO.md`](MIG_NRX_GDR_POOL_EXECUTION_PLAN_KO.md)
    - 완료된 process-per-endpoint actual GDR campaign의 실행 구성
-3. [`MIG_NRX_RESEARCH_CHECKPOINT_KO.md`](MIG_NRX_RESEARCH_CHECKPOINT_KO.md)
+4. [`MIG_NRX_RESEARCH_CHECKPOINT_KO.md`](MIG_NRX_RESEARCH_CHECKPOINT_KO.md)
    - 완료된 causal/five-way/background/multi-cell 결과와 수치의 상세 기준
-4. [`DART_RX_MULTI_ENDPOINT_INTEGRATION_PLAN_KO.md`](DART_RX_MULTI_ENDPOINT_INTEGRATION_PLAN_KO.md)
+5. [`DART_RX_MULTI_ENDPOINT_INTEGRATION_PLAN_KO.md`](DART_RX_MULTI_ENDPOINT_INTEGRATION_PLAN_KO.md)
    - pool 측정기를 실제 cuPHY/conventional/NRx 다중 endpoint 스킴으로 바꾸는 구현 기준
 
-위 네 문서가 현재 authoritative set이다. 서로 충돌하면 더 최근의
-`MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md`를 따른다.
+위 다섯 문서가 현재 authoritative set이다. 처음 이해할 때는 walkthrough를 읽고, 수치와
+실행 상태가 충돌하면 더 구체적인 result report와 보존된 CSV/JSON을 따른다.
 
 ## Architecture와 novelty 상세
 

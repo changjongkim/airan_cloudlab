@@ -1726,7 +1726,6 @@ def figure_03e_stage1_equal_depth():
     slowdown = [
         float(placement["MIG same"]["l1_slowdown"]),
         float(placement["Cross P2P"]["l1_slowdown"]),
-        np.nan,
     ]
 
     x = np.arange(len(desired))
@@ -1748,24 +1747,26 @@ def figure_03e_stage1_equal_depth():
     annotate_bars(axes[0], bars, "{:.3f}")
     style_axes(axes[0])
 
-    bars = axes[1].bar(x, slowdown, color=colors, width=0.62)
-    axes[1].set_xticks(x, labels)
+    isolation_x = np.arange(2)
+    bars = axes[1].bar(isolation_x, slowdown, color=colors[:2], width=0.62)
+    axes[1].set_xticks(isolation_x, labels[:2])
     axes[1].axhline(1.0, color=COLORS["gray"], linestyle="--", linewidth=1.2, label="L1 단독 실행")
     axes[1].set_ylim(0, 1.92)
+    axes[1].set_xlim(-0.55, 2.15)
     axes[1].set_ylabel("NRx 동시 실행 시 L1 active-time 증가 배율")
-    axes[1].set_title("(b) 별도 isolation gate: cross P2P가 L1을 보호")
-    annotate_bars(axes[1], bars[:2], "{:.3f}x")
+    axes[1].set_title("(b) 측정된 isolation: same-4g 대 cross P2P")
+    annotate_bars(axes[1], bars, "{:.3f}x")
     axes[1].text(
-        x[2],
-        0.86,
-        "L1 active\n미측정",
+        1.72,
+        1.30,
+        "NIC GDR\nE2E 측정 완료\nL1 isolation 미측정\nQwen 10.24 it/s",
         ha="center",
         va="center",
         fontsize=9,
         color="#6b7280",
         bbox={"boxstyle": "round,pad=0.30", "facecolor": "#f3f4f6", "edgecolor": "#9ca3af"},
     )
-    for index, value in enumerate(qwen):
+    for index, value in enumerate(qwen[:2]):
         axes[1].text(
             index,
             1.82,

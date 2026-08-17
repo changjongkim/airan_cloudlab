@@ -863,11 +863,15 @@ Stage 1도 하나의 숫자가 아니라 세 개의 내부 gate로 구성된다.
 
 ![Stage 1의 동일 queue-depth P2P/GDR 비교](figures/03e_stage1_equal_depth.png)
 
-| 배치와 transport | E2E mean | E2E p99 | 직렬 완료율 | Qwen | 직접 transport |
-|---|---:|---:|---:|---:|---:|
-| Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **300.250 slot/s** | 10.22 it/s | 없음 |
-| GPU P2P | **5.888 ms** | 6.224 ms | 169.804 slot/s | 10.22 it/s | 76.547 µs |
-| NIC GDR loopback | 6.326 ms | 6.846 ms | 158.095 slot/s | 10.24 it/s | E2E 차이에 포함 |
+| 배치와 transport | 한 요청 직렬 E2E mean ↓ | E2E p99 ↓ | NRx 동시 실행 시 L1 active-time 배율 ↓ | Qwen | 이 행이 말하는 것 |
+|---|---:|---:|---:|---:|---|
+| Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **1.621× (+62.1%)** | 10.22 it/s | 한 요청은 가장 빠르지만, NRx가 겹치면 L1 경합이 큼 |
+| Cross 2g+2g: GPU P2P | 5.888 ms | 6.224 ms | **1.043× (+4.3%)** | 10.22 it/s | 작은 slice 때문에 E2E는 느리지만 L1은 거의 보호됨 |
+| Cross 2g+2g: NIC GDR | 6.326 ms | 6.846 ms | **미측정** | 10.24 it/s | cross-MIG GPU-memory 경로는 확인; L1 isolation gate는 남음 |
+
+`↓`는 작을수록 좋다는 뜻이다. 이 표의 왼쪽은 **낮은 부하의 단일 요청 속도**, 오른쪽
+L1 배율은 **NRx 요청이 겹칠 때의 보호 성능**이다. 따라서 Same 4g의 핵심 문제는 첫 번째
+숫자가 아니라 `1.621×`이다.
 
 이 표는 두 가지로 나눠 읽어야 한다.
 

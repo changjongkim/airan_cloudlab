@@ -845,11 +845,15 @@ Stage 1 itself consists of three internal gates rather than one number.
 
 ![Stage 1 P2P/GDR comparison at the same queue depth](figures_en/03e_stage1_equal_depth.png)
 
-| Placement and transport | E2E mean | E2E p99 | Serial completion rate | Qwen | Direct transport |
-|---|---:|---:|---:|---:|---:|
-| Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **300.250 slot/s** | 10.22 it/s | None |
-| GPU P2P | **5.888 ms** | 6.224 ms | 169.804 slot/s | 10.22 it/s | 76.547 µs |
-| NIC GDR loopback | 6.326 ms | 6.846 ms | 158.095 slot/s | 10.24 it/s | Included in E2E difference |
+| Placement and transport | One-request serial E2E mean ↓ | E2E p99 ↓ | L1 active-time multiplier with concurrent NRx ↓ | Qwen | What this row means |
+|---|---:|---:|---:|---:|---|
+| Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **1.621× (+62.1%)** | 10.22 it/s | Fastest single request, but substantial L1 contention when NRx overlaps |
+| Cross 2g+2g: GPU P2P | 5.888 ms | 6.224 ms | **1.043× (+4.3%)** | 10.22 it/s | Slower E2E on smaller slices, but L1 is nearly protected |
+| Cross 2g+2g: NIC GDR | 6.326 ms | 6.846 ms | **Not measured** | 10.24 it/s | Cross-MIG GPU-memory path verified; L1 isolation gate remains |
+
+`↓` means lower is better. The left side reports **low-load single-request speed**; the L1 multiplier
+reports **protection when NRx requests overlap**. The important weakness of Same-4g is therefore not
+its first number but its `1.621×` L1 active time.
 
 This table must be read as two comparisons.
 

@@ -361,9 +361,10 @@ EN = {
         "(a) Serial E2E: fast same-4g versus isolated cross placement",
     "L1 단독 실행": "L1 alone",
     "NRx 동시 실행 시 L1 active-time 증가 배율": "L1 active-time multiplier with concurrent NRx",
-    "(b) 별도 isolation gate: cross P2P가 L1을 보호":
-        "(b) Separate isolation gate: cross P2P protects L1",
-    "L1 active\n미측정": "L1 active\nnot measured",
+    "(b) 측정된 isolation: same-4g 대 cross P2P":
+        "(b) Measured isolation: same-4g versus cross P2P",
+    "NIC GDR\nE2E 측정 완료\nL1 isolation 미측정\nQwen 10.24 it/s":
+        "NIC GDR\nE2E measured\nL1 isolation not measured\nQwen 10.24 it/s",
     "Stage 1: same-4g는 빠르지만 L1 경합, cross 배치는 L1 보호 대신 작은 slice 비용":
         "Stage 1: same-4g is fast but contended; cross placement protects L1 at a slice-capacity cost",
     "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1, (b)는 별도 ring-depth=2 isolation gate; GDR의 L1-active 값은 미측정. P2P↔GDR만 동일 2g+2g transport 비교":

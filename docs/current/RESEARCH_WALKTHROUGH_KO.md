@@ -582,13 +582,54 @@ thread/timestamp를 이용해 L1 phase와 NRx phase를 분리한다. 두 process
 paired capture가 완료돼야 “P2P/GDR 분리가 L1 host thread의 어떤 blocking을 얼마나
 제거했는가”를 같은 분모로 주장할 수 있다.
 
-## 4. 실제 problem existence: busy queue와 idle capacity가 동시에 존재한다
+여기까지는 **NRx를 L1과 분리해야 하는 이유와 분리된 endpoint까지 가는 길**을 확인했다.
+그러나 길이 있다고 여러 NRx가 자동으로 사용되는 것은 아니다. 다음 절은 단일 NRx의 queue
+cliff가 실제 multi-endpoint 환경에서 `busy queue + idle worker`로 나타나는지를 확인해,
+data-path 실험에서 scheduler 설계로 넘어가는 징검다리다.
 
-이 절의 그림은 **전송 방식의 성능 그래프가 아니라, 왜 여러 NRx를 요청 단위로 선택해야
-하는지를 분리해 확인한 compute/queue 실험**이다. 실제 TensorRT NRx는 서로 다른 세
-physical GPU의 `3g.20gb MIG`에 하나씩 상주시켰다. 다만 동일한 deterministic input tensor를
-각 endpoint GPU에 미리 올려 두었기 때문에 이 gate에는 cuPHY front/back, P2P, GDR tensor
-전송, conventional fallback 실행이 들어 있지 않다.
+## 4. 왜 NRx를 여러 개 중에서 골라야 하는가: 한 queue는 무너지는데 다른 NRx는 논다
+
+앞의 실험들은 여기까지를 보여줬다.
+
+1. **§2의 단일-endpoint 실험:** MIG가 Qwen을 제대로 격리해도 NRx 하나의 service rate는
+   유한하다. 4g NRx는 약 `745 requests/s`를 처리했지만 arrival이 750–800/s로 올라가자 p99가
+   `15.58–217.79 ms`로 폭증했다. 즉 queue cliff는 실제로 존재한다.
+2. **§3의 배치/host 분석:** L1과 NRx를 같은 GI에 두면 L1까지 함께 느려질 수 있으므로,
+   protected L1과 NRx compute queue를 분리하는 편이 낫다. P2P/GDR는 분리된 NRx에 도달할
+   수 있는 data path를 제공한다.
+
+하지만 이 두 결과만으로는 여러 NRx를 하나의 pool처럼 선택해야 한다는 결론이 아직 나오지
+않는다. Remote NRx에 갈 수 있다는 사실과, 실제로 그 capacity를 빌릴 필요가 있다는 사실은
+다르기 때문이다. 다음 질문이 하나 남는다.
+
+> **실제 slot 요청이 시간에 따라 들어올 때, 현재 할당된 NRx queue는 deadline을 놓치는데
+> 이미 켜져 있는 다른 NRx는 동시에 놀고 있는 순간이 존재하는가?**
+
+이 질문에 `yes`여야 static MIG placement의 capacity fragmentation이 실제 problem이고,
+request-level endpoint selection이 필요하다. 그래서 실험을 다음 순서로 한 단계씩 분리했다.
+
+```text
+[앞선 Gate A] NRx 하나의 service curve 측정
+               → capacity를 넘으면 queue가 실제로 붕괴
+
+[앞선 Gate B] P2P/GDR data-path 측정
+               → 분리된 NRx GPU memory까지 도달 가능
+
+[이 절의 Gate C] 같은 arrival trace를 세 NRx에 입력
+               → 고정 binding일 때 busy queue + idle NRx가 동시에 생기는가?
+               → 요청별로 다른 NRx를 고르면 그 현상이 줄어드는가?
+```
+
+따라서 이 절의 그림은 **전송 방식의 성능 그래프가 아니라, Gate C의 compute/queue
+problem-existence 실험**이다. 실제 TensorRT NRx는 서로 다른 세 physical GPU의 `3g.20gb
+MIG`에 하나씩 상주시켰다. §2의 4g capacity 수치를 그대로 재사용한 것이 아니라, 이
+실험에서는 각 3g endpoint를 약 `1.6 ms/request`로 별도 calibration했다.
+
+동일한 deterministic input tensor는 각 endpoint GPU에 미리 올려 두었다. 그래야 P2P/GDR
+속도 차이를 제거하고 **오직 static binding과 request routing이 queue에 만드는 차이**만 볼
+수 있다. 따라서 이 gate에는 cuPHY front/back, P2P/GDR tensor 전송, conventional fallback
+실행이 들어 있지 않다. 실제 full-size GDR request/result를 포함한 재검증은 뒤의 Stage 2에서
+별도로 수행한다.
 
 ```text
 slot/Nrx-required trace

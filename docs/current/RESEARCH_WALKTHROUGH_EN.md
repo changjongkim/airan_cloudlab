@@ -567,13 +567,52 @@ The current `03d_cuda_host_blocking` figure is therefore **causal evidence that 
 and migrates between API boundaries**, not a five-way winner chart. Only the matched capture can
 quantify, on one denominator, which L1 host waits P2P/GDR separation removes.
 
-## 4. Direct evidence that the problem exists
+Up to this point, the evidence explains **why NRx should be separated from L1 and how an isolated
+endpoint can be reached.** A data path does not automatically make multiple NRx workers useful.
+The next section is the bridge from transport to scheduling: it tests whether the single-endpoint
+queue cliff appears as a busy queue and an idle worker in a real multi-endpoint execution.
 
-This figure is a **compute/queue experiment that isolates why requests must be routed across NRx
-workers; it is not a transport benchmark.** One real TensorRT NRx worker resides in a `3g.20gb MIG`
-on each of three physical GPUs. The same deterministic input tensor is preloaded at every endpoint,
-so this gate excludes the cuPHY front/back path, P2P/GDR tensor movement, and execution of the
-conventional fallback.
+## 4. Why select among multiple NRx workers? One queue collapses while another worker is idle
+
+The preceding experiments established two facts.
+
+1. **The single-endpoint gate in §2:** MIG correctly isolates Qwen, but one NRx has finite service
+   rate. The 4g NRx sustained approximately `745 requests/s`; increasing arrival to 750–800/s made
+   p99 rise to `15.58–217.79 ms`. The queue cliff is real.
+2. **The placement and host analysis in §3:** placing L1 and NRx in one GI can slow L1 as well, so
+   protected L1 and the NRx compute queue should be separated. P2P/GDR provides a data path to an
+   isolated NRx.
+
+Those facts alone do not yet justify selecting among a pool of NRx workers. Being able to reach a
+remote NRx is different from proving that its capacity is needed. One question remains:
+
+> **Under time-varying slot arrivals, does the currently assigned NRx miss its timeliness target
+> while another already-resident NRx is idle at the same time?**
+
+Only a `yes` establishes static-placement fragmentation and motivates request-level endpoint
+selection. The experiment chain therefore separates three gates:
+
+```text
+[Earlier Gate A] Measure one NRx service curve
+                 → its queue collapses beyond capacity
+
+[Earlier Gate B] Measure P2P/GDR data paths
+                 → isolated NRx GPU memory is reachable
+
+[Gate C here]    Replay one arrival trace against three NRx workers
+                 → does fixed binding create a busy queue plus idle workers?
+                 → does per-request selection reduce the problem?
+```
+
+The figure in this section is therefore **Gate C, a compute/queue problem-existence experiment, not
+a transport benchmark.** One real TensorRT NRx worker resides in a `3g.20gb MIG` on each of three
+physical GPUs. It does not reuse the 4g capacity number from §2; each 3g endpoint is calibrated near
+`1.6 ms/request` for this experiment.
+
+The same deterministic input tensor is preloaded at every endpoint to remove P2P/GDR performance
+from the comparison and isolate the queueing effect of static binding versus request routing. This
+gate excludes the cuPHY front/back path, P2P/GDR tensor movement, and conventional fallback
+execution. Stage 2 later repeats policy evaluation with full-size GDR request/result transport.
 
 ```text
 slot / NRx-required trace

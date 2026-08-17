@@ -769,22 +769,57 @@ Figure 3c uses only this proper two-client experiment.
 
 # Part IV. Evaluation
 
-## 15. Stage-by-stage GDR experimental build-up
+## 15. How to read the evaluation: Stages 1–3 are not competing configurations
 
-Stages 1, 2, and 3 in the figure below are not conceptual boxes. They are **three hardware
-experiments that answer different questions**. They must not be merged into a claim that all results
-were obtained under one topology. Stage 1 validates the data path, Stage 2 validates concurrent
-service capacity and routing, and Stage 3 validates actual-radio correctness. Only Stage 4—the gate
-that combines all three under one concurrent workload—remains incomplete.
+Stages 1, 2, and 3 do **not** run the same workload to decide which configuration is fastest. They
+use different topologies and metrics to form a validation ladder, adding one question at a time.
+
+```text
+Stage 1: Can data cross an isolation boundary without CPU-DRAM staging?
+    ↓ establish connectivity and single-request cost
+Stage 2: Can several resident NRx workers share incoming request load?
+    ↓ establish replica capacity and routing behavior
+Stage 3: Can a returned NRx result be used safely in the actual PHY chain?
+    ↓ establish CE→LDPC/CRC correctness and commit semantics
+Stage 4: Do all three properties hold with multi-cell bursts and background AI?
+    ↓ remaining integrated experiment
+```
+
+It would therefore be incorrect to compare the Stage 1 `6.326 ms` with the Stage 3 decision p99 of
+`5.139 ms` and call one Stage faster. **Comparisons occur within each Stage.**
+
+| Stage | Plain-language question | Comparison inside the Stage | One-line result |
+|---|---|---|---|
+| 1. Data path | Can GPU data cross isolation without a CPU-memory bounce? | P2P versus NIC GDR at equal queue depth | GDR worked and cost 0.438 ms more on average than P2P. |
+| 2. Pool capacity | Do one to three NRx workers and better routing reduce queueing? | 1/2/3 replicas and static, round-robin, and finish-aware policies | Multiple queues help, but overload and policy choice still matter. |
+| 3. Radio correctness | Can remote NRx improve decoding and still commit safely? | conventional, all-NRx, and utility admission | Correct-TB rose 0.62→0.80; utility retained it with 25% fewer NRx calls. |
+| 4. Integration | Do these properties coexist under real bursts and background work? | Final DART-Rx versus baseline policies | Not yet complete. |
+
+### Plain-language metric guide
+
+| Metric | Meaning in this report |
+|---|---|
+| `E2E latency` | Time from sending the request tensor until that experiment finishes processing the returned NRx result |
+| `requests/s` | Cell-slot NRx requests per second entering the pool after the CE-side invocation decision |
+| `no-timely` | Fraction without a usable NRx result before that experiment's expiry; it is not automatically a production L1 miss |
+| `correct TB ratio` | Fraction of transport blocks decoded correctly after LDPC/CRC processing |
+| `decision latency` | Time until either the conventional or NRx candidate is committed as the final L1 result |
+
+The figure below shows this validation order. Each Stage is a completed, separate hardware
+experiment; only Stage 4 has not combined all three properties in one concurrent workload.
 
 ![Experimental build-up from Stage 1 cross-MIG GDR through the Stage 2 three-replica pool and Stage 3 actual-radio gate](figures_en/00a_gdr_evolution.png)
 
-| Stage | Actual physical placement | Primary question | Status |
+| Stage | Actual physical placement | Why this placement was used | Status |
 |---|---|---|---|
-| 1. Cross-MIG GDR baseline | GPU0: `2g L1 · 2g NRx · 3g Qwen` | Does GPU-memory transport across a retained MIG wall work at acceptable cost? | Complete |
-| 2. Fixed-MIG three-replica GDR pool | GPU0 4g source MR; NRx 0/1/2 on the 3g MIGs of GPUs 0/1/2 | Does request-level aggregation of resident NRx capacity beat static binding? | Complete |
-| 3. Actual-radio correctness gate | Actual L1 on GPU0 4g; NRx 0/1/2 on full GPUs 1/2/3 | Can remote results be committed into CE→LDPC/CRC without expiry or duplicate-result errors? | Complete |
-| 4. Final integrated gate | Protected L1 4g, resident NRx 3g pool, and background AI | Do all three properties hold simultaneously under actual multi-cell bursts? | **Incomplete** |
+| 1. Cross-MIG GDR baseline | GPU0: `2g L1 · 2g NRx · 3g Qwen` | Isolate the GPU-memory path across MIG boundaries | Complete |
+| 2. Fixed-MIG three-replica GDR pool | GPU0 4g source MR; NRx 0/1/2 on the 3g MIGs of GPUs 0/1/2 | Remove radio processing and sweep replicas, arrivals, and routing at scale | Complete |
+| 3. Actual-radio correctness gate | Actual L1 on GPU0 4g; NRx 0/1/2 on full GPUs 1/2/3 | Hold capacity questions aside and validate CE→LDPC/CRC output and commit correctness | Complete |
+| 4. Final integrated gate | Protected L1 4g, resident NRx 3g pool, and background AI | Validate all three properties together under actual multi-cell bursts | **Incomplete** |
+
+On a first read, follow §§15.1–15.4 and then §20. Sections 16–19 do not introduce more Stages;
+they reinterpret the same measurements by research question: placement, background reclaim,
+routing, and radio utility.
 
 ### 15.1 Stage 1 — single-GPU cross-MIG GDR baseline
 
@@ -793,6 +828,11 @@ that combines all three under one concurrent workload—remains incomplete.
 available CUDA P2P/IPC path with ConnectX-6 Dx NIC-loopback GDR at the same queue depth of one. The
 GDR path transfers a `1,415,232 B` request and a `314,496 B` result between GPU MRs without CPU-DRAM
 payload staging.
+
+> **In plain language:** Stage 1 asks whether one road actually works. It compares P2P and GDR under
+> equal conditions, but it does not yet schedule several NRx workers. Success does not require GDR
+> to beat P2P; it requires correct full-size tensor exchange across retained isolation without a
+> CPU-DRAM bounce.
 
 Stage 1 itself consists of three internal gates rather than one number.
 
@@ -827,6 +867,11 @@ can expose pooled request-level capacity **without reconfiguring fixed MIG**. Th
 only as an L1-side source GPU MR; this gate did not execute actual radio. NRx 0/1/2 resided in the 3g
 MIGs of GPUs 0/1/2. The 4g domains on GPUs 1/2 and all of GPU3 were unused. Each worker had a separate
 process, CUDA context, GPU MR, RC QP, and resident TensorRT/CUDA Graph.
+
+> **In plain language:** Stage 2 puts one, two, or three NRx workers behind the road and compares
+> where incoming requests should queue. The intended gain is not a faster individual inference; it
+> is more **pool-wide timely service capacity**. cuPHY and radio decoding are deliberately absent,
+> so `no-timely` in this Stage is not itself a radio failure.
 
 The `412` validated Stage 2 runs form four layers:
 
@@ -916,6 +961,11 @@ NRx, feeds the returned LLRs through LDPC/CRC, and validates utility admission, 
 single-commit semantics. Its topology differs from Stage 2: actual L1 ran in the 4g MIG on GPU0,
 while NRx 0/1/2 ran on **full GPUs** 1/2/3.
 
+> **In plain language:** Stage 3 asks whether the system can safely use an answer returned by a
+> remote worker as an actual receiver result. It compares conventional-only, NRx on every slot, and
+> selective NRx. It validates radio correctness, but because the NRx workers use full GPUs, it does
+> not remeasure the Stage 2 capacity of a 3g-MIG pool.
+
 Stage 3 separately checks endpoint count, radio mode, and Nsight causality. The one- and two-endpoint
 rows are single-run functionality gates; only the three-endpoint modes have three repetitions.
 They must not be used as an endpoint-count performance-scaling curve.
@@ -981,6 +1031,11 @@ resident NRx replicas occupy several 3g MIGs; Qwen, ResNet, BERT, and Whisper us
 full-GPU domains. Multi-cell periodic/offset bursts and selective NRx requests drive DART-Rx, which
 jointly uses utility, deadline, and queue state for endpoint selection, admission, fallback, and
 commit.
+
+> **In plain language:** Stage 4 is the final DART-Rx evaluation. It must combine Stage 2's resident
+> `3g MIG` pool, Stage 3's actual-radio/commit path, and background reclaim **in the same run**. The
+> completed results in this report validate the required parts separately; they do not yet validate
+> the full product under one concurrent workload.
 
 At minimum, the final gate must compare `static-one`, `static-cell`, round-robin, predicted-finish,
 and DART-Rx on the same trace while reporting L1 p99, deadline miss/no-timely ratio, correct TB,

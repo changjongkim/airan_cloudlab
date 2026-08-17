@@ -786,22 +786,58 @@ two-client 실험만 사용한다.
 
 # Part IV. Evaluation
 
-## 15. Stage-by-stage GDR 실험 빌드업
+## 15. 먼저 읽는 법: Stage 1·2·3은 서로 경쟁하는 방식이 아니다
 
-아래 그림의 Stage 1, 2, 3은 아이디어 스케치가 아니라 **서로 다른 질문을 실제 하드웨어에서
-검증한 세 실험**이다. 중요한 점은 세 결과를 한 topology에서 동시에 얻었다고 합치지 않는
-것이다. Stage 1은 data path, Stage 2는 concurrent service capacity와 routing, Stage 3은
-actual-radio correctness를 차례로 검증한다. Stage 4만 아직 이 세 축을 하나의 동시 workload로
-결합하지 못한 최종 목표다.
+가장 먼저 구분해야 할 점이 있다. **Stage 1, 2, 3은 같은 workload에서 누가 더 빠른지를
+비교하는 세 configuration이 아니다.** 서로 다른 topology와 지표를 사용해, 앞 단계에서 확인한
+기능 위에 다음 질문을 하나씩 올린 검증 사다리다.
+
+```text
+Stage 1: 격리된 GPU memory 사이에 실제 길을 만들 수 있는가?
+    ↓ 연결 가능성과 단일 요청 비용 확인
+Stage 2: 그 길로 여러 NRx worker를 묶으면 밀려오는 요청을 나눌 수 있는가?
+    ↓ replica capacity와 routing 확인
+Stage 3: 그렇게 받은 NRx 결과를 실제 PHY 결과로 안전하게 사용할 수 있는가?
+    ↓ CE→LDPC/CRC correctness와 commit 확인
+Stage 4: 위 세 가지가 background AI와 multi-cell burst에서 동시에 되는가?
+    ↓ 아직 남은 최종 통합 실험
+```
+
+따라서 Stage 1의 `6.326 ms`와 Stage 3의 decision p99 `5.139 ms`를 직접 비교해 “어느 Stage가
+더 빠르다”고 말하면 안 된다. **비교는 각 Stage 내부에서** 수행한다.
+
+| 단계 | 쉬운 질문 | 그 Stage 안에서 비교한 것 | 한 줄 결론 |
+|---|---|---|---|
+| 1. Data path | CPU DRAM을 거치지 않고 격리 경계를 넘을 수 있는가? | P2P 대 NIC GDR, 동일 queue depth | GDR 경로가 동작하며 P2P보다 평균 0.438 ms 비쌌다. |
+| 2. Pool capacity | NRx를 1개에서 3개로 늘리고 요청을 잘 나누면 queue가 줄어드는가? | replica 1/2/3개와 static·round-robin·finish-aware 정책 | 여러 queue를 사용할 수 있지만 overload와 정책 선택은 여전히 중요하다. |
+| 3. Radio correctness | remote NRx 결과가 실제 복호 결과를 개선하면서 안전하게 commit되는가? | conventional·all-NRx·utility admission | correct-TB 0.62→0.80, utility는 같은 결과로 NRx 호출 25% 절감. |
+| 4. Integration | 위 결과가 실제 burst와 background AI에서 동시에 유지되는가? | 최종 DART-Rx 대 baseline 정책 | 아직 미완료다. |
+
+### 평가 지표를 쉬운 말로 읽으면
+
+| 지표 | 이 문서에서 뜻하는 것 |
+|---|---|
+| `E2E latency` | 요청 tensor를 보내고 NRx 결과를 돌려받아 해당 실험의 처리를 끝낼 때까지의 시간 |
+| `requests/s` | CE 뒤에서 NRx가 필요하다고 판단되어 pool로 들어오는 cell-slot 요청 수/초 |
+| `no-timely` | 실험에서 정한 expiry 전에 사용할 NRx 결과가 없었던 비율. production L1 miss와 동일하지 않다. |
+| `correct TB ratio` | LDPC/CRC까지 처리했을 때 올바르게 복호한 transport block의 비율 |
+| `decision latency` | conventional 또는 NRx 중 하나를 최종 L1 결과로 commit할 때까지의 시간 |
+
+아래 그림은 이 검증 순서를 보여준다. 각 Stage는 아이디어 상자가 아니라 실제 하드웨어에서
+끝낸 별도 실험이다. Stage 4만 아직 세 축을 하나의 동시 workload로 결합하지 못했다.
 
 ![Stage 1의 cross-MIG GDR에서 Stage 2의 3-replica pool과 Stage 3의 actual-radio gate로 진행한 실험 빌드업](figures/00a_gdr_evolution.png)
 
-| 단계 | 실제 물리 배치 | 핵심 질문 | 상태 |
+| 단계 | 실제 물리 배치 | 이 배치를 사용한 이유 | 상태 |
 |---|---|---|---|
-| 1. Cross-MIG GDR baseline | GPU0: `2g L1 · 2g NRx · 3g Qwen` | MIG 벽을 유지한 GPU-memory transport가 실제로 동작하고 비용이 감당 가능한가? | 완료 |
-| 2. Fixed-MIG 3-replica GDR pool | GPU0 4g source MR, GPU0/1/2의 3g에 NRx 0/1/2 | 여러 resident NRx의 capacity를 요청 단위로 합치면 static binding보다 나은가? | 완료 |
-| 3. Actual-radio correctness gate | GPU0 4g actual L1, GPU1/2/3 full GPU에 NRx 0/1/2 | remote NRx 결과를 CE→LDPC/CRC 경로에 만료·중복 없이 안전하게 commit할 수 있는가? | 완료 |
-| 4. Final integrated gate | protected L1 4g + resident NRx 3g pool + background AI | 위 세 기능이 actual multi-cell burst에서 동시에 성립하는가? | **미완료** |
+| 1. Cross-MIG GDR baseline | GPU0: `2g L1 · 2g NRx · 3g Qwen` | 한 GPU 안의 MIG 경계를 넘는 GPU-memory 경로만 분리해 측정 | 완료 |
+| 2. Fixed-MIG 3-replica GDR pool | GPU0 4g source MR, GPU0/1/2의 3g에 NRx 0/1/2 | actual radio를 빼고 replica 수·도착률·routing만 크게 sweep | 완료 |
+| 3. Actual-radio correctness gate | GPU0 4g actual L1, GPU1/2/3 full GPU에 NRx 0/1/2 | capacity 변수 대신 실제 CE→LDPC/CRC 결과와 commit correctness를 분리해 검증 | 완료 |
+| 4. Final integrated gate | protected L1 4g + resident NRx 3g pool + background AI | 위 세 기능을 실제 multi-cell burst에서 동시에 검증 | **미완료** |
+
+처음 읽을 때는 §15.1–15.4와 §20만 순서대로 보면 된다. §16–19는 새로운 Stage를 추가하는
+부분이 아니라, 같은 측정들을 placement, background reclaim, routing, radio utility라는 질문별로
+다시 해석하는 상세 분석이다.
 
 ### 15.1 Stage 1 — single-GPU cross-MIG GDR baseline
 
@@ -810,6 +846,11 @@ MIG에는 L1, 다른 2g MIG에는 NRx, 남은 3g에는 Qwen을 두었다. MIG �
 허용되는 특수 경로와 ConnectX-6 Dx NIC loopback GDR를 같은 queue depth 1에서 비교했다.
 GDR 경로는 `1,415,232 B` request와 `314,496 B` result를 GPU MR 사이에서 옮기며 CPU DRAM
 payload staging을 사용하지 않았다.
+
+> **쉽게 말하면:** Stage 1은 “도로 하나가 실제로 열리는가?”를 확인한다. P2P와 GDR 중
+> 어느 연결이 같은 조건에서 얼마가 드는지는 비교하지만, 아직 여러 NRx를 스케줄하지 않는다.
+> 이 Stage의 성공 기준은 GDR가 P2P를 이기는 것이 아니라, MIG 격리를 유지하면서 full-size
+> tensor가 CPU DRAM bounce 없이 정확히 왕복하는 것이다.
 
 Stage 1도 하나의 숫자가 아니라 세 개의 내부 gate로 구성된다.
 
@@ -844,6 +885,11 @@ transport보다 NRx service time과 queue가 더 큰 다음 병목**이라는 �
 않았다. GPU0/1/2의 3g MIG에 NRx 0/1/2를 각각 상주시켰으며 GPU1/2의 4g와 GPU3은 사용하지
 않았다. 각 worker는 독립 process, CUDA context, GPU MR, RC QP, resident TensorRT/CUDA Graph를
 가졌다.
+
+> **쉽게 말하면:** Stage 2는 도로 뒤에 NRx worker를 1개, 2개, 3개 놓고 요청이 몰릴 때
+> 어느 줄로 보낼지를 비교한다. 여기서 좋아져야 하는 것은 NRx 한 번의 계산시간이 아니라
+> **pool 전체가 제시간에 받아낼 수 있는 요청량**이다. cuPHY와 실제 무선 복호는 의도적으로
+> 제외했으므로 이 Stage의 `no-timely`를 실제 radio failure로 읽으면 안 된다.
 
 Stage 2의 `412`개 validated run은 다음 네 층으로 구성된다.
 
@@ -933,6 +979,11 @@ CE 결과를 remote NRx에 보내고, 돌아온 LLR을 LDPC/CRC까지 처리하�
 epoch, expiry와 single-commit가 올바른지 검증한다. 이 gate의 topology는 Stage 2와 다르다.
 GPU0의 4g MIG에서 actual L1을 실행했고, GPU1/2/3의 **full GPU**에 NRx 0/1/2를 두었다.
 
+> **쉽게 말하면:** Stage 3는 “remote worker가 돌려준 답을 실제 수신 결과로 믿고 써도
+> 되는가?”를 확인한다. conventional-only, 모든 slot의 NRx, 필요한 slot만 NRx를 비교한다.
+> 이 Stage는 실제 radio correctness를 보지만 NRx가 full GPU에 있으므로, Stage 2의 3g-MIG
+> pool capacity를 다시 측정한 실험은 아니다.
+
 Stage 3도 endpoint 수 확인, radio mode 비교, Nsight 원인 분석을 분리했다. Endpoint 1/2
 결과는 각 1회 기능 gate이고, endpoint 3의 세 mode만 각 3회 반복했으므로 endpoint 수에 따른
 성능 scaling curve로 사용하면 안 된다.
@@ -997,6 +1048,11 @@ resident NRx replica를 둔다. 남는 4g/full-GPU domain에서는 Qwen, ResNet,
 background AI를 실행한다. Multi-cell periodic/offset burst와 selective NRx 요청을 넣고,
 DART-Rx가 utility, deadline, queue 상태를 함께 사용해 endpoint 선택·admission·fallback commit을
 수행해야 한다.
+
+> **쉽게 말하면:** Stage 4가 진짜 최종 DART-Rx 평가다. Stage 2의 `3g MIG resident pool`과
+> Stage 3의 `actual radio/commit`, 그리고 background reclaim을 **같은 run에서 동시에**
+> 실행해야 한다. 현재 보고서의 완료 결과는 이 최종 결론에 필요한 부품들을 각각 검증한
+> 것이며, 아직 완제품 전체를 한 번에 검증한 것은 아니다.
 
 최종 비교는 최소한 `static-one`, `static-cell`, round-robin, predicted-finish와 DART-Rx를 같은
 trace에서 비교하고, L1 p99, deadline miss/no-timely, correct TB, endpoint utilization,

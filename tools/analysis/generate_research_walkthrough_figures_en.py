@@ -468,6 +468,30 @@ EN = {
         "Key: MPS uses capacity well but has no L1 wall; MIG/MIG+MPS retain same-GI contention and fixed capacity. P2P is the fast isolated path within one GPU; GDR extends the NRx pool across GPUs.",
     "아직 없는 최종 공정 비교: 동일 물리 A100 budget · 동일 Qwen 처리량 · 동일 NRx burst에서 다섯 방식의 L1 p99 / timely-result / background utility":
         "Missing final matched gate: same physical-A100 budget · same Qwen throughput · same NRx burst; compare L1 p99 / timely results / background utility across all five",
+    "NRx 동시 실행 시 L1 active-time 배율": "L1 active-time ratio with concurrent NRx",
+    "(a) L1 보호: 낮을수록 좋음": "(a) L1 protection: lower is better",
+    "동등한 L1-active\ngate 미측정": "Matched L1-active\ngate not measured",
+    "* GDR 1.103× = 추정값": "* GDR 1.103× = estimate",
+    "(b) 낮은 부하의 slot tail: 모두 6–7 ms대": "(b) Low-load slot tail: all around 6–7 ms",
+    "나머지 depth=2": "Others: depth=2",
+    "격리 배치 약 10.2 it/s": "Isolated placements: about 10.2 it/s",
+    "(c) Background utility: MPS는 가장 가까운 50% cap 점":
+        "(c) Background utility: nearest MPS point is the 50% cap",
+    "동시에 실행한 독립 NRx process 수": "Concurrent independent NRx processes",
+    "20-cell L1 p99(ms)": "20-cell L1 p99 (ms)",
+    "(d) 별도 stress gate: MPS의 multi-NRx scaling 붕괴":
+        "(d) Separate stress gate: MPS multi-NRx scaling collapse",
+    "4g MIG 안의 MPS": "MPS inside a 4g MIG",
+    "다섯 방식의 직접 실측: 낮은 부하 E2E는 비슷해도 L1 보호와 scaling은 다르다":
+        "Direct Five-Way Evidence: Similar Low-Load E2E, Different L1 Protection and Scaling",
+    "다섯 방식의 실측 비교: 낮은 부하 E2E는 비슷해도 L1 보호와 scaling은 다르다":
+        "Five-Way Evidence: Similar Low-Load E2E, Different L1 Protection and Scaling",
+    "(a–c) placement campaign, 3회 집계; Full MPS=Qwen 50% cap(11.14 it/s), GDR는 2회·depth=1이고 L1-active 미수집. (d)는 별도 20-cell causal campaign의 3회 중앙값이므로 절대 ms를 (a–c)와 직접 비교하지 않음.":
+        "(a–c) placement campaign, three-run aggregate; Full MPS uses the Qwen 50% cap (11.14 it/s); GDR has two runs at depth=1 and no L1-active measurement. (d) is a separate 20-cell causal campaign using three-run medians; do not compare its absolute milliseconds with (a–c).",
+    "(a–c) placement campaign, 3회 집계; Full MPS=Qwen 50% cap(11.14 it/s). GDR E2E는 2회·depth=1 실측, (a)의 1.103×만 동등 trace가 없는 추정값(*). (d)는 별도 20-cell causal campaign의 3회 중앙값이므로 절대 ms를 (a–c)와 직접 비교하지 않음.":
+        "(a–c) placement campaign, three-run aggregate; Full MPS uses the Qwen 50% cap (11.14 it/s). GDR E2E is measured from two depth=1 runs; only the 1.103× value in (a) is an estimate (*) without a matched trace. (d) is a separate 20-cell causal campaign using three-run medians; do not compare its absolute milliseconds with (a–c).",
+    "(a–c) placement campaign, 3회 집계; Full MPS=Qwen 50% cap(11.14 it/s). GDR E2E는 2회·depth=1 실측이고, 동등한 L1-active 값은 수집하지 않음. (d)는 별도 20-cell causal campaign의 3회 중앙값이므로 절대 ms를 (a–c)와 직접 비교하지 않음.":
+        "(a–c) placement campaign, three-run aggregate; Full MPS uses the Qwen 50% cap (11.14 it/s). GDR E2E is measured from two depth=1 runs; no matched L1-active value was collected. (d) is a separate 20-cell causal campaign using three-run medians; do not compare its absolute milliseconds with (a–c).",
 }
 
 
@@ -565,6 +589,7 @@ def main() -> None:
         base.figure_03_placement_and_transport,
         base.figure_03e_stage1_equal_depth,
         base.figure_03f_fiveway_evidence_scorecard,
+        base.figure_03g_fiveway_measured_evidence,
         base.figure_03b_fiveway_absolute_rate,
         base.figure_03c_mig_mps_quota,
         base.figure_03d_cuda_host_blocking,

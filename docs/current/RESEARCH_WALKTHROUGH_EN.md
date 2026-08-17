@@ -354,24 +354,33 @@ heterogeneous endpoints one deadline-safe receiver service.
 
 ### 1.5 How to read all five approaches in one figure
 
-The figure below deliberately avoids forcing the five approaches into one performance ranking. Each
-row shows whether a hardware wall actually separates L1 from NRx, where background AI runs, the L1
-effect directly established by the current experiments, and the NRx domain the path can reach.
+The figure below combines the **direct measurements** for all five approaches into four panels.
+Panels (a)–(c) use the same placement campaign. Full MPS uses the 50% Qwen-cap point (`11.14 it/s`),
+the nearest measured point to the `10.22–10.24 it/s` isolated placements. Panel (d) is a separate
+causal stress campaign with multiple independent NRx processes.
 
-![Protection, reach, and direct evidence for MPS, MIG, MIG+MPS, P2P, and NIC GDR](figures_en/03f_fiveway_evidence_scorecard.png)
+![Measured L1 protection, E2E, background throughput, and scaling for MPS, MIG, MIG+MPS, P2P, and NIC GDR](figures_en/03g_fiveway_measured_evidence.png)
 
-Full MPS is the red starting point not because its raw capacity is low, but because it has no
-protection boundary: increasing NRx processes from `1→8` raised L1 p99 by `4.5×`. MIG local and
-MIG+MPS isolate sibling background work, but L1 and NRx remain inside one 4g, producing measured
-active-time increases of `1.621×` and `1.702×`. P2P reduced that increase to `1.043×` as the
-same-GPU fast path. GDR cost `0.438 ms` more mean E2E than P2P, but reaches NRx services in other
-physical GPUs and processes.
+- **(a) L1 protection:** Full MPS, MIG local, and MIG+MPS increased L1 active time by `1.601×`,
+  `1.621×`, and `1.702×` even in the low-load placement gate. Separating L1 and NRx into different
+  MIGs with P2P reduced this to `1.043×`. No matched L1-active gate was collected for NIC GDR, so the
+  graph leaves it unmeasured. The current working estimate based on the implementation and observed
+  P2P/GDR difference is approximately `1.103×`, but it is not plotted as a measured bar.
+- **(b) Low-load slot p99:** all five lie between `6.56` and `7.26 ms`. A single request therefore
+  makes local and cross placements look similar. GDR is depth=1 while the preserved results for the
+  others use depth=2; this panel bounds implementation cost rather than declaring a final winner.
+- **(c) Background utility:** the isolated placements sustain `10.22–10.24 it/s`; the selected Full
+  MPS point sustains `11.14 it/s`. It is not perfectly matched, but it is closer than the measured
+  30% or 100% MPS-cap points.
+- **(d) Scaling:** the limitation hidden by low-load E2E appears in the NRx-process sweep. Full-A100
+  MPS increased L1 p99 from `42.3→189.3 ms` (`4.5×`), while MPS inside a 4g increased it from
+  `40.7→435.7 ms` (`10.7×`).
 
-The conclusion is therefore not that GDR is the fastest. **P2P/GDR preserve an L1 protection wall
-while reaching NRx outside the local 4g**; MPS, MIG, and MIG+MPS remain the utilization, sibling-
-isolation, and share-control baselines. A final matched-background five-way gate with the same
-physical-GPU budget, Qwen throughput, and NRx burst has not yet been completed. The figure does not
-claim an overall winner before that experiment.
+The direct conclusion is: **low-load E2E is similar across the five approaches, but MPS-family L1
+protection collapses as co-tenant count grows. P2P experimentally restores protection on the
+same-GPU path; GDR pays a small additional E2E cost to extend reach across GPUs and processes.** A
+final winner still requires one matched gate with the same physical-GPU budget, Qwen throughput,
+and NRx burst.
 
 
 

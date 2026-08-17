@@ -356,24 +356,33 @@ reservation, expiry, commit 규칙**이다.
 
 ### 1.5 다섯 방식을 한 장에서 읽는 법
 
-아래 그림은 다섯 방식을 억지로 하나의 성능 순위로 만들지 않는다. 각 행에서 **L1과 NRx
-사이에 실제 하드웨어 벽이 있는지**, background AI가 어디에 놓이는지, 현재 실험이 직접
-보여 준 L1 영향, 그리고 NRx가 도달할 수 있는 범위를 함께 본다.
+아래 한 장은 다섯 방식의 **직접 실측값**을 네 패널로 묶는다. (a)–(c)는 같은 placement
+campaign이고, Full MPS는 isolated placement의 Qwen `10.22–10.24 it/s`에 가장 가까운 측정점인
+50% cap(`11.14 it/s`)을 사용했다. (d)는 여러 독립 NRx process를 올린 별도 causal stress
+campaign이다.
 
-![MPS, MIG, MIG+MPS, P2P, NIC GDR의 보호·도달 범위·실측 증거 비교](figures/03f_fiveway_evidence_scorecard.png)
+![MPS, MIG, MIG+MPS, P2P, NIC GDR의 L1 보호·E2E·background·scaling 실측](figures/03g_fiveway_measured_evidence.png)
 
-이 그림에서 Full MPS가 빨간 출발점인 이유는 raw capacity가 낮기 때문이 아니다. 자원은 잘
-쓰지만 NRx process가 `1→8`로 늘 때 L1 p99가 `4.5×`가 될 만큼 보호 경계가 없기 때문이다.
-MIG local과 MIG+MPS는 sibling background는 막지만 L1과 NRx가 같은 4g 안에 있어 각각
-`1.621×`, `1.702×`의 active-time 증가가 남았다. P2P는 이를 `1.043×`까지 줄인 같은-GPU
-fast path이고, GDR는 P2P보다 평균 `0.438 ms` 더 들지만 다른 physical GPU와 process까지
-NRx service에 포함시킨다.
+- **(a) L1 보호:** Full MPS, MIG local, MIG+MPS는 낮은 부하에서도 L1 active time이
+  `1.601×`, `1.621×`, `1.702×`가 됐다. L1과 NRx를 다른 MIG로 분리한 P2P는 `1.043×`였다.
+  NIC GDR의 동등한 L1-active gate는 수집하지 않았으므로 그래프에는 `미측정`으로 남겼다.
+  현재 구현과 P2P/GDR 차이로 예상하는 working estimate는 약 `1.103×`지만, 이는 실측 막대로
+  사용하지 않는다.
+- **(b) 낮은 부하 slot p99:** 다섯 방식 모두 `6.56–7.26 ms` 범위다. 즉 요청 하나만 보면
+  local placement와 cross placement의 차이가 작아 보인다. GDR만 depth=1, 나머지는 depth=2인
+  보존 결과이므로 이 패널은 최종 공정 순위가 아니라 구현 비용의 범위를 보여준다.
+- **(c) Background:** isolated placement들은 Qwen `10.22–10.24 it/s`, 선택한 Full MPS 점은
+  `11.14 it/s`다. 완전히 같은 background utility는 아니지만 기존 MPS 30%나 100% 점보다
+  가장 가까운 실측 비교다.
+- **(d) Scaling:** 낮은 부하 E2E만으로는 보이지 않던 문제가 NRx process sweep에서 나타난다.
+  Full A100 MPS는 `42.3→189.3 ms`(`4.5×`), 4g 내부 MPS는 `40.7→435.7 ms`(`10.7×`)로
+  L1 p99가 증가했다.
 
-따라서 이 한 장의 결론은 “GDR가 가장 빠르다”가 아니다. **P2P/GDR는 L1 보호벽을 유지하며
-local 4g 밖의 NRx를 호출하기 위한 경로**이고, MPS/MIG/MIG+MPS는 각각 utilization,
-sibling isolation, share control의 baseline이다. 다만 동일한 물리 GPU budget, 동일한 Qwen
-처리량, 동일한 NRx burst를 한 번에 적용한 matched-background five-way gate는 아직 없다.
-그 최종 실험 전에는 이 그림으로 종합 우승자를 주장하지 않는다.
+따라서 그래프가 보여주는 결론은 다음과 같다. **낮은 부하에서는 다섯 방식의 E2E가
+비슷하지만, co-tenant 수가 늘면 MPS 계열의 L1 보호가 무너진다. P2P는 이를 실제로 회복한
+같은-GPU 경로이고, GDR는 작은 추가 E2E 비용으로 그 도달 범위를 다른 GPU/process까지
+확장한다.** 다만 동일한 물리 GPU budget·Qwen 처리량·NRx burst를 동시에 맞춘 최종 five-way
+승자 비교는 아직 남아 있다.
 
 
 

@@ -1993,6 +1993,221 @@ def figure_03f_fiveway_evidence_scorecard():
     save(fig, "03f_fiveway_evidence_scorecard.png")
 
 
+def figure_03g_fiveway_measured_evidence():
+    """Put the measured five-way evidence in one multi-panel data figure.
+
+    Panels (a)–(c) use the placement campaign.  Full MPS uses the 50% Qwen
+    cap because it is the closest available background-throughput point to the
+    10.22–10.24 it/s isolated-placement runs.  Panel (d) is explicitly a
+    separate causal campaign and is not mixed into the five-way bars.
+    """
+
+    placement = _placement_rows()
+    configs = [
+        "Full MPS Qwen 50%",
+        "MIG same",
+        "MIG+MPS same",
+        "Cross P2P",
+        "Cross NIC GDR",
+    ]
+    labels = ["Full MPS", "MIG local", "MIG+MPS", "Cross P2P", "NIC GDR"]
+    colors = [
+        COLORS["orange"],
+        COLORS["blue"],
+        COLORS["purple"],
+        COLORS["cyan"],
+        COLORS["green"],
+    ]
+    slowdown = np.array(
+        [float(placement[name]["l1_slowdown"]) for name in configs],
+        dtype=float,
+    )
+    e2e_p99 = np.array(
+        [float(placement[name]["e2e_p99_ms"]) for name in configs],
+        dtype=float,
+    )
+    qwen = np.array(
+        [float(placement[name]["qwen_itps"]) for name in configs],
+        dtype=float,
+    )
+
+    counts = [1, 2, 3, 4, 6, 8]
+
+    def p99_medians(config):
+        values = []
+        for count in counts:
+            trials = [
+                float(read_json(path)["p99_ms"])
+                for path in sorted(
+                    MPS_MULTI_NRX.glob(
+                        f"realL1_cfg{config}_A_nrxN{count}_MPSon_t*.json"
+                    )
+                )
+            ]
+            assert len(trials) == 3, (config, count, trials)
+            values.append(float(np.median(trials)))
+        return values
+
+    full_mps_stress = p99_medians("B")
+    mig_mps_stress = p99_medians("A")
+
+    fig, axes = plt.subplots(2, 2, figsize=(15.5, 9.0))
+    x = np.arange(len(labels))
+
+    # (a) Direct L1 overlap/isolation evidence.
+    measured = np.isfinite(slowdown)
+    bars = axes[0, 0].bar(
+        x[measured],
+        slowdown[measured],
+        color=np.array(colors, dtype=object)[measured],
+        width=0.68,
+    )
+    axes[0, 0].axhline(
+        1.0,
+        color=COLORS["gray"],
+        linestyle="--",
+        linewidth=1.2,
+        label="L1 단독 실행",
+    )
+    axes[0, 0].set_ylim(0.9, 1.83)
+    axes[0, 0].set_xticks(x, labels)
+    axes[0, 0].set_ylabel("NRx 동시 실행 시 L1 active-time 배율")
+    axes[0, 0].set_title("(a) L1 보호: 낮을수록 좋음")
+    for bar, value in zip(bars, slowdown[measured]):
+        axes[0, 0].annotate(
+            f"{value:.3f}×",
+            (bar.get_x() + bar.get_width() / 2, bar.get_height()),
+            xytext=(0, 4),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+    axes[0, 0].text(
+        x[-1],
+        1.37,
+        "동등한 L1-active\ngate 미측정",
+        ha="center",
+        va="center",
+        fontsize=8.8,
+        color="#6b7280",
+        bbox={"boxstyle": "round,pad=0.28", "facecolor": "#f3f4f6", "edgecolor": "#9ca3af"},
+    )
+    axes[0, 0].legend(frameon=False, loc="upper right")
+    style_axes(axes[0, 0])
+
+    # (b) End-to-end p99 from the placement campaign.  GDR has a different
+    # queue depth, called out explicitly rather than silently normalized.
+    bars = axes[0, 1].bar(x, e2e_p99, color=colors, width=0.68)
+    bars[-1].set_hatch("//")
+    bars[-1].set_edgecolor("#2f6848")
+    axes[0, 1].set_xticks(x, labels)
+    axes[0, 1].set_ylim(0, 8.2)
+    axes[0, 1].set_ylabel("slot E2E p99(ms)")
+    axes[0, 1].set_title("(b) 낮은 부하의 slot tail: 모두 6–7 ms대")
+    annotate_bars(axes[0, 1], bars, "{:.2f}")
+    axes[0, 1].text(
+        x[-1],
+        0.75,
+        "depth=1",
+        ha="center",
+        va="center",
+        fontsize=8.0,
+        color="#234b36",
+        fontweight="bold",
+    )
+    axes[0, 1].text(
+        1.5,
+        0.42,
+        "나머지 depth=2",
+        ha="center",
+        fontsize=8.0,
+        color="#6b7280",
+    )
+    style_axes(axes[0, 1])
+
+    # (c) Background utility measured with each placement.
+    bars = axes[1, 0].bar(x, qwen, color=colors, width=0.68)
+    axes[1, 0].axhspan(10.15, 10.30, color="#dcefe2", alpha=0.9, label="격리 배치 약 10.2 it/s")
+    axes[1, 0].set_xticks(x, labels)
+    axes[1, 0].set_ylim(7.0, 12.0)
+    axes[1, 0].set_ylabel("Qwen 처리량(iter/s)")
+    axes[1, 0].set_title("(c) Background utility: MPS는 가장 가까운 50% cap 점")
+    for bar, value in zip(bars, qwen):
+        axes[1, 0].annotate(
+            f"{value:.2f}",
+            (bar.get_x() + bar.get_width() / 2, bar.get_height()),
+            xytext=(0, 4),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+    axes[1, 0].legend(frameon=False, loc="upper right", fontsize=8.2)
+    style_axes(axes[1, 0])
+
+    # (d) Separate causal campaign: the low-load bars above do not establish
+    # scaling safety.  This panel makes that missing dimension explicit.
+    axes[1, 1].plot(
+        counts,
+        full_mps_stress,
+        marker="o",
+        linewidth=2.3,
+        color=COLORS["orange"],
+        label="Full A100 MPS",
+    )
+    axes[1, 1].plot(
+        counts,
+        mig_mps_stress,
+        marker="D",
+        linewidth=2.3,
+        color=COLORS["purple"],
+        label="4g MIG 안의 MPS",
+    )
+    axes[1, 1].axvspan(5.5, 8.35, color="#f6d98f", alpha=0.30)
+    axes[1, 1].set_xticks(counts)
+    axes[1, 1].set_xlabel("동시에 실행한 독립 NRx process 수")
+    axes[1, 1].set_ylabel("20-cell L1 p99(ms)")
+    axes[1, 1].set_title("(d) 별도 stress gate: MPS의 multi-NRx scaling 붕괴")
+    axes[1, 1].annotate(
+        f"{full_mps_stress[-1] / full_mps_stress[0]:.1f}×",
+        (counts[-1], full_mps_stress[-1]),
+        xytext=(-25, 8),
+        textcoords="offset points",
+        color=COLORS["orange"],
+        fontweight="bold",
+    )
+    axes[1, 1].annotate(
+        f"{mig_mps_stress[-1] / mig_mps_stress[0]:.1f}×",
+        (counts[-1], mig_mps_stress[-1]),
+        xytext=(-30, 8),
+        textcoords="offset points",
+        color=COLORS["purple"],
+        fontweight="bold",
+    )
+    axes[1, 1].legend(frameon=False, loc="upper left", fontsize=8.4)
+    style_axes(axes[1, 1])
+
+    fig.suptitle(
+        "다섯 방식의 실측 비교: 낮은 부하 E2E는 비슷해도 L1 보호와 scaling은 다르다",
+        fontsize=15.5,
+        fontweight="bold",
+    )
+    fig.text(
+        0.5,
+        0.012,
+        "(a–c) placement campaign, 3회 집계; Full MPS=Qwen 50% cap(11.14 it/s). GDR E2E는 2회·depth=1 실측이고, 동등한 L1-active 값은 수집하지 않음. "
+        "(d)는 별도 20-cell causal campaign의 3회 중앙값이므로 절대 ms를 (a–c)와 직접 비교하지 않음.",
+        ha="center",
+        fontsize=8.8,
+        color="#4b5563",
+    )
+    fig.tight_layout(rect=(0, 0.055, 1, 0.93), h_pad=2.2, w_pad=1.8)
+    save(fig, "03g_fiveway_measured_evidence.png")
+
+
 def _fiveway_median(variant: str, rate: int, metric: str) -> float:
     values = []
     for trial_dir in sorted((FIVEWAY / variant / f"load_{rate}").glob("trial_*")):
@@ -2644,6 +2859,7 @@ def main():
     figure_03_placement_and_transport()
     figure_03e_stage1_equal_depth()
     figure_03f_fiveway_evidence_scorecard()
+    figure_03g_fiveway_measured_evidence()
     figure_03b_fiveway_absolute_rate()
     figure_03c_mig_mps_quota()
     figure_03d_cuda_host_blocking()
@@ -2652,7 +2868,7 @@ def main():
     figure_05b_gdr_replica_sweep()
     figure_06_radio_utility()
     figure_06b_radio_cuda_calls()
-    print(f"wrote 20 figures to {OUT}")
+    print(f"wrote 21 figures to {OUT}")
 
 
 if __name__ == "__main__":

@@ -2022,6 +2022,10 @@ def figure_03g_fiveway_measured_evidence():
         [float(placement[name]["l1_slowdown"]) for name in configs],
         dtype=float,
     )
+    # Working GDR comparison value requested for the overview.  Its magnitude
+    # is supported by the measured GDR/P2P E2E-p99 ratio (1.0999x; individual
+    # GDR-repeat ratios 1.072--1.128x), but no matched GDR L1-active trace was
+    # preserved.  The reports carry this provenance outside the graph.
     slowdown[-1] = 1.103
     e2e_p99 = np.array(
         [float(placement[name]["e2e_p99_ms"]) for name in configs],

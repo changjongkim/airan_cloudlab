@@ -367,6 +367,17 @@ causal stress campaign with multiple independent NRx processes.
   L1-active trace was not preserved for this value; it is the working estimate used from the current
   implementation and observed P2P/GDR difference. This provenance note remains in the text rather
   than cluttering the graph.
+
+The magnitude of `1.103×` is not arbitrary. In the equal-depth transport gate, the measured GDR/P2P
+E2E-p99 ratio is `6.846 / 6.224 = 1.100×`; comparing each of the two GDR repeats against the
+aggregate P2P value gives `1.072–1.128×`. Thus `1.103×` is reasonable as a representative value at
+approximately **1.10×**. It is not, however, proof of the same L1-active ratio. `l1_active` covers
+CE/front plus LDPC/CRC/back, while most RDMA waiting lies outside those CUDA intervals. A
+conservative bound assigns none or all of the `0.438 ms` mean GDR–P2P E2E delta to the `2.429 ms`
+P2P 2g-L1 baseline, yielding `1.043–1.223×`. The plotted value lies inside this physically plausible
+range, but the paper should treat it as an **approximately 1.10× provisional value**, not a
+three-decimal measurement. A matched gate with CUDA-event timing around GDR CE/front and
+LDPC/CRC/back is required to make it definitive.
 - **(b) Low-load slot p99:** all five lie between `6.56` and `7.26 ms`. A single request therefore
   makes local and cross placements look similar. GDR is depth=1 while the preserved results for the
   others use depth=2; this panel bounds implementation cost rather than declaring a final winner.
@@ -508,10 +519,40 @@ required follow-up for the other three conditions.
 
 ## 4. Direct evidence that the problem exists
 
-Three independent resident TensorRT endpoints processed single-cell, multi-cell, and selective-burst
-traces. We compare pinning every request to one endpoint with selecting the earliest predicted finish.
+This figure is a **compute/queue experiment that isolates why requests must be routed across NRx
+workers; it is not a transport benchmark.** One real TensorRT NRx worker resides in a `3g.20gb MIG`
+on each of three physical GPUs. The same deterministic input tensor is preloaded at every endpoint,
+so this gate excludes the cuPHY front/back path, P2P/GDR tensor movement, and execution of the
+conventional fallback.
+
+```text
+slot / NRx-required trace
+        ↓
+host scheduler selects one endpoint
+        ↓
+real TensorRT + CUDA Graph executes on the selected 3g MIG
+
+Excluded: L1 tensor transport, cuPHY CE/LDPC, and conventional fallback execution
+```
+
+The two plotted policies are:
+
+- **Red, `static-one`:** pin every request to NRx 0, even as its queue grows. NRx 1 and NRx 2
+  receive no work.
+- **Blue, `predicted-finish`:** actually select the endpoint among NRx 0/1/2 whose already-reserved
+  work is predicted to finish first. If no endpoint can finish before the 5 ms gate, record
+  `fallback required` instead of extending the queue. Blue therefore combines **distributed
+  selection and deadline admission**.
 
 ![One NRx queue collapses while other workers remain idle](figures_en/02_fixed_placement_fragmentation.png)
+
+The three panels ask different questions about the same runs.
+
+| Panel | Plain-language question | Exact denominator and meaning |
+|---|---|---|
+| **(a) p99 request latency** | How late were the NRx requests that finished? | The slowest-1% boundary of `arrival → queue wait → TensorRT completion` among completed NRx requests. A request rejected early by blue admission is absent from this latency set, so panel (a) must be read with (b). |
+| **(b) no result within 5 ms** | For all NRx requests, how often was no result usable in time? | All NRx-required requests are the denominator. Completion after 5 ms, overflow, and predicted-finish pre-fallback all count as failures. This is the more comprehensive usable-result coverage metric. |
+| **(c) endpoint idle fraction** | How much of the three NRx workers sat idle meanwhile? | Fraction of `3 endpoints × trace duration` without TensorRT execution. **Both red and blue bars in (c) are idle fractions; blue is not the endpoint-selection rate.** |
 
 | Workload | Pin one NRx: p99 / no timely result | Earliest predicted finish: p99 / no timely result |
 |---|---:|---:|
@@ -519,16 +560,37 @@ traces. We compare pinning every request to one endpoint with selecting the earl
 | 4 cells, 1 ms, bursty 10% | 51.39 ms / 64.85% | 5.50 ms / 1.61% |
 | 4 cells, 0.5 ms, bursty 10% | 3332.84 ms / 99.90% | 5.06 ms / 7.89% |
 
-Some traces had at least 66.7% aggregate endpoint idleness while the pinned endpoint missed the
-timeliness threshold. A low average NRx probability is insufficient: a short burst can overload one
-queue while other endpoints are idle. This is direct measurement evidence for the fragmentation
-problem.
+In the first workload, one NRx has an observed service time near `1.6 ms`, or roughly `625
+requests/s`, while NRx 0 alone receives `1,000 requests/s`. Its queue must therefore grow. NRx 1 and
+NRx 2 receive no work, leaving approximately `2/3`, or `66.7%`, of aggregate endpoint-time idle.
+Blue uses primarily two endpoints and changes p99 from `3293.25` to `1.63 ms`, while no-timely
+coverage failures fall from `99.97%` to `0.13%`.
+
+The middle `4 cells · 1 ms · bursty 10%` case is subtler and more important. Both policies are idle
+roughly `78–79%` on average because mean demand is low. Yet a short burst forms a long queue at NRx
+0 under static-one, producing `51.39 ms` p99. Predicted-finish spreads that burst and reduces p99 to
+`5.50 ms`. **Low average GPU utilization can therefore coexist with poor tail latency.** This is
+temporal service-capacity fragmentation.
+
+Blue still has a `7.89%` no-timely ratio in the third workload. Routing can recover stranded
+capacity, but it cannot make three replicas or the 5 ms gate sufficient for every burst. The result
+therefore does not say that three NRx workers solve every load. It says that **static binding wastes
+capacity that already exists, and overload still requires admission and fallback after routing.**
 
 `No timely result` means no usable NRx result within the 5 ms experimental gate; it also includes
 requests for which the scheduler chose conventional fallback. This compute/queue metric is not the
 same as a radio deadline miss because this gate does not execute the full PHY fallback path.
 
-## 5. Precise problem statement
+The claim boundary is equally important:
+
+- **Established:** the same three real NRx workers can exhibit a busy queue and idle capacity at
+  once because of static binding; request-level routing/admission greatly reduces the damage.
+- **Not established here:** whether P2P or GDR is faster, end-to-end behavior with real L1 tensors,
+  or universal superiority of predicted-finish over round robin for every trace.
+- **Follow-on link:** the P2P/GDR gates test whether tensors can reach the selected endpoint; the
+  Stage-2 GDR-pool gate repeats policy evaluation with full-size request/result transport.
+
+## 5. The complete problem: each mechanism solves only one axis
 
 > **When a burst of useful NRx requests exceeds the capacity of the current MIG, use NRx capacity in
 > other isolated GPU spaces without stopping L1 or reconfiguring MIG, while preventing late or stale
@@ -544,6 +606,60 @@ This is more than load balancing. It combines the following constraints:
 | Absolute expiry | Even a correct result is unusable for that slot after expiry |
 | Conventional baseline | Failure of an optional NRx must leave a valid recovery path |
 | Background utility | Spare accelerators cannot remain empty for peak demand alone |
+
+### 5.1 Where each existing approach stops
+
+| Approach | What it actually solves | Measured remaining limitation | Required next capability |
+|---|---|---|---|
+| **Full MPS** | Work-conserving sharing of one full GPU across processes | L1 p99 rises `42.3→189.3 ms` as NRx processes grow `1→8`; there is no physical L1 wall | Separate mandatory L1 and optional NRx compute domains |
+| **MIG local** | Strongly protects a 4g from Qwen in a sibling 3g | L1 and NRx in the same 4g remain unisolated and L1 active time is `1.621×`; endpoint capacity is fixed | Dedicated L1 and NRx MIGs plus access to external capacity |
+| **MIG+MPS local** | Adjusts average shares within one 4g while retaining sibling-MIG isolation | Quotas create neither a new hardware wall nor capacity outside the 4g | Scale out to another resident endpoint rather than only tune shares |
+| **Cross P2P** | Separates compute queues for a peer-capable MIG pair and restores L1 slowdown to `1.043×` | Topology/process scope is limited; one remote NRx still has finite capacity | A common path to endpoints outside P2P reach |
+| **Cross NIC GDR** | Reaches memory in another MIG/process/GPU without CPU-DRAM bounce | Costs `0.438 ms` mean over P2P here and does not choose an endpoint or handle late results | Deadline-aware routing, bounded credit, and expiry-safe commit |
+| **Multiple NRx + static binding** | Pre-provisions more endpoints | One queue reaches seconds while `66.7%` of endpoint-time is idle | A request-level service pool and finish-aware admission |
+
+No mechanism in this table is simply “bad.” **MPS provides utilization, MIG provides isolation, and
+P2P/GDR provide reachability, but none completes dynamic NRx service under isolation together with
+deadline correctness.**
+
+### 5.2 Architectural requirements derived from the measurements
+
+| Observed problem | Required system property | DART-Rx block |
+|---|---|---|
+| MPS co-tenant pressure propagates into L1 tail latency | A fixed physical protection boundary for mandatory PHY | **Protected L1 MIG** |
+| MIG reconfiguration is unavailable on the fast path and endpoint startup is expensive | Pre-resident model, context, graph, and buffers | **Resident NRx fabric** |
+| Some MIG/GPU pairs are outside P2P reach | A remote GPU data path without CPU-DRAM staging | **P2P/GDR tensor plane** |
+| A busy queue and idle NRx coexist | Select and reserve one feasible endpoint per request | **Predicted-finish scheduler + credit** |
+| A burst violates expiry even at low average load | Absolute-deadline admission that avoids extending a doomed queue | **Utility/deadline admission** |
+| A remote NRx can be late, fail, or return an old-slot result | Preserve the baseline and authorize exactly one result | **Conventional fallback + versioned exactly-one commit** |
+| Keeping spare endpoints empty wastes value | Background work reclaimable within a bounded interval | **Bounded background lease** |
+
+### 5.3 The causal path into the design
+
+```text
+Use only MPS work conservation
+    → cannot protect L1 from co-tenant tails
+
+Add fixed MIG isolation
+    → protects L1, but pins NRx capacity to rooms
+
+Open GPU-memory paths with P2P/GDR
+    → reaches remote NRx, but does not choose queues or validate late results
+
+Select a resident endpoint with a shadow reservation ledger
+    → uses idle capacity, but overload and late completion remain possible
+
+Add deadline admission, conventional fallback, and versioned commit
+    → use only timely NRx results and block stale results from PHY state
+
+Add bounded background leases
+    → avoid leaving peak capacity empty while retaining bounded burst reclaim
+```
+
+DART-Rx is therefore neither “fast MIG reconfiguration” nor a claim that GDR is faster than P2P.
+It is an **architecture that preserves fixed-MIG L1 isolation, borrows service capacity from
+pre-resident NRx workers per request, and commits the result into PHY state only while it remains
+valid.** The four blocks in Part II directly implement these measured requirements.
 
 ---
 # Part II. DART-Rx design

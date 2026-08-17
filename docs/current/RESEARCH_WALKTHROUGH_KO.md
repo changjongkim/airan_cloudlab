@@ -368,6 +368,17 @@ campaign이다.
   NIC GDR는 그래프에서 `1.103×`로 표시했다. 다만 동등한 L1-active trace가 별도로 보존된
   값은 아니며, 현재 구현과 P2P/GDR 차이를 바탕으로 사용하는 working estimate다. 이
   provenance 설명은 그래프를 복잡하게 만들지 않도록 본문에만 둔다.
+
+`1.103×`의 크기가 완전히 임의인 것은 아니다. 같은 depth-1 transport gate에서 GDR와 P2P의
+E2E p99 비율은 `6.846 / 6.224 = 1.100×`였고, 두 GDR repeat를 P2P 집계값과 각각 비교한
+범위는 `1.072–1.128×`였다. 따라서 `1.103×`는 **약 1.10× 수준의 대표값으로는 합당**하다.
+그러나 `l1_active = CE/front + LDPC/CRC/back`인 반면 RDMA 대기시간 대부분은 이 두 구간
+밖에 있으므로, E2E 비율이 곧 L1 active-time 비율이라는 보장은 없다. 최악의 경우 GDR–P2P
+평균 E2E 차이 `0.438 ms` 전부를 P2P의 2g L1 baseline `2.429 ms`에 부과하면 상한은
+`1.223×`; 아무 차이도 L1 kernel 구간에 들어오지 않으면 하한은 P2P의 `1.043×`다.
+`1.103×`는 이 물리적으로 가능한 구간 안에 있지만, 논문에서는 세 자리 실측치가 아니라
+**약 `1.10×`의 provisional value**로 해석해야 한다. 확정에는 GDR producer의 CE/front와
+LDPC/CRC/back을 CUDA event로 따로 재측정하는 matched gate가 필요하다.
 - **(b) 낮은 부하 slot p99:** 다섯 방식 모두 `6.56–7.26 ms` 범위다. 즉 요청 하나만 보면
   local placement와 cross placement의 차이가 작아 보인다. GDR만 depth=1, 나머지는 depth=2인
   보존 결과이므로 이 패널은 최종 공정 순위가 아니라 구현 비용의 범위를 보여준다.
@@ -521,10 +532,40 @@ CUDA call이 원인인가”는 MIG co-location과 GDR vertical slice만 직접 
 
 ## 4. 실제 problem existence: busy queue와 idle capacity가 동시에 존재한다
 
-3개의 독립 resident TensorRT endpoint에 single-cell, multi-cell, selective burst trace를
-입력하고 static-one과 predicted-finish placement를 비교했다.
+이 절의 그림은 **전송 방식의 성능 그래프가 아니라, 왜 여러 NRx를 요청 단위로 선택해야
+하는지를 분리해 확인한 compute/queue 실험**이다. 실제 TensorRT NRx는 서로 다른 세
+physical GPU의 `3g.20gb MIG`에 하나씩 상주시켰다. 다만 동일한 deterministic input tensor를
+각 endpoint GPU에 미리 올려 두었기 때문에 이 gate에는 cuPHY front/back, P2P, GDR tensor
+전송, conventional fallback 실행이 들어 있지 않다.
+
+```text
+slot/Nrx-required trace
+        ↓
+host scheduler가 endpoint 하나를 선택
+        ↓
+선택된 3g MIG에서 실제 TensorRT + CUDA Graph 실행
+
+제외: L1 tensor 이동(P2P/GDR), cuPHY CE/LDPC, conventional fallback 실행
+```
+
+비교한 두 정책은 다음과 같다.
+
+- **빨간색 `static-one`:** 모든 NRx 요청을 NRx 0에 고정한다. NRx 0의 queue가 길어져도
+  NRx 1과 NRx 2로 보내지 않는다.
+- **파란색 `predicted-finish`:** NRx 0/1/2 중 현재 예약된 작업이 가장 빨리 끝날 endpoint를
+  실제로 선택한다. 세 endpoint 모두 5 ms 안에 끝낼 수 없다고 예측되면 queue에 더 넣지
+  않고 `fallback required`로 기록한다. 따라서 파란색은 **분산 선택과 deadline admission을
+  함께 적용한 결과**다.
 
 ![한 NRx 대기열은 밀리는데 다른 NRx 처리기는 노는 고정 배치 문제](figures/02_fixed_placement_fragmentation.png)
+
+그림의 세 패널은 같은 run을 서로 다른 질문으로 읽는다.
+
+| 패널 | 쉬운 질문 | 정확한 분모와 의미 |
+|---|---|---|
+| **(a) p99 요청 지연** | 끝난 NRx 요청은 얼마나 늦었는가? | 실제 완료된 NRx 요청의 `도착 → queue 대기 → TensorRT 완료` 시간 중 느린 1% 경계. 파란색에서 deadline admission으로 사전 fallback된 요청은 이 latency 집합에 없으므로 (b)와 함께 봐야 한다. |
+| **(b) 5 ms 안에 결과 없음** | 전체 NRx 요청 중 제시간에 쓸 결과를 못 받은 비율은? | 모든 NRx-required 요청이 분모다. 5 ms 뒤 완료, queue overflow, predicted-finish의 사전 fallback을 모두 실패로 센다. 두 정책의 usable-result coverage를 비교하는 더 포괄적인 지표다. |
+| **(c) endpoint idle fraction** | 그동안 세 NRx 계산기는 얼마나 놀았는가? | `3 endpoints × trace 실행시간` 중 TensorRT를 실행하지 않은 시간의 비율이다. **(c)의 빨간색과 파란색 모두 idle 값**이며, 파란색이 endpoint 선택 비율을 뜻하지 않는다. |
 
 대표 결과는 다음과 같다.
 
@@ -534,15 +575,40 @@ CUDA call이 원인인가”는 MIG co-location과 GDR vertical slice만 직접 
 | 4 cells, 1 ms, bursty 10% | 51.39 ms / 64.85% | 5.50 ms / 1.61% |
 | 4 cells, 0.5 ms, bursty 10% | 3332.84 ms / 99.90% | 5.06 ms / 7.89% |
 
-static-one이 miss를 만드는 동안 전체 endpoint idle fraction이 66.7% 이상인 사례가 존재했다.
-낮은 평균 NRx 비율에서도 burst가 한 queue에 몰리면 해당 queue는 deadline을 놓치고 다른
-endpoint는 idle일 수 있다. 이 결과가 연구 problem의 직접적인 실측 증거다.
+첫 번째 workload에서는 NRx 한 개의 실측 service time이 약 `1.6 ms`, 즉 대략 `625
+requests/s`인데 `1,000 requests/s`가 NRx 0 하나에 들어온다. 그래서 빨간색은 구조적으로
+queue가 계속 증가한다. 그동안 NRx 1과 NRx 2에는 일을 보내지 않으므로 전체 endpoint-time의
+약 `2/3`, 즉 `66.7%`가 idle이다. 파란색은 주로 두 endpoint를 사용해 같은 요청률을
+처리하므로 p99가 `3293.25 → 1.63 ms`, no-timely가 `99.97 → 0.13%`로 줄었다.
+
+가운데의 `4 cells · 1 ms · bursty 10%`는 더 미묘하고 중요하다. 평균 요청률이 낮아서 두
+정책 모두 endpoint idle fraction이 약 `78–79%`로 높다. 그러나 짧은 순간에 요청이 몰릴
+때 static-one은 NRx 0에만 burst를 쌓아 p99 `51.39 ms`를 만들고, predicted-finish는 같은
+burst를 다른 NRx에 나눠 p99를 `5.50 ms`로 낮춘다. 즉 **평균 GPU utilization이 낮아도 한
+queue의 tail latency는 나쁠 수 있다.** 이것이 시간적으로 capacity가 잘못된 queue 뒤에
+갇히는 fragmentation이다.
+
+세 번째 workload에서는 파란색도 no-timely `7.89%`가 남는다. Routing으로 stranded
+capacity를 사용해도 세 replica의 총 service capacity나 5 ms gate 자체가 부족한 burst는
+존재한다는 뜻이다. 따라서 결과는 “세 NRx면 모든 부하가 해결된다”가 아니라, **static
+binding은 사용 가능한 capacity조차 낭비하고, routing 이후에도 admission과 fallback이
+필요하다**는 것을 보여준다.
 
 여기서 `no-timely`는 5 ms experimental gate 안에 usable NRx가 없었다는 뜻이며, scheduler가
 conventional fallback을 요구한 경우도 포함한다. 이 compute/queue gate에는 actual PHY
 fallback 결과가 없으므로 radio deadline miss와 같은 metric으로 읽으면 안 된다.
 
-## 5. 문제를 정확히 정의하면
+이 그림이 증명하는 것과 증명하지 않는 것도 구분해야 한다.
+
+- **증명함:** 동일한 세 실제 NRx worker에서도 고정 binding 때문에 busy queue와 idle
+  capacity가 동시에 존재하며, request-level routing/admission이 이를 크게 줄인다.
+- **증명하지 않음:** P2P와 GDR 중 어느 것이 빠른지, actual L1 tensor를 옮긴 end-to-end
+  성능, predicted-finish가 모든 trace에서 round-robin보다 항상 우수하다는 주장.
+- **후속 연결:** P2P/GDR gate는 선택한 remote endpoint까지 tensor를 옮길 수 있는지를
+  측정하고, Stage 2 GDR-pool gate는 full-size request/result를 포함해 routing 정책을 다시
+  평가한다.
+
+## 5. 전체 문제를 한 번에 보면: 각 방식은 한 축만 해결한다
 
 > **NRx 요청이 갑자기 몰려 현재 MIG의 처리량을 넘었을 때, L1과 MIG 구성을 건드리지 않고
 > 다른 GPU 공간의 NRx를 빌려 쓰되, 늦거나 이전 slot의 AI 결과가 최종 무선 결과에 섞이지
@@ -562,6 +628,60 @@ accelerator의 capacity를 사용하면서 late/stale result의 PHY-state commit
 | Absolute expiry | deadline 뒤 도착한 정확한 결과도 해당 slot에는 쓸 수 없다. |
 | Conventional baseline | optional NRx가 실패해도 PHY recovery path가 남아 있어야 한다. |
 | Background utility | peak만 보고 spare accelerator를 항상 비워둘 수 없다. |
+
+### 5.1 기존 방식별로 어디까지 해결하고 어디서 멈추는가
+
+| 방식 | 실제로 해결하는 것 | 실측으로 드러난 한계 | 그래서 필요한 다음 기능 |
+|---|---|---|---|
+| **Full MPS** | 한 full GPU의 SM을 여러 process가 work-conserving하게 사용 | NRx process `1→8`에서 L1 p99 `42.3→189.3 ms`; 물리적 L1 보호벽이 없음 | mandatory L1과 optional NRx의 compute domain 분리 |
+| **MIG local** | sibling 3g의 Qwen 간섭으로부터 4g를 강하게 보호 | 같은 4g의 L1+NRx는 격리되지 않고 L1 active `1.621×`; 한 endpoint capacity는 고정 | L1 전용 MIG와 NRx 전용 MIG 분리, 외부 capacity 접근 |
+| **MIG+MPS local** | sibling MIG 격리를 유지하며 한 4g 안의 평균 share 조절 | quota를 바꿔도 새 하드웨어 벽이나 4g 밖 capacity가 생기지 않음 | share tuning이 아니라 다른 resident endpoint로 scale-out |
+| **Cross P2P** | peer 가능한 MIG pair에서 compute queue를 분리하고 L1 slowdown을 `1.043×`로 회복 | 지원 topology와 process 범위가 제한되고 한 remote NRx가 차면 끝 | P2P 범위 밖 endpoint까지 가는 공통 data path |
+| **Cross NIC GDR** | CPU DRAM bounce 없이 다른 MIG/process/GPU memory까지 도달 | P2P보다 평균 `0.438 ms` 비싸며, 어느 endpoint를 고를지와 late result 처리는 해결하지 않음 | deadline-aware routing, bounded credit, expiry-safe commit |
+| **여러 NRx + static binding** | endpoint 수만 미리 늘려 둠 | 한 queue는 수 초로 무너지는데 다른 endpoint-time `66.7%`가 idle | request-level service pool과 finish-aware admission |
+
+이 표의 결론은 특정 mechanism 하나가 나쁘다는 것이 아니다. **MPS는 utilization, MIG는
+isolation, P2P/GDR는 reachability를 각각 제공하지만, isolation을 유지한 상태의 동적 NRx
+service와 deadline correctness를 하나도 완성하지 못한다.**
+
+### 5.2 실험에서 도출되는 설계 요구조건
+
+| 관측된 문제 | 시스템에 필요한 성질 | DART-Rx에서 맡는 블록 |
+|---|---|---|
+| MPS의 co-tenant pressure가 L1 tail로 전파 | mandatory PHY의 고정된 물리 보호 경계 | **Protected L1 MIG** |
+| MIG 재구성은 fast path에서 불가능하고 endpoint 시작도 비쌈 | model/context/graph/buffer가 미리 준비된 고정 endpoint | **Resident NRx fabric** |
+| P2P가 닿지 않는 MIG/GPU가 존재 | CPU DRAM staging 없는 remote GPU data path | **P2P/GDR tensor plane** |
+| busy queue와 idle NRx가 동시에 존재 | 요청마다 feasible endpoint를 고르고 자리를 예약 | **Predicted-finish scheduler + credit** |
+| 평균 load가 낮아도 burst는 deadline을 넘김 | 늦을 요청을 queue에 넣지 않는 absolute-deadline admission | **Utility/deadline admission** |
+| remote NRx는 늦거나 실패하거나 이전 slot 결과를 반환할 수 있음 | 기존 수신 결과를 보존하고 하나만 확정 | **Conventional fallback + versioned exactly-one commit** |
+| spare endpoint를 항상 비우면 비용 낭비 | NRx burst 때 유한 시간 안에 회수 가능한 background 실행 | **Bounded background lease** |
+
+### 5.3 따라서 설계는 다음 인과관계로 이어진다
+
+```text
+MPS의 work conservation만 사용
+    → L1을 co-tenant tail에서 보호할 수 없음
+
+MIG로 고정 격리
+    → L1은 보호되지만 NRx capacity가 방별로 고정
+
+P2P/GDR로 방 사이의 GPU-memory 경로 개방
+    → remote NRx에 도달하지만 queue 선택과 결과 유효성은 모름
+
+resident endpoint + shadow reservation으로 하나를 선택
+    → idle capacity를 사용하지만 overload/late result는 여전히 가능
+
+deadline admission + conventional fallback + versioned commit
+    → 제시간에 끝날 NRx만 사용하고 늦은 결과는 PHY state에서 차단
+
+bounded background lease
+    → peak를 위해 항상 비워 두지 않으면서 burst 때 capacity 회수
+```
+
+따라서 DART-Rx는 “MIG를 빠르게 재구성하는 방법”도, “GDR가 P2P보다 빠르다는 방법”도
+아니다. **고정 MIG가 제공하는 L1 isolation을 유지한 채, 미리 상주한 여러 NRx의 service
+capacity를 요청 단위로 빌리고, 그 결과를 deadline-safe하게 PHY에 commit하는 architecture**다.
+다음 Part II의 네 설계 블록은 위 표의 요구조건을 그대로 구현한다.
 
 ---
 

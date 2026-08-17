@@ -888,6 +888,24 @@ process, CUDA context, GPU MR, RC QP, and resident TensorRT/CUDA Graph.
 > is more **pool-wide timely service capacity**. cuPHY and radio decoding are deliberately absent,
 > so `no-timely` in this Stage is not itself a radio failure.
 
+#### Bottom line first: what worked and what failed
+
+The table below uses round-robin, which accepts every request and distributes them in order. Each
+number is the fraction that returned an actual NRx result within `5 ms`; higher is better. This is
+the simplest view of Stage 2 capacity.
+
+| Incoming request stream | Offered NRx load | 1 NRx | 2 NRx | 3 NRx | Conclusion |
+|---|---:|---:|---:|---:|---|
+| One cell, every 1 ms | 1,000/s | 0.005% | 0.015% | **97.205%** | **Good:** the third replica makes this steady load nearly sustainable |
+| Two synchronized cells | 2,000/s | 0.0025% | 0% | **0%** | **Failed:** load exceeds aggregate three-replica capacity and the queue collapses |
+| Four cells, selective 10% bursts | Mean 385/s | 13.264% | 39.753% | **67.021%** | **Partial:** low mean load hides bursts that make 33% late |
+
+The **positive result** is that three real full-size-GDR NRx replicas operate independently and
+serve `97.2%` of a steady 1,000/s stream. The **negative result** is that three replicas still cannot
+serve 2,000/s, and synchronized bursts miss the deadline even at a low mean arrival rate. Stage 2
+does not show that “building a pool solves the problem.” It measures the **fixed-capacity cliff and
+the need for burst-aware admission**.
+
 The `412` validated Stage 2 runs form four layers:
 
 | Internal campaign | Runs | Endpoints / policies | Question |
@@ -912,6 +930,10 @@ does not execute cuPHY CE itself.
 | `predicted-finish` | Minimize `max(now, reserved tail)+service bound` | Calibrated service bound and reserved queue tail | Yes, if predicted completion exceeds expiry | Replica, representative, full |
 | `tail-aware` | Earliest predicted finish among endpoints whose guard is open | Adaptive recent-512 p99.5 × 1.10 bound and outlier circuit guard | Yes, if infeasible or all endpoints are guarded | All campaigns |
 
+Despite its name, predicted-finish is not an ML predictor. If now is 0 ms, expiry is 5 ms, one NRx
+has 3 ms of reserved work, and its measured service bound is 2 ms, its finish estimate is simply
+`3+2=5 ms`. A value beyond 5 ms is rejected. It is a basic **deadline-feasibility calculation**.
+
 The static policies, round-robin, and shortest-queue submit remote work without testing deadline
 feasibility. Predicted-finish reserves completion using the calibration p95 service bound with a
 `1.10×` margin. Tail-aware additionally adapts to the recent tail and temporarily removes an
@@ -920,40 +942,56 @@ does not necessarily imply more remote execution; it also reflects admission beh
 
 ![Stage 2 sweep from one to three real NRx replicas](figures_en/05b_gdr_replica_sweep.png)
 
-The replica sweep rejects the simplistic conclusion that every policy improves monotonically with
-more replicas. For single-cell 1,000/s, predicted-finish no-timely falls
-`61.5% → 34.7% → 12.0%`, and round-robin changes from `100.0% → 100.0% → 2.8%`. For synchronized
-two-cell 2,000/s, predicted-finish still has `58.9%` no-timely with three replicas because offered
-load remains high relative to pool capacity. In the selective burst, three-replica round-robin is
-best at `33.0%`, while predicted-finish reaches `64.5%` because of conservative rejection. This
-27-run sweep uses one representative replay per point and does not replace full-matrix statistics.
+The replica sweep rejects the simplistic conclusion that more replicas always solve the problem.
+For single-cell 1,000/s, three replicas reach `97.2%` timely with round-robin and `88.0%` with
+predicted-finish. For synchronized two-cell 2,000/s, round-robin reaches `0%` and predicted-finish
+only `41.1%`. Predicted-finish preserves some timely results by sending infeasible requests to the
+conventional path before they clog the queue; because Stage 2 does not execute that receiver, those
+rejects still count as `no-timely`. For selective bursts, three-replica round-robin reaches only
+`67.0%`, while conservative predicted-finish reaches `35.5%`. This 27-run sweep is one causal replay
+per representative trace and does not replace the full-matrix statistics.
 
 Applying all six policies to the same representative traces likewise shows that no single policy
-wins every workload. Values below are the fraction without a usable NRx result within `5 ms`;
-lower is better.
+wins every workload. Values below are the fraction with an NRx result within `5 ms`; higher is
+better.
 
 | Policy | Single 1,000/s | Sync two-cell 2,000/s | Selective burst, mean 385/s |
 |---|---:|---:|---:|
-| static-one | 99.995% | 99.998% | 87.125% |
-| static-cell | 99.995% | 100.000% | 80.078% |
-| round-robin | **6.580%** | 100.000% | **33.900%** |
-| shortest-queue | 44.040% | 97.165% | 38.326% |
-| predicted-finish | 24.595% | **62.588%** | 54.250% |
-| tail-aware | 16.400% | 82.585% | 68.903% |
+| static-one | 0.005% | 0.002% | 12.875% |
+| static-cell | 0.005% | 0% | 19.922% |
+| round-robin | **93.420%** | 0% | **66.100%** |
+| shortest-queue | 55.960% | 2.835% | 61.674% |
+| predicted-finish | 75.405% | **37.412%** | 45.750% |
+| tail-aware | 83.600% | 17.415% | 31.097% |
 
-Round-robin is work-conserving when load fits within pool capacity, but it cannot suppress
-overload. Predicted-finish removes futile work under overload but also rejects usable requests.
-This is why final DART-Rx admission must combine queue timing with radio utility and a fallback-risk
-budget.
+**The direct conclusion is that neither policy is always better.** When the replica count is too
+small or synchronized two-cell 2,000/s exceeds pool capacity, predicted-finish wins. Round-robin
+admits every request and delivers `0%` timely results, while predicted-finish sends requests that
+cannot finish within 5 ms to the conventional path and preserves `37.4%` timely NRx results among
+the remaining work. With three replicas serving single-cell 1,000/s or selective bursts, capacity
+is relatively sufficient, round-robin wins, and conservative predicted-finish rejection hurts.
 
-The full matrix contained `29 workload points × 3 trials × 4 policies = 348 runs`.
+The data therefore do **not** support always selecting an endpoint with predicted-finish. They
+support a simpler two-step design:
 
-| Policy | Overall no-timely ratio | Paired improvement vs static-one | Paired improvement vs static-cell |
-|---|---:|---:|---:|
-| static-one | 1.0000 | — | — |
-| static-cell | 1.0000 | — | — |
-| predicted-finish | **0.8133** | 87/87 traces; median `18.65 pp` | 86/87 traces; median `16.50 pp` |
-| tail-aware | 0.8432 | 87/87 traces; median `14.69 pp` | 83/87 traces; median `9.70 pp` |
+1. **Deadline admission:** if no endpoint can finish before expiry, immediately choose the
+   conventional fallback instead of polluting a remote queue.
+2. **Round-robin dispatch:** after admission, distribute across healthy endpoints with available
+   credits; return one credit on completion.
+
+Predicted-finish and tail-aware are ablations that led to this design, not final DART-Rx scheduler
+claims.
+
+The full matrix contained `29 workload points × 3 trials × 4 policies = 348 runs`. Because `69/87`
+paired traces intentionally offer `>1,500 requests/s`, the aggregate is an overload stress result,
+not a normal-operation performance number.
+
+| Policy | Overall timely-NRx ratio ↑ | Overall no-timely ratio | Paired improvement vs static-one | Paired improvement vs static-cell |
+|---|---:|---:|---:|---:|
+| static-one | 0.0000 | 1.0000 | — | — |
+| static-cell | 0.0000 | 1.0000 | — | — |
+| predicted-finish | **0.1867** | 0.8133 | 87/87 traces; median `18.65 pp` | 86/87 traces; median `16.50 pp` |
+| tail-aware | 0.1568 | 0.8432 | 87/87 traces; median `14.69 pp` | 83/87 traces; median `9.70 pp` |
 
 ![Stage 2 policy results by load and paired improvement in the full matrix](figures_en/05_gdr_pool_policy.png)
 

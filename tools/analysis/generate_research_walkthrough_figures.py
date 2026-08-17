@@ -2176,14 +2176,14 @@ def figure_05_gdr_pool_policy():
     style_axes(axes[1])
 
     fig.suptitle(
-        "NRx 선택 정책 결과: 완료시간을 예측하면 실패할 전송은 줄지만, 요청 수락 판단은 아직 보수적",
+        "Stage 2 정책 결론: 정상 부하는 round-robin, overload에서만 deadline admission이 필요",
         fontsize=14,
         fontweight="bold",
     )
     fig.text(
         0.5,
         -0.005,
-        "실험 범위: 요청 패턴 29개 x 3회 x 정책 4개 = 348회, 5 ms 비교선. '결과 없음'에는 처음부터 기존 수신기를 고른 경우도 포함",
+        "실험 범위: 요청 패턴 29개 x 3회 x 정책 4개 = 348회, 5 ms 비교선. 대부분 overload stress이며 predicted 정책의 사전 fallback도 '결과 없음'에 포함",
         ha="center",
         fontsize=9,
         color="#4b5563",
@@ -2213,14 +2213,13 @@ def figure_05b_gdr_replica_sweep():
             "평균 385 requests/s",
         ),
     ]
-    policies = ["round_robin", "predicted_finish", "tail_aware"]
+    policies = ["round_robin", "predicted_finish"]
     displays = [
-        "순서대로 분배",
-        "예상 완료가 가장 빠른 곳",
-        "완료 예측 + tail guard",
+        "Round-robin · 모든 요청 수락",
+        "Deadline gate · 늦을 요청은 fallback",
     ]
-    colors = [COLORS["orange"], COLORS["blue"], COLORS["purple"]]
-    markers = ["o", "s", "D"]
+    colors = [COLORS["orange"], COLORS["blue"]]
+    markers = ["o", "s"]
     lookup = {
         (
             int(row["stage"].rsplit("r", 1)[1]),
@@ -2238,7 +2237,7 @@ def figure_05b_gdr_replica_sweep():
             policies, displays, colors, markers
         )
         ):
-            values = [lookup[(endpoint, scenario, policy)] for endpoint in endpoints]
+            values = [1.0 - lookup[(endpoint, scenario, policy)] for endpoint in endpoints]
             axis.plot(
                 endpoints,
                 values,
@@ -2249,8 +2248,8 @@ def figure_05b_gdr_replica_sweep():
                 label=display,
             )
             for endpoint, value in zip(endpoints, values):
-                x_offset = (-0.065, 0.0, 0.065)[policy_index]
-                y_offset = (0.040, -0.050, 0.065)[policy_index]
+                x_offset = (-0.045, 0.045)[policy_index]
+                y_offset = (0.040, -0.055)[policy_index]
                 axis.text(
                     endpoint + x_offset,
                     min(1.035, max(0.018, value + y_offset)),
@@ -2263,19 +2262,21 @@ def figure_05b_gdr_replica_sweep():
         axis.set_xlabel("동시에 상주한 NRx replica 수")
         axis.set_title(f"{title}\n{rate}")
         axis.set_ylim(0, 1.08)
+        axis.axhline(0.95, color="#94a3b8", linewidth=1.1, linestyle="--")
         style_axes(axis)
-    axes[0].set_ylabel("5 ms 안에 쓸 NRx 결과가 없는 비율")
-    axes[0].legend(frameon=False, fontsize=8.1, loc="lower left")
+    axes[0].set_ylabel("5 ms 안에 도착한 NRx 결과 비율(높을수록 좋음)")
+    axes[0].legend(frameon=False, fontsize=8.1, loc="upper left")
+    axes[2].text(3.02, 0.958, "95% timely", fontsize=7.7, color="#64748b", ha="right")
 
     fig.suptitle(
-        "Stage 2 replica sweep: NRx를 늘리면 capacity는 늘지만, 부하와 정책에 따라 효과가 달라짐",
+        "Stage 2 핵심: NRx 3개는 1,000/s periodic을 처리하지만 2,000/s와 burst는 아직 못 버팀",
         fontsize=14,
         fontweight="bold",
     )
     fig.text(
         0.5,
         -0.005,
-        "실험 범위: 실제 1/2/3개의 resident 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 낮을수록 좋으며 full-matrix 통계는 별도 정책 그림에 제시",
+        "실험 범위: 실제 1/2/3개의 resident 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 예상-완료 정책의 사전 fallback도 제시간 NRx 결과 없음으로 계산",
         ha="center",
         fontsize=8.8,
         color="#4b5563",

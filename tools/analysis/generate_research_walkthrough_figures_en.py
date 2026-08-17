@@ -352,8 +352,12 @@ EN = {
     "(b) 똑같은 요청 흐름으로 정책끼리 직접 비교": "(b) Pairwise policies on identical request traces",
     "NRx 선택 정책 결과: 완료시간을 예측하면 실패할 전송은 줄지만, 요청 수락 판단은 아직 보수적":
         "NRx policy result: finish prediction reduces futile transfers, but admission remains conservative",
+    "Stage 2 정책 결론: 정상 부하는 round-robin, overload에서만 deadline admission이 필요":
+        "Stage 2 policy: round-robin within capacity; deadline admission only under overload",
     "실험 범위: 요청 패턴 29개 x 3회 x 정책 4개 = 348회, 5 ms 비교선. '결과 없음'에는 처음부터 기존 수신기를 고른 경우도 포함":
         "Scope: 29 request patterns x 3 trials x 4 policies = 348 runs; 5 ms threshold; 'no result' includes choosing the conventional receiver up front",
+    "실험 범위: 요청 패턴 29개 x 3회 x 정책 4개 = 348회, 5 ms 비교선. 대부분 overload stress이며 predicted 정책의 사전 fallback도 '결과 없음'에 포함":
+        "Scope: 29 patterns x 3 trials x 4 policies = 348 runs; most are overload stress; predicted-policy fallback counts as no result",
     "같은 4g\nL1+NRx": "Same 4g\nL1+NRx",
     "분리된 2g+2g\nGPU P2P": "Separate 2g+2g\nGPU P2P",
     "분리된 2g+2g\nNIC GDR": "Separate 2g+2g\nNIC GDR",
@@ -371,6 +375,8 @@ EN = {
         "Qwen runs on a separate 3g in every configuration. (a) uses depth 1; (b) is a separate ring-depth-2 isolation gate. GDR L1-active time was not measured. Only P2P vs. GDR is an equal 2g+2g transport comparison.",
     "순서대로 분배": "Round-robin",
     "예상 완료가 가장 빠른 곳": "Earliest predicted finish",
+    "Round-robin · 모든 요청 수락": "Round-robin · admit every request",
+    "Deadline gate · 늦을 요청은 fallback": "Deadline gate · fallback if predicted late",
     "완료 예측 + tail guard": "Predicted finish + tail guard",
     "(a) 셀 1개 · 1 ms마다 NRx": "(a) One cell · NRx every 1 ms",
     "(b) 셀 2개 · 같은 시각에 NRx": "(b) Two cells · synchronized NRx",
@@ -383,6 +389,12 @@ EN = {
         "(c) Four cells · selective 10% bursts\nMean 385 requests/s",
     "평균 385 requests/s": "Mean 385 requests/s",
     "동시에 상주한 NRx replica 수": "Concurrent resident NRx replicas",
+    "5 ms 안에 도착한 NRx 결과 비율(높을수록 좋음)": "NRx results arriving within 5 ms (higher is better)",
+    "95% timely": "95% timely",
+    "Stage 2 핵심: NRx 3개는 1,000/s periodic을 처리하지만 2,000/s와 burst는 아직 못 버팀":
+        "Stage 2: three NRx workers sustain periodic 1,000/s, but not 2,000/s or bursts",
+    "실험 범위: 실제 1/2/3개의 resident 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 예상-완료 정책의 사전 fallback도 제시간 NRx 결과 없음으로 계산":
+        "Scope: 1/2/3 real resident 3g-MIG GDR endpoints; one replay per representative trace; predicted-finish fallback counts as no timely NRx result",
     "Stage 2 replica sweep: NRx를 늘리면 capacity는 늘지만, 부하와 정책에 따라 효과가 달라짐":
         "Stage 2 replica sweep: more NRx capacity helps, but the gain depends on workload and policy",
     "실험 범위: 실제 1/2/3개의 resident 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 낮을수록 좋으며 full-matrix 통계는 별도 정책 그림에 제시":

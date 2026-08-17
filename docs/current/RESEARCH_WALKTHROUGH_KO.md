@@ -907,6 +907,24 @@ run에는 대응 L1-active 값이 없어 그 칸을 `미측정`으로 남긴다.
 > **pool 전체가 제시간에 받아낼 수 있는 요청량**이다. cuPHY와 실제 무선 복호는 의도적으로
 > 제외했으므로 이 Stage의 `no-timely`를 실제 radio failure로 읽으면 안 된다.
 
+#### 먼저 결론: 무엇이 좋았고 무엇이 실패했는가
+
+아래는 모든 요청을 순서대로 세 NRx에 보내는 round-robin 결과다. 숫자는 **5 ms 안에 실제
+NRx 결과가 돌아온 요청 비율**이며 높을수록 좋다. 이 표가 Stage 2의 capacity 결과를 가장
+직관적으로 보여준다.
+
+| 들어온 요청 흐름 | offered NRx load | NRx 1개 | NRx 2개 | NRx 3개 | 결론 |
+|---|---:|---:|---:|---:|---|
+| 셀 1개, 매 1 ms | 1,000/s | 0.005% | 0.015% | **97.205%** | **좋음:** 세 번째 replica를 더해야 이 일정한 부하를 거의 처리함 |
+| 셀 2개, 같은 시각에 요청 | 2,000/s | 0.0025% | 0% | **0%** | **실패:** 세 replica의 합산 capacity보다 부하가 커 queue가 무너짐 |
+| 셀 4개, 10% 선택 burst | 평균 385/s | 13.264% | 39.753% | **67.021%** | **부분 성공:** 평균 부하는 낮지만 순간 burst 때문에 33%는 늦음 |
+
+즉 **좋은 결과**는 실제 full-size GDR NRx replica 세 개가 독립적으로 일하며 1,000/s의
+일정한 요청을 `97.2%` 처리했다는 것이다. **나쁜 결과**는 replica 세 개도 2,000/s를 감당하지
+못하고, 평균 도착률이 낮아도 synchronized burst에서는 deadline을 놓친다는 것이다. Stage 2는
+“pool을 만들면 문제가 끝난다”가 아니라, **고정 배치의 capacity cliff와 burst-aware admission이
+왜 필요한지**를 측정한 실험이다.
+
 Stage 2의 `412`개 validated run은 다음 네 층으로 구성된다.
 
 | 내부 campaign | runs | endpoint / 정책 | 질문 |
@@ -931,6 +949,10 @@ Stage 2의 `412`개 validated run은 다음 네 층으로 구성된다.
 | `predicted-finish` | `max(now, reserved tail)+service bound`가 가장 작은 endpoint | calibration 기반 service bound와 예약된 queue tail | deadline 뒤 완료 예상이면 conventional path로 reject | replica, representative, full |
 | `tail-aware` | predicted-finish 중 guard가 열린 endpoint | 최근 512개 p99.5 × 1.10 adaptive bound, outlier circuit guard | deadline infeasible 또는 모든 endpoint guarded면 reject | 모든 campaign |
 
+`predicted-finish`라는 이름은 거창하지만 AI 예측기가 아니다. 예를 들어 현재 시각이 0 ms,
+deadline이 5 ms이고 어떤 NRx 앞에 예약된 일이 3 ms, 측정한 service bound가 2 ms라면 예상
+완료는 `3+2=5 ms`다. 5 ms를 넘으면 보내지 않는 단순한 **deadline feasibility 계산**이다.
+
 `static-*`, round-robin과 shortest-queue는 deadline feasibility를 확인하지 않고 일단 remote
 queue에 넣는다. `predicted-finish`는 초기 calibration p95에 `1.10×` margin을 둔 service bound로
 완료시각을 예약한다. `tail-aware`는 여기에 최근 tail을 반영하고, 진행 중 요청이 bound의
@@ -939,40 +961,55 @@ queue에 넣는다. `predicted-finish`는 초기 calibration p95에 `1.10×` mar
 
 ![Stage 2에서 실제 NRx replica를 1개에서 3개로 늘린 결과](figures/05b_gdr_replica_sweep.png)
 
-Replica sweep은 “replica가 많을수록 항상 모든 정책이 좋아진다”는 단순 결론을 부정한다.
-Single-cell 1,000/s에서 predicted-finish no-timely는 `61.5% → 34.7% → 12.0%`, round-robin은
-`100.0% → 100.0% → 2.8%`로 개선됐다. 반면 synchronized 2-cell 2,000/s는 3개를 사용해도
-predicted-finish가 `58.9%`로, offered load가 pool capacity에 비해 여전히 높았다. Selective
-burst에서는 round-robin이 3개에서 `33.0%`로 가장 좋고 predicted-finish는 보수적 reject 때문에
-`64.5%`였다. 이 27-run sweep은 한 representative trace씩의 causal 결과이며 full-matrix
-통계를 대신하지 않는다.
+Replica sweep은 “replica가 많을수록 항상 해결된다”는 단순 결론을 부정한다. Single-cell
+1,000/s에서 세 replica의 timely ratio는 round-robin `97.2%`, predicted-finish `88.0%`였다.
+반면 synchronized 2-cell 2,000/s에서 round-robin은 `0%`, predicted-finish도 `41.1%`뿐이었다.
+Predicted-finish는 끝없이 queueing할 요청을 미리 conventional path로 돌려 일부 timely 결과를
+보존했지만, 이 Stage는 conventional receiver를 실행하지 않으므로 그 reject도 `no-timely`에
+포함한다. Selective burst에서는 세 replica round-robin도 `67.0%`만 timely였고,
+predicted-finish는 보수적 reject 때문에 `35.5%`였다. 이 27-run sweep은 각 representative
+trace 1회의 causal 결과이며 full-matrix 통계를 대신하지 않는다.
 
 6개 정책을 같은 representative trace에 적용한 결과도 한 정책이 모든 workload에서
-우세하지 않음을 보여준다. 아래 값은 `5 ms` 안에 사용할 NRx 결과가 없었던 비율이며 낮을수록
-좋다.
+우세하지 않음을 보여준다. 아래 값은 **`5 ms` 안에 돌아온 NRx 결과 비율**이며 높을수록 좋다.
 
 | 정책 | Single 1,000/s | Sync 2-cell 2,000/s | Selective burst 평균 385/s |
 |---|---:|---:|---:|
-| static-one | 99.995% | 99.998% | 87.125% |
-| static-cell | 99.995% | 100.000% | 80.078% |
-| round-robin | **6.580%** | 100.000% | **33.900%** |
-| shortest-queue | 44.040% | 97.165% | 38.326% |
-| predicted-finish | 24.595% | **62.588%** | 54.250% |
-| tail-aware | 16.400% | 82.585% | 68.903% |
+| static-one | 0.005% | 0.002% | 12.875% |
+| static-cell | 0.005% | 0% | 19.922% |
+| round-robin | **93.420%** | 0% | **66.100%** |
+| shortest-queue | 55.960% | 2.835% | 61.674% |
+| predicted-finish | 75.405% | **37.412%** | 45.750% |
+| tail-aware | 83.600% | 17.415% | 31.097% |
 
-Round-robin은 load가 pool capacity 안에 있을 때 work conservation이 좋지만 overload를 미리
-차단하지 않는다. Predicted-finish는 overload에서 futile work를 막지만 usable request도
-거절한다. 이것이 최종 DART-Rx 정책이 queue time만 보지 않고 radio utility와 fallback risk
-budget까지 함께 봐야 하는 이유다.
+**이 표의 직접적인 결론은 한 정책이 항상 더 좋은 것이 아니라는 점이다.** Replica가 부족하거나
+Sync 2-cell 2,000/s처럼 pool capacity를 넘으면 predicted-finish가 더 좋다. Round-robin은 모든
+요청을 queue에 넣어 `0%` timely가 되지만, predicted-finish는 “이 요청은 5 ms 전에 못 끝난다”고
+판단한 요청을 conventional path로 미리 보내 남은 요청의 `37.4%`를 timely하게 보존한다. 반대로
+replica 세 개로 Single 1,000/s 또는 selective burst를 처리할 때는 capacity가 상대적으로
+충분해져 round-robin이 더 높고, predicted-finish의 보수적 reject가 손해가 된다.
 
-Full matrix는 `29 workload points × 3 trials × 4 policies = 348 runs`였다.
+따라서 현재 데이터가 지지하는 최종 방향은 **predicted-finish로 항상 endpoint를 고르는 것**이
+아니다. 다음의 단순한 두 단계다.
 
-| 정책 | 전체 no-timely ratio | static-one 대비 paired 개선 | static-cell 대비 paired 개선 |
-|---|---:|---:|---:|
-| static-one | 1.0000 | — | — |
-| static-cell | 1.0000 | — | — |
-| predicted-finish | **0.8133** | 87/87 trace, median `18.65%p` | 86/87 trace, median `16.50%p` |
-| tail-aware | 0.8432 | 87/87 trace, median `14.69%p` | 83/87 trace, median `9.70%p` |
+1. **Deadline admission:** 모든 endpoint가 deadline 전에 끝낼 수 없으면 즉시 conventional
+   fallback을 선택해 remote queue를 오염시키지 않는다.
+2. **Round-robin dispatch:** admission을 통과했다면 credit이 남은 healthy endpoint 사이에
+   round-robin으로 분배한다. Completion이 오면 credit을 반환한다.
+
+Predicted-finish와 tail-aware는 이 두 단계 설계를 찾기 위한 ablation이며, 현재 형태를 최종
+DART-Rx scheduler라고 주장하지 않는다.
+
+Full matrix는 `29 workload points × 3 trials × 4 policies = 348 runs`였다. 이 중 `69/87`
+paired trace가 `>1,500 request/s`인 의도적인 overload stress였으므로, 전체 평균을 정상 운용
+성능으로 읽으면 안 된다.
+
+| 정책 | 전체 timely NRx ratio ↑ | 전체 no-timely ratio | static-one 대비 paired 개선 | static-cell 대비 paired 개선 |
+|---|---:|---:|---:|---:|
+| static-one | 0.0000 | 1.0000 | — | — |
+| static-cell | 0.0000 | 1.0000 | — | — |
+| predicted-finish | **0.1867** | 0.8133 | 87/87 trace, median `18.65%p` | 86/87 trace, median `16.50%p` |
+| tail-aware | 0.1568 | 0.8432 | 87/87 trace, median `14.69%p` | 83/87 trace, median `9.70%p` |
 
 ![Stage 2 full matrix에서 부하별 정책 결과와 paired improvement](figures/05_gdr_pool_policy.png)
 

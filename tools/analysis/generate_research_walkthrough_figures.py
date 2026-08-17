@@ -2613,7 +2613,7 @@ def figure_05_gdr_pool_policy():
 
 
 def figure_05b_gdr_replica_sweep():
-    """Show how one, two, and three real GDR endpoints change timely capacity."""
+    """Show how one, two, and three resident GDR endpoints change timely capacity."""
 
     rows = read_csv(GDR_POOL / "MEDIANS.csv")
     scenarios = [
@@ -2636,7 +2636,7 @@ def figure_05b_gdr_replica_sweep():
     policies = ["round_robin", "predicted_finish"]
     displays = [
         "Round-robin · 모든 요청 수락",
-        "Deadline gate · 늦을 요청은 fallback",
+        "Deadline admission · 늦을 요청은 fallback",
     ]
     colors = [COLORS["orange"], COLORS["blue"]]
     markers = ["o", "s"]
@@ -2681,7 +2681,7 @@ def figure_05b_gdr_replica_sweep():
                     color=color,
                 )
         axis.set_xticks(endpoints)
-        axis.set_xlabel("동시에 상주한 NRx replica 수")
+        axis.set_xlabel("동시에 상주한 NRx endpoint 수")
         axis.set_title(f"{title}\n{rate}")
         axis.set_ylim(0, 1.08)
         axis.axhline(0.95, color="#94a3b8", linewidth=1.1, linestyle="--")
@@ -2692,14 +2692,14 @@ def figure_05b_gdr_replica_sweep():
     axes[0].legend(frameon=False, fontsize=8.1, loc="upper left")
 
     fig.suptitle(
-        "Stage 2 핵심: NRx 3개는 1,000/s periodic을 처리하지만 2,000/s와 burst는 아직 못 버팀",
+        "Stage 2 결론: endpoint 3개는 1,000/s를 처리하지만 2,000/s와 burst에는 부족",
         fontsize=14,
         fontweight="bold",
     )
     fig.text(
         0.5,
         -0.005,
-        "실험 범위: 실제 1/2/3개의 resident 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 예상-완료 정책의 사전 fallback도 제시간 NRx 결과 없음으로 계산",
+        "실험 범위: 실제 1/2/3개의 상주 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 사전 fallback도 timely-result 실패로 계산",
         ha="center",
         fontsize=8.8,
         color="#4b5563",

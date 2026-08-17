@@ -389,7 +389,7 @@ EN = {
     "순서대로 분배": "Round-robin",
     "예상 완료가 가장 빠른 곳": "Earliest predicted finish",
     "Round-robin · 모든 요청 수락": "Round-robin · admit every request",
-    "Deadline gate · 늦을 요청은 fallback": "Deadline gate · fallback if predicted late",
+    "Deadline admission · 늦을 요청은 fallback": "Deadline admission · fallback if infeasible",
     "통과 영역": "PASS region",
     "95% 미달": "Below 95%",
     "완료 예측 + tail guard": "Predicted finish + tail guard",
@@ -404,12 +404,17 @@ EN = {
         "(c) Four cells · selective 10% bursts\nMean 385 requests/s",
     "평균 385 requests/s": "Mean 385 requests/s",
     "동시에 상주한 NRx replica 수": "Concurrent resident NRx replicas",
+    "동시에 상주한 NRx endpoint 수": "Concurrent resident NRx endpoints",
     "5 ms 안에 도착한 NRx 결과 비율(높을수록 좋음)": "NRx results arriving within 5 ms (higher is better)",
     "95% timely": "95% timely",
     "Stage 2 핵심: NRx 3개는 1,000/s periodic을 처리하지만 2,000/s와 burst는 아직 못 버팀":
         "Stage 2: three NRx workers sustain periodic 1,000/s, but not 2,000/s or bursts",
+    "Stage 2 결론: endpoint 3개는 1,000/s를 처리하지만 2,000/s와 burst에는 부족":
+        "Stage 2 result: three endpoints handle 1,000/s but not 2,000/s or bursts",
     "실험 범위: 실제 1/2/3개의 resident 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 예상-완료 정책의 사전 fallback도 제시간 NRx 결과 없음으로 계산":
         "Scope: 1/2/3 real resident 3g-MIG GDR endpoints; one replay per representative trace; predicted-finish fallback counts as no timely NRx result",
+    "실험 범위: 실제 1/2/3개의 상주 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 사전 fallback도 timely-result 실패로 계산":
+        "Scope: one, two, or three resident 3g-MIG GDR endpoints; one replay per representative trace; early fallback counts as a timely-result failure",
     "Stage 2 replica sweep: NRx를 늘리면 capacity는 늘지만, 부하와 정책에 따라 효과가 달라짐":
         "Stage 2 replica sweep: more NRx capacity helps, but the gain depends on workload and policy",
     "실험 범위: 실제 1/2/3개의 resident 3g-MIG GDR endpoint, 각 점은 같은 representative trace 1회. 낮을수록 좋으며 full-matrix 통계는 별도 정책 그림에 제시":

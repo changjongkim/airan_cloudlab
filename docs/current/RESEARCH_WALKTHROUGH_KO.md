@@ -334,34 +334,51 @@ DART-Rx는 local, P2P, GDR 중 하나만 고집하지 않는다. 같은 endpoint
 사용한다. 연구의 핵심은 data path 선택 그 자체가 아니라 **이 서로 다른 endpoint를 하나의
 deadline-safe receiver service로 만드는 admission, reservation, expiry, commit 규칙**이다.
 
-### 1.5 같은 요청률에서 실제 배치 package는 어디서 무너지는가
+### 1.5 공정성 주의: 같은 요청률에서 본 raw service limit
 
 앞의 단일 요청·전송 실험은 요청 하나의 경로를 본다. 실제 multi-cell에서는 처리시간뿐 아니라 초당
-몇 개를 지속해서 받을 수 있는지가 중요하다. 그래서 완전히 같은 50–350 request/s trace를
-다섯 방식에 넣어 120회 실행했다. 이 gate에는 background co-tenant를 넣지 않아 각
-placement 자체의 service limit를 먼저 분리했다. Background와의 trade-off는 앞의 Qwen cap
-sweep과 뒤의 reclaim 실험에서 별도로 측정했다.
+몇 개를 지속해서 받을 수 있는지도 중요하다. 그래서 완전히 같은 50–350 request/s trace를
+다섯 방식에 넣어 120회 실행했다.
 
-![다섯 배치 방식의 초당 요청 수별 대기열 붕괴 지점](figures/03b_fiveway_absolute_rate.png)
+> **이 표는 종합 우승자를 고르는 실험이 아니다.** Background가 없고 optimized NRx 경로 하나만
+> 사용하는 상태에서 각 **실제 배치 package의 raw service limit**를 측정한다. Full MPS는 full
+> A100 전체를 사용하지만 나머지는 4g 또는 2g MIG slice를 사용하므로 계산 자원부터 같지 않다.
+> 따라서 이 표는 L1 isolation, multi-process interference 또는 동일-SM 효율을 비교하지 않는다.
 
-| 방식 | p99가 100 ms를 넘기 전 마지막 측정점 | 그 지점 p99 | 다음 측정점 |
-|---|---:|---:|---:|
-| Full MPS | 적어도 350/s | 2.551 ms | sweep 범위 안에서 collapse 없음 |
-| MIG local | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
-| MIG+MPS (two clients, uncapped) | 250/s | 3.437 ms | 300/s → **259.106 ms** |
-| Cross P2P | 250/s | 4.911 ms | 300/s → **451.798 ms** |
-| Cross NIC GDR | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
+![서로 다른 GPU 자원량을 가진 다섯 배치 package의 background 없는 raw service limit](figures/03b_fiveway_absolute_rate.png)
+
+| 실제 배치 package | 이 gate에서 사용한 GPU 자원 | p99가 100 ms를 넘기 전 마지막 측정점 | 그 지점 p99 | 다음 측정점 |
+|---|---|---:|---:|---:|
+| Full MPS | **full A100** 공유 | 적어도 350/s | 2.551 ms | sweep 범위 안에서 collapse 없음 |
+| MIG local | 한 4g에 L1+NRx | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
+| MIG+MPS | 한 4g의 two clients, uncapped | 250/s | 3.437 ms | 300/s → **259.106 ms** |
+| Cross P2P | 2g L1 + 2g NRx | 250/s | 4.911 ms | 300/s → **451.798 ms** |
+| Cross NIC GDR | 2g L1 + 2g NRx | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
 
 `100 ms`는 production deadline이 아니라 queue collapse를 눈에 띄게 구분하기 위한 진단선이다.
-여기서 Full MPS는 full A100을 사용하고 local/cross 방식은 MIG slice를 사용하므로, 이 표는
-동일한 SM 수의 순수 성능 비교가 아니다. **실제 배치 package가 제공하는 capacity와 isolation
-trade-off**다.
+여기서 Full MPS가 가장 좋아 보이는 이유는 단순하다. 가장 큰 계산 자원을 쓰고, background가
+없으며, 한 optimized NRx 경로만 실행하므로 MPS의 work-conserving 장점만 드러난다. 앞에서 본
+multi-NRx stress test와 모순되지 않는다. 독립 NRx process를 `1→8`개로 늘린 그 실험에서는
+full-A100 MPS의 L1 p99가 `42.3→189.3 ms`로 `4.5×` 증가했다. 즉 **MPS는 raw throughput에는
+강하지만 co-tenant와 독립 context가 늘어날 때 L1을 보호하는 벽이 없다.**
+
+따라서 “무엇이 더 좋은가”는 지표별로 답해야 한다.
+
+| 질문 | 현재 실험에서 유리한 방식 | 근거 |
+|---|---|---|
+| Background 없는 단일 optimized NRx의 raw capacity | Full MPS | full A100을 work-conserving하게 사용 |
+| NRx 동시 실행 중 L1 active-time 보호 | Cross P2P | L1 slowdown `1.621× → 1.043×` |
+| Sibling background 격리 | MIG | Qwen 동시 실행 시 NRx capacity 변화 `-0.11%` |
+| P2P가 닿지 않는 isolated NRx 연결 | NIC GDR | CPU DRAM bounce 없는 cross-boundary GPU-memory path |
+
+이 gate는 raw capacity 축 하나를 채운다. Background와의 trade-off는 Qwen cap 및 multi-NRx
+sweep, L1 보호는 isolation gate, spare-work 회수는 §15.4에서 각각 측정한다.
 
 이 결과가 보여주는 문제의식은 다음과 같다.
 
-- Full MPS는 raw capacity가 가장 높았다. 따라서 연구가 “MIG가 언제나 MPS보다 빠르다”고
-  주장하면 틀린다. MPS의 문제는 최대 처리량이 아니라 background load에 따른 L1 tail과
-  예측 가능성이다.
+- Full MPS는 **이 좁은 raw-capacity gate에서만** 가장 높았다. 따라서 연구가 “MIG가 언제나
+  MPS보다 빠르다”고 주장하면 틀리지만, 이를 “MPS가 실시간 L1에 가장 좋다”로 읽어도 틀린다.
+  MPS의 문제는 최대 처리량이 아니라 co-tenant/context 증가에 따른 L1 tail과 예측 가능성이다.
 - MIG local은 sibling background를 훌륭히 막지만, 4g 안의 NRx capacity 이상을 다른 idle
   partition에서 자동으로 가져오지 못한다.
 - MIG+MPS는 한 4g를 더 잘 나누는 도구일 뿐, 4g의 총 capacity를 늘리거나 벽 밖의 idle

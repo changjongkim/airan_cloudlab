@@ -1816,11 +1816,11 @@ def _fiveway_median(variant: str, rate: int, metric: str) -> float:
 def figure_03b_fiveway_absolute_rate():
     rates = [50, 100, 140, 160, 180, 250, 300, 350]
     variants = [
-        ("mps", "전체 GPU 공유(MPS)", COLORS["orange"], "D"),
-        ("mig_local", "MIG 안에 L1+NRx", COLORS["blue"], "o"),
-        ("mig_mps", "MIG+MPS 안에 L1+NRx", COLORS["purple"], "P"),
-        ("p2p", "L1·NRx 분리(GPU 직접/P2P)", COLORS["cyan"], "s"),
-        ("gdr", "L1·NRx 분리(NIC 직접/GDR)", COLORS["green"], "^"),
+        ("mps", "MPS · full A100", COLORS["orange"], "D"),
+        ("mig_local", "MIG local · 4g", COLORS["blue"], "o"),
+        ("mig_mps", "MIG+MPS · 4g", COLORS["purple"], "P"),
+        ("p2p", "Cross P2P · 2g+2g", COLORS["cyan"], "s"),
+        ("gdr", "Cross GDR · 2g+2g", COLORS["green"], "^"),
     ]
     series = {
         variant: [_fiveway_median(variant, rate, "sojourn") for rate in rates]
@@ -1846,7 +1846,7 @@ def figure_03b_fiveway_absolute_rate():
     axes[0].set_yscale("log")
     axes[0].set_xlabel("모든 방식에 똑같이 넣은 초당 요청 수")
     axes[0].set_ylabel("도착부터 완료까지 느린 1% 시간(ms, 로그)")
-    axes[0].set_title("(a) 배치마다 대기열이 무너지는 지점이 다름")
+    axes[0].set_title("(a) 실제 package별 raw queue 한계 (GPU 자원량 다름)")
     axes[0].legend(frameon=False, fontsize=8.2, ncol=2)
     style_axes(axes[0])
 
@@ -1858,21 +1858,21 @@ def figure_03b_fiveway_absolute_rate():
     axes[1].invert_yaxis()
     axes[1].set_xlim(0, 390)
     axes[1].set_xlabel("100 ms 이상으로 폭증하기 전 마지막 측정 요청률")
-    axes[1].set_title("(b) 이번 실험에서 안정적으로 처리한 범위")
-    for bar, value, label in zip(bars, stable, labels):
-        suffix = "+" if label == "전체 GPU 공유(MPS)" and value == max(rates) else ""
+    axes[1].set_title("(b) Background 없는 raw 안정 범위 · L1 보호 지표 아님")
+    for bar, value, label, variant in zip(bars, stable, labels, [v[0] for v in variants]):
+        suffix = "+" if variant == "mps" and value == max(rates) else ""
         axes[1].text(value + 7, bar.get_y() + bar.get_height() / 2, f"{value}{suffix}/s", va="center", fontsize=9)
     style_axes(axes[1])
 
     fig.suptitle(
-        "같은 요청률 비교: 격리 방식마다 한계는 다르지만 고정된 NRx 경로는 모두 처리 상한이 있음",
+        "Raw capacity gate: full-A100 MPS와 MIG slice의 종합 우승 비교가 아님",
         fontsize=14,
         fontweight="bold",
     )
     fig.text(
         0.5,
         -0.005,
-        "실험 범위: 다른 AI 작업 없이 초당 50~350개 요청, 10초 x 3회 x 5개 배치 = 120회. 100 ms는 대기열 붕괴 확인선",
+        "Background 없음 · optimized NRx 경로 1개 · 할당 GPU 자원 불균등. 10초 x 3회 x 5개 배치 = 120회; 100 ms는 진단선",
         ha="center",
         fontsize=9,
         color="#4b5563",

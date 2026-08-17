@@ -332,32 +332,51 @@ P2P where peer access exists, and GDR across other process/GPU/isolation boundar
 the path selection itself, but the admission, reservation, expiry, and commit contract that makes
 heterogeneous endpoints one deadline-safe receiver service.
 
-### 1.5 Where do the actual placement packages collapse under the same arrival rate?
+### 1.5 Fairness warning: raw service limits under the same arrival rate
 
 The placement experiment above emphasizes a single dependency path. Multi-cell operation also
-depends on the sustainable request rate. We therefore replayed identical 50–350 requests/s traces
-against five placements in 120 runs. This gate excludes a background co-tenant so that the service
-limit of each placement can be isolated. Qwen interference and background reclaim are measured in
-separate gates.
+depends on sustainable request rate, so we replayed identical 50–350 requests/s traces against five
+placements in 120 runs.
 
-![Queue-collapse boundaries for five placement approaches](figures_en/03b_fiveway_absolute_rate.png)
+> **This experiment does not choose an overall winner.** It measures the raw service limit of each
+> deployable package with no background tenant and one optimized NRx path. Full MPS uses the entire
+> A100, whereas the other packages use 4g or 2g MIG slices. It therefore does not compare equal-SM
+> efficiency, L1 isolation, or multi-process interference.
 
-| Placement | Last measured point before p99 exceeded 100 ms | p99 at that point | Next point |
-|---|---:|---:|---:|
-| Full MPS | At least 350/s | 2.551 ms | No collapse within the sweep |
-| MIG local | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
-| MIG+MPS, two clients uncapped | 250/s | 3.437 ms | 300/s → **259.106 ms** |
-| Cross P2P | 250/s | 4.911 ms | 300/s → **451.798 ms** |
-| Cross NIC GDR | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
+![Background-free raw service limits of five packages with unequal GPU allocations](figures_en/03b_fiveway_absolute_rate.png)
+
+| Deployable package | GPU allocation in this gate | Last point before p99 exceeded 100 ms | p99 there | Next point |
+|---|---|---:|---:|---:|
+| Full MPS | **Full A100** shared | At least 350/s | 2.551 ms | No collapse within the sweep |
+| MIG local | L1+NRx in one 4g | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
+| MIG+MPS | Two uncapped clients in one 4g | 250/s | 3.437 ms | 300/s → **259.106 ms** |
+| Cross P2P | 2g L1 + 2g NRx | 250/s | 4.911 ms | 300/s → **451.798 ms** |
+| Cross NIC GDR | 2g L1 + 2g NRx | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
 
 The 100 ms line is a diagnostic marker for an obvious queue collapse, not a production deadline.
-Full MPS uses a full A100, while the local and cross configurations use MIG slices. This is therefore
-not an equal-SM microbenchmark. It is the **capacity–isolation trade-off of each deployable package.**
+Full MPS looks best here for a straightforward reason: it has the largest compute allocation, no
+background tenant, and only one optimized NRx path, exposing the work-conserving benefit of MPS.
+This does not contradict the earlier multi-NRx stress test. When independent NRx processes increased
+from `1→8`, full-A100 MPS increased L1 p99 from `42.3→189.3 ms`, or `4.5×`. **MPS is strong in raw
+throughput but has no hardware wall protecting L1 as co-tenants and independent contexts increase.**
+
+The winner therefore depends on the question:
+
+| Question | Favorable measured approach | Evidence |
+|---|---|---|
+| Background-free raw capacity of one optimized NRx path | Full MPS | Work-conserving use of a full A100 |
+| L1 active-time protection while NRx overlaps | Cross P2P | L1 slowdown `1.621× → 1.043×` |
+| Isolation from sibling background work | MIG | NRx capacity changed only `-0.11%` with Qwen |
+| Reaching isolated NRx outside P2P support | NIC GDR | Cross-boundary GPU-memory path without CPU-DRAM bounce |
+
+This gate fills only the raw-capacity axis. Qwen-cap and multi-NRx sweeps measure interference,
+the isolation gate measures L1 protection, and §15.4 measures reclaim of background work.
 
 The result sharpens the problem statement:
 
-- Full MPS has the highest raw capacity. A claim that MIG is always faster than MPS would be false.
-  The MPS concern is L1-tail predictability under background load, not peak throughput.
+- Full MPS is highest **only in this narrow raw-capacity gate**. It would be wrong to claim either
+  that MIG is always faster or that MPS is therefore best for real-time L1. The MPS concern is L1
+  tail and predictability as co-tenants and independent contexts increase, not peak throughput.
 - MIG local isolates sibling background work but cannot automatically pull capacity from another
   idle partition after the 4g NRx saturates.
 - MIG+MPS partitions one 4g more carefully; it neither increases total 4g capacity nor accesses idle

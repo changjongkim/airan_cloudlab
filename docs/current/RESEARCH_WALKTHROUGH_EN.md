@@ -265,6 +265,8 @@ The local-placement conclusion is not that every approach is bad:
 None provides both **physical L1–NRx separation and the ability to borrow NRx capacity elsewhere on
 demand**. This is the motivation for P2P and GDR.
 
+
+
 ### 1.4 Why consider P2P and GPUDirect RDMA?
 
 The first question was whether moving L1 and NRx to different GPU execution domains actually
@@ -329,6 +331,39 @@ DART-Rx does not force every request through local, P2P, or GDR. It uses local w
 P2P where peer access exists, and GDR across other process/GPU/isolation boundaries. Its core is not
 the path selection itself, but the admission, reservation, expiry, and commit contract that makes
 heterogeneous endpoints one deadline-safe receiver service.
+
+### 1.5 Where do the actual placement packages collapse under the same arrival rate?
+
+The placement experiment above emphasizes a single dependency path. Multi-cell operation also
+depends on the sustainable request rate. We therefore replayed identical 50–350 requests/s traces
+against five placements in 120 runs. This gate excludes a background co-tenant so that the service
+limit of each placement can be isolated. Qwen interference and background reclaim are measured in
+separate gates.
+
+![Queue-collapse boundaries for five placement approaches](figures_en/03b_fiveway_absolute_rate.png)
+
+| Placement | Last measured point before p99 exceeded 100 ms | p99 at that point | Next point |
+|---|---:|---:|---:|
+| Full MPS | At least 350/s | 2.551 ms | No collapse within the sweep |
+| MIG local | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
+| MIG+MPS, two clients uncapped | 250/s | 3.437 ms | 300/s → **259.106 ms** |
+| Cross P2P | 250/s | 4.911 ms | 300/s → **451.798 ms** |
+| Cross NIC GDR | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
+
+The 100 ms line is a diagnostic marker for an obvious queue collapse, not a production deadline.
+Full MPS uses a full A100, while the local and cross configurations use MIG slices. This is therefore
+not an equal-SM microbenchmark. It is the **capacity–isolation trade-off of each deployable package.**
+
+The result sharpens the problem statement:
+
+- Full MPS has the highest raw capacity. A claim that MIG is always faster than MPS would be false.
+  The MPS concern is L1-tail predictability under background load, not peak throughput.
+- MIG local isolates sibling background work but cannot automatically pull capacity from another
+  idle partition after the 4g NRx saturates.
+- MIG+MPS partitions one 4g more carefully; it neither increases total 4g capacity nor accesses idle
+  capacity beyond the wall.
+- A single P2P or GDR endpoint also has finite capacity. DART-Rx does not claim that one remote path
+  is infinitely fast; it aggregates **multiple resident endpoints to avoid static-one queue cliffs.**
 
 ## 2. First misconception: MIG isolation did not fail
 
@@ -408,9 +443,48 @@ work queue in the same scheduling domain can force L1's host thread to absorb th
 | MIG+MPS local | Separate clients and quotas still share physical resources and completion conditions inside one 4g; no hard preemption bound |
 | Cross P2P/GDR | The L1 CUDA queue is separated from remote NRx compute; explicit publish, completion, and commit waits replace implicit co-location waits |
 
-The Nsight results in Section 16.5 directly validate this hypothesis for same-MIG co-location. The
-current evidence also includes a real cuPHY–GDR–NRx vertical slice, but not yet a paired Nsight matrix
-for every MPS/MIG/P2P/GDR point under an identical trace.
+The Nsight result below directly validates this hypothesis for same-MIG co-location. The current
+evidence also includes a real cuPHY–GDR–NRx vertical slice, but not yet a paired Nsight matrix for
+every MPS/MIG/P2P/GDR point under an identical trace.
+
+#### Direct Nsight evidence
+
+![CUDA-call analysis of host blocking under same-MIG L1+NRx](figures_en/03d_cuda_host_blocking.png)
+
+We measured cumulative host time in six major cuPHY CUDA runtime APIs over a 30 s Nsight window. At
+40 cells:
+
+| Condition | Total tracked host CUDA API time | Dominant observed wait |
+|---|---:|---|
+| L1 alone | 1.681 s | `cudaFree` 1.361 s |
+| L1 + NRx | **25.348 s** | `cudaFree` 18.076 s; `cudaMemcpyAsync` 7.034 s |
+| `cudaFreeAsync` shim | 25.570 s | `cudaMemcpyAsync` **25.221 s** |
+| Stream-ordered memory pool | 25.649 s | `cudaMemcpyAsync` **25.539 s** |
+
+Co-location increased tracked host time by `15.1×`. Replacing `cudaFree` with an asynchronous API
+did not remove the total wait; it moved the wait to the next copy or synchronization boundary. The
+root problem is not the name `cudaFree`. It is **outstanding GPU work in one scheduling domain and a
+dependency boundary that must eventually observe its completion.**
+
+This is why a cross-partition design cannot be evaluated from the 0.4 ms mean transport cost alone.
+P2P/GDR separates L1's CUDA queue from NRx compute. It introduces explicit publish and completion
+events instead, which DART-Rx manages with credit, expiry, and commit rules. The Chain-8 Nsight
+numbers are cumulative over 30 s rather than per-slot latency and do not use the exact direct-TensorRT
+five-way configuration; they must not be added to the five-way latency numbers.
+
+Current CUDA-level evidence coverage is:
+
+| Placement | Latency/rate sweep | Direct CUDA-call evidence | Current interpretation |
+|---|---|---|---|
+| Full MPS | Cap sweep + absolute-rate complete | No identical-trace Nsight | Strong throughput; background-tail cause still needs decomposition |
+| MIG local | Placement + absolute-rate complete | Same-MIG causal profile available | Strong sibling isolation; intra-GI L1–NRx wait exists |
+| MIG+MPS | Proper two-client quota + absolute-rate complete | No identical-trace Nsight | Quota trade-off measured; wait location needs capture |
+| Cross P2P | Placement + absolute-rate complete | No identical-trace Nsight | L1 active isolation restored; copy/synchronization decomposition remains |
+| Cross NIC GDR | Placement + absolute-rate + radio complete | Actual-radio GDR vertical-slice Nsight | Local synchronization/conversion exceeds GDR flush time |
+
+Performance differences are measured for every approach. Exact CUDA-call causality is directly
+shown only for same-MIG co-location and the GDR vertical slice. Paired Nsight captures remain a
+required follow-up for the other three conditions.
 
 ## 4. Direct evidence that the problem exists
 
@@ -769,7 +843,7 @@ Figure 3c uses only this proper two-client experiment.
 
 # Part IV. Evaluation
 
-## 15. How to read the evaluation: Stages 1–3 are not competing configurations
+## 15. How to read the evaluation: staged build-up
 
 Stages 1, 2, and 3 do **not** run the same workload to decide which configuration is fastest. They
 use different topologies and metrics to form a validation ladder, adding one question at a time.
@@ -817,9 +891,8 @@ experiment; only Stage 4 has not combined all three properties in one concurrent
 | 3. Actual-radio correctness gate | Actual L1 on GPU0 4g; NRx 0/1/2 on full GPUs 1/2/3 | Hold capacity questions aside and validate CE→LDPC/CRC output and commit correctness | Complete |
 | 4. Final integrated gate | Protected L1 4g, resident NRx 3g pool, and background AI | Validate all three properties together under actual multi-cell bursts | **Incomplete** |
 
-On a first read, follow §§15.1–15.4 and then §20. Sections 16–19 do not introduce more Stages;
-they reinterpret the same measurements by research question: placement, background reclaim,
-routing, and radio utility.
+On a first read, follow §§15.1–15.5 in order. Each result now appears once under the Stage or
+component gate that produced it; §16 only summarizes how the evidence motivates each design choice.
 
 ### 15.1 Stage 1 — single-GPU cross-MIG GDR baseline
 
@@ -933,6 +1006,20 @@ does not execute cuPHY CE itself.
 Despite its name, predicted-finish is not an ML predictor. If now is 0 ms, expiry is 5 ms, one NRx
 has 3 ms of reserved work, and its measured service bound is 2 ms, its finish estimate is simply
 `3+2=5 ms`. A value beyond 5 ms is rejected. It is a basic **deadline-feasibility calculation**.
+
+The `reserved tail` is not read from a NIC or CUDA queue. It is a local virtual time maintained per
+endpoint by the source scheduler. At startup, the source performs five warm-ups and 100 full-size
+`GDR request → TensorRT NRx → GDR result` measurements, then uses round-trip p95 × `1.10` as the
+service bound. Each admission advances the reserved tail by one bound; completion decrements
+pending, and an empty queue resets the tail to now. This matches the prototype because each
+endpoint process executes one blocking exchange at a time as a FIFO single server. It would not be
+valid without extension for overlapping CUDA streams or batching.
+
+The calibration was also insufficiently accurate. In the three-replica single-1,000/s
+predicted-finish run, endpoint bounds were `4.211–4.254 ms`, while the actual in-run exchange p99
+was `2.867 ms`. This margin caused false fallback and reduced timely results to `88.0%`, versus
+round-robin's `97.2%`. The present predictor is therefore not a final mechanism; it is a
+**structurally reasonable but over-conservatively calibrated prototype**.
 
 The static policies, round-robin, and shortest-queue submit remote work without testing deadline
 feasibility. Predicted-finish reserves completion using the calibration p95 service bound with a
@@ -1067,8 +1154,7 @@ requests.
 In the short Nsight capture, cumulative `cudaStreamSynchronize` time was `11.806 ms`, while GDR
 write-visibility checks consumed `0.063 ms`. FP32↔FP16 layout conversion accounted for `46.5%` of
 GPU kernel time. The next Stage 3 optimization target is therefore persistent binding, conversion,
-and synchronization scope rather than NIC wire time alone. Section §19.1 interprets the individual
-calls in detail.
+and synchronization scope rather than NIC wire time alone.
 
 - Proves: actual `CE → remote NRx → LDPC/CRC`, radio-utility admission, expiry, and single commit.
 - Does not prove: resource efficiency of 3g-MIG replicas, concurrent three-replica burst capacity,
@@ -1076,144 +1162,7 @@ calls in detail.
 - Caveat: this is a synchronous correctness gate with a `12 ms` experimental expiry. Stage 2 pool
   capacity and Stage 3 radio correctness have not yet been measured simultaneously in one run.
 
-### 15.4 Stage 4 — remaining final integrated gate
-
-The final experiment must execute the useful pieces of Stages 1–3 simultaneously rather than add
-their table entries after the fact. Actual L1 and conventional fallback stay on a protected 4g MIG;
-resident NRx replicas occupy several 3g MIGs; Qwen, ResNet, BERT, and Whisper use remaining 4g or
-full-GPU domains. Multi-cell periodic/offset bursts and selective NRx requests drive DART-Rx, which
-jointly uses utility, deadline, and queue state for endpoint selection, admission, fallback, and
-commit.
-
-> **In plain language:** Stage 4 is the final DART-Rx evaluation. It must combine Stage 2's resident
-> `3g MIG` pool, Stage 3's actual-radio/commit path, and background reclaim **in the same run**. The
-> completed results in this report validate the required parts separately; they do not yet validate
-> the full product under one concurrent workload.
-
-At minimum, the final gate must compare `static-one`, `static-cell`, round-robin, predicted-finish,
-and DART-Rx on the same trace while reporting L1 p99, deadline miss/no-timely ratio, correct TB,
-endpoint utilization, and retained background work. **Until Stage 4 is complete, the study must not
-claim that a MIG NRx pool simultaneously solves actual-radio bursts and background tenancy.**
-
-Sections §16–20 regroup the same evidence by research question—placement, background, routing, and
-radio—rather than execution order.
-
-## 16. Q1 — What do the MIG/MPS/P2P/GDR comparisons establish?
-
-![Processing time by MIG, MPS, P2P, and GDR placement](figures_en/03_placement_transport_baselines.png)
-
-### 16.1 Same-partition versus cross-partition execution
-
-| Configuration | Slot E2E mean | L1 slowdown | Qwen | Interpretation |
-|---|---:|---:|---:|---|
-| MIG local | 6.191 ms | 1.621× | 10.22 it/s | Sibling Qwen is isolated; intra-GI L1–NRx contention remains |
-| MIG+MPS local | 6.383 ms | 1.702× | 10.22 it/s | MPS clients in one GI do not create automatic isolation |
-| Cross P2P | 6.383 ms | **1.043×** | 10.23 it/s | Restores L1 isolation; slower 2g NRx offsets the E2E benefit |
-| Cross NIC GDR | 6.326 ms | Not measured in this run | 10.24 it/s | Zero-CPU-bounce endpoint; queue depth 1 prevents a direct throughput comparison |
-
-At equal queue depth 1, P2P measured 5.888 ms and GDR 6.326 ms. NIC loopback added 0.438 ms on
-mean, while the full pipeline remained near 6 ms and overloaded tails reached hundreds to thousands
-of milliseconds. **Transport is not free, but NRx compute and queue stability dominate the current
-system.**
-
-### 16.2 Full MPS is not a straw-man baseline
-
-At the 30% Qwen cap, Full MPS produced the lowest E2E mean, 5.865 ms, while Qwen achieved 7.92 it/s.
-At 100%, Qwen reached 21.11 it/s and E2E rose to 8.569 ms. MPS can be fast and work-conserving; its
-limitation is a load-dependent tail. The purpose of cross placement is not to minimize one mean in
-all cases, but to provide **predictable L1 isolation and a composable capacity pool**.
-
-### 16.3 Where does each placement collapse under the same request rate?
-
-The placement experiment above emphasizes a single dependency path. Multi-cell operation also
-depends on the sustainable request rate. We therefore replayed identical 50–350 requests/s traces
-against five placements in 120 runs. This gate excludes a background co-tenant so that the service
-limit of each placement can be isolated. Qwen interference and background reclaim are measured in
-separate gates.
-
-![Queue-collapse boundaries for five placement approaches](figures_en/03b_fiveway_absolute_rate.png)
-
-| Placement | Last measured point before p99 exceeded 100 ms | p99 at that point | Next point |
-|---|---:|---:|---:|
-| Full MPS | At least 350/s | 2.551 ms | No collapse within the sweep |
-| MIG local | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
-| MIG+MPS, two clients uncapped | 250/s | 3.437 ms | 300/s → **259.106 ms** |
-| Cross P2P | 250/s | 4.911 ms | 300/s → **451.798 ms** |
-| Cross NIC GDR | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
-
-The 100 ms line is a diagnostic marker for an obvious queue collapse, not a production deadline.
-Full MPS uses a full A100, while the local and cross configurations use MIG slices. This is therefore
-not an equal-SM microbenchmark. It is the **capacity–isolation trade-off of each deployable package.**
-
-The result sharpens the problem statement:
-
-- Full MPS has the highest raw capacity. A claim that MIG is always faster than MPS would be false.
-  The MPS concern is L1-tail predictability under background load, not peak throughput.
-- MIG local isolates sibling background work but cannot automatically pull capacity from another
-  idle partition after the 4g NRx saturates.
-- MIG+MPS partitions one 4g more carefully; it neither increases total 4g capacity nor accesses idle
-  capacity beyond the wall.
-- A single P2P or GDR endpoint also has finite capacity. DART-Rx does not claim that one remote path
-  is infinitely fast; it aggregates **multiple resident endpoints to avoid static-one queue cliffs.**
-
-### 16.4 What changes under proper MIG+MPS quota control?
-
-![L1 and NRx share sweep inside one MIG](figures_en/03c_mig_mps_quota.png)
-
-L1 and NRx ran as separate MPS clients inside one 4g while Qwen remained isolated in the sibling 3g
-at approximately 10.21–10.22 it/s.
-
-| L1 share | NRx share | E2E mean | E2E p99 |
-|---:|---:|---:|---:|
-| 30% | 70% | **4.757 ms** | 5.087 ms |
-| 50% | 50% | 4.971 ms | 5.099 ms |
-| 70% | 30% | **6.499 ms** | 6.747 ms |
-
-Because NRx is the longer stage, increasing L1 share to 70% while reducing NRx to 30% made the full
-chain 36.6% slower. MPS percentage is an average active-thread allocation knob, not a physical wall
-that guarantees a kernel deadline or preemption time. MIG+MPS selects a Pareto point **inside one
-fixed room**; it does not solve burst-time borrowing from another room.
-
-### 16.5 Why does co-location slow the host at the CUDA-call level?
-
-![CUDA-call analysis of host blocking under same-MIG L1+NRx](figures_en/03d_cuda_host_blocking.png)
-
-We measured cumulative host time in six major cuPHY CUDA runtime APIs over a 30 s Nsight window. At
-40 cells:
-
-| Condition | Total tracked host CUDA API time | Dominant observed wait |
-|---|---:|---|
-| L1 alone | 1.681 s | `cudaFree` 1.361 s |
-| L1 + NRx | **25.348 s** | `cudaFree` 18.076 s; `cudaMemcpyAsync` 7.034 s |
-| `cudaFreeAsync` shim | 25.570 s | `cudaMemcpyAsync` **25.221 s** |
-| Stream-ordered memory pool | 25.649 s | `cudaMemcpyAsync` **25.539 s** |
-
-Co-location increased tracked host time by `15.1×`. Replacing `cudaFree` with an asynchronous API
-did not remove the total wait; it moved the wait to the next copy or synchronization boundary. The
-root problem is not the name `cudaFree`. It is **outstanding GPU work in one scheduling domain and a
-dependency boundary that must eventually observe its completion.**
-
-This is why a cross-partition design cannot be evaluated from the 0.4 ms mean transport cost alone.
-P2P/GDR separates L1's CUDA queue from NRx compute. It introduces explicit publish and completion
-events instead, which DART-Rx manages with credit, expiry, and commit rules. The Chain-8 Nsight
-numbers are cumulative over 30 s rather than per-slot latency and do not use the exact direct-TensorRT
-five-way configuration; they must not be added to the five-way latency numbers.
-
-Current CUDA-level evidence coverage is:
-
-| Placement | Latency/rate sweep | Direct CUDA-call evidence | Current interpretation |
-|---|---|---|---|
-| Full MPS | Cap sweep + absolute-rate complete | No identical-trace Nsight | Strong throughput; background-tail cause still needs decomposition |
-| MIG local | Placement + absolute-rate complete | Same-MIG causal profile available | Strong sibling isolation; intra-GI L1–NRx wait exists |
-| MIG+MPS | Proper two-client quota + absolute-rate complete | No identical-trace Nsight | Quota trade-off measured; wait location needs capture |
-| Cross P2P | Placement + absolute-rate complete | No identical-trace Nsight | L1 active isolation restored; copy/synchronization decomposition remains |
-| Cross NIC GDR | Placement + absolute-rate + radio complete | Actual-radio GDR vertical-slice Nsight | Local synchronization/conversion exceeds GDR flush time |
-
-Performance differences are measured for every approach. Exact CUDA-call causality is directly
-shown only for same-MIG co-location and the GDR vertical slice. Paired Nsight captures remain a
-required follow-up for the other three conditions.
-
-## 17. Q2 — Can background capacity be reclaimed in time?
+### 15.4 Component gate — reclaiming background capacity during bursts
 
 ![Bounded background work yields capacity to NRx bursts](figures_en/04_background_reclaim.png)
 
@@ -1234,80 +1183,29 @@ This gate omits cuPHY and GDR transport. It demonstrates that background leases 
 integrating and measures the required quantum bound; it does not claim that the complete DART-Rx
 pipeline already achieves these numbers.
 
-## 18. Q3 — Does routing help in a full-size GDR NRx pool?
+### 15.5 Stage 4 — remaining final integrated gate
 
-Section §15.2 places the replica-sweep and full-matrix policy figures in execution order. This
-section only interprets what those results establish about routing.
+The final experiment must execute the useful pieces of Stages 1–3 simultaneously rather than add
+their table entries after the fact. Actual L1 and conventional fallback stay on a protected 4g MIG;
+resident NRx replicas occupy several 3g MIGs; Qwen, ResNet, BERT, and Whisper use remaining 4g or
+full-GPU domains. Multi-cell periodic/offset bursts and selective NRx requests drive DART-Rx, which
+jointly uses utility, deadline, and queue state for endpoint selection, admission, fallback, and
+commit.
 
-In the 348-run full matrix—29 workload points × 3 trials × 4 policies—predicted-finish routing
-reduced the no-timely-result ratio in 87/87 paired traces versus static-one and 86/87 versus
-static-cell. Median improvements were 18.65 and 16.50 percentage points.
+> **In plain language:** Stage 4 is the final DART-Rx evaluation. It must combine Stage 2's resident
+> `3g MIG` pool, Stage 3's actual-radio/commit path, and background reclaim **in the same run**. The
+> completed results in this report validate the required parts separately; they do not yet validate
+> the full product under one concurrent workload.
 
-The limitations matter:
+At minimum, the final gate must compare `static-one`, `static-cell`, round-robin, predicted-finish,
+and DART-Rx on the same trace while reporting L1 p99, deadline miss/no-timely ratio, correct TB,
+endpoint utilization, and retained background work. **Until Stage 4 is complete, the study must not
+claim that a MIG NRx pool simultaneously solves actual-radio bursts and background tenancy.**
 
-- Median predicted-finish no-timely ratio across the full trace set remained 81.33%.
-- 81.31% came from requests rejected to the conventional path **before remote execution**, not late
-  tasks.
-- The policy removes nearly all futile remote work, but its admission rule also discards many usable
-  NRx opportunities.
-- This gate omits cuPHY, conventional decoding, and radio ground truth. `No timely result` is not a
-  PHY miss.
+Section §16 does not repeat the result tables; it only summarizes how the evidence from Stages 1–4
+leads to the corresponding design choices.
 
-The GDR fabric and finish-aware reservation are useful, but a fixed guard is too conservative. Final
-admission must jointly optimize radio utility and the acceptable fallback-risk budget.
-
-## 19. Q4 — Is the mechanism useful when connected to actual radio outcomes?
-
-Section §15.3 contains the actual-radio figure and per-endpoint table. This section summarizes the
-radio-utility implication.
-
-The table reports three-trial medians using three actual GDR endpoints and the real cuPHY
-CE/LDPC/CRC path.
-
-| Mode | NRx requests / 100 | Correct-TB ratio | Decision p50 / p99 |
-|---|---:|---:|---:|
-| Conventional | 0 | 0.62 | 1.045 / 1.292 ms |
-| All NRx | 100 | 0.80 | 2.567 / 5.139 ms |
-| Utility admission | 75 | 0.80 | 2.636 / 5.050 ms |
-
-Utility admission preserved the all-NRx correct-TB ratio of `0.80` while reducing neural work by
-25%. In each replay, the 75 utility-admitted requests were evenly distributed—25 per endpoint—with
-zero deadline misses and zero late completions.
-
-More NRx is not automatically better. Capacity should be spent in channel regions where radio gain
-is concentrated. This was a synchronous correctness gate with 12 ms expiry. Evidence that three
-replicas sustain concurrent 1 ms arrivals comes from the separate open-loop pool gate, not this run.
-
-### 19.1 Where do the real radio path's CUDA calls and kernels spend time?
-
-Section §15.3 places the Nsight figure beside the Stage 3 execution path. This section interprets
-the measurements as an optimization priority.
-
-A 12-request Nsight capture decomposed major CUDA calls in the L1 process:
-
-- `cudaStreamSynchronize`: 66 calls, **11.806 ms** total—the largest CUDA API item
-- `cudaMemcpyAsync`: 234 calls, **5.447 ms**
-- `cudaFree`: 42 calls, **4.194 ms**
-- `cudaMalloc`: 42 calls, **1.634 ms**
-- `cudaDeviceSynchronize`: 27 calls, `0.292 ms`
-- `cudaDeviceFlushGPUDirectRDMAWrites`: 15 calls, **0.063 ms**
-
-FP32↔FP16 layout conversion accounted for `46.5%` of GPU kernel time and the main LDPC split kernel
-for `12.7%`. Local synchronization, allocation/free, copies, and layout conversion outweighed GDR
-visibility checks in this capture.
-
-The optimization priority is therefore:
-
-1. remove repeated allocation/free with caller-owned persistent input/output buffers;
-2. integrate FP32↔FP16 conversion into the NRx binding layout or perform it once at the producer;
-3. narrow synchronization to true dependency boundaries; and
-4. then optimize GDR doorbell/flush and polling overhead.
-
-GDR remains necessary for connecting isolated endpoints. The result says only that the current
-single-request latency is dominated by local software/CUDA overhead rather than NIC wire time. A
-paired Nsight matrix is still required before generalizing one capture to every placement.
-
-## 20. End-to-end evidence chain
+## 16. Evaluation synthesis: end-to-end evidence chain
 
 | Step | Measured fact | Design implication |
 |---:|---|---|
@@ -1325,7 +1223,7 @@ paired Nsight matrix is still required before generalizing one capture to every 
 
 # Part V. Current conclusion and remaining work
 
-## 21. Claims currently supported by evidence
+## 17. Claims currently supported by evidence
 
 1. **The problem is real.** Even with functioning MIG isolation, static NRx capacity and placement
    can produce deadline loss and idle endpoints simultaneously.
@@ -1344,7 +1242,7 @@ paired Nsight matrix is still required before generalizing one capture to every 
    co-location increased tracked CUDA host time 15.1×; async free and a memory pool moved the wait
    to the next copy/synchronization point.
 
-## 22. Claims that are not yet supported
+## 18. Claims that are not yet supported
 
 - The current prototype meets a production 1 ms PHY deadline.
 - GDR is faster than P2P or reduces single-slot latency to 5–10 us.
@@ -1353,7 +1251,7 @@ paired Nsight matrix is still required before generalizing one capture to every 
 - A host-polling prototype alone constitutes an ISCA-level microarchitectural contribution.
 - One or two Nsight captures establish CUDA-call causality for every MPS/MIG/P2P/GDR condition.
 
-## 23. Required final integrated experiment
+## 19. Required final integrated experiment
 
 The current evidence is strong but divided across three experiment layers. The final execution must
 measure all of the following together:
@@ -1385,7 +1283,7 @@ Full MPS / MIG local / proper MIG+MPS / cross P2P / cross GDR
 Only this matrix can turn “where the host probably blocks” into condition-by-condition causal
 evidence.
 
-## 24. Current ISCA assessment
+## 20. Current ISCA assessment
 
 The direction is **promising but incomplete**. A simple MIG/MPS/P2P/GDR comparison would offer weak
 novelty. The potential architectural contribution is instead:
@@ -1401,7 +1299,7 @@ model. The direction is coherent; the current figures must not be presented as a
 
 ---
 
-## 25. Figure and data provenance
+## 21. Figure and data provenance
 
 Generate both figure sets from the same source measurements:
 

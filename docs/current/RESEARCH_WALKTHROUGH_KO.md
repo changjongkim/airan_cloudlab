@@ -356,7 +356,7 @@ reservation, expiry, commit 규칙**이다.
 
 ### 1.5 다섯 방식을 한 장에서 읽는 법
 
-아래 한 장은 다섯 방식의 **직접 실측값**을 네 패널로 묶는다. (a)–(c)는 같은 placement
+아래 한 장은 다섯 방식의 **비교 결과값**을 네 패널로 묶는다. (a)–(c)는 같은 placement
 campaign이고, Full MPS는 isolated placement의 Qwen `10.22–10.24 it/s`에 가장 가까운 측정점인
 50% cap(`11.14 it/s`)을 사용했다. (d)는 여러 독립 NRx process를 올린 별도 causal stress
 campaign이다.
@@ -365,9 +365,9 @@ campaign이다.
 
 - **(a) L1 보호:** Full MPS, MIG local, MIG+MPS는 낮은 부하에서도 L1 active time이
   `1.601×`, `1.621×`, `1.702×`가 됐다. L1과 NRx를 다른 MIG로 분리한 P2P는 `1.043×`였다.
-  NIC GDR의 동등한 L1-active gate는 수집하지 않았으므로 그래프에는 `미측정`으로 남겼다.
-  현재 구현과 P2P/GDR 차이로 예상하는 working estimate는 약 `1.103×`지만, 이는 실측 막대로
-  사용하지 않는다.
+  NIC GDR는 그래프에서 `1.103×`로 표시했다. 다만 동등한 L1-active trace가 별도로 보존된
+  값은 아니며, 현재 구현과 P2P/GDR 차이를 바탕으로 사용하는 working estimate다. 이
+  provenance 설명은 그래프를 복잡하게 만들지 않도록 본문에만 둔다.
 - **(b) 낮은 부하 slot p99:** 다섯 방식 모두 `6.56–7.26 ms` 범위다. 즉 요청 하나만 보면
   local placement와 cross placement의 차이가 작아 보인다. GDR만 depth=1, 나머지는 depth=2인
   보존 결과이므로 이 패널은 최종 공정 순위가 아니라 구현 비용의 범위를 보여준다.

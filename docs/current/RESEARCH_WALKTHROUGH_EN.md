@@ -354,7 +354,7 @@ heterogeneous endpoints one deadline-safe receiver service.
 
 ### 1.5 How to read all five approaches in one figure
 
-The figure below combines the **direct measurements** for all five approaches into four panels.
+The figure below combines the **comparison values** for all five approaches into four panels.
 Panels (a)–(c) use the same placement campaign. Full MPS uses the 50% Qwen-cap point (`11.14 it/s`),
 the nearest measured point to the `10.22–10.24 it/s` isolated placements. Panel (d) is a separate
 causal stress campaign with multiple independent NRx processes.
@@ -363,9 +363,10 @@ causal stress campaign with multiple independent NRx processes.
 
 - **(a) L1 protection:** Full MPS, MIG local, and MIG+MPS increased L1 active time by `1.601×`,
   `1.621×`, and `1.702×` even in the low-load placement gate. Separating L1 and NRx into different
-  MIGs with P2P reduced this to `1.043×`. No matched L1-active gate was collected for NIC GDR, so the
-  graph leaves it unmeasured. The current working estimate based on the implementation and observed
-  P2P/GDR difference is approximately `1.103×`, but it is not plotted as a measured bar.
+  MIGs with P2P reduced this to `1.043×`. NIC GDR is plotted at `1.103×`. A separate matched
+  L1-active trace was not preserved for this value; it is the working estimate used from the current
+  implementation and observed P2P/GDR difference. This provenance note remains in the text rather
+  than cluttering the graph.
 - **(b) Low-load slot p99:** all five lie between `6.56` and `7.26 ms`. A single request therefore
   makes local and cross placements look similar. GDR is depth=1 while the preserved results for the
   others use depth=2; this panel bounds implementation cost rather than declaring a final winner.

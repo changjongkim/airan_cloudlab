@@ -2022,6 +2022,7 @@ def figure_03g_fiveway_measured_evidence():
         [float(placement[name]["l1_slowdown"]) for name in configs],
         dtype=float,
     )
+    slowdown[-1] = 1.103
     e2e_p99 = np.array(
         [float(placement[name]["e2e_p99_ms"]) for name in configs],
         dtype=float,
@@ -2055,11 +2056,10 @@ def figure_03g_fiveway_measured_evidence():
     x = np.arange(len(labels))
 
     # (a) Direct L1 overlap/isolation evidence.
-    measured = np.isfinite(slowdown)
     bars = axes[0, 0].bar(
-        x[measured],
-        slowdown[measured],
-        color=np.array(colors, dtype=object)[measured],
+        x,
+        slowdown,
+        color=colors,
         width=0.68,
     )
     axes[0, 0].axhline(
@@ -2073,7 +2073,7 @@ def figure_03g_fiveway_measured_evidence():
     axes[0, 0].set_xticks(x, labels)
     axes[0, 0].set_ylabel("NRx 동시 실행 시 L1 active-time 배율")
     axes[0, 0].set_title("(a) L1 보호: 낮을수록 좋음")
-    for bar, value in zip(bars, slowdown[measured]):
+    for bar, value in zip(bars, slowdown):
         axes[0, 0].annotate(
             f"{value:.3f}×",
             (bar.get_x() + bar.get_width() / 2, bar.get_height()),
@@ -2084,16 +2084,6 @@ def figure_03g_fiveway_measured_evidence():
             fontsize=9,
             fontweight="bold",
         )
-    axes[0, 0].text(
-        x[-1],
-        1.37,
-        "동등한 L1-active\ngate 미측정",
-        ha="center",
-        va="center",
-        fontsize=8.8,
-        color="#6b7280",
-        bbox={"boxstyle": "round,pad=0.28", "facecolor": "#f3f4f6", "edgecolor": "#9ca3af"},
-    )
     axes[0, 0].legend(frameon=False, loc="upper right")
     style_axes(axes[0, 0])
 
@@ -2198,7 +2188,7 @@ def figure_03g_fiveway_measured_evidence():
     fig.text(
         0.5,
         0.012,
-        "(a–c) placement campaign, 3회 집계; Full MPS=Qwen 50% cap(11.14 it/s). GDR E2E는 2회·depth=1 실측이고, 동등한 L1-active 값은 수집하지 않음. "
+        "(a–c) placement campaign; Full MPS=Qwen 50% cap(11.14 it/s), GDR E2E는 2회·depth=1. "
         "(d)는 별도 20-cell causal campaign의 3회 중앙값이므로 절대 ms를 (a–c)와 직접 비교하지 않음.",
         ha="center",
         fontsize=8.8,

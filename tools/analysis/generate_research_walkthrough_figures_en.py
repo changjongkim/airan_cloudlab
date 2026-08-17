@@ -492,6 +492,8 @@ EN = {
         "(a–c) placement campaign, three-run aggregate; Full MPS uses the Qwen 50% cap (11.14 it/s). GDR E2E is measured from two depth=1 runs; only the 1.103× value in (a) is an estimate (*) without a matched trace. (d) is a separate 20-cell causal campaign using three-run medians; do not compare its absolute milliseconds with (a–c).",
     "(a–c) placement campaign, 3회 집계; Full MPS=Qwen 50% cap(11.14 it/s). GDR E2E는 2회·depth=1 실측이고, 동등한 L1-active 값은 수집하지 않음. (d)는 별도 20-cell causal campaign의 3회 중앙값이므로 절대 ms를 (a–c)와 직접 비교하지 않음.":
         "(a–c) placement campaign, three-run aggregate; Full MPS uses the Qwen 50% cap (11.14 it/s). GDR E2E is measured from two depth=1 runs; no matched L1-active value was collected. (d) is a separate 20-cell causal campaign using three-run medians; do not compare its absolute milliseconds with (a–c).",
+    "(a–c) placement campaign; Full MPS=Qwen 50% cap(11.14 it/s), GDR E2E는 2회·depth=1. (d)는 별도 20-cell causal campaign의 3회 중앙값이므로 절대 ms를 (a–c)와 직접 비교하지 않음.":
+        "(a–c) placement campaign; Full MPS uses the Qwen 50% cap (11.14 it/s), and GDR E2E uses two depth=1 runs. (d) is a separate 20-cell causal campaign using three-run medians; do not compare its absolute milliseconds with (a–c).",
 }
 
 

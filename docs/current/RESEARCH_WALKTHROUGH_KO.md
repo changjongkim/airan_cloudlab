@@ -1,3 +1,14 @@
+> **⚠ GitHub 렌더링 안내**: 이 원본 문서는 1,486 line · 96 KB · 17 image · 248 table row
+> 로 GitHub 웹 UI에서 렌더링이 매우 느리거나 실패할 수 있다. 챕터 분할본을 사용하는 것을
+> 권장한다.
+>
+> 챕터 분할본: [`walkthrough_ko/`](walkthrough_ko/README.md)
+> - [Chapter 1 · Problem and context](walkthrough_ko/01_problem_and_context.md)
+> - [Chapter 2 · Architecture](walkthrough_ko/02_architecture.md)
+> - [Chapter 3 · Evaluation and results](walkthrough_ko/03_evaluation.md)
+
+---
+
 # DART-Rx 연구 전체 설명: 문제 → 설계 → 실험 결과
 
 **기준일:** 2026-08-16

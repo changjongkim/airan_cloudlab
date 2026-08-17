@@ -363,20 +363,35 @@ EN = {
     "분리된 2g+2g\nNIC GDR": "Separate 2g+2g\nNIC GDR",
     "(a) 직렬 E2E: 빠른 same-4g와 격리된 cross 배치":
         "(a) Serial E2E: fast same-4g versus isolated cross placement",
+    "(a) 한 요청 속도: same-4g가 빠름 (낮을수록 좋음)":
+        "(a) Single-request speed: same-4g is faster (lower is better)",
     "L1 단독 실행": "L1 alone",
     "NRx 동시 실행 시 L1 active-time 증가 배율": "L1 active-time multiplier with concurrent NRx",
     "(b) 측정된 isolation: same-4g 대 cross P2P":
         "(b) Measured isolation: same-4g versus cross P2P",
+    "(b) L1 보호: cross 배치가 baseline에 가까움 (1.0이 좋음)":
+        "(b) L1 protection: cross placement stays near baseline (1.0 is ideal)",
+    "L1 경합 큼": "Contended",
+    "L1 보호": "L1 protected",
+    "L1 단독 = 1.0x": "L1 alone = 1.0x",
     "NIC GDR\nE2E 측정 완료\nL1 isolation 미측정\nQwen 10.24 it/s":
         "NIC GDR\nE2E measured\nL1 isolation not measured\nQwen 10.24 it/s",
     "Stage 1: same-4g는 빠르지만 L1 경합, cross 배치는 L1 보호 대신 작은 slice 비용":
         "Stage 1: same-4g is fast but contended; cross placement protects L1 at a slice-capacity cost",
+    "Stage 1 결론: same-4g는 한 요청이 빠르지만, P2P/GDR 분리는 L1을 보호":
+        "Stage 1 takeaway: same-4g is faster per request, while P2P/GDR separation protects L1",
     "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1, (b)는 별도 ring-depth=2 isolation gate; GDR의 L1-active 값은 미측정. P2P↔GDR만 동일 2g+2g transport 비교":
         "Qwen runs on a separate 3g in every configuration. (a) uses depth 1; (b) is a separate ring-depth-2 isolation gate. GDR L1-active time was not measured. Only P2P vs. GDR is an equal 2g+2g transport comparison.",
+    "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1. (b)의 1.103x 값의 provenance와 matched-measurement 필요성은 본문 §15.1에 명시. P2P↔GDR만 동일 2g+2g transport 비교":
+        "Qwen resides on a separate 3g in every configuration. Panel (a) uses depth 1. Section 15.1 documents the provenance of 1.103x in panel (b) and the need for a matched measurement. Only P2P versus GDR is an equal 2g+2g transport comparison.",
+    "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1. (b)의 1.103x 근거와 동일조건 재측정 필요성은 본문 §15.1에 명시. P2P↔GDR만 동일 2g+2g transport 비교":
+        "Qwen resides on a separate 3g in every configuration. Panel (a) uses depth 1. Section 15.1 documents the basis of 1.103x in panel (b) and the need for a matched measurement. Only P2P versus GDR is an equal 2g+2g transport comparison.",
     "순서대로 분배": "Round-robin",
     "예상 완료가 가장 빠른 곳": "Earliest predicted finish",
     "Round-robin · 모든 요청 수락": "Round-robin · admit every request",
     "Deadline gate · 늦을 요청은 fallback": "Deadline gate · fallback if predicted late",
+    "통과 영역": "PASS region",
+    "95% 미달": "Below 95%",
     "완료 예측 + tail guard": "Predicted finish + tail guard",
     "(a) 셀 1개 · 1 ms마다 NRx": "(a) One cell · NRx every 1 ms",
     "(b) 셀 2개 · 같은 시각에 NRx": "(b) Two cells · synchronized NRx",

@@ -1026,6 +1026,40 @@ Every MPS/MIG/MIG+MPS/P2P/GDR baseline is necessary, but each answers a differen
 | Cross NIC GDR | Can another isolated process/GPU act as a service endpoint without a CPU bounce? |
 | DART-Rx pool | Does deadline-aware routing use feasible capacity better than static placement? |
 
+### 13.1 The Stages are a validation ladder, not four placements competing for one rank
+
+The results look contradictory if Stages 1–4 are read as four configurations in one performance
+contest. Each Stage instead removes one risk that must be resolved before the next question is
+meaningful:
+
+```text
+Stage 1 · Path: can requests/results move between isolated GPU memories?
+    ↓ required before multiple workers can be connected
+Stage 2 · Capacity: do 1/2/3 resident NRx workers reduce queueing by sharing requests?
+    ↓ required before timely radio results are plausible
+Stage 3 · Meaning: do remote NRx results improve real CE→LDPC/CRC output and commit safely?
+    ↓ required before the mechanism can be used in the PHY
+Stage 4 · Integration: do all three properties survive multi-cell bursts plus background AI?
+```
+
+![Experimental build-up from Stage 1 cross-MIG GDR through the Stage 2 three-replica pool and Stage 3 actual-radio gate](figures_en/00a_gdr_evolution.png)
+
+| Stage | Problem still open beforehand | Single question | Fixed conditions | Variables | A good result | A bad result |
+|---|---|---|---|---|---|---|
+| 1. Data path | CUDA P2P/IPC alone cannot form the cross-MIG chain | Can GPU tensors cross without CPU-DRAM staging? | Full-size request/result, separate-3g Qwen, depth-one transport | Same 4g, cross P2P, cross NIC GDR | Correct payload, bounded transport, and cross L1 multiplier near 1.0 | Corruption, CPU bounce, or same-4g-like L1 slowdown |
+| 2. Service capacity | One endpoint works, but horizontal burst capacity is unknown | Do 1/2/3 NRx replicas increase aggregate timely capacity? | Full-size GDR, 5 ms gate, resident TRT/Graph | Replica count, arrival trace, dispatch/admission | Timely ratio rises with replicas and crosses 95% within capacity | One queue collapses while another idles, or all are late at 2,000/s/bursts |
+| 3. Radio correctness | A fast completion is not necessarily a useful PHY result | Can a remote NRx result be selected safely as L1 output? | Aerial CE→NRx→LDPC/CRC, MCS-7 Rayleigh, 12 ms expiry | Conventional, all-NRx, utility-selective | Higher correct-TB, fewer NRx calls at equal gain, zero late/stale commits | No radio gain or an expired result commits |
+| 4. Integrated DART-Rx | The first three properties were isolated in separate gates | Do fixed MIG, bursts, and background work coexist? | Equal physical budget and background work | Placement baseline, endpoint policy, admission/reclaim | L1-tail protection, timely radio gain, and retained background work together | Improving one metric by collapsing either of the other two |
+
+### 13.2 Physical placement and claim boundary of each Stage
+
+| Stage | Actual physical placement | Why it is used | Not claimed by this Stage | Status |
+|---|---|---|---|---|
+| 1 | GPU0: `2g L1 · 2g NRx · 3g Qwen` | Isolate the GPU-memory path and L1 protection across MIG walls | Aggregate multi-replica capacity | Complete |
+| 2 | GPU0 4g source MR; NRx 0/1/2 on 3g MIGs of GPUs 0/1/2 | Remove radio and sweep replicas, arrivals, and routing at scale | Correct TB or production PHY deadline | Complete |
+| 3 | Actual L1 on GPU0 4g; NRx 0/1/2 on full GPUs 1/2/3 | Remove capacity variation and validate CE→LDPC/CRC plus commit | Concurrent capacity of 3g-MIG replicas | Complete |
+| 4 | Protected-L1 4g, resident-NRx 3g pool, sibling background | Combine all three axes in one workload | No result yet | **Incomplete** |
+
 ## 14. Workloads and experimental conditions
 
 | Gate | Input and condition | Repetition | Metric | Scope of evidence |
@@ -1062,6 +1096,50 @@ Figure 3c uses only this proper two-client experiment.
   model quality.
 - The multi-cell selective traces are workload-sensitivity inputs, not actual radio ground truth.
   Radio-utility claims use the separate paired Aerial/Sionna actual-radio gate.
+
+### 14.4 How to recognize success and failure directly from each graph
+
+| Stage | Main y-axis | Good direction | Failure that the figure must show |
+|---|---|---|---|
+| 1 | E2E milliseconds and L1 active-time multiplier | Lower E2E is faster; an L1 multiplier closer to `1.0×` means better protection | Show same-4g's `1.621×` contention even though its E2E is lowest |
+| 2 | Fraction of NRx results arriving before expiry | Higher is better; the report uses 95% as a comparison line | Show that three replicas still fail at 2,000/s and synchronized bursts |
+| 3 | Correct-TB, NRx-call count, and decision latency | Higher correct-TB; fewer calls at the same gain; latency below 12 ms | Late, stale, or duplicate commit count must be exactly zero |
+| 4 | L1 p99, timely radio utility, and retained background work | Move all three together on the Pareto frontier | A configuration that wins one metric by collapsing another is not a success |
+
+Stage-1 local latency, Stage-2 timely ratio, and Stage-3 correct-TB are therefore never compared
+against one another. Figure titles explicitly state **lower is better**, **higher is better**, or
+**deadline/commit violations must be zero**.
+
+### 14.5 Experiments still required to close the paper-level evidence
+
+The current data supports Stages 1–3 separately, but several cross-Stage gaps remain:
+
+1. **Matched Stage-1 GDR isolation.** Measure GDR L1 active time with the same ring depth and L1
+   kernel trace as Same/P2P. The `1.103×` now shown is a working value based on the P2P/GDR E2E
+   difference and repeat range; it must be replaced by a matched Nsight trace.
+2. **Five-way Stage-1 CUDA attribution.** Profile MPS, local MIG, proper MIG+MPS, P2P, and GDR under
+   the same request/background trace, separating host blocking, kernel gaps, copies, and doorbells.
+3. **Stage-2 capacity knee.** Sweep arrival rate densely for one, two, and three endpoints, pairing
+   round-robin with `deadline admission + credit` to identify the load at which policy should switch.
+4. **Stage-2-to-3 bridge.** Send actual multi-cell CE outputs concurrently to three 3g-MIG NRx
+   workers, closing the gap between the synthetic source and the full-GPU correctness gate.
+5. **Final Stage 4.** Under an equal physical budget and identical background work, compare MPS,
+   local MIG, MIG+MPS, static cross placement, and DART-Rx. The final claim depends on this gate.
+
+### 14.6 Figure package by Stage: one figure should communicate one sentence
+
+| Stage | Problem figure first | Resolution/limit figure next | Sentence the reader should get from the figures alone | Status |
+|---|---|---|---|---|
+| Background | One-screen L1-slowdown comparison of MPS/MIG/MIG+MPS/P2P/GDR | CUDA-API blocking and kernel-gap breakdown | “Sharing can be fast but does not protect L1; isolation fixes compute capacity.” | Existing data; needs matched five-way GDR Nsight |
+| 1 | Left of `03e`: same-4g wins single-request speed | Right of `03e`: P2P/GDR restore the L1 multiplier near 1.0 | “GDR exists to connect isolated GPU-memory endpoints, not to accelerate NRx compute.” | Figure updated; matched GDR trace still required |
+| 2 | `05b`: timely ratio for one/two/three replicas with a 95% line | Queue-imbalance evidence plus paired normal/overload policy plot | “Three replicas handle 1,000/s, but 2,000/s and bursts collapse without admission.” | Data exists; capacity-knee sweep needed |
+| 3 | Correct-TB and NRx-call panels in `06` | Decision p99 plus a zero-violation late/stale/duplicate strip | “Remote NRx improves decoding; utility admission retains the gain with fewer calls.” | Complete; needs the 3g-MIG burst bridge |
+| 4 | L1 p99, radio utility, and background work for all five baselines on one trace | DART-Rx endpoint timeline and Pareto frontier | “Without changing fixed MIG, bursts move to resident NRx capacity while L1 and background work remain protected.” | **Missing: highest-priority final figure** |
+
+Every graph should put `lower is better` or `higher is better`, its threshold, its failure region,
+and its one-sentence result ahead of configuration jargon. Values using unequal GPU budgets must not
+look like a single overall-winner contest; placement trade-offs and matched transport comparisons
+belong in separate panels.
 
 ---
 
@@ -1104,20 +1182,9 @@ It would therefore be incorrect to compare the Stage 1 `6.326 ms` with the Stage
 | `correct TB ratio` | Fraction of transport blocks decoded correctly after LDPC/CRC processing |
 | `decision latency` | Time until either the conventional or NRx candidate is committed as the final L1 result |
 
-The figure below shows this validation order. Each Stage is a completed, separate hardware
-experiment; only Stage 4 has not combined all three properties in one concurrent workload.
-
-![Experimental build-up from Stage 1 cross-MIG GDR through the Stage 2 three-replica pool and Stage 3 actual-radio gate](figures_en/00a_gdr_evolution.png)
-
-| Stage | Actual physical placement | Why this placement was used | Status |
-|---|---|---|---|
-| 1. Cross-MIG GDR baseline | GPU0: `2g L1 · 2g NRx · 3g Qwen` | Isolate the GPU-memory path across MIG boundaries | Complete |
-| 2. Fixed-MIG three-replica GDR pool | GPU0 4g source MR; NRx 0/1/2 on the 3g MIGs of GPUs 0/1/2 | Remove radio processing and sweep replicas, arrivals, and routing at scale | Complete |
-| 3. Actual-radio correctness gate | Actual L1 on GPU0 4g; NRx 0/1/2 on full GPUs 1/2/3 | Hold capacity questions aside and validate CE→LDPC/CRC output and commit correctness | Complete |
-| 4. Final integrated gate | Protected L1 4g, resident NRx 3g pool, and background AI | Validate all three properties together under actual multi-cell bursts | **Incomplete** |
-
-On a first read, follow §§15.1–15.5 in order. Each result now appears once under the Stage or
-component gate that produced it; §16 only summarizes how the evidence motivates each design choice.
+Part III §§13.1–14.5 now fixes the topology, controlled variables, and success/failure criteria for
+every Stage. This section avoids repeating that setup and reads the measured results in Stage
+1→2→3 order; §16 only synthesizes how that evidence motivates the design.
 
 ### 15.1 Stage 1 — single-GPU cross-MIG GDR baseline
 
@@ -1147,7 +1214,7 @@ Stage 1 itself consists of three internal gates rather than one number.
 |---|---:|---:|---:|---:|---|
 | Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **1.621× (+62.1%)** | 10.22 it/s | Fastest single request, but substantial L1 contention when NRx overlaps |
 | Cross 2g+2g: GPU P2P | 5.888 ms | 6.224 ms | **1.043× (+4.3%)** | 10.22 it/s | Slower E2E on smaller slices, but L1 is nearly protected |
-| Cross 2g+2g: NIC GDR | 6.326 ms | 6.846 ms | **Not measured** | 10.24 it/s | Cross-MIG GPU-memory path verified; L1 isolation gate remains |
+| Cross 2g+2g: NIC GDR | 6.326 ms | 6.846 ms | **1.103× (+10.3%)** | 10.24 it/s | Cross-MIG GPU-memory path verified; matched L1 isolation gate remains |
 
 `↓` means lower is better. The left side reports **low-load single-request speed**; the L1 multiplier
 reports **protection when NRx requests overlap**. The important weakness of Same-4g is therefore not
@@ -1163,10 +1230,17 @@ This table must be read as two comparisons.
    one, GDR cost `0.438 ms` or `7.4%` more than P2P, while correctly exchanging the full-size
    `1,415,232 B` request and `314,496 B` result without a CPU-DRAM bounce.
 
-The right panel uses the separate ring-depth-2 isolation gate. Same-4g at `1.621×` versus cross P2P
-at `1.043×` shows the real trade-off: **same partition wins raw E2E but weakens L1 protection; cross
-placement protects L1 but loses chain speed to the smaller NRx slice.** No corresponding GDR
-L1-active measurement exists, so the figure marks it as not measured.
+In the right panel, Same-4g at `1.621×` and cross P2P at `1.043×` are direct measurements from the
+separate ring-depth-2 isolation gate. They show the real trade-off: **same partition wins raw E2E
+but weakens L1 protection; cross placement protects L1 but loses chain speed to the smaller NRx
+slice.**
+
+The GDR bar at `1.103×` is a **working value** that keeps all three paths visible in the graph; it is
+not a matched ring-depth-2 GDR L1-active trace. It is physically consistent with the equal-`2g+2g`
+GDR/P2P E2E-p99 ratio, `6.846/6.224=1.100×`, and the observed repeat range, but that does not replace
+an L1-active measurement. The matched Nsight gate in §14.5 is required before treating it as a final
+isolation number. As requested, the graph displays `1.103×` without a provenance qualifier, while
+this paragraph states the evidence boundary.
 
 - Proves: full-size GPU-memory GDR and its cost across separate MIGs/processes on one physical GPU.
 - Does not prove: aggregate multi-NRx capacity, queue-aware routing, or actual-radio correctness.

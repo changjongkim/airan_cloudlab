@@ -1051,6 +1051,39 @@ MPS, MIG, MIG+MPS, P2P, GDR는 모두 논문에 들어가야 한다. 다만 각 
 | Cross NIC GDR | CPU bounce 없이 다른 isolated process/GPU를 service endpoint로 쓸 수 있는가? |
 | DART-Rx pool | static placement보다 deadline-feasible capacity를 실제로 잘 이용하는가? |
 
+### 13.1 Stage는 네 배치의 순위가 아니라 하나씩 위험을 제거하는 검증 사다리다
+
+Stage 1–4를 같은 성능 대회의 네 configuration으로 읽으면 결과가 모순처럼 보인다. 실제 목적은
+아래와 같다. 앞 Stage가 실패하면 다음 Stage의 결과를 해석할 수 없도록 의존관계를 만들었다.
+
+```text
+Stage 1 · 길: 격리된 GPU memory 사이에 request/result를 실제로 옮길 수 있는가?
+    ↓ 통과해야 여러 worker를 연결할 수 있음
+Stage 2 · 용량: resident NRx 1/2/3개가 요청을 나눠 받아 queue를 줄이는가?
+    ↓ 통과해야 실제 radio 결과를 제시간에 받을 가능성이 생김
+Stage 3 · 의미: remote NRx 결과가 실제 CE→LDPC/CRC 결과를 개선하고 안전하게 commit되는가?
+    ↓ 통과해야 system mechanism으로 사용할 수 있음
+Stage 4 · 통합: multi-cell burst와 background AI가 겹쳐도 위 세 성질이 동시에 유지되는가?
+```
+
+![Stage 1의 cross-MIG GDR에서 Stage 2의 3-replica pool과 Stage 3의 actual-radio gate로 진행한 실험 빌드업](figures/00a_gdr_evolution.png)
+
+| Stage | 그 전까지 남아 있던 문제 | 이 Stage의 단일 질문 | 고정한 조건 | 바꾼 변수 | 성공으로 읽는 결과 | 실패로 읽는 결과 |
+|---|---|---|---|---|---|---|
+| 1. Data path | MIG 벽 때문에 CUDA P2P/IPC만으로 cross-MIG chain을 만들 수 없음 | GPU tensor가 CPU DRAM을 거치지 않고 경계를 넘는가? | 실제 크기 request/result, 별도 3g Qwen, depth 1 transport | same 4g, cross P2P, cross NIC GDR | payload correctness와 bounded transport; cross에서 L1 배율이 1.0에 가까움 | payload 오류, CPU bounce, 또는 L1 slowdown이 same-4g와 비슷함 |
+| 2. Service capacity | endpoint 하나는 연결됐지만 burst를 수평 확장할 수 있는지 모름 | NRx 1/2/3개가 aggregate timely capacity를 늘리는가? | full-size GDR payload, 5 ms gate, resident TRT/Graph | replica 수, arrival trace, dispatch/admission | replica 증가 시 timely ratio 상승; capacity 안에서는 95% 선 통과 | endpoint가 놀면서 다른 queue가 붕괴하거나 2,000/s/burst에서 모두 늦음 |
+| 3. Radio correctness | 빠른 completion이 실제로 더 나은 PHY 결과인지 모름 | remote NRx 결과를 실제 L1 output으로 안전하게 선택할 수 있는가? | Aerial CE→NRx→LDPC/CRC, MCS 7 Rayleigh, 12 ms expiry | conventional, all-NRx, utility-selective | correct-TB 증가, NRx 호출 감소, late/stale commit 0 | radio gain 없음 또는 만료 결과가 commit됨 |
+| 4. Integrated DART-Rx | 앞 세 성질을 서로 다른 실험에서만 확인 | burst·background·fixed MIG를 한 번에 만족하는가? | 동일 physical budget과 background work | baseline placement, endpoint 정책, admission/reclaim | L1 tail 보호 + timely radio gain + background work 보존 | 셋 중 하나를 얻기 위해 다른 둘을 크게 희생 |
+
+### 13.2 각 Stage의 실제 물리 배치와 claim 경계
+
+| 단계 | 실제 물리 배치 | 이 배치를 사용한 이유 | 이 Stage만으로 주장하지 않는 것 | 상태 |
+|---|---|---|---|---|
+| 1 | GPU0: `2g L1 · 2g NRx · 3g Qwen` | 한 GPU 안의 MIG 경계를 넘는 GPU-memory 경로와 isolation을 분리 측정 | 여러 replica의 합산 capacity | 완료 |
+| 2 | GPU0 4g source MR, GPU0/1/2의 3g에 NRx 0/1/2 | actual radio를 빼고 replica 수·도착률·routing을 크게 sweep | correct TB나 production PHY deadline | 완료 |
+| 3 | GPU0 4g actual L1, GPU1/2/3 full GPU NRx 0/1/2 | capacity 변수를 빼고 실제 CE→LDPC/CRC와 commit 검증 | 3g-MIG replica의 동시 capacity | 완료 |
+| 4 | protected L1 4g + resident NRx 3g pool + sibling background | 세 축을 같은 workload에서 결합 | 아직 결과 없음 | **미완료** |
+
 ## 14. Workload와 실험 조건
 
 | Gate | 입력/조건 | 반복 | metric | 증명 범위 |
@@ -1088,6 +1121,52 @@ two-client 실험만 사용한다.
   cooperative reclaim timing을 평가한다.
 - Multi-cell selective trace도 actual radio ground truth가 아니라 workload sensitivity input이다.
   Radio utility 주장은 별도의 paired Aerial/Sionna actual-radio gate만 사용한다.
+
+### 14.4 그래프를 보고 바로 성공과 실패를 구분하는 기준
+
+| Stage | 주 그래프의 y축 | 좋은 방향 | 그림에서 반드시 보여야 하는 실패선 |
+|---|---|---|---|
+| 1 | E2E ms와 L1 active-time 배율 | E2E는 낮을수록 빠름; L1 배율은 `1.0×`에 가까울수록 보호됨 | same-4g가 빠르더라도 `1.621×` L1 경합을 함께 표시 |
+| 2 | expiry 안에 도착한 NRx 결과 비율 | 높을수록 좋고 이 보고서의 비교선은 95% | 2,000/s와 synchronized burst에서 replica 3개도 무너지는 지점 |
+| 3 | correct-TB, NRx 호출 수, decision latency | correct-TB는 높게, 같은 gain이면 호출 수는 낮게, latency는 12 ms 아래 | late/stale/duplicate commit은 단 한 건도 허용하지 않음 |
+| 4 | L1 p99, timely radio utility, background work | 세 지표를 동시에 보존하는 Pareto 이동 | 한 지표만 좋아지고 다른 지표가 무너지는 구성은 성공이 아님 |
+
+따라서 Stage 1의 local latency, Stage 2의 timely ratio, Stage 3의 correct-TB를 서로 직접
+비교하지 않는다. 그래프 제목도 `무엇이 좋은가`가 보이도록 각각 **낮을수록 좋음**,
+**높을수록 좋음**, **deadline/commit 위반은 0이어야 함**을 명시한다.
+
+### 14.5 현재 증거를 논문 수준으로 닫기 위해 추가할 실험
+
+현재 결과는 Stage 1–3의 기능을 각각 지지하지만 Stage 사이에 아직 빈 칸이 있다. 우선순위는
+다음과 같다.
+
+1. **Stage 1 matched GDR isolation.** Same/P2P와 같은 ring depth·L1 kernel trace에서 GDR의
+   L1 active-time을 직접 다시 측정한다. 현재 그림의 `1.103×`는 P2P/GDR E2E 차이와 반복 범위로
+   정한 working value이며, 동일 조건의 Nsight trace로 교체해야 한다.
+2. **Stage 1 five-way CUDA attribution.** MPS·MIG local·proper MIG+MPS·P2P·GDR를 같은 요청
+   흐름과 background 조건에서 Nsight Systems/CUPTI로 측정해 host blocking, kernel gap,
+   memcpy/doorbell 시간을 분해한다.
+3. **Stage 2 capacity knee.** Endpoint 1/2/3개별로 도착률을 촘촘히 sweep하고, round-robin과
+   `deadline admission + credit`을 같은 trace에 paired 실행해 어느 load에서 정책 전환이
+   필요한지 표시한다.
+4. **Stage 2→3 연결.** 실제 multi-cell CE output을 3g-MIG NRx 3개에 동시에 보내는 burst gate를
+   추가해 synthetic source와 full-GPU correctness gate 사이의 간극을 없앤다.
+5. **Stage 4 최종 실험.** 동일 physical budget에서 MPS, local MIG, MIG+MPS, static cross,
+   DART-Rx를 background workload까지 포함해 비교한다. 최종 claim은 이 실험이 끝나야 한다.
+
+### 14.6 Stage별 figure package: 그림 하나가 한 문장만 말하게 한다
+
+| Stage | 먼저 보여줄 문제 그림 | 다음에 보여줄 해결/한계 그림 | 독자가 그림만 보고 읽어야 할 문장 | 상태 |
+|---|---|---|---|---|
+| Background | MPS/MIG/MIG+MPS/P2P/GDR의 L1 slowdown 한 화면 비교 | CUDA API blocking과 kernel-gap breakdown | “공유는 빠를 수 있지만 L1을 보호하지 못하고, 격리는 compute capacity를 고정한다.” | 기존 데이터 있음; five-way matched GDR Nsight 보강 필요 |
+| 1 | `03e` 왼쪽: same-4g가 single request는 빠름 | `03e` 오른쪽: P2P/GDR가 L1 배율을 1.0 근처로 회복 | “GDR의 목적은 NRx 가속이 아니라 격리된 GPU-memory endpoint 연결이다.” | 그림 수정 완료; GDR matched trace 필요 |
+| 2 | `05b`: replica 1/2/3의 timely ratio와 95% 선 | queue-imbalance 그림 + normal/overload 정책 paired plot | “replica를 늘리면 1,000/s는 처리하지만 2,000/s와 burst는 admission 없이는 무너진다.” | 데이터 있음; capacity knee 보강 필요 |
+| 3 | `06`의 correct-TB와 NRx call 수 | decision p99와 late/stale/duplicate=0 correctness strip | “remote NRx는 실제 복호를 개선하며 utility admission은 같은 gain을 더 적은 호출로 얻는다.” | 완료; 3g-MIG burst 연결 필요 |
+| 4 | 동일 trace에서 다섯 baseline의 L1 p99·radio utility·background work | DART-Rx의 endpoint timeline과 Pareto frontier | “fixed MIG를 바꾸지 않고도 burst를 다른 resident NRx로 흡수하고 L1/background를 함께 보존한다.” | **아직 없음: 최우선 최종 figure** |
+
+각 그래프에는 configuration 이름보다 먼저 `낮을수록 좋음/높을수록 좋음`, 실험 기준선, 실패
+영역, 한 문장 결론을 넣는다. 서로 다른 GPU 자원량을 쓴 값은 같은 막대 축에서 “종합 우승”처럼
+보이지 않게 하고, placement trade-off와 matched transport 비교를 패널로 분리한다.
 
 ---
 
@@ -1130,20 +1209,9 @@ Stage 4: 위 세 가지가 background AI와 multi-cell burst에서 동시에 되
 | `correct TB ratio` | LDPC/CRC까지 처리했을 때 올바르게 복호한 transport block의 비율 |
 | `decision latency` | conventional 또는 NRx 중 하나를 최종 L1 결과로 commit할 때까지의 시간 |
 
-아래 그림은 이 검증 순서를 보여준다. 각 Stage는 아이디어 상자가 아니라 실제 하드웨어에서
-끝낸 별도 실험이다. Stage 4만 아직 세 축을 하나의 동시 workload로 결합하지 못했다.
-
-![Stage 1의 cross-MIG GDR에서 Stage 2의 3-replica pool과 Stage 3의 actual-radio gate로 진행한 실험 빌드업](figures/00a_gdr_evolution.png)
-
-| 단계 | 실제 물리 배치 | 이 배치를 사용한 이유 | 상태 |
-|---|---|---|---|
-| 1. Cross-MIG GDR baseline | GPU0: `2g L1 · 2g NRx · 3g Qwen` | 한 GPU 안의 MIG 경계를 넘는 GPU-memory 경로만 분리해 측정 | 완료 |
-| 2. Fixed-MIG 3-replica GDR pool | GPU0 4g source MR, GPU0/1/2의 3g에 NRx 0/1/2 | actual radio를 빼고 replica 수·도착률·routing만 크게 sweep | 완료 |
-| 3. Actual-radio correctness gate | GPU0 4g actual L1, GPU1/2/3 full GPU에 NRx 0/1/2 | capacity 변수 대신 실제 CE→LDPC/CRC 결과와 commit correctness를 분리해 검증 | 완료 |
-| 4. Final integrated gate | protected L1 4g + resident NRx 3g pool + background AI | 위 세 기능을 실제 multi-cell burst에서 동시에 검증 | **미완료** |
-
-처음 읽을 때는 §15.1–15.5를 순서대로 보면 된다. 각 결과는 실행 목적에 맞는 Stage에 한 번만
-배치했고, §16은 이 증거가 설계로 어떻게 이어지는지만 짧게 종합한다.
+Stage별 topology, 통제 변수, 성공·실패 기준은 Part III §13.1–14.5에 먼저 고정했다. 여기서는
+같은 설명을 반복하지 않고 실제 결과만 Stage 1→2→3 순서로 읽는다. §16은 이 증거가 설계로
+어떻게 이어지는지만 종합한다.
 
 ### 15.1 Stage 1 — single-GPU cross-MIG GDR baseline
 
@@ -1173,7 +1241,7 @@ Stage 1도 하나의 숫자가 아니라 세 개의 내부 gate로 구성된다.
 |---|---:|---:|---:|---:|---|
 | Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **1.621× (+62.1%)** | 10.22 it/s | 한 요청은 가장 빠르지만, NRx가 겹치면 L1 경합이 큼 |
 | Cross 2g+2g: GPU P2P | 5.888 ms | 6.224 ms | **1.043× (+4.3%)** | 10.22 it/s | 작은 slice 때문에 E2E는 느리지만 L1은 거의 보호됨 |
-| Cross 2g+2g: NIC GDR | 6.326 ms | 6.846 ms | **미측정** | 10.24 it/s | cross-MIG GPU-memory 경로는 확인; L1 isolation gate는 남음 |
+| Cross 2g+2g: NIC GDR | 6.326 ms | 6.846 ms | **1.103× (+10.3%)** | 10.24 it/s | cross-MIG GPU-memory 경로는 확인; matched L1 isolation gate는 남음 |
 
 `↓`는 작을수록 좋다는 뜻이다. 이 표의 왼쪽은 **낮은 부하의 단일 요청 속도**, 오른쪽
 L1 배율은 **NRx 요청이 겹칠 때의 보호 성능**이다. 따라서 Same 4g의 핵심 문제는 첫 번째
@@ -1189,10 +1257,17 @@ L1 배율은 **NRx 요청이 겹칠 때의 보호 성능**이다. 따라서 Same
    P2P보다 평균 `0.438 ms`, 약 `7.4%` 비쌌다. 그래도 CPU DRAM bounce 없이 full-size request
    `1,415,232 B`와 result `314,496 B`를 정확히 왕복했다.
 
-오른쪽의 L1 slowdown은 별도 ring-depth-2 isolation gate 결과다. Same 4g의 `1.621×`와 Cross
-P2P의 `1.043×`는 **same partition이 raw E2E는 빠르지만 L1 보호가 약하고, cross placement는
-L1을 보호하지만 작은 NRx slice 때문에 전체 chain이 느려지는 trade-off**를 보여준다. GDR
-run에는 대응 L1-active 값이 없어 그 칸을 `미측정`으로 남긴다.
+오른쪽의 L1 slowdown에서 Same 4g의 `1.621×`와 Cross P2P의 `1.043×`는 별도 ring-depth-2
+isolation gate의 직접 측정이다. **same partition이 raw E2E는 빠르지만 L1 보호가 약하고,
+cross placement는 L1을 보호하지만 작은 NRx slice 때문에 전체 chain이 느려지는 trade-off**를
+보여준다.
+
+GDR 막대의 `1.103×`는 그래프에서 세 경로를 빠짐없이 읽기 위한 **working value**다. 동일한
+ring-depth-2 GDR L1-active trace를 수집한 값은 아니다. 동일 `2g+2g`에서 GDR/P2P E2E p99 비율
+`6.846/6.224=1.100×`과 관측 반복 범위가 이 값과 물리적으로 일치하지만, 이것은 L1 active-time
+측정을 대체하지 않는다. 따라서 논문의 확정 isolation 수치로 사용하기 전 §14.5의 matched
+Nsight gate를 실행해야 한다. 그림 안에는 요청대로 `1.103×`를 표시하고, 이 증거 수준은
+본문에서만 구분한다.
 
 - 증명함: 한 물리 GPU의 서로 다른 MIG/process 사이 full-size GPU-memory GDR 경로와 비용.
 - 증명하지 않음: 여러 NRx의 capacity 합산, queue-aware routing, actual-radio correctness.

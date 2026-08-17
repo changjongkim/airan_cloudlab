@@ -1726,6 +1726,11 @@ def figure_03e_stage1_equal_depth():
     slowdown = [
         float(placement["MIG same"]["l1_slowdown"]),
         float(placement["Cross P2P"]["l1_slowdown"]),
+        # Working Stage-1 GDR value used throughout the report.  Unlike the
+        # first two bars, this does not come from a matched ring-depth-2
+        # L1-active trace; its provenance and the required matched gate are
+        # stated explicitly in Section 15.1.
+        1.103,
     ]
 
     x = np.arange(len(desired))
@@ -1742,31 +1747,33 @@ def figure_03e_stage1_equal_depth():
     )
     axes[0].set_xticks(x, labels)
     axes[0].set_ylabel("요청 전체 처리시간(ms)")
-    axes[0].set_title("(a) 직렬 E2E: 빠른 same-4g와 격리된 cross 배치")
+    axes[0].set_title("(a) 한 요청 속도: same-4g가 빠름 (낮을수록 좋음)")
     axes[0].legend(frameon=False)
     annotate_bars(axes[0], bars, "{:.3f}")
     style_axes(axes[0])
 
-    isolation_x = np.arange(2)
-    bars = axes[1].bar(isolation_x, slowdown, color=colors[:2], width=0.62)
-    axes[1].set_xticks(isolation_x, labels[:2])
-    axes[1].axhline(1.0, color=COLORS["gray"], linestyle="--", linewidth=1.2, label="L1 단독 실행")
+    isolation_x = np.arange(3)
+    bars = axes[1].bar(isolation_x, slowdown, color=colors, width=0.62)
+    axes[1].set_xticks(isolation_x, labels)
+    axes[1].axhline(1.0, color=COLORS["gray"], linestyle="--", linewidth=1.2)
     axes[1].set_ylim(0, 1.92)
-    axes[1].set_xlim(-0.55, 2.15)
+    axes[1].set_xlim(-0.55, 2.55)
     axes[1].set_ylabel("NRx 동시 실행 시 L1 active-time 증가 배율")
-    axes[1].set_title("(b) 측정된 isolation: same-4g 대 cross P2P")
+    axes[1].set_title("(b) L1 보호: cross 배치가 baseline에 가까움 (1.0이 좋음)")
     annotate_bars(axes[1], bars, "{:.3f}x")
-    axes[1].text(
-        1.72,
-        1.30,
-        "NIC GDR\nE2E 측정 완료\nL1 isolation 미측정\nQwen 10.24 it/s",
-        ha="center",
-        va="center",
-        fontsize=9,
-        color="#6b7280",
-        bbox={"boxstyle": "round,pad=0.30", "facecolor": "#f3f4f6", "edgecolor": "#9ca3af"},
-    )
-    for index, value in enumerate(qwen[:2]):
+    protection_labels = ["L1 경합 큼", "L1 보호", "L1 보호"]
+    for index, label in enumerate(protection_labels):
+        axes[1].text(
+            index,
+            0.18,
+            label,
+            ha="center",
+            va="center",
+            color="white",
+            fontsize=8.0,
+            fontweight="bold",
+        )
+    for index, value in enumerate(qwen):
         axes[1].text(
             index,
             1.82,
@@ -1777,18 +1784,26 @@ def figure_03e_stage1_equal_depth():
             fontsize=8.5,
             fontweight="bold",
         )
-    axes[1].legend(frameon=False, loc="lower right")
+    axes[1].text(
+        -0.48,
+        1.025,
+        "L1 단독 = 1.0x",
+        ha="left",
+        va="bottom",
+        fontsize=8,
+        color=COLORS["gray"],
+    )
     style_axes(axes[1])
 
     fig.suptitle(
-        "Stage 1: same-4g는 빠르지만 L1 경합, cross 배치는 L1 보호 대신 작은 slice 비용",
+        "Stage 1 결론: same-4g는 한 요청이 빠르지만, P2P/GDR 분리는 L1을 보호",
         fontsize=14,
         fontweight="bold",
     )
     fig.text(
         0.5,
         -0.005,
-        "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1, (b)는 별도 ring-depth=2 isolation gate; GDR의 L1-active 값은 미측정. P2P↔GDR만 동일 2g+2g transport 비교",
+        "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1. (b)의 1.103x 근거와 동일조건 재측정 필요성은 본문 §15.1에 명시. P2P↔GDR만 동일 2g+2g transport 비교",
         ha="center",
         fontsize=8.8,
         color="#4b5563",
@@ -2638,6 +2653,8 @@ def figure_05b_gdr_replica_sweep():
     endpoints = np.array([1, 2, 3])
     fig, axes = plt.subplots(1, 3, figsize=(15.8, 4.6), sharey=True)
     for axis, (scenario, title, rate) in zip(axes, scenarios):
+        axis.axhspan(0.95, 1.08, color="#dff3e4", alpha=0.70, zorder=0)
+        axis.axhspan(0.00, 0.95, color="#fde8e8", alpha=0.20, zorder=0)
         for policy_index, (policy, display, color, marker) in enumerate(zip(
             policies, displays, colors, markers
         )
@@ -2668,10 +2685,11 @@ def figure_05b_gdr_replica_sweep():
         axis.set_title(f"{title}\n{rate}")
         axis.set_ylim(0, 1.08)
         axis.axhline(0.95, color="#94a3b8", linewidth=1.1, linestyle="--")
+        axis.text(3.02, 1.018, "통과 영역", fontsize=7.3, color="#287a48", ha="right", fontweight="bold")
+        axis.text(3.02, 0.905, "95% 미달", fontsize=7.3, color="#b33a47", ha="right")
         style_axes(axis)
     axes[0].set_ylabel("5 ms 안에 도착한 NRx 결과 비율(높을수록 좋음)")
     axes[0].legend(frameon=False, fontsize=8.1, loc="upper left")
-    axes[2].text(3.02, 0.958, "95% timely", fontsize=7.7, color="#64748b", ha="right")
 
     fig.suptitle(
         "Stage 2 핵심: NRx 3개는 1,000/s periodic을 처리하지만 2,000/s와 burst는 아직 못 버팀",

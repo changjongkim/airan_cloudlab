@@ -357,13 +357,17 @@ EN = {
     "같은 4g\nL1+NRx": "Same 4g\nL1+NRx",
     "분리된 2g+2g\nGPU P2P": "Separate 2g+2g\nGPU P2P",
     "분리된 2g+2g\nNIC GDR": "Separate 2g+2g\nNIC GDR",
-    "(a) 같은 queue depth=1에서 transport 비교": "(a) Transport at the same queue depth of one",
-    "완료한 slot/s": "Completed slots/s",
-    "(b) 직렬 dependency path의 완료 처리량": "(b) Completion rate of the serial dependency path",
-    "Stage 1: NIC GDR는 cross-MIG GPU-memory 경로를 열지만 P2P보다 평균 0.438 ms 추가":
-        "Stage 1: NIC GDR enables a cross-MIG GPU-memory path at 0.438 ms mean overhead vs. P2P",
-    "실험 범위: optimized direct TensorRT, request 1,415,232 B / result 314,496 B, Qwen은 별도 3g에서 약 10.22~10.24 iter/s; 같은 4g와 2g+2g는 동일 SM 비교가 아님":
-        "Scope: optimized direct TensorRT; 1,415,232-B request / 314,496-B result; Qwen runs on a separate 3g at 10.22-10.24 iter/s; same-4g and 2g+2g are not equal-SM configurations",
+    "(a) 직렬 E2E: 빠른 same-4g와 격리된 cross 배치":
+        "(a) Serial E2E: fast same-4g versus isolated cross placement",
+    "L1 단독 실행": "L1 alone",
+    "NRx 동시 실행 시 L1 active-time 증가 배율": "L1 active-time multiplier with concurrent NRx",
+    "(b) 별도 isolation gate: cross P2P가 L1을 보호":
+        "(b) Separate isolation gate: cross P2P protects L1",
+    "L1 active\n미측정": "L1 active\nnot measured",
+    "Stage 1: same-4g는 빠르지만 L1 경합, cross 배치는 L1 보호 대신 작은 slice 비용":
+        "Stage 1: same-4g is fast but contended; cross placement protects L1 at a slice-capacity cost",
+    "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1, (b)는 별도 ring-depth=2 isolation gate; GDR의 L1-active 값은 미측정. P2P↔GDR만 동일 2g+2g transport 비교":
+        "Qwen runs on a separate 3g in every configuration. (a) uses depth 1; (b) is a separate ring-depth-2 isolation gate. GDR L1-active time was not measured. Only P2P vs. GDR is an equal 2g+2g transport comparison.",
     "순서대로 분배": "Round-robin",
     "예상 완료가 가장 빠른 곳": "Earliest predicted finish",
     "완료 예측 + tail guard": "Predicted finish + tail guard",

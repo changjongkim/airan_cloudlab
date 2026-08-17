@@ -1703,10 +1703,11 @@ def figure_03_placement_and_transport():
 
 
 def figure_03e_stage1_equal_depth():
-    """Stage-1 controlled comparison with the same request/response depth."""
+    """Stage-1 placement/transport trade-off plus the separately measured L1 isolation effect."""
 
     rows = read_csv(PLACEMENT / "DEPTH1_TRANSPORT_COMPARISON.csv")
     by_name = {row["config"]: row for row in rows}
+    placement = _placement_rows()
     desired = [
         "MIG same depth 1",
         "Cross P2P depth 1",
@@ -1721,11 +1722,12 @@ def figure_03e_stage1_equal_depth():
     colors = [COLORS["blue"], COLORS["cyan"], COLORS["green"]]
     means = [float(by_name[name]["e2e_mean_ms"]) for name in desired]
     p99s = [float(by_name[name]["e2e_p99_ms"]) for name in desired]
-    throughput = [
-        float(by_name[name]["completion_throughput_slots_s"])
-        for name in desired
+    qwen = [float(by_name[name]["qwen_itps"]) for name in desired]
+    slowdown = [
+        float(placement["MIG same"]["l1_slowdown"]),
+        float(placement["Cross P2P"]["l1_slowdown"]),
+        np.nan,
     ]
-    trials = [int(by_name[name]["n_trials"]) for name in desired]
 
     x = np.arange(len(desired))
     fig, axes = plt.subplots(1, 2, figsize=(12.8, 4.7))
@@ -1741,38 +1743,51 @@ def figure_03e_stage1_equal_depth():
     )
     axes[0].set_xticks(x, labels)
     axes[0].set_ylabel("요청 전체 처리시간(ms)")
-    axes[0].set_title("(a) 같은 queue depth=1에서 transport 비교")
+    axes[0].set_title("(a) 직렬 E2E: 빠른 same-4g와 격리된 cross 배치")
     axes[0].legend(frameon=False)
     annotate_bars(axes[0], bars, "{:.3f}")
     style_axes(axes[0])
 
-    bars = axes[1].bar(x, throughput, color=colors, width=0.62)
+    bars = axes[1].bar(x, slowdown, color=colors, width=0.62)
     axes[1].set_xticks(x, labels)
-    axes[1].set_ylabel("완료한 slot/s")
-    axes[1].set_title("(b) 직렬 dependency path의 완료 처리량")
-    annotate_bars(axes[1], bars, "{:.1f}")
-    for index, count in enumerate(trials):
+    axes[1].axhline(1.0, color=COLORS["gray"], linestyle="--", linewidth=1.2, label="L1 단독 실행")
+    axes[1].set_ylim(0, 1.92)
+    axes[1].set_ylabel("NRx 동시 실행 시 L1 active-time 증가 배율")
+    axes[1].set_title("(b) 별도 isolation gate: cross P2P가 L1을 보호")
+    annotate_bars(axes[1], bars[:2], "{:.3f}x")
+    axes[1].text(
+        x[2],
+        0.86,
+        "L1 active\n미측정",
+        ha="center",
+        va="center",
+        fontsize=9,
+        color="#6b7280",
+        bbox={"boxstyle": "round,pad=0.30", "facecolor": "#f3f4f6", "edgecolor": "#9ca3af"},
+    )
+    for index, value in enumerate(qwen):
         axes[1].text(
             index,
-            throughput[index] * 0.54,
-            f"{count}회",
+            1.82,
+            f"Qwen {value:.2f} it/s",
             ha="center",
             va="center",
-            color="white",
-            fontsize=9,
+            color="#374151",
+            fontsize=8.5,
             fontweight="bold",
         )
+    axes[1].legend(frameon=False, loc="lower right")
     style_axes(axes[1])
 
     fig.suptitle(
-        "Stage 1: NIC GDR는 cross-MIG GPU-memory 경로를 열지만 P2P보다 평균 0.438 ms 추가",
+        "Stage 1: same-4g는 빠르지만 L1 경합, cross 배치는 L1 보호 대신 작은 slice 비용",
         fontsize=14,
         fontweight="bold",
     )
     fig.text(
         0.5,
         -0.005,
-        "실험 범위: optimized direct TensorRT, request 1,415,232 B / result 314,496 B, Qwen은 별도 3g에서 약 10.22~10.24 iter/s; 같은 4g와 2g+2g는 동일 SM 비교가 아님",
+        "모든 구성에서 Qwen은 별도 3g에 상주. (a)는 depth=1, (b)는 별도 ring-depth=2 isolation gate; GDR의 L1-active 값은 미측정. P2P↔GDR만 동일 2g+2g transport 비교",
         ha="center",
         fontsize=8.8,
         color="#4b5563",

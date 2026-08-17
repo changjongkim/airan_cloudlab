@@ -841,41 +841,53 @@ Stage 4: 위 세 가지가 background AI와 multi-cell burst에서 동시에 되
 
 ### 15.1 Stage 1 — single-GPU cross-MIG GDR baseline
 
-**목적.** 첫 단계는 scheduler 성능이 아니라 data-path feasibility를 분리한다. 한 A100의 2g
-MIG에는 L1, 다른 2g MIG에는 NRx, 남은 3g에는 Qwen을 두었다. MIG 사이 CUDA P2P/IPC가
-허용되는 특수 경로와 ConnectX-6 Dx NIC loopback GDR를 같은 queue depth 1에서 비교했다.
-GDR 경로는 `1,415,232 B` request와 `314,496 B` result를 GPU MR 사이에서 옮기며 CPU DRAM
-payload staging을 사용하지 않았다.
+**목적.** Stage 1은 사실 두 질문을 분리한다. 먼저 `L1+NRx`가 같은 4g를 쓰는 빠른 local
+배치와, L1·NRx를 각각 2g로 나눈 cross 배치의 **속도 대 격리 trade-off**를 본다. 그 다음
+cross `2g+2g` 배치를 고정하고 GPU P2P와 ConnectX-6 Dx NIC-loopback GDR의 전송비용만
+비교한다. 세 구성 모두 남은 별도 3g MIG에서 Qwen을 동시에 실행했으며 처리량은
+`10.22–10.24 it/s`로 같았다.
 
-> **쉽게 말하면:** Stage 1은 “도로 하나가 실제로 열리는가?”를 확인한다. P2P와 GDR 중
-> 어느 연결이 같은 조건에서 얼마가 드는지는 비교하지만, 아직 여러 NRx를 스케줄하지 않는다.
-> 이 Stage의 성공 기준은 GDR가 P2P를 이기는 것이 아니라, MIG 격리를 유지하면서 full-size
-> tensor가 CPU DRAM bounce 없이 정확히 왕복하는 것이다.
+> **쉽게 말하면:** 같은 4g가 한 요청은 가장 빨리 끝냈다. 그러나 그 안에서는 L1과 NRx가
+> 경합해 L1 active time이 단독 실행의 `1.621×`가 됐다. Cross P2P는 chain 전체는 느려졌지만
+> L1 slowdown을 `1.043×`로 회복했다. GDR의 역할은 NRx 계산을 빠르게 만드는 것이 아니라,
+> P2P를 쓸 수 없는 격리 배치에도 GPU-memory 경로를 제공하는 것이다.
 
 Stage 1도 하나의 숫자가 아니라 세 개의 내부 gate로 구성된다.
 
 | 내부 gate | 반복 | 통제한 변수 | 사용 목적 |
 |---|---:|---|---|
 | Direct-GDR correctness | 2 repeats | optimized TensorRT contract와 실제 GPU MR request/result | CPU payload staging 없이 양방향 결과가 일치하는지 확인 |
-| Equal-depth transport | P2P 3회, GDR 2회 | P2P와 GDR 모두 queue depth 1 | transport 방식의 E2E 비용을 공정하게 비교 |
-| Ring-depth-2 isolation | P2P 3회 | L1 alone vs cross-P2P, 동일 2g L1 | NRx를 다른 compute queue로 분리했을 때 L1 active slowdown 측정 |
+| Equal-depth placement | same 4g 3회, P2P 3회, GDR 2회 | 모두 queue depth 1, Qwen은 별도 3g | local 속도와 cross 배치 비용을 함께 표시 |
+| Equal-depth transport | P2P 3회, GDR 2회 | 동일한 cross `2g+2g`; 전송 방식만 변경 | P2P와 GDR의 비용을 공정하게 비교 |
+| Ring-depth-2 isolation | same 4g 3회, cross-P2P 3회 | 각 배치의 L1-alone baseline으로 정규화 | NRx를 다른 compute queue로 분리했을 때 L1 보호 효과 측정 |
 
 ![Stage 1의 동일 queue-depth P2P/GDR 비교](figures/03e_stage1_equal_depth.png)
 
-| Cross-MIG transport | E2E mean | E2E p99 | slot throughput | Qwen | transport mean |
+| 배치와 transport | E2E mean | E2E p99 | 직렬 완료율 | Qwen | 직접 transport |
 |---|---:|---:|---:|---:|---:|
+| Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **300.250 slot/s** | 10.22 it/s | 없음 |
 | GPU P2P | **5.888 ms** | 6.224 ms | 169.804 slot/s | 10.22 it/s | 76.547 µs |
 | NIC GDR loopback | 6.326 ms | 6.846 ms | 158.095 slot/s | 10.24 it/s | E2E 차이에 포함 |
 
-GDR의 평균 E2E 비용은 P2P보다 `0.438 ms`, 약 `7.4%` 컸다. 그러나 pipeline은 여전히 6 ms
-수준이고 이후 overload queue tail은 수백–수천 ms까지 증가한다. 따라서 이 단계의 결론은
-“NIC가 P2P보다 빠르다”가 아니다. **CPU bounce 없이 격리된 endpoint를 연결할 수 있고,
-transport보다 NRx service time과 queue가 더 큰 다음 병목**이라는 것이다.
+이 표는 두 가지로 나눠 읽어야 한다.
+
+1. **Same 4g 대 cross 2g+2g는 transport만의 비교가 아니다.** Same 4g에서는 두 stage가
+   큰 4g를 공유하지만 cross에서는 L1과 NRx가 각각 2g로 제한된다. Cross P2P의 직접 전송은
+   평균 `76.547 µs`뿐인데 E2E는 `2.550 ms` 증가했다. 주원인은 NIC/P2P가 아니라 작은 slice에서
+   L1과 특히 NRx compute가 느려진 것이다.
+2. **P2P 대 GDR만 공정한 transport 비교다.** 동일한 cross `2g+2g`, depth 1에서 GDR는
+   P2P보다 평균 `0.438 ms`, 약 `7.4%` 비쌌다. 그래도 CPU DRAM bounce 없이 full-size request
+   `1,415,232 B`와 result `314,496 B`를 정확히 왕복했다.
+
+오른쪽의 L1 slowdown은 별도 ring-depth-2 isolation gate 결과다. Same 4g의 `1.621×`와 Cross
+P2P의 `1.043×`는 **same partition이 raw E2E는 빠르지만 L1 보호가 약하고, cross placement는
+L1을 보호하지만 작은 NRx slice 때문에 전체 chain이 느려지는 trade-off**를 보여준다. GDR
+run에는 대응 L1-active 값이 없어 그 칸을 `미측정`으로 남긴다.
 
 - 증명함: 한 물리 GPU의 서로 다른 MIG/process 사이 full-size GPU-memory GDR 경로와 비용.
 - 증명하지 않음: 여러 NRx의 capacity 합산, queue-aware routing, actual-radio correctness.
-- 주의: main ring-depth-2 P2P run에서는 L1 active slowdown `1.043×`를 측정했지만, 해당 GDR
-  run에는 대응 L1-active 값이 없다. GDR도 동일 slowdown이라고 추정하지 않는다.
+- 주의: depth 1의 `slot/s`는 한 요청씩 직렬 처리한 E2E의 역수에 가깝다. 여러 endpoint의
+  concurrent pool capacity는 Stage 2에서 별도로 평가한다.
 
 ### 15.2 Stage 2 — fixed-MIG NRx 3-replica GDR pool
 

@@ -823,42 +823,53 @@ routing, and radio utility.
 
 ### 15.1 Stage 1 — single-GPU cross-MIG GDR baseline
 
-**Purpose.** The first stage isolates data-path feasibility from scheduler behavior. L1 occupies one
-2g MIG, NRx occupies another 2g MIG, and Qwen occupies the remaining 3g on one A100. We compare an
-available CUDA P2P/IPC path with ConnectX-6 Dx NIC-loopback GDR at the same queue depth of one. The
-GDR path transfers a `1,415,232 B` request and a `314,496 B` result between GPU MRs without CPU-DRAM
-payload staging.
+**Purpose.** Stage 1 separates two questions. It first contrasts a fast local placement, where L1
+and NRx share one 4g, with cross placement, where L1 and NRx each receive a 2g, exposing the
+**speed-versus-isolation trade-off**. It then holds cross `2g+2g` fixed and changes only the transport
+between GPU P2P and ConnectX-6 Dx NIC-loopback GDR. Every configuration concurrently ran Qwen in the
+remaining separate 3g MIG at `10.22–10.24 it/s`.
 
-> **In plain language:** Stage 1 asks whether one road actually works. It compares P2P and GDR under
-> equal conditions, but it does not yet schedule several NRx workers. Success does not require GDR
-> to beat P2P; it requires correct full-size tensor exchange across retained isolation without a
-> CPU-DRAM bounce.
+> **In plain language:** Same-4g completed one request fastest, but L1 and NRx contended inside it,
+> raising L1 active time to `1.621×` its alone baseline. Cross P2P made the whole chain slower but
+> restored L1 slowdown to `1.043×`. GDR is not intended to accelerate NRx compute; it provides a
+> GPU-memory path to isolated placements where P2P cannot be used.
 
 Stage 1 itself consists of three internal gates rather than one number.
 
 | Internal gate | Repetitions | Controlled variable | Purpose |
 |---|---:|---|---|
 | Direct-GDR correctness | 2 repeats | Optimized TensorRT contract and real GPU-MR request/result | Verify bidirectional results without CPU payload staging |
-| Equal-depth transport | 3 P2P, 2 GDR | Queue depth one for both P2P and GDR | Compare E2E transport cost fairly |
-| Ring-depth-2 isolation | 3 P2P | L1-alone versus cross-P2P on the same 2g L1 | Measure L1 active slowdown after moving NRx to another compute queue |
+| Equal-depth placement | 3 same-4g, 3 P2P, 2 GDR | Queue depth one for all; Qwen on a separate 3g | Display local speed and cross-placement cost |
+| Equal-depth transport | 3 P2P, 2 GDR | Identical cross `2g+2g`; transport only changes | Compare P2P and GDR cost fairly |
+| Ring-depth-2 isolation | 3 same-4g, 3 cross-P2P | Normalize each placement to its own L1-alone baseline | Measure L1 protection after separating the compute queues |
 
 ![Stage 1 P2P/GDR comparison at the same queue depth](figures_en/03e_stage1_equal_depth.png)
 
-| Cross-MIG transport | E2E mean | E2E p99 | Slot throughput | Qwen | Transport mean |
+| Placement and transport | E2E mean | E2E p99 | Serial completion rate | Qwen | Direct transport |
 |---|---:|---:|---:|---:|---:|
+| Same 4g: L1+NRx | **3.338 ms** | **3.501 ms** | **300.250 slot/s** | 10.22 it/s | None |
 | GPU P2P | **5.888 ms** | 6.224 ms | 169.804 slot/s | 10.22 it/s | 76.547 µs |
 | NIC GDR loopback | 6.326 ms | 6.846 ms | 158.095 slot/s | 10.24 it/s | Included in E2E difference |
 
-GDR added `0.438 ms`, about `7.4%`, to mean E2E latency relative to P2P. The pipeline nevertheless
-remained near 6 ms, while overload tails in later experiments grew to hundreds or thousands of
-milliseconds. The conclusion is not that NIC GDR is faster than P2P. It is that **isolated endpoints
-can communicate without a CPU bounce, and the next dominant problem is NRx service time and
-queueing rather than transport alone.**
+This table must be read as two comparisons.
+
+1. **Same-4g versus cross-2g+2g is not a transport-only comparison.** Same-4g lets both stages share
+   the larger 4g, whereas cross placement caps each stage at 2g. Direct P2P transport averaged only
+   `76.547 µs`, while E2E increased by `2.550 ms`; smaller-slice L1 and especially NRx compute caused
+   most of the loss.
+2. **Only P2P versus GDR is a controlled transport comparison.** At identical cross `2g+2g` and depth
+   one, GDR cost `0.438 ms` or `7.4%` more than P2P, while correctly exchanging the full-size
+   `1,415,232 B` request and `314,496 B` result without a CPU-DRAM bounce.
+
+The right panel uses the separate ring-depth-2 isolation gate. Same-4g at `1.621×` versus cross P2P
+at `1.043×` shows the real trade-off: **same partition wins raw E2E but weakens L1 protection; cross
+placement protects L1 but loses chain speed to the smaller NRx slice.** No corresponding GDR
+L1-active measurement exists, so the figure marks it as not measured.
 
 - Proves: full-size GPU-memory GDR and its cost across separate MIGs/processes on one physical GPU.
 - Does not prove: aggregate multi-NRx capacity, queue-aware routing, or actual-radio correctness.
-- Caveat: the main ring-depth-2 P2P run measured L1 active slowdown of `1.043×`; no corresponding
-  L1-active value exists for that GDR run, so the same slowdown is not inferred.
+- Caveat: at depth one, `slot/s` is approximately the inverse of serial E2E latency. Concurrent
+  multi-endpoint pool capacity is evaluated separately in Stage 2.
 
 ### 15.2 Stage 2 — fixed-MIG three-replica GDR pool
 

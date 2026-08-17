@@ -517,6 +517,56 @@ Performance differences are measured for every approach. Exact CUDA-call causali
 shown only for same-MIG co-location and the GDR vertical slice. Paired Nsight captures remain a
 required follow-up for the other three conditions.
 
+#### Required five-way paired host-blocking gate
+
+The final mechanism analysis needs **one matched CUDA-call figure for Full MPS, MIG local,
+MIG+MPS, Cross P2P, and Cross NIC GDR.** Existing 30-second same-MIG captures and the actual-radio
+GDR capture must not be placed in one bar chart: their code path, cell count, process boundary, and
+capture duration give them different denominators.
+
+A fair paired gate must fix the following conditions.
+
+| Controlled item | Required condition |
+|---|---|
+| L1/NRx code | The same optimized direct-TensorRT, caller-owned-buffer, CUDA-Graph path |
+| Requests | One preserved arrival trace and identical request/result tensor sizes |
+| Load | A common stable point at `180 requests/s` and a pressure point at `250 requests/s` |
+| Background | Paired off/on runs; on-runs target approximately `10.2 Qwen it/s` |
+| Repetition | 30 seconds × 3 trials per condition; exclude cold initialization and shutdown |
+| Baselines | Separate L1-alone captures for full GPU, 4g L1, and 2g L1; normalize within geometry |
+| Nsight scope | `cuda,nvtx,osrt`; NVTX ranges for L1 front, transport publish/wait, NRx, L1 back, and commit |
+
+One aggregate API total would still be ambiguous. The final analysis should contain three panels:
+
+1. **L1-coordinator host-blocked time per slot:** divide time inside tracked CUDA APIs by completed
+   slots and also report slowdown relative to the matching-geometry L1-alone baseline.
+2. **Which API absorbed the wait:** stacked decomposition of `cudaFree`, `cudaMemcpyAsync`,
+   `cudaStream/Event/DeviceSynchronize`, `cudaDeviceFlushGPUDirectRDMAWrites`, launch, and other.
+   Preserve call count and call-duration p50/p95/p99 in the companion CSV.
+3. **Where the wait occurred in the pipeline:** attribute API intervals to L1 front, local NRx, P2P
+   copy, GDR publish/completion, and L1 back/commit using NVTX timestamps; measure temporal overlap
+   between L1 GPU idle gaps and host API intervals.
+
+Process structure must be handled explicitly. MPS and GDR use separate L1-producer and NRx-consumer
+captures, with the **L1 coordinator as the primary metric** and NRx-side APIs in a separate
+supporting panel. MIG local and the current P2P path execute in one process, so NVTX range and
+thread/timestamp attribution must separate L1 and NRx phases. Summing two processes' cumulative
+times would be invalid.
+
+The hypotheses to test are listed below; they are not conclusions until this gate runs.
+
+| Placement | Host-blocking hypothesis to test |
+|---|---|
+| Full MPS | Co-tenant work surfaces at L1 synchronization/free/copy dependency points |
+| MIG local | Sibling Qwen is isolated, but outstanding NRx work in the same 4g increases L1 API wait |
+| MIG+MPS | Client quotas either reduce total wait or merely move it between APIs |
+| Cross P2P | L1 API wait approaches the 2g L1-alone baseline, leaving explicit peer-copy completion |
+| Cross NIC GDR | Remote NRx compute leaves the L1 CUDA queue; GDR flush/completion and local conversion waits remain |
+
+The current `03d_cuda_host_blocking` figure is therefore **causal evidence that host blocking exists
+and migrates between API boundaries**, not a five-way winner chart. Only the matched capture can
+quantify, on one denominator, which L1 host waits P2P/GDR separation removes.
+
 ## 4. Direct evidence that the problem exists
 
 This figure is a **compute/queue experiment that isolates why requests must be routed across NRx

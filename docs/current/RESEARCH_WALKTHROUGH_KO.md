@@ -530,6 +530,58 @@ latency가 아니며 exact direct-TensorRT five-way configuration도 아니므�
 CUDA call이 원인인가”는 MIG co-location과 GDR vertical slice만 직접 증명된 상태다. 나머지
 세 조건의 paired Nsight는 결과를 보강하기 위한 필수 후속 실험이다.
 
+#### 반드시 추가할 5-way paired host-blocking gate
+
+논문의 최종 원인 분석에는 **Full MPS, MIG local, MIG+MPS, Cross P2P, Cross NIC GDR를
+동일한 Nsight 조건으로 다시 측정한 한 장의 5-way CUDA-call figure가 필요하다.** 기존
+same-MIG 30초 capture와 actual-radio GDR capture를 한 막대그래프에 넣으면 안 된다. 실행
+경로, cell 수, process 경계, capture 길이가 달라서 API 누적시간의 분모가 다르기 때문이다.
+
+공정한 paired gate는 다음 조건을 고정해야 한다.
+
+| 고정 항목 | 조건 |
+|---|---|
+| L1/NRx 코드 | 같은 optimized direct-TensorRT, caller-owned buffer, CUDA Graph 경로 |
+| 요청 | 같은 보존 arrival trace와 같은 request/result 크기 |
+| 부하 | 공통 안정점 `180 requests/s`와 queue pressure가 드러나는 `250 requests/s`를 각각 측정 |
+| Background | off/on을 paired로 두고, on에서는 Qwen throughput을 약 `10.2 it/s`로 맞춤 |
+| 반복 | 각 조건 30초 × 3 trials; cold initialization과 shutdown은 steady window에서 제외 |
+| 기준선 | full GPU, 4g L1, 2g L1 각각의 L1-alone capture를 따로 측정해 동일 geometry 기준으로 정규화 |
+| Nsight 범위 | `cuda,nvtx,osrt`; L1 front, transport publish/wait, NRx, L1 back, commit NVTX range |
+
+특히 총 API 시간 하나만 비교하면 또 오해가 생긴다. 최종 분석은 다음 세 패널로 보여줘야
+한다.
+
+1. **L1 coordinator의 host-blocked time/slot:** 주요 CUDA API 안에 머문 시간을 완료 slot
+   수로 나누고, 같은 geometry의 L1-alone 대비 배율도 함께 표시한다.
+2. **어느 API가 기다림을 떠안았는가:** `cudaFree`, `cudaMemcpyAsync`,
+   `cudaStream/Event/DeviceSynchronize`, `cudaDeviceFlushGPUDirectRDMAWrites`, launch/other를
+   stacked bar로 분해한다. 호출 횟수와 call-duration p50/p95/p99도 별도 CSV에 남긴다.
+3. **기다림이 어느 pipeline 단계에 있었는가:** NVTX timestamp로 각 API를 L1 front,
+   local NRx, P2P copy, GDR publish/completion, L1 back/commit에 귀속하고, L1 GPU idle gap과
+   host API interval의 시간 overlap을 계산한다.
+
+process 구조가 다른 것도 그대로 다뤄야 한다. MPS와 GDR는 L1 producer와 NRx consumer를
+별도 process로 capture하고 **L1 coordinator 결과를 주 지표**로 사용한다. NRx-side API는
+보조 패널로 분리한다. MIG local과 현재 P2P는 한 process 안에서 실행되므로 NVTX range와
+thread/timestamp를 이용해 L1 phase와 NRx phase를 분리한다. 두 process의 누적시간을 단순히
+더하면 안 된다.
+
+이 gate에서 확인할 가설은 다음과 같지만, 결과가 나오기 전에는 결론으로 쓰지 않는다.
+
+| 방식 | 검증할 host-blocking 가설 |
+|---|---|
+| Full MPS | co-tenant work가 L1의 sync/free/copy dependency 지점에 나타나는가? |
+| MIG local | sibling Qwen은 격리돼도 같은 4g의 NRx outstanding work가 L1 API wait를 늘리는가? |
+| MIG+MPS | client quota가 wait 총량을 줄이는가, 아니면 API 사이에서 위치만 이동시키는가? |
+| Cross P2P | L1 API wait가 2g L1-alone에 가까워지고 명시적 peer-copy completion만 남는가? |
+| Cross NIC GDR | remote NRx compute wait가 L1 CUDA queue에서 분리되고 GDR flush/completion 및 local conversion wait로 바뀌는가? |
+
+따라서 현재 `03d_cuda_host_blocking`은 **host blocking이 실제 존재하며 API 이름을 바꿔도
+대기가 이동한다는 causal evidence**이고, 아직 5-way 승자 그래프가 아니다. 최종 5-way
+paired capture가 완료돼야 “P2P/GDR 분리가 L1 host thread의 어떤 blocking을 얼마나
+제거했는가”를 같은 분모로 주장할 수 있다.
+
 ## 4. 실제 problem existence: busy queue와 idle capacity가 동시에 존재한다
 
 이 절의 그림은 **전송 방식의 성능 그래프가 아니라, 왜 여러 NRx를 요청 단위로 선택해야

@@ -1797,6 +1797,202 @@ def figure_03e_stage1_equal_depth():
     save(fig, "03e_stage1_equal_depth.png")
 
 
+def figure_03f_fiveway_evidence_scorecard():
+    """Summarize the five placement families without inventing a common winner.
+
+    The available campaigns intentionally answer different questions.  This
+    scorecard keeps those conditions visible instead of putting unequal GPU
+    allocations and background conditions on one misleading capacity axis.
+    """
+
+    rows = [
+        {
+            "name": "Full MPS",
+            "placement": "full A100\nL1 · NRx · BG 공유",
+            "wall": "없음",
+            "background": "같은 GPU\nMPS share",
+            "evidence": "NRx process 1→8\nL1 p99 4.5×",
+            "reach": "한 GPU의\n공유 domain",
+            "role": "높은 활용률\n보호 없는 baseline",
+            "color": COLORS["orange"],
+            "wall_level": "bad",
+        },
+        {
+            "name": "MIG local",
+            "placement": "4g: L1+NRx\n3g: BG",
+            "wall": "L1↔NRx 없음\nsibling에는 있음",
+            "background": "sibling 3g\n격리",
+            "evidence": "NRx overlap\nL1 active 1.621×",
+            "reach": "같은 4g\n안에서만",
+            "role": "강한 sibling 격리\nlocality baseline",
+            "color": COLORS["blue"],
+            "wall_level": "mixed",
+        },
+        {
+            "name": "MIG+MPS local",
+            "placement": "4g 안 MPS\n3g: BG",
+            "wall": "L1↔NRx 없음\nshare만 조절",
+            "background": "sibling 3g\n격리",
+            "evidence": "NRx overlap\nL1 active 1.702×",
+            "reach": "같은 4g\n안에서만",
+            "role": "GI 내부 share\n조절 baseline",
+            "color": COLORS["purple"],
+            "wall_level": "mixed",
+        },
+        {
+            "name": "Cross P2P",
+            "placement": "2g L1 | 2g NRx\n3g: BG",
+            "wall": "있음",
+            "background": "sibling 3g\n격리",
+            "evidence": "NRx overlap\nL1 active 1.043×",
+            "reach": "같은 physical GPU의\npeer-capable MIG",
+            "role": "cross-MIG\n저비용 fast path",
+            "color": COLORS["cyan"],
+            "wall_level": "good",
+        },
+        {
+            "name": "NIC GDR",
+            "placement": "L1/NRx 분리\nGPU MR + NIC",
+            "wall": "있음",
+            "background": "sibling 또는\nremote domain",
+            "evidence": "P2P 대비 E2E\n+0.438 ms",
+            "reach": "다른 GPU · process\nRDMA endpoint",
+            "role": "DART-Rx의\ncross-GPU fabric",
+            "color": COLORS["green"],
+            "wall_level": "good",
+        },
+    ]
+
+    columns = [
+        ("방식", 0.135),
+        ("실제 배치", 0.160),
+        ("L1–NRx\n하드웨어 벽", 0.145),
+        ("Background AI", 0.135),
+        ("직접 실측 증거\n(실험 조건은 서로 다름)", 0.170),
+        ("NRx 도달 범위", 0.150),
+        ("이 연구에서의 역할", 0.190),
+    ]
+    total_width = sum(width for _, width in columns)
+    columns = [(label, width / total_width) for label, width in columns]
+    x_edges = np.concatenate(([0.0], np.cumsum([width for _, width in columns])))
+
+    fig = plt.figure(figsize=(16.4, 7.0))
+    axis = fig.add_axes([0.025, 0.145, 0.95, 0.70])
+    axis.set_xlim(0, 1)
+    axis.set_ylim(0, 1)
+    axis.axis("off")
+
+    header_height = 0.145
+    row_height = (1.0 - header_height) / len(rows)
+    header_color = "#17324d"
+    border_color = "#cbd5e1"
+
+    for index, (label, _) in enumerate(columns):
+        left, right = x_edges[index], x_edges[index + 1]
+        axis.add_patch(
+            Rectangle(
+                (left, 1 - header_height),
+                right - left,
+                header_height,
+                facecolor=header_color,
+                edgecolor="white",
+                linewidth=1.5,
+            )
+        )
+        axis.text(
+            (left + right) / 2,
+            1 - header_height / 2,
+            label,
+            ha="center",
+            va="center",
+            color="white",
+            fontsize=10.2,
+            fontweight="bold",
+        )
+
+    wall_faces = {
+        "bad": "#fde2e2",
+        "mixed": "#fff1cc",
+        "good": "#dff3e5",
+    }
+    for row_index, row in enumerate(rows):
+        top = 1 - header_height - row_index * row_height
+        bottom = top - row_height
+        background = "#f8fafc" if row_index % 2 == 0 else "#ffffff"
+        cell_values = [
+            row["name"],
+            row["placement"],
+            row["wall"],
+            row["background"],
+            row["evidence"],
+            row["reach"],
+            row["role"],
+        ]
+        for column_index, value in enumerate(cell_values):
+            left, right = x_edges[column_index], x_edges[column_index + 1]
+            face = wall_faces[row["wall_level"]] if column_index == 2 else background
+            axis.add_patch(
+                Rectangle(
+                    (left, bottom),
+                    right - left,
+                    row_height,
+                    facecolor=face,
+                    edgecolor=border_color,
+                    linewidth=1.0,
+                )
+            )
+            if column_index == 0:
+                axis.add_patch(
+                    Rectangle(
+                        (left, bottom),
+                        0.010,
+                        row_height,
+                        facecolor=row["color"],
+                        edgecolor="none",
+                    )
+                )
+            axis.text(
+                (left + right) / 2 + (0.004 if column_index == 0 else 0),
+                (top + bottom) / 2,
+                value,
+                ha="center",
+                va="center",
+                fontsize=9.6 if column_index else 10.5,
+                fontweight="bold" if column_index in (0, 2, 4) else "normal",
+                color="#172033",
+                linespacing=1.25,
+            )
+
+    fig.suptitle(
+        "다섯 방식 한눈에 보기: capacity 순위가 아니라 L1 보호 · 도달 범위 · 비용의 차이",
+        fontsize=16,
+        fontweight="bold",
+        y=0.965,
+    )
+    fig.text(
+        0.5,
+        0.095,
+        "핵심: MPS는 자원을 잘 쓰지만 L1 보호벽이 없고, MIG/MIG+MPS는 같은 GI 경합과 고정 capacity가 남는다. "
+        "P2P는 같은 GPU의 빠른 격리 경로, GDR는 다른 GPU까지 NRx pool을 확장하는 경로다.",
+        ha="center",
+        va="center",
+        fontsize=10.4,
+        color="#26374a",
+    )
+    fig.text(
+        0.5,
+        0.045,
+        "아직 없는 최종 공정 비교: 동일 물리 A100 budget · 동일 Qwen 처리량 · 동일 NRx burst에서 다섯 방식의 L1 p99 / timely-result / background utility",
+        ha="center",
+        va="center",
+        fontsize=9.5,
+        color=COLORS["red"],
+        fontweight="bold",
+        bbox={"boxstyle": "round,pad=0.35", "facecolor": "#fff4f4", "edgecolor": "#ef9a9a"},
+    )
+    save(fig, "03f_fiveway_evidence_scorecard.png")
+
+
 def _fiveway_median(variant: str, rate: int, metric: str) -> float:
     values = []
     for trial_dir in sorted((FIVEWAY / variant / f"load_{rate}").glob("trial_*")):
@@ -2447,6 +2643,7 @@ def main():
     figure_02_fragmentation()
     figure_03_placement_and_transport()
     figure_03e_stage1_equal_depth()
+    figure_03f_fiveway_evidence_scorecard()
     figure_03b_fiveway_absolute_rate()
     figure_03c_mig_mps_quota()
     figure_03d_cuda_host_blocking()
@@ -2455,7 +2652,7 @@ def main():
     figure_05b_gdr_replica_sweep()
     figure_06_radio_utility()
     figure_06b_radio_cuda_calls()
-    print(f"wrote 19 figures to {OUT}")
+    print(f"wrote 20 figures to {OUT}")
 
 
 if __name__ == "__main__":

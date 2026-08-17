@@ -126,12 +126,31 @@ to every cross-process MIG combination. The GDR experiment instead separated L1 
 registered their GPU memories, and carried payload through NIC loopback without staging it in CPU
 DRAM.
 
+**P2P can connect multiple ordinary full GPUs, but the A100 MIG target in this study has a narrower
+support domain.** NVIDIA's current MIG guide states that, with the R570 driver generation, P2P is
+supported only between MIG instances on the same physical GPU; P2P between MIG instances on
+different physical GPUs and between a MIG device and a non-MIG GPU is unsupported. CUDA IPC across
+GPU Instances is also unsupported. Our R580 P2P gate succeeded precisely in the supported case: one
+process owned a `2g↔2g` pair on the same A100.
+
+| Path | Reachability | Role in the current experiments |
+|---|---|---|
+| Local | Same MIG/CUDA device | Shortest path, but L1 and NRx share one execution domain |
+| CUDA P2P | **Peer-capable MIG pair on the same physical A100** | Stage 1 single-process `2g↔2g` fast-path/lower-bound baseline |
+| NIC GDR | Different MIGs on one GPU, **MIGs on different physical GPUs**, and separate processes/containers; potentially another host over RDMA | Stage 1 loopback and the primary fabric for the Stage 2/3 multi-physical-GPU resident pool |
+
+P2P and GDR are therefore both multi-device tensor paths, but P2P cannot replace GDR in the target
+pool topology. P2P is the short path within one physical GPU where supported; GDR reaches MIGs on
+other physical GPUs. [NVIDIA MIG Deployment Considerations](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/deployment-considerations.html)
+specifies the P2P and IPC boundary, while the [CUDA multi-GPU guide](https://docs.nvidia.com/cuda/cuda-programming-guide/03-advanced/multi-gpu-systems.html)
+defines general P2P capability per device pair through `cudaDeviceCanAccessPeer()`.
+
 | Deployment | Plain description | What it does well | What it does not solve |
 |---|---|---|---|
 | Full GPU + MPS | Multiple processes share one full GPU | High utilization and work conservation; spare SM capacity is immediately usable | No physical boundary; long AI work and a shared GPU queue can perturb L1 tail latency |
 | MIG local | A physical wall is created, but L1 and NRx share one room | Protects the 4g from Qwen or other work on the sibling MIG | L1 and NRx inside the same 4g still share SMs, memory resources, and GPU work queues |
 | MIG + MPS local | MPS reallocates shares between processes inside one MIG | Preserves sibling isolation and tunes average shares inside one GI | Creates no new hardware isolation; a quota is not a deadline or preemption guarantee |
-| Cross P2P | L1 and NRx occupy separate GPU partitions connected by a peer path | Separates L1 and NRx compute queues with low transport overhead | Peer access is topology-dependent, and the remote NRx still has finite capacity |
+| Cross P2P | L1 and NRx occupy peer-capable MIGs on the same physical A100 and use a CUDA peer path | Separates L1 and NRx compute queues with low transport overhead | Cannot form the cross-process GI pool across physical GPUs; remote NRx capacity is still finite |
 | Cross NIC GDR | GPU memories are NIC-registered and connected directly | Reaches isolated MIG/process/GPU endpoints without a CPU-DRAM bounce | Does not make NRx computation faster; admission and queueing remain separate problems |
 
 The relevant axes are:
@@ -327,62 +346,34 @@ Use deadline and radio utility to select an endpoint;
 recover to the conventional path when the NRx result is late
 ```
 
-DART-Rx does not force every request through local, P2P, or GDR. It uses local when safe and timely,
-P2P where peer access exists, and GDR across other process/GPU/isolation boundaries. Its core is not
-the path selection itself, but the admission, reservation, expiry, and commit contract that makes
+The DART-Rx design may use local within one MIG and P2P for a supported MIG pair on the same physical
+GPU. However, **the currently implemented multi-physical-GPU NRx pool uses GDR as its primary path**;
+a P2P pool backend has not been implemented or evaluated. The core contribution is not path
+selection itself, but the admission, reservation, expiry, and commit contract that makes
 heterogeneous endpoints one deadline-safe receiver service.
 
-### 1.5 Fairness warning: raw service limits under the same arrival rate
+### 1.5 How to read all five approaches in one figure
 
-The placement experiment above emphasizes a single dependency path. Multi-cell operation also
-depends on sustainable request rate, so we replayed identical 50–350 requests/s traces against five
-placements in 120 runs.
+The figure below deliberately avoids forcing the five approaches into one performance ranking. Each
+row shows whether a hardware wall actually separates L1 from NRx, where background AI runs, the L1
+effect directly established by the current experiments, and the NRx domain the path can reach.
 
-> **This experiment does not choose an overall winner.** It measures the raw service limit of each
-> deployable package with no background tenant and one optimized NRx path. Full MPS uses the entire
-> A100, whereas the other packages use 4g or 2g MIG slices. It therefore does not compare equal-SM
-> efficiency, L1 isolation, or multi-process interference.
+![Protection, reach, and direct evidence for MPS, MIG, MIG+MPS, P2P, and NIC GDR](figures_en/03f_fiveway_evidence_scorecard.png)
 
-![Background-free raw service limits of five packages with unequal GPU allocations](figures_en/03b_fiveway_absolute_rate.png)
+Full MPS is the red starting point not because its raw capacity is low, but because it has no
+protection boundary: increasing NRx processes from `1→8` raised L1 p99 by `4.5×`. MIG local and
+MIG+MPS isolate sibling background work, but L1 and NRx remain inside one 4g, producing measured
+active-time increases of `1.621×` and `1.702×`. P2P reduced that increase to `1.043×` as the
+same-GPU fast path. GDR cost `0.438 ms` more mean E2E than P2P, but reaches NRx services in other
+physical GPUs and processes.
 
-| Deployable package | GPU allocation in this gate | Last point before p99 exceeded 100 ms | p99 there | Next point |
-|---|---|---:|---:|---:|
-| Full MPS | **Full A100** shared | At least 350/s | 2.551 ms | No collapse within the sweep |
-| MIG local | L1+NRx in one 4g | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
-| MIG+MPS | Two uncapped clients in one 4g | 250/s | 3.437 ms | 300/s → **259.106 ms** |
-| Cross P2P | 2g L1 + 2g NRx | 250/s | 4.911 ms | 300/s → **451.798 ms** |
-| Cross NIC GDR | 2g L1 + 2g NRx | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
+The conclusion is therefore not that GDR is the fastest. **P2P/GDR preserve an L1 protection wall
+while reaching NRx outside the local 4g**; MPS, MIG, and MIG+MPS remain the utilization, sibling-
+isolation, and share-control baselines. A final matched-background five-way gate with the same
+physical-GPU budget, Qwen throughput, and NRx burst has not yet been completed. The figure does not
+claim an overall winner before that experiment.
 
-The 100 ms line is a diagnostic marker for an obvious queue collapse, not a production deadline.
-Full MPS looks best here for a straightforward reason: it has the largest compute allocation, no
-background tenant, and only one optimized NRx path, exposing the work-conserving benefit of MPS.
-This does not contradict the earlier multi-NRx stress test. When independent NRx processes increased
-from `1→8`, full-A100 MPS increased L1 p99 from `42.3→189.3 ms`, or `4.5×`. **MPS is strong in raw
-throughput but has no hardware wall protecting L1 as co-tenants and independent contexts increase.**
 
-The winner therefore depends on the question:
-
-| Question | Favorable measured approach | Evidence |
-|---|---|---|
-| Background-free raw capacity of one optimized NRx path | Full MPS | Work-conserving use of a full A100 |
-| L1 active-time protection while NRx overlaps | Cross P2P | L1 slowdown `1.621× → 1.043×` |
-| Isolation from sibling background work | MIG | NRx capacity changed only `-0.11%` with Qwen |
-| Reaching isolated NRx outside P2P support | NIC GDR | Cross-boundary GPU-memory path without CPU-DRAM bounce |
-
-This gate fills only the raw-capacity axis. Qwen-cap and multi-NRx sweeps measure interference,
-the isolation gate measures L1 protection, and §15.4 measures reclaim of background work.
-
-The result sharpens the problem statement:
-
-- Full MPS is highest **only in this narrow raw-capacity gate**. It would be wrong to claim either
-  that MIG is always faster or that MPS is therefore best for real-time L1. The MPS concern is L1
-  tail and predictability as co-tenants and independent contexts increase, not peak throughput.
-- MIG local isolates sibling background work but cannot automatically pull capacity from another
-  idle partition after the 4g NRx saturates.
-- MIG+MPS partitions one 4g more carefully; it neither increases total 4g capacity nor accesses idle
-  capacity beyond the wall.
-- A single P2P or GDR endpoint also has finite capacity. DART-Rx does not claim that one remote path
-  is infinitely fast; it aggregates **multiple resident endpoints to avoid static-one queue cliffs.**
 
 ## 2. First misconception: MIG isolation did not fail
 
@@ -826,7 +817,7 @@ Every MPS/MIG/MIG+MPS/P2P/GDR baseline is necessary, but each answers a differen
 |---|---|---:|---|---|
 | MIG isolation/cliff | 4g NRx at 500/700/750/800 requests/s; sibling-3g Qwen on/off | One hardware run per condition | Capacity, p99, backlog | Isolation and queue cliff |
 | Placement/transport | Optimized CE–direct TRT–LDPC chain with Qwen co-tenant | Mostly 3 trials; GDR 2 | L1 active time, E2E, transport, Qwen it/s | MPS/MIG/P2P/GDR trade-offs |
-| Five-way absolute rate | Identical 50/100/140/160/180/250/300/350 requests/s traces for MPS/MIG/MIG+MPS/P2P/GDR | 8 rates × 3 trials × 5 = 120 runs | Sojourn p99, throughput | Queue cliff per placement |
+| Five-way absolute-rate diagnostic | Identical 50/100/140/160/180/250/300/350 requests/s traces without background AI | 8 rates × 3 trials × 5 = 120 runs | Sojourn p99, throughput | Records raw service limits under unequal GPU allocations; not used to claim an overall winner |
 | Proper MIG+MPS quota | Separate L1/NRx MPS clients in one 4g at 30:70, 50:50, and 70:30; sibling-3g Qwen | 1,000 slots × 3 trials per split | Mean/p99, Qwen it/s | Actual meaning and limitation of quota |
 | CUDA host blocking | Same-MIG cuPHY L1+NRx; 4/10/40/60 cells; baseline/async-free/memory-pool variants | 16 conditions, each a 30 s Nsight trace | Host time per CUDA API | Origin and relocation of synchronization waits |
 | Multi-cell problem gate | 1/2/4/8 cells; 0.5/1 ms; synchronized/staggered; selective iid/bursty NRx at 10–100% | 29 traces × 3 trials × 5 policies = 435 rows | p99, no-timely, fallback, idle fraction | Existence of fragmentation |
@@ -1216,6 +1207,13 @@ commit.
 > completed results in this report validate the required parts separately; they do not yet validate
 > the full product under one concurrent workload.
 
+The main comparison must use the same one-physical-A100 hardware budget and matched background
+utility. Full MPS places L1+NRx+Qwen together; MIG local uses `4g L1+NRx | 3g Qwen`; MIG+MPS uses
+`L1/NRx MPS clients in 4g | 3g Qwen`; P2P/GDR use `2g L1 | 2g NRx | 3g Qwen`. Rather than fixing an
+arbitrary MPS cap, the experiment should tune it to match Qwen near `10.2 it/s`, then replay the same
+multi-cell NRx burst and report L1 p99, NRx no-timely/capacity, and Qwen throughput together. This
+matched-background five-way sweep is not yet complete.
+
 At minimum, the final gate must compare `static-one`, `static-cell`, round-robin, predicted-finish,
 and DART-Rx on the same trace while reporting L1 p99, deadline miss/no-timely ratio, correct TB,
 endpoint utilization, and retained background work. **Until Stage 4 is complete, the study must not
@@ -1248,10 +1246,11 @@ leads to the corresponding design choices.
    can produce deadline loss and idle endpoints simultaneously.
 2. **P2P/GDR is a data-plane enabler, not the whole solution.** It provides L1 separation and remote
    reachability but does not eliminate NRx service shortage.
-3. **MPS, MIG, and MIG+MPS expose different trade-offs.** Full MPS provides the strongest raw
-   capacity in the absolute-rate sweep but risks a load-dependent L1 tail. MIG provides sibling
-   isolation while pinning capacity spatially. MIG+MPS controls average shares inside one MIG but
-   creates neither a new isolation boundary nor remote elasticity.
+3. **MPS has no physical L1-protection boundary.** Raising independent NRx processes from `1→8`
+   increased L1 p99 from `42.3→189.3 ms` (`4.5×`) on full-A100 MPS and from `40.7→435.7 ms`
+   (`10.7×`) inside a 4g MIG. MIG provides sibling isolation while pinning capacity spatially;
+   MIG+MPS controls average shares inside one MIG but creates neither a new isolation boundary nor
+   remote elasticity.
 4. **The DART-Rx contribution is a cross-layer contract.** It combines utility/deadline admission,
    finish-aware credit, ordered GPU transport, expiry-safe single commit, and bounded background
    leases in one slot transaction.

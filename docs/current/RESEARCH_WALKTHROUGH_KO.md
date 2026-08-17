@@ -119,12 +119,31 @@ path다.
 process와 GPU memory registration으로 분리하고, payload를 CPU DRAM에 올리지 않은 채 NIC
 loopback으로 전달했다.
 
+**일반 full GPU끼리는 P2P로 multi-GPU 통신할 수 있지만, 이 연구의 A100 MIG 조건은 다르다.**
+현재 NVIDIA MIG 가이드는 R570 계열에서 같은 physical GPU 안의 MIG instance 사이 P2P만
+지원하고, 서로 다른 physical GPU의 MIG끼리 또는 MIG와 non-MIG GPU 사이 P2P는 지원하지
+않는다고 명시한다. GPU Instance 사이 CUDA IPC도 지원되지 않는다. 우리 R580 P2P gate가
+성공한 이유도 정확히 같은 A100 안의 `2g↔2g`를 한 process가 소유한 지원 범위였기 때문이다.
+
+| 경로 | 도달 가능한 범위 | 현재 실험에서의 위치 |
+|---|---|---|
+| Local | 같은 MIG/CUDA device | 가장 짧지만 L1과 NRx가 같은 execution domain을 공유 |
+| CUDA P2P | **같은 physical A100 안의 peer-capable MIG pair** | Stage 1의 single-process `2g↔2g` fast-path/lower-bound baseline |
+| NIC GDR | 같은 GPU의 다른 MIG, **다른 physical GPU의 MIG**, 별도 process/container; RDMA network면 다른 host도 가능 | Stage 1 loopback과 Stage 2·3 multi-physical-GPU resident pool의 primary fabric |
+
+따라서 P2P와 GDR가 모두 multi-device tensor 전송이라는 점은 맞지만, 우리 target topology에서
+P2P가 GDR를 대체하지는 못한다. P2P는 한 physical GPU 안에서 가능한 짧은 경로이고, GDR는
+다른 physical GPU의 MIG까지 pool에 포함시키는 경로다. [NVIDIA MIG Deployment
+Considerations](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/deployment-considerations.html)은
+이 P2P/IPC 범위를 명시하며, [CUDA multi-GPU guide](https://docs.nvidia.com/cuda/cuda-programming-guide/03-advanced/multi-gpu-systems.html)는
+일반 P2P 지원 여부를 device pair의 `cudaDeviceCanAccessPeer()` 결과로 정의한다.
+
 | 방식 | 쉽게 말하면 | 잘하는 것 | 해결하지 못하는 것 |
 |---|---|---|---|
 | Full GPU + MPS | 한 GPU를 여러 process가 함께 사용 | 남는 SM을 다른 일이 즉시 사용하므로 처리량이 높고 work-conserving | 물리적 경계가 없고, 긴 AI 작업과 GPU queue가 L1 tail을 흔들 수 있음 |
 | MIG local | GPU 안에 물리적으로 벽을 만들고, 한 방에 L1+NRx 배치 | sibling MIG의 Qwen 같은 작업으로부터 보호 | 같은 4g 방 안의 L1과 NRx는 여전히 SM·memory·CUDA work queue를 공유 |
 | MIG + MPS local | MIG 방 안에서 L1/NRx process 몫을 다시 나눔 | sibling 격리를 유지하며 한 GI 안의 평균 share 조절 | 새로운 하드웨어 격리를 만들지 않으며, quota는 deadline/preemption 보장이 아님 |
-| Cross P2P | L1과 NRx를 다른 GPU partition에 두고 GPU 경로로 연결 | L1과 NRx compute queue를 분리하면서 낮은 transport 비용 | MIG 사이 P2P가 허용되는 topology가 제한적이고 remote NRx capacity는 여전히 유한 |
+| Cross P2P | 같은 physical A100의 peer-capable MIG에 L1과 NRx를 나누고 CUDA peer path로 연결 | L1과 NRx compute queue를 분리하면서 낮은 transport 비용 | 다른 physical GPU의 MIG나 cross-process GI pool에는 사용할 수 없고 remote NRx capacity도 유한 |
 | Cross NIC GDR | 각 GPU memory를 NIC에 등록하고 직접 연결 | CPU DRAM bounce 없이 다른 MIG/process/GPU를 endpoint로 사용 | NIC가 NRx compute를 빠르게 만들지는 않으며 queue/admission 문제는 별도 |
 
 핵심 차이는 세 축이다.
@@ -329,63 +348,34 @@ GDR: P2P 범위 밖의 isolated NRx도 CPU bounce 없이 연결
 deadline/utility를 보고 endpoint를 선택하고, 늦은 결과는 conventional path로 복구
 ```
 
-DART-Rx는 local, P2P, GDR 중 하나만 고집하지 않는다. 같은 endpoint에서 안전하고 제시간에
-끝나면 local을, peer access가 가능하면 P2P를, 다른 process/GPU/isolation domain에는 GDR를
-사용한다. 연구의 핵심은 data path 선택 그 자체가 아니라 **이 서로 다른 endpoint를 하나의
-deadline-safe receiver service로 만드는 admission, reservation, expiry, commit 규칙**이다.
+DART-Rx 설계상 같은 MIG에서는 local, 같은 physical GPU의 지원되는 MIG pair에는 P2P를
+사용할 수 있다. 그러나 **현재 구현된 multi-physical-GPU NRx pool의 primary path는 GDR**이며,
+P2P pool backend는 구현·평가하지 않았다. 연구의 핵심은 data path 선택 자체가 아니라
+**이 서로 다른 endpoint를 하나의 deadline-safe receiver service로 만드는 admission,
+reservation, expiry, commit 규칙**이다.
 
-### 1.5 공정성 주의: 같은 요청률에서 본 raw service limit
+### 1.5 다섯 방식을 한 장에서 읽는 법
 
-앞의 단일 요청·전송 실험은 요청 하나의 경로를 본다. 실제 multi-cell에서는 처리시간뿐 아니라 초당
-몇 개를 지속해서 받을 수 있는지도 중요하다. 그래서 완전히 같은 50–350 request/s trace를
-다섯 방식에 넣어 120회 실행했다.
+아래 그림은 다섯 방식을 억지로 하나의 성능 순위로 만들지 않는다. 각 행에서 **L1과 NRx
+사이에 실제 하드웨어 벽이 있는지**, background AI가 어디에 놓이는지, 현재 실험이 직접
+보여 준 L1 영향, 그리고 NRx가 도달할 수 있는 범위를 함께 본다.
 
-> **이 표는 종합 우승자를 고르는 실험이 아니다.** Background가 없고 optimized NRx 경로 하나만
-> 사용하는 상태에서 각 **실제 배치 package의 raw service limit**를 측정한다. Full MPS는 full
-> A100 전체를 사용하지만 나머지는 4g 또는 2g MIG slice를 사용하므로 계산 자원부터 같지 않다.
-> 따라서 이 표는 L1 isolation, multi-process interference 또는 동일-SM 효율을 비교하지 않는다.
+![MPS, MIG, MIG+MPS, P2P, NIC GDR의 보호·도달 범위·실측 증거 비교](figures/03f_fiveway_evidence_scorecard.png)
 
-![서로 다른 GPU 자원량을 가진 다섯 배치 package의 background 없는 raw service limit](figures/03b_fiveway_absolute_rate.png)
+이 그림에서 Full MPS가 빨간 출발점인 이유는 raw capacity가 낮기 때문이 아니다. 자원은 잘
+쓰지만 NRx process가 `1→8`로 늘 때 L1 p99가 `4.5×`가 될 만큼 보호 경계가 없기 때문이다.
+MIG local과 MIG+MPS는 sibling background는 막지만 L1과 NRx가 같은 4g 안에 있어 각각
+`1.621×`, `1.702×`의 active-time 증가가 남았다. P2P는 이를 `1.043×`까지 줄인 같은-GPU
+fast path이고, GDR는 P2P보다 평균 `0.438 ms` 더 들지만 다른 physical GPU와 process까지
+NRx service에 포함시킨다.
 
-| 실제 배치 package | 이 gate에서 사용한 GPU 자원 | p99가 100 ms를 넘기 전 마지막 측정점 | 그 지점 p99 | 다음 측정점 |
-|---|---|---:|---:|---:|
-| Full MPS | **full A100** 공유 | 적어도 350/s | 2.551 ms | sweep 범위 안에서 collapse 없음 |
-| MIG local | 한 4g에 L1+NRx | 300/s | 3.470 ms | 350/s → **1124.981 ms** |
-| MIG+MPS | 한 4g의 two clients, uncapped | 250/s | 3.437 ms | 300/s → **259.106 ms** |
-| Cross P2P | 2g L1 + 2g NRx | 250/s | 4.911 ms | 300/s → **451.798 ms** |
-| Cross NIC GDR | 2g L1 + 2g NRx | 180/s | 4.527 ms | 250/s → **1048.696 ms** |
+따라서 이 한 장의 결론은 “GDR가 가장 빠르다”가 아니다. **P2P/GDR는 L1 보호벽을 유지하며
+local 4g 밖의 NRx를 호출하기 위한 경로**이고, MPS/MIG/MIG+MPS는 각각 utilization,
+sibling isolation, share control의 baseline이다. 다만 동일한 물리 GPU budget, 동일한 Qwen
+처리량, 동일한 NRx burst를 한 번에 적용한 matched-background five-way gate는 아직 없다.
+그 최종 실험 전에는 이 그림으로 종합 우승자를 주장하지 않는다.
 
-`100 ms`는 production deadline이 아니라 queue collapse를 눈에 띄게 구분하기 위한 진단선이다.
-여기서 Full MPS가 가장 좋아 보이는 이유는 단순하다. 가장 큰 계산 자원을 쓰고, background가
-없으며, 한 optimized NRx 경로만 실행하므로 MPS의 work-conserving 장점만 드러난다. 앞에서 본
-multi-NRx stress test와 모순되지 않는다. 독립 NRx process를 `1→8`개로 늘린 그 실험에서는
-full-A100 MPS의 L1 p99가 `42.3→189.3 ms`로 `4.5×` 증가했다. 즉 **MPS는 raw throughput에는
-강하지만 co-tenant와 독립 context가 늘어날 때 L1을 보호하는 벽이 없다.**
 
-따라서 “무엇이 더 좋은가”는 지표별로 답해야 한다.
-
-| 질문 | 현재 실험에서 유리한 방식 | 근거 |
-|---|---|---|
-| Background 없는 단일 optimized NRx의 raw capacity | Full MPS | full A100을 work-conserving하게 사용 |
-| NRx 동시 실행 중 L1 active-time 보호 | Cross P2P | L1 slowdown `1.621× → 1.043×` |
-| Sibling background 격리 | MIG | Qwen 동시 실행 시 NRx capacity 변화 `-0.11%` |
-| P2P가 닿지 않는 isolated NRx 연결 | NIC GDR | CPU DRAM bounce 없는 cross-boundary GPU-memory path |
-
-이 gate는 raw capacity 축 하나를 채운다. Background와의 trade-off는 Qwen cap 및 multi-NRx
-sweep, L1 보호는 isolation gate, spare-work 회수는 §15.4에서 각각 측정한다.
-
-이 결과가 보여주는 문제의식은 다음과 같다.
-
-- Full MPS는 **이 좁은 raw-capacity gate에서만** 가장 높았다. 따라서 연구가 “MIG가 언제나
-  MPS보다 빠르다”고 주장하면 틀리지만, 이를 “MPS가 실시간 L1에 가장 좋다”로 읽어도 틀린다.
-  MPS의 문제는 최대 처리량이 아니라 co-tenant/context 증가에 따른 L1 tail과 예측 가능성이다.
-- MIG local은 sibling background를 훌륭히 막지만, 4g 안의 NRx capacity 이상을 다른 idle
-  partition에서 자동으로 가져오지 못한다.
-- MIG+MPS는 한 4g를 더 잘 나누는 도구일 뿐, 4g의 총 capacity를 늘리거나 벽 밖의 idle
-  capacity를 가져오지 않는다.
-- P2P/GDR의 단일 remote endpoint도 당연히 유한하다. DART-Rx의 주장은 remote path 하나가
-  무한히 빠르다는 것이 아니라, **여러 resident endpoint를 묶어 static-one의 queue cliff를
-  피한다**는 것이다.
 
 ## 2. 첫 번째 오해: MIG isolation이 실패한 것이 아니다
 
@@ -845,7 +835,7 @@ MPS, MIG, MIG+MPS, P2P, GDR는 모두 논문에 들어가야 한다. 다만 각 
 |---|---|---:|---|---|
 | MIG isolation/cliff | 4g NRx, 500/700/750/800 request/s, sibling 3g Qwen on/off | 조건당 1 hardware run | capacity, p99, backlog | isolation과 queue cliff |
 | Placement/transport | optimized CE–direct TRT–LDPC chain, Qwen co-tenant | 대부분 3 trials; GDR 2 | L1 active, E2E, transport, Qwen it/s | MPS/MIG/P2P/GDR trade-off |
-| Five-way absolute-rate | 같은 50/100/140/160/180/250/300/350 request/s trace를 MPS/MIG/MIG+MPS/P2P/GDR에 입력 | 8 rates × 3 trials × 5 = 120 runs | sojourn p99, throughput | 방식별 queue cliff |
+| Five-way absolute-rate diagnostic | background 없이 같은 50/100/140/160/180/250/300/350 request/s trace를 MPS/MIG/MIG+MPS/P2P/GDR에 입력 | 8 rates × 3 trials × 5 = 120 runs | sojourn p99, throughput | unequal GPU allocation의 raw service limit만 기록; main 우열 비교에는 사용하지 않음 |
 | Proper MIG+MPS quota | 한 4g MIG의 별도 L1/NRx MPS client, L1:NRx 30:70/50:50/70:30, sibling 3g Qwen | split당 1,000 slots × 3 trials | mean/p99, Qwen it/s | quota의 실제 의미와 한계 |
 | CUDA host blocking | same-MIG cuPHY L1+NRx, 4/10/40/60 cells, no-shim/async-free/mempool | 16 conditions, 각 30 s Nsight | API별 host time | synchronization wait의 원인/이동 |
 | Multi-cell problem gate | 1/2/4/8 cells, 0.5/1 ms, sync/stagger, selective iid/bursty 10–100% | 29 traces × 3 trials × 5 policies = 435 rows | p99, no-timely, fallback, idle | fragmentation 존재 |
@@ -1235,6 +1225,13 @@ DART-Rx가 utility, deadline, queue 상태를 함께 사용해 endpoint 선택·
 > 실행해야 한다. 현재 보고서의 완료 결과는 이 최종 결론에 필요한 부품들을 각각 검증한
 > 것이며, 아직 완제품 전체를 한 번에 검증한 것은 아니다.
 
+Main comparison에서는 한 physical A100이라는 같은 hardware budget과 같은 background
+utility를 사용해야 한다. Full MPS에는 L1+NRx+Qwen을 함께 두고, MIG local은 `4g L1+NRx |
+3g Qwen`, MIG+MPS는 `4g의 L1/NRx MPS clients | 3g Qwen`, P2P/GDR는 `2g L1 | 2g NRx |
+3g Qwen`으로 둔다. MPS cap을 임의로 고정하지 않고 Qwen 처리량을 예를 들어 약 `10.2 it/s`로
+맞춘 뒤, 동일한 multi-cell NRx burst에서 L1 p99, NRx no-timely/capacity와 Qwen 처리량을 함께
+비교해야 한다. 이 matched-background five-way sweep은 아직 미완료다.
+
 최종 비교는 최소한 `static-one`, `static-cell`, round-robin, predicted-finish와 DART-Rx를 같은
 trace에서 비교하고, L1 p99, deadline miss/no-timely, correct TB, endpoint utilization,
 background work retained를 함께 보고해야 한다. **Stage 4가 완료되기 전에는 “MIG NRx pool이
@@ -1267,10 +1264,10 @@ actual-radio burst와 background tenant를 동시에 해결했다”는 최종 I
    deadline miss와 idle endpoint가 동시에 발생한다.
 2. **P2P/GDR는 해결책 전체가 아니라 data-plane enabler다.** L1 isolation과 remote endpoint
    reachability를 제공하지만 NRx service shortage를 없애지는 않는다.
-3. **MPS, MIG, MIG+MPS는 서로 다른 trade-off다.** Full MPS는 이번 absolute-rate sweep에서
-   가장 높은 raw capacity를 보였지만 load-dependent L1 tail의 위험이 있다. MIG는 sibling
-   isolation을 제공하지만 capacity를 방별로 고정한다. MIG+MPS는 한 MIG 안의 평균 share를
-   조절하지만 새 isolation boundary나 remote elasticity를 만들지 않는다.
+3. **MPS에는 물리적 L1 보호 경계가 없다.** 독립 NRx process를 `1→8`개로 늘리자 full-A100
+   MPS의 L1 p99가 `42.3→189.3 ms`(`4.5×`), 4g 내부 MPS는 `40.7→435.7 ms`(`10.7×`)가 됐다.
+   MIG는 sibling isolation을 제공하지만 capacity를 방별로 고정하고, MIG+MPS는 한 MIG 안의
+   평균 share만 조절할 뿐 새 isolation boundary나 remote elasticity를 만들지 않는다.
 4. **DART-Rx의 핵심은 cross-layer contract다.** utility/deadline admission, finish-aware
    endpoint credit, ordered GPU transport, expiry-safe single commit, bounded background lease를
    하나의 slot transaction으로 묶는다.

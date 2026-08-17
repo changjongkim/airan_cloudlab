@@ -1060,6 +1060,43 @@ Stage 4 · Integration: do all three properties survive multi-cell bursts plus b
 | 3 | Actual L1 on GPU0 4g; NRx 0/1/2 on full GPUs 1/2/3 | Remove capacity variation and validate CE→LDPC/CRC plus commit | Concurrent capacity of 3g-MIG replicas | Complete |
 | 4 | Protected-L1 4g, resident-NRx 3g pool, sibling background | Combine all three axes in one workload | No result yet | **Incomplete** |
 
+### 13.3 Representative measured result for each Stage: what worked and what failed
+
+The following three figures are the **primary result figures** for Stages 1–3. Part IV does not
+repeat them; it provides the detailed numerical and causal analysis.
+
+#### Stage 1 · data path and L1 protection
+
+![Stage 1 comparison of same-4g single-request speed and cross-P2P/GDR L1 protection](figures_en/03e_stage1_equal_depth.png)
+
+- **Good:** P2P at `1.043×` and GDR at `1.103×` stay near the L1-alone `1.0×` reference.
+- **Bad:** cross `2g+2g` has slower single-request E2E because NRx runs on a smaller slice.
+- **Takeaway:** GDR is not an NRx accelerator; it is the data path to isolated endpoints that P2P
+  cannot reach.
+
+#### Stage 2 · resident-NRx replica capacity
+
+![Stage 2 timely-service ratio as real resident NRx replicas increase from one to three](figures_en/05b_gdr_replica_sweep.png)
+
+- **Good:** Three replicas with round-robin serve `97.2%` of periodic `1,000 requests/s` on time.
+- **Bad:** Three replicas still deliver `0%` at `2,000 requests/s` and only `67.0%` for the mean-385/s
+  burst trace.
+- **Takeaway:** horizontal replicas add real capacity, but burst and overload still require a
+  separate admission mechanism.
+
+#### Stage 3 · actual-radio utility and commit
+
+![Stage 3 actual-radio success, NRx-call count, and decision latency](figures_en/06_actual_radio_utility.png)
+
+- **Good:** Correct-TB rises from `0.62` to `0.80`.
+- **Good:** Utility-selective invocation retains `0.80` while reducing NRx calls from `100` to `75`.
+- **Safety:** Decision p99 is `5.05–5.14 ms`, below the 12 ms expiry, with zero late/stale commits.
+- **Takeaway:** a remote NRx completion can improve real PHY output, but Stage 3 uses full-GPU NRx
+  workers and therefore does not establish concurrent 3g-MIG burst capacity.
+
+Stage 4 has no equivalent result figure yet. This is not a documentation omission: it marks the
+**remaining integrated experiment**.
+
 ## 14. Workloads and experimental conditions
 
 | Gate | Input and condition | Repetition | Metric | Scope of evidence |
@@ -1208,7 +1245,8 @@ Stage 1 itself consists of three internal gates rather than one number.
 | Equal-depth transport | 3 P2P, 2 GDR | Identical cross `2g+2g`; transport only changes | Compare P2P and GDR cost fairly |
 | Ring-depth-2 isolation | 3 same-4g, 3 cross-P2P | Normalize each placement to its own L1-alone baseline | Measure L1 protection after separating the compute queues |
 
-![Stage 1 P2P/GDR comparison at the same queue depth](figures_en/03e_stage1_equal_depth.png)
+The primary result appears first in the Stage-1 panel of §13.3. This section interprets its values
+and provenance.
 
 | Placement and transport | One-request serial E2E mean ↓ | E2E p99 ↓ | L1 active-time multiplier with concurrent NRx ↓ | Qwen | What this row means |
 |---|---:|---:|---:|---:|---|
@@ -1326,7 +1364,8 @@ feasibility. Predicted-finish reserves completion using the calibration p95 serv
 endpoint when its in-flight request exceeds `1.25×` the bound. A lower no-timely ratio therefore
 does not necessarily imply more remote execution; it also reflects admission behavior.
 
-![Stage 2 sweep from one to three real NRx replicas](figures_en/05b_gdr_replica_sweep.png)
+The primary replica-sweep figure appears first in the Stage-2 panel of §13.3. This section separates
+the causal behavior of the policies.
 
 The replica sweep rejects the simplistic conclusion that more replicas always solve the problem.
 For single-cell 1,000/s, three replicas reach `97.2%` timely with round-robin and `88.0%` with
@@ -1425,7 +1464,8 @@ The validated total is therefore `12+5=17`; the table below uses only campaign 3
 | 3 | Conventional | 3 | 0.620 | 1.045 / 1.292 ms | — |
 | 3 | Utility | 3 | 0.800 | 2.636 / 5.050 ms | 2.013 / 2.967 ms |
 
-![Stage 3 actual-radio success, NRx calls, and decision latency](figures_en/06_actual_radio_utility.png)
+The primary actual-radio figure appears first in the Stage-3 panel of §13.3. This section interprets
+the per-mode numbers and correctness boundary.
 
 Three-trial medians for the primary three-endpoint comparison within `17` validated runs were:
 

@@ -1084,6 +1084,42 @@ Stage 4 · 통합: multi-cell burst와 background AI가 겹쳐도 위 세 성질
 | 3 | GPU0 4g actual L1, GPU1/2/3 full GPU NRx 0/1/2 | capacity 변수를 빼고 실제 CE→LDPC/CRC와 commit 검증 | 3g-MIG replica의 동시 capacity | 완료 |
 | 4 | protected L1 4g + resident NRx 3g pool + sibling background | 세 축을 같은 workload에서 결합 | 아직 결과 없음 | **미완료** |
 
+### 13.3 Stage별 대표 실측 그림: 무엇이 좋았고 무엇이 실패했는가
+
+아래 세 장이 Stage 1–3의 **주 결과 그림**이다. Part IV에서는 같은 그림을 다시 싣지 않고
+수치와 원인만 상세히 해석한다.
+
+#### Stage 1 · data path와 L1 protection
+
+![Stage 1에서 same-4g의 빠른 단일 요청과 P2P/GDR cross 배치의 L1 보호를 함께 비교](figures/03e_stage1_equal_depth.png)
+
+- **좋음:** P2P `1.043×`, GDR `1.103×`로 L1-alone `1.0×`에 가까워진다.
+- **나쁨:** cross `2g+2g`는 작은 NRx slice 때문에 single-request E2E가 same-4g보다 느리다.
+- **읽을 결론:** GDR은 NRx 계산 가속기가 아니라 P2P가 닿지 않는 격리 endpoint를 연결하는
+  data path다.
+
+#### Stage 2 · resident NRx replica capacity
+
+![Stage 2에서 실제 resident NRx replica를 1개에서 3개로 늘렸을 때의 제시간 처리 비율](figures/05b_gdr_replica_sweep.png)
+
+- **좋음:** 3개 replica의 round-robin은 periodic `1,000 requests/s`를 `97.2%` timely로 처리한다.
+- **나쁨:** `2,000 requests/s`에서는 세 개도 `0%`, 평균 `385/s` burst에서도 `67.0%`뿐이다.
+- **읽을 결론:** replica 수평 확장은 실제 capacity를 늘리지만, burst와 overload를 없애지는
+  못하므로 admission이 별도로 필요하다.
+
+#### Stage 3 · actual-radio utility와 commit
+
+![Stage 3에서 actual-radio 성공률, NRx 호출 수와 decision latency](figures/06_actual_radio_utility.png)
+
+- **좋음:** correct-TB가 `0.62→0.80`으로 증가한다.
+- **좋음:** utility-selective는 같은 `0.80`을 유지하며 NRx 호출을 `100→75`로 줄인다.
+- **안전성:** decision p99는 `5.05–5.14 ms`로 12 ms expiry 아래이며 late/stale commit은 0이다.
+- **읽을 결론:** remote NRx completion은 단순 처리량 숫자가 아니라 실제 PHY 결과로 사용할 수
+  있지만, Stage 3의 NRx는 full GPU이므로 3g-MIG burst capacity까지 증명한 것은 아니다.
+
+Stage 4에는 아직 이와 같은 대표 결과 그림이 없다. 그것이 문서 누락이 아니라 **최종 통합
+실험이 실제로 남아 있다는 표시**다.
+
 ## 14. Workload와 실험 조건
 
 | Gate | 입력/조건 | 반복 | metric | 증명 범위 |
@@ -1235,7 +1271,7 @@ Stage 1도 하나의 숫자가 아니라 세 개의 내부 gate로 구성된다.
 | Equal-depth transport | P2P 3회, GDR 2회 | 동일한 cross `2g+2g`; 전송 방식만 변경 | P2P와 GDR의 비용을 공정하게 비교 |
 | Ring-depth-2 isolation | same 4g 3회, cross-P2P 3회 | 각 배치의 L1-alone baseline으로 정규화 | NRx를 다른 compute queue로 분리했을 때 L1 보호 효과 측정 |
 
-![Stage 1의 동일 queue-depth P2P/GDR 비교](figures/03e_stage1_equal_depth.png)
+대표 결과 그림은 §13.3의 Stage 1 패널에 먼저 배치했다. 여기서는 수치와 provenance를 해석한다.
 
 | 배치와 transport | 한 요청 직렬 E2E mean ↓ | E2E p99 ↓ | NRx 동시 실행 시 L1 active-time 배율 ↓ | Qwen | 이 행이 말하는 것 |
 |---|---:|---:|---:|---:|---|
@@ -1354,7 +1390,8 @@ queue에 넣는다. `predicted-finish`는 초기 calibration p95에 `1.10×` mar
 `1.25×`를 넘으면 해당 endpoint를 일시적으로 후보에서 제외한다. 따라서 no-timely가 낮다는
 것과 많은 요청을 remote로 실행한다는 것은 같은 뜻이 아니다.
 
-![Stage 2에서 실제 NRx replica를 1개에서 3개로 늘린 결과](figures/05b_gdr_replica_sweep.png)
+대표 replica-sweep 그림은 §13.3의 Stage 2 패널에 먼저 배치했다. 여기서는 정책별 원인을
+분리해 해석한다.
 
 Replica sweep은 “replica가 많을수록 항상 해결된다”는 단순 결론을 부정한다. Single-cell
 1,000/s에서 세 replica의 timely ratio는 round-robin `97.2%`, predicted-finish `88.0%`였다.
@@ -1452,7 +1489,8 @@ Stage 3도 endpoint 수 확인, radio mode 비교, Nsight 원인 분석을 분�
 | 3 | conventional | 3 | 0.620 | 1.045 / 1.292 ms | — |
 | 3 | utility | 3 | 0.800 | 2.636 / 5.050 ms | 2.013 / 2.967 ms |
 
-![Stage 3에서 actual-radio 성공률, NRx 호출 수와 decision latency](figures/06_actual_radio_utility.png)
+대표 actual-radio 그림은 §13.3의 Stage 3 패널에 먼저 배치했다. 여기서는 mode별 수치와
+correctness 경계를 해석한다.
 
 전체 `17`개 validated run 중 핵심 3-endpoint 비교의 3-trial median은 다음과 같다.
 

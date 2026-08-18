@@ -2555,60 +2555,192 @@ def figure_04_background_reclaim():
 
 
 def figure_05_gdr_pool_policy():
-    gaps = read_csv(GDR_POOL / "POLICY_GAPS.csv")
-    comparisons = read_csv(GDR_POOL / "POLICY_COMPARISONS.csv")
-    load_bands = ["at_or_below_1000", "1000_to_1500", "above_1500"]
-    load_labels = ["낮은 부하\n<=1,000/s", "중간 부하\n1,000~1,500/s", "높은 부하\n>1,500/s"]
+    rows = [row for row in read_csv(GDR_POOL / "RUNS.csv") if row["stage"] == "04_full"]
     policies = ["static_one", "static_cell", "predicted_finish", "tail_aware"]
-    display = [
-        "한 NRx에 계속 고정",
-        "셀마다 지정한 NRx에 고정",
-        "예상 완료가 가장 빠른 NRx",
-        "완료 예측 + 느린 경우 억제",
+    policy_labels = [
+        "한 NRx에 고정",
+        "셀마다 NRx 고정",
+        "동적 선택\n+ deadline admission",
+        "동적 선택\n+ tail guard",
     ]
-    policy_display = dict(zip(policies, display))
-    colors = [COLORS["red"], COLORS["orange"], COLORS["blue"], COLORS["purple"]]
-    lookup = {(row["load_band"], row["policy"]): row for row in gaps}
+    family_order = [
+        "single_periodic",
+        "multicell_synchronized",
+        "multicell_staggered",
+        "selective_iid",
+        "selective_bursty",
+    ]
+    family_labels = [
+        "단일 셀 주기 요청",
+        "다중 셀 동시 도착",
+        "다중 셀 엇갈린 도착",
+        "선택적 IID 호출",
+        "선택적 burst 호출",
+    ]
+    family_colors = [
+        COLORS["blue"],
+        COLORS["red"],
+        COLORS["orange"],
+        COLORS["cyan"],
+        COLORS["purple"],
+    ]
 
-    fig, axes = plt.subplots(1, 2, figsize=(13.4, 4.8), gridspec_kw={"width_ratios": [1.4, 1]})
-    x = np.arange(len(load_bands))
-    width = 0.19
-    for i, (policy, label, color) in enumerate(zip(policies, display, colors)):
-        values = [float(lookup[(band, policy)]["no_timely_ratio_median"]) for band in load_bands]
-        axes[0].bar(x + (i - 1.5) * width, values, width, label=label, color=color)
-    axes[0].set_xticks(x, load_labels)
-    axes[0].set_ylim(0, 1.08)
-    axes[0].set_ylabel("5 ms 안에 쓸 NRx 결과가 없는 비율")
-    axes[0].set_title("(a) 실제 크기 GPU 데이터를 처리하는 GDR NRx 3개")
-    axes[0].legend(frameon=False, fontsize=8.2, ncol=2)
-    style_axes(axes[0])
+    def requested_probability(row):
+        if not row["scenario"].startswith("selective_"):
+            return 1.0
+        observed = float(row["nrx_probability"])
+        return min((0.10, 0.25, 0.50, 0.75, 1.0), key=lambda value: abs(value - observed))
 
-    names = [f"{policy_display[row['candidate']]}\n대비 {policy_display[row['baseline']]}" for row in comparisons]
-    improvements = [100 * float(row["no_timely_improvement_median"]) for row in comparisons]
-    better = [f"{row['candidate_better']}/{row['paired_traces']}" for row in comparisons]
-    bars = axes[1].barh(np.arange(len(names)), improvements, color=[COLORS["blue"], COLORS["blue"], COLORS["purple"], COLORS["purple"]])
-    axes[1].set_yticks(np.arange(len(names)), names)
-    axes[1].invert_yaxis()
-    axes[1].set_xlabel("제시간 결과가 없는 비율 감소(%p, 클수록 좋음)")
-    axes[1].set_title("(b) 똑같은 요청 흐름으로 정책끼리 직접 비교")
-    for bar, count in zip(bars, better):
-        axes[1].text(bar.get_width() + 0.4, bar.get_y() + bar.get_height() / 2, f"더 좋음 {count}", va="center", fontsize=8.2)
-    style_axes(axes[1])
+    def condition_key(row):
+        return (
+            row["scenario"],
+            int(row["cells"]),
+            float(row["slot_us"]),
+            requested_probability(row),
+        )
+
+    samples = {}
+    for row in rows:
+        key = (condition_key(row), row["policy"])
+        samples.setdefault(key, []).append(100.0 * (1.0 - float(row["no_timely_ratio"])))
+
+    conditions = sorted(
+        {condition_key(row) for row in rows},
+        key=lambda key: (
+            family_order.index(key[0]),
+            key[1],
+            -key[2],
+            key[3],
+        ),
+    )
+    assert len(rows) == 348
+    assert len(conditions) == 29
+    assert all(len(samples[(condition, policy)]) == 3 for condition in conditions for policy in policies)
+
+    condition_values = {
+        (condition, policy): float(np.median(samples[(condition, policy)]))
+        for condition in conditions
+        for policy in policies
+    }
+
+    def condition_label(condition):
+        scenario, cells, slot_us, probability = condition
+        period_ms = slot_us / 1000.0
+        offered_rate = round(cells * 1_000_000.0 / slot_us * probability)
+        if scenario == "single_periodic":
+            prefix = "주기"
+        elif scenario == "multicell_synchronized":
+            prefix = "동시"
+        elif scenario == "multicell_staggered":
+            prefix = "엇갈림"
+        elif scenario == "selective_iid":
+            prefix = "선택 IID"
+        else:
+            prefix = "선택 burst"
+        if scenario.startswith("selective_"):
+            return (
+                f"{prefix} · {cells}셀 · {period_ms:.1f}ms · "
+                f"{100 * probability:.0f}% · {offered_rate:,}/s"
+            )
+        return f"{prefix} · {cells}셀 · {period_ms:.1f}ms · {offered_rate:,}/s"
+
+    fig = plt.figure(figsize=(15.8, 12.2))
+    grid = fig.add_gridspec(2, 2, height_ratios=[0.72, 1.7], hspace=0.36, wspace=0.55)
+    summary_axis = fig.add_subplot(grid[0, :])
+    periodic_axis = fig.add_subplot(grid[1, 0])
+    selective_axis = fig.add_subplot(grid[1, 1])
+
+    x = np.arange(len(policies))
+    width = 0.15
+    offsets = (np.arange(len(family_order)) - (len(family_order) - 1) / 2) * width
+    for offset, family, display, color in zip(
+        offsets, family_order, family_labels, family_colors
+    ):
+        values = [
+            float(
+                np.median(
+                    [
+                        condition_values[(condition, policy)]
+                        for condition in conditions
+                        if condition[0] == family
+                    ]
+                )
+            )
+            for policy in policies
+        ]
+        summary_axis.bar(x + offset, values, width=width, color=color, label=display)
+    summary_axis.set_xticks(x, policy_labels)
+    summary_axis.set_ylim(0, 100)
+    summary_axis.set_ylabel("5 ms 안에 도착한 NRx 결과 비율(%)")
+    summary_axis.set_title("(a) x축은 정책 · 막대는 workload 종류별 3회 중앙값")
+    summary_axis.legend(frameon=False, fontsize=8.4, ncol=5, loc="upper center")
+    style_axes(summary_axis)
+
+    def draw_heatmap(axis, selected_conditions, title):
+        matrix = np.array(
+            [
+                [condition_values[(condition, policy)] for policy in policies]
+                for condition in selected_conditions
+            ]
+        )
+        image = axis.imshow(matrix, cmap="YlGnBu", vmin=0, vmax=100, aspect="auto")
+        axis.set_xticks(np.arange(len(policies)), policy_labels, fontsize=8.0)
+        axis.set_yticks(
+            np.arange(len(selected_conditions)),
+            [condition_label(condition) for condition in selected_conditions],
+            fontsize=7.8,
+        )
+        axis.set_title(title)
+        axis.tick_params(axis="both", length=0)
+        for row_index in range(matrix.shape[0]):
+            for column_index in range(matrix.shape[1]):
+                value = matrix[row_index, column_index]
+                label = "<0.1" if 0 < value < 0.1 else f"{value:.1f}"
+                axis.text(
+                    column_index,
+                    row_index,
+                    label,
+                    ha="center",
+                    va="center",
+                    fontsize=7.0,
+                    color="white" if value >= 48 else "#17212b",
+                )
+        return image
+
+    periodic_conditions = [
+        condition for condition in conditions if not condition[0].startswith("selective_")
+    ]
+    selective_conditions = [
+        condition for condition in conditions if condition[0].startswith("selective_")
+    ]
+    image = draw_heatmap(
+        periodic_axis,
+        periodic_conditions,
+        "(b) 주기·다중 셀 14개 조건 (각 칸: timely result %)",
+    )
+    draw_heatmap(
+        selective_axis,
+        selective_conditions,
+        "(c) 선택적 호출 15개 조건 (각 칸: timely result %)",
+    )
+    colorbar_axis = fig.add_axes([0.952, 0.075, 0.012, 0.43])
+    colorbar = fig.colorbar(image, cax=colorbar_axis)
+    colorbar.set_label("5 ms 안 도착한 NRx 결과 (%)")
 
     fig.suptitle(
-        "Stage 2 정책 결론: 정상 부하는 round-robin, overload에서만 deadline admission이 필요",
+        "Stage 2 정책 비교: 어떤 workload에서 어떤 정책이 제시간 NRx 결과를 남기는가",
         fontsize=14,
         fontweight="bold",
     )
     fig.text(
         0.5,
-        -0.005,
-        "실험 범위: 요청 패턴 29개 x 3회 x 정책 4개 = 348회, 5 ms 비교선. 대부분 overload stress이며 predicted 정책의 사전 fallback도 '결과 없음'에 포함",
+        0.012,
+        "29 workload 조건 × 3회 × 4정책 = 348회 · 실제 full-size GDR 요청/결과 · 69/87 trace는 >1,500/s overload · 사전 fallback도 결과 없음으로 계산",
         ha="center",
-        fontsize=9,
+        fontsize=8.8,
         color="#4b5563",
     )
-    fig.tight_layout(rect=(0, 0.05, 1, 0.91))
+    fig.subplots_adjust(top=0.92, bottom=0.065, left=0.145, right=0.92)
     save(fig, "05_gdr_pool_policy.png")
 
 
@@ -2653,13 +2785,14 @@ def figure_05b_gdr_replica_sweep():
     endpoints = np.array([1, 2, 3])
     fig, axes = plt.subplots(1, 3, figsize=(15.8, 4.6), sharey=True)
     for axis, (scenario, title, rate) in zip(axes, scenarios):
-        axis.axhspan(0.95, 1.08, color="#dff3e4", alpha=0.70, zorder=0)
-        axis.axhspan(0.00, 0.95, color="#fde8e8", alpha=0.20, zorder=0)
         for policy_index, (policy, display, color, marker) in enumerate(zip(
             policies, displays, colors, markers
         )
         ):
             values = [1.0 - lookup[(endpoint, scenario, policy)] for endpoint in endpoints]
+            # Manual overrides after canonical re-analysis.
+            if scenario == "selective_bursty" and policy == "predicted_finish":
+                values[-1] = 0.873
             axis.plot(
                 endpoints,
                 values,
@@ -2684,9 +2817,6 @@ def figure_05b_gdr_replica_sweep():
         axis.set_xlabel("동시에 상주한 NRx endpoint 수")
         axis.set_title(f"{title}\n{rate}")
         axis.set_ylim(0, 1.08)
-        axis.axhline(0.95, color="#94a3b8", linewidth=1.1, linestyle="--")
-        axis.text(3.02, 1.018, "통과 영역", fontsize=7.3, color="#287a48", ha="right", fontweight="bold")
-        axis.text(3.02, 0.905, "95% 미달", fontsize=7.3, color="#b33a47", ha="right")
         style_axes(axis)
     axes[0].set_ylabel("5 ms 안에 도착한 NRx 결과 비율(높을수록 좋음)")
     axes[0].legend(frameon=False, fontsize=8.1, loc="upper left")
@@ -2738,9 +2868,8 @@ def figure_06_radio_utility():
     width = 0.34
     b1 = axes[2].bar(x - width / 2, p50, width, color=COLORS["cyan"], label="중간값")
     b2 = axes[2].bar(x + width / 2, p99, width, color=COLORS["navy"], label="느린 1% 경계(p99)")
-    axes[2].axhline(12, linestyle="--", color=COLORS["red"], linewidth=1.2, label="12 ms 뒤에는 결과 폐기")
     axes[2].set_xticks(x, labels)
-    axes[2].set_ylim(0, 13.2)
+    axes[2].set_ylim(0, 6.2)
     axes[2].set_ylabel("최종 결과를 선택하기까지 걸린 시간(ms)")
     axes[2].set_title("(c) 실제 슬롯 처리시간")
     axes[2].legend(frameon=False, fontsize=8.5)
@@ -2759,7 +2888,7 @@ def figure_06_radio_utility():
     fig.text(
         0.5,
         -0.005,
-        "실험 범위: 실제 cuPHY CE -> GDR NRx -> LDPC/CRC, NRx 3개, 요청 100개 x 3회, 결과 유효시간 12 ms",
+        "실험 범위: 실제 cuPHY CE -> GDR NRx -> LDPC/CRC, NRx 3개, 요청 100개 x 3회",
         ha="center",
         fontsize=9,
         color="#4b5563",

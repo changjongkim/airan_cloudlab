@@ -1228,28 +1228,51 @@ admits every request and reaches `0%`, while deadline admission falls back early
 across healthy endpoints with credits. `predicted-finish` and `tail-aware` are ablations that led to
 this design, not final scheduler names.
 
-#### 15.2.3 Full workload stress result
+#### 15.2.3 How does each policy behave across the full workload matrix?
 
-The full matrix contained `29 workload points × 3 trials × 4 policies = 348 runs`. Because `69/87`
-paired traces intentionally offer `>1,500 requests/s`, the aggregate is an overload stress result,
-not a normal-operation performance number.
+The full matrix contains `29 workload conditions × 3 trials × 4 policies = 348 runs`. Here, 87 is
+not a request count: it is `29 conditions × 3 trials`, and each run contains thousands to hundreds
+of thousands of requests. The figure therefore puts all four policies on the x-axis instead of
+plotting win/loss counts. The top panel summarizes workload families; the heatmaps expose the
+three-trial median for every one of the 29 conditions.
 
-| Policy | Overall timely-result rate ↑ | Paired improvement vs static-one | Paired improvement vs static-cell |
-|---|---:|---:|---:|
-| static-one | 0.0000 | — | — |
-| static-cell | 0.0000 | — | — |
-| predicted-finish | **0.1867** | 87/87 traces; median `18.65 pp` | 86/87 traces; median `16.50 pp` |
-| tail-aware | 0.1568 | 87/87 traces; median `14.69 pp` | 83/87 traces; median `9.70 pp` |
+| Workload family | Pin one NRx | Pin each cell | Dynamic + deadline admission | Dynamic + tail guard |
+|---|---:|---:|---:|---:|
+| Single-cell periodic | 0.004% | 0.004% | **60.341%** | 54.990% |
+| Synchronized multi-cell | 0.001% | 0% | **11.840%** | 6.846% |
+| Staggered multi-cell | 0.001% | 0% | **10.795%** | 6.090% |
+| Selective IID | 0.005% | 3.906% | **36.371%** | 29.822% |
+| Selective burst | 0.003% | 1.695% | **21.949%** | 13.888% |
 
-![Stage 2 policy results by load and paired improvement in the full matrix](figures_en/05_gdr_pool_policy.png)
+Each family value is the median of the condition-level three-trial medians. This prevents a family
+with more conditions from dominating the summary.
 
-Because `69/87` traces exceed `1,500/s`, the aggregate is an overload stress result rather than a
-normal-operation average. Timely-result failure includes both late execution and early fallback.
-The result supports admission over static binding; it does not establish that the present predictor
-calibration is optimal.
+![Stage 2 policy comparison with policies on the x-axis and all 29 workload conditions exposed](figures_en/05_gdr_pool_policy.png)
+
+The figure separates three findings.
+
+1. **Static policies cannot redistribute the three workers' capacity as requests change.** Pin-one
+   leaves two workers idle; per-cell pinning cannot move work when one cell's assigned queue backs up.
+   Most periodic/multi-cell conditions therefore deliver almost no timely results.
+2. **Per-request dynamic selection uses stranded capacity.** For one cell at a 1 ms period,
+   per-cell pinning rises from `<0.1%` to `74.9%` with dynamic deadline selection. Selective IID at
+   10% rises from `76.5%` to `89.8%`. At 4,000–16,000 requests/s, however, aggregate demand exceeds
+   all three endpoints, so dynamic selection also remains low.
+3. **The current tail guard adds no benefit.** It is below the basic dynamic deadline policy in all
+   five families and should not be claimed as a required final mechanism.
+
+As a robustness check, dynamic deadline selection beats per-cell pinning in `86/87` runs, but this
+count is not the main result. In the one losing run, it rejected 4,625 of 8,145 requests too early
+because of an over-conservative service bound. The matrix therefore demonstrates both the need for
+**request-level routing** and the need to calibrate **admission separately**.
+
+Because `69/87` runs intentionally exceed `1,500 requests/s`, this is an overload stress matrix,
+not a normal-operation average. Timely-result failure includes both late execution and early
+fallback. The final design should distribute requests by credit in the normal range and invoke
+deadline fallback only when every endpoint is infeasible.
 
 - Proves: real full-size GDR requests/results, three simultaneously resident endpoints,
-  request-level scale-out, and deadline admission that outperforms static binding.
+  request-level scale-out, and dynamic routing/admission with higher timely-result rates than static binding.
 - Does not prove: cuPHY/LDPC/CRC outcomes, BLER/CRC gain, or a production PHY deadline.
 - Interpretation: this is not one faster 3g MIG. It is a capacity experiment that exposes **three
   finite endpoint queues as one pool**.

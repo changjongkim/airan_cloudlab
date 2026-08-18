@@ -1259,28 +1259,50 @@ overload에서는 round-robin이 모든 요청을 queue에 넣어 `0%`가 된 �
 round-robin으로 dispatch한다. `predicted-finish`와 `tail-aware`는 이 결론을 얻기 위한
 ablation이며 최종 scheduler 이름으로 사용하지 않는다.
 
-#### 15.2.3 전체 workload stress 결과
+#### 15.2.3 전체 workload에서 정책별로 무엇이 달라지는가
 
-Full matrix는 `29 workload points × 3 trials × 4 policies = 348 runs`였다. 이 중 `69/87`
-paired trace가 `>1,500 request/s`인 의도적인 overload stress였으므로, 전체 평균을 정상 운용
-성능으로 읽으면 안 된다.
+Full matrix는 `29 workload 조건 × 3회 × 4정책 = 348회`다. 여기서 87은 요청 수가 아니라
+`29조건 × 3회`인 **전체 workload 실행 수**이며, 각 실행에는 수천~수십만 개 요청이 들어 있다.
+아래 그림은 승패 횟수 대신 x축에 네 정책을 모두 놓는다. 위 막대는 workload 종류별 중앙값,
+아래 heatmap은 29개 조건 각각의 3회 중앙값이다.
 
-| 정책 | 전체 timely-result rate ↑ | static-one 대비 paired 개선 | static-cell 대비 paired 개선 |
-|---|---:|---:|---:|
-| static-one | 0.0000 | — | — |
-| static-cell | 0.0000 | — | — |
-| predicted-finish | **0.1867** | 87/87 trace, median `18.65%p` | 86/87 trace, median `16.50%p` |
-| tail-aware | 0.1568 | 87/87 trace, median `14.69%p` | 83/87 trace, median `9.70%p` |
+| workload 종류 | 한 NRx 고정 | 셀마다 NRx 고정 | 동적 선택 + deadline admission | 동적 선택 + tail guard |
+|---|---:|---:|---:|---:|
+| 단일 셀 주기 요청 | 0.004% | 0.004% | **60.341%** | 54.990% |
+| 다중 셀 동시 도착 | 0.001% | 0% | **11.840%** | 6.846% |
+| 다중 셀 엇갈린 도착 | 0.001% | 0% | **10.795%** | 6.090% |
+| 선택적 IID 호출 | 0.005% | 3.906% | **36.371%** | 29.822% |
+| 선택적 burst 호출 | 0.003% | 1.695% | **21.949%** | 13.888% |
 
-![Stage 2 full matrix에서 부하별 정책 결과와 paired improvement](figures/05_gdr_pool_policy.png)
+표와 그림의 family 값은 먼저 각 조건의 3회 중앙값을 구한 뒤, 같은 workload 종류 안에서 다시
+중앙값을 취했다. 따라서 조건 수가 많은 family가 결과를 과도하게 지배하지 않는다.
 
-이 matrix의 `69/87` trace가 `>1,500/s` overload였으므로 전체 평균을 정상 운용 성능으로
-읽지 않는다. 또한 timely-result 실패에는 늦은 실행뿐 아니라 사전 fallback도 포함된다.
-이 결과는 static binding보다 admission이 낫다는 증거이지, 현재 predictor calibration이
-최적이라는 증거가 아니다.
+![Stage 2의 네 정책을 x축에 놓고 29개 workload 조건별 timely-result를 펼친 비교](figures/05_gdr_pool_policy.png)
+
+그림은 세 가지를 구분한다.
+
+1. **고정 정책은 상주 NRx 세 개의 용량을 요청에 맞춰 재분배하지 못한다.** 한 NRx 고정은
+   나머지 두 개를 놀리고, 셀별 고정은 특정 셀의 queue가 밀려도 다른 endpoint로 옮기지 못한다.
+   그 결과 periodic/multi-cell 조건 대부분에서 timely result가 거의 0%다.
+2. **요청 단위 동적 선택은 실제로 stranded capacity를 사용한다.** 예를 들어 1-cell 1 ms에서는
+   셀별 고정 `<0.1%`가 동적 deadline 정책 `74.9%`로, selective-IID 10%에서는 `76.5%`가
+   `89.8%`로 증가했다. 반면 4,000–16,000/s 구간은 endpoint 세 개의 총 capacity 자체를
+   넘으므로 동적 선택도 낮다.
+3. **tail guard는 현재 calibration에서 추가 이득이 아니다.** 다섯 family 모두 기본 동적
+   deadline 정책보다 낮았다. 최종 정책의 필수 mechanism으로 주장하지 않는다.
+
+Paired robustness check에서는 동적 deadline 정책이 셀별 고정보다 `86/87` 실행에서 높았지만,
+이 숫자는 메인 결과가 아니다. 유일하게 나빴던 실행은 동적 정책이 8,145개 중 4,625개를 너무
+보수적으로 사전 fallback한 calibration 실패였다. 따라서 이 결과는 **request-level routing의
+필요성**과 **admission calibration의 분리 필요성**을 함께 보여준다.
+
+또한 `69/87` 실행은 `>1,500 request/s`인 의도적인 overload stress다. timely-result 실패에는
+늦은 실행뿐 아니라 사전 fallback도 포함된다. 이 결과는 현재 predictor가 최적이라는 증거가
+아니며, 최종 설계는 정상 범위에서 credit 기반 분산을 하고 모든 endpoint가 불가능할 때만
+deadline fallback을 적용해야 한다.
 
 - 증명함: 실제 full-size GDR request/result, 세 endpoint 동시 상주, request-level scale-out,
-  static binding보다 나은 deadline admission.
+  static binding보다 높은 timely-result를 만드는 동적 routing/admission.
 - 증명하지 않음: cuPHY/LDPC/CRC 결과, BLER/CRC gain, production PHY deadline.
 - 해석: 이 단계는 “3g MIG 하나가 더 빨라졌다”가 아니라 **세 개의 유한한 endpoint queue를
   하나의 pool로 사용했다**는 capacity 실험이다.

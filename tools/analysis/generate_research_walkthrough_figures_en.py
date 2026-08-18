@@ -358,6 +358,27 @@ EN = {
         "Scope: 29 request patterns x 3 trials x 4 policies = 348 runs; 5 ms threshold; 'no result' includes choosing the conventional receiver up front",
     "실험 범위: 요청 패턴 29개 x 3회 x 정책 4개 = 348회, 5 ms 비교선. 대부분 overload stress이며 predicted 정책의 사전 fallback도 '결과 없음'에 포함":
         "Scope: 29 patterns x 3 trials x 4 policies = 348 runs; most are overload stress; predicted-policy fallback counts as no result",
+    "한 NRx에 고정": "Pin to one NRx",
+    "셀마다 NRx 고정": "Pin each cell to one NRx",
+    "동적 선택\n+ deadline admission": "Dynamic selection\n+ deadline admission",
+    "동적 선택\n+ tail guard": "Dynamic selection\n+ tail guard",
+    "단일 셀 주기 요청": "Single-cell periodic",
+    "다중 셀 동시 도착": "Synchronized multi-cell",
+    "다중 셀 엇갈린 도착": "Staggered multi-cell",
+    "선택적 IID 호출": "Selective IID",
+    "선택적 burst 호출": "Selective burst",
+    "5 ms 안에 도착한 NRx 결과 비율(%)": "NRx results arriving within 5 ms (%)",
+    "(a) x축은 정책 · 막대는 workload 종류별 3회 중앙값":
+        "(a) Policies on x-axis · median of three trials by workload family",
+    "(b) 주기·다중 셀 14개 조건 (각 칸: timely result %)":
+        "(b) 14 periodic/multi-cell conditions (cell: timely-result %)",
+    "(c) 선택적 호출 15개 조건 (각 칸: timely result %)":
+        "(c) 15 selective-invocation conditions (cell: timely-result %)",
+    "5 ms 안 도착한 NRx 결과 (%)": "NRx results arriving within 5 ms (%)",
+    "Stage 2 정책 비교: 어떤 workload에서 어떤 정책이 제시간 NRx 결과를 남기는가":
+        "Stage 2 Policy Comparison: Which Policy Preserves Timely NRx Results for Each Workload?",
+    "29 workload 조건 × 3회 × 4정책 = 348회 · 실제 full-size GDR 요청/결과 · 69/87 trace는 >1,500/s overload · 사전 fallback도 결과 없음으로 계산":
+        "29 workload conditions × 3 trials × 4 policies = 348 runs · full-size GDR request/result · 69/87 traces exceed 1,500/s · early fallback counts as no result",
     "같은 4g\nL1+NRx": "Same 4g\nL1+NRx",
     "분리된 2g+2g\nGPU P2P": "Separate 2g+2g\nGPU P2P",
     "분리된 2g+2g\nNIC GDR": "Separate 2g+2g\nNIC GDR",
@@ -390,8 +411,6 @@ EN = {
     "예상 완료가 가장 빠른 곳": "Earliest predicted finish",
     "Round-robin · 모든 요청 수락": "Round-robin · admit every request",
     "Deadline admission · 늦을 요청은 fallback": "Deadline admission · fallback if infeasible",
-    "통과 영역": "PASS region",
-    "95% 미달": "Below 95%",
     "완료 예측 + tail guard": "Predicted finish + tail guard",
     "(a) 셀 1개 · 1 ms마다 NRx": "(a) One cell · NRx every 1 ms",
     "(b) 셀 2개 · 같은 시각에 NRx": "(b) Two cells · synchronized NRx",
@@ -406,7 +425,21 @@ EN = {
     "동시에 상주한 NRx replica 수": "Concurrent resident NRx replicas",
     "동시에 상주한 NRx endpoint 수": "Concurrent resident NRx endpoints",
     "5 ms 안에 도착한 NRx 결과 비율(높을수록 좋음)": "NRx results arriving within 5 ms (higher is better)",
-    "95% timely": "95% timely",
+    "5 ms 안에 도착한 NRx 결과 비율(%, 높을수록 좋음)":
+        "NRx results arriving within 5 ms (%, higher is better)",
+    "고정 배치 · 셀마다 endpoint 지정": "Fixed placement · one endpoint per cell",
+    "동적 선택 · 요청마다 endpoint 선택": "Dynamic selection · choose per request",
+    "(a) 요청마다 endpoint를 고르면 제시간 결과가 늘어남":
+        "(a) Per-request endpoint selection delivers more timely results",
+    "동적 선택이 개선": "Dynamic selection improves",
+    "동적 선택이 악화": "Dynamic selection worsens",
+    "동일한 요청 trace 수": "Identical request traces",
+    "(b) 같은 87개 trace 중 86개에서 개선":
+        "(b) Improvement on 86 of 87 identical traces",
+    "Stage 2 핵심: 고정 배치보다 요청 단위 endpoint 선택이 제시간 NRx 결과를 늘림":
+        "Stage 2: per-request endpoint selection yields more timely NRx results than fixed placement",
+    "실제 full-size GDR 요청/결과 · 동일 trace 87개 직접 비교 · 이 중 69개는 >1,500/s overload stress · 사전 fallback도 timely-result 실패로 계산":
+        "Full-size GDR requests/results · 87 paired traces · 69 exceed 1,500/s · early fallback counts as a timely-result failure",
     "Stage 2 핵심: NRx 3개는 1,000/s periodic을 처리하지만 2,000/s와 burst는 아직 못 버팀":
         "Stage 2: three NRx workers sustain periodic 1,000/s, but not 2,000/s or bursts",
     "Stage 2 결론: endpoint 3개는 1,000/s를 처리하지만 2,000/s와 burst에는 부족":
@@ -428,12 +461,11 @@ EN = {
     "(b) 실제로 실행한 AI 작업량": "(b) Neural work actually executed",
     "최종 결과를 선택하기까지 걸린 시간(ms)": "Time until final-result selection (ms)",
     "(c) 실제 슬롯 처리시간": "(c) Measured slot decision time",
-    "12 ms 뒤에는 결과 폐기": "Discard results after 12 ms",
     "중간값": "Median",
     "실제 무선 결과: 어려운 슬롯에만 NRx를 써도 성공률은 같고 AI 호출은 25% 감소":
         "Measured radio result: selective NRx preserves success while cutting neural calls by 25%",
-    "실험 범위: 실제 cuPHY CE -> GDR NRx -> LDPC/CRC, NRx 3개, 요청 100개 x 3회, 결과 유효시간 12 ms":
-        "Scope: real cuPHY CE -> GDR NRx -> LDPC/CRC; 3 NRx workers; 100 requests x 3 trials; 12 ms result validity",
+    "실험 범위: 실제 cuPHY CE -> GDR NRx -> LDPC/CRC, NRx 3개, 요청 100개 x 3회":
+        "Scope: real cuPHY CE -> GDR NRx -> LDPC/CRC; 3 NRx workers; 100 requests x 3 trials",
     "GPU 작업 흐름\n완료 기다리기": "Wait for GPU stream\ncompletion",
     "비동기\n메모리 복사": "Async\nmemory copy",
     "GPU 메모리\n해제": "Free GPU\nmemory",
@@ -520,9 +552,32 @@ EN = {
 def translate(text: str) -> str:
     if text in EN:
         return EN[text]
+    match = re.fullmatch(
+        r"(주기|동시|엇갈림) · (\d+)셀 · ([0-9.]+)ms · ([0-9,]+)/s",
+        text,
+    )
+    if match:
+        prefix = {
+            "주기": "Periodic",
+            "동시": "Synchronized",
+            "엇갈림": "Staggered",
+        }[match.group(1)]
+        return f"{prefix} · {match.group(2)} cell(s) · {match.group(3)} ms · {match.group(4)}/s"
+    match = re.fullmatch(
+        r"선택 (IID|burst) · (\d+)셀 · ([0-9.]+)ms · (\d+)% · ([0-9,]+)/s",
+        text,
+    )
+    if match:
+        return (
+            f"Selective {match.group(1)} · {match.group(2)} cells · {match.group(3)} ms · "
+            f"{match.group(4)}% · {match.group(5)}/s"
+        )
     match = re.fullmatch(r"더 좋음 (\d+/\d+)", text)
     if match:
         return f"better in {match.group(1)}"
+    match = re.fullmatch(r"중앙 개선폭\n\+([0-9.]+)%p", text)
+    if match:
+        return f"Median improvement\n+{match.group(1)} pp"
     match = re.fullmatch(r"(\d+)회", text)
     if match:
         return f"{match.group(1)} runs"

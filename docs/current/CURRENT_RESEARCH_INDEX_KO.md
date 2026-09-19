@@ -1,8 +1,14 @@
 # 현재 MIG–NRx/DART-Rx 연구 문서 인덱스
 
-**Updated:** 2026-08-16 KST
+**Updated:** 2026-09-19 KST
 **Workspace entry:** `../../README.md`  
 **Data catalog:** `../../data/README.md`
+
+## 현재 방향 (2026-09-19)
+
+- [`RESEARCH_DIRECTION_MPS_KO.md`](RESEARCH_DIRECTION_MPS_KO.md)
+  - MIG는 제약 조건, 최적화는 MPS 위에서. 단일 GPU MPS 스케줄링 → Perlmutter MPS + RDMA 분산
+  - 근거 수치, Future Direction 문구, Perlmutter 확인 항목, NVIDIA 미팅 질문, 개념 정리
 
 ## 먼저 읽을 문서
 

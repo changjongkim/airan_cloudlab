@@ -4,11 +4,20 @@
 **Workspace entry:** `../../README.md`  
 **Data catalog:** `../../data/README.md`
 
-## 현재 방향 (2026-09-19)
+## 현재 방향 (2026-09-20)
+
+- [`RESEARCH_PLAN_SOFTWALL_KO.md`](RESEARCH_PLAN_SOFTWALL_KO.md) ← **현재 작업 기준**
+  - 하드웨어 파티션 없이 소프트웨어만으로 deadline 계약을 성립시키는 SoftWall 스킴과
+    SIGMETRICS/NSDI 목표 연구 계획 (문제 난이도, 배포 요구사항, 기여 구조 C1–C5,
+    단계별 게이트 P0–P7, 평가 설계, 리스크 레지스터)
+  - 4-GPU 노드: L1 전용 GPU + NVLink P2P NRx pool + bounded lease background
+  - 아래 `RESEARCH_DIRECTION_MPS_KO.md`와 `results/20260803/MIG_MPS_COMBINED_REPORT.md`의
+    충돌 해소 입장은 이 문서 §2.3, 정정 항목은 §1.3
 
 - [`RESEARCH_DIRECTION_MPS_KO.md`](RESEARCH_DIRECTION_MPS_KO.md)
   - MIG는 제약 조건, 최적화는 MPS 위에서. 단일 GPU MPS 스케줄링 → Perlmutter MPS + RDMA 분산
   - 근거 수치, Future Direction 문구, Perlmutter 확인 항목, NVIDIA 미팅 질문, 개념 정리
+  - §4의 "Perlmutter MPS daemon 확인 필요"는 2026-06-05에 이미 해결됨 (계획서 §1.3 참조)
 
 ## 먼저 읽을 문서
 

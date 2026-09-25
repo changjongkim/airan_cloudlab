@@ -1,5 +1,10 @@
 # MIG + MPS Combined: The Only Viable GPU Isolation Strategy for AI-RAN
 
+> **Legacy, non-authoritative report.** This file reproduces the 2026-08 Chain 17/19
+> analysis. Its 40/50 ms proxy is not a target-DU timing contract, and its deployment
+> recommendations are not SoftWall production-qualification claims. The current
+> production decision is recorded in `results/softwall_multigpu/softwall_production_exit_gate_v3.json`.
+
 **Date**: 2026-08-03
 **Platform**: CloudLab d8545 · NVIDIA A100-SXM4-40GB × 4 · Driver 580.173.02 · CUDA 13.0
 **Workload**: cuPHY 25.3-cubb 5G L1 + diverse AI stack (Qwen 2.5-3B, Whisper large-v3, BERT, Qwen-VL, NRx, CsiNet, BeamPred)

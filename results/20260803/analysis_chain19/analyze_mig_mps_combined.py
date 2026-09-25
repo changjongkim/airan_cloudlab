@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""MIG + MPS combined analysis — 30 figures.
+"""LEGACY MIG + MPS combined analysis — 30 figures.
 
-Core thesis: MIG alone or MPS alone is insufficient. MIG cross-partition
-+ MPS on AI partition is the only combination that preserves L1 baseline
-latency AND enables high AI throughput.
+This script is retained only to reproduce the 2026-08 Chain 17/19 figures.
+It is not authoritative for SoftWall, does not establish a production timing
+contract, and must not be cited as a production-qualification result. In
+particular, the measured N=6 same-partition MPS pct=30 p99 is 145.9 ms; the
+former 45 ms fallback value was incorrect.
+
+Historical hypothesis: compare MIG/MPS placement effects on the measured
+Chain 17/19 proxy and AI throughput.
 
 Data sources:
   - /Users/changjongkim/New_research/cloudlab_results/results/20260725/chain17_all_stats.json  (108 conditions)
@@ -14,7 +19,7 @@ Figure organization (30 total):
   Ch1 · The Four Quadrants (MIG × MPS)                    F1-F4
   Ch2 · MIG alone insufficient                             F5-F8
   Ch3 · MPS alone insufficient                             F9-F12
-  Ch4 · MIG + MPS combined = WINNER                        F13-F17
+  Ch4 · Historical best measured placement                 F13-F17
   Ch5 · Realistic deployment                               F18-F22
   Ch6 · Optimization within MIG+MPS                        F23-F27
   Ch7 · Verdict                                            F28-F30
@@ -120,7 +125,7 @@ def fig01_quadrant_l1_latency():
             v = matrix[i, j]
             color = "white" if v > 30 else INK
             ax.text(j, i, f"{v:.1f} ms\nper slot", ha="center", va="center", fontsize=16, color=color, fontweight="bold")
-    ax.set_title("Fig 1 · L1 latency by MIG × MPS quadrant — combined MIG+MPS is the only winner",
+    ax.set_title("Fig 1 · Legacy Chain 17/19 MIG × MPS latency comparison",
                  fontweight="bold", pad=18, loc="left")
     plt.colorbar(im, ax=ax, label="L1 per-slot latency (ms, 100 kernels/slot proxy)")
     fig.text(0.02, 0.008,
@@ -174,13 +179,13 @@ def fig03_combined_verdict():
         ((0, 0, 5, 4), COL_WARN, "⚠️ PARTIAL",
          "MIG cross-partition + MPS off\nL1 baseline preserved\nAI serializes → slow\nUse: single AI + L1"),
         ((5, 0, 5, 4), COL_GOOD, "✅ OPTIMAL",
-         "MIG cross-partition + MPS on\nL1 baseline preserved\nAI throughput full\nUse: PRODUCTION"),
+         "MIG cross-partition + MPS on\nL1 proxy preserved\nAI throughput full\nHistorical best"),
     ]
     for (x, y, w, h), col, tag, txt in boxes:
         ax.add_patch(plt.Rectangle((x, y), w, h, facecolor=col, alpha=0.2, edgecolor=col, linewidth=3))
         ax.text(x + 0.3, y + h - 0.5, tag, fontsize=16, fontweight="bold", color=col)
         ax.text(x + 0.3, y + h - 1.5, txt, fontsize=12, color=INK, verticalalignment="top")
-    ax.text(5, 9.7, "Fig 3 · The Verdict: MIG + MPS combined is production-ready. Alone, each is insufficient.",
+    ax.text(5, 9.7, "Fig 3 · Legacy placement result — not a production qualification",
             ha="center", fontsize=17, fontweight="bold")
     ax.axhline(4.5, color=INK_MUT, linewidth=1)
     ax.axvline(5, color=INK_MUT, linewidth=1)
@@ -208,7 +213,7 @@ def fig04_pareto():
     ax.text(50, 0, "50 ms\nSLA threshold", ha="right", va="bottom", color=INK, fontsize=11, style="italic")
     ax.set_xlabel("L1 p99 latency (ms) — LOWER is better")
     ax.set_ylabel("AI aggregate throughput (%) — HIGHER is better")
-    ax.set_title("Fig 4 · Pareto frontier — only MIG CP + MPS on achieves upper-left (safe + fast)",
+    ax.set_title("Fig 4 · Legacy Pareto frontier for the measured Chain 17/19 proxy",
                  fontweight="bold", pad=18, loc="left")
     ax.grid(alpha=0.5)
     fig.text(0.02, 0.008,
@@ -422,7 +427,7 @@ def fig12_diverse_vs_identical():
     print("F12")
 
 # =============================================================
-# Chapter 4: MIG + MPS combined = WINNER
+# Chapter 4: historical best measured placement
 # =============================================================
 def fig13_cp_l1_invariance():
     """Fig 13: CP + MPS on AI — L1 latency invariant."""
@@ -446,7 +451,7 @@ def fig13_cp_l1_invariance():
     ax.set_title("Fig 13 · MIG CP + MPS on AI — L1 latency FLAT even at N=16 diverse AI",
                  fontweight="bold", pad=18, loc="left")
     fig.text(0.02, 0.008,
-             "L1 on 4g partition, N diverse AI on 3g partition (MPS on). L1 mean/p95/p99 all stay baseline for N=6-16. WINNER combination.",
+             "L1 on 4g partition, N diverse AI on 3g partition (MPS on). Historical proxy result; not a production timing contract.",
              fontsize=11, color=INK_SEC, style="italic")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     plt.savefig(f"{FIG}/F13_cp_l1_invariance.png"); plt.close()
@@ -586,7 +591,7 @@ def fig18_realistic_softbank():
     ax.set_title("Fig 18 · SoftBank AITRAS-style deployment — MIG CP + MPS on AI is the only pass",
                  fontweight="bold", pad=18, loc="left")
     fig.text(0.02, 0.008,
-             "Only combination that meets L1 SLA (<50ms) AND full AI throughput.",
+             "Best placement under this legacy 50ms proxy; not a target-DU SLA qualification.",
              fontsize=11, color=INK_SEC, style="italic")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     plt.savefig(f"{FIG}/F18_realistic_softbank.png"); plt.close()
@@ -824,7 +829,7 @@ def fig28_master_decision():
     """Fig 28: Master decision matrix."""
     fig, ax = plt.subplots(figsize=(15, 8))
     ax.axis('off')
-    header = ["Topology", "L1 p99 (ms)", "AI thput (%)", "Fault iso", "Scale to N≥6", "SLA compliant"]
+    header = ["Topology", "L1 p99 (ms)", "AI thput (%)", "Fault iso", "Scale to N≥6", "Legacy proxy pass"]
     rows = [
         ("Multi-GPU (separate GPUs)", "40", "100", "✓", "✓", "✓"),
         ("MIG CP + MPS on AI", "40", "100", "✓", "✓", "✓"),
@@ -852,7 +857,7 @@ def fig28_master_decision():
                     fontsize=11, color=row_col if j>0 else INK, fontweight="bold" if j==0 else "normal")
     ax.set_xlim(0, sum(cell_w))
     ax.set_ylim(-0.5, 8)
-    ax.text(sum(cell_w)/2, 7.9, "Fig 28 · Master decision matrix — MIG + MPS combined is production-ready",
+    ax.text(sum(cell_w)/2, 7.9, "Fig 28 · Legacy Chain 17/19 decision matrix — not production qualification",
             ha="center", fontsize=17, fontweight="bold")
     ax.text(0, -0.3, "✓ = full pass · ◐ = partial with caveats · ✗ = fail",
             fontsize=11, style="italic", color=INK_SEC)
@@ -872,8 +877,8 @@ def fig29_decision_tree():
         (7, 6, "No → Same GPU", INK, 0.3),
         (7, 4.5, "AI count ≤ 5?", INK, 0.3),
         (4, 3, "Yes → MIG CP + MPS (still preferred)", COL_GOOD, 0.35),
-        (9.5, 3, "Yes → SP + MPS pct=30 (fallback)", COL_WARN, 0.35),
-        (7, 1.5, "No → MIG CP + MPS (mandatory)", COL_GOOD, 0.35),
+        (9.5, 3, "Yes → no qualified SP fallback", COL_BAD, 0.35),
+        (7, 1.5, "No → CP was historical best", COL_GOOD, 0.35),
     ]
     for x, y, txt, col, alpha in nodes:
         ax.add_patch(plt.Rectangle((x-1.6, y-0.35), 3.2, 0.7, facecolor=col, alpha=alpha, edgecolor=col, linewidth=2))
@@ -888,7 +893,7 @@ def fig29_decision_tree():
               ((7, 4.15), (7, 1.85)),]
     for (x1,y1), (x2,y2) in arrows:
         ax.annotate("", xy=(x2, y2), xytext=(x1, y1), arrowprops=dict(arrowstyle="->", color=INK_MUT, lw=1.5))
-    ax.text(5, 9.7, "Fig 29 · Decision tree — MIG + MPS is the recommended combination for production",
+    ax.text(5, 9.7, "Fig 29 · Legacy placement tree — no production recommendation",
             ha="center", fontsize=17, fontweight="bold")
     plt.savefig(f"{FIG}/F29_decision_tree.png"); plt.close()
     print("F29")

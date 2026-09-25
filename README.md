@@ -2,7 +2,7 @@
 
 **기준일:** 2026-09-25
 **현재 연구:** SoftWall — MIG를 사용하지 않는 공유 GPU(MPS)에서 optional NeuralRx의 조건부 복구 의무를 인증하는 runtime substrate
-**현재 단계:** 원고 provenance 정리 완료, production P2 frozen 개발 gate 995/1,000으로 실패; live-DU timing과 native cuPHY fast path가 남음
+**현재 단계:** 원고 provenance 정리 완료. Production P2 bounded campaign은 frozen 개발 gate 995/1,000 실패와 사전 중단 규칙에 따라 종료했으며, 유일한 활성 production blocker는 target-DU timing contract(P1)임
 **투고 목표:** ACM SIGMETRICS 2027 Winter 사이클 — abstract 2027-01-04 23:59 AoE, paper 2027-01-11 23:59 AoE, 통보 2027-03-10 (공식 CFP, 2026-09-25 확인)
 **최신 스냅샷 태그:** `softwall-sigmetrics-snapshot-20260925` (commit `2a97f8b`)
 
@@ -222,7 +222,7 @@ MPS restart와 Qwen reload 중의 가용성은 주장하지 않는다.
 | # | 문제 | 상태 |
 |---|---|---|
 | 1 | `RESEARCH_PLAN_SOFTWALL_KO.md`의 NeuralRx 용량 수치가 두 출처를 혼합했다. 문서는 "full A100 1164.1 req/s, 서비스 1.34 ms"로 기재했으나 `NRX_CAPACITY.csv`의 full GPU 1 replica 값은 1130.5 req/s, 평균 0.882 ms, p99 1.107 ms이다. 1.34 ms는 4g MIG 행(745.1 req/s)의 값이다. 같은 문서의 P2P 76.84 µs는 같은 GPU 안 MIG 쌍의 단일 process 측정값이다. | 문서를 `docs/archive/`로 이동하고 보관 사유를 첫 줄에 기재했다. 본문 수치는 이력으로 남아 있으므로 인용하지 않는다. |
-| 2 | `analyze_mig_mps_combined.py`와 `MIG_MPS_COMBINED_REPORT.md`가 "SP + MPS pct=30"을 45 ms로 기재했다. 실측은 N=6에서 145.9 ms이다. | 두 파일 모두 145.9 ms로 정정했다. |
+| 2 | `analyze_mig_mps_combined.py`와 MIG/MPS 영문·한국어 보고서가 "SP + MPS pct=30"을 45 ms fallback으로 기재했다. 실측은 N=6에서 145.9 ms이다. | 수치를 145.9 ms로 정정하고, 세 파일을 현재 SoftWall production 판정에서 제외되는 과거 재현 자료로 명시했다. |
 | 3 | 원고 §9의 long-tail 서술에 수치가 없었다. | `main.tex`에 C158 attempt 4의 NeuralRx 완료 350.948 ms를 기재했다. 원인은 미확정이다. |
 | 4 | `fallback_start_ns`는 예약 시각이며 실제 시작 시각이 아니다. | 원고의 시간 판정은 commit return을 기준으로 한다. Fallback의 실제 GPU 시작 시각은 계측하지 않는다. |
 | 5 | `docs/current/`의 `SOFTWALL_*.md`가 74개였고 노벨티 판정 문서가 시점별로 중복되었다. | `docs/current/`를 17개 문서로 줄이고 나머지를 `docs/archive/`로 옮겼다. |
@@ -248,8 +248,8 @@ MPS restart와 Qwen reload 중의 가용성은 주장하지 않는다.
 
 | 감사 | 결과 | 원본 |
 |---|---|---|
-| 원고 주장 감사 | 13/13 PASS (`forbidden_overclaim_absent`, `negative_performance_result` 포함) | `results/softwall_multigpu/softwall_manuscript_claim_audit_v1.json` |
-| 투고 감사 | 25/25 PASS | `results/softwall_multigpu/softwall_sigmetrics_submission_audit_v1.json` |
+| 원고 주장 감사 | 134/134 PASS (`forbidden_overclaim_absent`, `negative_performance_result` 포함) | `results/softwall_multigpu/softwall_manuscript_claim_audit_v1.json` |
+| 투고 감사 | 27/27 PASS | `results/softwall_multigpu/softwall_sigmetrics_submission_audit_v1.json` |
 | C162 재현성 manifest | 83개 파일 | `results/softwall_multigpu/c162_artifact_manifest.json` |
 
 ## 9. 연구 경과
@@ -329,7 +329,7 @@ Perlmutter A100에서 MIG OFF 상태로 CloudLab 실험을 재측정했다.
 
 1. 원고 정리: **완료.** 수치 provenance, C158 tail, P3 Results 승격, P2 stage attribution, Winter CFP와 문서 archive를 claim/submission audit으로 고정했다.
 2. P1 target-DU timing contract 확보: 최소 schema, 세 획득 경로와 parametric bridge를 timing-contract 문서에 고정했다. 실제 target DU trace가 없으면 `UQ_NO_PRODUCTION_TRACE`를 유지한다.
-3. P2 fast path: persistent-input 구현은 remote NeuralRx–pair 상관을 0.9603에서 0.3307로 낮췄지만 frozen gate가 995/1,000으로 실패했다. Native N0 parity fixture는 양 decoder의 같은 1,377-byte TB와 두 raw-IQ layout의 183,456개 복소 원소에 대한 C++ bitwise 일치로 통과했다. C++/CUDA IQ bridge도 fixture bitwise parity와 양 decoder 300/300 correctness를 통과했지만 진단 deadline은 298/300이었다. Persistent monolithic conventional은 300/300 correct였고 p50 1.014 ms였으나 max 5.363 ms였으며, 두 partial-native path를 결합한 C168은 293/300이었다. 따라서 N1/N2 완료나 timing qualification으로 세지 않는다. 다음 구현은 N1 GPU1 fused native NeuralRx와 N2의 fully native phase setup이다. 새 qualification은 live-DU `D`가 확보된 뒤 독립 holdout 1,000/1,000으로만 연다.
+3. P2 fast path bounded campaign: **사전 중단 규칙에 따라 종료.** Persistent-input 구현은 remote NeuralRx–pair 상관을 0.9603에서 0.3307로 낮췄지만 frozen gate가 995/1,000으로 실패했고 holdout을 열지 않았다. Native N0 parity fixture는 양 decoder의 같은 1,377-byte TB와 두 raw-IQ layout의 183,456개 복소 원소에 대한 C++ bitwise 일치로 통과했다. C++/CUDA IQ bridge도 fixture bitwise parity와 양 decoder 300/300 correctness를 통과했지만 진단 deadline은 298/300이었다. Persistent monolithic conventional은 300/300 correct였고 p50 1.014 ms였으나 max 5.363 ms였으며, 두 partial-native path를 결합한 C168은 293/300이었다. N1/N2는 현재 논문의 다음 작업이 아니라 보류된 engineering roadmap이다. 실제 target-DU `D`와 clock provenance를 P1에서 확보하고 새 protocol을 사전 고정한 경우에만 재개한다.
 
 다음 항목은 수행하지 않는다: 새 메커니즘 추가, 나머지 수명주기 UQ 5개 채우기, 처리량 우위 재시도, P1 이전의 P4 통합 재자격, 새 문서 생성.
 

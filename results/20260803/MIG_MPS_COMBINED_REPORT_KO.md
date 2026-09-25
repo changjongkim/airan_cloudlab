@@ -1,5 +1,10 @@
 # MIG + MPS 결합: AI-RAN을 위한 유일한 GPU 격리 전략
 
+> **과거 재현용 비권위 문서.** 이 파일은 2026-08 Chain 17/19 분석을 보존한다.
+> 여기의 40/50 ms proxy는 target-DU timing contract가 아니며, 배치 권고는 현재 SoftWall의
+> production 자격 주장으로 사용할 수 없다. 현재 판정은
+> `results/softwall_multigpu/softwall_production_exit_gate_v3.json`에 있다.
+
 **날짜**: 2026-08-03
 **플랫폼**: CloudLab d8545 · NVIDIA A100-SXM4-40GB × 4 · Driver 580.173.02 · CUDA 13.0
 **워크로드**: cuPHY 25.3-cubb 5G L1 + 다양한 AI 스택 (Qwen 2.5-3B, Whisper large-v3, BERT, Qwen-VL, NRx, CsiNet, BeamPred)
@@ -21,7 +26,7 @@
 | ------------------------------ | ----------- | ------------- | ---- |
 | Multi-GPU                      | **40**      | 100 %         | ✅ 이상적 (비싸다) |
 | **MIG CP + MPS on AI**         | **40**      | 100 %         | ✅ **프로덕션** |
-| MIG SP + MPS pct=30 (튜닝)     | 45          | 85 %          | ⚠ 차선 |
+| MIG SP + MPS pct=30 (N=6 실측) | 145.9       | 85 %          | ✗ 측정 실패 |
 | MIG SP + MPS 기본값            | 150+        | 100 %         | ✗ SLA 파괴 |
 | Full GPU + MPS on              | 63          | 100 %         | ✗ L1 50 % 페널티 |
 | MIG 없음, MPS 없음             | 300+        | 30 %          | ✗ 파국 |
@@ -109,7 +114,7 @@ MIG를 완전히 빼고 (Full GPU, no partition) MPS에만 의존하면?
 
 ![F11](analysis_chain19/figures/mig_mps/F11_mps_pct_full_gpu.png)
 
-**MPS thread% 튜닝 (diverse-AI 실험 Exp 11)** — (pct, N) 그리드의 L1 p99 heatmap. 최선은 pct=30, N=6에서 45 ms. 기본값 (150+ ms) 보다는 훨씬 좋으나 MIG CP baseline 대비 여전히 12 % 나쁨. **튜닝은 근접시킬 뿐 격리에 도달하지 못한다.**
+**MPS thread% 튜닝 (diverse-AI 실험 Exp 11)** — (pct, N) 그리드의 L1 p99 heatmap. pct=30, N=6의 세 실행 평균 p99는 **145.9 ms**이며 약 40 ms인 MIG CP baseline의 약 3.6배다. **튜닝은 cross-partition 격리에 접근하지 못한다.**
 
 ![F12](analysis_chain19/figures/mig_mps/F12_diverse_vs_identical.png)
 
@@ -137,7 +142,7 @@ L1은 전용 MIG 파티션 (예: 4g.20gb), AI는 반대 파티션 (3g.20gb) + AI
 
 ![F16](analysis_chain19/figures/mig_mps/F16_cp_vs_sp_direct.png)
 
-**CP vs SP 직접 비교 (N=6)** — CP + MPS는 baseline 유지 (40 ms). SP는 최선의 pct=30 튜닝에서도 45 ms (12 % 나쁨). SP + 기본값 pct=100은 150+ ms (SLA 파괴).
+**CP vs SP 직접 비교 (N=6)** — CP + MPS는 약 40 ms였다. SP pct=30은 145.9 ms, pct=100은 411.3 ms로 둘 다 이 문서의 50 ms proxy를 넘었다.
 
 ![F17](analysis_chain19/figures/mig_mps/F17_cp_extreme_scale.png)
 
@@ -185,7 +190,7 @@ L1은 전용 MIG 파티션 (예: 4g.20gb), AI는 반대 파티션 (3g.20gb) + AI
 
 ![F24](analysis_chain19/figures/mig_mps/F24_pct_within_sp.png)
 
-**SP 토폴로지 내부의 MPS thread% cap** — 대비용. 모든 셀 ≥45 ms. 최선의 SP 결과도 CP의 40 ms에 미치지 못함.
+**SP 토폴로지 내부의 MPS thread% cap** — 대비용. N=6, pct=30도 p99 145.9 ms였으며 CP의 약 40 ms에 미치지 못했다.
 
 ![F25](analysis_chain19/figures/mig_mps/F25_cell_count_sla.png)
 
@@ -214,7 +219,7 @@ L1은 전용 MIG 파티션 (예: 4g.20gb), AI는 반대 파티션 (3g.20gb) + AI
 **배치 결정 트리**:
 1. Multi-GPU 가능? → 사용 (최대 용량, 최쉬움).
 2. Single GPU만?
-   - AI 수 ≤ 5? → MIG CP + MPS 여전히 선호; SP + MPS pct=30은 예산 fallback.
+   - Same-partition pct=30은 N=6에서 p99 145.9 ms였으므로 자격 있는 fallback이 아니다.
    - AI 수 > 5? → MIG CP + MPS **필수**.
 
 ![F30](analysis_chain19/figures/mig_mps/F30_cost_benefit.png)
@@ -274,7 +279,7 @@ diverse-AI 실험의 교훈은 duty cycle이 GPU-utilization 지표이지 SLA �
 ## 다음 단계
 
 - **다음 endurance 실험 (24-hour)**: 프로덕션 replica — cuPHY + Aerial CTL + 6-service AI 스택 (Qwen/Whisper/BERT/Qwen-VL/NRx/CsiNet) MIG CP + MPS 하.
-- MIG CP + MPS vs SP fallback 에서의 AI 서비스 SLO (Qwen p99 요청 지연, Whisper 지연 등) 측정 → fallback 선택 시 서비스당 throughput 비용 정량화.
+- MIG CP + MPS와 same-partition 진단군의 AI 서비스 SLO를 비교할 수 있으나, same-partition을 production fallback으로 부르지 않는다.
 - 80GB 변형 및 7g 파티션 MIG config 테스트 — 단일 7g 파티션의 Full GPU MIG가 Full GPU처럼 행동하는지, MIG scheduler에서 뭔가를 얻는지.
 
 ---

@@ -684,7 +684,9 @@
     },
     {
       "id": "P2_FAST_PATH",
-      "requirement": "Implement a path whose qualified all-fail completion fits the derived deadline. Same-stream raw-IQ full-remote P2P is the best measured candidate but still exceeded 4.5 ms in 115/1000 trials; the measured tail is dominated by remote cuPHY channel estimation."
+      "requirement": "Implement a path whose qualified all-fail completion fits the derived deadline. Same-stream raw-IQ full-remote P2P is the best measured candidate but still exceeded 4.5 ms in 115/1000 trials; the measured tail is dominated by remote cuPHY channel estimation.",
+      "campaign_status": "CURRENT_BOUNDED_CAMPAIGN_STOPPED",
+      "reopen_condition": "P1 target-DU D and a newly preregistered protocol"
     },
     {
       "id": "P3_CHANNEL_COMPATIBILITY",
@@ -735,7 +737,7 @@
     }
   },
   "native_fast_path_status": {
-    "status": "N0_NATIVE_IO_COMPLETE_N1_N2_FUSED_EXECUTABLES_PENDING",
+    "status": "P2_BOUNDED_CAMPAIGN_STOPPED_P1_EXTERNAL_REQUIRED",
     "qualification_status": "NOT_QUALIFIED",
     "n0_exact_fixture": {
       "pass": true,
@@ -796,13 +798,8 @@
       "interpretation": "Input assembly is native and exact, but its 298/300 diagnostic timing does not resolve the qualified fast-path tail and cannot open a holdout.",
       "qualification": "forbidden"
     },
-    "next_stage": {
-      "id": "N1",
-      "name": "native_remote_neuralrx",
-      "gate": "300/300 parity correctness; diagnostic only"
-    },
     "artifact": "results/softwall_multigpu/c166_native_fast_path_status_v1.json",
-    "artifact_sha256": "f53abcacc2c6fdc0e55381e75ee525cea13aa8039ae5e3c47665d1288e745398",
+    "artifact_sha256": "c41040ebaee0a97c98597a6aaac3a4276b1ca4ec3fc47435ffd6c1daadff0690",
     "native_conventional_shadow": {
       "status": "PERSISTENT_MONOLITHIC_PARITY_PASS_DIAGNOSTIC_ONLY",
       "request_allocating_baseline": "results/softwall_multigpu/c166_native_conventional_shadow_request_allocating_job58871654.json",
@@ -875,6 +872,65 @@
       },
       "interpretation": "Median service improved, but seven conventional-tail units exceeded the diagnostic threshold. Partial native components do not qualify P2 or open a holdout.",
       "qualification": "forbidden"
-    }
+    },
+    "campaign_stop_decision": {
+      "decision": "STOP_CURRENT_P2_CAMPAIGN",
+      "basis": "The frozen C165 development gate rejected the candidate at 995/1000 and prohibited opening its holdout. Bounded diagnostics removed the original remote-CE-dominance hypothesis without producing a qualifying path.",
+      "evidence": {
+        "initial_remote_ce_pair_pearson": 0.9602820841334867,
+        "postfix_remote_neural_pair_pearson": 0.330708051738178,
+        "correlation_diagnostic_target": 0.5,
+        "development_timely": 995,
+        "development_total": 1000,
+        "development_late": 5,
+        "holdout_opened": false,
+        "late_attribution": {
+          "conventional_completion": 4,
+          "remote_neuralrx": 1
+        },
+        "partial_native_canary_timely": 293,
+        "partial_native_canary_total": 300
+      },
+      "evidence_artifacts": [
+        "results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json",
+        "results/softwall_multigpu/c165_ce_tail_frozen_protocol.json",
+        "results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json",
+        "results/softwall_multigpu/c168_persistent_pair_canary_seed20359400_job58871654.json"
+      ],
+      "scope": "No N1/N2 mechanism completion, new fast-path holdout, deadline adjustment, sleep injection, or replacement seed in the current paper campaign.",
+      "reopen_only_after": "P1 target-DU D plus a newly preregistered protocol."
+    },
+    "active_next_action": {
+      "id": "P1_LIVE_DU_CLOCK",
+      "action": "Acquire the target-DU timing contract and synchronized trace using the frozen minimum schema.",
+      "artifact": "docs/current/SOFTWALL_PUSCH_TIMING_CONTRACT_KO.md",
+      "external_dependency": true
+    },
+    "deferred_followup_stages": [
+      {
+        "id": "N1",
+        "name": "native_remote_neuralrx",
+        "gate": "300/300 parity correctness; diagnostic only",
+        "scope": "deferred engineering roadmap; not active manuscript work"
+      },
+      {
+        "id": "N2",
+        "name": "native_conventional_shadow",
+        "gate": "300/300 parity correctness; diagnostic only",
+        "scope": "deferred engineering roadmap; not active manuscript work"
+      },
+      {
+        "id": "N3",
+        "name": "paired_native_canary",
+        "gate": "300/300 both paths correct, single commit, fences retire; diagnostic only",
+        "scope": "deferred engineering roadmap; not active manuscript work"
+      },
+      {
+        "id": "N4",
+        "name": "production_qualification",
+        "gate": "requires P1 target-DU contract, then 1000/1000 development before one independent 1000/1000 holdout",
+        "scope": "deferred engineering roadmap; not active manuscript work"
+      }
+    ]
   }
 }

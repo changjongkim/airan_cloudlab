@@ -83,8 +83,9 @@ GPU 0.918, conventional completion 0.941이 지배했다. 별도 300건 profiler
 
 이때 4.5 ms는 단순 그래프 선이 아니라 mode의 `D` parameter다. Scheduling이나 Qwen을 붙이기
 전에 양 radio path의 whole-service tail이 함께 자격화돼야 한다. 현재 Python prototype은
-그 조건을 5건 위반했으며, 다음 C++/CUDA fast path는 GPU1 NRx CE뿐 아니라 GPU0의
-CE→noise→equalizer chain도 포함해야 한다.
+그 조건을 5건 위반했다. 완전한 C++/CUDA fast path를 향후 다시 구현한다면 GPU1 NRx CE뿐
+아니라 GPU0의 CE→noise→equalizer chain도 포함해야 한다. 다만 현재 bounded campaign은 아래의
+사전 중단 규칙이 발동했으므로 이 구현을 계속하지 않는다.
 
 ### 1.3 설계에 주는 결론
 
@@ -163,9 +164,11 @@ t_IQ_ready → t_PHY_submit → t_CRC_visible → t_FAPI_publish
 요청 ID, SFN/slot, single commit, clock conversion error와 expiry provenance를 C163 validator에
 넣는다. testMAC 4.5 ms는 그 전까지 conservative integration target으로만 사용한다.
 
-### P2 — Production fast path
+### P2 — Production fast path — bounded campaign 종료
 
-raw-IQ P2P 구조를 Python polling prototype에서 persistent C++/CUDA path로 옮긴다.
+아래는 재개 시 필요한 persistent C++/CUDA path의 설계 계약이다. 현재 논문의 활성 구현
+계획이 아니며, P1에서 target-DU `D`와 clock provenance를 확보하고 새 protocol을 사전 고정한
+뒤에만 재개한다.
 
 1. GPU0 raw-IQ publish와 conventional launch를 같은 release event에서 시작한다.
 2. GPU1은 channel estimation, TensorRT, LDPC, CRC를 하나의 persistent execution graph 또는
@@ -177,7 +180,7 @@ raw-IQ P2P 구조를 Python polling prototype에서 persistent C++/CUDA path로 
 
 현재 Python raw-P2P는 995/1,000까지 도달한 구조 선택의 근거일 뿐 qualification 결과가 아니다.
 
-#### P2-native 구현 단위
+#### P2-native 후속 구현 단위 — 현재 범위에서 보류
 
 소스 감사 결과, native path를 처음부터 새로 작성할 필요는 없다. Aerial checkout에는 두
 재사용 경로가 있다.
@@ -191,7 +194,7 @@ raw-IQ P2P 구조를 Python polling prototype에서 persistent C++/CUDA path로 
   현재 `pycuphycpp` CMake target에는 `pycuphy_trt_engine.cpp`가 빠져 있으므로 SoftWall
   executable target에서 이를 명시적으로 포함해야 한다.
 
-구현과 판정 순서는 다음으로 고정한다.
+재개할 경우의 구현과 판정 순서는 다음으로 고정한다.
 
 1. **N0 exact fixture.** 현재 C165의 clean-PUSCH raw IQ, TB, engine hash, static/dynamic radio
    parameter를 versioned binary+JSON fixture로 내보낸다. C++ loader가 shape, byte order,
@@ -220,7 +223,7 @@ N0는 2026-09-25에 완료했다. Seed 20359400의 양 reference decoder가 같�
 일치했고 잘못된 C-order destination은 거절했다. 300-request canary는 conventional과 NeuralRx
 각 300/300 correct였지만 진단용 4.5 ms 선은 298/300만 만족했다. 따라서 입력 조립은 정확히
 native화됐지만 tail 원인은 아니며 N1 완료나 timing qualification으로 세지 않는다. 다음
-미구현 단위는 CE→TensorRT→LDPC/CRC를 한 native lifecycle로 묶는 N1 fused remote NeuralRx다.
+미구현 단위였던 N1 fused remote NeuralRx는 현재 범위에서 보류한다.
 
 N2 방향도 monolithic `PuschPipeline` shadow로 먼저 검증했다. 기존 separable conventional과
 monolithic conventional은 각각 300/300 correct였고, HARQ buffer를 readiness 때 한 번
@@ -236,6 +239,16 @@ wrapper를 지나므로 N2 완료로 세지 않으며, 이 canary도 P2 qualific
 HDF5 vector가 없어 현재 C165와 다른 radio profile의 숫자를 대신 만들 수 없다. 그 예제를
 qualification 대용으로 사용하지 않는다. Deadline 변경, sleep 주입, seed 교체 재시도,
 Python prototype의 추가 holdout도 금지한다.
+
+#### P2 중단 판정
+
+C163의 초기 remote CE와 pair latency 상관은 0.9603이었다. Persistent-input과 stream-ordering을
+적용한 C165에서는 이 상관이 0.3307로 내려가 사전 기준 0.5보다 낮아졌지만 frozen 개발 gate는
+995/1,000에 그쳤다. Late 5건은 GPU0 conventional completion 4건과 remote NeuralRx 1건으로
+분산됐고, 추가 partial-native canary C168도 293/300이었다. 따라서 고정한 원인 가설을 소진한
+뒤에도 1,000/1,000을 만들지 못하면 중단한다는 규칙이 발동했다. Holdout은 열지 않았으며,
+N1--N4는 production 자격 결과가 아니다. 현재 유일한 활성 다음 단계는 P1 target-DU timing
+contract 획득이다.
 
 ### P3 — Supported-channel NeuralRx — 좁은 mode 완료
 
@@ -269,6 +282,7 @@ P3의 제한된 supported mode는 확보했다. 이제 제출 범위를 가르�
    완료한 뒤 제출한다.
 
 현재 데이터는 channel gap을 전부 뭉뚱그릴 필요가 없음을 보여준다. CDL-D/E는 통과했고
-TDL-A는 실패했다. 반면 production timing은 여전히 실제 구현을 기각한다. 다음 구현은
-양 GPU cuPHY service tail을 줄이는 persistent C++/CUDA fast path와 live-DU contract 수집에
-집중한다. 추가 optimizer나 lifecycle matrix 확장은 이 gate보다 우선순위가 낮다.
+TDL-A는 실패했다. 반면 production timing은 여전히 실제 구현을 기각한다. 현재 활성 작업은
+live-DU contract 수집뿐이다. 양 GPU persistent C++/CUDA fast path는 실제 `D`를 확보한 뒤
+새 protocol로 재개할 engineering roadmap이며, 추가 optimizer나 lifecycle matrix 확장은
+현재 범위에 포함하지 않는다.

@@ -135,7 +135,7 @@ Production `d_MAC`, cross-family, lifecycle 나머지 5개를 단순히 채우�
 |---|---|
 | Claim/evidence freeze | 완료 |
 | 영문 full-structure draft | 완료 |
-| Machine-readable claim audit | 13/13 PASS, necessity witness 포함 |
+| Machine-readable claim audit | 134/134 PASS, necessity witness 포함 |
 | Novelty/closest-work matrix | 완료, Interplay/CAORA 추가 |
 | Fig.3 envelope/scalability | 완료 |
 | Fig.1 system contract | 완료 |

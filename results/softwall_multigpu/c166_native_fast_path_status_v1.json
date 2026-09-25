@@ -1,6 +1,6 @@
 {
   "schema": "softwall-c166-native-fast-path-status-v1",
-  "status": "N0_NATIVE_IO_COMPLETE_N1_N2_FUSED_EXECUTABLES_PENDING",
+  "status": "P2_BOUNDED_CAMPAIGN_STOPPED_P1_EXTERNAL_REQUIRED",
   "qualification_status": "NOT_QUALIFIED",
   "n0_exact_fixture": {
     "pass": true,
@@ -43,32 +43,9 @@
     "tensorrt": "third_party/aerial-cuda-accelerated-ran/pyaerial/pybind11/pycuphy_trt_engine.cpp",
     "ldpc_crc": "third_party/aerial-cuda-accelerated-ran/pyaerial/pybind11/pycuphy_ldpc.hpp and pycuphy_crc_check.hpp"
   },
-  "ordered_next_stages": [
-    {
-      "id": "N1",
-      "name": "native_remote_neuralrx",
-      "gate": "300/300 parity correctness; diagnostic only"
-    },
-    {
-      "id": "N2",
-      "name": "native_conventional_shadow",
-      "gate": "300/300 parity correctness; diagnostic only"
-    },
-    {
-      "id": "N3",
-      "name": "paired_native_canary",
-      "gate": "300/300 both paths correct, single commit, fences retire; diagnostic only"
-    },
-    {
-      "id": "N4",
-      "name": "production_qualification",
-      "gate": "requires P1 target-DU contract, then 1000/1000 development before one independent 1000/1000 holdout"
-    }
-  ],
   "current_blockers": [
-    "N1 fused native cuPHY CE->TensorRT->LDPC/CRC and N2 fully native phase setup are not implemented; partial native pairing was 293/300 at the diagnostic 4.5-ms line",
-    "target-DU d_MAC and synchronized clock trace are unavailable",
-    "C165 Python development gate failed 995/1000 and did not open a holdout"
+    "target-DU d_MAC and synchronized clock trace are unavailable; P1 is the first active external blocker",
+    "P2 remains not qualified because C165 failed 995/1000 and no holdout was opened"
   ],
   "forbidden_shortcuts": [
     "deadline adjustment",
@@ -173,5 +150,69 @@
     },
     "interpretation": "Median service improved, but seven conventional-tail units exceeded the diagnostic threshold. Partial native components do not qualify P2 or open a holdout.",
     "qualification": "forbidden"
+  },
+  "deferred_followup_stages": [
+    {
+      "id": "N1",
+      "name": "native_remote_neuralrx",
+      "gate": "300/300 parity correctness; diagnostic only",
+      "scope": "deferred engineering roadmap; not active manuscript work"
+    },
+    {
+      "id": "N2",
+      "name": "native_conventional_shadow",
+      "gate": "300/300 parity correctness; diagnostic only",
+      "scope": "deferred engineering roadmap; not active manuscript work"
+    },
+    {
+      "id": "N3",
+      "name": "paired_native_canary",
+      "gate": "300/300 both paths correct, single commit, fences retire; diagnostic only",
+      "scope": "deferred engineering roadmap; not active manuscript work"
+    },
+    {
+      "id": "N4",
+      "name": "production_qualification",
+      "gate": "requires P1 target-DU contract, then 1000/1000 development before one independent 1000/1000 holdout",
+      "scope": "deferred engineering roadmap; not active manuscript work"
+    }
+  ],
+  "active_next_action": {
+    "id": "P1_LIVE_DU_CLOCK",
+    "action": "Acquire the target-DU timing contract and synchronized trace using the frozen minimum schema.",
+    "artifact": "docs/current/SOFTWALL_PUSCH_TIMING_CONTRACT_KO.md",
+    "external_dependency": true
+  },
+  "reopen_conditions": [
+    "A target-DU d_MAC and synchronized clock provenance are available.",
+    "A new protocol is frozen against that target-DU D before any new timing outcome is opened.",
+    "The current C165 failure and unopened holdout remain preserved rather than replaced."
+  ],
+  "stop_decision": {
+    "decision": "STOP_CURRENT_P2_CAMPAIGN",
+    "basis": "The frozen C165 development gate rejected the candidate at 995/1000 and prohibited opening its holdout. Bounded diagnostics removed the original remote-CE-dominance hypothesis without producing a qualifying path.",
+    "evidence": {
+      "initial_remote_ce_pair_pearson": 0.9602820841334867,
+      "postfix_remote_neural_pair_pearson": 0.330708051738178,
+      "correlation_diagnostic_target": 0.5,
+      "development_timely": 995,
+      "development_total": 1000,
+      "development_late": 5,
+      "holdout_opened": false,
+      "late_attribution": {
+        "conventional_completion": 4,
+        "remote_neuralrx": 1
+      },
+      "partial_native_canary_timely": 293,
+      "partial_native_canary_total": 300
+    },
+    "evidence_artifacts": [
+      "results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json",
+      "results/softwall_multigpu/c165_ce_tail_frozen_protocol.json",
+      "results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json",
+      "results/softwall_multigpu/c168_persistent_pair_canary_seed20359400_job58871654.json"
+    ],
+    "scope": "No N1/N2 mechanism completion, new fast-path holdout, deadline adjustment, sleep injection, or replacement seed in the current paper campaign.",
+    "reopen_only_after": "P1 target-DU D plus a newly preregistered protocol."
   }
 }

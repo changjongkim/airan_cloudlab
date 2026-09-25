@@ -54,6 +54,16 @@ def main() -> None:
     parser.add_argument("--busy-poll", action="store_true")
     parser.add_argument("--cpu-affinity-index", type=int)
     parser.add_argument("--profile-stages", action="store_true")
+    parser.add_argument(
+        "--input-mode",
+        choices=("transient_sync", "persistent_sync", "persistent_ordered"),
+        default="transient_sync",
+        help=(
+            "How raw real/imag P2P input becomes the cuPHY complex slot. "
+            "persistent_ordered keeps the buffer and relies on the receiver "
+            "stream dependency instead of a host synchronization."
+        ),
+    )
     args = parser.parse_args()
 
     cpu_affinity = pin_to_allowed_cpu(args.cpu_affinity_index)
@@ -70,6 +80,11 @@ def main() -> None:
             device=args.destination_device,
             direct_nrx_same_stream=args.same_stream,
         )
+        persistent_rx_slot = None
+        if args.input_mode != "transient_sync":
+            persistent_rx_slot = cp.empty(
+                SLOT_SHAPE, dtype=cp.complex64, order="F"
+            )
     forward_copy = P2PCopier(args.source_device, args.destination_device)
     backward_copy = P2PCopier(args.destination_device, args.source_device)
 
@@ -102,8 +117,16 @@ def main() -> None:
             with cp.cuda.Device(args.destination_device), receiver.stream:
                 real = remote_forward[:SLOT_ELEMENTS].reshape(SLOT_SHAPE)
                 imag = remote_forward[SLOT_ELEMENTS:].reshape(SLOT_SHAPE)
-                receiver.rx_slot = cp.asfortranarray(real + 1j * imag)
-            receiver.stream.synchronize()
+                if persistent_rx_slot is None:
+                    receiver.rx_slot = cp.asfortranarray(real + 1j * imag)
+                else:
+                    # Preserve the Fortran layout expected by cuPHY without
+                    # allocating a complex temporary on every request.
+                    cp.copyto(persistent_rx_slot.real, real)
+                    cp.copyto(persistent_rx_slot.imag, imag)
+                    receiver.rx_slot = persistent_rx_slot
+            if args.input_mode != "persistent_ordered":
+                receiver.stream.synchronize()
             stage_profile = None
             if args.profile_stages:
                 stage_profile = receiver.profile_neural_direct_once()
@@ -155,6 +178,7 @@ def main() -> None:
             "same_stream": args.same_stream,
             "busy_poll": args.busy_poll,
             "profile_stages": args.profile_stages,
+            "input_mode": args.input_mode,
             "cpu_affinity": cpu_affinity,
             "completed_units": len(records),
             "sequences_contiguous": [x["sequence"] for x in records]

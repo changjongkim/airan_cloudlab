@@ -1,0 +1,56 @@
+{
+  "schema": "softwall-c165-ce-tail-frozen-protocol-v1",
+  "campaign": "c165_cuphy_ce_tail_bounded_hardening",
+  "frozen_before_execution": true,
+  "role": "Bounded implementation hardening of the existing C163 raw-IQ two-GPU path; no new scheduler, deadline, workload, or service class.",
+  "reference_result": {
+    "artifact": "results/softwall_multigpu/c163_raw_p2p_v4_same_stream_analysis_job58868110.json",
+    "result": "885/1000 at 4.5 ms"
+  },
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "hypotheses_in_order": [
+    {
+      "id": "H1_persistent_input",
+      "mode": "persistent_sync",
+      "seed": 20359000,
+      "iterations": 300,
+      "role": "ablation",
+      "hypothesis": "A persistent Fortran complex input removes per-request complex allocation while retaining the pre-CE host synchronization.",
+      "decision": "Mechanism ablation only; cannot qualify or open a holdout."
+    },
+    {
+      "id": "H2_stream_ordered_input",
+      "mode": "persistent_ordered",
+      "seed": 20359100,
+      "iterations": 1000,
+      "role": "development",
+      "hypothesis": "The persistent buffer plus the already-correct cuPHY stream dependency removes the redundant pre-CE host synchronization.",
+      "decision": "Exactly 1000/1000 correct pair completions <=4.5 ms opens one disjoint-seed holdout; any late or incorrect completion rejects the candidate."
+    },
+    {
+      "id": "H2_independent_holdout",
+      "mode": "persistent_ordered",
+      "seed": 20359200,
+      "iterations": 1000,
+      "role": "holdout",
+      "open_condition": "H2 development all_pass=true",
+      "decision": "Exactly 1000/1000 correct pair completions <=4.5 ms qualifies this finite-sample mode; any late or incorrect completion rejects it."
+    }
+  ],
+  "stop_rules": [
+    "Do not open the holdout unless the fixed development gate passes.",
+    "Do not change the 4.5-ms threshold, warmup, workload, seed, iteration count, or correctness rule after observing results.",
+    "Preserve every raw result and failure; do not rerun with a different seed to replace a failure.",
+    "If H2 fails, the candidate is rejected and the remaining CE tail stays an explicit production gap; profiling may diagnose but cannot qualify it."
+  ],
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "source_sha256_before_execution": {
+    "scripts_for_node/softwall_same_gpu/c163_raw_p2p_nrx_worker.py": "21922e4d15d75725fdba6c1ac21528f98cf2c473e7f1c631a25ef56fd96aa257",
+    "scripts_for_node/softwall_same_gpu/c163_raw_p2p_controller.py": "c55af86e5e37ed143e3592ca006853635402eff3942ee5ac8990733e093ad38f",
+    "scripts_for_node/softwall_same_gpu/run_c165_ce_tail_candidate.sh": "ed851aee521fffa04bdcfbf316a9f6bcfefb3440b38e3d1a721a199c98b64018",
+    "scripts_for_node/softwall_same_gpu/analyze_c165_ce_tail.py": "dec97fea86b9450ae965f49e07c7f7fb7fb63843c16e3a898876c9cc1e4bff3d",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "cfef726c67f011295abc600c7e12b8fc6dda38d61b8803a8ca73435014a429dc",
+    "scripts_for_node/task1/nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

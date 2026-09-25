@@ -56,7 +56,12 @@ def main() -> None:
     parser.add_argument("--profile-stages", action="store_true")
     parser.add_argument(
         "--input-mode",
-        choices=("transient_sync", "persistent_sync", "persistent_ordered"),
+        choices=(
+            "transient_sync",
+            "persistent_sync",
+            "persistent_ordered",
+            "native_ordered",
+        ),
         default="transient_sync",
         help=(
             "How raw real/imag P2P input becomes the cuPHY complex slot. "
@@ -85,6 +90,9 @@ def main() -> None:
             persistent_rx_slot = cp.empty(
                 SLOT_SHAPE, dtype=cp.complex64, order="F"
             )
+        native_iq = None
+        if args.input_mode == "native_ordered":
+            import _softwall_native_iq as native_iq
     forward_copy = P2PCopier(args.source_device, args.destination_device)
     backward_copy = P2PCopier(args.destination_device, args.source_device)
 
@@ -119,6 +127,13 @@ def main() -> None:
                 imag = remote_forward[SLOT_ELEMENTS:].reshape(SLOT_SHAPE)
                 if persistent_rx_slot is None:
                     receiver.rx_slot = cp.asfortranarray(real + 1j * imag)
+                elif args.input_mode == "native_ordered":
+                    native_iq.assemble_iq(
+                        remote_forward,
+                        persistent_rx_slot,
+                        int(receiver.stream.ptr),
+                    )
+                    receiver.rx_slot = persistent_rx_slot
                 else:
                     # Preserve the Fortran layout expected by cuPHY without
                     # allocating a complex temporary on every request.

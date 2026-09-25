@@ -1,0 +1,19 @@
+{
+  "schema": "softwall-c166-native-iq-analysis-correction-v1",
+  "reason": "The first analyzer compared the worker total against 300 timed units, but the worker correctly records 100 controller warmups plus 300 timed units.",
+  "scope": "Analyzer-only correction over unchanged raw artifacts; no physical rerun and no decision threshold change.",
+  "preserved_failure": "results/softwall_multigpu/c166_native_iq_canary_seed20359400_job58871654_analysis_error.json",
+  "expected_after_correction": {
+    "controller_timed_units": 300,
+    "controller_warmup_units": 100,
+    "worker_total_units": 400
+  },
+  "sha256": {
+    "controller_raw": "ba29d116340e63384bb386ca52d6c98dd96aa48746ed266f3e437fea240e885e",
+    "worker_raw": "cda6ee70dad53d7a2debead0d4226739fc0b676442ea29408f4bb31f4a94f96d",
+    "preserved_analysis_error": "545350792973b6ae4dadb1a86ff3ede1eeb71086daa9c3cd4398334806d6a645",
+    "initial_corrected_analyzer": "8239dd395ae1301d879a82866295bd35efe70814b71e94ec1a8405f07ef7053d",
+    "current_additive_analyzer": "7177822bc29063c2f3725dcbd1fafebe37a03308416737720bab4b3f89c047bd"
+  },
+  "additive_change_after_correction": "The current analyzer also copies mode and timing summaries; the pass rule and raw inputs are unchanged."
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "softwall-c166-native-iq-canary-v1",
+  "analysis_role": "Diagnostic parity canary for the C++/CUDA IQ assembly bridge; not N1 completion and not latency or production qualification.",
+  "iterations": 300,
+  "warmup": 100,
+  "worker_expected_units": 400,
+  "controller_conventional_mode": "separable",
+  "checks": {
+    "controller_iterations": true,
+    "worker_iterations_including_warmup": true,
+    "controller_conventional_correct": true,
+    "controller_neural_correct": true,
+    "worker_neural_correct_including_warmup": true,
+    "worker_sequences_contiguous": true,
+    "worker_error_absent": true,
+    "native_mode": true
+  },
+  "all_pass": true,
+  "controller_pair_wall_ms": {
+    "n": 300,
+    "mean": 3.8383172566666666,
+    "p50": 3.816564,
+    "p95": 3.9157175,
+    "p99": 4.0874161399999975,
+    "p99_9": 5.1502132860000005,
+    "min": 3.774582,
+    "max": 5.16489
+  },
+  "controller_conventional_gpu_ms": {
+    "n": 300,
+    "mean": 3.530362130800883,
+    "p50": 3.515056014060974,
+    "p95": 3.6030735969543457,
+    "p99": 3.680506875514983,
+    "p99_9": 4.533723791599291,
+    "min": 3.4749441146850586,
+    "max": 4.773536205291748
+  },
+  "controller_remote_neural_gpu_ms": {
+    "n": 300,
+    "mean": 2.1522606937090556,
+    "p50": 2.1391199827194214,
+    "p95": 2.193033528327942,
+    "p99": 2.207635796070099,
+    "p99_9": 3.9103941700459055,
+    "min": 2.1160640716552734,
+    "max": 4.631008148193359
+  },
+  "controller_deadline_counts": {
+    "parallel_pair_wall_le_deadline": 298,
+    "parallel_pair_wall_gt_deadline": 2
+  },
+  "worker_neural_gpu_ms": {
+    "count": 400,
+    "mean": 2.1527736806869506,
+    "p50": 2.139647960662842,
+    "p99": 2.2266879081726074,
+    "max": 4.631008148193359
+  },
+  "source_sha256": {
+    "controller_raw": "ba29d116340e63384bb386ca52d6c98dd96aa48746ed266f3e437fea240e885e",
+    "worker_raw": "cda6ee70dad53d7a2debead0d4226739fc0b676442ea29408f4bb31f4a94f96d"
+  },
+  "decision": "parity_canary_pass",
+  "qualification": "forbidden"
+}

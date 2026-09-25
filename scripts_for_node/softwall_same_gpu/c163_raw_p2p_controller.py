@@ -63,7 +63,14 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20358100)
     parser.add_argument("--cpu-affinity-index", type=int)
     parser.add_argument("--profile-conventional", action="store_true")
+    parser.add_argument(
+        "--conventional-mode",
+        choices=("separable", "persistent_monolithic"),
+        default="separable",
+    )
     args = parser.parse_args()
+    if args.profile_conventional and args.conventional_mode != "separable":
+        raise ValueError("stage profiling is only defined for separable conventional mode")
 
     cpu_affinity = pin_to_allowed_cpu(args.cpu_affinity_index)
 
@@ -72,7 +79,17 @@ def main() -> None:
     backward = cp.empty(BACKWARD_ELEMENTS, dtype=cp.float32)
     owner = CudaIpcOwner(args.tag, forward, backward, directory=args.ipc_dir)
     receiver = PairedDualReceiver(
-        args.engine, seed=args.seed, enable_local_neural=False
+        args.engine,
+        seed=args.seed,
+        enable_local_neural=False,
+        enable_native_conventional_shadow=(
+            args.conventional_mode == "persistent_monolithic"
+        ),
+    )
+    run_conventional = (
+        receiver.run_native_conventional
+        if args.conventional_mode == "persistent_monolithic"
+        else receiver.run_conventional
     )
     sequence = 0
     warmup_correct = 0
@@ -83,7 +100,7 @@ def main() -> None:
             sequence += 1
             fill_raw(receiver, forward)
             owner.publish_forward(sequence)
-            conventional = receiver.run_conventional()
+            conventional = run_conventional()
             owner.wait_backward(sequence, 2.0)
             marker = cp.asnumpy(backward)
             warmup_correct += int(conventional[1] and marker[0] == 1.0)
@@ -105,7 +122,7 @@ def main() -> None:
                     conventional_stage_profile["payload_mismatches"],
                 )
             else:
-                conventional = receiver.run_conventional()
+                conventional = run_conventional()
             conventional_done_ns = time.perf_counter_ns()
             owner.wait_backward(sequence, 0.1)
             marker = cp.asnumpy(backward)
@@ -146,6 +163,7 @@ def main() -> None:
         "warmup_correct": warmup_correct,
         "cpu_affinity": cpu_affinity,
         "profile_conventional": args.profile_conventional,
+        "conventional_mode": args.conventional_mode,
         "mechanism": (
             "GPU0 copies only raw IQ and immediately runs conventional. GPU1 performs "
             "NeuralRx channel estimation, TensorRT, LDPC, and CRC, returning a small result."

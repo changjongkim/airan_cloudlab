@@ -215,7 +215,22 @@ N0는 2026-09-25에 완료했다. Seed 20359400의 양 reference decoder가 같�
 복소 원소를 C++ loader에서도 bitwise 비교했다. Byte order, 크기와 SHA-256도 모두 일치했다.
 이 fixture는 parity 입력이며 timing 결과가 아니다. 권위 상태는
 [C166 native fast-path status](../../results/softwall_multigpu/c166_native_fast_path_status_v1.json)에
-있고, 다음 미구현 단위는 N1 native remote NeuralRx다.
+있다. 이어서 P2P의 두 float plane을 cuPHY의 complex64 Fortran slot으로 조립하는 경로를
+단일 C++/CUDA kernel로 교체했다. Frozen fixture의 183,456개 복소 원소가 GPU에서 bitwise
+일치했고 잘못된 C-order destination은 거절했다. 300-request canary는 conventional과 NeuralRx
+각 300/300 correct였지만 진단용 4.5 ms 선은 298/300만 만족했다. 따라서 입력 조립은 정확히
+native화됐지만 tail 원인은 아니며 N1 완료나 timing qualification으로 세지 않는다. 다음
+미구현 단위는 CE→TensorRT→LDPC/CRC를 한 native lifecycle로 묶는 N1 fused remote NeuralRx다.
+
+N2 방향도 monolithic `PuschPipeline` shadow로 먼저 검증했다. 기존 separable conventional과
+monolithic conventional은 각각 300/300 correct였고, HARQ buffer를 readiness 때 한 번
+할당해 재사용하는 adapter도 300/300 correct였다. Persistent monolithic GPU 시간은 p50
+1.014 ms, p99 3.294 ms, max 5.363 ms였다. N0 native IQ bridge와 이 conventional path를
+함께 실행한 C168은 양 경로 300/300 correct와 pair p50 2.668 ms를 보였지만 4.5 ms 진단선은
+293/300이었다. 7개 late는 conventional tail이었고 remote NeuralRx max는 2.278 ms였다.
+따라서 native 방향은 중앙값을 줄였지만 tail 보장을 만들지 못했다. Phase setup이 아직 Python
+wrapper를 지나므로 N2 완료로 세지 않으며, 이 canary도 P2 qualification이나 holdout 개방에
+사용하지 않는다.
 
 기존 `cuphy_ex_pusch_rx_multi_pipe`는 소스는 있지만 이 checkout에 build artifact와 해당 PUSCH
 HDF5 vector가 없어 현재 C165와 다른 radio profile의 숫자를 대신 만들 수 없다. 그 예제를

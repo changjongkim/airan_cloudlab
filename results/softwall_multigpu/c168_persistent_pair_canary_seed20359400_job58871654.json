@@ -1,0 +1,66 @@
+{
+  "schema": "softwall-c166-native-iq-canary-v1",
+  "analysis_role": "Diagnostic parity canary for the C++/CUDA IQ assembly bridge; not N1 completion and not latency or production qualification.",
+  "iterations": 300,
+  "warmup": 100,
+  "worker_expected_units": 400,
+  "controller_conventional_mode": "persistent_monolithic",
+  "checks": {
+    "controller_iterations": true,
+    "worker_iterations_including_warmup": true,
+    "controller_conventional_correct": true,
+    "controller_neural_correct": true,
+    "worker_neural_correct_including_warmup": true,
+    "worker_sequences_contiguous": true,
+    "worker_error_absent": true,
+    "native_mode": true
+  },
+  "all_pass": true,
+  "controller_pair_wall_ms": {
+    "n": 300,
+    "mean": 2.884662883333333,
+    "p50": 2.667535,
+    "p95": 3.8688017500000003,
+    "p99": 8.853149439999997,
+    "p99_9": 9.739598103000016,
+    "min": 2.62867,
+    "max": 9.961756
+  },
+  "controller_conventional_gpu_ms": {
+    "n": 300,
+    "mean": 1.5229689598083496,
+    "p50": 1.066703975200653,
+    "p95": 3.5573600053787233,
+    "p99": 8.51485264778137,
+    "p99_9": 9.424744530677811,
+    "min": 1.044800043106079,
+    "max": 9.646368026733398
+  },
+  "controller_remote_neural_gpu_ms": {
+    "n": 300,
+    "mean": 2.143852690855662,
+    "p50": 2.138751983642578,
+    "p95": 2.1893440008163454,
+    "p99": 2.207015669345856,
+    "p99_9": 2.2601361207962047,
+    "min": 2.11081600189209,
+    "max": 2.2778561115264893
+  },
+  "controller_deadline_counts": {
+    "parallel_pair_wall_le_deadline": 293,
+    "parallel_pair_wall_gt_deadline": 7
+  },
+  "worker_neural_gpu_ms": {
+    "count": 400,
+    "mean": 2.146457118988037,
+    "p50": 2.1403839588165283,
+    "p99": 2.2185919284820557,
+    "max": 2.2778561115264893
+  },
+  "source_sha256": {
+    "controller_raw": "ebba1551d4f82b738dea4bb95aba13377b28a24f31a54a02b526a23a8d06bcc8",
+    "worker_raw": "53081340239046c5101c52130e36f027e781e5f6b2248e90dfbefbb59555af36"
+  },
+  "decision": "parity_canary_pass",
+  "qualification": "forbidden"
+}

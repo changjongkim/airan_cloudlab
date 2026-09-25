@@ -47,6 +47,7 @@ class PairedDualReceiver:
         transmit_antennas: int = 4,
         direct_nrx_same_stream: bool = False,
         num_ul_streams: int = 4,
+        enable_native_conventional_shadow: bool = False,
     ) -> None:
         cp.cuda.runtime.setDevice(device)
         np.random.seed(seed)
@@ -221,6 +222,18 @@ class PairedDualReceiver:
                 stream=self.stream if self.direct_nrx_same_stream else None,
             )
             self.neural_engine.capture_graph()
+        self.native_conventional_shadow = None
+        if enable_native_conventional_shadow:
+            from persistent_pusch_rx import PersistentPuschRx
+
+            self.native_conventional_shadow = PersistentPuschRx(
+                cell_id=41,
+                num_rx_ant=4,
+                num_tx_ant=4,
+                enable_pusch_tdi=enable_pusch_tdi,
+                eq_coeff_algo=1,
+                cuda_stream=self.stream_handle,
+            )
 
     def apply_rayleigh_awgn(
         self, snr_db: float, seed: int, *, noise_reference: str = "post_fading"
@@ -375,6 +388,18 @@ class PairedDualReceiver:
         return self.conv_crc.check_crc(
             input_bits=blocks, pusch_configs=self.pusch_configs
         )
+
+    def native_conventional_once(self):
+        """Run Aerial's monolithic cuPHY PUSCH pipeline as a parity shadow."""
+
+        if self.native_conventional_shadow is None:
+            raise RuntimeError("native conventional shadow is disabled")
+        crc_values, transport_blocks = self.native_conventional_shadow.run_persistent(
+            rx_slot=self.rx_slot,
+            slot=self.slot,
+            pusch_configs=self.pusch_configs,
+        )
+        return transport_blocks, crc_values
 
     def neural_once_wrapper(self):
         channel = self.neural_channel_estimator.estimate(
@@ -869,6 +894,9 @@ class PairedDualReceiver:
 
     def run_conventional(self) -> tuple[float, bool, int, int]:
         return self._measure(self.conventional_once)
+
+    def run_native_conventional(self) -> tuple[float, bool, int, int]:
+        return self._measure(self.native_conventional_once)
 
     def run_neural(self) -> tuple[float, bool, int, int]:
         return self._measure(self.neural_once)

@@ -329,7 +329,7 @@ Perlmutter A100에서 MIG OFF 상태로 CloudLab 실험을 재측정했다.
 
 1. 원고 정리: **완료.** 수치 provenance, C158 tail, P3 Results 승격, P2 stage attribution, Winter CFP와 문서 archive를 claim/submission audit으로 고정했다.
 2. P1 target-DU timing contract 확보: 최소 schema, 세 획득 경로와 parametric bridge를 timing-contract 문서에 고정했다. 실제 target DU trace가 없으면 `UQ_NO_PRODUCTION_TRACE`를 유지한다.
-3. P2 fast path: persistent-input 구현은 remote NeuralRx–pair 상관을 0.9603에서 0.3307로 낮췄지만 frozen gate가 995/1,000으로 실패했다. Native N0 parity fixture는 양 decoder의 같은 1,377-byte TB와 두 raw-IQ layout의 183,456개 복소 원소에 대한 C++ bitwise 일치로 통과했다. 다음 구현은 N1 GPU1 native NeuralRx, N2 GPU0 native conventional이다. 새 qualification은 live-DU `D`가 확보된 뒤 독립 holdout 1,000/1,000으로만 연다.
+3. P2 fast path: persistent-input 구현은 remote NeuralRx–pair 상관을 0.9603에서 0.3307로 낮췄지만 frozen gate가 995/1,000으로 실패했다. Native N0 parity fixture는 양 decoder의 같은 1,377-byte TB와 두 raw-IQ layout의 183,456개 복소 원소에 대한 C++ bitwise 일치로 통과했다. C++/CUDA IQ bridge도 fixture bitwise parity와 양 decoder 300/300 correctness를 통과했지만 진단 deadline은 298/300이었다. Persistent monolithic conventional은 300/300 correct였고 p50 1.014 ms였으나 max 5.363 ms였으며, 두 partial-native path를 결합한 C168은 293/300이었다. 따라서 N1/N2 완료나 timing qualification으로 세지 않는다. 다음 구현은 N1 GPU1 fused native NeuralRx와 N2의 fully native phase setup이다. 새 qualification은 live-DU `D`가 확보된 뒤 독립 holdout 1,000/1,000으로만 연다.
 
 다음 항목은 수행하지 않는다: 새 메커니즘 추가, 나머지 수명주기 UQ 5개 채우기, 처리량 우위 재시도, P1 이전의 P4 통합 재자격, 새 문서 생성.
 

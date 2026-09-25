@@ -1,6 +1,6 @@
 {
   "schema": "softwall-c166-native-fast-path-status-v1",
-  "status": "N0_PARITY_FIXTURE_COMPLETE_N1_IMPLEMENTATION_PENDING",
+  "status": "N0_NATIVE_IO_COMPLETE_N1_N2_FUSED_EXECUTABLES_PENDING",
   "qualification_status": "NOT_QUALIFIED",
   "n0_exact_fixture": {
     "pass": true,
@@ -66,7 +66,7 @@
     }
   ],
   "current_blockers": [
-    "N1/N2 native cuPHY executables and exact C++ radio-parameter loader are not implemented",
+    "N1 fused native cuPHY CE->TensorRT->LDPC/CRC and N2 fully native phase setup are not implemented; partial native pairing was 293/300 at the diagnostic 4.5-ms line",
     "target-DU d_MAC and synchronized clock trace are unavailable",
     "C165 Python development gate failed 995/1000 and did not open a holdout"
   ],
@@ -75,5 +75,103 @@
     "sleep injection",
     "seed replacement after failure",
     "using a different PUSCH example vector as C165 qualification"
-  ]
+  ],
+  "native_iq_bridge": {
+    "status": "PARITY_PASS_DIAGNOSTIC_ONLY",
+    "scope": "C++/CUDA two-plane C-order raw IQ to complex64 Fortran-order cuPHY slot assembly",
+    "validation": "results/softwall_multigpu/c166_native_iq_bridge_validation.json",
+    "validation_sha256": "d25679507b268609efd358163131d7f752aa3a91db641e4ebf8da602a9b16c31",
+    "canary": "results/softwall_multigpu/c166_native_iq_canary_seed20359400_job58871654.json",
+    "canary_sha256": "8df35654edde3d6ff8c1cf3d0fb0ae81ddee65bc079583113ea2cc754f0b7759",
+    "analysis_correction": "results/softwall_multigpu/c166_native_iq_canary_analysis_correction.json",
+    "analysis_correction_sha256": "cbb76174d9845731ddc3eddfd529999337e1b190b4e700d08dae8ea2923c1cde",
+    "source": "scripts_for_node/softwall_same_gpu/native_fast_path/native_iq_bridge.cu",
+    "source_sha256": "fa5019f6694e5bc62e75e9fd89232db18e54d1585912fdafe8a5871ee6fb85b2",
+    "fixture_complex_elements_bitwise_equal": 183456,
+    "timed_correctness": {
+      "conventional": 300,
+      "neuralrx": 300
+    },
+    "warmup_neuralrx_correct": 100,
+    "diagnostic_deadline_only": {
+      "deadline_ms": 4.5,
+      "timely": 298,
+      "late": 2
+    },
+    "interpretation": "Input assembly is native and exact, but its 298/300 diagnostic timing does not resolve the qualified fast-path tail and cannot open a holdout.",
+    "qualification": "forbidden"
+  },
+  "native_conventional_shadow": {
+    "status": "PERSISTENT_MONOLITHIC_PARITY_PASS_DIAGNOSTIC_ONLY",
+    "request_allocating_baseline": "results/softwall_multigpu/c166_native_conventional_shadow_request_allocating_job58871654.json",
+    "request_allocating_baseline_sha256": "66958af91047ae70677ab8c3ebbb7954dd9607c231d6b1328982fd6b99781908",
+    "persistent_shadow": "results/softwall_multigpu/c167_persistent_conventional_shadow_job58871654.json",
+    "persistent_shadow_sha256": "02ed2b257f99edb19ce29bdefa7567aaa9478019d9631150087742d2d4a3b064",
+    "correctness": {
+      "separable": 300,
+      "persistent_monolithic": 300
+    },
+    "persistent_gpu_ms": {
+      "n": 300,
+      "mean": 1.196218989690145,
+      "p50": 1.0139359831809998,
+      "p99": 3.2939514636993397,
+      "max": 5.36297607421875
+    },
+    "interpretation": "The monolithic cuPHY PuschPipeline preserves the TB and moves HARQ allocation to readiness, but phase setup still crosses the Python wrapper and the finite diagnostic retained a 5.363-ms maximum.",
+    "qualification": "forbidden",
+    "source_sha256": {
+      "persistent_adapter": "2dee1421dd15030f57e85cb94be320769d374ba1fbfea692460e00df23b6d930",
+      "receiver_integration": "68ed61080c5e99ef758919ea55da86d86ec04646ad5fd9d4ff755ae64d9b871f",
+      "campaign": "a04fa8bf8b994d76851d7a63c7ca7a7647572ce065e7970164812f3091bf3645"
+    }
+  },
+  "paired_partial_native_canary": {
+    "status": "CORRECTNESS_PASS_TIMING_DIAGNOSTIC_FAIL",
+    "artifact": "results/softwall_multigpu/c168_persistent_pair_canary_seed20359400_job58871654.json",
+    "artifact_sha256": "9f057ba014a9026576f550bd2f201b99f487b36644c26e68cfaeda1c96f1ebf3",
+    "components": [
+      "GPU0 persistent-HARQ monolithic cuPHY conventional",
+      "GPU1 C++/CUDA exact IQ bridge plus existing staged NeuralRx"
+    ],
+    "correctness": {
+      "conventional": 300,
+      "neuralrx": 300
+    },
+    "deadline_ms_diagnostic_only": 4.5,
+    "timely": 293,
+    "late": 7,
+    "pair_wall_ms": {
+      "n": 300,
+      "mean": 2.884662883333333,
+      "p50": 2.667535,
+      "p95": 3.8688017500000003,
+      "p99": 8.853149439999997,
+      "p99_9": 9.739598103000016,
+      "min": 2.62867,
+      "max": 9.961756
+    },
+    "conventional_gpu_ms": {
+      "n": 300,
+      "mean": 1.5229689598083496,
+      "p50": 1.066703975200653,
+      "p95": 3.5573600053787233,
+      "p99": 8.51485264778137,
+      "p99_9": 9.424744530677811,
+      "min": 1.044800043106079,
+      "max": 9.646368026733398
+    },
+    "remote_neural_gpu_ms": {
+      "n": 300,
+      "mean": 2.143852690855662,
+      "p50": 2.138751983642578,
+      "p95": 2.1893440008163454,
+      "p99": 2.207015669345856,
+      "p99_9": 2.2601361207962047,
+      "min": 2.11081600189209,
+      "max": 2.2778561115264893
+    },
+    "interpretation": "Median service improved, but seven conventional-tail units exceeded the diagnostic threshold. Partial native components do not qualify P2 or open a holdout.",
+    "qualification": "forbidden"
+  }
 }

@@ -27,6 +27,12 @@ def sha256(path: Path) -> str:
 
 def read_field(data: Any, field: str) -> Any:
     """Resolve a dotted JSON field, including numeric list indices."""
+    if field.startswith("sum(") and field.endswith(")") and "[]" in field:
+        expression = field[4:-1]
+        prefix, suffix = expression.split("[]", 1)
+        rows = read_field(data, prefix.rstrip("."))
+        suffix = suffix.lstrip(".")
+        return sum(read_field(row, suffix) for row in rows)
     value = data
     for part in field.split("."):
         value = value[int(part)] if isinstance(value, list) else value[part]
@@ -130,12 +136,26 @@ def audit_quantitative_provenance(manuscript: str) -> tuple[dict, list[dict]]:
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.channel_estimation.gpu_ms.max", 9.592415809631348),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.channel_estimation.pearson_with_pair_wall", 0.9602820841334867),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.tensorrt_graph.gpu_ms.p99", 0.8863686168193817),
+            ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "host_enqueue_us.tensorrt_graph.mean", 7.442636666666664),
+            ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "copy.forward_gpu_us.mean", 36.26122652242581),
+            ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "copy.backward_gpu_us.mean", 17.150400035704177),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "copy.forward_gpu_us.p99", 69.26303833723067),
+            ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "host_enqueue_us.derate_match.mean", 1060.1050966666674),
+            ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "host_enqueue_us.derate_match.p99", 1105.38023),
+            ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.derate_match.gpu_ms.p99", 0.1675606334209441),
         ],
         "P3_CHANNEL_HOLDOUT": [
             ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.D.strata.4.trials", 50),
             ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.D.strata.4.conventional_correct", 50),
             ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.D.strata.4.neural_correct", 50),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "sum(models.D.strata[].conventional_correct)", 153),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "sum(models.D.strata[].neural_correct)", 164),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "sum(models.E.strata[].conventional_correct)", 155),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "sum(models.E.strata[].neural_correct)", 163),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.D.low_snr_neural_only", 16),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.D.low_snr_conventional_only", 5),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.E.low_snr_neural_only", 15),
+            ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.E.low_snr_conventional_only", 7),
             ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "aggregate_low_snr_paired.neural_only", 31),
             ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "aggregate_low_snr_paired.conventional_only", 12),
             ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "aggregate_low_snr_paired.exact_pvalue", 0.005401572654591291),

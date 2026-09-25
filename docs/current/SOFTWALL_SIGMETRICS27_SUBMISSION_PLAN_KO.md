@@ -2,9 +2,9 @@
 
 **기준일:** 2026-09-25  
 **권고 track:** Systems primary, Measurement & Applied Modeling secondary  
-**공식 일정:** [SIGMETRICS 2027 CFP](https://www.sigmetrics.org/sigmetrics2027/pages/cfp.html) 기준
-abstract 2026-10-02 23:59 AoE, paper 2026-10-09 23:59 AoE  
-**재확인:** 2026-09-25 UTC, notification 2026-12-09와 conference 2027-06-07–11 Atlanta까지
+**공식 일정:** [SIGMETRICS 2027 CFP](https://www.sigmetrics.org/sigmetrics2027/pages/cfp.html) Winter 기준
+abstract 2027-01-04 23:59 AoE, paper 2027-01-11 23:59 AoE  
+**재확인:** 2026-09-25 UTC, notification 2027-03-10과 conference 2027-06-07–11 Atlanta까지
 [기계 판독 snapshot](../../results/softwall_multigpu/sigmetrics27_cfp_recheck_v1.json)에 기록  
 **형식:** CFP의 `\documentclass[acmsmall, screen, review]{acmart}`에 double-anonymous용
 `anonymous` option을 추가한 review 원고, technical content 최대 20쪽, references 무제한,
@@ -143,5 +143,6 @@ Production `d_MAC`, cross-family, lifecycle 나머지 5개를 단순히 채우�
 | BibTeX 정규화 | 완료, 인용 16개 모두 resolve |
 | Anonymous/reproducibility/AI-disclosure/CFP audit | 26/26 PASS |
 
-현재 연구 증거를 더 늘리는 단계는 끝났다. 제출 가능성은 남은 2주 동안 원고의 명료성,
-정리 가정, 도표와 bibliography를 얼마나 정확하게 고정하는지에 달려 있다.
+현재 새로운 optimizer·lifecycle 증거를 더 늘리는 단계는 끝났다. Winter 제출 전 남은 구현은
+P2 channel-estimation tail의 frozen diagnosis/holdout과 P1 외부 trace 수용 준비로 제한한다.
+그 결과와 무관하게 원고의 claim boundary, 도표와 bibliography를 정확히 고정한다.

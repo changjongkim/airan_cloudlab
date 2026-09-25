@@ -693,12 +693,15 @@ completed 0/1,000 requests within 4.5\,ms. Moving precomputed \NRx inputs to GPU
 0/1,000. Moving channel estimation through CRC behind raw-IQ P2P improved completion to 852/1,000
 (3.831\,ms median), but retained 148 late samples; disabling Python GC did not remove the tail.
 Binding cuPHY and caller-owned TensorRT to one stream improved timely completion to 885/1,000 but
-retained 115 late samples. A diagnostic 300-request stage profile localized the tail to LS channel
-estimation (0.866/4.873/9.592\,ms p50/p99/max, 0.9603 correlation with pair wall time), while the
-TensorRT graph had a 0.886\,ms p99 and forward P2P copy a 69.3\,$\mu$s p99. Profiling changes timing,
-so these values are mechanism evidence rather than qualification. The envelope still classifies every
-tested implementation as unqualified at this threshold. These diagnostics are neither WCET evidence
-nor a production trace.
+retained 115 late samples. A diagnostic 300-request stage profile localized the tail to cuPHY LS
+channel estimation: its GPU p50/p99/max were 0.866/4.873/9.592\,ms and its correlation with pair wall
+time was 0.9603. TensorRT host enqueue averaged 7.443\,$\mu$s, while the graph itself had a
+0.886\,ms GPU p99. Forward/backward P2P copies averaged 36.261/17.150\,$\mu$s on GPU. Derate-match
+host-call duration averaged 1,060.105\,$\mu$s with a 1,105.380\,$\mu$s p99, while its GPU p99 was
+0.168\,ms. Thus transport and TensorRT were comparatively stable; channel estimation carried the
+diagnostic tail. Because 4.5\,ms is the mode's $D$ parameter, a qualified service component cannot
+have a tail beyond $D$; this implementation fails before scheduling or external AI is considered.
+Profiling changes timing, so these values are mechanism evidence rather than qualification or WCET.
 
 The Aerial TDL-A subdomain remains unqualified. Across raw and normalized Aerial TDL-A,
 public-reference DMRS/MCS/start-symbol settings, one-antenna frequency/time channel execution, and an
@@ -707,13 +710,31 @@ FP32 engine built as in the public notebook, conventional decoding succeeded in 
 rather than a simple power, radio-profile, transmitter, or precision setting.
 
 % provenance: P3_CHANNEL_HOLDOUT
+\subsection{Supported-channel \NRx result}
+
 We next reconstructed the public Sionna 1.0.2/TensorFlow 2.19 contract. Clean MCS7 and default
 Rayleigh controls passed, and a fixed development matrix identified CDL-D/E at 100\,ns as holdout
 candidates while preserving A/B/C failures. Before opening new payload, slot, and channel seeds, we
 froze a D/E paired holdout with five Es/No strata and 50 blocks per stratum per model. Both pipelines
-passed 50/50 at 10\,dB. Across low-SNR strata, \NRx-only correctness was 31 versus 12
-conventional-only (two-sided exact $p=0.00540$). This closes the channel gate only for the declared
-finite-sample Sionna CDL-D/E mode, not TDL-A, field IQ, or production timing.
+passed 50/50 at 10\,dB. Table~\ref{tab:channel-holdout} reports the full paired outcome.
+
+\begin{table}[t]
+\caption{Frozen disjoint-seed Sionna CDL-D/E holdout.}
+\label{tab:channel-holdout}
+\begin{tabularx}{\linewidth}{@{}Xrrrr@{}}
+\toprule
+Mode & Conv. & \NRx & \NRx-only & Conv.-only \\
+\midrule
+CDL-D, 100\,ns & 153/250 & 164/250 & 16 & 5 \\
+CDL-E, 100\,ns & 155/250 & 163/250 & 15 & 7 \\
+Paired aggregate & -- & -- & \textbf{31} & \textbf{12} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The aggregate discordant outcomes give a two-sided exact $p=0.00540$. This is a positive Results
+claim: optional \NRx has conditional radio value in the frozen Sionna CDL-D/E mode. It closes the
+channel gate only for that finite-sample mode, not TDL-A, field IQ, timing, or production HARQ.
 
 \section{Related Work}
 

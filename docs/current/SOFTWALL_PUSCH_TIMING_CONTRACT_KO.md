@@ -15,6 +15,64 @@
 
 **P0 진입 조건:** 대상 DU의 설정 또는 FAPI/MAC trace에서 `t_IQ_ready`, `t_release`, `d_MAC`와 slot 번호를 같은 시계 기준으로 얻고, 요청별 `D=d_MAC−t_release`를 고정한다. 그 다음 AI 없는 필수 경로가 해당 `P,D`와 all-fail capacity 조건을 만족하는지 검증한다. 대상 DU 계약이 없으면 `D21/D80/D130`은 연구용 가정으로만 유지한다. 이 문서는 특정 3GPP 릴리스가 보편적인 gNB 처리 마감값을 준다고 주장하지 않는다.
 
+## Production trace 최소 schema와 수용 규칙
+
+새 schema를 만들지 않는다. 현재 구현된
+[raw trace template](../../results/softwall_multigpu/c163_raw_du_trace_template_v1.json),
+[clock calibration](../../results/softwall_multigpu/c163_clock_calibration_template_v1.json),
+[expiry contract](../../results/softwall_multigpu/c163_expiry_contract_template_v1.json),
+[mode qualification](../../results/softwall_multigpu/c163_mode_qualification_template_v1.json) 네 파일을
+[v2 contract](../../results/softwall_multigpu/softwall_du_timing_contract_template_v2.json)로 조립한다.
+
+| 계층 | 최소 필드 | 수용 규칙 |
+|---|---|---|
+| Trace provenance | `source_type`, `identifier`, 원본 `path`, `sha256` | `du-fapi-trace` 또는 `du-mac-trace`; 원본 hash가 일치해야 함 |
+| Clock | `domain`, `timestamp_unit=ns`, `synchronized`, `method`, `max_error_ns`, calibration artifact | same-host monotonic-raw, PTP/PHC, TAI calibration 중 하나; 모든 record가 같은 domain |
+| TB identity | `request_id`, `batch_id`, `home_id`, `cell_id`, `slot_id`와 가능하면 SFN | request ID 유일; raw event를 조립한 뒤 identity가 바뀌면 거부 |
+| TB timestamps | `iq_ready_ns`, `release_ns`, `phy_submit_ns`, `crc_visible_ns`, `fapi_publish_ns`, `mac_consume_ns`, `expiry_ns` | 모두 비음수 integer이고 같은 clock; 앞의 여섯 시각은 단조 증가 |
+| Radio outcome | `radio_commit_count`, `nrx_admitted`, `nrx_outcome_at_decision`, `nrx_outcome_observed_ns` | commit 정확히 1회; decision 이후에 관측된 NRx outcome을 미래 정보로 사용하면 거부 |
+| Decision | `batch_id`, `decision_ns`, `mandatory_request_ids`, `unresolved_request_ids`, `ai_context_length`, `ai_deadline_ns`, `ai_lease_accepted`, `ai_complete_ns` | batch의 mandatory/unresolved 집합과 raw record가 일치; 허가된 AI는 class bound와 deadline을 만족 |
+| Expiry provenance | `source_type`, `source_reference`, 원본 `path`, `sha256`, `synthetic=false`, `derived_from_ue_k2_n2=false` | DU configuration, MAC scheduler trace, FAPI contract만 허용; UE K2/N2나 사후 선택 D는 거부 |
+| Mode fingerprint | lifecycle, node qualification, recovery capacity, `B_NRx`, `B_recovery`, `B_control`, guard, AI class bounds, qualification artifact/hash | 하나라도 바뀌면 다른 mode이며 기존 bound 재사용 금지 |
+
+추가 hard rule은 `mac_consume_ns + max_error_ns <= expiry_ns`다. 관측 miss 한 건, duplicate
+commit 한 건, artifact reconstruction 불일치 한 건도 mode를 fail-closed한다. 유한 trace가
+통과해도 WCET로 승격하지 않는다.
+
+## 세 가지 획득 경로와 필드 매핑
+
+| 획득 경로 | 직접 얻는 필드 | 결합해야 하는 필드 | 판정 범위 |
+|---|---|---|---|
+| **A. Target DU 직접 계측** | slot clock에서 IQ ready/release/PHY submit, cuPHY/FAPI에서 CRC visible/publish, MAC에서 consume/expiry | request ID와 SFN/slot로 세 계층 join, clock calibration | P1을 닫을 수 있는 우선 경로 |
+| **B. FAPI trace + MAC scheduler log join** | FAPI capture가 PHY submit/CRC visible/publish, MAC log가 consume과 explicit expiry 제공 | IQ ready/release hook, 공통 TAI/PTP 변환, expiry configuration hash | 두 artifact가 같은 TB identity와 clock으로 재조립될 때 P1 가능 |
+| **C. Aerial testMAC controlled-L2** | slot `T0`, handler arrival, `T0+4.5 ms` configured threshold | 실제 target MAC consume/expiry는 없음 | fast-path integration 진단만 가능; production `d_MAC` 대체 불가 |
+
+경로 A의 현재 Aerial hook 후보는 `nv_tick_generator`의 slot indication,
+`phy::send_crc_indication`, 그 호출부와 target MAC consume 지점이다. 경로 B는 source artifact를
+두 개 이상 사용해도 최종 builder가 content hash와 request identity로 하나의 contract를
+재구성해야 한다. 경로 C의 4.5 ms는 구현 최적화용 보수적 `D` 후보이며 실제 DU trace를
+얻기 전에는 P1 evidence로 승격하지 않는다.
+
+## Trace에서 SoftWall parameter로의 결정적 변환
+
+요청 `i`와 clock 최대 오차 `epsilon`에 대해 validator/bridge는 다음 값만 사용한다.
+
+```text
+D_i                    = expiry_i - release_i - epsilon
+release_i^recovery     = release_i + B_NRx    (NRx admitted)
+                       = release_i            (NRx not admitted)
+deadline_i^recovery    = expiry_i - guard - epsilon
+service_i^recovery     = B_recovery
+AI blackout            = [decision,
+                          decision + B_control + B_AI(context_class)]
+```
+
+따라서 slot duration이나 평균 arrival period `P`를 `D_i`로 치환하지 않는다. 초기 all-fail
+집합과 각 decision 시각의 unresolved 집합에 certificate를 각각 만들고, AI blackout을 넣은
+뒤에도 certificate가 남을 때만 lease를 허가한다. 관측 결과와 predicted QSU/QSN/MI/UQ가
+다르면 해당 mode는 UQ다. 이 mapping은 production trace가 들어왔을 때 그대로 실행되지만,
+trace 부재 자체를 해결하지는 않는다.
+
 ## 로컬 Aerial source audit
 
 현재 checkout에서 CRC/FAPI publication과 slot clock을 삽입할 위치는 확인했다.

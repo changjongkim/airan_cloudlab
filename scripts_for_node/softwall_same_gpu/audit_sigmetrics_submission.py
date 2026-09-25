@@ -132,9 +132,9 @@ def main():
         "conference_metadata_present": "SIGMETRICS 2027" in tex and "June 7--11, 2027" in tex,
         "official_cfp_rechecked": (
             cfp.get("all_pass") is True
-            and cfp["fall_deadline"]["abstract_registration"] == "October 2, 2026 23:59 AoE"
-            and cfp["fall_deadline"]["paper_submission"] == "October 9, 2026 23:59 AoE"
-            and cfp["fall_deadline"]["notification"] == "December 9, 2026"
+            and cfp["winter_deadline"]["abstract_registration"] == "January 4, 2027 23:59 AoE"
+            and cfp["winter_deadline"]["paper_submission"] == "January 11, 2027 23:59 AoE"
+            and cfp["winter_deadline"]["notification"] == "March 10, 2027"
             and cfp["format"]["technical_content_pages_max"] == 20
             and cfp["format"]["review"] == "double anonymous"
         ),
@@ -176,7 +176,7 @@ def main():
         ),
         "production_and_wcet_limits_present": (
             "make no production" in normalized_tex
-            and "neither WCET evidence nor a production trace" in normalized_tex
+            and "mechanism evidence rather than qualification or WCET" in normalized_tex
             and "WCET" in tex
             and production.get("all_pass") is False
             and production.get("status") == "FAIL_CURRENT_DESIGN_NOT_PRODUCTION_QUALIFIED"
@@ -188,7 +188,8 @@ def main():
                 ["parallel_pair_wall_le_deadline"] == 885
             and "885/1,000" in tex
             and "External Aerial TDL-A" in tex
-            and r"31 \NRx-only versus 12 conventional-only" in tex
+            and r"Paired aggregate & -- & -- & \textbf{31} & \textbf{12}" in tex
+            and "optional \\NRx has conditional radio value" in tex
         ),
         "quantitative_provenance_preserved": (
             upstream.get("checks", {}).get("quantitative_provenance_complete") is True

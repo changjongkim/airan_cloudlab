@@ -537,11 +537,15 @@ precomputed NeuralRx inputs to GPU1 also completed 0/1,000. Moving the complete 
 including channel estimation and CRC, behind raw-IQ P2P improved completion to 852/1,000 (3.831 ms
 median), but retained 148 late samples; disabling Python GC did not remove the tail. Binding cuPHY and
 caller-owned TensorRT to one stream and busy-polling improved timely completion to 885/1,000, but did
-not close the gate. A diagnostic 300-request stage profile localized the tail to LS channel estimation:
-its p50/p99/max were 0.866/4.873/9.592 ms and its correlation with pair wall time was 0.9603. TensorRT
-graph execution had a 0.886 ms p99 and forward P2P copy a 69.3 us p99. Profiling changes timing, so
-these stage values are mechanism evidence rather than qualification. Every tested implementation
-remains unqualified at 4.5 ms. These diagnostics are neither WCET evidence nor a production trace.
+not close the gate. A diagnostic 300-request stage profile localized the tail to cuPHY LS channel
+estimation: its GPU p50/p99/max were 0.866/4.873/9.592 ms and its correlation with pair wall time was
+0.9603. TensorRT host enqueue averaged 7.443 us while the TensorRT graph itself had a 0.886 ms GPU p99.
+Forward/backward P2P copies averaged 36.261/17.150 us on GPU. Derate-match host-call duration averaged
+1,060.105 us with a 1,105.380 us p99, while its GPU p99 was 0.168 ms. Thus transport and TensorRT were
+comparatively stable; the diagnostic tail is carried by channel estimation. Because the 4.5 ms target
+is the mode's `D` parameter, a single qualified service component cannot have a tail beyond `D`; this
+implementation therefore fails before scheduling or external AI is considered. Profiling changes
+timing, so these stage values are mechanism evidence rather than qualification or WCET.
 
 External Aerial TDL-A remains unqualified. Across raw and normalized Aerial TDL-A, public-reference
 DMRS/MCS/start-symbol settings, one-antenna frequency/time-domain channel execution, and a TensorRT
@@ -550,16 +554,26 @@ arm while NeuralRx succeeded in none. This localizes the gap to an unsupported m
 or domain rather than a simple power, radio-profile, transmitter, or precision setting.
 
 <!-- provenance: P3_CHANNEL_HOLDOUT -->
+#### 7.10 Supported-channel NeuralRx result
+
 We then reconstructed the public notebook's actual Sionna 1.0.2/TensorFlow 2.19 contract. Clean MCS7
 direct and wrapper controls and the default Sionna Rayleigh channel passed NeuralRx 20/20. A fixed
 development matrix revealed a channel-family boundary: CDL-A degraded from 10/10 at 1 ns delay spread
 to 2/10 at 10 ns and 0/10 at 30 and 100 ns; CDL-B/C at 100 ns also failed, while CDL-D/E passed 10/10.
 We froze D/E before opening disjoint payload, slot, and channel seeds. The resulting paired holdout used
 five Es/No strata and 50 new blocks per stratum per model. At 10 dB, both pipelines passed 50/50 for
-both models. Across the four low-SNR strata, NeuralRx-only correctness was 31 and conventional-only
-correctness was 12 (two-sided exact p=0.00540). This closes the channel-compatibility gate only for the
-declared Sionna CDL-D/E, 100 ns, MCS7/FP32 finite-sample mode. It does not qualify TDL-A, field IQ, or
-production timing.
+both models.
+
+| Frozen holdout | Conventional | NeuralRx | Low-SNR NeuralRx-only | Low-SNR conventional-only |
+|---|---:|---:|---:|---:|
+| CDL-D, 100 ns | 153/250 | 164/250 | 16 | 5 |
+| CDL-E, 100 ns | 155/250 | 163/250 | 15 | 7 |
+| Paired aggregate | — | — | **31** | **12** |
+
+The aggregate discordant outcomes give a two-sided exact `p=0.00540`. This is a positive Results
+claim: optional NeuralRx has conditional radio value in the frozen Sionna CDL-D/E mode. It closes the
+channel-compatibility gate only for the declared Sionna CDL-D/E, 100 ns, MCS7/FP32 finite-sample mode.
+It does not qualify TDL-A, field IQ, timing, or production HARQ.
 
 ## 8. Related Work
 

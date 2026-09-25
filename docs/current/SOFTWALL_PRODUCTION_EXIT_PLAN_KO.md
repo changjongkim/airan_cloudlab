@@ -59,10 +59,17 @@ synchronization을 없애면 적시 완료가 852에서 885로 늘었지만, 115
 안전 계약으로 채택할 수 없다.
 
 사후 stage diagnostic 300건은 긴 tail을 remote cuPHY LS channel estimation으로 좁혔다.
-Channel estimation은 p50 0.866 ms, p99 4.873 ms, max 9.592 ms였고 pair wall과 Pearson
-상관은 0.9603이었다. TensorRT graph는 p99 0.886 ms, forward P2P copy는 p99 69.3 µs였다.
-Profiling event가 timing을 바꾸므로 이 수치는 qualification이 아니라 다음 C++/CUDA fast-path
-구현의 병목 근거다.
+Channel estimation GPU 시간은 p50 0.866 ms, p99 4.873 ms, max 9.592 ms였고 pair wall과
+Pearson 상관은 0.9603이었다. TensorRT host enqueue 평균은 7.443 µs였고 실제 graph GPU
+p99는 0.886 ms였다. Forward/backward P2P GPU copy 평균은 36.261/17.150 µs였다. Derate-match
+host call은 평균 1,060.105 µs, p99 1,105.380 µs였지만 GPU p99는 0.168 ms였다. 단위와
+계층을 섞지 않으면 transport와 TensorRT graph는 비교적 안정적이고, tail의 지배 단계는
+cuPHY LS channel estimation이다.
+
+이때 4.5 ms는 단순 그래프 선이 아니라 mode의 `D` parameter다. Diagnostic mode에서
+channel-estimation component 하나의 p99가 이미 `D`를 넘으므로, scheduling이나 Qwen을
+붙이기 전에 underlying NRx service class가 자격 미달이다. Profiling event가 timing을
+바꾸므로 이 수치는 qualification/WCET가 아니라 다음 C++/CUDA fast-path 구현의 병목 근거다.
 
 ### 1.3 설계에 주는 결론
 

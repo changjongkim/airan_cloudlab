@@ -1,0 +1,21 @@
+{
+  "schema": "softwall-c166-native-fixture-protocol-v1",
+  "frozen_before_execution": true,
+  "role": "N0 Python-to-native parity fixture only; no latency, deadline, WCET, service-bound, or production claim.",
+  "seed": 20359400,
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "required_outputs": [
+    "manifest.json",
+    "rx_slot_complex64_fortran.bin",
+    "rx_slot_real_imag_float32_c.bin",
+    "reference_tb_uint8.bin"
+  ],
+  "pass_rule": "Reference conventional and NeuralRx must both decode correctly; every file hash/size must match; the direct Fortran complex slot and split real/imag C-order payload must reconstruct identical logical values.",
+  "qualification": "forbidden",
+  "source_sha256_before_execution": {
+    "scripts_for_node/softwall_same_gpu/export_c166_native_fixture.py": "a901671a56ad331e44428b516b699200d145784d68b413242eb59a4fd4c92e47",
+    "scripts_for_node/softwall_same_gpu/run_c166_export_native_fixture.sh": "04513076c0b0c386bc8a995e490abf5403cb30bae61cb8b9d5d7dd563f55b700",
+    "scripts_for_node/softwall_same_gpu/validate_c166_native_fixture.py": "93b0aed763c40975c04c761eb7fa3c56b7125fd7e5a6562e60e33cf384d83fd9",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "afc96d538b91749e00ced9c1be9424665873a075e70ef7c2eb3d823b1171e121"
+  }
+}

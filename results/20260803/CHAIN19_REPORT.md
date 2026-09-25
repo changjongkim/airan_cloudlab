@@ -1,5 +1,11 @@
 # Chain 19 — AI-RAN GPU Isolation Follow-up Report
 
+> **Legacy, non-authoritative report with a corrected conclusion.** This file preserves
+> the 2026-08 Chain 19 analysis. Its original same-partition `pct=30, N=6` latency claim
+> was wrong: the measured three-run p99 is **145.9 ms**, not about 45 ms. The 36.1% duty
+> observation remains valid, but it does not establish a timing SLA or a production
+> fallback. Current SoftWall claims must not cite this report for production qualification.
+
 **Setting**: CloudLab d8545-10s10305 · NVIDIA A100-SXM4-40GB × 4 · driver 580.173.02 · CUDA 13.0 · cuPHY 25.3-cubb (pyaerial 2026.1.dev1)
 **Session**: 2026-08-02 to 2026-08-03 (Chain 19 exec time: 3h 3min)
 **Scale**: 13 experiments · 273 nsys captures · 22 polished figures · ~1.5 GB raw data (nsys-rep excluded from git)
@@ -13,7 +19,7 @@ Chain 19 extends the Chain 9-18 story with 13 targeted follow-up experiments add
 
 **Novel Finding 1**: Config B (Full GPU, 108 SM) + 1-3 diverse AI containers *improves* L1 duty cycle beyond L1-alone baseline (38% → 62%). MPS keeps the launch queue continuously dispatching, which fills natural L1 idle gaps. This contradicts the intuition that adding co-tenants can only hurt L1 — it can help, up to a point.
 
-**Novel Finding 2**: `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30` is the true sweet spot, not `70` as Chain 17 Part B recommended. At N=6 (breakdown zone), pct=30 recovers L1 duty to 36.1% — near baseline. pct=70 only reaches 24.6%. Aggressive AI thread cap works significantly better than mild cap.
+**Corrected Finding 2**: `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30` produced the highest duty value in the tested N=6 sweep: 36.1% versus 24.6% at pct=70. This is a duty-only result. The measured N=6 p99 at pct=30 is 145.9 ms, so pct=30 is not a timing-safe sweet spot or a qualified deployment fallback.
 
 Additional confirmations from Chain 19:
 - Cross-partition holds under AI-side scaling to N=16 (Exp 5) — L1 baseline invariant.
@@ -65,11 +71,11 @@ Additional confirmations from Chain 19:
 - Mechanism: MPS server continuously dispatches queued kernels, filling L1's natural idle gaps.
 - Only starts declining at N=8+ (still 40%, above baseline for N≤10).
 
-**Finding B — `pct=30` is the true MPS thread% sweet spot (novel — Chain 17 Part B was under-optimal).**
+**Finding B — `pct=30` maximizes the tested duty metric, but fails the latency check.**
 - N=6, pct=100 (default): 18.9% duty (breakdown).
 - N=6, pct=70 (Chain 17's recommendation): 24.6%.
-- **N=6, pct=30: 36.1%** (near baseline, breakdown effectively mitigated).
-- More aggressive AI thread cap gives L1 more scheduling budget.
+- **N=6, pct=30: 36.1% duty**, but measured p99 latency is **145.9 ms**.
+- The aggressive cap improves duty relative to pct=70, but does not provide timing isolation.
 
 **Finding C — Cross-partition scales to N=16 diverse AI without L1 impact.**
 - Chain 18 Part 8 tested N=6 diverse on 3g partition. Chain 19 Exp 5 extended to N=16.
@@ -544,16 +550,16 @@ Chain 17 Part B swept pct ∈ {100, 70, 50, 30} only for nrx_multi4 (fixed N=4).
 | 70% | 31.7% | 24.6% | 17.3% |
 | 100% (default) | 29.0% | 18.9% | 11.5% |
 
-**Novel finding**: pct=30 is the true sweet spot.
+**Corrected finding**: pct=30 is the best tested duty point, not a timing-safe operating point.
 
 **Compared to Chain 17 Part B**:
 - Chain 17 recommended pct=70 based on nrx_multi4 only.
-- Chain 19 Exp 11 shows pct=30 recovers **N=6 to 36.1%** (near baseline 30-32%!) while pct=70 only reaches 24.6%.
-- **pct=30 essentially eliminates the N=6 breakdown**.
+- Chain 19 Exp 11 shows pct=30 recovers **N=6 duty to 36.1%** while pct=70 reaches 24.6%.
+- The corrected latency analysis measures **145.9 ms p99** at N=6, so the breakdown remains in the SLA metric.
 
-**Mechanism**: pct=30 caps AI to 30% of SM allocation. This leaves 70% for L1 (and MPS scheduling capacity for L1 launches). At N≤6, this cap is enough to preserve L1 baseline.
+**Mechanism interpretation**: pct=30 caps AI to 30% of SM allocation and improves the duty proxy. It is not enough to preserve the L1 latency baseline.
 
-**Deployment implication**: `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30` for AI clients is the new recommended tuning knob (overriding Chain 17's pct=70).
+**Deployment implication**: do not promote pct=30 as a qualified fallback. It may be retained as a diagnostic tuning point only.
 
 ![Deep · Chain 17 + Chain 19 combined pct sweep](analysis_chain19/figures/e19_deep_cross_pct.png)
 
@@ -654,7 +660,7 @@ Combines Chain 17 Config A (identical NRx), Chain 19 Config B diverse (Exp 1), a
 
 ### 17.2 Combined MPS pct sweep (Chain 17 + Chain 19)
 
-Already covered in §14. Chain 19 Exp 11 supersedes Chain 17 Part B pct=70 recommendation. **New recommendation: pct=30**.
+Already covered in §14. pct=30 improved the duty proxy over pct=70, but its corrected N=6 p99 is 145.9 ms. **No same-partition production recommendation follows from this sweep.**
 
 ### 17.3 SLA ranking (273 conditions)
 
@@ -663,7 +669,7 @@ Already covered in §14. Chain 19 Exp 11 supersedes Chain 17 Part B pct=70 recom
 Per-slot latency (dur_med + gap_med × 100 kernels/slot proxy) across all 273 conditions. Top 15 are all cross-partition or Full GPU. Bottom 10 are same-partition N≥6.
 
 **Key rows**:
-- Best: Multi-GPU N=1-8, CP scenarios, Config B alone, pct=30 at N=4-6.
+- Best in the legacy proxy ranking: Multi-GPU N=1-8, CP scenarios, and Config B alone. pct=30 at N=4-6 is excluded from timing-safe recommendations.
 - Worst: SP N=8 MPS off (100+ms per slot), Config C N=8, SP breakdown scenarios.
 
 ### 17.4 Statistical reproducibility
@@ -708,7 +714,7 @@ Every condition plotted as (L1 p99, Qwen tok/s). Upper-left = ideal (low latency
 
 ![MPS pct × N L1 latency heatmap](analysis_chain19/figures/e19_pct_latency_heatmap.png)
 
-Direct L1 p99 latency (not duty) as MPS thread% varies. pct=30 at N=6 achieves ~45ms (near baseline 41ms), matching the duty-cycle finding but expressed as actual SLA metric.
+Direct L1 p99 latency (not duty) as MPS thread% varies. The corrected three-run N=6, pct=30 value is **145.9 ms**, roughly 3.6× the approximately 40 ms cross-partition baseline. The duty-cycle improvement does not translate into an SLA pass.
 
 ### 17b.6 Cross-partition L1 latency invariance
 
@@ -733,7 +739,7 @@ Per-workload throughput (Qwen tok/s, CsiNet iter/s, BeamPred iter/s, NRx iter/s)
 1. **L1 latency confirms the duty cycle story**: baseline ~40ms per iter, breakdown pushes p99 to 100+ ms — matches duty cycle degradation pattern but with SLA-direct interpretation.
 2. **Trade-off is real and quantifiable**: Config B N=1-3 achieves both low latency AND high AI throughput. Same-partition N≥6 loses on both axes.
 3. **Cross-partition proven at SLA metric level**: L1 p99 stays baseline for N=6-16 AI. This is the strongest deployment safety evidence.
-4. **`pct=30` recommendation validated by latency**: 45ms p99 at N=6 pct=30 is near baseline, confirming duty cycle finding is real SLA improvement.
+4. **`pct=30` recommendation rejected by latency**: N=6 pct=30 measures 145.9 ms p99. Its duty improvement is not evidence of timing isolation or a safe deployment mode.
 
 ---
 
@@ -746,12 +752,12 @@ Per-workload throughput (Qwen tok/s, CsiNet iter/s, BeamPred iter/s, NRx iter/s)
 **Mechanism**: MPS continuously dispatches AI kernels, filling L1's natural idle gaps. Full GPU has enough SM (108) that L1 kernels aren't crowded out.
 **Implication**: If you can't afford dedicated cross-partition MIG, Full GPU + light MPS co-tenancy (1-8 diverse AI) is actually better than L1-alone in duty terms.
 
-### 18.2 pct=30 is the true sweet spot (Exp 11)
+### 18.2 pct=30 improves duty but is not timing-safe (Exp 11)
 
 **Old belief**: Chain 17 recommended `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=70`.
-**New evidence**: Exp 11 fine-grained pct × N sweep shows pct=30 recovers N=6 to 36.1% (near baseline).
-**Mechanism**: pct=30 leaves 70% of MPS scheduling capacity for L1. At N≤6, this is enough to preserve baseline.
-**Implication**: Update deployment recommendation. If same-partition co-tenancy is required, `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30` (not 70).
+**New evidence**: Exp 11 fine-grained pct × N sweep shows pct=30 recovers N=6 duty to 36.1%, but the corrected latency p99 is 145.9 ms.
+**Mechanism**: pct=30 leaves more scheduling capacity for L1 and improves the duty proxy; it does not preserve the latency baseline.
+**Implication**: Do not use this result to recommend same-partition co-tenancy. The exact mode needs an independently qualified timing contract.
 
 ### 18.3 CUDA graph provides 5-6× per-slot latency reduction (Exp 6)
 
@@ -801,15 +807,15 @@ Combining Chain 9-19 findings, updated recommendations:
 1. **Multi-GPU (separate physical GPUs)** — zero interference. Use if hardware budget allows.
 2. **MIG cross-partition** — L1 on 4g.20gb, all AI on 3g.20gb. Hardware isolation, robust to N=16+ AI. **Golden path.**
 3. **Full GPU with MPS + light AI (N≤8)** — L1 duty *improved* by light co-tenancy. Best resource utilization if fault isolation not required.
-4. **Same-partition with pct=30 + MPS on (N≤6)** — near-baseline duty. Only if resource-constrained.
-5. **NOT RECOMMENDED**: same-partition N≥6 without pct tuning (default pct=100), or Config C (3g.20gb) with N≥6.
+4. **NOT QUALIFIED**: same-partition pct=30 at N=6. Duty is near the legacy baseline, but measured p99 is 145.9 ms.
+5. **NOT RECOMMENDED**: same-partition N≥6, including pct=30, or Config C (3g.20gb) with N≥6.
 
 ### 19.2 Configuration tuning cheat-sheet
 
 | Setting | Default | Recommended | Impact |
 |---|---|---|---|
 | MPS server | disabled | **enable** | Necessary for any co-tenancy |
-| `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` | 100 | **30** (for AI clients) | Recovers N=6 to baseline |
+| `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` | 100 | mode-specific; no qualified SP value | pct=30 improves duty but measures 145.9 ms p99 at N=6 |
 | MIG mode | disabled | **enable** with 4g+3g | Hardware isolation for L1 |
 | CUDA graph in L1 (future) | not used | **use if possible** | 5-6× per-slot latency reduction |
 

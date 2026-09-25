@@ -1,5 +1,10 @@
 # Chain 19 — AI-RAN GPU 격리 후속 실험 보고서
 
+> **과거 재현용 비권위 문서이며 결론을 정정함.** 이 파일은 2026-08 Chain 19 분석을
+> 보존한다. 원문의 same-partition `pct=30, N=6` 지연 주장은 틀렸다. 세 실행의 실측 p99는
+> 약 45 ms가 아니라 **145.9 ms**다. 36.1% duty 관측은 유효하지만 timing SLA나 production
+> fallback을 입증하지 않는다. 현재 SoftWall production 자격 근거로 이 문서를 인용하지 않는다.
+
 **환경**: CloudLab d8545-10s10305 · NVIDIA A100-SXM4-40GB × 4 · driver 580.173.02 · CUDA 13.0 · cuPHY 25.3-cubb (pyaerial 2026.1.dev1)
 **세션**: 2026-08-02 ~ 2026-08-03 (Chain 19 실행 시간: 3시간 3분)
 **규모**: 13개 실험 · 273개 nsys 캡처 · 22개 polished figure · 원본 데이터 약 1.5 GB (nsys-rep은 git 제외)
@@ -13,7 +18,7 @@ Chain 19는 `COMPREHENSIVE_REPORT.md §16`에서 언급된 한계들을 다루�
 
 **Novel Finding 1**: Config B (Full GPU, 108 SM) + 1-3개의 diverse AI 컨테이너를 co-locate 하면 L1 duty cycle이 L1 alone baseline 보다 **향상**됨 (38% → 62%). MPS가 launch queue를 지속적으로 dispatch 하기 때문에 L1의 natural idle gap이 채워짐. 이는 "co-tenant를 추가하면 L1이 나빠질 수만 있다"는 직관과 모순 — 어느 정도까지는 오히려 도움이 된다.
 
-**Novel Finding 2**: `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30`이 진짜 sweet spot. Chain 17 Part B가 권고한 `70`이 아님. N=6 breakdown zone에서 pct=30은 L1 duty를 36.1% (baseline 근처)로 회복시킴. pct=70은 24.6%까지만. **Aggressive AI thread cap이 mild cap보다 훨씬 낫다.**
+**정정된 Finding 2**: `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30`은 N=6 sweep에서 가장 높은 duty인 36.1%를 보였고 pct=70은 24.6%였다. 이는 duty에만 해당한다. N=6 pct=30의 실측 p99는 145.9 ms이므로 timing-safe sweet spot이나 자격 있는 deployment fallback이 아니다.
 
 Chain 19의 추가 확증:
 - Cross-partition은 AI-side N=16 scaling에도 견딤 (Exp 5) — L1 baseline 불변.
@@ -65,11 +70,11 @@ Chain 19의 추가 확증:
 - 메커니즘: MPS server가 queued kernel을 지속 dispatch 하며 L1 idle gap을 채움.
 - N=8+에서만 하락 시작 (그래도 40%, N≤10까지 baseline 이상).
 
-**Finding B — `pct=30`이 진짜 MPS thread% sweet spot (novel — Chain 17 Part B 정정 필요).**
+**Finding B — `pct=30`은 duty 지표를 최대화하지만 latency 검사를 실패함.**
 - N=6, pct=100 (default): 18.9% duty (breakdown).
 - N=6, pct=70 (Chain 17 권고): 24.6%.
-- **N=6, pct=30: 36.1%** (baseline 근처, breakdown 효과적 완화).
-- Aggressive AI thread cap이 L1에 더 많은 scheduling budget 확보.
+- **N=6, pct=30: duty 36.1%**지만 실측 p99 latency는 **145.9 ms**다.
+- Aggressive cap은 pct=70보다 duty를 개선하지만 시간 격리를 제공하지 않는다.
 
 **Finding C — Cross-partition은 N=16 diverse AI까지 L1 영향 없음.**
 - Chain 18 Part 8은 N=6 diverse까지 테스트. Chain 19 Exp 5는 N=16까지 확장.
@@ -544,16 +549,16 @@ Chain 17 Part B가 pct ∈ {100, 70, 50, 30}을 nrx_multi4에만 (고정 N=4) sw
 | 70% | 31.7% | 24.6% | 17.3% |
 | 100% (default) | 29.0% | 18.9% | 11.5% |
 
-**Novel finding**: pct=30이 진짜 sweet spot.
+**정정된 finding**: pct=30은 가장 좋은 duty 지점이지만 timing-safe operating point가 아니다.
 
 **Chain 17 Part B 대비**:
 - Chain 17이 nrx_multi4 기반 pct=70 권고.
-- Chain 19 Exp 11이 pct=30으로 **N=6을 36.1%까지 회복** (baseline 30-32% 근처!). pct=70은 24.6%까지만.
-- **pct=30이 N=6 breakdown을 essentially 제거**.
+- Chain 19 Exp 11에서 pct=30은 **N=6 duty를 36.1%까지 회복**했고 pct=70은 24.6%였다.
+- 정정된 latency 분석은 N=6에서 **p99 145.9 ms**를 측정했으므로 SLA 지표의 breakdown은 남아 있다.
 
-**메커니즘**: pct=30이 AI를 SM 할당의 30%로 cap. L1 (그리고 L1 launch에 대한 MPS scheduling capacity) 에게 70% 남김. N≤6에서 이 cap이 L1 baseline 보존에 충분.
+**메커니즘 해석**: pct=30은 AI를 SM 할당의 30%로 cap해 duty proxy를 개선하지만 L1 latency baseline을 보존하기에는 충분하지 않다.
 
-**배포 함의**: `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30` for AI clients가 새 권고 튜닝 knob (Chain 17의 pct=70 override).
+**배포 함의**: pct=30을 자격 있는 fallback으로 승격하지 않는다. 진단용 tuning point로만 보존한다.
 
 ![Deep · Chain 17 + Chain 19 결합 pct sweep](analysis_chain19/figures/e19_deep_cross_pct.png)
 
@@ -654,7 +659,7 @@ Chain 17 Config A (identical NRx), Chain 19 Config B diverse (Exp 1), Chain 19 C
 
 ### 17.2 결합 MPS pct sweep (Chain 17 + Chain 19)
 
-이미 §14에서 다룸. Chain 19 Exp 11이 Chain 17 Part B pct=70 권고를 supersede. **새 권고: pct=30**.
+이미 §14에서 다룸. pct=30은 pct=70보다 duty proxy를 개선했지만 정정된 N=6 p99는 145.9 ms다. **이 sweep에서 same-partition production 권고는 나오지 않는다.**
 
 ### 17.3 SLA ranking (273 conditions)
 
@@ -663,7 +668,7 @@ Chain 17 Config A (identical NRx), Chain 19 Config B diverse (Exp 1), Chain 19 C
 Per-slot latency (dur_med + gap_med × 100 kernels/slot proxy) 를 273 조건 걸쳐 계산. Top 15는 모두 cross-partition 또는 Full GPU. Bottom 10은 same-partition N≥6.
 
 **Key rows**:
-- Best: Multi-GPU N=1-8, CP scenarios, Config B alone, pct=30 at N=4-6.
+- 과거 proxy ranking의 best는 Multi-GPU N=1-8, CP scenarios, Config B alone이다. pct=30 at N=4-6은 timing-safe 권고에서 제외한다.
 - Worst: SP N=8 MPS off (100+ms per slot), Config C N=8, SP breakdown scenarios.
 
 ### 17.4 통계적 재현성
@@ -708,7 +713,7 @@ Qwen 2.5-3B via vLLM aggregate throughput이 diverse AI 스택 scale 하며 증�
 
 ![MPS pct × N L1 latency heatmap](analysis_chain19/figures/e19_pct_latency_heatmap.png)
 
-MPS thread% 변화에 따른 direct L1 p99 latency (duty 아님). pct=30 at N=6에서 ~45ms (baseline 41ms 근처) — duty-cycle 발견과 일치하지만 실제 SLA metric으로 표현.
+MPS thread% 변화에 따른 direct L1 p99 latency다. 정정된 N=6 pct=30의 세 실행 p99는 **145.9 ms**이며 약 40 ms인 cross-partition baseline의 약 3.6배다. Duty-cycle 개선은 SLA 통과로 이어지지 않는다.
 
 ### 17b.6 Cross-partition L1 latency 불변
 
@@ -733,7 +738,7 @@ Config B 스택 scale 시 워크로드 별 throughput (Qwen tok/s, CsiNet iter/s
 1. **L1 latency가 duty cycle story 확증**: baseline ~40ms per iter, breakdown이 p99를 100+ ms로 push — duty cycle degradation pattern 매칭하지만 SLA-direct 해석.
 2. **Trade-off이 실재하고 정량화 가능**: Config B N=1-3이 low latency AND high AI throughput 둘 다 달성. Same-partition N≥6이 두 축에서 모두 loss.
 3. **Cross-partition이 SLA metric 수준에서 검증**: N=6-16 AI 하 L1 p99가 baseline 유지. 가장 강력한 배포 안전 증거.
-4. **`pct=30` 권고가 latency로 검증**: N=6 pct=30에서 45ms p99가 baseline 근처 — duty cycle 발견이 실제 SLA 개선임 확증.
+4. **`pct=30` 권고는 latency로 기각**: N=6 pct=30은 p99 145.9 ms다. Duty 개선은 시간 격리나 안전한 deployment mode의 증거가 아니다.
 
 ---
 
@@ -746,12 +751,12 @@ Config B 스택 scale 시 워크로드 별 throughput (Qwen tok/s, CsiNet iter/s
 **Mechanism**: MPS가 AI kernel을 continuously dispatch, L1의 natural idle gap을 채움. Full GPU가 SM 충분 (108) 해서 L1 kernel이 밀리지 않음.
 **Implication**: Dedicated cross-partition MIG 여유 없다면, Full GPU + light MPS co-tenancy (1-8 diverse AI) 가 L1-alone 보다 duty 관점에서 오히려 낫다.
 
-### 18.2 pct=30이 진짜 sweet spot (Exp 11)
+### 18.2 pct=30은 duty를 개선하지만 timing-safe하지 않음 (Exp 11)
 
 **Old belief**: Chain 17이 `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=70` 권고.
-**New evidence**: Exp 11의 fine-grained pct × N sweep이 pct=30으로 N=6을 36.1% (baseline 근처)까지 회복.
-**Mechanism**: pct=30이 MPS scheduling capacity의 70%를 L1에게 남김. N≤6에서 이게 baseline 보존에 충분.
-**Implication**: 배포 권고 update. Same-partition co-tenancy 필요 시 `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=30` (70 아님).
+**New evidence**: Exp 11의 fine-grained pct × N sweep에서 pct=30은 N=6 duty를 36.1%로 회복했지만, 정정된 latency p99는 145.9 ms다.
+**Mechanism**: pct=30은 L1에 더 많은 scheduling capacity를 남겨 duty proxy를 개선하지만 latency baseline을 보존하지 않는다.
+**Implication**: 이 결과로 same-partition co-tenancy를 권고하지 않는다. Exact mode에는 독립적으로 자격화한 timing contract가 필요하다.
 
 ### 18.3 CUDA graph가 per-slot latency 5-6× 감소 (Exp 6)
 
@@ -801,15 +806,15 @@ Chain 9-19 발견 결합, 업데이트된 권고:
 1. **Multi-GPU (분리된 물리 GPU)** — zero interference. 하드웨어 예산 되면 사용.
 2. **MIG cross-partition** — L1 on 4g.20gb, 모든 AI on 3g.20gb. 하드웨어 격리, N=16+ AI에 robust. **Golden path.**
 3. **Full GPU + MPS + light AI (N≤8)** — L1 duty가 light co-tenancy 로 *향상*. Fault isolation 불필요 시 최고 리소스 활용.
-4. **Same-partition + pct=30 + MPS on (N≤6)** — near-baseline duty. Resource-constrained 시만.
-5. **NOT RECOMMENDED**: same-partition N≥6 without pct tuning (default pct=100), 또는 Config C (3g.20gb) with N≥6.
+4. **NOT QUALIFIED**: same-partition pct=30 at N=6. Duty는 과거 baseline 근처지만 실측 p99는 145.9 ms다.
+5. **NOT RECOMMENDED**: pct=30을 포함한 same-partition N≥6 또는 Config C (3g.20gb) with N≥6.
 
 ### 19.2 Configuration tuning cheat-sheet
 
 | Setting | Default | Recommended | Impact |
 |---|---|---|---|
 | MPS server | disabled | **enable** | 모든 co-tenancy에 필수 |
-| `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` | 100 | **30** (for AI clients) | N=6를 baseline까지 회복 |
+| `CUDA_MPS_ACTIVE_THREAD_PERCENTAGE` | 100 | mode-specific; 자격 있는 SP 값 없음 | pct=30은 duty를 개선하지만 N=6 p99 145.9 ms |
 | MIG mode | disabled | **enable** with 4g+3g | L1 하드웨어 격리 |
 | CUDA graph in L1 (future) | not used | **가능하면 사용** | 5-6× per-slot latency 감소 |
 

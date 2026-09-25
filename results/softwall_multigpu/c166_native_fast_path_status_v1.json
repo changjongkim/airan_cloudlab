@@ -1,0 +1,79 @@
+{
+  "schema": "softwall-c166-native-fast-path-status-v1",
+  "status": "N0_PARITY_FIXTURE_COMPLETE_N1_IMPLEMENTATION_PENDING",
+  "qualification_status": "NOT_QUALIFIED",
+  "n0_exact_fixture": {
+    "pass": true,
+    "manifest": "results/softwall_multigpu/c166_native_fixture_seed20359400/manifest.json",
+    "manifest_sha256": "d23cbda3f51f5907a427d7d6e5139eee23a7b17b8369053d501b4dea6edad050",
+    "validation": "results/softwall_multigpu/c166_native_fixture_validation.json",
+    "validation_sha256": "94dbaa9e32395c374ddebd1d1709704b5da2cff600f092b183970944c11ac0e7",
+    "reference_decoders": {
+      "conventional_correct": true,
+      "neural_correct": true,
+      "reference_tb_bytes": 1377
+    },
+    "buffer_hashes": {
+      "complex_fortran": "201215e8082a0eb2f46952280ddc640f2331b8af003d1a040d698cd6341fb6b5",
+      "p2p_real_imag": "3ae962436f1071bd1f3d01ddf46244cdee8b2c04d948ae38525730857bb03d80",
+      "reference_tb": "b36ba390afde617c6c98c17da0cf06f848c93a03976047e9e428aa12daff2913"
+    },
+    "correction": "results/softwall_multigpu/c166_native_fixture_validation_correction.json",
+    "cpp_validation": "results/softwall_multigpu/c166_native_fixture_cpp_validation.json",
+    "cpp_validation_sha256": "812d52100a7500f55c8d90b507fa21d41c71e8336c75feca9328b3ff83bf3d76",
+    "cpp_validation_checks": {
+      "little_endian": true,
+      "sizes_match": true,
+      "sha256_match": true,
+      "logical_layout_match": true,
+      "all_pass": true,
+      "complex_elements_bitwise_compared": 183456,
+      "qualification": "forbidden"
+    },
+    "cpp_loader_sources": {
+      "scripts_for_node/softwall_same_gpu/native_fast_path/native_fixture_check.cpp": "81eee8d85acfa3544eb485ea7d8fd8b47e03fa17155bba4538f5d5eab87917a6",
+      "scripts_for_node/softwall_same_gpu/native_fast_path/CMakeLists.txt": "035f6730a3a480d86366505676b0695fba0be5452b8bd22d6bf80551de764ebd",
+      "scripts_for_node/softwall_same_gpu/run_c166_native_fixture_cpp_check.py": "77330764aa83fcbdc7c1dc8008430a605b62d8490b056f60539df9cc0dc61a2e"
+    }
+  },
+  "native_source_anchors": {
+    "conventional_pipeline": "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/cuphydriver/src/uplink/phypusch_aggr.cpp",
+    "cpp_core_build_target": "third_party/aerial-cuda-accelerated-ran/pyaerial/CMakeLists.txt:pycuphycpp",
+    "channel_estimator": "third_party/aerial-cuda-accelerated-ran/pyaerial/pybind11/pycuphy_channel_est.cpp",
+    "tensorrt": "third_party/aerial-cuda-accelerated-ran/pyaerial/pybind11/pycuphy_trt_engine.cpp",
+    "ldpc_crc": "third_party/aerial-cuda-accelerated-ran/pyaerial/pybind11/pycuphy_ldpc.hpp and pycuphy_crc_check.hpp"
+  },
+  "ordered_next_stages": [
+    {
+      "id": "N1",
+      "name": "native_remote_neuralrx",
+      "gate": "300/300 parity correctness; diagnostic only"
+    },
+    {
+      "id": "N2",
+      "name": "native_conventional_shadow",
+      "gate": "300/300 parity correctness; diagnostic only"
+    },
+    {
+      "id": "N3",
+      "name": "paired_native_canary",
+      "gate": "300/300 both paths correct, single commit, fences retire; diagnostic only"
+    },
+    {
+      "id": "N4",
+      "name": "production_qualification",
+      "gate": "requires P1 target-DU contract, then 1000/1000 development before one independent 1000/1000 holdout"
+    }
+  ],
+  "current_blockers": [
+    "N1/N2 native cuPHY executables and exact C++ radio-parameter loader are not implemented",
+    "target-DU d_MAC and synchronized clock trace are unavailable",
+    "C165 Python development gate failed 995/1000 and did not open a holdout"
+  ],
+  "forbidden_shortcuts": [
+    "deadline adjustment",
+    "sleep injection",
+    "seed replacement after failure",
+    "using a different PUSCH example vector as C165 qualification"
+  ]
+}

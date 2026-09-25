@@ -1,0 +1,162 @@
+{
+  "schema": "softwall-c165-conventional-profile-analysis-v1",
+  "analysis_role": "Post-H2 mechanism diagnosis; profiling changes timing and cannot qualify the 4.5-ms path.",
+  "protocol": "results/softwall_multigpu/c165_conventional_stage_diagnostic_protocol.json",
+  "inputs": {
+    "controller": "results/softwall_multigpu/raw/c165_conventional_stage_profile_seed20359300_job58870979_controller.json",
+    "worker": "results/softwall_multigpu/raw/c165_conventional_stage_profile_seed20359300_job58870979_worker.json"
+  },
+  "iterations": 300,
+  "correctness": {
+    "neural_correct": 300,
+    "conventional_correct": 300
+  },
+  "pair_wall_ms": {
+    "n": 300,
+    "mean": 4.7347191233333366,
+    "p50": 4.713937,
+    "p95": 4.871642,
+    "p99": 4.943039,
+    "max": 5.309187
+  },
+  "conventional_total_gpu_ms": {
+    "n": 300,
+    "mean": 4.189515832265218,
+    "p50": 4.170144081115723,
+    "p95": 4.304031848907471,
+    "p99": 4.367487907409668,
+    "max": 4.771168231964111
+  },
+  "remote_neural_gpu_ms": {
+    "n": 300,
+    "mean": 2.138109014034271,
+    "p50": 2.1333119869232178,
+    "p95": 2.178015947341919,
+    "p99": 2.2000958919525146,
+    "max": 2.2175040245056152
+  },
+  "stages": {
+    "channel_estimation": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 1.0743773845831552,
+        "p50": 1.0707839727401733,
+        "p95": 1.1049920320510864,
+        "p99": 1.1244479417800903,
+        "max": 1.294975996017456
+      },
+      "host_enqueue_us": {
+        "n": 300,
+        "mean": 1070.2790900000002,
+        "p50": 1066.69,
+        "p95": 1099.854,
+        "p99": 1120.645,
+        "max": 1290.573
+      },
+      "pearson_with_conventional_total": 0.39598978143901653,
+      "pearson_with_pair_wall": 0.4386107226487128
+    },
+    "noise_estimation": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.8355038936932881,
+        "p50": 0.8293439745903015,
+        "p95": 0.8843200206756592,
+        "p99": 0.9039679765701294,
+        "max": 0.918720006942749
+      },
+      "host_enqueue_us": {
+        "n": 300,
+        "mean": 830.8798800000001,
+        "p50": 824.723,
+        "p95": 879.398,
+        "p99": 899.157,
+        "max": 913.735
+      },
+      "pearson_with_conventional_total": 0.5395566910328916,
+      "pearson_with_pair_wall": 0.554591845014674
+    },
+    "equalization": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 1.276542183160782,
+        "p50": 1.2680319547653198,
+        "p95": 1.3186559677124023,
+        "p99": 1.3455359935760498,
+        "max": 1.9042880535125732
+      },
+      "host_enqueue_us": {
+        "n": 300,
+        "mean": 1271.470839999999,
+        "p50": 1263.02,
+        "p95": 1313.507,
+        "p99": 1340.089,
+        "max": 1899.039
+      },
+      "pearson_with_conventional_total": 0.7611462127638755,
+      "pearson_with_pair_wall": 0.7063907338147281
+    },
+    "derate_match": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.3470725343624751,
+        "p50": 0.3440000116825104,
+        "p95": 0.3722879886627197,
+        "p99": 0.37932801246643066,
+        "max": 0.3861440122127533
+      },
+      "host_enqueue_us": {
+        "n": 300,
+        "mean": 342.2830166666666,
+        "p50": 339.306,
+        "p95": 366.548,
+        "p99": 371.387,
+        "max": 380.746
+      },
+      "pearson_with_conventional_total": 0.5235802823860739,
+      "pearson_with_pair_wall": 0.5212028295735417
+    },
+    "ldpc_decode": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.2631737598776817,
+        "p50": 0.2614400088787079,
+        "p95": 0.2759360074996948,
+        "p99": 0.28646400570869446,
+        "max": 0.2906239926815033
+      },
+      "host_enqueue_us": {
+        "n": 300,
+        "mean": 258.57449999999983,
+        "p50": 256.956,
+        "p95": 271.113,
+        "p99": 281.023,
+        "max": 285.712
+      },
+      "pearson_with_conventional_total": 0.44259805746530345,
+      "pearson_with_pair_wall": 0.46358902227993587
+    },
+    "crc": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.3928460794687271,
+        "p50": 0.3898560106754303,
+        "p95": 0.42153599858283997,
+        "p99": 0.4289279878139496,
+        "max": 0.4331839978694916
+      },
+      "host_enqueue_us": {
+        "n": 300,
+        "mean": 388.07492666666633,
+        "p50": 385.124,
+        "p95": 416.234,
+        "p99": 423.809,
+        "max": 427.947
+      },
+      "pearson_with_conventional_total": 0.44755431734937373,
+      "pearson_with_pair_wall": 0.4574235561090702
+    }
+  },
+  "worker_error": null,
+  "qualification": "diagnostic_only"
+}

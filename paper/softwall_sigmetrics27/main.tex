@@ -84,9 +84,10 @@ recovery-first baseline and an offline oracle found no material throughput advan
 optimizer claim. \sys instead identifies when conditional sharing is certifiably safe, when it has no
 useful slack, and when the mode must be rejected or requalified. These timing claims are finite-sample
 qualifications of synthetic \texttt{P180/D155} modes. Applying the same discipline to Aerial
-testMAC's 4.5\,ms UL-indication threshold rejected every tested implementation; the best raw-IQ
-same-stream two-GPU prototype completed 885/1,000 clean requests in time, with the remaining tail
-localized to remote cuPHY channel estimation. External Aerial TDL-A remains unqualified, but a
+testMAC's 4.5\,ms UL-indication threshold rejected every tested implementation; persistent input
+assembly and stream ordering improved the best raw-IQ two-GPU prototype to 995/1,000 clean requests,
+but the frozen development gate still failed and did not open a holdout. Four of the five late samples
+were limited by the conventional path and one by remote \NRx. External Aerial TDL-A remains unqualified, but a
 prespecified disjoint-seed Sionna CDL-D/E holdout passed: among 500 paired trials, low-SNR outcomes
 contained 31 \NRx-only versus 12 conventional-only correct blocks. These gates bound the present
 claim and identify the required production path and supported channel domain.
@@ -693,15 +694,27 @@ completed 0/1,000 requests within 4.5\,ms. Moving precomputed \NRx inputs to GPU
 0/1,000. Moving channel estimation through CRC behind raw-IQ P2P improved completion to 852/1,000
 (3.831\,ms median), but retained 148 late samples; disabling Python GC did not remove the tail.
 Binding cuPHY and caller-owned TensorRT to one stream improved timely completion to 885/1,000 but
-retained 115 late samples. A diagnostic 300-request stage profile localized the tail to cuPHY LS
+retained 115 late samples. A diagnostic 300-request stage profile localized that implementation's tail to cuPHY LS
 channel estimation: its GPU p50/p99/max were 0.866/4.873/9.592\,ms and its correlation with pair wall
 time was 0.9603. TensorRT host enqueue averaged 7.443\,$\mu$s, while the graph itself had a
 0.886\,ms GPU p99. Forward/backward P2P copies averaged 36.261/17.150\,$\mu$s on GPU. Derate-match
 host-call duration averaged 1,060.105\,$\mu$s with a 1,105.380\,$\mu$s p99, while its GPU p99 was
-0.168\,ms. Thus transport and TensorRT were comparatively stable; channel estimation carried the
-diagnostic tail. Because 4.5\,ms is the mode's $D$ parameter, a qualified service component cannot
-have a tail beyond $D$; this implementation fails before scheduling or external AI is considered.
-Profiling changes timing, so these values are mechanism evidence rather than qualification or WCET.
+0.168\,ms. Thus transport and TensorRT were comparatively stable.
+
+We then froze one bounded implementation change: a persistent Fortran-layout complex input removes
+per-request allocation, and the cuPHY stream orders input assembly before \NRx without a host
+synchronization. A 300-request allocation-only ablation was timely for 299 requests. The prespecified
+1,000-request stream-ordered development gate improved to 995 timely completions (3.813\,ms median,
+3.995\,ms p99), with both decoders correct for all 1,000, but five late completions rejected the
+candidate and did not open the independent holdout. Posthoc attribution found four late units whose
+conventional completion exceeded 4.5\,ms and one whose remote \NRx GPU service exceeded it. Pair
+latency correlated 0.941 with conventional completion and 0.331 with remote \NRx service. A
+profiling-only conventional run identified equalization as its most correlated stage ($r=0.761$ with
+conventional total; 1.904\,ms maximum), while conventional channel estimation reached 1.295\,ms.
+The remaining gap is therefore a tail across both cuPHY service paths rather than TensorRT, P2P, or
+remote CE alone. Because 4.5\,ms is the mode's $D$ parameter, this implementation fails before
+scheduling or external AI is considered. Profiling changes timing, so stage values are mechanism
+evidence rather than qualification or WCET.
 
 The Aerial TDL-A subdomain remains unqualified. Across raw and normalized Aerial TDL-A,
 public-reference DMRS/MCS/start-symbol settings, one-antenna frequency/time channel execution, and an
@@ -803,8 +816,8 @@ trace. Once such a trace is available, this path can classify request-specific e
 contract semantics; the resulting timing vector and mode must still be physically requalified. Aerial
 testMAC exposes a $T0+4.5$\,ms UL-indication threshold, but it is a controlled developer L2 rather than
 the target MAC. Every implementation tested retained violations at that threshold; even the best
-raw-IQ two-GPU prototype was timely for only 885/1,000 clean requests. We therefore make no production
-HARQ guarantee.
+raw-IQ two-GPU development prototype was timely for only 995/1,000 clean requests, and its failed gate
+did not open a holdout. We therefore make no production HARQ guarantee.
 
 Second, qualified bounds are finite-sample whole-path bounds. Zero observed violations do not prove a
 WCET or zero failure probability. A different hardware, software, placement, or lifecycle fingerprint

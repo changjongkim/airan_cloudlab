@@ -1,0 +1,42 @@
+{
+  "schema": "softwall-c165-ce-tail-analysis-v1",
+  "analysis_role": "development",
+  "protocol": "results/softwall_multigpu/c165_ce_tail_frozen_protocol.json",
+  "inputs": {
+    "controller": "results/softwall_multigpu/raw/c165_ce_tail_persistent_ordered_development_seed20359100_job58870979_controller.json",
+    "worker": "results/softwall_multigpu/raw/c165_ce_tail_persistent_ordered_development_seed20359100_job58870979_worker.json",
+    "controller_sha256": "aee22b8dd39ebe77e4a08da30af9a666ca4f5f65c2c8b8b6551d069d48ca6023",
+    "worker_sha256": "eef3c6d937c822d836091833728fa44293572329373d7cb550f36bd1757ffbe4"
+  },
+  "input_mode": "persistent_ordered",
+  "slurm_job_id": "58870979",
+  "deadline_ms": 4.5,
+  "iterations": 1000,
+  "timely": 995,
+  "late": 5,
+  "neural_correct": 1000,
+  "conventional_correct": 1000,
+  "pair_wall_ms": {
+    "p50": 3.812967,
+    "p99": 3.994517,
+    "max": 6.984723
+  },
+  "remote_neural_gpu_ms": {
+    "p50": 2.131648063659668,
+    "p99": 2.207520008087158,
+    "max": 4.916607856750488
+  },
+  "posthoc_path_attribution": {
+    "analysis_role": "Posthoc decomposition of the frozen development outcome; it does not alter the prespecified rejection.",
+    "pearson_pair_vs_remote_neural_gpu": 0.330708051738178,
+    "pearson_pair_vs_worker_path": 0.3159506553556121,
+    "pearson_pair_vs_conventional_done": 0.9411092125997566,
+    "pearson_pair_vs_conventional_gpu": 0.9181501595783746,
+    "pair_late_units": 5,
+    "late_with_conventional_done_gt_deadline": 4,
+    "late_with_remote_neural_gpu_gt_deadline": 1
+  },
+  "qualification_eligible": true,
+  "all_pass": false,
+  "decision": "rejected"
+}

@@ -2,7 +2,7 @@
 
 **기준일:** 2026-09-25
 **현재 연구:** SoftWall — MIG를 사용하지 않는 공유 GPU(MPS)에서 optional NeuralRx의 조건부 복구 의무를 인증하는 runtime substrate
-**현재 단계:** 원고 provenance 정리 완료, production P2 channel-estimation tail의 frozen diagnosis/holdout 진행
+**현재 단계:** 원고 provenance 정리 완료, production P2 frozen 개발 gate 995/1,000으로 실패; live-DU timing과 native cuPHY fast path가 남음
 **투고 목표:** ACM SIGMETRICS 2027 Winter 사이클 — abstract 2027-01-04 23:59 AoE, paper 2027-01-11 23:59 AoE, 통보 2027-03-10 (공식 CFP, 2026-09-25 확인)
 **최신 스냅샷 태그:** `softwall-sigmetrics-snapshot-20260925` (commit `2a97f8b`)
 
@@ -124,12 +124,12 @@ B_NRx = 45 ms, B_conv = 25 ms, B_AI(context64) = 35 ms
 
 ## 5. Production exit gate
 
-판정 원본: `results/softwall_multigpu/softwall_production_gates_current_v2.json`, `results/softwall_multigpu/softwall_production_exit_gate_v2.json`
+판정 원본: `results/softwall_multigpu/softwall_production_gates_current_v3.json`, `results/softwall_multigpu/softwall_production_exit_gate_v3.json`
 
 | Gate | 판정 | 내용 |
 |---|---|---|
 | P1 LIVE_DU_CLOCK | FAIL | Target DU의 timing contract 부재. 첫 번째 차단 요소 |
-| P2 FAST_PATH | FAIL | 4.5 ms 이내 885/1,000, 초과 115건. P1 contract hash 없음. 독립 holdout 아님 |
+| P2 FAST_PATH | FAIL | persistent-input path 4.5 ms 이내 995/1,000, 초과 5건. frozen 개발 gate 실패로 독립 holdout 미개방 |
 | P3 CHANNEL_COMPATIBILITY | PASS | Sionna CDL-D/E 한정 |
 | P4 INTEGRATED_REQUALIFICATION | FAIL | 통합 production 재자격 미수행 |
 
@@ -160,6 +160,7 @@ Clean synthetic PUSCH, AI 없음, warm persistent process 표본이다. 원본: 
 | Raw-IQ P2P, GPU1 full NeuralRx | 852/1,000 | 3.831 ms | 9.506 ms | tail로 FAIL |
 | 위 경로, Python GC OFF | 838/1,000 | 3.988 ms | 10.041 ms | GC 원인 가설 기각 |
 | 위 경로, caller-owned same-stream + busy poll | 885/1,000 | 3.929 ms | 11.696 ms | tail로 FAIL |
+| 위 경로, persistent input + stream ordering | **995/1,000** | **3.813 ms** | **3.995 ms** | correctness 1,000/1,000, late 5로 FAIL |
 
 ### 5.3 Stage 귀속
 
@@ -181,7 +182,7 @@ P2P copy GPU 시간: forward p50 20.7 µs, p99 69.3 µs, max 85.8 µs. Backward 
 
 Channel estimation은 timely unit과 late unit 사이에서 GPU 시간이 달라지는 유일한 stage이며(평균 0.930 ms 대 3.972 ms), pair latency와의 상관계수가 0.960이다. TensorRT graph의 GPU 시간은 약 0.86 ms로 4.5 ms 예산의 약 19%를 차지하지만 분산이 작고(p99 0.886 ms), timely와 late 사이의 평균 차이가 0.003 ms이며, pair latency와의 상관계수가 0.076이다. P2P 전송은 100 µs 미만이다.
 
-따라서 남은 4.5 ms 위반은 cuPHY LS channel estimation의 GPU 시간 tail에 국소화된다. SoftWall 계약은 `D`에 대해 파라미터적이며, 4.5 ms에서 실패하는 요소는 substrate가 아니라 그 아래의 cuPHY 서비스 시간이다.
+이 진단 뒤 C165는 per-request complex allocation과 redundant pre-CE host sync를 제거했다. Frozen 개발 gate는 995/1,000으로 개선됐지만 통과하지 못해 holdout을 열지 않았다. Late 5건 중 4건은 GPU0 conventional completion, 1건은 remote NeuralRx였고 pair latency 상관도는 conventional GPU 0.918, remote NeuralRx 0.331이었다. Profiler-only conventional 진단에서는 equalization이 total service와 가장 강하게 연결됐다(`r=0.761`). 따라서 남은 4.5 ms 위반은 remote CE 하나가 아니라 양 GPU의 cuPHY service tail이다.
 
 Host enqueue 시간(`host_enqueue_us`)은 GPU 시간과 별개로 기록되어 있다. Channel estimation host enqueue는 p50 0.578 ms, p99 4.595 ms, max 9.283 ms이고, TensorRT graph host enqueue는 p50 7.3 µs이다. TensorRT의 7.3 µs는 enqueue 비용이며 NeuralRx 실행 시간이 아니다.
 
@@ -328,7 +329,7 @@ Perlmutter A100에서 MIG OFF 상태로 CloudLab 실험을 재측정했다.
 
 1. 원고 정리: **완료.** 수치 provenance, C158 tail, P3 Results 승격, P2 stage attribution, Winter CFP와 문서 archive를 claim/submission audit으로 고정했다.
 2. P1 target-DU timing contract 확보: 최소 schema, 세 획득 경로와 parametric bridge를 timing-contract 문서에 고정했다. 실제 target DU trace가 없으면 `UQ_NO_PRODUCTION_TRACE`를 유지한다.
-3. P2 fast path: cuPHY LS channel estimation의 GPU 시간 tail을 제거한다. 통과 기준은 독립 holdout에서 tail을 포함한 4.5 ms 이내 1,000/1,000이다. Channel estimation과 pair latency의 상관계수를 0.9603에서 0.5 미만으로 낮추지 못하면 중단하고 stage 귀속을 결과로 유지한다.
+3. P2 fast path: persistent-input 구현은 remote NeuralRx–pair 상관을 0.9603에서 0.3307로 낮췄지만 frozen gate가 995/1,000으로 실패했다. Native N0 parity fixture는 양 decoder의 같은 1,377-byte TB와 두 raw-IQ layout의 183,456개 복소 원소에 대한 C++ bitwise 일치로 통과했다. 다음 구현은 N1 GPU1 native NeuralRx, N2 GPU0 native conventional이다. 새 qualification은 live-DU `D`가 확보된 뒤 독립 holdout 1,000/1,000으로만 연다.
 
 다음 항목은 수행하지 않는다: 새 메커니즘 추가, 나머지 수명주기 UQ 5개 채우기, 처리량 우위 재시도, P1 이전의 P4 통합 재자격, 새 문서 생성.
 

@@ -1395,7 +1395,8 @@ CI를 계산하지 않았다. Trace는 Q3 결과를 얻기 위한 성능 표본�
 
 1. **Synthetic deadline.** 현재 `P,D`는 test harness 계약이며 실제 DU의 MAC expiry가 아니다.
    Aerial testMAC의 `T0+4.5 ms` UL indication threshold를 중간 target으로 검사했지만 모든
-   경로가 tail을 남겼고, 최선의 same-stream raw-IQ two-GPU path도 885/1,000만 적시 완료했다.
+   경로가 tail을 남겼고, persistent-input/stream-ordered raw-IQ two-GPU 개발 path도
+   995/1,000만 적시 완료해 frozen gate에서 탈락했다. 따라서 holdout은 열지 않았다.
 2. **Finite-sample bound.** 통과한 service bound는 해당 mode의 표본 자격이며 WCET가 아니다.
 3. **PHY generalization.** Aerial TDL-A의 normalization, public-reference radio profile,
    exact 1×4 송신, frequency/time channel mode와 FP32 engine까지 검사했지만 모든 10-TB
@@ -1449,7 +1450,7 @@ CI를 계산하지 않았다. Trace는 Q3 결과를 얻기 위한 성능 표본�
 | Optimizer 판정 | 완료/종료 | C102 outcome FAIL, max-radio와 39/39 동일 |
 | Actual request workload | 완료 | BurstGPT 60초 1,136-request→Qwen2.5-1.5B full replay |
 | Strong system baseline | 완료/우위 실패 | C113 online 약0.1%; C159-Q3 exact empirical oracle 0.000%, 5% gate 실패로 새 holdout 중단 |
-| Production timing | **exit gate FAIL** | C163 validator24 통과, testMAC `T0+4.5ms` 확인. same-stream raw-IQ full-remote 885/1,000, late115. Stage diagnostic은 cuPHY LS channel-estimation tail로 원인을 좁힘. 실제 DU `d_MAC`도 없음 |
+| Production timing | **exit gate FAIL** | C163 validator24 통과, testMAC `T0+4.5ms` 확인. C165 persistent-input path 995/1,000, late5로 frozen gate 실패·holdout 미개방. Late 4건은 conventional, 1건은 remote NRx였고 실제 DU `d_MAC`도 없음 |
 | External channel | **P3 제한 통과** | Sionna CDL-D/E/100 ns holdout 500건 통과, 저 SNR NeuralRx-only31 vs conventional-only12 (`p=0.00540`). Aerial TDL-A와 field IQ는 미자격 |
 | Multi-GPU extension | C159-Q1/Q2, C161 fault, C162 boundary PASS | C162 actual NRx720·recovery330·Qwen90·commit720·miss0; nid001044 lifecycle UQ |
 | Lifecycle qualification | claim-scoped 종료 | Qualified/partial 5, UQ 5를 의도적 경계로 고정; process replacement canary는 single-node exploratory이고 holdout/claim 승격 없음 |
@@ -1473,7 +1474,8 @@ P180 context-64와 variable-context qualification은 C154--C159-Q2에서 통과�
 performance holdout을 중단했고 C160/C161 A0--A6 및 C162 small-state predictive envelope를
 qualified node에서 통과했다. C163의 production timing ingestion/validator는 준비됐지만 실제
 DU trace가 없어 UQ다. Vendor testMAC 4.5 ms target에서도 현재 경로가 FAIL했고, raw-IQ
-GPU1 full-NeuralRx가 유일한 유망 방향이지만 channel-estimation tail을 제거하지 못했다.
+GPU1 full-NeuralRx 구조는 995/1,000까지 개선됐지만, GPU0 conventional과 GPU1 NeuralRx의
+cuPHY service tail을 모두 제거하지 못했다.
 P3는 Sionna CDL-D/E mode에 한해 닫혔으나 Aerial TDL-A는 계속 UQ다. C164는 lifecycle token,
 idle30 및 restart 후 재자격한 첫 요청
 boundary와 Qwen reload 중 mandatory-continuity subset을 통과했다.
@@ -1658,7 +1660,7 @@ lifecycle mode도 limitation/future work로 명시한다.
 - [C162 이후 production/cross-family 실험 계획](../archive/SOFTWALL_POST_C162_EXPERIMENT_PLAN_KO.md)
 - [C163 production timing readiness](../../results/softwall_multigpu/c163_du_timing_readiness_v2.json)
 - [Production exit gate와 고도화 계획](SOFTWALL_PRODUCTION_EXIT_PLAN_KO.md)
-- [Machine-readable production exit gate v2](../../results/softwall_multigpu/softwall_production_exit_gate_v2.json)
+- [Machine-readable production exit gate v3](../../results/softwall_multigpu/softwall_production_exit_gate_v3.json)
 - [Sionna CDL-D/E holdout gate](../../results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json)
 - [C164 lifecycle-token, idle30, MPS-restart와 Qwen-reload 결과](SOFTWALL_C164_IDLE30_RESULT_KO.md)
 - [C164 idle30 two-node 결합 판정](../../results/softwall_multigpu/c164_idle30_two_node.json)

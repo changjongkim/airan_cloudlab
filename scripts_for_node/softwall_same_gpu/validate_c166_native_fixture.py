@@ -4,11 +4,11 @@
 from __future__ import annotations
 
 import argparse
+import array
 import hashlib
 import json
 from pathlib import Path
-
-import numpy as np
+import sys
 
 
 def sha256(path: Path) -> str:
@@ -38,14 +38,32 @@ def main() -> None:
     shape = tuple(manifest["buffers"]["complex_fortran"]["shape"])
     complex_path = args.fixture / manifest["buffers"]["complex_fortran"]["file"]
     p2p_path = args.fixture / manifest["buffers"]["p2p_real_imag"]["file"]
-    direct = np.fromfile(complex_path, dtype=np.complex64).reshape(shape, order="F")
-    planes = np.fromfile(p2p_path, dtype=np.float32)
-    elements = int(np.prod(shape))
-    rebuilt = (
-        planes[:elements].reshape(shape, order="C")
-        + 1j * planes[elements:].reshape(shape, order="C")
-    ).astype(np.complex64)
-    checks["p2p_and_fortran_logical_values_match"] = np.array_equal(direct, rebuilt)
+    if sys.byteorder != "little":
+        raise RuntimeError("C166 fixture validator currently requires little endian")
+    direct = array.array("f")
+    direct.frombytes(complex_path.read_bytes())
+    planes = array.array("f")
+    planes.frombytes(p2p_path.read_bytes())
+    n0, n1, n2 = shape
+    elements = n0 * n1 * n2
+    values_match = len(direct) == 2 * elements and len(planes) == 2 * elements
+    if values_match:
+        for first in range(n0):
+            for second in range(n1):
+                for third in range(n2):
+                    fortran_index = first + n0 * (second + n1 * third)
+                    c_index = (first * n1 + second) * n2 + third
+                    if (
+                        direct[2 * fortran_index] != planes[c_index]
+                        or direct[2 * fortran_index + 1] != planes[elements + c_index]
+                    ):
+                        values_match = False
+                        break
+                if not values_match:
+                    break
+            if not values_match:
+                break
+    checks["p2p_and_fortran_logical_values_match"] = values_match
     all_pass = all(checks.values())
     result = {
         "schema": "softwall-c166-native-fixture-validation-v1",

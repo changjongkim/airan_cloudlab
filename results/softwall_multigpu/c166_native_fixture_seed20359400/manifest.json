@@ -1,0 +1,93 @@
+{
+  "schema": "softwall-c166-native-fixture-v1",
+  "role": "Exact Python-to-native parity fixture for C165; no latency, deadline, WCET, or production qualification claim.",
+  "seed": 20359400,
+  "device": 0,
+  "engine": {
+    "path_at_export": "/softwall_runtime/engines/neural_rx_fp16_full.trt",
+    "sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97"
+  },
+  "radio": {
+    "slot": 2,
+    "start_symbol": 2,
+    "num_symbols": 12,
+    "dmrs_symbol_bitmap": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "mcs_index": 2,
+    "mod_order": 2,
+    "code_rate_x10": 1930,
+    "num_prbs": 273,
+    "start_prb": 0,
+    "num_layers": 1,
+    "num_rx_antennas": 4,
+    "num_uplink_streams": 4,
+    "num_dmrs_cdm_groups_without_data": 2,
+    "dmrs_scrambling_id": 41,
+    "scid": 0,
+    "rnti": 1234,
+    "data_scrambling_id": 0,
+    "channel_estimation_algorithm": 3,
+    "conventional_channel_estimation_algorithm": 1,
+    "equalizer_coefficient_algorithm": 1
+  },
+  "fixture_decode": {
+    "conventional_correct": true,
+    "neural_correct": true,
+    "reference_tb_bytes": 1377
+  },
+  "buffers": {
+    "complex_fortran": {
+      "file": "rx_slot_complex64_fortran.bin",
+      "shape": [
+        3276,
+        14,
+        4
+      ],
+      "dtype": "complex64",
+      "order": "F",
+      "bytes": 1467648,
+      "sha256": "201215e8082a0eb2f46952280ddc640f2331b8af003d1a040d698cd6341fb6b5"
+    },
+    "p2p_real_imag": {
+      "file": "rx_slot_real_imag_float32_c.bin",
+      "logical_shape": [
+        3276,
+        14,
+        4
+      ],
+      "dtype": "float32",
+      "order_per_plane": "C",
+      "plane_order": [
+        "real",
+        "imag"
+      ],
+      "elements_per_plane": 183456,
+      "bytes": 1467648,
+      "sha256": "3ae962436f1071bd1f3d01ddf46244cdee8b2c04d948ae38525730857bb03d80"
+    },
+    "reference_tb": {
+      "file": "reference_tb_uint8.bin",
+      "dtype": "uint8",
+      "bytes": 1377,
+      "sha256": "b36ba390afde617c6c98c17da0cf06f848c93a03976047e9e428aa12daff2913"
+    }
+  },
+  "source_sha256": {
+    "export_c166_native_fixture.py": "a901671a56ad331e44428b516b699200d145784d68b413242eb59a4fd4c92e47",
+    "dual_receiver_phy.py": "afc96d538b91749e00ced9c1be9424665873a075e70ef7c2eb3d823b1171e121"
+  }
+}

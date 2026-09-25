@@ -27,7 +27,7 @@ UPSTREAM = ROOT / "results" / "softwall_multigpu" / "softwall_manuscript_claim_a
 LIFECYCLE = ROOT / "results" / "softwall_multigpu" / "c164_lifecycle_qualification_summary_v1.json"
 NECESSITY = ROOT / "results" / "softwall_multigpu" / "softwall_necessity_witness_v2.json"
 CFP = ROOT / "results" / "softwall_multigpu" / "sigmetrics27_cfp_recheck_v1.json"
-PRODUCTION = ROOT / "results" / "softwall_multigpu" / "softwall_production_exit_gate_v2.json"
+PRODUCTION = ROOT / "results" / "softwall_multigpu" / "softwall_production_exit_gate_v3.json"
 OUT = ROOT / "results" / "softwall_multigpu" / "softwall_sigmetrics_submission_audit_v1.json"
 PROVENANCE_MARKERS = (
     "Q1_MPS_DIAGNOSTICS",
@@ -184,9 +184,11 @@ def main():
             and production["external_channel_diagnosis"]["gate_pass"] is True
             and production["external_channel_diagnosis"]["aerial_tdl_a"]["qualified"] is False
             and production["current_timing_diagnosis"]["cross_gpu_candidates"]
-                ["raw_iq_full_remote_same_stream"]["deadline_counts"]
-                ["parallel_pair_wall_le_deadline"] == 885
-            and "885/1,000" in tex
+                ["raw_iq_full_remote_persistent_ordered"]["deadline_counts"]
+                ["parallel_pair_wall_le_deadline"] == 995
+            and production["current_timing_diagnosis"]["cross_gpu_candidates"]
+                ["raw_iq_full_remote_persistent_ordered"]["holdout_opened"] is False
+            and "995/1,000" in tex
             and "External Aerial TDL-A" in tex
             and r"Paired aggregate & -- & -- & \textbf{31} & \textbf{12}" in tex
             and "optional \\NRx has conditional radio value" in tex
@@ -236,8 +238,8 @@ def main():
                 "status": production["status"],
                 "timing_gate_pass": production["current_timing_diagnosis"]["gate_pass"],
                 "channel_gate_pass": production["external_channel_diagnosis"]["gate_pass"],
-                "raw_iq_timely": production["current_timing_diagnosis"]
-                    ["cross_gpu_candidates"]["raw_iq_full_remote_same_stream"]
+                "best_raw_iq_development_timely": production["current_timing_diagnosis"]
+                    ["cross_gpu_candidates"]["raw_iq_full_remote_persistent_ordered"]
                     ["deadline_counts"]["parallel_pair_wall_le_deadline"],
             },
             "core_numbers_required": core_numbers,

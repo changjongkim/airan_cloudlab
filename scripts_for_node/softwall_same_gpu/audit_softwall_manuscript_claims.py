@@ -127,10 +127,10 @@ def audit_quantitative_provenance(manuscript: str) -> tuple[dict, list[dict]]:
             ("results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json", "counts.total_modes", 10),
         ],
         "P2_FAST_PATH_AND_STAGE": [
-            ("results/softwall_multigpu/softwall_production_exit_gate_v2.json", "timing_contract.ul_ind_deadline_ns", 4500000),
-            ("results/softwall_multigpu/softwall_production_exit_gate_v2.json", "current_timing_diagnosis.cross_gpu_candidates.raw_iq_full_remote.deadline_counts.parallel_pair_wall_le_deadline", 852),
-            ("results/softwall_multigpu/softwall_production_exit_gate_v2.json", "current_timing_diagnosis.cross_gpu_candidates.raw_iq_full_remote_same_stream.deadline_counts.parallel_pair_wall_le_deadline", 885),
-            ("results/softwall_multigpu/softwall_production_exit_gate_v2.json", "current_timing_diagnosis.cross_gpu_candidates.raw_iq_full_remote_same_stream.deadline_counts.parallel_pair_wall_gt_deadline", 115),
+            ("results/softwall_multigpu/softwall_production_exit_gate_v3.json", "timing_contract.ul_ind_deadline_ns", 4500000),
+            ("results/softwall_multigpu/softwall_production_exit_gate_v3.json", "current_timing_diagnosis.cross_gpu_candidates.raw_iq_full_remote.deadline_counts.parallel_pair_wall_le_deadline", 852),
+            ("results/softwall_multigpu/softwall_production_exit_gate_v3.json", "current_timing_diagnosis.cross_gpu_candidates.raw_iq_full_remote_same_stream.deadline_counts.parallel_pair_wall_le_deadline", 885),
+            ("results/softwall_multigpu/softwall_production_exit_gate_v3.json", "current_timing_diagnosis.cross_gpu_candidates.raw_iq_full_remote_same_stream.deadline_counts.parallel_pair_wall_gt_deadline", 115),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.channel_estimation.gpu_ms.p50", 0.8664640188217163),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.channel_estimation.gpu_ms.p99", 4.873409118652329),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.channel_estimation.gpu_ms.max", 9.592415809631348),
@@ -143,6 +143,17 @@ def audit_quantitative_provenance(manuscript: str) -> tuple[dict, list[dict]]:
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "host_enqueue_us.derate_match.mean", 1060.1050966666674),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "host_enqueue_us.derate_match.p99", 1105.38023),
             ("results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json", "stages.derate_match.gpu_ms.p99", 0.1675606334209441),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "timely", 995),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "late", 5),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "pair_wall_ms.p50", 3.812967),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "pair_wall_ms.p99", 3.994517),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "posthoc_path_attribution.pearson_pair_vs_remote_neural_gpu", 0.330708051738178),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "posthoc_path_attribution.pearson_pair_vs_conventional_done", 0.9411092125997566),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "posthoc_path_attribution.late_with_conventional_done_gt_deadline", 4),
+            ("results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json", "posthoc_path_attribution.late_with_remote_neural_gpu_gt_deadline", 1),
+            ("results/softwall_multigpu/c165_conventional_stage_profile_analysis_job58870979.json", "stages.equalization.gpu_ms.max", 1.9042880535125732),
+            ("results/softwall_multigpu/c165_conventional_stage_profile_analysis_job58870979.json", "stages.equalization.pearson_with_conventional_total", 0.7611462127638755),
+            ("results/softwall_multigpu/c165_conventional_stage_profile_analysis_job58870979.json", "stages.channel_estimation.gpu_ms.max", 1.294975996017456),
         ],
         "P3_CHANNEL_HOLDOUT": [
             ("results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json", "models.D.strata.4.trials", 50),
@@ -203,7 +214,7 @@ def main() -> None:
     lifecycle = load("c164_lifecycle_qualification_summary_v1.json")
     process = load("c164i3_processreplace_dev_j58862843_result.json")
     necessity = load("softwall_necessity_witness_v2.json")
-    production = load("softwall_production_exit_gate_v2.json")
+    production = load("softwall_production_exit_gate_v3.json")
     manuscript = MANUSCRIPT.read_text()
     normalized_manuscript = " ".join(manuscript.split())
     novelty = NOVELTY.read_text()
@@ -322,13 +333,15 @@ def main() -> None:
             and production.get("status") == "FAIL_CURRENT_DESIGN_NOT_PRODUCTION_QUALIFIED"
             and production["current_timing_diagnosis"]["gate_pass"] is False
             and production["current_timing_diagnosis"]["cross_gpu_candidates"]
-                ["raw_iq_full_remote_same_stream"]["deadline_counts"]
-                ["parallel_pair_wall_le_deadline"] == 885
+                ["raw_iq_full_remote_persistent_ordered"]["deadline_counts"]
+                ["parallel_pair_wall_le_deadline"] == 995
+            and production["current_timing_diagnosis"]["cross_gpu_candidates"]
+                ["raw_iq_full_remote_persistent_ordered"]["holdout_opened"] is False
             and production["external_channel_diagnosis"]["gate_pass"] is True
             and production["external_channel_diagnosis"]["aerial_tdl_a"]["qualified"] is False
             and production["claim_decision"]["sionna_cdl_de_neuralrx_support"]
                 == "FINITE_SAMPLE_PASS"
-            and "885/1,000" in manuscript
+            and "995/1,000" in manuscript
             and "external aerial tdl-a remains unqualified"
                 in normalized_manuscript.lower()
             and "31 neuralrx-only versus 12 conventional-only"
@@ -375,7 +388,7 @@ def main() -> None:
         "c164_lifecycle_qualification_summary_v1.json",
         "c164i3_processreplace_dev_j58862843_result.json",
         "softwall_necessity_witness_v2.json",
-        "softwall_production_exit_gate_v2.json",
+        "softwall_production_exit_gate_v3.json",
     ]
     output = {
         "schema": "softwall-manuscript-claim-audit-v1",
@@ -400,8 +413,8 @@ def main() -> None:
                 "status": production["status"],
                 "timing_gate_pass": production["current_timing_diagnosis"]["gate_pass"],
                 "channel_gate_pass": production["external_channel_diagnosis"]["gate_pass"],
-                "raw_iq_timely": production["current_timing_diagnosis"]
-                    ["cross_gpu_candidates"]["raw_iq_full_remote_same_stream"]
+                "best_raw_iq_development_timely": production["current_timing_diagnosis"]
+                    ["cross_gpu_candidates"]["raw_iq_full_remote_persistent_ordered"]
                     ["deadline_counts"]["parallel_pair_wall_le_deadline"],
             },
             "quantitative_provenance_scope": (

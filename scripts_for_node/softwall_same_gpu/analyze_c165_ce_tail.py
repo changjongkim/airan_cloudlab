@@ -20,6 +20,19 @@ def percentile(values: list[float], fraction: float) -> float:
     return ordered[round((len(ordered) - 1) * fraction)]
 
 
+def correlation(left: list[float], right: list[float]) -> float:
+    left_mean = sum(left) / len(left)
+    right_mean = sum(right) / len(right)
+    numerator = sum(
+        (x - left_mean) * (y - right_mean) for x, y in zip(left, right)
+    )
+    denominator = (
+        sum((x - left_mean) ** 2 for x in left)
+        * sum((y - right_mean) ** 2 for y in right)
+    ) ** 0.5
+    return numerator / denominator if denominator else 0.0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--controller", type=Path, required=True)
@@ -35,6 +48,18 @@ def main() -> None:
     deadline = float(protocol["deadline_ms"])
     pair = [float(row["parallel_pair_wall_ms"]) for row in controller["records"]]
     remote = [float(row["neural_gpu_ms"]) for row in worker["records"]]
+    worker_by_sequence = {int(row["sequence"]): row for row in worker["records"]}
+    timed_worker = [
+        worker_by_sequence[int(row["sequence"])] for row in controller["records"]
+    ]
+    remote_timed = [float(row["remote_neural_gpu_ms"]) for row in controller["records"]]
+    worker_path = [float(row["worker_path_ms"]) for row in timed_worker]
+    conventional_done = [
+        float(row["conventional_done_ms"]) for row in controller["records"]
+    ]
+    conventional_gpu = [
+        float(row["conventional_gpu_ms"]) for row in controller["records"]
+    ]
     iterations = int(controller["iterations"])
     timely = sum(value <= deadline for value in pair)
     correct = int(controller["correctness"]["neural_correct"])
@@ -77,6 +102,25 @@ def main() -> None:
             "p50": percentile(remote, 0.50),
             "p99": percentile(remote, 0.99),
             "max": max(remote, default=0.0),
+        },
+        "posthoc_path_attribution": {
+            "analysis_role": (
+                "Posthoc decomposition of the frozen development outcome; "
+                "it does not alter the prespecified rejection."
+            ),
+            "pearson_pair_vs_remote_neural_gpu": correlation(pair, remote_timed),
+            "pearson_pair_vs_worker_path": correlation(pair, worker_path),
+            "pearson_pair_vs_conventional_done": correlation(pair, conventional_done),
+            "pearson_pair_vs_conventional_gpu": correlation(pair, conventional_gpu),
+            "pair_late_units": sum(value > deadline for value in pair),
+            "late_with_conventional_done_gt_deadline": sum(
+                pair_value > deadline and conv_value > deadline
+                for pair_value, conv_value in zip(pair, conventional_done)
+            ),
+            "late_with_remote_neural_gpu_gt_deadline": sum(
+                pair_value > deadline and nrx_value > deadline
+                for pair_value, nrx_value in zip(pair, remote_timed)
+            ),
         },
         "qualification_eligible": eligible,
         "all_pass": all_pass,

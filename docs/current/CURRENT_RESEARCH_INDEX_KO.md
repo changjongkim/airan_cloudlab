@@ -23,7 +23,7 @@
 
 ## 현재 production exit gate
 
-- [Production exit 계획](SOFTWALL_PRODUCTION_EXIT_PLAN_KO.md): P1–P4 판정과 P2 CE-tail 구현 계획
+- [Production exit 계획](SOFTWALL_PRODUCTION_EXIT_PLAN_KO.md): P1–P4 판정과 P2 양 경로 cuPHY fast-path 구현 계획
 - [PUSCH timing contract](SOFTWALL_PUSCH_TIMING_CONTRACT_KO.md): live-DU trace 최소 schema와 validator bridge
 - [C160 fault model](SOFTWALL_C160_FAULT_MODEL_RESULT_KO.md): fault semantics
 - [C161 physical refinement](SOFTWALL_C161_PHASE2_RESULT_KO.md): physical lifecycle 검증

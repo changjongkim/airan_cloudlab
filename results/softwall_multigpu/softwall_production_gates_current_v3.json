@@ -1,0 +1,43 @@
+{
+  "schema": "softwall-production-gates-v3",
+  "all_pass": false,
+  "status": "PRODUCTION_NOT_QUALIFIED",
+  "first_blocker": "P1_LIVE_DU_CLOCK",
+  "stages": {
+    "P1_LIVE_DU_CLOCK": {
+      "pass": false,
+      "failures": [
+        "missing target-DU timing contract"
+      ]
+    },
+    "P2_FAST_PATH": {
+      "pass": false,
+      "failures": [
+        "persistent-input development fast path retained 5/1000 late pair completions",
+        "P1 contract hash is unavailable",
+        "development gate failed, so an independent holdout was not opened"
+      ]
+    },
+    "P3_CHANNEL_COMPATIBILITY": {
+      "pass": true,
+      "failures": []
+    },
+    "P4_INTEGRATED_REQUALIFICATION": {
+      "pass": false,
+      "failures": [
+        "missing integrated production requalification"
+      ]
+    }
+  },
+  "artifact_sha256": {
+    "p1": null,
+    "p2": "30d096f048b126fa6645bdbdf97adf3de581b164129ced87840fe25e43d0b37c",
+    "p3": "578296af73cdd4acd842ee7833769a3ea441bf2b20f4e220311bbe2ab2172528",
+    "p4": null
+  },
+  "production_exit_artifact": "results/softwall_multigpu/softwall_production_exit_gate_v3.json",
+  "production_exit_artifact_sha256": "95c9a97e753e708bb35b23cfed543d115e22873c0a41003ae4a174b32ccf9d53",
+  "native_fast_path_status": "N0_PARITY_FIXTURE_COMPLETE_N1_IMPLEMENTATION_PENDING",
+  "native_fast_path_status_artifact": "results/softwall_multigpu/c166_native_fast_path_status_v1.json",
+  "native_fast_path_status_artifact_sha256": "a2b36530f5e237874076a3285b0c9243dd6bb9cfbc476b9ce3daf8bb15ae3633"
+}

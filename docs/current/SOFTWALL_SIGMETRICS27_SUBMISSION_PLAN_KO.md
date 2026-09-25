@@ -143,6 +143,7 @@ Production `d_MAC`, cross-family, lifecycle 나머지 5개를 단순히 채우�
 | BibTeX 정규화 | 완료, 인용 16개 모두 resolve |
 | Anonymous/reproducibility/AI-disclosure/CFP audit | 26/26 PASS |
 
-현재 새로운 optimizer·lifecycle 증거를 더 늘리는 단계는 끝났다. Winter 제출 전 남은 구현은
-P2 channel-estimation tail의 frozen diagnosis/holdout과 P1 외부 trace 수용 준비로 제한한다.
-그 결과와 무관하게 원고의 claim boundary, 도표와 bibliography를 정확히 고정한다.
+현재 새로운 optimizer·lifecycle 증거를 더 늘리는 단계는 끝났다. P2 frozen 개발 gate는
+persistent-input/stream-ordered path에서 995/1,000으로 실패해 holdout을 열지 않았다. Winter
+제출 전 production 확장은 양 radio path의 native cuPHY fast path와 P1 외부 trace 수용으로
+제한한다. 그 결과와 무관하게 원고의 claim boundary, 도표와 bibliography를 정확히 고정한다.

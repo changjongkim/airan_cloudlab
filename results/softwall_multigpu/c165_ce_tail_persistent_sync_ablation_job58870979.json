@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-c165-ce-tail-analysis-v1",
+  "analysis_role": "ablation",
+  "protocol": "results/softwall_multigpu/c165_ce_tail_frozen_protocol.json",
+  "inputs": {
+    "controller": "results/softwall_multigpu/raw/c165_ce_tail_persistent_sync_ablation_seed20359000_job58870979_controller.json",
+    "worker": "results/softwall_multigpu/raw/c165_ce_tail_persistent_sync_ablation_seed20359000_job58870979_worker.json",
+    "controller_sha256": "10b161fcad8a3ea56dfafe4d67d8d2c60577ab1a61d796da934994a0c93f14ad",
+    "worker_sha256": "4e825b93c3e2fcdf90ed6f28c7089f6babb895f9dd8524cff04c60cf2825ce06"
+  },
+  "input_mode": "persistent_sync",
+  "slurm_job_id": "58870979",
+  "deadline_ms": 4.5,
+  "iterations": 300,
+  "timely": 299,
+  "late": 1,
+  "neural_correct": 300,
+  "conventional_correct": 300,
+  "pair_wall_ms": {
+    "p50": 3.788268,
+    "p99": 3.97549,
+    "max": 4.511094
+  },
+  "remote_neural_gpu_ms": {
+    "p50": 2.1407361030578613,
+    "p99": 2.235584020614624,
+    "max": 3.9066240787506104
+  },
+  "qualification_eligible": false,
+  "all_pass": false,
+  "decision": "diagnostic only"
+}

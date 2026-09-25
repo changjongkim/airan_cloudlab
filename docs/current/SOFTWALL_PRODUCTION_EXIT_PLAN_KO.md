@@ -10,13 +10,13 @@ P1·P2와 그 뒤의 P4는 아직 FAIL이다.
 | Exit gate | 현재 판정 | 직접 근거 |
 |---|---|---|
 | P1 live-DU timing | **FAIL** | target DU의 synchronized `d_MAC` trace가 없음 |
-| P2 production fast path | **FAIL** | same-stream raw-IQ P2P도 4.5 ms 이내 885/1,000; late 115 |
+| P2 production fast path | **FAIL** | persistent-input/stream-ordered raw-IQ P2P도 4.5 ms 이내 995/1,000; late 5, 개발 gate 실패로 holdout 미개방 |
 | P3 supported-channel NeuralRx | **PASS, 범위 제한** | 독립 Sionna CDL-D/E holdout 500건에서 high-SNR 두 pipeline 정상, 저 SNR NeuralRx-only 31 대 conventional-only 12 |
 | P4 integrated production mode | **BLOCKED** | P1/P2가 닫힌 뒤 동일 계약으로 재자격화해야 함 |
 
 권위 있는 기계 판정은
-[production exit gate v2](../../results/softwall_multigpu/softwall_production_exit_gate_v2.json)와
-[fail-closed P1--P4 판정](../../results/softwall_multigpu/softwall_production_gates_current_v2.json)에 있다.
+[production exit gate v3](../../results/softwall_multigpu/softwall_production_exit_gate_v3.json)와
+[fail-closed P1--P4 판정](../../results/softwall_multigpu/softwall_production_gates_current_v3.json)에 있다.
 
 ## 1. Production timing에서 새로 확인한 것
 
@@ -50,6 +50,7 @@ environment에서 사용하는 L2 도구”라고 정의하므로, 이 값을 fi
 | **Raw-IQ P2P, GPU1 full NeuralRx** | **852/1,000** | **3.831 ms** | 9.506 ms | 구조는 유망, tail 때문에 FAIL |
 | 위 경로, Python GC OFF | 838/1,000 | 3.988 ms | 10.041 ms | GC 원인 가설 기각 |
 | 위 경로, caller-owned same-stream + busy poll | **885/1,000** | **3.929 ms** | 11.696 ms | 33건 개선, tail 때문에 FAIL |
+| 위 경로, persistent input + stream ordering | **995/1,000** | **3.813 ms** | **3.995 ms** | correctness 1,000/1,000, late 5로 frozen gate FAIL |
 | GPU1 single-stream public wrapper | 첫 timed request timeout | worker 약 106.9 ms | — | 기각 |
 
 가장 중요한 결과는 raw-IQ full-remote 경로다. GPU0에서 NeuralRx용 LS를 먼저 계산하지 않고
@@ -66,10 +67,24 @@ host call은 평균 1,060.105 µs, p99 1,105.380 µs였지만 GPU p99는 0.168 m
 계층을 섞지 않으면 transport와 TensorRT graph는 비교적 안정적이고, tail의 지배 단계는
 cuPHY LS channel estimation이다.
 
-이때 4.5 ms는 단순 그래프 선이 아니라 mode의 `D` parameter다. Diagnostic mode에서
-channel-estimation component 하나의 p99가 이미 `D`를 넘으므로, scheduling이나 Qwen을
-붙이기 전에 underlying NRx service class가 자격 미달이다. Profiling event가 timing을
-바꾸므로 이 수치는 qualification/WCET가 아니라 다음 C++/CUDA fast-path 구현의 병목 근거다.
+이를 바탕으로 C165는 raw real/imag를 매 요청 새 complex 배열로 만들던 경로를 persistent
+Fortran buffer로 바꾸고, 같은 cuPHY stream의 순서로 dependency를 전달해 pre-CE host sync를
+제거했다. 사전 고정한 1,000회 개발 gate는 p50 3.813 ms, p99 3.995 ms로 크게 개선됐고 양
+decoder가 모두 1,000/1,000 정확했지만, 최대 6.985 ms와 late 5건 때문에 실패했다. 규칙대로
+독립 holdout은 열지 않았다.
+
+실패 5건을 사후 분해하면 4건은 GPU0 conventional completion이 4.5 ms를 넘었고 1건은 remote
+NeuralRx GPU service가 넘었다. Pair latency 상관도도 remote NeuralRx 0.331보다 conventional
+GPU 0.918, conventional completion 0.941이 지배했다. 별도 300건 profiler-only conventional
+진단에서는 equalization이 conventional total과 가장 강하게 연결됐고(`r=0.761`, max
+1.904 ms), conventional CE는 max 1.295 ms였다. Profiling 자체가 timing을 바꾸므로 이
+절대값은 qualification이 아니며, 병목이 remote CE 하나에서 양 GPU의 cuPHY service tail로
+이동했음을 보여주는 기전 자료다.
+
+이때 4.5 ms는 단순 그래프 선이 아니라 mode의 `D` parameter다. Scheduling이나 Qwen을 붙이기
+전에 양 radio path의 whole-service tail이 함께 자격화돼야 한다. 현재 Python prototype은
+그 조건을 5건 위반했으며, 다음 C++/CUDA fast path는 GPU1 NRx CE뿐 아니라 GPU0의
+CE→noise→equalizer chain도 포함해야 한다.
 
 ### 1.3 설계에 주는 결론
 
@@ -160,7 +175,52 @@ raw-IQ P2P 구조를 Python polling prototype에서 persistent C++/CUDA path로 
 5. P1의 `D` 안에서 all-fail conventional completion과 single commit을 독립 node에서
    재자격화한다.
 
-현재 Python raw-P2P는 구조 선택의 근거일 뿐 qualification 결과가 아니다.
+현재 Python raw-P2P는 995/1,000까지 도달한 구조 선택의 근거일 뿐 qualification 결과가 아니다.
+
+#### P2-native 구현 단위
+
+소스 감사 결과, native path를 처음부터 새로 작성할 필요는 없다. Aerial checkout에는 두
+재사용 경로가 있다.
+
+- `cuPHY-CP/cuphydriver/src/uplink/phypusch_aggr.cpp`의 `PhyPuschAggr`는
+  `cuphyCreatePuschRx`를 한 번 생성하고, 매 slot의 두 단계 `cuphySetupPuschRx`와
+  `cuphyRunPuschRx`를 stream 또는 graph mode로 실행한다.
+- `pyaerial/pybind11`의 C++ core에는 `PuschParams`, `ChannelEstimator`,
+  `NoiseIntfEstimator`, `ChannelEqualizer`, `TrtEngine`, `LdpcDerateMatch`, `LdpcDecoder`,
+  `CrcChecker`가 이미 있다. Python wrapper를 호출하지 않고 같은 객체를 직접 연결할 수 있다.
+  현재 `pycuphycpp` CMake target에는 `pycuphy_trt_engine.cpp`가 빠져 있으므로 SoftWall
+  executable target에서 이를 명시적으로 포함해야 한다.
+
+구현과 판정 순서는 다음으로 고정한다.
+
+1. **N0 exact fixture.** 현재 C165의 clean-PUSCH raw IQ, TB, engine hash, static/dynamic radio
+   parameter를 versioned binary+JSON fixture로 내보낸다. C++ loader가 shape, byte order,
+   payload hash를 검사하고 Python과 같은 TB/CRC를 내기 전에는 timing을 열지 않는다.
+2. **N1 native remote NeuralRx.** GPU1에 `PuschParams`와 C++ core 객체, TensorRT binding,
+   input/output buffer를 readiness 전에 영구 생성한다. P2P 완료 event 뒤 한 stream에서
+   LS CE→TensorRT→derate→LDPC→CRC를 실행하고 TB/CRC/fence만 반환한다. 300회 correctness
+   canary이며 latency qualification이 아니다.
+3. **N2 native conventional shadow.** GPU0 conventional CE→noise→equalizer→derate→LDPC→CRC를
+   `PhyPuschAggr` 또는 동일 C++ core chain으로 옮긴다. Python call boundary와 request별
+   allocation을 제거하고, normal path에 중간 synchronize를 넣지 않는다.
+4. **N3 paired native canary.** 동일 release event에서 GPU0 conventional과 GPU1 P2P NeuralRx를
+   시작한다. 각 path의 CUDA fence, first-valid single commit, all-fail conventional completion을
+   300회 검사한다. 오류 1건이면 중단한다.
+5. **N4 qualification.** P1에서 target-DU `D`와 clock provenance를 얻은 뒤에만 1,000회
+   frozen development를 연다. 1,000/1,000 correctness와 deadline을 모두 통과할 때만 다른
+   node·seed의 1,000회 holdout을 한 번 연다.
+
+N0는 2026-09-25에 완료했다. Seed 20359400의 양 reference decoder가 같은 1,377-byte TB를
+복호했고, complex64 Fortran slot과 current-P2P real/imag C-order payload의 183,456개
+복소 원소를 C++ loader에서도 bitwise 비교했다. Byte order, 크기와 SHA-256도 모두 일치했다.
+이 fixture는 parity 입력이며 timing 결과가 아니다. 권위 상태는
+[C166 native fast-path status](../../results/softwall_multigpu/c166_native_fast_path_status_v1.json)에
+있고, 다음 미구현 단위는 N1 native remote NeuralRx다.
+
+기존 `cuphy_ex_pusch_rx_multi_pipe`는 소스는 있지만 이 checkout에 build artifact와 해당 PUSCH
+HDF5 vector가 없어 현재 C165와 다른 radio profile의 숫자를 대신 만들 수 없다. 그 예제를
+qualification 대용으로 사용하지 않는다. Deadline 변경, sleep 주입, seed 교체 재시도,
+Python prototype의 추가 holdout도 금지한다.
 
 ### P3 — Supported-channel NeuralRx — 좁은 mode 완료
 
@@ -195,5 +255,5 @@ P3의 제한된 supported mode는 확보했다. 이제 제출 범위를 가르�
 
 현재 데이터는 channel gap을 전부 뭉뚱그릴 필요가 없음을 보여준다. CDL-D/E는 통과했고
 TDL-A는 실패했다. 반면 production timing은 여전히 실제 구현을 기각한다. 다음 구현은
-remote channel-estimation tail을 줄이는 persistent C++/CUDA fast path와 live-DU contract
-수집에 집중한다. 추가 optimizer나 lifecycle matrix 확장은 이 gate보다 우선순위가 낮다.
+양 GPU cuPHY service tail을 줄이는 persistent C++/CUDA fast path와 live-DU contract 수집에
+집중한다. 추가 optimizer나 lifecycle matrix 확장은 이 gate보다 우선순위가 낮다.

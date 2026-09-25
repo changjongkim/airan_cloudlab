@@ -34,9 +34,10 @@ recovery-first baseline and an offline oracle found no material throughput advan
 optimizer claim. SoftWall instead identifies when conditional sharing is certifiably safe, when it
 has no useful slack, and when the mode must be rejected or requalified. These timing claims are
 finite-sample qualifications of synthetic `P180/D155` modes. Applying the same qualification discipline
-to Aerial testMAC's 4.5 ms UL-indication threshold rejected every tested implementation; the best
-same-stream raw-IQ two-GPU prototype completed 885/1,000 clean requests in time, with the remaining
-tail localized to remote cuPHY channel estimation. External Aerial TDL-A remains unqualified, but a
+to Aerial testMAC's 4.5 ms UL-indication threshold rejected every tested implementation; persistent
+input assembly and stream ordering improved the best raw-IQ two-GPU prototype to 995/1,000 clean
+requests, but the frozen development gate still failed and did not open a holdout. Four of the five
+late samples were limited by the conventional path and one by remote NeuralRx. External Aerial TDL-A remains unqualified, but a
 prespecified disjoint-seed Sionna CDL-D/E holdout passed: over 500 paired trials, low-SNR outcomes
 contained 31 NeuralRx-only versus 12 conventional-only correct blocks. These gates bound the present
 claim and identify the required production fast path and supported channel domain.
@@ -537,15 +538,27 @@ precomputed NeuralRx inputs to GPU1 also completed 0/1,000. Moving the complete 
 including channel estimation and CRC, behind raw-IQ P2P improved completion to 852/1,000 (3.831 ms
 median), but retained 148 late samples; disabling Python GC did not remove the tail. Binding cuPHY and
 caller-owned TensorRT to one stream and busy-polling improved timely completion to 885/1,000, but did
-not close the gate. A diagnostic 300-request stage profile localized the tail to cuPHY LS channel
+not close the gate. A diagnostic 300-request stage profile localized that implementation's tail to cuPHY LS channel
 estimation: its GPU p50/p99/max were 0.866/4.873/9.592 ms and its correlation with pair wall time was
 0.9603. TensorRT host enqueue averaged 7.443 us while the TensorRT graph itself had a 0.886 ms GPU p99.
 Forward/backward P2P copies averaged 36.261/17.150 us on GPU. Derate-match host-call duration averaged
 1,060.105 us with a 1,105.380 us p99, while its GPU p99 was 0.168 ms. Thus transport and TensorRT were
-comparatively stable; the diagnostic tail is carried by channel estimation. Because the 4.5 ms target
-is the mode's `D` parameter, a single qualified service component cannot have a tail beyond `D`; this
-implementation therefore fails before scheduling or external AI is considered. Profiling changes
-timing, so these stage values are mechanism evidence rather than qualification or WCET.
+comparatively stable.
+
+We then froze one bounded implementation change: a persistent Fortran-layout complex input removes
+per-request allocation, and the existing cuPHY stream orders input assembly before NeuralRx without a
+host synchronization. A 300-request allocation-only ablation was timely for 299 requests. The
+prespecified 1,000-request stream-ordered development gate improved to 995 timely completions
+(3.813 ms median, 3.995 ms p99), with both decoders correct for all 1,000, but five late completions
+rejected the candidate and therefore did not open the independent holdout. Posthoc path attribution
+found four late units whose conventional completion exceeded 4.5 ms and one whose remote NeuralRx GPU
+service exceeded it. Pair latency correlated 0.941 with conventional completion and 0.331 with remote
+NeuralRx service. A profiling-only conventional run identified equalization as its most correlated
+stage (`r=0.761` with conventional total; 1.904 ms maximum), while conventional channel estimation
+reached 1.295 ms. The remaining gap is therefore a tail across the two cuPHY service paths rather than
+TensorRT, P2P, or remote CE alone. Because the 4.5 ms target is the mode's `D` parameter, this
+implementation fails before scheduling or external AI is considered. Profiling changes timing, so
+stage values are mechanism evidence rather than qualification or WCET.
 
 External Aerial TDL-A remains unqualified. Across raw and normalized Aerial TDL-A, public-reference
 DMRS/MCS/start-symbol settings, one-antenna frequency/time-domain channel execution, and a TensorRT
@@ -626,8 +639,9 @@ are implemented and pass 24 unit tests, but we do not have a target DU/FAPI trac
 is available, this path can classify request-specific expiries with the same contract semantics;
 the resulting timing vector and mode must still be physically requalified. Aerial testMAC exposes a
 `T0+4.5 ms` UL-indication threshold, but it is a controlled developer L2 rather than the target MAC.
-Every implementation we tested retained violations at that threshold; even the best raw-IQ two-GPU
-prototype was timely for only 885/1,000 clean requests. We therefore make no production HARQ guarantee.
+Every implementation we tested retained violations at that threshold; even the persistent-input
+raw-IQ two-GPU development prototype was timely for only 995/1,000 clean requests, and its failed gate
+did not open a holdout. We therefore make no production HARQ guarantee.
 
 Second, qualified bounds are finite-sample whole-path bounds. Zero observed violations do not prove a
 WCET or zero failure probability. Modes outside the exact node/GPU/software/placement/lifecycle

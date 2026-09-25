@@ -1,0 +1,10 @@
+{
+  "schema": "softwall-c166-native-fixture-validation-correction-v1",
+  "parent_protocol": "results/softwall_multigpu/c166_native_fixture_protocol.json",
+  "correction_before_successful_validation": true,
+  "failed_attempt": "Login-node Python 3.11 raised ModuleNotFoundError for numpy before reading or judging the fixture.",
+  "correction": "Replace NumPy-only reconstruction with Python standard-library float arrays and explicit C/F index mapping.",
+  "decision_rule_changed": false,
+  "original_validator_sha256": "93b0aed763c40975c04c761eb7fa3c56b7125fd7e5a6562e60e33cf384d83fd9",
+  "corrected_validator_sha256": "b9b481180eb165df87c18eef2cd3b5c2f1f88435cc1025302c9fd639fb6e4d8d"
+}

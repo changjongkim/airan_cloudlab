@@ -62,6 +62,7 @@ def main() -> None:
     parser.add_argument("--deadline-ms", type=float, default=4.5)
     parser.add_argument("--seed", type=int, default=20358100)
     parser.add_argument("--cpu-affinity-index", type=int)
+    parser.add_argument("--profile-conventional", action="store_true")
     args = parser.parse_args()
 
     cpu_affinity = pin_to_allowed_cpu(args.cpu_affinity_index)
@@ -94,7 +95,17 @@ def main() -> None:
             sequence += 1
             raw_copy_gpu_ms = fill_raw(receiver, forward)
             owner.publish_forward(sequence)
-            conventional = receiver.run_conventional()
+            conventional_stage_profile = None
+            if args.profile_conventional:
+                conventional_stage_profile = receiver.profile_conventional_once()
+                conventional = (
+                    conventional_stage_profile["total_gpu_ms"],
+                    conventional_stage_profile["correct"],
+                    conventional_stage_profile["crc_failures"],
+                    conventional_stage_profile["payload_mismatches"],
+                )
+            else:
+                conventional = receiver.run_conventional()
             conventional_done_ns = time.perf_counter_ns()
             owner.wait_backward(sequence, 0.1)
             marker = cp.asnumpy(backward)
@@ -111,6 +122,7 @@ def main() -> None:
                 "neural_payload_mismatches": int(marker[2]),
                 "remote_neural_gpu_ms": float(marker[3]),
                 "parallel_pair_wall_ms": (completed_ns - release_ns) / 1e6,
+                "conventional_stage_profile": conventional_stage_profile,
             })
     finally:
         try:
@@ -133,6 +145,7 @@ def main() -> None:
         "iterations": args.iterations,
         "warmup_correct": warmup_correct,
         "cpu_affinity": cpu_affinity,
+        "profile_conventional": args.profile_conventional,
         "mechanism": (
             "GPU0 copies only raw IQ and immediately runs conventional. GPU1 performs "
             "NeuralRx channel estimation, TensorRT, LDPC, and CRC, returning a small result."

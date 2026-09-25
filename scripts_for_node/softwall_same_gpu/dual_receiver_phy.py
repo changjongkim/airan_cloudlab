@@ -646,6 +646,102 @@ class PairedDualReceiver:
             "payload_mismatches": payload_mismatches,
         }
 
+    def profile_conventional_once(self) -> dict:
+        """Profile the normal conventional path without intermediate syncs.
+
+        CUDA events delimit each stage on the receiver stream.  Python call
+        duration is retained separately because a synchronous or delayed
+        cuPHY call can appear as idle time between the enclosing events.  This
+        is a diagnostic path and is not used for service qualification.
+        """
+
+        names = (
+            "channel_estimation",
+            "noise_estimation",
+            "equalization",
+            "derate_match",
+            "ldpc_decode",
+            "crc",
+        )
+        host_enqueue_us = {}
+
+        def timed_enqueue(name, function):
+            begin_ns = time.perf_counter_ns()
+            value = function()
+            host_enqueue_us[name] = (
+                time.perf_counter_ns() - begin_ns
+            ) / 1000.0
+            return value
+
+        with cp.cuda.Device(self.device), self.stream:
+            events = [cp.cuda.Event() for _ in range(len(names) + 1)]
+            events[0].record()
+            channel = timed_enqueue(
+                "channel_estimation",
+                lambda: self.conv_channel_estimator.estimate(
+                    rx_slot=self.rx_slot,
+                    slot=self.slot,
+                    pusch_configs=self.pusch_configs,
+                ),
+            )
+            events[1].record()
+            lw_inv, noise_var = timed_enqueue(
+                "noise_estimation",
+                lambda: self.noise_estimator.estimate(
+                    rx_slot=self.rx_slot,
+                    channel_est=channel,
+                    slot=self.slot,
+                    pusch_configs=self.pusch_configs,
+                ),
+            )
+            events[2].record()
+            llrs, _ = timed_enqueue(
+                "equalization",
+                lambda: self.equalizer.equalize(
+                    rx_slot=self.rx_slot,
+                    channel_est=channel,
+                    lw_inv=lw_inv,
+                    noise_var_pre_eq=noise_var,
+                    pusch_configs=self.pusch_configs,
+                ),
+            )
+            events[3].record()
+            coded = timed_enqueue(
+                "derate_match",
+                lambda: self.conv_derate.derate_match(
+                    input_llrs=llrs, pusch_configs=self.pusch_configs
+                ),
+            )
+            events[4].record()
+            blocks = timed_enqueue(
+                "ldpc_decode",
+                lambda: self.conv_decoder.decode(
+                    input_llrs=coded, pusch_configs=self.pusch_configs
+                ),
+            )
+            events[5].record()
+            output = timed_enqueue(
+                "crc",
+                lambda: self.conv_crc.check_crc(
+                    input_bits=blocks, pusch_configs=self.pusch_configs
+                ),
+            )
+            events[6].record()
+        events[-1].synchronize()
+        correct, crc_failures, payload_mismatches = self._verify(output)
+        stage_gpu_ms = {
+            name: float(cp.cuda.get_elapsed_time(events[index], events[index + 1]))
+            for index, name in enumerate(names)
+        }
+        return {
+            "stages_gpu_ms": stage_gpu_ms,
+            "host_enqueue_us": host_enqueue_us,
+            "total_gpu_ms": float(cp.cuda.get_elapsed_time(events[0], events[-1])),
+            "correct": correct,
+            "crc_failures": crc_failures,
+            "payload_mismatches": payload_mismatches,
+        }
+
     def profile_neural_direct_once(self) -> dict:
         """Profile the caller-owned same-stream NeuralRx path stage by stage.
 

@@ -1,0 +1,34 @@
+{
+  "schema": "softwall-c165-conventional-stage-diagnostic-protocol-v1",
+  "frozen_before_execution": true,
+  "trigger": {
+    "artifact": "results/softwall_multigpu/c165_ce_tail_persistent_ordered_development_job58870979.json",
+    "result": "995/1000; 4/5 late units limited by GPU0 conventional completion and 1/5 by remote NeuralRx",
+    "posthoc_correlations": {
+      "pair_vs_remote_nrx_gpu": 0.330708051738178,
+      "pair_vs_conventional_gpu": 0.9181501595783746
+    }
+  },
+  "role": "Mechanism diagnosis only. CUDA events and Python timers alter timing; no service qualification or holdout decision may use this run.",
+  "seed": 20359300,
+  "warmup": 100,
+  "iterations": 300,
+  "deadline_ms_for_reference_only": 4.5,
+  "worker_input_mode": "persistent_ordered",
+  "stages": [
+    "channel_estimation",
+    "noise_estimation",
+    "equalization",
+    "derate_match",
+    "ldpc_decode",
+    "crc"
+  ],
+  "decision": "Identify the stage with the largest tail and strongest correlation with conventional total and pair wall; preserve all outcomes. Do not open another qualification run from this diagnostic.",
+  "source_sha256_before_execution": {
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "afc96d538b91749e00ced9c1be9424665873a075e70ef7c2eb3d823b1171e121",
+    "scripts_for_node/softwall_same_gpu/c163_raw_p2p_controller.py": "4daf3e28fcc067a96200a83b04a0dc4f125137c34a232fad8fed438d248d9c61",
+    "scripts_for_node/softwall_same_gpu/c163_raw_p2p_nrx_worker.py": "21922e4d15d75725fdba6c1ac21528f98cf2c473e7f1c631a25ef56fd96aa257",
+    "scripts_for_node/softwall_same_gpu/run_c165_conventional_profile.sh": "e2275c5a9221c40cb81d7bcd78b33510704f8af93b0d35015380e511e0ee47fa",
+    "scripts_for_node/softwall_same_gpu/analyze_c165_conventional_profile.py": "c538542f98b5bdd8462cf5811d68113ee5de012bbd54cec7d771c72cfbae33d4"
+  }
+}

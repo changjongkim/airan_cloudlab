@@ -195,7 +195,7 @@ def fig04_pareto():
         ("No MIG + MPS on (N=6)",100, 100, COL_WARN),
         ("MIG SP + MPS off",    50, 30, COL_BAD),
         ("MIG SP + MPS on (N=6)",150, 100, COL_BAD),
-        ("MIG SP + MPS pct=30",  45, 100, COL_WARN),
+        ("MIG SP + MPS pct=30", 145.9, 100, COL_WARN),
         ("MIG CP + MPS on (N=6)", 40, 100, COL_GOOD),
         ("MIG CP + MPS on (N=16)",40, 100, COL_GOOD),
         ("Multi-GPU",           40, 100, COL_GOOD),
@@ -395,7 +395,7 @@ def fig11_mps_pct_full_gpu():
     ax.set_title("Fig 11 · MPS thread% tuning within same-partition — pct=30 helps but doesn't eliminate need for MIG",
                  fontweight="bold", pad=18, loc="left")
     fig.text(0.02, 0.008,
-             "Even at best tuning (pct=30), N=6 shows 45ms — close to baseline but still worse than MIG cross-partition (40ms).",
+             "At pct=30, N=6 measures 145.9ms p99, versus about 40ms for MIG cross-partition.",
              fontsize=11, color=INK_SEC, style="italic")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     plt.savefig(f"{FIG}/F11_mps_pct_full_gpu.png"); plt.close()
@@ -531,7 +531,7 @@ def fig16_cp_vs_sp_direct():
     ax.set_title("Fig 16 · CP vs SP at N=6 — MIG CROSS provides zero-penalty isolation",
                  fontweight="bold", pad=18, loc="left")
     fig.text(0.02, 0.008,
-             "Only MIG cross-partition + MPS on AI keeps L1 at baseline. SP even with best pct=30 tuning still shows 5-10% penalty.",
+             "Only MIG cross-partition + MPS on AI stays near the L1 baseline; SP pct=30 at N=6 measures 145.9ms p99.",
              fontsize=11, color=INK_SEC, style="italic")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     plt.savefig(f"{FIG}/F16_cp_vs_sp_direct.png"); plt.close()
@@ -566,7 +566,7 @@ def fig18_realistic_softbank():
         ("SoftBank AITRAS goal:\n5G L1 + 6 AI services",  None, None),
         ("Naive: All on Full GPU + MPS", 100, 60),
         ("Naive: SP + MPS default",       180, 90),
-        ("Tuned: SP + MPS pct=30",         55, 85),
+        ("SP + MPS pct=30 (N=6 measured)", 145.9, 85),
         ("BEST: MIG CP + MPS on AI",       40, 100),
     ]
     fig, ax = plt.subplots(figsize=(15, 6.5))
@@ -645,7 +645,7 @@ def fig20_fault_isolation():
 def fig21_sla_compliance():
     """Fig 21: Real 5G TTI SLA compliance per topology."""
     topologies = ["Multi-GPU", "MIG CP + MPS", "SP + MPS pct=30", "SP + MPS pct=70", "SP + MPS pct=100", "Full GPU + MPS", "No MIG no MPS"]
-    l1_p99 = [40, 40, 45, 60, 150, 65, 300]
+    l1_p99 = [40, 40, 145.9, 60, 150, 65, 300]
     compliant = [v < 50 for v in l1_p99]
     fig, ax = plt.subplots(figsize=(14, 6.5))
     x = np.arange(len(topologies))
@@ -746,7 +746,7 @@ def fig24_pct_within_sp():
     ax.set_title("Fig 24 · MPS pct within SAME-partition — pct=30 helps but never reaches CP performance",
                  fontweight="bold", pad=18, loc="left")
     fig.text(0.02, 0.008,
-             "Best SP result (pct=30, N=6) is 45ms — still 5ms worse than CP topology 40ms.",
+             "SP pct=30 at N=6 is 145.9ms p99, versus about 40ms for CP topology.",
              fontsize=11, color=INK_SEC, style="italic")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     plt.savefig(f"{FIG}/F24_pct_within_sp.png"); plt.close()
@@ -828,7 +828,7 @@ def fig28_master_decision():
     rows = [
         ("Multi-GPU (separate GPUs)", "40", "100", "✓", "✓", "✓"),
         ("MIG CP + MPS on AI", "40", "100", "✓", "✓", "✓"),
-        ("MIG SP + MPS pct=30", "45", "100", "✗", "◐", "◐"),
+        ("MIG SP + MPS pct=30", "145.9", "100", "✗", "✗", "✗"),
         ("MIG SP + MPS pct=100 (default)", "150", "100", "✗", "✗", "✗"),
         ("Full GPU + MPS on", "63", "100", "✗", "◐", "✗"),
         ("Full GPU + MPS off", "300", "30", "✗", "✗", "✗"),

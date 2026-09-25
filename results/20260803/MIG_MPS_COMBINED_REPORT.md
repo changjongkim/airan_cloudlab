@@ -21,7 +21,7 @@ The earlier duty-cycle framing was misleading. When we shifted to the correct SL
 | ------------------------------ | ----------- | ------------- | ------- |
 | Multi-GPU                      | **40**      | 100 %         | ✅ ideal (but expensive) |
 | **MIG CP + MPS on AI**         | **40**      | 100 %         | ✅ **production** |
-| MIG SP + MPS pct=30 (tuned)    | 45          | 85 %          | ⚠ fallback |
+| MIG SP + MPS pct=30 (N=6)     | 145.9       | 85 %          | ✗ measured failure |
 | MIG SP + MPS default           | 150+        | 100 %         | ✗ SLA break |
 | Full GPU + MPS on              | 63          | 100 %         | ✗ 50 % L1 penalty |
 | No MIG, no MPS                 | 300+        | 30 %          | ✗ catastrophic |
@@ -109,7 +109,7 @@ If we skip MIG entirely (Full GPU, no partition) and rely on MPS, what happens?
 
 ![F11](analysis_chain19/figures/mig_mps/F11_mps_pct_full_gpu.png)
 
-**MPS thread% tuning (diverse-AI experiment · Exp 11)** — heatmap of L1 p99 across (pct, N). Best result at pct=30, N=6 is 45 ms. Better than default (150+ ms) but still 12 % worse than MIG CP baseline. **Tuning approaches but never matches** the isolation of MIG cross-partition.
+**MPS thread% tuning (diverse-AI experiment · Exp 11)** — heatmap of L1 p99 across (pct, N). At pct=30 and N=6, the three-run mean p99 is **145.9 ms**, not 45 ms. It is roughly 3.6× the approximately 40 ms MIG CP baseline; tuning does not approach cross-partition isolation.
 
 ![F12](analysis_chain19/figures/mig_mps/F12_diverse_vs_identical.png)
 
@@ -137,7 +137,7 @@ Now the combination. L1 on a dedicated MIG partition (say 4g.20gb), AI on the ot
 
 ![F16](analysis_chain19/figures/mig_mps/F16_cp_vs_sp_direct.png)
 
-**CP vs SP direct comparison at N=6** — CP + MPS holds baseline (40 ms). SP even with best pct=30 tuning is 45 ms (12 % worse). SP with default pct=100 is 150+ ms (SLA break).
+**CP vs SP direct comparison at N=6** — CP + MPS holds near 40 ms. SP pct=30 measures 145.9 ms p99, while pct=100 measures 411.3 ms; both break the plotted 50 ms threshold.
 
 ![F17](analysis_chain19/figures/mig_mps/F17_cp_extreme_scale.png)
 
@@ -165,7 +165,7 @@ Applying the finding to real deployment shapes.
 
 ![F21](analysis_chain19/figures/mig_mps/F21_sla_compliance.png)
 
-**5G TTI SLA compliance across topologies**. Only Multi-GPU and MIG CP + MPS pass. Every same-partition variant except aggressively-tuned SP (pct=30) fails.
+**Illustrative threshold comparison across topologies.** Only Multi-GPU and MIG CP + MPS are below the plotted 50 ms threshold. All measured same-partition variants, including pct=30, exceed it. This historical threshold is not a production TTI/HARQ contract.
 
 ![F22](analysis_chain19/figures/mig_mps/F22_violation_heatmap.png)
 
@@ -185,7 +185,7 @@ Given the topology is fixed (MIG CP + MPS on AI), what levers remain for tuning?
 
 ![F24](analysis_chain19/figures/mig_mps/F24_pct_within_sp.png)
 
-**MPS thread% cap within SP topology** — for contrast. Every entry ≥45 ms. Even the best SP result never beats CP's 40 ms.
+**MPS thread% cap within SP topology** — for contrast. The measured pct=30, N=6 point is 145.9 ms p99; it does not approach CP's approximately 40 ms result.
 
 ![F25](analysis_chain19/figures/mig_mps/F25_cell_count_sla.png)
 
@@ -214,7 +214,7 @@ Given the topology is fixed (MIG CP + MPS on AI), what levers remain for tuning?
 **Deployment decision tree**:
 1. Multi-GPU available? → use it (highest capacity, easiest).
 2. Single GPU only?
-   - AI count ≤ 5? → MIG CP + MPS still preferred; SP + MPS pct=30 as budget fallback.
+   - AI count ≤ 5? → use measured qualification for the exact mode; pct=30 is not a qualified fallback for N=6.
    - AI count > 5? → MIG CP + MPS **mandatory**.
 
 ![F30](analysis_chain19/figures/mig_mps/F30_cost_benefit.png)
@@ -267,7 +267,7 @@ The lesson from the diverse-AI experiment is that duty cycle is a GPU-utilizatio
 
 - **identical-NRx grid experiment (2026-07 · 108 conditions)**: full 3 configs × 6 N × 2 MPS grid with 3 trials → confirmed MPS is necessary for AI multiplexing, MPS-off catastrophic.
 - **fault·NCU deep-dive experiment (2026-07 · multi-part)**: fault injection, NCU per-kernel metrics, dynamic scaling → confirmed CP fault isolation, kernel warp-stall causes.
-- **diverse-AI deployment experiment (2026-08-03 · 273 conditions · 213 per-iter measurements)**: CP invariance up to N=16, SP breakdown at N=6, MPS pct=30 as best SP tuning → confirmed CP + MPS as invariant, tuning of MPS pct as secondary lever within CP.
+- **diverse-AI deployment experiment (2026-08-03 · 273 conditions · 213 per-iter measurements)**: CP invariance up to N=16 and SP breakdown at N=6; pct=30 still measured 145.9 ms p99 at N=6 and is not a qualified fallback.
 
 ---
 

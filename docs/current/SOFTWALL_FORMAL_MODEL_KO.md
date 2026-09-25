@@ -177,15 +177,15 @@ launch 시각 `t_l`에 `B_launch_control=5 ms`와 `B_AI=35 ms`를 합친 blackou
 남은 debt와 함께 재검사하는 V17.1은 두-node Nsight arm에서 Qwen kernel2,448,
 recovery kernel212, forbidden overlap0 ns와 D155 miss0을 통과했다. 너무 늦은
 `t_l=64 ms` conditional 상태는 상태 변경 없이 거절된다.
-상세는 [V17 shared-recovery 모델](SOFTWALL_SHARED_RECOVERY_V17_MODEL_KO.md)과
-[C151/C152 물리 path](SOFTWALL_CONFIRM151_152_SHARED_RECOVERY_PATH_KO.md),
-[C153 통합 결과](SOFTWALL_CONFIRM153_INTEGRATED_RESULT_KO.md),
-[C154/C155 holdout](SOFTWALL_CONFIRM154_155_CONTROLLED_HOLDOUT_KO.md),
-[C156 GPU timeline](SOFTWALL_CONFIRM156_GPU_TIMELINE_RESULT_KO.md),
-[C157 actual-NRx 결과](SOFTWALL_CONFIRM157_ACTUAL_NRX_RESULT_KO.md),
-[C158 반복 자격](SOFTWALL_CONFIRM158_REPEATED_QUALIFICATION_KO.md),
-[C159-Q1 P180 결과](SOFTWALL_CONFIRM159_Q1_P180_RESULT_KO.md)와
-[C159-Q2 variable-context 결과](SOFTWALL_CONFIRM159_Q2_VARIABLE_RESULT_KO.md)에 있다.
+상세는 [V17 shared-recovery 모델](../archive/SOFTWALL_SHARED_RECOVERY_V17_MODEL_KO.md)과
+[C151/C152 물리 path](../archive/SOFTWALL_CONFIRM151_152_SHARED_RECOVERY_PATH_KO.md),
+[C153 통합 결과](../archive/SOFTWALL_CONFIRM153_INTEGRATED_RESULT_KO.md),
+[C154/C155 holdout](../archive/SOFTWALL_CONFIRM154_155_CONTROLLED_HOLDOUT_KO.md),
+[C156 GPU timeline](../archive/SOFTWALL_CONFIRM156_GPU_TIMELINE_RESULT_KO.md),
+[C157 actual-NRx 결과](../archive/SOFTWALL_CONFIRM157_ACTUAL_NRX_RESULT_KO.md),
+[C158 반복 자격](../archive/SOFTWALL_CONFIRM158_REPEATED_QUALIFICATION_KO.md),
+[C159-Q1 P180 결과](../archive/SOFTWALL_CONFIRM159_Q1_P180_RESULT_KO.md)와
+[C159-Q2 variable-context 결과](../archive/SOFTWALL_CONFIRM159_Q2_VARIABLE_RESULT_KO.md)에 있다.
 
 C121은 두 disjoint home의 `[4,4]` 8셀, C122는 네 home의 `[3,3,3,3]` 12셀에서 이
 가정을 물리화했다. 각 home은 별도 recovery lane, NRx endpoint 두 개와 Qwen queue를
@@ -562,7 +562,7 @@ guard153ms를 12ms 넘는다. E6b는 `t=89 ms`, debt1, context64에서 finish154
 넘는다. 두 점은 mandatory-only feasible인 QSN이며 SoftWall은 두 node 합계60/60회 AI를
 launch 전에 거절했다. 이는 사후 contract 해석이고 C162에서 debt-blind miss를 관측했다는
 주장이 아니다. 상세 감사는
-[필요성 반론 결정](SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에 있다.
+[필요성 반론 결정](../archive/SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에 있다.
 
 **Corollary 1 — too-large-unit no benefit.** 모든 보이는 AI unit이 `b_eff > W+Delta`이면
 atomic compaction은 안전하더라도 추가 admission을 만들 수 없다.
@@ -851,7 +851,7 @@ Control state의 commit만 원자적이다. 여러 GPU kernel이 하드웨어에
 이 작업이 끝나야 “모델이 구현을 설명한다”를 넘어 “모델이 보지 않은 경계를 예측한다”는
 주장을 할 수 있다.
 
-- [C134 독립 node 결과](SOFTWALL_CONFIRM134_INDEPENDENT_NODE_RESULT_KO.md)
+- [C134 독립 node 결과](../archive/SOFTWALL_CONFIRM134_INDEPENDENT_NODE_RESULT_KO.md)
 - [Sharded-home envelope v11](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v11.json)
 - [Sharded-home envelope v12](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v12.json)
 - [V12 validation summary](../../results/softwall_multigpu/softwall_envelope_v12_validation_summary.json)
@@ -861,39 +861,39 @@ Control state의 commit만 원자적이다. 여러 GPU kernel이 하드웨어에
 - [V10→V11 ring/phase regression](../../results/softwall_multigpu/softwall_envelope_v10_v11_ring_phase_regression_v1.json)
 - [V11→V12 AI guard regression](../../results/softwall_multigpu/softwall_envelope_v11_v12_ai_guard_regression_v1.json)
 - [C135 사건별 static counterfactual](../../results/softwall_multigpu/confirm135_static_counterfactual_audit_v1.json)
-- [C135 물리 결과](SOFTWALL_CONFIRM135_V11_AI40_RESULT_KO.md)
-- [C136 독립 node 결과](SOFTWALL_CONFIRM136_V12_REQUALIFICATION_RESULT_KO.md)
+- [C135 물리 결과](../archive/SOFTWALL_CONFIRM135_V11_AI40_RESULT_KO.md)
+- [C136 독립 node 결과](../archive/SOFTWALL_CONFIRM136_V12_REQUALIFICATION_RESULT_KO.md)
 - [C135/C136 결합 감사](../../results/softwall_multigpu/confirm135_136_combined_v12_qualification.json)
 - [V12 cross-node validation summary](../../results/softwall_multigpu/softwall_envelope_v12_cross_node_validation_summary.json)
 - [V12 cross-node manifest](../../results/softwall_multigpu/softwall_envelope_v12_cross_node_manifest.json)
-- [C137 service-bound telemetry](SOFTWALL_CONFIRM137_SERVICE_BOUND_TELEMETRY_RESULT_KO.md)
+- [C137 service-bound telemetry](../archive/SOFTWALL_CONFIRM137_SERVICE_BOUND_TELEMETRY_RESULT_KO.md)
 - [Service-bound qualification 방법론](SOFTWALL_SERVICE_BOUND_QUALIFICATION_KO.md)
 - [Service-bound qualification v2](../../results/softwall_multigpu/softwall_service_bound_qualification_v2.json)
 - [C137 artifact manifest](../../results/softwall_multigpu/confirm137_artifact_manifest.json)
 - [Service-bound v2 manifest](../../results/softwall_multigpu/softwall_service_bound_v2_manifest.json)
-- [C138–C140 control-bound correction](SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)
+- [C138–C140 control-bound correction](../archive/SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)
 - [Sharded-home envelope v13](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v13.json)
 - [V12→V13 control-bound regression](../../results/softwall_multigpu/softwall_envelope_v12_v13_control_bound_regression_v1.json)
 - [V13 validation summary](../../results/softwall_multigpu/softwall_envelope_v13_validation_summary.json)
 - [Service-bound qualification v3](../../results/softwall_multigpu/softwall_service_bound_qualification_v3.json)
 - [V13 corrected-control manifest](../../results/softwall_multigpu/softwall_v13_corrected_control_manifest.json)
-- [C141 독립-node 재자격](SOFTWALL_CONFIRM141_V13_INDEPENDENT_RESULT_KO.md)
+- [C141 독립-node 재자격](../archive/SOFTWALL_CONFIRM141_V13_INDEPENDENT_RESULT_KO.md)
 - [Service-bound qualification v4](../../results/softwall_multigpu/softwall_service_bound_qualification_v4.json)
-- [V14 pipelined-control 설계](SOFTWALL_PIPELINED_CONTROL_DESIGN_KO.md)
-- [C142--C144 결과](SOFTWALL_CONFIRM142_144_V14_PIPELINED_RESULT_KO.md)
+- [V14 pipelined-control 설계](../archive/SOFTWALL_PIPELINED_CONTROL_DESIGN_KO.md)
+- [C142--C144 결과](../archive/SOFTWALL_CONFIRM142_144_V14_PIPELINED_RESULT_KO.md)
 - [V14 prediction](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v14.json)
 - [V14 validation](../../results/softwall_multigpu/softwall_envelope_v14_validation_summary.json)
 - [Pipelined-control finite model](../../results/softwall_multigpu/softwall_pipelined_control_model_v1.json)
 - [V14 immutable manifest](../../results/softwall_multigpu/softwall_v14_pipelined_control_manifest.json)
-- [V14 ownership 반례와 V15 교정](SOFTWALL_V14_OWNERSHIP_CORRECTION_KO.md)
-- [C145--C146 V15 결과](SOFTWALL_CONFIRM145_146_V15_SINGLE_TOKEN_RESULT_KO.md)
+- [V14 ownership 반례와 V15 교정](../archive/SOFTWALL_V14_OWNERSHIP_CORRECTION_KO.md)
+- [C145--C146 V15 결과](../archive/SOFTWALL_CONFIRM145_146_V15_SINGLE_TOKEN_RESULT_KO.md)
 - [V14→V15 ownership regression](../../results/softwall_multigpu/softwall_v14_v15_staged_ownership_regression_v1.json)
 - [Pipelined-control finite model v2](../../results/softwall_multigpu/softwall_pipelined_control_model_v2.json)
 - [Finite-model semantic reproducibility](../../results/softwall_multigpu/softwall_pipelined_control_model_v2_reproducibility_v1.json)
 - [V15 prediction](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v15.json)
 - [V15 validation](../../results/softwall_multigpu/softwall_envelope_v15_validation_summary.json)
 - [V15 immutable manifest](../../results/softwall_multigpu/softwall_v15_single_token_manifest.json)
-- [C147--C148 V16 four-point 결과](SOFTWALL_CONFIRM147_148_V16_FOUR_POINT_RESULT_KO.md)
+- [C147--C148 V16 four-point 결과](../archive/SOFTWALL_CONFIRM147_148_V16_FOUR_POINT_RESULT_KO.md)
 - [V16 prediction](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v16.json)
 - [V16 validation](../../results/softwall_multigpu/softwall_envelope_v16_validation_summary.json)
 - [V16 immutable manifest](../../results/softwall_multigpu/softwall_v16_four_point_manifest.json)

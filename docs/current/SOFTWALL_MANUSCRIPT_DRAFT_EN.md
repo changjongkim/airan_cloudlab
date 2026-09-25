@@ -386,6 +386,7 @@ experimental measurement or ground-truth label.
 
 ### 7.1 MPS is a mechanism, not the contract
 
+<!-- provenance: Q1_MPS_DIAGNOSTICS -->
 Under separate-client overrun, active-thread caps of 100% and 20% produced 2/1,500 and 1/1,500
 deadline misses. A later lifecycle comparison observed 0/10,000 misses for a CPU socket sham and
 12/10,000 for the GPU/MPS-client arm. These tests do not prove a universal failure probability. They
@@ -393,6 +394,7 @@ show that cap selection alone cannot serve as the certificate used by this paper
 
 ### 7.2 End-to-end variable-class qualification
 
+<!-- provenance: Q2_WARM_PATH -->
 The authoritative warm `P180/D155` variable-class campaign used independent development and holdout
 nodes with the same frozen source and different seeds. It admitted Qwen contexts from 16 to 512 tokens
 with class bounds `{35,35,35,40,65,75}` ms.
@@ -414,6 +416,7 @@ exercised bounded certificate revalidation; no Qwen kernel began after its lates
 
 ### 7.3 Fault closure
 
+<!-- provenance: C160_FAULT -->
 A finite-state audit first checked 51 combinations of epoch, generation, fence, and marker state with
 no invariant violation. The physical A0–A6 campaign then covered clean operation, correlated NeuralRx
 failure, reply delay before and after physical completion, stale and duplicate responses, terminal
@@ -426,6 +429,7 @@ NeuralRx whole-path bound and was correctly retained as UQ rather than pooled in
 
 ### 7.4 Predicting a boundary before execution
 
+<!-- provenance: C162_ENVELOPE -->
 The C162 model was compared with exact feasibility on 16,023 qualified states and retrospectively with
 1,200 physical decisions; both comparisons had zero mismatch. We then froze seven physical boundary
 cases before execution. Every round ran four actual NeuralRx requests and used controlled suffix faults
@@ -438,6 +442,7 @@ was admitted in 30/30 rounds, while 89 ms or later was rejected in 30/30.
 
 ### 7.5 Certified scheduler scalability
 
+<!-- provenance: C162_SCHEDULER -->
 The polynomial candidate scheduler tries five deterministic list orders and returns the first schedule
 accepted by an independent verifier. On 600 heterogeneous small states, exact search accepted 504 and
 the certified scheduler accepted 494: false-safe was zero and false-conservative was ten. On the
@@ -456,6 +461,7 @@ budget through 64 debts (right); these latency samples are not WCET bounds.*
 
 ### 7.6 What the certificate prevents
 
+<!-- provenance: C162_NECESSITY -->
 Two prespecified C162 cases isolate necessity from throughput. In E4, two recovery debts remain at
 45 ms and a context-256 request is visible. Mandatory-only recovery is feasible, but admitting AI
 yields a bound-respecting completion of 165 ms, 12 ms past the 153 ms radio guard. In E6b, one debt
@@ -495,6 +501,7 @@ We compare SoftWall with the certificate-preserving recovery-first system descri
 semantic difference is whether external AI may execute before unresolved recovery is physically
 completed.
 
+<!-- provenance: C159_BASELINE -->
 On four non-overlapping BurstGPT calibration windows containing 4,290 requests and 1,129,504 offered
 tokens, both systems assigned 931 timely requests and 385,262 tokens. Under a sensitivity that charged
 every recovery its full 25 ms bound, SoftWall improved timely token value by only 0.066%, far below the
@@ -506,6 +513,7 @@ throughput optimizer for this trace.
 
 ### 7.8 Lifecycle qualification
 
+<!-- provenance: C164_LIFECYCLE -->
 The paper's lifecycle matrix intentionally contains five qualified or partial subsets and five UQ
 modes. Qualified evidence covers warm persistent operation, a first request after 30 s idle, MPS restart
 followed by full requalification, mandatory radio continuity during Qwen reload, and same-worker channel
@@ -522,6 +530,7 @@ CRC-bearing UL indications at `T0+4.5 ms`; its validator reconstructs slot `T0` 
 arrival beyond that threshold as late. NVIDIA describes testMAC as a developer L2 for a controlled
 environment, so this is a vendor integration target rather than a field-DU `d_MAC`.
 
+<!-- provenance: P2_FAST_PATH_AND_STAGE -->
 We applied the threshold only as a diagnostic under optimistic clean, warm, no-AI conditions. Local
 wait-then-recover and same-GPU speculative paths completed 0/1,000 requests within 4.5 ms. Moving
 precomputed NeuralRx inputs to GPU1 also completed 0/1,000. Moving the complete NeuralRx pipeline,
@@ -540,6 +549,7 @@ engine built without FP16 as in the public notebook, conventional decoding succe
 arm while NeuralRx succeeded in none. This localizes the gap to an unsupported model/channel interface
 or domain rather than a simple power, radio-profile, transmitter, or precision setting.
 
+<!-- provenance: P3_CHANNEL_HOLDOUT -->
 We then reconstructed the public notebook's actual Sionna 1.0.2/TensorFlow 2.19 contract. Clean MCS7
 direct and wrapper controls and the default Sionna Rayleigh channel passed NeuralRx 20/20. A fixed
 development matrix revealed a channel-family boundary: CDL-A degraded from 10/10 at 1 ns delay spread
@@ -612,8 +622,13 @@ fingerprint must be requalified.
 Third, all authoritative hardware results use the A100 family. Four-GPU and multi-home paths exercise
 NVLink P2P, but cross-family validity is untested.
 
+<!-- provenance: C158_LONG_TAIL -->
 Fourth, the fault model excludes arbitrary GPU/driver hang and full process-replacement recovery. Five
-lifecycle modes remain UQ, and a separate long-tail observation has an unresolved root cause.
+lifecycle modes remain UQ. In C158 attempt 4, one NeuralRx completion reached 350.948 ms in a
+400-request run whose NeuralRx p99 was 8.111 ms, a 43.3× p99 excursion; the run consequently had
+4/400 deadline misses. Targeted 30 s-idle, quiescent MPS-restart/requalification, Qwen-reload, and
+same-worker reconnect campaigns did not reproduce that excursion. Its root cause therefore remains
+unresolved, and none of those lifecycle results qualifies the C158 tail away.
 
 Fifth, the PHY generalization is limited. External Aerial TDL-A development screens retained
 conventional success on every ten-TB arm and NeuralRx success on none after testing normalization,

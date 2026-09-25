@@ -111,7 +111,7 @@ certificate-preserving 기준선이다. 이를 failure correlation로 깨는 실
 정의를 바꾸므로 열지 않는다. C162 E4/E6b의 두 prespecified QSN 상태는 debt-blind
 current-idle admission이 radio guard를 12/1ms 넘길 수 있음을 보이고, SoftWall은 두 node에서
 합계 60/60회 GPU launch 전에 거절했다. 상세 판정은
-[필요성 반론 감사](SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에 있다.
+[필요성 반론 감사](../archive/SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에 있다.
 
 Production `d_MAC`, cross-family, lifecycle 나머지 5개를 단순히 채우기 위한 campaign은 열지
 않는다. 이들은 현재 원고의 limitation/future work다.

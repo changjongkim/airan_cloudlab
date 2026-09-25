@@ -142,7 +142,7 @@ SoftWall은 두 상태를 합계60/60회 launch 전에 거절했다. 이는 obse
 contract-level witness다. 따라서 정확한 주장은 “어떤 공유에도 SoftWall이 필요하다”가 아니라
 “unresolved recovery보다 AI를 먼저 실행하면서 contract를 유지하려면 executable witness가
 필요하다”다. 자세한 판정은
-[필요성 반론 감사](SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에 있다.
+[필요성 반론 감사](../archive/SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에 있다.
 
 ### “Synthetic D155라 실제 RAN 보장이 아니다.”
 

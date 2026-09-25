@@ -19,7 +19,7 @@
 
 Baseline은 채널 gate, queue-aware endpoint 선택, **고정** 복구 여유, 독립된 bounded AI 허가를 각각 실행한다. SoftWall의 추가 가설은 NRx 수락·복구 calendar·AI 허가량을 함께 결정해서 고정 결합의 과잉 예약 또는 충돌을 줄인다는 것이다. 두 정책 모두 late/stale/duplicate 결과 차단과 물리 완료 전 credit 점유를 지켜야 한다. 이 안전장치 없이 baseline만 실패하게 만드는 비교는 novelty 증거가 아니다.
 
-**노벨리티 판정에는 더 강한 비교군을 추가한다.** 고정 calendar와 별도로, 동일한 관측 정보·서비스 상한·all-fail 안전 검사를 가진 AI 수요 인지 greedy 정책이 성공/실패 사건마다 복구 예약을 앞뒤로 재배치하고 AI unit을 허가하게 한다. 제안하는 [조건부 복구 credit 교환 정책](SOFTWALL_JOINT_SCHEME_PROPOSAL_KO.md)이 이 greedy와 같은 결정을 내리거나 같은 무선 효용·유효 AI 완료량을 얻으면, 단순 예약 재배치나 구성요소 결합을 알고리즘 기여로 주장하지 않는다. 작은 동시 요청 집합의 정확 최적해도 함께 계산해 남은 개선 여지를 확인한다.
+**노벨리티 판정에는 더 강한 비교군을 추가한다.** 고정 calendar와 별도로, 동일한 관측 정보·서비스 상한·all-fail 안전 검사를 가진 AI 수요 인지 greedy 정책이 성공/실패 사건마다 복구 예약을 앞뒤로 재배치하고 AI unit을 허가하게 한다. 제안하는 [조건부 복구 credit 교환 정책](../archive/SOFTWALL_JOINT_SCHEME_PROPOSAL_KO.md)이 이 greedy와 같은 결정을 내리거나 같은 무선 효용·유효 AI 완료량을 얻으면, 단순 예약 재배치나 구성요소 결합을 알고리즘 기여로 주장하지 않는다. 작은 동시 요청 집합의 정확 최적해도 함께 계산해 남은 개선 여지를 확인한다.
 
 **2026-09-22 구성요소 갱신:** [Confirm60](../../results/softwall_same_gpu/confirm60_low_gate_abba_job58729926.json)의
 train-only 낮은 feature skip은 독립 두 쌍에서 무선 정답을 유지하고 AI를 +0.943%/+1.877%

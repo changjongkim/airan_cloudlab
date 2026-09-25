@@ -642,8 +642,8 @@ C119/C120은 local 1개+remote 3개로 네 GPU를 모두 사용해 recovery/leas
 직접 자격화한 end-to-end path bound를 사용하고 component vector는 원인 진단과 transport
 선택에 사용한다.
 상세 결과는
-[C114 결과](SOFTWALL_CONFIRM114_MULTIGPU_RESULT_KO.md)와
-[멀티 GPU·모델링 로드맵](SOFTWALL_MULTIGPU_MODELING_ROADMAP_KO.md)에 있다.
+[C114 결과](../archive/SOFTWALL_CONFIRM114_MULTIGPU_RESULT_KO.md)와
+[멀티 GPU·모델링 로드맵](../archive/SOFTWALL_MULTIGPU_MODELING_ROADMAP_KO.md)에 있다.
 
 ### 3.11 Sharded recovery home과 certificate 합성
 
@@ -696,7 +696,7 @@ C138의 실제 faulting call이 5.205/5.831 ms에 반환돼 이 시간 계약은
 V13 synchronous mode는 socket wait `T_sock=5 ms`와 admission wall bound `B_rpc=7 ms`를
 분리하고 `B_control=3×7=21 ms`를 선납한다. C139는 prepare/commit/complete 각 두 arm에서
 7 ms 후보를 통과했고, C140은 보정된 `AI35+21+2=58 ms` 조건부 class를 검증했다.
-세부 correction chain은 [C138–C140 판정](SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)에 있다.
+세부 correction chain은 [C138–C140 판정](../archive/SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)에 있다.
 C141은 이 두 요소를 독립 A100 node에서 함께 재자격했다.
 
 ### 3.13 Launch-time revalidated single-token pipelined control
@@ -719,12 +719,12 @@ t_launch + B_commit + B_AI(class) + G_physical
 검사하고, 동기 `commit`이 7 ms bound 안에 ACK된 경우에만 Qwen을 제출한다. CUDA fence가
 확인되면 local lease를 회수하지만 global token은 async complete ACK까지 inflight다.
 적용 여부가 불명확해지면 token을 quarantine하고 신규 global AI만 닫는다. 이 구조와
-상태 기계는 [V14 설계](SOFTWALL_PIPELINED_CONTROL_DESIGN_KO.md)에 고정했다. V15는 여기에
+상태 기계는 [V14 설계](../archive/SOFTWALL_PIPELINED_CONTROL_DESIGN_KO.md)에 고정했다. V15는 여기에
 `staged ∨ offered => no prepare`를 추가해 home별 launch 전 token을 하나로 제한한다.
 Runtime은 억제 횟수와 최대 unlaunched token을 기록하며, mode 자격은 문제가 된 retained
 token 분기의 실제 관측을 요구한다. V14 반례와 교정은
-[ownership correction](SOFTWALL_V14_OWNERSHIP_CORRECTION_KO.md)에, 두-node 결과는
-[C145--C146 결과](SOFTWALL_CONFIRM145_146_V15_SINGLE_TOKEN_RESULT_KO.md)에 고정했다.
+[ownership correction](../archive/SOFTWALL_V14_OWNERSHIP_CORRECTION_KO.md)에, 두-node 결과는
+[C145--C146 결과](../archive/SOFTWALL_CONFIRM145_146_V15_SINGLE_TOKEN_RESULT_KO.md)에 고정했다.
 
 ### 3.14 Shared mandatory-recovery calendar (V17 candidate)
 
@@ -747,7 +747,7 @@ global-order·lifecycle 오류는 0이었다. 이후 C153--C158은 global model,
 Qwen lease와 shared worker를 deadline 아래 한 transaction으로 통합했다. C158의 warm
 `P600/D155` repeated mode는 두 node·2,000 actual NRx request에서 finite-sample PASS지만,
 `P180` trace-performance와 integrated fault mode는 UQ다. 구조와 승격 gate는
-[V17 shared-recovery 모델](SOFTWALL_SHARED_RECOVERY_V17_MODEL_KO.md)에 있다.
+[V17 shared-recovery 모델](../archive/SOFTWALL_SHARED_RECOVERY_V17_MODEL_KO.md)에 있다.
 
 ---
 
@@ -781,7 +781,9 @@ publish한다. 모든 peer 방향과 equality monitor는 readiness 전에 prefli
 ### 4.3 계측
 
 - host: request release, feature, admission, dispatch, worker publish/observe,
-  fallback start, GPU return, commit return
+  reserved recovery start와 실제 worker dispatch/start를 서로 다른 필드로 기록하고 GPU return,
+  commit return을 계측한다. 과거 `fallback_start_ns`는 예약 시각이므로 실제 실행 시작 근거로
+  재사용하지 않는다.
 - GPU: CUDA event duration과 Nsight Systems kernel interval
 - correctness: conventional/NeuralRx CRC 및 payload, single commit
 - resource: endpoint ring, recovery calendar generation, AI lease retire, residual credit,
@@ -970,7 +972,7 @@ retiming과 AI lease를 원자 완료했다. 그러나 safe work-conserving 대�
 두 효과 모두 +2%에 못 미치고 CI가 0을 포함한다. 처리량 우위 가설은 종료한다. 반면
 static-safe는 두 seed에서 73,841/73,770 token에 그쳐, 고정 all-fail block의 비용과
 단순 work conservation의 큰 가치는 확인됐다. 상세 판정은
-[C113 결과](SOFTWALL_CONFIRM113_STRONG_BASELINE_RESULT_KO.md)에 있다.
+[C113 결과](../archive/SOFTWALL_CONFIRM113_STRONG_BASELINE_RESULT_KO.md)에 있다.
 
 ### 5.7 RQ6 — Joint optimizer의 음성 결과
 
@@ -1030,10 +1032,10 @@ Component별 최초 2 ms home 후보는 C117에서 front 2.393 ms와 back 2.741 
 front/back 3 ms를 사전 고정한 C118은 두 arm 모두 통과했다. C118의 home front/back
 최대는 1.831/1.886 ms와 2.732/1.371 ms였고, remote worker와 end-to-end NRx 최대는
 4.209 ms와 12.579 ms였다. 상세 수치와 claim boundary는
-[C114 결과](SOFTWALL_CONFIRM114_MULTIGPU_RESULT_KO.md)와
-[C115 결과](SOFTWALL_CONFIRM115_MULTIGPU_BASELINE_RESULT_KO.md),
-[C117 실패 경계](SOFTWALL_CONFIRM117_COMPONENT_BOUND_RESULT_KO.md),
-[C118 재자격 결과](SOFTWALL_CONFIRM118_COMPONENT_REQUALIFICATION_RESULT_KO.md)에 있다.
+[C114 결과](../archive/SOFTWALL_CONFIRM114_MULTIGPU_RESULT_KO.md)와
+[C115 결과](../archive/SOFTWALL_CONFIRM115_MULTIGPU_BASELINE_RESULT_KO.md),
+[C117 실패 경계](../archive/SOFTWALL_CONFIRM117_COMPONENT_BOUND_RESULT_KO.md),
+[C118 재자격 결과](../archive/SOFTWALL_CONFIRM118_COMPONENT_REQUALIFICATION_RESULT_KO.md)에 있다.
 
 C116은 `nrx0/nrx1/nrx2`의 timed admission을 331/263/126과 320/265/134회 기록했고,
 controller dispatch와 각 worker 완료 수가 정확히 일치했다. 두 arm의 atomic exchange는
@@ -1045,7 +1047,7 @@ arm은 모두 네 endpoint 사용·worker count·system safety를 통과하고 a
 97/85/85/95회를 완료했다. 반면 eager canary는 pretraffic GPU0 OOM이었고, C119의
 backward P2P 100 us와 C120의 home back 3 ms 후보가 각각 한 건씩 깨졌다. 네 arm의
 end-to-end NRx 최대는 11.717--16.757 ms로 25 ms 후보 안이었다. 정확한 판정은
-[C119/C120 결과](SOFTWALL_CONFIRM119_120_FOUR_GPU_RESULT_KO.md)에 있다.
+[C119/C120 결과](../archive/SOFTWALL_CONFIRM119_120_FOUR_GPU_RESULT_KO.md)에 있다.
 
 C121은 두 4셀 recovery home을 GPU0/1에서 동시에 실행했다. 두 독립 arm의 release 차이는
 0 ns, 실제 공통 timed interval은 61.034/61.033초였고 총 5,440 TB의 모든 safety gate가
@@ -1055,7 +1057,7 @@ atomic recovery/AI exchange와 적시 Qwen 처리가 발생했다. 이 결과는
 composition과 horizontal memory scaling의 증거다. 다만 C124의 더 긴 재검사에서 4-cell
 home의 conv12 bound가 한 번 깨졌으므로 C121 exact mode의 현재 자격은 UQ다. 3-cell/home인
 C122 exact mode는 그 반례가 직접 적용되지 않는다. 상세 판정은
-[C121/C122 결과](SOFTWALL_CONFIRM121_122_SHARDED_HOME_RESULT_KO.md)에 있다.
+[C121/C122 결과](../archive/SOFTWALL_CONFIRM121_122_SHARDED_HOME_RESULT_KO.md)에 있다.
 
 ### 5.9 RQ8 — Global AI queue와 certificate-ordered 실행
 
@@ -1073,7 +1075,7 @@ timing-dependent NRx admission 차이로 실패했고, global 대비 static toke
 composition + conformant executor의 물리 동작**이다. Global routing 처리량 우위는
 입증되지 않았다. 이후 V17은 shared mandatory resource의 exact global model과 물리 cuPHY
 data path를 각각 통과했지만 두 요소의 deadline·Qwen transaction 통합은 아직 UQ다. 상세 판정은
-[C123--126 결과](SOFTWALL_CONFIRM123_126_GLOBAL_AI_RESULT_KO.md)에 있다.
+[C123--126 결과](../archive/SOFTWALL_CONFIRM123_126_GLOBAL_AI_RESULT_KO.md)에 있다.
 
 C127은 post-apply commit reply loss를 두 독립 arm에 주입했다. 총 5,440 TB에서 모든
 deadline·NRx·conventional·AI bound gate가 통과했고, fault 뒤에도 home 0은 2,490 TB를,
@@ -1081,7 +1083,7 @@ home 1은 AI 1,668개를 처리했다. Home 0은 arm마다 ambiguity 한 건을 
 닫았으며 duplicate commit/execution은 0이었다. 각 broker에 남은 `inflight` token 하나는
 실행되지 않은 ambiguous request의 의도된 quarantine이다. 이 결과는 AI control fault의
 제한된 격리 근거이며 broker crash recovery나 exactly-once protocol의 근거는 아니다.
-상세 판정은 [C127 결과](SOFTWALL_CONFIRM127_BROKER_FAULT_RESULT_KO.md)에 있다.
+상세 판정은 [C127 결과](../archive/SOFTWALL_CONFIRM127_BROKER_FAULT_RESULT_KO.md)에 있다.
 
 C128--132는 reply loss를 broker process fail-stop으로 강화했다. C128의 synchronous marker
 mode는 양 home에서 각각 한 번 D155를 넘었고, marker를 제거한 C129도 무제한 complete RPC
@@ -1094,17 +1096,17 @@ C132는 세 RPC의 총 15 ms와 physical guard 2 ms를 모든 global-AI admissio
 처리했고 deadline·NRx·conventional·AI-bound·horizon 위반과 duplicate execution이 모두
 0이었다. 양 home은 broker 상실 뒤 global AI를 닫고 local RAN을 끝까지 실행했다. 이는
 volatile fail-stop containment이며 restart/durable recovery/exactly-once 주장이 아니다.
-상세 판정은 [C128--132 결과](SOFTWALL_CONFIRM128_132_BROKER_CRASH_RESULT_KO.md)에 있다.
+상세 판정은 [C128--132 결과](../archive/SOFTWALL_CONFIRM128_132_BROKER_CRASH_RESULT_KO.md)에 있다.
 
 C133은 C132가 직접 주입하지 않은 post-prepare와 post-complete fault를 두 seed씩 검사했다.
 새 네 arm은 10,880 TB와 crash 탐지 뒤 9,962 TB에서 모든 safety 위반 0이었다. C132와
 합치면 prepare/commit/complete 각 두 arm, 총 16,320 TB다. Prepare ambiguity는 physical
 AI를 launch하지 않았고 complete ambiguity는 target AI를 정확히 한 번 실행했다. 상세
-matrix는 [C128--133 결과](SOFTWALL_CONFIRM128_133_CONTROL_FAULT_RESULT_KO.md)에 있다.
+matrix는 [C128--133 결과](../archive/SOFTWALL_CONFIRM128_133_CONTROL_FAULT_RESULT_KO.md)에 있다.
 
 C134는 같은 frozen contract를 다른 allocation과 node에서 prepare/commit/complete
 각 두 arm으로 재자격했다. 6/6 arm, 16,320 TB와 crash 뒤 14,926 TB에서 위반 0이었다.
-상세 판정은 [C134 독립 node 결과](SOFTWALL_CONFIRM134_INDEPENDENT_NODE_RESULT_KO.md)에 있다.
+상세 판정은 [C134 독립 node 결과](../archive/SOFTWALL_CONFIRM134_INDEPENDENT_NODE_RESULT_KO.md)에 있다.
 
 C138은 이 결과가 측정하지 않았던 faulting RPC wall time을 열었다. 첫 prepare-crash
 arm에서 5 ms timeout 호출 두 개가 5.205/5.831 ms에 반환돼 `rpc_wall_bound`만 실패했다.
@@ -1112,9 +1114,9 @@ C139는 timeout 5 ms와 admission wall bound 7 ms를 분리하고 세 RPC 21 ms�
 새 A100 node의 prepare/commit/complete 각 두 arm, 16,320 TB와 RPC 2,020회에서 최대
 5.653 ms, 7 ms 초과와 safety 위반은 0이었다. C140은 이 보정 계약의 AI35 conditional
 class를 두 arm·2,560 TB·target exchange 8회로 검증했다. 상세 판정은
-[C138–C140 결과](SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)에 있다.
+[C138–C140 결과](../archive/SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)에 있다.
 C141은 독립 node에서 같은 control 6 arm과 AI35 두 arm을 모두 통과했다. 두-node 결합
-판정은 [C141 결과](SOFTWALL_CONFIRM141_V13_INDEPENDENT_RESULT_KO.md)에 있다.
+판정은 [C141 결과](../archive/SOFTWALL_CONFIRM141_V13_INDEPENDENT_RESULT_KO.md)에 있다.
 
 ### 5.10 RQ9 — Pipelined global control
 
@@ -1225,11 +1227,11 @@ fault 뒤 radio continuation260도 qualified node에서 통과했다. 같은 최
 `nid001044` lifecycle은 sequence-1 NRx47.470 ms로 NRx45 bound를 깨 UQ다. 이 단계에서는
 cold/restart와 production expiry도 UQ였고, 아래 C164가 restart 후 재자격 subset만 별도로
 닫는다. 상세는
-[C159-Q1 결과](SOFTWALL_CONFIRM159_Q1_P180_RESULT_KO.md),
-[C159-Q2 결과](SOFTWALL_CONFIRM159_Q2_VARIABLE_RESULT_KO.md)와
+[C159-Q1 결과](../archive/SOFTWALL_CONFIRM159_Q1_P180_RESULT_KO.md),
+[C159-Q2 결과](../archive/SOFTWALL_CONFIRM159_Q2_VARIABLE_RESULT_KO.md)와
 [Q3 oracle 결과](../../results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json),
 [C160 결과](SOFTWALL_C160_FAULT_MODEL_RESULT_KO.md),
-[C161 1단계 결과](SOFTWALL_C161_PHASE1_RESULT_KO.md),
+[C161 1단계 결과](../archive/SOFTWALL_C161_PHASE1_RESULT_KO.md),
 [C161 2단계 결과](SOFTWALL_C161_PHASE2_RESULT_KO.md),
 [C162 예측 envelope 결과](SOFTWALL_C162_PREDICTIVE_ENVELOPE_RESULT_KO.md)에 있다.
 
@@ -1284,7 +1286,7 @@ fifth reject를 함께 보면, MPS 실패 → global obligation → AI-first adm
 
 All-fail 보장은 failure 확률에 의존하지 않으므로 correlation sweep은 safety necessity의
 필수 실험이 아니다. 허용된 all-fail 분기 하나면 current idleness만으로 guarantee를 만들 수
-없음을 보이기에 충분하다. 상세는 [필요성 반론 감사](SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에
+없음을 보이기에 충분하다. 상세는 [필요성 반론 감사](../archive/SOFTWALL_NECESSITY_GAP_DECISION_KO.md)에
 있다.
 
 ### 5.13 Evaluation 결론
@@ -1525,50 +1527,50 @@ lifecycle mode도 limitation/future work로 명시한다.
 
 ## Appendix B. 권위 문서
 
-- [현재 스킴과 노벨티 판정](SOFTWALL_CURRENT_SCHEME_AND_EVIDENCE_KO.md)
-- [Substrate/envelope 전환안](SOFTWALL_SUBSTRATE_ENVELOPE_PAPER_PLAN_KO.md)
+- [현재 스킴과 노벨티 판정](../archive/SOFTWALL_CURRENT_SCHEME_AND_EVIDENCE_KO.md)
+- [Substrate/envelope 전환안](../archive/SOFTWALL_SUBSTRATE_ENVELOPE_PAPER_PLAN_KO.md)
 - [실험 gate ledger](../../results/softwall_same_gpu/EXPERIMENT_GATE_LEDGER_KO.md)
-- [Bound-first 판정](SOFTWALL_BOUND_FIRST_DECISION_KO.md)
-- [C102 다중 사건 판정](SOFTWALL_MULTI_EVENT_POLICY_GATE_KO.md)
-- [AI-RAN workload gate](SOFTWALL_AI_RAN_WORKLOAD_GATE_KO.md)
+- [Bound-first 판정](../archive/SOFTWALL_BOUND_FIRST_DECISION_KO.md)
+- [C102 다중 사건 판정](../archive/SOFTWALL_MULTI_EVENT_POLICY_GATE_KO.md)
+- [AI-RAN workload gate](../archive/SOFTWALL_AI_RAN_WORKLOAD_GATE_KO.md)
 - [PUSCH timing contract](SOFTWALL_PUSCH_TIMING_CONTRACT_KO.md)
 - [선행 연구 감사](SOFTWALL_RELATED_WORK_AUDIT_KO.md)
-- [C113 강한 baseline 최종 판정](SOFTWALL_CONFIRM113_STRONG_BASELINE_RESULT_KO.md)
+- [C113 강한 baseline 최종 판정](../archive/SOFTWALL_CONFIRM113_STRONG_BASELINE_RESULT_KO.md)
 - [C113 feasibility-envelope 사후 감사](../../results/softwall_same_gpu/confirm113_feasibility_envelope_posthoc.json)
-- [멀티 GPU·모델링 고도화 로드맵](SOFTWALL_MULTIGPU_MODELING_ROADMAP_KO.md)
+- [멀티 GPU·모델링 고도화 로드맵](../archive/SOFTWALL_MULTIGPU_MODELING_ROADMAP_KO.md)
 - [4×A100 peer-access topology gate](../../results/softwall_multigpu/topology_peer_gate_job58815435.json)
-- [C114 멀티 GPU 결과](SOFTWALL_CONFIRM114_MULTIGPU_RESULT_KO.md)
+- [C114 멀티 GPU 결과](../archive/SOFTWALL_CONFIRM114_MULTIGPU_RESULT_KO.md)
 - [C114 aggregate gate](../../results/softwall_multigpu/confirm114_multigpu_gates_job58815435.json)
 - [C114 artifact manifest](../../results/softwall_multigpu/confirm114_artifact_manifest.json)
-- [C157 actual NeuralRx 통합 결과](SOFTWALL_CONFIRM157_ACTUAL_NRX_RESULT_KO.md)
+- [C157 actual NeuralRx 통합 결과](../archive/SOFTWALL_CONFIRM157_ACTUAL_NRX_RESULT_KO.md)
 - [C157 두 노드 결합 판정](../../results/softwall_multigpu/confirm157_actual_nrx_two_node.json)
-- [C158 반복 actual NeuralRx 자격](SOFTWALL_CONFIRM158_REPEATED_QUALIFICATION_KO.md)
+- [C158 반복 actual NeuralRx 자격](../archive/SOFTWALL_CONFIRM158_REPEATED_QUALIFICATION_KO.md)
 - [C158 두 노드 결합 판정](../../results/softwall_multigpu/confirm158_repeated_actual_nrx_two_node.json)
 - [C158 manifest](../../results/softwall_multigpu/confirm158_repeated_actual_nrx_manifest.json)
-- [C159 actual-NRx trace 사전 명세](SOFTWALL_CONFIRM159_TRACE_PROTOCOL_KO.md)
-- [C159-Q1 P180 두 노드 결과](SOFTWALL_CONFIRM159_Q1_P180_RESULT_KO.md)
+- [C159 actual-NRx trace 사전 명세](../archive/SOFTWALL_CONFIRM159_TRACE_PROTOCOL_KO.md)
+- [C159-Q1 P180 두 노드 결과](../archive/SOFTWALL_CONFIRM159_Q1_P180_RESULT_KO.md)
 - [C159-Q1 결합 판정](../../results/softwall_multigpu/confirm159_q1_p180_two_node.json)
 - [C159-Q1 manifest](../../results/softwall_multigpu/confirm159_q1_p180_manifest.json)
-- [C159-Q2 variable-context 두 노드 결과](SOFTWALL_CONFIRM159_Q2_VARIABLE_RESULT_KO.md)
+- [C159-Q2 variable-context 두 노드 결과](../archive/SOFTWALL_CONFIRM159_Q2_VARIABLE_RESULT_KO.md)
 - [C159-Q2 결합 판정](../../results/softwall_multigpu/confirm159_q2_variable_two_node.json)
-- [C159-Q3 oracle 결과](SOFTWALL_CONFIRM159_Q3_ORACLE_RESULT_KO.md)
+- [C159-Q3 oracle 결과](../archive/SOFTWALL_CONFIRM159_Q3_ORACLE_RESULT_KO.md)
 - [C159-Q3 machine result](../../results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json)
-- [C115 같은 예산 멀티 GPU baseline](SOFTWALL_CONFIRM115_MULTIGPU_BASELINE_RESULT_KO.md)
-- [C116 three-endpoint 결과](SOFTWALL_CONFIRM116_THREE_ENDPOINT_RESULT_KO.md)
-- [C117 component-bound 실패 경계](SOFTWALL_CONFIRM117_COMPONENT_BOUND_RESULT_KO.md)
-- [C118 component-bound 재자격](SOFTWALL_CONFIRM118_COMPONENT_REQUALIFICATION_RESULT_KO.md)
-- [C119/C120 4-GPU 결과](SOFTWALL_CONFIRM119_120_FOUR_GPU_RESULT_KO.md)
+- [C115 같은 예산 멀티 GPU baseline](../archive/SOFTWALL_CONFIRM115_MULTIGPU_BASELINE_RESULT_KO.md)
+- [C116 three-endpoint 결과](../archive/SOFTWALL_CONFIRM116_THREE_ENDPOINT_RESULT_KO.md)
+- [C117 component-bound 실패 경계](../archive/SOFTWALL_CONFIRM117_COMPONENT_BOUND_RESULT_KO.md)
+- [C118 component-bound 재자격](../archive/SOFTWALL_CONFIRM118_COMPONENT_REQUALIFICATION_RESULT_KO.md)
+- [C119/C120 4-GPU 결과](../archive/SOFTWALL_CONFIRM119_120_FOUR_GPU_RESULT_KO.md)
 - [C119/C120 artifact manifest](../../results/softwall_multigpu/confirm119_120_artifact_manifest.json)
-- [C121/C122 sharded-home 결과](SOFTWALL_CONFIRM121_122_SHARDED_HOME_RESULT_KO.md)
-- [C123--126 global AI 결과](SOFTWALL_CONFIRM123_126_GLOBAL_AI_RESULT_KO.md)
-- [C127 broker fault containment 결과](SOFTWALL_CONFIRM127_BROKER_FAULT_RESULT_KO.md)
-- [C128--132 broker fail-stop/control-budget 결과](SOFTWALL_CONFIRM128_132_BROKER_CRASH_RESULT_KO.md)
-- [C128--133 full control-point fault matrix](SOFTWALL_CONFIRM128_133_CONTROL_FAULT_RESULT_KO.md)
+- [C121/C122 sharded-home 결과](../archive/SOFTWALL_CONFIRM121_122_SHARDED_HOME_RESULT_KO.md)
+- [C123--126 global AI 결과](../archive/SOFTWALL_CONFIRM123_126_GLOBAL_AI_RESULT_KO.md)
+- [C127 broker fault containment 결과](../archive/SOFTWALL_CONFIRM127_BROKER_FAULT_RESULT_KO.md)
+- [C128--132 broker fail-stop/control-budget 결과](../archive/SOFTWALL_CONFIRM128_132_BROKER_CRASH_RESULT_KO.md)
+- [C128--133 full control-point fault matrix](../archive/SOFTWALL_CONFIRM128_133_CONTROL_FAULT_RESULT_KO.md)
 - [C128--132 artifact manifest](../../results/softwall_multigpu/confirm128_132_artifact_manifest.json)
 - [Sharded-home envelope v7](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v7.json)
-- [Endpoint-only multi-GPU envelope v1](SOFTWALL_ENDPOINT_OFFLOAD_ENVELOPE_RESULT_KO.md)
+- [Endpoint-only multi-GPU envelope v1](../archive/SOFTWALL_ENDPOINT_OFFLOAD_ENVELOPE_RESULT_KO.md)
 - [형식 모델과 입증 의무](SOFTWALL_FORMAL_MODEL_KO.md)
-- [C134 독립 allocation/node 재자격](SOFTWALL_CONFIRM134_INDEPENDENT_NODE_RESULT_KO.md)
+- [C134 독립 allocation/node 재자격](../archive/SOFTWALL_CONFIRM134_INDEPENDENT_NODE_RESULT_KO.md)
 - [Sharded-home envelope v8](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v8.json)
 - [Sharded-home envelope v10](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v10.json)
 - [V10 validation summary](../../results/softwall_multigpu/softwall_envelope_v10_validation_summary.json)
@@ -1584,27 +1586,27 @@ lifecycle mode도 limitation/future work로 명시한다.
 - [V10→V11 regression](../../results/softwall_multigpu/softwall_envelope_v10_v11_ring_phase_regression_v1.json)
 - [V11→V12 guard regression](../../results/softwall_multigpu/softwall_envelope_v11_v12_ai_guard_regression_v1.json)
 - [C135 static counterfactual](../../results/softwall_multigpu/confirm135_static_counterfactual_audit_v1.json)
-- [C135 V11 AI40 결과](SOFTWALL_CONFIRM135_V11_AI40_RESULT_KO.md)
-- [C136 V12 독립 node 결과](SOFTWALL_CONFIRM136_V12_REQUALIFICATION_RESULT_KO.md)
+- [C135 V11 AI40 결과](../archive/SOFTWALL_CONFIRM135_V11_AI40_RESULT_KO.md)
+- [C136 V12 독립 node 결과](../archive/SOFTWALL_CONFIRM136_V12_REQUALIFICATION_RESULT_KO.md)
 - [C135/C136 combined audit](../../results/softwall_multigpu/confirm135_136_combined_v12_qualification.json)
 - [V12 cross-node validation summary](../../results/softwall_multigpu/softwall_envelope_v12_cross_node_validation_summary.json)
 - [V12 cross-node manifest](../../results/softwall_multigpu/softwall_envelope_v12_cross_node_manifest.json)
-- [C137 service-bound telemetry](SOFTWALL_CONFIRM137_SERVICE_BOUND_TELEMETRY_RESULT_KO.md)
+- [C137 service-bound telemetry](../archive/SOFTWALL_CONFIRM137_SERVICE_BOUND_TELEMETRY_RESULT_KO.md)
 - [Service-bound qualification 방법론](SOFTWALL_SERVICE_BOUND_QUALIFICATION_KO.md)
 - [Service-bound qualification v2](../../results/softwall_multigpu/softwall_service_bound_qualification_v2.json)
 - [C137 artifact manifest](../../results/softwall_multigpu/confirm137_artifact_manifest.json)
 - [Service-bound v2 manifest](../../results/softwall_multigpu/softwall_service_bound_v2_manifest.json)
-- [C138–C140 control-bound correction](SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)
+- [C138–C140 control-bound correction](../archive/SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)
 - [Envelope V13 prediction](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v13.json)
 - [V12→V13 regression](../../results/softwall_multigpu/softwall_envelope_v12_v13_control_bound_regression_v1.json)
 - [V13 validation summary](../../results/softwall_multigpu/softwall_envelope_v13_validation_summary.json)
 - [Service-bound qualification v3](../../results/softwall_multigpu/softwall_service_bound_qualification_v3.json)
 - [V13 corrected-control manifest](../../results/softwall_multigpu/softwall_v13_corrected_control_manifest.json)
-- [C141 corrected V13 독립-node 재자격](SOFTWALL_CONFIRM141_V13_INDEPENDENT_RESULT_KO.md)
+- [C141 corrected V13 독립-node 재자격](../archive/SOFTWALL_CONFIRM141_V13_INDEPENDENT_RESULT_KO.md)
 - [Service-bound qualification v4](../../results/softwall_multigpu/softwall_service_bound_qualification_v4.json)
 - [V13 cross-node manifest](../../results/softwall_multigpu/softwall_v13_cross_node_manifest.json)
-- [V14 pipelined-control 설계](SOFTWALL_PIPELINED_CONTROL_DESIGN_KO.md)
-- [C142--C144 V14 결과](SOFTWALL_CONFIRM142_144_V14_PIPELINED_RESULT_KO.md)
+- [V14 pipelined-control 설계](../archive/SOFTWALL_PIPELINED_CONTROL_DESIGN_KO.md)
+- [C142--C144 V14 결과](../archive/SOFTWALL_CONFIRM142_144_V14_PIPELINED_RESULT_KO.md)
 - [Pipelined-control finite model](../../results/softwall_multigpu/softwall_pipelined_control_model_v1.json)
 - [Envelope V14 prediction](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v14.json)
 - [V14 validation summary](../../results/softwall_multigpu/softwall_envelope_v14_validation_summary.json)
@@ -1612,37 +1614,37 @@ lifecycle mode도 limitation/future work로 명시한다.
 - [C143 control-fault result](../../results/softwall_multigpu/confirm143_v14_control_faults_result.json)
 - [C144 independent-node result](../../results/softwall_multigpu/confirm144_v14_independent_node_result.json)
 - [V14 immutable manifest](../../results/softwall_multigpu/softwall_v14_pipelined_control_manifest.json)
-- [V14 ownership 반례와 V15 교정](SOFTWALL_V14_OWNERSHIP_CORRECTION_KO.md)
-- [C145--C146 V15 결과](SOFTWALL_CONFIRM145_146_V15_SINGLE_TOKEN_RESULT_KO.md)
+- [V14 ownership 반례와 V15 교정](../archive/SOFTWALL_V14_OWNERSHIP_CORRECTION_KO.md)
+- [C145--C146 V15 결과](../archive/SOFTWALL_CONFIRM145_146_V15_SINGLE_TOKEN_RESULT_KO.md)
 - [V14→V15 ownership regression](../../results/softwall_multigpu/softwall_v14_v15_staged_ownership_regression_v1.json)
 - [Pipelined-control finite model v2](../../results/softwall_multigpu/softwall_pipelined_control_model_v2.json)
 - [Finite-model semantic reproducibility](../../results/softwall_multigpu/softwall_pipelined_control_model_v2_reproducibility_v1.json)
 - [Envelope V15 prediction](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v15.json)
 - [V15 validation summary](../../results/softwall_multigpu/softwall_envelope_v15_validation_summary.json)
 - [V15 immutable manifest](../../results/softwall_multigpu/softwall_v15_single_token_manifest.json)
-- [C147--C148 V16 four-point 결과](SOFTWALL_CONFIRM147_148_V16_FOUR_POINT_RESULT_KO.md)
+- [C147--C148 V16 four-point 결과](../archive/SOFTWALL_CONFIRM147_148_V16_FOUR_POINT_RESULT_KO.md)
 - [Envelope V16 prediction](../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v16.json)
 - [V16 validation summary](../../results/softwall_multigpu/softwall_envelope_v16_validation_summary.json)
 - [V16 immutable manifest](../../results/softwall_multigpu/softwall_v16_four_point_manifest.json)
-- [V17 shared-recovery control-plane 모델](SOFTWALL_SHARED_RECOVERY_V17_MODEL_KO.md)
+- [V17 shared-recovery control-plane 모델](../archive/SOFTWALL_SHARED_RECOVERY_V17_MODEL_KO.md)
 - [V17 finite-state 결과](../../results/softwall_multigpu/softwall_shared_recovery_model_v1.json)
 - [V17 model manifest](../../results/softwall_multigpu/softwall_shared_recovery_model_v1_manifest.json)
-- [C151/C152 shared cuPHY path](SOFTWALL_CONFIRM151_152_SHARED_RECOVERY_PATH_KO.md)
+- [C151/C152 shared cuPHY path](../archive/SOFTWALL_CONFIRM151_152_SHARED_RECOVERY_PATH_KO.md)
 - [C151/C152 combined qualification](../../results/softwall_multigpu/confirm151_152_shared_conventional_qualification.json)
 - [C151/C152 transitive manifest](../../results/softwall_multigpu/confirm151_152_shared_conventional_manifest.json)
-- [C153 integrated canary 결과](SOFTWALL_CONFIRM153_INTEGRATED_RESULT_KO.md)
+- [C153 integrated canary 결과](../archive/SOFTWALL_CONFIRM153_INTEGRATED_RESULT_KO.md)
 - [C153 development manifest](../../results/softwall_multigpu/confirm153_development_manifest.json)
-- [C154/C155 controlled integrated holdout](SOFTWALL_CONFIRM154_155_CONTROLLED_HOLDOUT_KO.md)
+- [C154/C155 controlled integrated holdout](../archive/SOFTWALL_CONFIRM154_155_CONTROLLED_HOLDOUT_KO.md)
 - [C154/C155 combined result](../../results/softwall_multigpu/confirm154_155_controlled_integrated_holdout.json)
 - [C154/C155 manifest](../../results/softwall_multigpu/confirm154_155_integrated_holdout_manifest.json)
-- [C156 GPU timeline과 V17.1 교정](SOFTWALL_CONFIRM156_GPU_TIMELINE_RESULT_KO.md)
+- [C156 GPU timeline과 V17.1 교정](../archive/SOFTWALL_CONFIRM156_GPU_TIMELINE_RESULT_KO.md)
 - [C156 passing result](../../results/softwall_multigpu/confirm156_timeline_attempt3_job58853926_result.json)
 - [C156b independent-node result](../../results/softwall_multigpu/confirm156b_timeline_holdout_job58854401_result.json)
 - [C156/C156b combined result](../../results/softwall_multigpu/confirm156_156b_two_node_gpu_timeline.json)
 - [C156 manifest](../../results/softwall_multigpu/confirm156_gpu_timeline_manifest.json)
-- [C160--C162 fault/envelope 실행 계획](SOFTWALL_C160_C162_EXPERIMENT_PLAN_KO.md)
+- [C160--C162 fault/envelope 실행 계획](../archive/SOFTWALL_C160_C162_EXPERIMENT_PLAN_KO.md)
 - [C160 fault state-model 결과](SOFTWALL_C160_FAULT_MODEL_RESULT_KO.md)
-- [C161 1단계 physical fault 결과](SOFTWALL_C161_PHASE1_RESULT_KO.md)
+- [C161 1단계 physical fault 결과](../archive/SOFTWALL_C161_PHASE1_RESULT_KO.md)
 - [C161 1단계 결합 판정](../../results/softwall_multigpu/c161_phase1_two_node.json)
 - [C161 1단계 artifact manifest](../../results/softwall_multigpu/c161_phase1_manifest.json)
 - [C161 2단계 physical fault 결과](SOFTWALL_C161_PHASE2_RESULT_KO.md)
@@ -1653,7 +1655,7 @@ lifecycle mode도 limitation/future work로 명시한다.
 - [C162 scheduler scalability](../../results/softwall_multigpu/c162_scheduler_scalability_v1.json)
 - [C162 envelope/scalability figure](figures/softwall_c162_envelope_scalability.pdf)
 - [C162 artifact manifest](../../results/softwall_multigpu/c162_artifact_manifest.json)
-- [C162 이후 production/cross-family 실험 계획](SOFTWALL_POST_C162_EXPERIMENT_PLAN_KO.md)
+- [C162 이후 production/cross-family 실험 계획](../archive/SOFTWALL_POST_C162_EXPERIMENT_PLAN_KO.md)
 - [C163 production timing readiness](../../results/softwall_multigpu/c163_du_timing_readiness_v2.json)
 - [Production exit gate와 고도화 계획](SOFTWALL_PRODUCTION_EXIT_PLAN_KO.md)
 - [Machine-readable production exit gate v2](../../results/softwall_multigpu/softwall_production_exit_gate_v2.json)
@@ -1669,11 +1671,11 @@ lifecycle mode도 limitation/future work로 명시한다.
 - [C164 durable reconnect state-model audit](../../results/softwall_multigpu/c164_reconnect_model_v1.json)
 - [C164 same-worker reconnect two-node 판정](../../results/softwall_multigpu/c164_reconnect_two_node.json)
 - [C164 reconnect artifact manifest](../../results/softwall_multigpu/c164_reconnect_manifest.json)
-- [실험 중단선과 원고 전환 결정](SOFTWALL_EXPERIMENT_STOP_AND_MANUSCRIPT_PLAN_KO.md)
+- [실험 중단선과 원고 전환 결정](../archive/SOFTWALL_EXPERIMENT_STOP_AND_MANUSCRIPT_PLAN_KO.md)
 - [Machine-readable experiment stop decision](../../results/softwall_multigpu/softwall_experiment_stop_decision_v1.json)
 - [영문 원고 초안](SOFTWALL_MANUSCRIPT_DRAFT_EN.md)
 - [Novelty defense matrix](SOFTWALL_NOVELTY_DEFENSE_MATRIX_KO.md)
 - [Machine-readable manuscript claim audit](../../results/softwall_multigpu/softwall_manuscript_claim_audit_v1.json)
 - [System contract figure](figures/softwall_system_contract.pdf)
 - [SIGMETRICS 2027 submission plan](SOFTWALL_SIGMETRICS27_SUBMISSION_PLAN_KO.md)
-- [V17 최종 실험 계획](SOFTWALL_FINAL_EXPERIMENT_PLAN_KO.md)
+- [V17 최종 실험 계획](../archive/SOFTWALL_FINAL_EXPERIMENT_PLAN_KO.md)

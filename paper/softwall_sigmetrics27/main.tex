@@ -496,6 +496,7 @@ hashed artifacts. Generative AI produced no experimental measurement or ground-t
 
 \subsection{MPS is a mechanism, not the contract}
 
+% provenance: Q1_MPS_DIAGNOSTICS
 Under separate-client overrun, active-thread caps of 100\% and 20\% produced 2/1,500 and 1/1,500
 deadline misses. A later lifecycle comparison observed 0/10,000 misses for a CPU socket sham and
 12/10,000 for the GPU/MPS-client arm. These tests do not establish a universal failure probability.
@@ -503,6 +504,7 @@ They show that cap selection alone cannot be the certificate used by this paper.
 
 \subsection{End-to-end variable-class qualification}
 
+% provenance: Q2_WARM_PATH
 The authoritative warm \texttt{P180/D155} campaign used independent development and holdout nodes with
 the same frozen source and different seeds. It admitted Qwen contexts from 16 to 512 tokens with class
 bounds $\{35,35,35,40,65,75\}$\,ms.
@@ -532,6 +534,7 @@ certificate revalidation; no Qwen kernel began after its latest-start.
 
 \subsection{Fault closure}
 
+% provenance: C160_FAULT
 A finite-state audit checked 51 combinations of epoch, generation, fence, and marker state with no
 invariant violation. The physical A0--A6 campaign covered clean operation, correlated \NRx failure,
 reply delay before and after physical completion, stale and duplicate responses, terminal channel
@@ -544,6 +547,7 @@ whole-path bound and was retained as \UQ rather than pooled into the passing res
 
 \subsection{Predicting an unopened physical boundary}
 
+% provenance: C162_ENVELOPE
 The envelope was compared with exact feasibility on 16,023 qualified states and retrospectively with
 1,200 physical decisions; both had zero mismatch. We then froze seven physical boundary cases before
 execution. Every round ran four actual \NRx requests and used controlled suffix faults to set unresolved
@@ -568,6 +572,7 @@ rounds, while 89\,ms or later was rejected in 30/30.
 
 \subsection{Certified scheduler scalability}
 
+% provenance: C162_SCHEDULER
 The polynomial candidate scheduler tries five deterministic list orders and returns the first schedule
 accepted by an independent verifier. On 600 heterogeneous small states, exact search accepted 504 and
 the certified scheduler accepted 494: false-safe was zero and false-conservative was ten. On the
@@ -579,6 +584,7 @@ was 0.131\,ms. These are finite-run CPU measurements.
 
 \subsection{What the certificate prevents}
 
+% provenance: C162_NECESSITY
 Two prespecified C162 cases isolate necessity from throughput. In E4, two recovery debts remain at
 45\,ms and a context-256 AI request is visible. Mandatory-only recovery is feasible, but admitting the
 AI transaction yields a bound-respecting completion of 165\,ms, 12\,ms past the 153\,ms radio guard.
@@ -625,6 +631,7 @@ improve in the evaluated trace.
 
 \subsection{Strong baseline and no material headroom}
 
+% provenance: C159_BASELINE
 We compare \sys with the certificate-preserving recovery-first system described above. The only
 semantic difference is
 whether external AI may execute before unresolved recovery is physically completed. On four
@@ -639,6 +646,7 @@ higher-throughput optimizer for this trace.
 
 \subsection{Lifecycle qualification}
 
+% provenance: C164_LIFECYCLE
 The paper's lifecycle matrix intentionally contains five qualified or partial subsets and five \UQ
 modes (Table~\ref{tab:lifecycle}). Qualified evidence covers warm persistent operation, a first request
 after 30\,s idle, MPS restart followed by full requalification, mandatory radio continuity during Qwen
@@ -679,6 +687,7 @@ CRC-bearing UL indications at $T0+4.5$\,ms; its validator reconstructs slot $T0$
 handler arrival as late. NVIDIA describes testMAC as a developer L2 for a controlled environment, so
 this is a vendor integration target rather than a field-DU \texttt{d\_MAC}.
 
+% provenance: P2_FAST_PATH_AND_STAGE
 Under optimistic clean, warm, no-AI conditions, local wait-then-recover and same-GPU speculative paths
 completed 0/1,000 requests within 4.5\,ms. Moving precomputed \NRx inputs to GPU1 also completed
 0/1,000. Moving channel estimation through CRC behind raw-IQ P2P improved completion to 852/1,000
@@ -697,6 +706,7 @@ FP32 engine built as in the public notebook, conventional decoding succeeded in 
 \NRx succeeded in none. This localizes the gap to an unsupported model/channel interface or domain
 rather than a simple power, radio-profile, transmitter, or precision setting.
 
+% provenance: P3_CHANNEL_HOLDOUT
 We next reconstructed the public Sionna 1.0.2/TensorFlow 2.19 contract. Clean MCS7 and default
 Rayleigh controls passed, and a fixed development matrix identified CDL-D/E at 100\,ns as holdout
 candidates while preserving A/B/C failures. Before opening new payload, slot, and channel seeds, we
@@ -782,8 +792,13 @@ must be requalified.
 Third, all authoritative hardware results use the A100 family. Four-GPU and multi-home paths exercise
 NVLink P2P, but cross-family validity is untested.
 
+% provenance: C158_LONG_TAIL
 Fourth, the fault model excludes arbitrary GPU/driver hang and full process-replacement recovery. Five
-lifecycle modes remain \UQ, and a separate long-tail observation has an unresolved root cause.
+lifecycle modes remain \UQ. In C158 attempt 4, one \NRx completion reached 350.948\,ms in a
+400-request run whose \NRx p99 was 8.111\,ms, a 43.3$\times$ p99 excursion; the run consequently had
+4/400 deadline misses. Targeted 30\,s-idle, quiescent MPS-restart/requalification, Qwen-reload, and
+same-worker reconnect campaigns did not reproduce that excursion. Its root cause therefore remains
+unresolved, and none of those lifecycle results qualifies the C158 tail away.
 
 Fifth, PHY generalization is limited. External Aerial TDL-A development screens retained conventional
 success on every ten-TB arm and \NRx success on none after testing normalization, public-reference

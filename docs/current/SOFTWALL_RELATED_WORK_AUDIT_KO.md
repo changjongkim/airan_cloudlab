@@ -1,8 +1,8 @@
 **SoftWall의 AI-RAN 선행 연구와 차별화 검토 — 2026-09-24**
 
-대상: [원 계획서](RESEARCH_PLAN_SOFTWALL_KO.md), [구체 스킴](SOFTWALL_SCHEME_AND_NEXT_STEPS_KO.md), [타당성 검토](RESEARCH_PLAN_SOFTWALL_REVIEW_KO.md).
+대상: [원 계획서](../archive/RESEARCH_PLAN_SOFTWALL_KO.md), [구체 스킴](../archive/SOFTWALL_SCHEME_AND_NEXT_STEPS_KO.md), [타당성 검토](../archive/RESEARCH_PLAN_SOFTWALL_REVIEW_KO.md).
 
-후속 검토: [novelty thesis와 입증 기준](SOFTWALL_NOVELTY_THESIS_KO.md). AI-RAN 밖의 primary–backup scheduling, optional/mandatory 및 wind-up 모델, Neural Simplex도 추가 비교 대상으로 확인했다. 복구 예약 자체를 새 기여로 확정하지 않으며, 내부 DART 구현의 존재와 외부 선행 연구 중복을 구분한다.
+후속 검토: [novelty thesis와 입증 기준](../archive/SOFTWALL_NOVELTY_THESIS_KO.md). AI-RAN 밖의 primary–backup scheduling, optional/mandatory 및 wind-up 모델, Neural Simplex도 추가 비교 대상으로 확인했다. 복구 예약 자체를 새 기여로 확정하지 않으며, 내부 DART 구현의 존재와 외부 선행 연구 중복을 구분한다.
 
 **판정: 유사 연구가 있다. AI-RAN, GPU 공유, deadline-aware admission, conventional 경로,
 bounded background 실행, P2P endpoint는 각각 새 기여가 아니다.** 이번 공개 본문 검토에서
@@ -257,7 +257,7 @@ all-fail executable calendar, external-AI lease와 provenance-qualified predicti
 
 | 순서 | 질문 / 실험 | 얻어야 할 증거 |
 |---|---|---|
-| 0 | 실제 release→전송→NRx→LDPC/CRC→commit과 conventional 경로가 deadline에 들어오는가? | [타당성 검토](RESEARCH_PLAN_SOFTWALL_REVIEW_KO.md)의 P0를 먼저 통과. 실제 PHY expiry와 실험용 timeout을 구분 |
+| 0 | 실제 release→전송→NRx→LDPC/CRC→commit과 conventional 경로가 deadline에 들어오는가? | [타당성 검토](../archive/RESEARCH_PLAN_SOFTWALL_REVIEW_KO.md)의 P0를 먼저 통과. 실제 PHY expiry와 실험용 timeout을 구분 |
 | 1 | 여러 셀의 NRx tail이 동시에 늘어나면 recovery가 밀리는가? | 독립/고정 예약 대비 joint 예약의 효과; recovery burst와 예약 비용을 함께 측정 |
 | 2 | 동일 무선 입력에서 GPU 간섭·queue만 바뀌면 어떤 선택이 이득인가? | radio-only gate 및 queue-only placement로 충분하지 않은 구간과 원인을 제시 |
 | 3 | 늦은 DMA·kernel이 다음 요청 버퍼에 영향을 주는가? | 물리 완료 전 재사용 금지, 만료 결과 격리, 중복 commit 방지. correctness 증거로 분류 |

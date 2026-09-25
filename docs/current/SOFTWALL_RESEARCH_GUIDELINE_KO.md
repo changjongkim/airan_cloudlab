@@ -2,7 +2,7 @@
 
 **작성:** 2026-09-21 KST
 **적용:** confirm51 이후의 모든 라운드
-**역할:** *무엇을* 할지는 [노벨리티 실행안](SOFTWALL_NOVELTY_ACTION_PLAN_KO.md)이 정하고, 이 문서는 *어떻게* 할지를 정한다.
+**역할:** *무엇을* 할지는 [노벨리티 실행안](../archive/SOFTWALL_NOVELTY_ACTION_PLAN_KO.md)이 정하고, 이 문서는 *어떻게* 할지를 정한다.
 **근거:** confirm2–50 라운드의 실제 진행 패턴 분석
 
 ---

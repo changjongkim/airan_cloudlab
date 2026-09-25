@@ -29,6 +29,19 @@ NECESSITY = ROOT / "results" / "softwall_multigpu" / "softwall_necessity_witness
 CFP = ROOT / "results" / "softwall_multigpu" / "sigmetrics27_cfp_recheck_v1.json"
 PRODUCTION = ROOT / "results" / "softwall_multigpu" / "softwall_production_exit_gate_v2.json"
 OUT = ROOT / "results" / "softwall_multigpu" / "softwall_sigmetrics_submission_audit_v1.json"
+PROVENANCE_MARKERS = (
+    "Q1_MPS_DIAGNOSTICS",
+    "Q2_WARM_PATH",
+    "C160_FAULT",
+    "C162_ENVELOPE",
+    "C162_SCHEDULER",
+    "C162_NECESSITY",
+    "C159_BASELINE",
+    "C164_LIFECYCLE",
+    "P2_FAST_PATH_AND_STAGE",
+    "P3_CHANNEL_HOLDOUT",
+    "C158_LONG_TAIL",
+)
 
 
 def sha256(path):
@@ -176,6 +189,14 @@ def main():
             and "885/1,000" in tex
             and "External Aerial TDL-A" in tex
             and r"31 \NRx-only versus 12 conventional-only" in tex
+        ),
+        "quantitative_provenance_preserved": (
+            upstream.get("checks", {}).get("quantitative_provenance_complete") is True
+            and len(upstream.get("evidence", {}).get("quantitative_provenance", [])) >= 70
+            and all(f"% provenance: {marker}" in tex for marker in PROVENANCE_MARKERS)
+            and "350.948\\,ms" in tex
+            and "8.111\\,ms" in tex
+            and "4/400 deadline misses" in tex
         ),
         "reproducibility_statement_present": r"\paragraph{Reproducibility.}" in tex,
         "intro_artifact_plan_present": (

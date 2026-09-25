@@ -1,0 +1,24 @@
+{
+  "artifact_sha256": {
+    "results/softwall_multigpu/c164a2_idle30_dev_j58861564_peer_spec.json": "0c49abeb6859cc17a758311aa41a164c2bec76fd9253dd780b95a96c66c8f34b",
+    "results/softwall_multigpu/c164a2_idle30_dev_j58861564_protocol.json": "c80067c64b537672097cad5e26f4e97066c9eb6513fdec7dc4cfd30c80a1087b",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_coordinator.json": "95dae641b9870007fdf0dc2439853268d4ba773a94121d0dee6516058c702372",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_home0_h0-r0_owner.json": "28177a08862edf362e088f9c72b4c40dd61e08e156ee603e54d23ccad90fa420",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_home0_h0-r1_owner.json": "ce05999b84d58bae7b4310ef4d7918feb6f3aa20db7b49e42a5d1b4494c4531e",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_home0_h0-r2_owner.json": "e860dbd720dfeee6c29c7eca20878d810fc92b2fa0c23bca8d48fdd6b4b1a2b3",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_home1_h1-r0_owner.json": "f049db08c6e6a9bbff41fb8cf928f0e8b33c72d8c122e002a8c55b33283ee8ef",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_idle_marker.json": "d6fe14d85615b53d270bf4037a5c908ca35b0c46b8fdabe365d3fbaa311b4c1e",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_nrx_worker.json": "024bcad6e4edc3d43512ef78dfe3205fd8fdf5169541201ecf13cc98451d23bc",
+    "results/softwall_multigpu/raw/c164a2_idle30_dev_j58861564_qwen.json": "a7394270e1820f94a2b72c57552fb17379e56539b3b08ebe6f7e62e8205320be"
+  },
+  "attempt": 2,
+  "cause": "publishing the schedule before a 30-second idle caused the unchanged 5-second request wait timeout to expire before release",
+  "correction": "moved the lifecycle idle after all readiness but before schedule publication; restored the original 3-second release lead and 5-second request timeout",
+  "job": "58861564",
+  "node": "nid001169",
+  "observed_schedule_to_release_idle_s": 32.996801959,
+  "qualification_sample": false,
+  "schema": "softwall-c164-development-failure-v1",
+  "status": "LIFECYCLE_DESIGN_FAIL",
+  "timed_rounds_completed": 0
+}

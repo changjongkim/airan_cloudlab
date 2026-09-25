@@ -1,0 +1,56 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm82_four_cell_persistent_mode_service_bound_qualification",
+  "frozen_before_full_execution": true,
+  "job": "58738952",
+  "node": "nid001229",
+  "iterations_per_arm": 3000,
+  "cells": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "current_nrx_bound_ms": 50,
+  "current_conv_bound_ms": 25,
+  "ai_budget_ms": 15,
+  "ai_rpc_timeout_ms": 12,
+  "ai_deadline_ms": 50,
+  "gate_threshold": 1.9490545988082886,
+  "inject_correlated_failure_every": 5,
+  "candidate_warm_nrx_bounds_ms": [
+    25,
+    30
+  ],
+  "candidate_warm_conv_bounds_ms": [
+    8
+  ],
+  "tail_window_start_release": 2500,
+  "arms": [
+    {
+      "name": "a",
+      "prefix": "confirm82_bound_a_job58738952",
+      "payload_seed": 20820051,
+      "channel_seed_base": 20821000
+    },
+    {
+      "name": "b",
+      "prefix": "confirm82_bound_b_job58738952",
+      "payload_seed": 20820052,
+      "channel_seed_base": 20831000
+    }
+  ],
+  "frozen_gates": "Two independent 3,000-release persistent warm-mode runs on the same MPS GPU and unchanged four-cell controller: source/provenance/contract, zero observed deadline/current B_NRx50/B_conv25/AI15/guard/fault/credit violations and complete worker counts. Candidate warm-mode NRx25/30 and conventional8 are separately reported PASS/FAIL from full host paths; no candidate is elevated to a hard WCET by this campaign. Preserve any run failure as failure, do not substitute shorter traces.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_confirm80_four_cell_ai15.sh": "30629012f233e0b59aaea449d92a6837e8884892cbff447e504fd2cda9b840cf",
+    "scripts_for_node/softwall_same_gpu/four_cell_atomic_lease_controller.py": "0eea53aabfb5d073ad2d084029e04377738f03da4c87d1219b29efe136f33272",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm80_four_cell_ai15.py": "815de8e01b6ff816f9820b987b9d04800e42636167acabf7fe0c15c14df63abe",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/s2_runner.py": "8bb2f65e2c7c1cac655b7c2d82e7ae8d3500b377b8ecde44ef491333a855be7c",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "4573034b0f3b09c27f756d661a77eb4e7660c7981a711c7f9e5665e8a0716279",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm82_bound_campaign.py": "ba82c45ceee5c4b6aee681f3b0881cf426b2070cfd2480e64189fdf59b45e017"
+  },
+  "limits": "This is only the persistent, prewarmed four-cell co-run mode with fixed low PHY gate and synthetic P180/D155. Confirm40 unprewarmed first conventional fallback took 22.756/35.303 ms and remains a distinct cold mode. Confirm43/44 one-endpoint cap80 10,000-release NRx GPU front/post tails exceeded 30 ms near release 2740; this campaign tests whether the tail transfers to the new mode. Statistical sample maxima are not WCET, and no actual DU deadline or joint-versus-greedy performance claim follows."
+}

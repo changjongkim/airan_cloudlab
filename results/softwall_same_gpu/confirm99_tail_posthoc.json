@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-confirm99-first-release-tail-posthoc-v1",
+  "evidence_grade": "posthoc_timing_explanation",
+  "frozen_parent_safety_pass": false,
+  "violating_release": 0,
+  "cell": 0,
+  "declared_nrx_bound_ms": 45,
+  "observed_nrx_response_ms": 48.604562,
+  "nrx_worker_published_ms_from_release": 16.98997,
+  "nrx_controller_observed_ms_from_release": 48.604562,
+  "worker_to_controller_observation_gap_ms": 31.614592,
+  "pre_observation_ai_interval_ms": [
+    15.79669,
+    39.861983
+  ],
+  "early_mandatory_conventional_intervals_ms": [
+    [
+      39.91713,
+      42.715936
+    ],
+    [
+      42.718211,
+      45.308002
+    ],
+    [
+      45.310297,
+      47.732625
+    ]
+  ],
+  "radio_deadline_misses": 0,
+  "interpretation": "The worker published the NRx result before 17 ms, but the controller waited for an asynchronous Qwen RPC and committed three mandatory conventional cells before consuming it at 48.605 ms. The NRx45 contract is release-to-controller-observation, so this is a real frozen bound violation, not a GPU-kernel service tail to delete. The N/F/F/N AI differences remain descriptive because the safety gate failed."
+}

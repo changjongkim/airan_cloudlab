@@ -1,0 +1,61 @@
+{
+  "artifact_sha256": {
+    "results/softwall_multigpu/c164i2_processreplace_dev_j58862813_pretermination_failure.json": "3d504408945a8858d0fc998a5c45e7a69aa9a2e975f08ce20d52f22dc3ed80dd",
+    "results/softwall_multigpu/c164i3_processreplace_dev_j58862843_protocol.json": "8f98a64c8fe748b2c4d079c0bd692321da49dee04e64c5b5dfd76fcf1a745a7d",
+    "results/softwall_multigpu/c164i3_processreplace_dev_j58862843_result.json": "a43b4c2ccb6acbad1573c286c5166a053fc5b972f5b4c13c2b242c337d4dc3a7",
+    "results/softwall_multigpu/c164i_processreplace_dev_j58862729_prelaunch_failure.json": "8019895f73db3002335f15e1e3e2db654ca32374b141bb0aaf4bc4384f3c152d"
+  },
+  "date_utc": "2026-09-25",
+  "decision": {
+    "lifecycle_matrix_is_claim_scoped": true,
+    "new_physical_experiment_rule": "Only after manuscript review identifies a claim-critical evidence gap.",
+    "next_gate": "submission claim/evidence freeze and manuscript writing",
+    "open_process_replacement_holdout": false,
+    "promote_process_replacement_to_main_claim": false,
+    "qualified_or_partial_modes": 5,
+    "remaining_modes_are_completion_checklist": false,
+    "unqualified_modes": 5
+  },
+  "exploratory_process_replacement": {
+    "campaign": "development",
+    "counts": {
+      "cell_decodes": 1944,
+      "component_bound_violations": 0,
+      "deadline_misses": 0,
+      "episodes": 8,
+      "launched_replacements": 4,
+      "mandatory_releases": 486,
+      "prepared_replacements": 4,
+      "terminate_client_success": 8
+    },
+    "host": "nid001061",
+    "interpretation": "Single-node development canary only; no independent holdout and no lifecycle-matrix promotion.",
+    "job_id": "58862843",
+    "remaining_uq": [
+      "durable-journal arbitrary crash windows",
+      "GPU/driver failure",
+      "optional-service availability during replacement",
+      "production d_MAC",
+      "WCET"
+    ],
+    "status": "C164_PROCESS_REPLACEMENT_PHYSICAL_PASS"
+  },
+  "paper_scope": {
+    "core": "certified conditional-recovery substrate plus predictive feasibility envelope for qualified MIG-off MPS AI-RAN modes",
+    "explicit_limitations": [
+      "production d_MAC unavailable",
+      "cross-family validation unavailable",
+      "five lifecycle modes UQ",
+      "350 ms tail root cause unresolved"
+    ],
+    "included_lifecycle_evidence": [
+      "warm persistent",
+      "30-second idle first request",
+      "MPS restart after requalification",
+      "Qwen reload mandatory-only continuity",
+      "same-worker channel reconnect reconciliation"
+    ]
+  },
+  "schema": "softwall-experiment-stop-decision-v1",
+  "status": "SOFTWALL_LIFECYCLE_EXPANSION_STOPPED_FOR_MANUSCRIPT"
+}

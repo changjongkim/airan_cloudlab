@@ -1,0 +1,19 @@
+{
+  "schema": "softwall-c163-diagnostic-protocol-v1",
+  "frozen_before_execution": true,
+  "purpose": "Test the remaining fast-path candidate after sequential and same-GPU speculative paths both missed 4.5 ms in 1000/1000 trials.",
+  "claim_boundary": "This two-GPU clean isolated test is neither a production d_MAC qualification nor a WCET bound. It omits MPS, external AI, a real DU clock, and real channels.",
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "iterations": 1000,
+  "seed": 20358000,
+  "mechanism": "GPU0 conventional overlaps GPU1 P2P TensorRT NeuralRx; the pair completes after GPU0 NeuralRx postprocessing.",
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "decision_rule": "Report pair-completion counts at 4.5 ms; do not promote sample statistics to a bound.",
+  "source_sha256_before_execution": {
+    "c163_p2p_speculative_controller.py": "22a2458bfa0ff6374fc1537ef71e8796670b332a83c9ae2b3529ee5de878a7c3",
+    "run_c163_p2p_speculative.sh": "ada95bfc7a2923c79d82092c57426b0b2bb62c07f142d2e11389237cd3ddb457",
+    "multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "softwall-confirmatory-campaign-failure-v1",
+  "campaign": "confirm112_trace_driven_strong_baselines",
+  "job": "58815435",
+  "node": "nid001016",
+  "protocol_sha256": "c9e65ca4076650eedce4971a9fb367780586387eab80da4f3e9c04f1a5220392",
+  "completed_arms": [
+    {
+      "name": "static_s1",
+      "controller_sha256": "05b86b9ee7308a6b3394fca8d499ec4c2f940019308fe947314a99f69e5555ef",
+      "timely_value_tokens": 73769,
+      "safety_gate": "pass"
+    },
+    {
+      "name": "wc_s1_a",
+      "controller_sha256": "a975e0cbd5f37fe5010772855e1aa7dc2998c7de2d9b0f74d1dd1da1fb6c5a04",
+      "timely_value_tokens": 224921,
+      "safety_gate": "pass"
+    }
+  ],
+  "failed_arm": {
+    "name": "sw_s1_a",
+    "controller_sha256": "05d292cd8e47ecd70c56fb162c80cf2868c487d06153bb43313aeb3ea1b4326a",
+    "release_index": 56,
+    "cell": 0,
+    "now_after_release_ms": 116.674,
+    "immutable_nrx_cutoff_ms": 105,
+    "live_retimed_credit_start_ms": 141,
+    "commit_state": "OPEN",
+    "execution_started": false,
+    "failure": "controller compared current time with the immutable NRx cutoff instead of the live retimed recovery-credit start and therefore called normal start rather than early retime"
+  },
+  "disposition": "Campaign stopped at the first failed frozen arm. No Confirm112 performance conclusion is valid. The source and partial result are preserved; the corrected campaign must use a new protocol and source hashes."
+}

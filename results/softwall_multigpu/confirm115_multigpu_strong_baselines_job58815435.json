@@ -1,0 +1,282 @@
+{
+  "schema": "softwall-confirm115-multigpu-strong-baselines-v1",
+  "protocol_sha256": "5e09267fd91ec1ff4506c99badbfc28c62889fd8ac5503bb807fd92029e73f9e",
+  "trace_sha256_observed": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+  "source_audit": {
+    "scripts_for_node/softwall_same_gpu/run_confirm115_multigpu_strong_baselines.sh": {
+      "expected": "81ad9c93d22b000616270aba04fecf2f3af5bf87183054aa18679dd70237f003",
+      "observed": "81ad9c93d22b000616270aba04fecf2f3af5bf87183054aa18679dd70237f003",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/run_multigpu_softwall_arm.sh": {
+      "expected": "8f9644cde984ac18e7d8da246414b949122f3c745f5daee9bb1ce87cfddece65",
+      "observed": "8f9644cde984ac18e7d8da246414b949122f3c745f5daee9bb1ce87cfddece65",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": {
+      "expected": "05153f6af5f3e89102c220f9bf429c9167022767408908681cf3b0b32b7bb477",
+      "observed": "05153f6af5f3e89102c220f9bf429c9167022767408908681cf3b0b32b7bb477",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": {
+      "expected": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "observed": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_nrx_worker.py": {
+      "expected": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+      "observed": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": {
+      "expected": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "observed": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/analyze_confirm115_multigpu_strong_baselines.py": {
+      "expected": "eece344fdb63788d101cf951922308a465072a25938ea331d3f26f96ba4c01c8",
+      "observed": "eece344fdb63788d101cf951922308a465072a25938ea331d3f26f96ba4c01c8",
+      "match": true
+    },
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": {
+      "expected": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+      "observed": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+      "match": true
+    },
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": {
+      "expected": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "observed": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "match": true
+    }
+  },
+  "arms": {
+    "static_s1": {
+      "wrapper": "results/softwall_multigpu/c115_static_s1_j58815435_result.json",
+      "wrapper_sha256": "0a5e004ec69e32147063d45f2bb6cec8a8f08440321c464afc4b79b663c4aed0",
+      "system_expected": "static",
+      "system_observed": "static",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 74766,
+      "timely_requests": 299,
+      "correct_cells": 619,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "remote_worker_completed": 296
+    },
+    "wc_s1_a": {
+      "wrapper": "results/softwall_multigpu/c115_wc_s1_a_j58815435_result.json",
+      "wrapper_sha256": "2975f419424e188c3f5fb2a99de3fa510181929fe28bcdf28dcd6b35ee9f935a",
+      "system_expected": "work_conserving",
+      "system_observed": "work_conserving",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 224258,
+      "timely_requests": 885,
+      "correct_cells": 618,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "remote_worker_completed": 296
+    },
+    "sw_s1_a": {
+      "wrapper": "results/softwall_multigpu/c115_sw_s1_a_j58815435_result.json",
+      "wrapper_sha256": "7a5f5bc344004b666116274ae9107d3fab6a3e408cf48a9319c88f761e07755b",
+      "system_expected": "softwall",
+      "system_observed": "softwall",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 224910,
+      "timely_requests": 888,
+      "correct_cells": 619,
+      "recovery_retime_count": 84,
+      "joint_lease_retired_count": 84,
+      "remote_worker_completed": 296
+    },
+    "sw_s1_b": {
+      "wrapper": "results/softwall_multigpu/c115_sw_s1_b_j58815435_result.json",
+      "wrapper_sha256": "14f80f494138f49c8373673f27247d5c7d479130bad31fd897271d5f08e602f8",
+      "system_expected": "softwall",
+      "system_observed": "softwall",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 224655,
+      "timely_requests": 887,
+      "correct_cells": 619,
+      "recovery_retime_count": 84,
+      "joint_lease_retired_count": 84,
+      "remote_worker_completed": 296
+    },
+    "wc_s1_b": {
+      "wrapper": "results/softwall_multigpu/c115_wc_s1_b_j58815435_result.json",
+      "wrapper_sha256": "ccfb7a1dfac5a0f8af8eb53b933c2f32b3c786642cdbd2e9727d81448b25744c",
+      "system_expected": "work_conserving",
+      "system_observed": "work_conserving",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 224946,
+      "timely_requests": 887,
+      "correct_cells": 620,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "remote_worker_completed": 296
+    },
+    "static_s2": {
+      "wrapper": "results/softwall_multigpu/c115_static_s2_j58815435_result.json",
+      "wrapper_sha256": "39b8b589a0a082f20fab979ef8b475b7026b3dbfab89352c73418588a537c37f",
+      "system_expected": "static",
+      "system_observed": "static",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 73447,
+      "timely_requests": 294,
+      "correct_cells": 631,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "remote_worker_completed": 299
+    },
+    "sw_s2_a": {
+      "wrapper": "results/softwall_multigpu/c115_sw_s2_a_j58815435_result.json",
+      "wrapper_sha256": "866743237888c6b26e44951f3e87ce355dee0c2de2d0b51e34dea1383aa19777",
+      "system_expected": "softwall",
+      "system_observed": "softwall",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 225048,
+      "timely_requests": 888,
+      "correct_cells": 630,
+      "recovery_retime_count": 86,
+      "joint_lease_retired_count": 86,
+      "remote_worker_completed": 299
+    },
+    "wc_s2_a": {
+      "wrapper": "results/softwall_multigpu/c115_wc_s2_a_j58815435_result.json",
+      "wrapper_sha256": "35c413e69d0fb3f9f5d7800745d9c35637552d7a04d1fb173825d085ca49fa75",
+      "system_expected": "work_conserving",
+      "system_observed": "work_conserving",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 224638,
+      "timely_requests": 886,
+      "correct_cells": 631,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "remote_worker_completed": 299
+    },
+    "wc_s2_b": {
+      "wrapper": "results/softwall_multigpu/c115_wc_s2_b_j58815435_result.json",
+      "wrapper_sha256": "47d1b5847307da47828f3abb74005e94f16c3e2b805f3de9f83e2f20d6302d79",
+      "system_expected": "work_conserving",
+      "system_observed": "work_conserving",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 224639,
+      "timely_requests": 886,
+      "correct_cells": 631,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "remote_worker_completed": 299
+    },
+    "sw_s2_b": {
+      "wrapper": "results/softwall_multigpu/c115_sw_s2_b_j58815435_result.json",
+      "wrapper_sha256": "c79661f64e43b10abac96751f1da89f83139fb9d3bce4b02d70f63078d5e794b",
+      "system_expected": "softwall",
+      "system_observed": "softwall",
+      "all_arm_gates_pass": true,
+      "artifacts_unchanged": true,
+      "timely_value_tokens": 224850,
+      "timely_requests": 887,
+      "correct_cells": 631,
+      "recovery_retime_count": 86,
+      "joint_lease_retired_count": 86,
+      "remote_worker_completed": 299
+    }
+  },
+  "radio_parity": {
+    "seed1": {
+      "arms": [
+        "static_s1",
+        "wc_s1_a",
+        "sw_s1_a",
+        "sw_s1_b",
+        "wc_s1_b"
+      ],
+      "structural_signature_equal": true,
+      "correct_cells": {
+        "static_s1": 619,
+        "wc_s1_a": 618,
+        "sw_s1_a": 619,
+        "sw_s1_b": 619,
+        "wc_s1_b": 620
+      }
+    },
+    "seed2": {
+      "arms": [
+        "static_s2",
+        "sw_s2_a",
+        "wc_s2_a",
+        "wc_s2_b",
+        "sw_s2_b"
+      ],
+      "structural_signature_equal": true,
+      "correct_cells": {
+        "static_s2": 631,
+        "sw_s2_a": 630,
+        "wc_s2_a": 631,
+        "wc_s2_b": 631,
+        "sw_s2_b": 631
+      }
+    }
+  },
+  "paired_comparisons": [
+    {
+      "name": "seed1_work_vs_softwall",
+      "softwall_arms": [
+        "sw_s1_a",
+        "sw_s1_b"
+      ],
+      "work_conserving_arms": [
+        "wc_s1_a",
+        "wc_s1_b"
+      ],
+      "softwall_mean_timely_value": 224782.5,
+      "work_conserving_mean_timely_value": 224602.0,
+      "delta_tokens": 180.5,
+      "effect_pct": 0.08036437787731186,
+      "paired_source_second_bootstrap_95_ci": [
+        -478.0,
+        834.5
+      ],
+      "effect_at_least_2pct": false,
+      "bootstrap_lower_positive": false
+    },
+    {
+      "name": "seed2_work_vs_softwall",
+      "softwall_arms": [
+        "sw_s2_a",
+        "sw_s2_b"
+      ],
+      "work_conserving_arms": [
+        "wc_s2_a",
+        "wc_s2_b"
+      ],
+      "softwall_mean_timely_value": 224949.0,
+      "work_conserving_mean_timely_value": 224638.5,
+      "delta_tokens": 310.5,
+      "effect_pct": 0.13822207680339746,
+      "paired_source_second_bootstrap_95_ci": [
+        -124.0,
+        884.5
+      ],
+      "effect_at_least_2pct": false,
+      "bootstrap_lower_positive": false
+    }
+  ],
+  "gates": {
+    "provenance": true,
+    "safety": true,
+    "radio_structural_parity": true,
+    "outcome": false,
+    "all_pass": false
+  },
+  "interpretation": "The outcome gate is deliberately identical to C113. A failure ends the multi-GPU throughput-superiority claim but preserves a passing transport-independent safety result."
+}

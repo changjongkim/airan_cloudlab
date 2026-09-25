@@ -1,0 +1,146 @@
+{
+  "schema": "softwall-global-ai-two-home-certificate-arm-result-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s2_p1_job58819952_protocol.json",
+  "broker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_broker.json",
+  "broker_summary": {
+    "offered_requests": 1136,
+    "offered_value_tokens": 288591,
+    "timely_requests": 1134,
+    "timely_value_tokens": 288195,
+    "states": {
+      "completed": 1134,
+      "expired": 2
+    },
+    "per_home": {
+      "0": {
+        "committed": 568,
+        "completed": 568,
+        "timely_value_tokens": 144294
+      },
+      "1": {
+        "committed": 566,
+        "completed": 566,
+        "timely_value_tokens": 143901
+      }
+    },
+    "registered_homes": [
+      0,
+      1
+    ],
+    "finalized_homes": [
+      0,
+      1
+    ],
+    "outstanding_tokens": 0,
+    "duplicate_commit_count": 0
+  },
+  "homes": [
+    {
+      "home": 0,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h0_controller.json",
+      "first_release_ns": 139610644715753,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c126_s2_p1_job58819952/barrier",
+        "member": 0,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 362,
+          "expected_units": 362,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 282,
+          "expected_units": 282,
+          "count_match": true
+        }
+      ],
+      "summary": {
+        "records": 1360,
+        "correct_cells": 605,
+        "nrx_commits": 417,
+        "conv_commits": 943,
+        "atomic_exchange": 146,
+        "ai_timely_value_tokens": 144294
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    },
+    {
+      "home": 1,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h1_controller.json",
+      "first_release_ns": 139610644715753,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c126_s2_p1_job58819952/barrier",
+        "member": 1,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 363,
+          "expected_units": 363,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 293,
+          "expected_units": 293,
+          "count_match": true
+        }
+      ],
+      "summary": {
+        "records": 1360,
+        "correct_cells": 604,
+        "nrx_commits": 436,
+        "conv_commits": 924,
+        "atomic_exchange": 159,
+        "ai_timely_value_tokens": 143901
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    }
+  ],
+  "gates": {
+    "two_homes": true,
+    "same_first_release": true,
+    "eight_cells": true,
+    "worker_count_match": true,
+    "system_safety": true,
+    "broker_homes": true,
+    "global_unique_requests": true,
+    "broker_drained": true,
+    "both_homes_ai": true
+  },
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s2_p1_job58819952_protocol.json": "649071817afe30c710a2250f44aea927e183fdaa37438917d90a245bff2bb4b0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_broker.json": "a388c83aeddc6d1bdc4a27e612c138a4a98e02b76eab58b789344dd5fc61cc5f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h0_controller.json": "ad353f3265008ec1709657604fde6c3f73f887d3883b3a971c23236e8eb69ac6",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h0_worker0.json": "bdd9f89446af0592de466b5a797352c3fdf028959dd32eac886843b5e9531c2b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h0_worker1.json": "9fa1c8aa1e28658da696c3c68c4b6ff6a3108c33dee86de060aafb9d6ddcb6e4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h0_background.json": "21cadd332f6ffe5aafed23cd95e62c907e2dbd158b0b394cca4401c95527a073",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h0_requalification.json": "eb4700df7b117faa07e4a5c87fd335455a07468fa1c830a94c578eaf9a5de1c7",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h1_controller.json": "624c7916df7da22d2451ba39066f8c4cca2a40ed53752453d8212f3bc5b58972",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h1_worker0.json": "f2074675c242d74209f98bf7bc37c99e218b0765d823bc965e142c26dcead5e9",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h1_worker1.json": "ea94d2838dc48f4cb83881524129958bef0ea1dd0117af58251fad1069927cb7",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h1_background.json": "f91b278bd0a0842e9a36adf128e53dc90af05b952d16933e00f84e1d4a7de031",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_s2_p1_job58819952_h1_requalification.json": "f07ed0c134349d652b8ef8023ef5019c67748f478879d4f72e2ce6eee4304c38"
+  },
+  "scope": "one globally leased BurstGPT queue across two disjoint four-cell recovery homes; per-home execution credits; live-certificate recovery dispatch order"
+}

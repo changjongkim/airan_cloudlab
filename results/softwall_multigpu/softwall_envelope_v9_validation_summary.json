@@ -1,0 +1,62 @@
+{
+  "schema": "softwall-envelope-v9-validation-summary-v1",
+  "status": "PASS",
+  "model_correction": {
+    "v4_regression_status": "QSU",
+    "v5_regression_status": "QSN",
+    "cause": "v4 transferred conditional recovery release across homes using a global admitted flag",
+    "v5_rule": "Delta_h <= max(0, admitted_nrx_h - 1) * recovery_bound_h",
+    "frozen_v8_modified": false
+  },
+  "exact_oracle": {
+    "status": "PASS",
+    "current_grid_scenarios": 18,
+    "endpoint_pools": 39,
+    "bounded_exhaustive_cases": 3640,
+    "cardinality_gaps": 0,
+    "schedule_failures": 0,
+    "scope": "simultaneous release-zero jobs with endpoint-specific but job-independent service bounds; no general online queueing or WCET claim"
+  },
+  "envelope_v9": {
+    "counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "classification_changes_from_v8": 0,
+    "conditional_slack_reductions_from_v8": 3,
+    "manifest_items": 11,
+    "manifest_hash_mismatches": 0
+  },
+  "unit_validation": {
+    "allocation_job_id": 58824436,
+    "node": "nid001305",
+    "gpu_family": "NVIDIA A100-SXM4-40GB",
+    "aerial_container_tests_passed": 103,
+    "qwen_runtime_tests_passed": 3,
+    "dart_runtime_tests_passed": 21,
+    "total_tests_passed": 127,
+    "initial_combined_discovery": {
+      "passed_before_error": 103,
+      "error": "test_trace_qwen_worker import failed because the Aerial environment does not contain torch",
+      "resolution": "reran Aerial and Qwen suites in their designated container Python environments; both passed"
+    }
+  },
+  "preserved_evidence": {
+    "confirm134_artifacts": 76,
+    "confirm134_artifact_hash_mismatches": 0,
+    "confirm134_source_checks": 11,
+    "confirm134_source_hash_mismatches": 0,
+    "runtime_fault_regression_iterations": 10000,
+    "runtime_fault_regression_pass": true
+  },
+  "documentation_audit": {
+    "documents": 12,
+    "local_links_checked": 502,
+    "missing_links": 0,
+    "outside_workspace_links": 0,
+    "git_diff_check": "PASS"
+  },
+  "claim_boundary": "V9 strengthens deterministic multi-home envelope correctness and implementation audit. It does not add a production deadline, WCET, online-queue optimality, cross-family, restart, durable reconciliation, or throughput-superiority claim."
+}

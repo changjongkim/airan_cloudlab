@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-multigpu-transport-comparison-v1",
+  "p2p": "results/softwall_multigpu/g1a_formal_job58815435_result.json",
+  "p2p_sha256": "e755b44afc28211e3099a43b528ec19fb27ed9b9c2f2d14a7a8fe13bdedc57cf",
+  "host_staging": "results/softwall_multigpu/g1b_host_formal_job58815435_result.json",
+  "host_staging_sha256": "ec42bc1077c482e4eb523c89051e79d43e789a14423ec1060a808a4ca8684d5f",
+  "iterations_each": 10000,
+  "forward_bytes": 1415232,
+  "backward_bytes": 314496,
+  "p2p_all_pass": true,
+  "host_staging_all_pass": true,
+  "round_trip_us": {
+    "p2p": {
+      "count": 9980,
+      "mean": 217.9448435871742,
+      "p50": 213.122,
+      "p99": 248.53,
+      "max": 1307.105
+    },
+    "host_staging": {
+      "count": 9980,
+      "mean": 353.0069130260527,
+      "p50": 349.265,
+      "p99": 377.73,
+      "max": 1647.273
+    },
+    "host_over_p2p_p50_ratio": 1.6388031268475332,
+    "host_over_p2p_p99_ratio": 1.5198567577354847,
+    "p50_saved_by_p2p_us": 136.14299999999997,
+    "p99_saved_by_p2p_us": 129.20000000000002
+  },
+  "gates": {
+    "same_payload_and_iterations": true,
+    "both_integrity_gates_pass": true
+  },
+  "scope": "descriptive warm transport comparison on one NVLink node; not end-to-end NeuralRx or application throughput",
+  "all_pass": true
+}

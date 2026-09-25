@@ -1,0 +1,28 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "aerial_tdl_reference_profile_root_cause_screen",
+  "frozen_before_execution": true,
+  "role": "Post-failure development localization only; no channel qualification or performance claim.",
+  "prior_preserved_failures": [
+    "aerial_tdl_compatibility_job58694167.json",
+    "aerial_tdl_1x4_compatibility_job58694384.json",
+    "aerial_tdl_normalization_development_job58865869.json"
+  ],
+  "hypothesis": "The historical SoftWall PUSCH profile differs from the public NeuralRx reference in DMRS spacing, MCS, start symbol, and conventional TDI configuration.",
+  "channel": "Aerial TDL-A, 30 ns, 10 Hz, 1x4 UL, no AWGN",
+  "iterations_per_profile": 10,
+  "payload_seed": 20357300,
+  "tdl_seed": 57301,
+  "profiles_in_order": [
+    "historical",
+    "reference_dmrs_spacing",
+    "reference_dmrs_and_mcs",
+    "nvidia_reference"
+  ],
+  "next_gate": "Any successful profile must be frozen before a disjoint-seed holdout; development outcomes alone cannot repair the external-channel claim.",
+  "source_sha256_before_execution": {
+    "probe_aerial_tdl_reference_profile_development.py": "f2ab9b018004dde9d30f7604a60244b11f812bca443433c66facae17d98e722b",
+    "run_aerial_tdl_reference_profile_development.sh": "1a6f309e5b64a3a79012d0f668cb76fd8cbf77d78e6eda87f2bb9cf75d7b9038",
+    "dual_receiver_phy.py": "6fccf049ff08bd03b04b4cb4a76ee8971f10d4cb9c18ccad25555adb169377d7"
+  }
+}

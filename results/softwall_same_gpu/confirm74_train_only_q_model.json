@@ -1,0 +1,72 @@
+{
+  "schema": "softwall-confirm74-train-only-phy-rescue-model-v1",
+  "source": "results/softwall_same_gpu/raw/confirm74_value_job58734412_train.json",
+  "source_sha256": "d1957592b514be4e43214565d9d4d4db304e2e658f736060e1eb7fb15723ab99",
+  "feature": "channel_estimate_power",
+  "train_seed": 20800001,
+  "train_n": 5000,
+  "noise_reference": "pre_fading",
+  "snr_db": -8.5,
+  "support_min": 1.5152674913406372,
+  "support_max": 3.4848220348358154,
+  "bin_upper_edges": [
+    1.8065098524093628,
+    1.921505331993103,
+    2.0375900268554688,
+    2.2028133869171143
+  ],
+  "bins": [
+    {
+      "index": 0,
+      "train_n": 1000,
+      "rescue_count": 0,
+      "neural_success_count": 0,
+      "q_rescue_smoothed": 0.0004995004995004995,
+      "q_rescue_wilson95_lower": 2.168404344971009e-19,
+      "q_rescue_wilson95_upper": 0.0038267584855551234,
+      "p_neural_success_smoothed": 0.0004995004995004995
+    },
+    {
+      "index": 1,
+      "train_n": 1000,
+      "rescue_count": 0,
+      "neural_success_count": 0,
+      "q_rescue_smoothed": 0.0004995004995004995,
+      "q_rescue_wilson95_lower": 2.168404344971009e-19,
+      "q_rescue_wilson95_upper": 0.0038267584855551234,
+      "p_neural_success_smoothed": 0.0004995004995004995
+    },
+    {
+      "index": 2,
+      "train_n": 1000,
+      "rescue_count": 273,
+      "neural_success_count": 433,
+      "q_rescue_smoothed": 0.27322677322677325,
+      "q_rescue_wilson95_lower": 0.2462959489171712,
+      "q_rescue_wilson95_upper": 0.3014413994352708,
+      "p_neural_success_smoothed": 0.43306693306693306
+    },
+    {
+      "index": 3,
+      "train_n": 1000,
+      "rescue_count": 12,
+      "neural_success_count": 1000,
+      "q_rescue_smoothed": 0.012487512487512488,
+      "q_rescue_wilson95_lower": 0.006877647806403522,
+      "q_rescue_wilson95_upper": 0.02085726847549828,
+      "p_neural_success_smoothed": 0.9995004995004995
+    },
+    {
+      "index": 4,
+      "train_n": 1000,
+      "rescue_count": 0,
+      "neural_success_count": 1000,
+      "q_rescue_smoothed": 0.0004995004995004995,
+      "q_rescue_wilson95_lower": 2.168404344971009e-19,
+      "q_rescue_wilson95_upper": 0.0038267584855551234,
+      "p_neural_success_smoothed": 0.9995004995004995
+    }
+  ],
+  "test_data_accessed": false,
+  "policy_use_limit": "Only synthetic -8.5 dB fixed-pre-fading-noise diagnostic. Use q upper bound to charge skipped NeuralRx radio-risk budget; use q lower bound when valuing speculative NRx. Out-of-support features must fail closed until independently qualified. This model does not include late-result q_use."
+}

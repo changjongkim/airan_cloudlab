@@ -1,0 +1,128 @@
+{
+  "accepted_physical_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "campaign": "development",
+  "excluded_nodes": [
+    "nid001064",
+    "nid001085"
+  ],
+  "expected_actual_recovery_keys": [
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ]
+  ],
+  "expected_actual_success_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "expected_global_reject": [
+    "home1",
+    "h1-r1"
+  ],
+  "gates": {
+    "actual_outcome_pattern": "exactly the two frozen +20 dB keys succeed",
+    "global_reject": "the fifth 3+2 debt is rejected before GPU launch",
+    "qwen": "one context-64 unit inside a V17.1 launch-time lease",
+    "recovery": "two -15 dB requests match local conventional CRC semantics",
+    "safety": "single commit, zero deadline/bound/credit/lifecycle violations"
+  },
+  "label": "confirm157a_actual_nrx_attempt4_job58854900",
+  "mode": {
+    "ai_bound_ms": 35,
+    "capacity": 1,
+    "conventional_bound_ms": 25,
+    "expiry_ms": 155,
+    "guard_ms": 2,
+    "launch_control_bound_ms": 5,
+    "lifecycle": "persistent warm endpoint with per-peer activation 100 ms before release",
+    "nrx_bound_ms": 45,
+    "nrx_release_prewarm_lead_ms": 100.0,
+    "period_ms": 180,
+    "qwen_context_length": 64,
+    "qwen_model": "Qwen/Qwen2.5-1.5B",
+    "release_lead_ms": 3000.0,
+    "warmup": 10
+  },
+  "offered_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ],
+    [
+      "home1",
+      "h1-r1"
+    ]
+  ],
+  "outcome_source": "actual TensorRT NeuralRx CRC before the frozen 45 ms cutoff",
+  "placement": {
+    "home0": "GPU0",
+    "home1": "GPU1",
+    "persistent_actual_nrx": "GPU3 under MPS 80",
+    "shared_cuphy_and_qwen": "GPU2 under MPS 80/20"
+  },
+  "recovery_oracle": "same-input local conventional semantics: successful CRC requires payload equality; failed CRC requires the shared path to fail CRC, because failed-CRC payload bits are not radio-valid output",
+  "schema": "softwall-actual-nrx-integrated-protocol-v1",
+  "scope": "Finite-sample actual-NeuralRx transition canary. Passing does not establish WCET, cold/long-idle qualification, production d_MAC, fault coverage, throughput superiority, or cross-GPU-family generality.",
+  "seed_base": 25800000,
+  "snr_assignment_rule": "one +20 dB expected-success request per home and two -15 dB expected-failure requests; fixed before outcomes are opened",
+  "source_sha256": {
+    "scripts/actual_nrx_integrated_coordinator.py": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d",
+    "scripts/actual_nrx_integrated_owner.py": "0b3ad90dd898bd9abeea832c83ac2b07bb571304eae6476f52ecb0611ed2e210",
+    "scripts/actual_nrx_multi_peer_worker.py": "f38fad0cf8330c48ae84c7c408f8e4db64051e3062fefc6669bdabb7af252509",
+    "scripts/actual_nrx_shared_recovery_plan_v1.py": "c9e036f23f2bf913d1b5c4b27ba9a6bb82acfdcb166400b3a9abb4c0fc6b1041",
+    "scripts/analyze_actual_nrx_integrated.py": "e4f2dab20f7c378dd35d3aca6f7e8b385f3f297bbb5dd58a4a6d7c1e8b72e598",
+    "scripts/build_actual_nrx_integrated_protocol.py": "7b287c1d41cf9fe24a2826c25bedd6240351798433dd51e5df685a75c9fd727a",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_launch_plan_v1.py": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts/run_actual_nrx_integrated.sh": "f057bd188a5c9f5f71df6b5487a6f7133f80f5869d2af1d01b9c0f3580a383cb",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run"
+}

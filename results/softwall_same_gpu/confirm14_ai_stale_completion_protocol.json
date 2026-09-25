@@ -1,0 +1,29 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm14_paired2_nrx_stale_completion",
+  "purpose": "Verify that an AI response arriving after the RPC contract timeout is rejected and future AI admission fails closed.",
+  "ran": {
+    "input": "Aerial PdschTx-generated valid 273-PRB PUSCH slot",
+    "cells_per_release": 2,
+    "period_ms": 25,
+    "deadline_ms": 21,
+    "iterations": 500,
+    "seed": 20270302
+  },
+  "ai": {
+    "kind": "NeuralRx TensorRT CUDA Graph",
+    "end_to_end_budget_ms": 6,
+    "guard_ms": 1,
+    "rpc_timeout_ms": 7,
+    "injected_response_delay_ms": 20
+  },
+  "primary_gate": {
+    "ran_deadline_misses": 0,
+    "incorrect_transport_blocks": 0,
+    "ai_fault_count": 1,
+    "ai_disabled_after_fault": true,
+    "ai_units_after_fault": 0
+  },
+  "interpretation_limit": "The injected delay occurs after GPU completion. This validates timeout/stale-response handling, not preemption of an overlong GPU kernel."
+}

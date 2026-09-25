@@ -1,0 +1,108 @@
+{
+  "schema": "softwall-confirm74-phy-value-calibration-v1",
+  "job": "58734412",
+  "node": "nid001409",
+  "all_pass": true,
+  "gates": {
+    "source_hashes": true,
+    "provenance": true,
+    "disjoint": true,
+    "sample_size": true,
+    "calibration": true,
+    "predictive_value": true
+  },
+  "train_rescue": 285,
+  "test_rescue": 269,
+  "train_only_edges": [
+    1.8065098524093628,
+    1.921505331993103,
+    2.0375900268554688,
+    2.2028133869171143
+  ],
+  "bins": [
+    {
+      "index": 0,
+      "feature_lower_inclusive": null,
+      "feature_upper_exclusive": 1.8065098524093628,
+      "train_n": 1000,
+      "test_n": 980,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_incremental_rescue_probability": 0.0004995004995004995,
+      "train_neural_success_probability": 0.0004995004995004995,
+      "test_rescue_rate": 0.0,
+      "test_rescue_wilson95": [
+        0.0,
+        0.0039045506633749558
+      ]
+    },
+    {
+      "index": 1,
+      "feature_lower_inclusive": 1.8065098524093628,
+      "feature_upper_exclusive": 1.921505331993103,
+      "train_n": 1000,
+      "test_n": 987,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_incremental_rescue_probability": 0.0004995004995004995,
+      "train_neural_success_probability": 0.0004995004995004995,
+      "test_rescue_rate": 0.0,
+      "test_rescue_wilson95": [
+        2.168404344971009e-19,
+        0.0038769661750591806
+      ]
+    },
+    {
+      "index": 2,
+      "feature_lower_inclusive": 1.921505331993103,
+      "feature_upper_exclusive": 2.0375900268554688,
+      "train_n": 1000,
+      "test_n": 1058,
+      "train_rescue": 273,
+      "test_rescue": 256,
+      "train_incremental_rescue_probability": 0.27322677322677325,
+      "train_neural_success_probability": 0.43306693306693306,
+      "test_rescue_rate": 0.24196597353497165,
+      "test_rescue_wilson95": [
+        0.21712292512374515,
+        0.26867601833962246
+      ]
+    },
+    {
+      "index": 3,
+      "feature_lower_inclusive": 2.0375900268554688,
+      "feature_upper_exclusive": 2.2028133869171143,
+      "train_n": 1000,
+      "test_n": 975,
+      "train_rescue": 12,
+      "test_rescue": 13,
+      "train_incremental_rescue_probability": 0.012487512487512488,
+      "train_neural_success_probability": 0.9995004995004995,
+      "test_rescue_rate": 0.013333333333333334,
+      "test_rescue_wilson95": [
+        0.007808423159243663,
+        0.022678085714876818
+      ]
+    },
+    {
+      "index": 4,
+      "feature_lower_inclusive": 2.2028133869171143,
+      "feature_upper_exclusive": null,
+      "train_n": 1000,
+      "test_n": 1000,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_incremental_rescue_probability": 0.0004995004995004995,
+      "train_neural_success_probability": 0.9995004995004995,
+      "test_rescue_rate": 0.0,
+      "test_rescue_wilson95": [
+        2.168404344971009e-19,
+        0.0038267584855551234
+      ]
+    }
+  ],
+  "weighted_mace": 0.0070761238761238784,
+  "brier_model": 0.04158374652320478,
+  "brier_train_prevalence_constant": 0.05091580000000519,
+  "interpretation": "Disjoint 5,000/5,000 synthetic fixed-pre-fading-noise PHY trials. Train-only feature bins estimate incremental NeuralRx rescue, with held-out calibration and Brier comparison. No online scheduling, q_use timing, TDL/DU generalization, or production guarantee."
+}

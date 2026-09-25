@@ -1,0 +1,12 @@
+{
+  "schema": "softwall-confirm67-client-profiler-protocol-v1",
+  "job": "58734412",
+  "purpose": "Repair Confirm66's failed instrumentation by profiling inside the NeuralRx client and the permitted background AI client while keeping the same two-endpoint 10-release async smoke.",
+  "runner": "scripts_for_node/softwall_same_gpu/run_confirm67_profiled_clients.sh",
+  "runner_sha256": "eea13612c7cb6a2679ea0e16b25b23a7205289f7026feeb3838ed32af9ec2520",
+  "controller_sha256": "2ac3d0a2a16a5696194f7ed04b9e3337dc95e882f454c60ca85e070992f56c1e",
+  "iterations": 10,
+  "mode": "async_one",
+  "frozen_gate": "At least one NRx-client and one AI-client GPU kernel activity table with attributable timestamps must be present before any GPU kernel overlap claim. If timestamp epochs cannot be aligned, overlap remains unqualified.",
+  "limits": "Profiler perturbation and synthetic P150/D130 mean this is instrumentation qualification only; no throughput, service bound, deadline guarantee, or joint policy advantage claim."
+}

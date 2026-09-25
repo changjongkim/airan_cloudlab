@@ -1,0 +1,337 @@
+{
+  "schema": "softwall-sharded-home-envelope-input-v3",
+  "status": "post-C121/C122 evidence snapshot 2026-09-24",
+  "scope": "Synchronous P180/D155 cells distributed across disjoint RAN home GPUs; each home has two local NRx endpoints and one bounded Qwen worker. Only exact physically tested multi-home modes are qualified.",
+  "classification": {
+    "QSU": "qualified-safe-useful",
+    "QSN": "qualified-safe-no-slack",
+    "MI": "mandatory timing or per-home memory infeasible",
+    "UQ": "memory/timing arithmetic is feasible but multi-home timing/lifecycle bounds are not physically qualified"
+  },
+  "scenarios": [
+    {
+      "id": "sharded_home_g1_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 4,
+      "home_cell_counts": [
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C113 qualifies the single-home four-cell reference"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c8",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 8,
+      "home_cell_counts": [
+        8
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 12,
+      "home_cell_counts": [
+        12
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 4,
+      "home_cell_counts": [
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c8",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C121: two independent 2-home x 4-cell arms, 5,440 total TB, synchronized release delta 0 ns, safety violations 0"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 12,
+      "home_cell_counts": [
+        6,
+        6
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 4,
+      "home_cell_counts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c8",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 8,
+      "home_cell_counts": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 12,
+      "home_cell_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C122: two independent 4-home x 3-cell arms, 8,160 total TB, synchronized release delta 0 ns, safety violations 0"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    }
+  ]
+}

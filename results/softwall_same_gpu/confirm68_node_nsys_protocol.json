@@ -1,0 +1,13 @@
+{
+  "schema": "softwall-confirm68-node-profiler-protocol-v1",
+  "job": "58734412",
+  "purpose": "Determine whether Confirm67's overlapping CUDA graph windows contain concurrently executing GPU kernels from NeuralRx worker 0 and early AI.",
+  "runner": "scripts_for_node/softwall_same_gpu/run_confirm68_profiled_nodes.sh",
+  "runner_sha256": "b29868fb20a801479dcd438f8065dccc562afa9c02834f27ed9ab5455282cea8",
+  "analyzer_sha256": "0ebd430be14ac0f3ebd0ec5c99f861508429e635d18b72fd31f32c3b1793d0bb",
+  "iterations": 10,
+  "mode": "async_one",
+  "nsys_cuda_graph_trace": "node",
+  "frozen_gate": "Both profiler exports must contain runtime GPU kernel intervals aligned with controller release and early-AI windows. Report actual overlapping kernel interval pairs without using them as a service bound.",
+  "limits": "Profiler perturbation, one NeuralRx worker profiled, and synthetic P150/D130; not a worst-case co-run qualification, production deadline guarantee, or joint policy comparison."
+}

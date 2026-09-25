@@ -1,0 +1,61 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161p1a_dev_j58859044_peer_spec.json": "e2b9a13424dc9050a1c67fa05b28036c9ec99171168ae92bf4408ce5a092841c",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161p1a_dev_j58859044_protocol.json": "59f08e90d253c21013b27734beff68e90db645b684bd659ae0075e911f93a7f6",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159_experiment_prespec_v1.json": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_coordinator.json": "970d4812c4cab54ca25377a853dc288e7e9edd15af246cb49552d7a77a93ce4d",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_gpu_inventory.csv": "660a50b3540886abaa79e8546454308a71083c815157d449b545f733432a8663",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_home0_h0-r0_owner.json": "009e92c27b762fa4d50b1769a0db50ff5def116c71a99fc6a3839c99537d5b77",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_home0_h0-r1_owner.json": "dc3b15931d08ae21154ae57932ad98030849cae5757c84a8c82c196ec0dfdee4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_home0_h0-r2_owner.json": "f2075dce21c69d2742abda6075277dc34623a893124a882aeff86c9226d7f06a",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_home1_h1-r0_owner.json": "2d8d9232ae9ebf250bfacf3e6f34245a6304033ec74bea3be0e11d44ac753e09",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_nrx_worker.json": "24dfbf94e2eb04532e3ee6de73083e1ed7bf2cb3a765a1b56b40f875c2512ca3",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c161p1a_dev_j58859044_qwen.json": "4daba2e441e10bf18b1b61dc5044ed2f506633ae30003261b2a16ac1aea2d97b"
+  },
+  "campaign": "development",
+  "gates": {
+    "actual_nrx_bound_and_transport": true,
+    "atomic_batch_all_rounds": true,
+    "complete_sample_and_arm_order": true,
+    "correlated_all_fail_physically_recovered": true,
+    "fault_arm_semantics": true,
+    "latest_start_nonlaunch_exercised": true,
+    "no_process_error": true,
+    "node_inventory_and_exclusion": true,
+    "nofault_qwen_exercised": true,
+    "physical_p2p_ipc_lifecycle": true,
+    "pre_staged_input_and_full_preflight": true,
+    "qwen_bound_identity_and_guard": true,
+    "recovery_bound_transport_and_contract": true,
+    "single_timely_radio_commit": true,
+    "source_hash_match": true
+  },
+  "job_id": "58859044",
+  "node": "nid001824",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161p1a_dev_j58859044_protocol.json",
+  "schema": "softwall-c161-phase1-result-v1",
+  "scope": "C161 phase-1 physical fault semantics in the C159-Q2 warm P180 placement. It covers correlated outcome suppression and an enforced physical latest-start non-launch; response loss, worker crash, GPU hang, production d_MAC and cross-family behavior remain UQ.",
+  "status": "C161_PHASE1_PASS",
+  "summary": {
+    "actual_nrx_requests": 360,
+    "actual_nrx_successes": 246,
+    "arm_counts": {
+      "correlated_all_fail": 30,
+      "latest_start_nonlaunch": 30,
+      "no_fault": 30
+    },
+    "commit_max_ms": 125.205205,
+    "correlated_recoveries": 120,
+    "deadline_misses": 0,
+    "effective_successes": 169,
+    "guarded_nonlaunches": 25,
+    "nrx_max_ms": 19.350315,
+    "physical_recoveries": 191,
+    "qwen_max_ms": 52.837193,
+    "qwen_units": 25,
+    "radio_commits": 360,
+    "recovery_max_ms": 12.58242,
+    "rounds": 90
+  }
+}

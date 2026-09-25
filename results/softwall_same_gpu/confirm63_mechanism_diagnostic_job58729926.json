@@ -1,0 +1,36 @@
+{
+  "schema": "softwall-confirm63-posthoc-mechanism-diagnostic-v1",
+  "role": "exploratory, not a frozen performance gate",
+  "job": "58729926",
+  "arms": {
+    "off": {
+      "nrx_worker_gpu_count": 209,
+      "nrx_worker_gpu_p50_ms": 1.9539519548416138,
+      "nrx_worker_gpu_p99_ms": 2.0857279300689697,
+      "pre_ai_units": 0,
+      "pre_ai_host_p50_ms": null,
+      "pre_ai_host_p99_ms": null,
+      "pre_ai_gpu_p50_ms": null,
+      "pre_ai_gpu_p99_ms": null,
+      "post_radio_ai_units": 5935,
+      "all_ai_units": 5935,
+      "radio_end_host_p50_ms": 6.7710375,
+      "radio_end_host_max_ms": 9.564244
+    },
+    "one": {
+      "nrx_worker_gpu_count": 209,
+      "nrx_worker_gpu_p50_ms": 1.8585280179977417,
+      "nrx_worker_gpu_p99_ms": 2.180191993713379,
+      "pre_ai_units": 153,
+      "pre_ai_host_p50_ms": 3.770431,
+      "pre_ai_host_p99_ms": 4.26433,
+      "pre_ai_gpu_p50_ms": 3.282047986984253,
+      "pre_ai_gpu_p99_ms": 3.4754879474639893,
+      "post_radio_ai_units": 5684,
+      "all_ai_units": 5837,
+      "radio_end_host_p50_ms": 10.056911,
+      "radio_end_host_max_ms": 22.616333
+    }
+  },
+  "interpretation": "Worker CUDA-event p99 changed little while host-observed NRx and radio response grew; a synchronous pre-radio AI RPC is consistent with added host blocking. A single off-then-one order does not isolate causal throughput loss from temporal drift or all GPU interference."
+}

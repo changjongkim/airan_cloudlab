@@ -1,0 +1,133 @@
+{
+  "schema": "softwall-envelope-v11-validation-summary-v1",
+  "status": "PASS",
+  "model_correction": {
+    "v10_issue": "V10 treated physical ring_depth=1 endpoints as reusable completion-slot streams and collapsed executor phases.",
+    "v11_rule": "Endpoint admission is capped by finite ring credits; conditional release and decision time depend on whether rejected recoveries execute before exchange or remain live.",
+    "full_control_witness": {
+      "requests_per_home": 4,
+      "admitted_nrx": 2,
+      "rejected_live_recoveries": 2,
+      "released_recovery_ms": 50,
+      "decision_time_ms": 45,
+      "remaining_recoveries": 2,
+      "recovery_boundary_ms": 103,
+      "transaction_window_ms": 58,
+      "raw_ai_ms": 40,
+      "control_ms": 15,
+      "effective_transaction_ms": 55,
+      "model_margin_ms": 3
+    },
+    "regression_status": "PASS"
+  },
+  "envelope_v11": {
+    "counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "classification_changes_from_v10": 0,
+    "geometry_exchange_home_class_pairs": 39,
+    "decision_time_exchange_home_class_pairs": 2,
+    "decision_candidates": [
+      "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134:home0:AI40",
+      "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134:home1:AI40"
+    ]
+  },
+  "exact_oracle": {
+    "status": "PASS",
+    "grid_scenarios": 18,
+    "endpoint_pools": 39,
+    "bounded_exhaustive_cases": 10920,
+    "cardinality_gaps": 0,
+    "scenario_failures": 0,
+    "scope": "Exact finite-state cardinality and schedule-consistency audit for the synchronous release-zero, endpoint-specific but job-independent service-bound model with finite endpoint ring credits; not a queueing or WCET proof."
+  },
+  "prospective_falsification": {
+    "incremental_observation_status": "HYPOTHESIS_REJECTED_NO_NEW_CANDIDATE",
+    "new_incremental_candidates": 0,
+    "reason": "No new service class beyond the current observe-all full-control candidate; controller change was not implemented."
+  },
+  "pre_c135_evidence_audit": {
+    "status": "NO_OFFERED_AI40_EVIDENCE",
+    "home_releases": 8160,
+    "candidate_branches": 3771,
+    "after_observation_ai_exchanges": 156,
+    "ai40_occurrences": 0,
+    "interpretation": "The sealed BurstGPT campaign did not offer the AI40 class in the candidate branch; this was an evidence gap, not an infeasibility result."
+  },
+  "confirm135": {
+    "status": "PASS",
+    "allocation_job_id": 58826874,
+    "node": "nid001245",
+    "arms": 2,
+    "radio_records": 2560,
+    "atomic_exchanges": 19,
+    "candidate_branches": 288,
+    "ai40_candidate_exchanges": 10,
+    "minimum_observed_reserved_horizon_margin_ms": 51.056189,
+    "maximum_admitted_nrx_per_home_release": 2,
+    "observed_maxima": {
+      "nrx_response_ms": 16.950882,
+      "conventional_host_path_ms": 5.782443,
+      "ai_execution_ms": 27.755875,
+      "ai_gpu_ms": 26.638784408569336
+    },
+    "declared_violation_totals": {
+      "deadline_misses": 0,
+      "nrx_bound_violations": 0,
+      "conv_bound_violations": 0,
+      "conv_path_bound_violations": 0,
+      "pre_radio_ai_guard_violations": 0,
+      "background_budget_violations": 0,
+      "background_horizon_violations": 0
+    },
+    "artifact_manifest_items": 46,
+    "artifact_manifest_sha256": "ff337a2d62e5e1e2fc579e9317642aaa73eb51b7b658e93e11ff689d3170de4c"
+  },
+  "unit_validation": {
+    "allocation_job_id": 58828266,
+    "node": "nid001781",
+    "gpu_family": "NVIDIA A100-SXM4-40GB",
+    "aerial_container_tests_passed": 155,
+    "qwen_runtime_tests_passed": 3,
+    "dart_suite_tests_passed": 30,
+    "dart_runtime_tests_within_suite": 21,
+    "total_tests_passed": 188,
+    "new_v11_targeted_tests_passed": 33,
+    "logs": [
+      "results/softwall_multigpu/raw/envelope_v11_aerial_tests_job58828266_compute.log",
+      "results/softwall_multigpu/raw/envelope_v11_qwen_tests_job58828266_compute.log",
+      "results/softwall_multigpu/raw/envelope_v11_dart_tests_job58828266_compute.log"
+    ],
+    "non_authoritative_attempts": "results/softwall_multigpu/softwall_envelope_v11_validation_attempts_v1.json"
+  },
+  "preserved_evidence": {
+    "confirm134_artifact_manifest": "results/softwall_multigpu/confirm134_artifact_manifest.json",
+    "confirm134_full_control_fault_arms": 6,
+    "combined_c132_c133_c134_fault_arms": 12,
+    "combined_declared_safety_violations": 0,
+    "runtime_fault_regression_iterations": 10000,
+    "runtime_fault_regression_pass": true
+  },
+  "g7_production_timing_readiness": {
+    "status": "UQ_NO_PRODUCTION_TRACE",
+    "validator_tests_passed": 9,
+    "production_trace_available": false
+  },
+  "documentation_audit": {
+    "status": "PASS",
+    "documents": 11,
+    "local_links_checked": 553,
+    "missing_links": 0,
+    "outside_workspace_links": 0,
+    "json_artifacts_parsed": 12,
+    "git_diff_check": "PASS"
+  },
+  "claim_boundary": "V11 predicts and C135 physically realizes one synthetic two-home A100/MPS conditional AI40 service class under declared finite-sample bounds. This is not BurstGPT throughput superiority, WCET, production d_MAC, cross-family hardware, restart, durable reconciliation, or exactly-once evidence.",
+  "artifact_manifest": {
+    "items": 34,
+    "hash_mismatches": 0
+  }
+}

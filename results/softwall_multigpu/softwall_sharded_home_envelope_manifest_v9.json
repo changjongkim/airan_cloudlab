@@ -1,0 +1,36 @@
+{
+  "schema": "softwall-sharded-home-envelope-manifest-v9",
+  "status": "home-local-conditional-slack-and-exact-oracle-audited",
+  "files": {
+    "scripts_for_node/softwall_same_gpu/softwall_envelope_checker_v5.py": "860afa8109a2382bf2378ee0339370cb84681ccf45766ad07b995420e34ca00f",
+    "scripts_for_node/softwall_same_gpu/test_softwall_envelope_checker_v5.py": "a41660c0a88316a0e824bdbde05d10d9aa3a69fcc2ba6071923891c1d69abadc",
+    "scripts_for_node/softwall_same_gpu/softwall_endpoint_admission_exact_oracle.py": "bf43639646a8bcba1735cce66a12e1094c6339311228fc7fa5617b67c0ee6b49",
+    "scripts_for_node/softwall_same_gpu/test_softwall_endpoint_admission_exact_oracle.py": "0f71eab412c4ce9201f25a44a0f4b8c462569ebeff716f3d8ff6b93c6928bb42",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_grid_v9.json": "e720c82d22714f68652f394e8052b887e501b91b9ae98dca386fbd7d1a74ebdd",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v9.json": "22a7fd07d2a0402894b1f765e3be5d1a39b3e74f60484ec72e1cfcca1c2f966d",
+    "results/softwall_multigpu/softwall_endpoint_admission_exact_oracle_audit_v1.json": "af0787e1ab8ae7929a55e5340eb9cb563fd58f9b858b4219da6f11d48d015e48",
+    "results/softwall_multigpu/softwall_envelope_v4_v5_home_local_regression_v1.json": "6592c155db4c784dbc238c1ad20b58cced9c3db149ae1ea0136a51629273d045",
+    "results/softwall_multigpu/confirm134_independent_node_control_matrix_result.json": "60d3d17e039c32b888b0f14900f6203afb01dc2ae9974d36ff253a1cca6459c4",
+    "results/softwall_multigpu/confirm134_artifact_manifest.json": "bd0be442bfa06811fd4bd85ea60f527532f2e32043329b84a6a01865701c29d0",
+    "results/softwall_multigpu/softwall_envelope_v9_validation_summary.json": "314f39e74f8679ab95c192e9d7a8ba49d33ca233d9b8dddde4e67cb564452a8e"
+  },
+  "classification_counts": {
+    "QSU": 5,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 10
+  },
+  "oracle_audit": {
+    "grid_scenarios": 18,
+    "endpoint_pools": 39,
+    "bounded_exhaustive_cases": 3640,
+    "cardinality_gaps": 0,
+    "schedule_failures": 0
+  },
+  "regression": {
+    "v4": "QSU",
+    "v5": "QSN",
+    "cause": "v4 incorrectly transferred conditional recovery release across homes; v5 uses per-home admitted NeuralRx count"
+  },
+  "claim": "Current symmetric physical-mode classifications are unchanged, while v5 removes a demonstrated asymmetric cross-home false-usefulness classification and the independent exact oracle matches every current endpoint pool and 3,640 bounded synthetic cases."
+}

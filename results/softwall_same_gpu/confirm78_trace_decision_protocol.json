@@ -1,0 +1,61 @@
+{
+  "schema": "softwall-frozen-exploratory-protocol-v1",
+  "campaign": "confirm78_heldout_feature_joint_vs_strong_greedy_screen",
+  "heldout_raw": "confirm77_multisnr_job58738952_test.json",
+  "heldout_seed": 20910001,
+  "episodes_per_snr": 100,
+  "radio_deadline_ms": 130,
+  "conventional_bound_ms": 25,
+  "nrx_ready_ms": 50,
+  "nrx_endpoint_capacity": 2,
+  "min_expected_radio_rescues": 0.1,
+  "ai_patterns": [
+    {
+      "name": "two_equal_units",
+      "units": [
+        {
+          "name": "ai0",
+          "deadline_ms": 50,
+          "isolated_ms": 15,
+          "nrx_overlap_ms": 15,
+          "value": 1
+        },
+        {
+          "name": "ai1",
+          "deadline_ms": 90,
+          "isolated_ms": 15,
+          "nrx_overlap_ms": 15,
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "unequal_value_deadline",
+      "units": [
+        {
+          "name": "ai0",
+          "deadline_ms": 65,
+          "isolated_ms": 15,
+          "nrx_overlap_ms": 15,
+          "value": 2
+        },
+        {
+          "name": "ai1",
+          "deadline_ms": 95,
+          "isolated_ms": 15,
+          "nrx_overlap_ms": 15,
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/screen_confirm78_trace_decisions.py": "36a5c952235134db2a34b1baae49240ec7ed0f6df6a77391dc4b32f721aa9bb1",
+    "scripts_for_node/softwall_same_gpu/offline_contingent_phy_ai.py": "11e00aa25aaca44840d4df0dcb6ff3b40e8168cd8c1370c79f634d1f670c14be",
+    "scripts_for_node/softwall_same_gpu/offline_recovery_exchange.py": "36ecc9adc538929e1c7e16030c56853ee78d808464615cf9c381ccf67b5229e3",
+    "scripts_for_node/softwall_same_gpu/mixed_snr_phy_value_model.py": "a330e60e82f515fe57f9b4d914e37ba63f4d7be5f39ccb07bac6bf8d5a43db69",
+    "results/softwall_same_gpu/confirm77_train_only_q_model.json": "20ff0fc3249928e59e0a153a4ee64728c823c5ff6e3374ba0305f75440bd17d0",
+    "results/softwall_same_gpu/raw/confirm77_multisnr_job58738952_test.json": "6115de38c9c4a616462477558c5adf497220f3265ca3c1a27aadd6ef3803219e"
+  },
+  "limitations": "Exploratory and partly informed by aggregate Confirm77 calibration. Held-out outcome labels are not used for decisions, but no publication-level blind test or GPU comparison is claimed."
+}

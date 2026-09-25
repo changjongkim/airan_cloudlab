@@ -1,0 +1,76 @@
+{
+  "schema": "softwall-envelope-v16-validation-v1",
+  "status": "PASS",
+  "classification_counts": {
+    "QSU": 6,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 13
+  },
+  "physical_fault_matrix": {
+    "operation_counts": {
+      "prepare": 2,
+      "commit": 2,
+      "complete": 2,
+      "abort": 2
+    },
+    "operation_nodes": {
+      "prepare": [
+        "nid001244",
+        "nid003417"
+      ],
+      "abort": [
+        "nid001005",
+        "nid003197"
+      ],
+      "commit": [
+        "nid001244",
+        "nid003417"
+      ],
+      "complete": [
+        "nid001244",
+        "nid003417"
+      ]
+    },
+    "distinct_nodes": [
+      "nid001005",
+      "nid001244",
+      "nid003197",
+      "nid003417"
+    ],
+    "fault_arms": 8,
+    "radio_records": 15360,
+    "radio_after_fault": 10125,
+    "ai45_exchanges": 12,
+    "suppressed_prepares": 666,
+    "maximum_unlaunched_tokens": 1
+  },
+  "gates": {
+    "prior_v15_validation_pass": true,
+    "v15_three_point_mode_demoted": true,
+    "v16_four_point_mode_qsu": true,
+    "only_commit_is_ran_critical": true,
+    "ai45_exchange_geometry_preserved": true,
+    "four_operations_two_arms_each": true,
+    "four_distinct_physical_nodes": true,
+    "all_eight_fault_arms_pass": true,
+    "abort_target_never_executed": true,
+    "radio_continues_after_every_fault": true,
+    "single_token_invariant_all_nodes": true,
+    "retained_token_branch_all_nodes": true,
+    "finite_model_all_four_operations": true,
+    "all_node_source_hashes_match": true
+  },
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_grid_v16.json": "30ad092d1e7a0615af493e0fb70b78047e57ceaed9040eb1a47306c521bf3309",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v16.json": "febc29dd5db7eeecf242a21d0d4114b8b01427ef63e2b2df764f0f52282032ba",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_envelope_v15_validation_summary.json": "2d0be7df22e052d7a38ac64face18045c5546558ace4bbd316e3566f8fda24b6",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_pipelined_control_model_v2.json": "d3f7600eff87cdcb6f2f1ffc98283a95a1a3ebe9dc802d96cd886683225d66d0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm145_v15_single_token_result.json": "f30806eac2dc87b82bc4655bce325197d327b096889c672b071558e983ca0a88",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm146_v15_single_token_result.json": "a304c29b17d00f45e910b26e9373bfb2cb2d00ea4955b00116de42161b4eb605",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm147_v16_abort_result.json": "dc3564499738a4c85dc5c2723cf5d2c5ff2f6ca77d3a315a7b51e2dfeac67b6a",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm148_v16_abort_result.json": "0f6871f5257e0562ac2947e4621d6b603cb4d2770f353da2fa0b6dc61b700e4b"
+  },
+  "claim_boundary": "Finite-sample A100 qualification: each of prepare, abort, commit, and complete has two independent-node post-apply fail-stop arms. Operations were not injected as a Cartesian product on every node; production d_MAC, WCET, and cross-family claims remain out of scope."
+}

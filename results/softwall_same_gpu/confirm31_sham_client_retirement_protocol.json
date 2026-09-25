@@ -1,0 +1,35 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm31_sham_client_retirement",
+  "purpose": "Isolate MPS client/context lifecycle from optional GPU overrun by retiring an initialized NeuralRx worker without submitting any work, then running mandatory RAN releases.",
+  "selection_source": {
+    "confirm28": "Worker-free conventional-only control had 0/10000 D35 misses.",
+    "confirm30": "Overrun drain plus immediate process retirement had 17/10000 post-retirement D35 misses, but overrun and teardown were coupled."
+  },
+  "mandatory_ran": {
+    "input": "clean valid 273-PRB PUSCH",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations_per_run": 1000,
+    "runs": 5
+  },
+  "lifecycle_fault": {
+    "optional_work_submitted": 0,
+    "worker": "initialized persistent NeuralRx CUDA Graph RPC worker",
+    "retirement": "send stop and close the MPS client before the first timed RAN release",
+    "delay_before_first_release_ms": 200,
+    "caps": [100, 20]
+  },
+  "primary_gate": {
+    "no_optional_work_submitted": true,
+    "all_workers_report_zero_completed_units": true,
+    "all_endpoints_retired_before_release_zero": true,
+    "all_ran_releases_correct": true,
+    "all_ran_deadline_misses": 0
+  },
+  "interpretation": {
+    "fail": "A miss falsifies the assumption that an initialized MPS client can be retired safely during a live RAN epoch even without an optional overrun.",
+    "pass": "No observed miss narrows confirm30 to overrun-plus-retirement or residual-state interaction; it does not prove teardown universally safe."
+  }
+}

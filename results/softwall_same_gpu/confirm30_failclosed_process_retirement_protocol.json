@@ -1,0 +1,35 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm30_failclosed_process_retirement",
+  "purpose": "Test whether draining a timed-out optional unit and terminating its MPS client process removes the residual tail observed when the CUDA context remained idle.",
+  "selection_source": {
+    "confirm29": "Admission quarantine with an idle live CUDA context produced one 38.011 ms RAN miss in 10000 releases.",
+    "policy_change": "After the first timeout, drain the physical work, reject its result, send stop, close the RPC channel, wait for process exit, and never admit that endpoint again."
+  },
+  "mandatory_ran": {
+    "input": "clean valid 273-PRB PUSCH",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations_per_run": 1000,
+    "runs": 5
+  },
+  "fault": {
+    "work_unit": "40 sequential NeuralRx CUDA Graph launches in a separate low-priority MPS client",
+    "timeout_ms": 5,
+    "admitted_indices": [0],
+    "post_timeout_policy": "drain and reject the late response, stop the worker, close the client channel, wait for process exit, and issue no later work",
+    "caps": [100, 20]
+  },
+  "primary_gate": {
+    "exactly_one_fault_request_per_run": true,
+    "all_fault_requests_timeout": true,
+    "all_late_responses_drained": true,
+    "all_endpoints_retired": true,
+    "all_ran_releases_correct": true,
+    "all_ran_deadline_misses": 0,
+    "all_physically_overlapped_deadline_misses": 0,
+    "no_outstanding_unit_at_end": true
+  },
+  "interpretation_limit": "Passing supports fail-closed recovery for the tested A100/MPS workload and D35 contract. It does not prove universal hard real-time isolation or preemption of an already running CUDA kernel."
+}

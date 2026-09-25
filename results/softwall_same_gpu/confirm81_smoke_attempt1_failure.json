@@ -1,0 +1,12 @@
+{
+  "schema": "softwall-confirm81-smoke-failure-v1",
+  "job": "58738952",
+  "prefix": "smoke81_fenced_fault_job58738952",
+  "scope": "Excluded 20-release pre-freeze smoke, not a full qualification result",
+  "exit_code": 1,
+  "failure": "After the first joint AI RPC timed out, the worker-side CUDA-synchronized marker for lease before_recovery_0 was written. The client disabled future AI. On the next release, the pre-radio AI path ignored that disabled state and issued another request; finish_pre_ai raised asynchronous pre-radio AI completion unconfirmed.",
+  "marker": "raw/smoke81_fenced_fault_job58738952_completion_marker.json",
+  "worker_raw": "raw/smoke81_fenced_fault_job58738952_background.json",
+  "marker_gpu_ms": 3.095871925354004,
+  "fix": "The four-cell fault controller now requires background.enabled before starting any pre-radio AI thread. A separate smoke and full frozen protocol must be rerun; this failed smoke is not relabeled as a pass."
+}

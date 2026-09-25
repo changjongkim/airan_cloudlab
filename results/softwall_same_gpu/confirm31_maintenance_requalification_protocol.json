@@ -1,0 +1,41 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm31_maintenance_requalification",
+  "purpose": "Test the lifecycle recovery path after an optional-client timeout: quarantine and drain during the first RAN phase, stop the client only after releases cease, wait for cleanup, then requalify a fresh conventional service.",
+  "selection_source": {
+    "confirm30": "Immediate process/MPS-client retirement during live RAN produced 6/5000 cap100 and 11/5000 cap20 D35 misses.",
+    "policy_change": "Move worker stop and context cleanup outside the live-RAN interval."
+  },
+  "runs": 3,
+  "caps": [100, 20],
+  "fault_phase": {
+    "input": "clean valid 273-PRB PUSCH",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations": 100,
+    "fault_requests": 1,
+    "work_unit": "40 sequential NeuralRx CUDA Graph launches",
+    "timeout_ms": 5,
+    "policy": "drain and reject; no further admissions; stop worker after the final RAN release"
+  },
+  "maintenance": {
+    "ran_releases": 0,
+    "quiet_after_worker_exit_ms": 20000
+  },
+  "requalification_phase": {
+    "policy": "fresh conventional-only process with no AI worker or RPC socket",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations": 1000,
+    "warmup": 20
+  },
+  "primary_gate": {
+    "one_fault_per_run": true,
+    "all_faults_timeout_and_drain": true,
+    "no_outstanding_work_before_maintenance": true,
+    "all_post_maintenance_releases_correct": true,
+    "post_maintenance_deadline_misses": 0
+  },
+  "interpretation_limit": "Passing qualifies the tested 20-second maintenance/restart sequence for this A100 setup. It does not bound arbitrary MPS cleanup time, repair deadline misses inside the fault phase, or prove universal hard real-time behavior."
+}

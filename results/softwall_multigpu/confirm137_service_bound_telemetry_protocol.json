@@ -1,0 +1,121 @@
+{
+  "schema": "softwall-confirm137-service-bound-telemetry-protocol-v1",
+  "status": "frozen-after-canary-before-formal-arms",
+  "allocation_node": "nid001177",
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049"
+  ],
+  "arms": [
+    {
+      "name": "s1",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        28000051,
+        28010051
+      ],
+      "channel_seeds": [
+        28001000,
+        28011000
+      ]
+    },
+    {
+      "name": "s2",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        28020051,
+        28030051
+      ],
+      "channel_seeds": [
+        28021000,
+        28031000
+      ]
+    },
+    {
+      "name": "s3",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        28040051,
+        28050051
+      ],
+      "channel_seeds": [
+        28041000,
+        28051000
+      ]
+    },
+    {
+      "name": "s4",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        28060051,
+        28070051
+      ],
+      "channel_seeds": [
+        28061000,
+        28071000
+      ]
+    },
+    {
+      "name": "s5",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        28080051,
+        28090051
+      ],
+      "channel_seeds": [
+        28081000,
+        28091000
+      ]
+    },
+    {
+      "name": "s6",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        28100051,
+        28110051
+      ],
+      "channel_seeds": [
+        28101000,
+        28111000
+      ]
+    }
+  ],
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 25,
+  "target_ai_bound_ms": 40,
+  "global_broker_rpc_timeout_ms": 5,
+  "global_broker_transaction_budget_ms": 15,
+  "admission_ai_guard_ms": 17,
+  "required_rpc_operations": [
+    "prepare",
+    "commit",
+    "complete"
+  ],
+  "failure_rule": "stop on first formal arm failure; do not widen a bound post hoc",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "scripts_for_node/softwall_same_gpu/global_trace_service_bound_controller.py": "52bbd28b0229ffc852273b90c7c14a525e8d6b00604b597a6465daa100b4fd3f",
+    "scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "scripts_for_node/softwall_same_gpu/instrumented_deadline_global_trace_client.py": "89267830cc141470ea73b93087af60a310bad4ab8480335570d720b0c595a799",
+    "scripts_for_node/softwall_same_gpu/run_service_bound_telemetry_arm.sh": "7a8a1ca0478723a836eb3ed86c4c690e382068c07e7cc1e2fa7b02bfb3a5a7d9",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm137_service_bound_telemetry.py": "3c1420f84fdaad47b074adfd3a234841dbfd42cbaf71d03971bd0c3001ce0e5b",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm136_v12_requalification.py": "16bca8e71c73c86170da6730a53e6ea6428a3e51e609743ad08bdd33620372a7",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm135_static_counterfactual.py": "400473f604b8e28b6ca5d36984086f1cbc1d6e675cd8d3d43922e93f3b0d9032",
+    "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

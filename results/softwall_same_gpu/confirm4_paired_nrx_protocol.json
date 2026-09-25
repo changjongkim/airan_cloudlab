@@ -1,0 +1,29 @@
+{
+  "status": "frozen before confirm4_paired_nrx execution",
+  "frozen_utc": "2026-09-20",
+  "campaign": "confirm4_paired_nrx",
+  "purpose": "Validate S0 with valid paired radio input and actual NeuralRx on one MPS GPU",
+  "hardware": "one A100-SXM4-40GB, MIG disabled, one MPS server, same physical GPU",
+  "ran_workload": "Aerial PdschTx-generated 273-PRB slot decoded through CE, NI, EQ, de-rate-match, LDPC, CRC, and payload comparison",
+  "ai_workload": "Aerial NeuralRx TensorRT FP16 CUDA Graph",
+  "period_ms": 10,
+  "deadline_ms": 9,
+  "iterations_per_run": 1000,
+  "runs_per_condition": 5,
+  "seed_base": 20266000,
+  "protected_s0": {
+    "ai_end_to_end_budget_ms": 4,
+    "guard_ms": 0.5,
+    "one_outstanding_ai_unit": true
+  },
+  "primary_checks": {
+    "all_transport_blocks_correct": true,
+    "ran_alone_deadline_misses": 0,
+    "protected_deadline_misses": 0,
+    "protected_ai_budget_violations": 0,
+    "protected_release_crossings": 0,
+    "protected_ai_throughput": "greater than zero"
+  },
+  "selection_history": "An exploratory 1000-request paired-radio run missed an 8 ms deadline once with a maximum of 8.789 ms; 9 ms is evaluated only on new seeds.",
+  "interpretation_limit": "Repeated decoding uses a fixed valid slot per run; channel diversity and unconditional hard-real-time proof remain future work."
+}

@@ -1,0 +1,84 @@
+{
+  "schema": "softwall-confirm43-posthoc-mechanism-diagnostic-v1",
+  "job": "58682997",
+  "status": "exploratory; does not change frozen Confirm43 gates",
+  "pairs": [
+    {
+      "off": "r1_off",
+      "on": "r2_on",
+      "off_ai_units": 127682,
+      "on_ai_units": 127981,
+      "net_extra_ai_units": 299,
+      "gap_ai_units": 659,
+      "post_ran_ai_difference": -360,
+      "exploratory_100_release_block_interval": {
+        "block_size_releases": 100,
+        "blocks": 100,
+        "mean_extra_ai_per_block": 2.99,
+        "normal_95_interval_extra_ai_per_block": [
+          -1.0208586549389889,
+          7.000858654938989
+        ]
+      }
+    },
+    {
+      "off": "r4_off",
+      "on": "r3_on",
+      "off_ai_units": 127231,
+      "on_ai_units": 128001,
+      "net_extra_ai_units": 770,
+      "gap_ai_units": 663,
+      "post_ran_ai_difference": 107,
+      "exploratory_100_release_block_interval": {
+        "block_size_releases": 100,
+        "blocks": 100,
+        "mean_extra_ai_per_block": 7.7,
+        "normal_95_interval_extra_ai_per_block": [
+          6.397944499933844,
+          9.002055500066156
+        ]
+      }
+    }
+  ],
+  "total_net_extra_ai_units": 1069,
+  "total_gap_ai_units": 1322,
+  "total_post_ran_ai_difference": -253,
+  "exploratory_combined_100_release_block_interval": {
+    "block_size_releases": 100,
+    "blocks": 200,
+    "mean_extra_ai_per_block": 5.345,
+    "normal_95_interval_extra_ai_per_block": [
+      3.2165480587688493,
+      7.473451941231151
+    ]
+  },
+  "nrx_bound_violations": [
+    {
+      "condition": "r1_off",
+      "release_index": 2762,
+      "channel_seed": 20335762,
+      "post_gpu_ms": 34.667327880859375,
+      "response_ms": 37.056966,
+      "deadline_miss": false,
+      "fallback": false
+    },
+    {
+      "condition": "r2_on",
+      "release_index": 2749,
+      "channel_seed": 20335749,
+      "post_gpu_ms": 28.843904495239258,
+      "response_ms": 30.975425,
+      "deadline_miss": false,
+      "fallback": false
+    },
+    {
+      "condition": "r4_off",
+      "release_index": 2762,
+      "channel_seed": 20335762,
+      "post_gpu_ms": 44.74639892578125,
+      "response_ms": 46.989556,
+      "deadline_miss": false,
+      "fallback": false
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "arms": [
+    {
+      "arm_index": 0,
+      "branch": "overload",
+      "seeds": {
+        "channel": {
+          "home0/h0-r0": 25500051,
+          "home0/h0-r1": 25500151,
+          "home0/h0-r2": 25500251,
+          "home1/h1-r0": 25500351,
+          "home1/h1-r1": 25500451
+        },
+        "receiver": {
+          "home0/h0-r0": 25500011,
+          "home0/h0-r1": 25500111,
+          "home0/h0-r2": 25500211,
+          "home1/h1-r0": 25500311,
+          "home1/h1-r1": 25500411
+        }
+      }
+    },
+    {
+      "arm_index": 1,
+      "branch": "all_success",
+      "seeds": {
+        "channel": {
+          "home0/h0-r0": 25510051,
+          "home0/h0-r1": 25510151,
+          "home0/h0-r2": 25510251,
+          "home1/h1-r0": 25510351,
+          "home1/h1-r1": 25510451
+        },
+        "receiver": {
+          "home0/h0-r0": 25510011,
+          "home0/h0-r1": 25510111,
+          "home0/h0-r2": 25510211,
+          "home1/h1-r0": 25510311,
+          "home1/h1-r1": 25510411
+        }
+      }
+    },
+    {
+      "arm_index": 2,
+      "branch": "conditional_open",
+      "seeds": {
+        "channel": {
+          "home0/h0-r0": 25520051,
+          "home0/h0-r1": 25520151,
+          "home0/h0-r2": 25520251,
+          "home1/h1-r0": 25520351,
+          "home1/h1-r1": 25520451
+        },
+        "receiver": {
+          "home0/h0-r0": 25520011,
+          "home0/h0-r1": 25520111,
+          "home0/h0-r2": 25520211,
+          "home1/h1-r0": 25520311,
+          "home1/h1-r1": 25520411
+        }
+      }
+    },
+    {
+      "arm_index": 3,
+      "branch": "all_fail",
+      "seeds": {
+        "channel": {
+          "home0/h0-r0": 25530051,
+          "home0/h0-r1": 25530151,
+          "home0/h0-r2": 25530251,
+          "home1/h1-r0": 25530351,
+          "home1/h1-r1": 25530451
+        },
+        "receiver": {
+          "home0/h0-r0": 25530011,
+          "home0/h0-r1": 25530111,
+          "home0/h0-r2": 25530211,
+          "home1/h1-r0": 25530311,
+          "home1/h1-r1": 25530411
+        }
+      }
+    }
+  ],
+  "branch_order": [
+    "overload",
+    "all_success",
+    "conditional_open",
+    "all_fail"
+  ],
+  "excluded_nodes": [
+    "nid001032",
+    "nid001176",
+    "nid001253",
+    "nid001280",
+    "nid001348"
+  ],
+  "label": "confirm155_integrated_holdout_job",
+  "mode": {
+    "ai_bound_ms": 35,
+    "capacity": 1,
+    "conventional_bound_ms": 25,
+    "expiry_ms": 155,
+    "guard_ms": 2,
+    "nrx_bound_ms": 45,
+    "period_ms": 180,
+    "qwen_context_length": 64,
+    "qwen_model": "Qwen/Qwen2.5-1.5B",
+    "release_lead_ms": 3000.0,
+    "release_semantics": "t_IQ_ready_after_synthetic_channel_preparation",
+    "snr_db": 20.0,
+    "warmup": 10
+  },
+  "outcome_source": "prospectively controlled branch injection",
+  "placement": {
+    "GPU3": "unused in controlled-outcome holdout",
+    "home0_owners": "GPU0",
+    "home1_owners": "GPU1",
+    "shared_cuphy_and_qwen": "GPU2 under MPS 80/20"
+  },
+  "required_branches": [
+    "all_fail",
+    "conditional_open",
+    "all_success",
+    "overload"
+  ],
+  "schema": "softwall-confirm154-integrated-holdout-protocol-v1",
+  "scope": "Prospective same-source four-branch integrated holdout. Passing qualifies controlled outcome semantics on one additional A100 node; actual NeuralRx output, fault matrix, WCET, production d_MAC and throughput remain outside this campaign.",
+  "source_sha256": {
+    "scripts/analyze_confirm154_holdout_arm.py": "bb49586b3108ea1cbd0643407273642737c4bf27141ef855931811524029b21b",
+    "scripts/analyze_confirm154_holdout_campaign.py": "4bb10be8f97e0de6568ba1ed0e003ac30860e7045b17e850a3889a6e16bfd007",
+    "scripts/build_confirm154_holdout_protocol.py": "1a514daea37b7eee0d163935065b4665897b86dc9392c28971b59d281c57881b",
+    "scripts/build_confirm154_peer_spec.py": "8681dc95d75c9bcc4f04bbf7870b741c92037093d67d439ce2f1e7bad74c6b0b",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_holdout_plan_v1.py": "792cfce1235761f6156f9197b4b652dca95610cb5f647d0fc26cac9e7a202876",
+    "scripts/integrated_shared_recovery_holdout_worker.py": "dc13cc496563743fc7a9dc0dcc04fe8ccb5d008f661849eb957b4e94ea0be02e",
+    "scripts/integrated_shared_recovery_owner.py": "b703a5decddcd0322bf146aade5d4848494b5860bc3c49eca506c7b735789699",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/run_confirm154_integrated_holdout.sh": "bdc8ba7e8b168cfbbaaf166aa9af8df00a57e6e0f28f0b1f08aa8f93ed84510d",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run"
+}

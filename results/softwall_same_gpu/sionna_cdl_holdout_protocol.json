@@ -1,0 +1,36 @@
+{
+  "schema": "softwall-channel-holdout-protocol-v1",
+  "campaign": "sionna_cdl_de_holdout",
+  "frozen_before_execution": true,
+  "selection_provenance": {
+    "development_protocol": "sionna_cdl_family_development_protocol.json",
+    "development_result": "CDL-D/100 ns and CDL-E/100 ns each decoded conventional 10/10 and NeuralRx 10/10 at 30 dB; A/B/C results remain preserved and are not pooled",
+    "holdout_seeds_disjoint": true
+  },
+  "models": ["D", "E"],
+  "delay_spread_ns": 100.0,
+  "speed_mps": 0.8333,
+  "esno_grid_db": [-4.0, -3.6, -3.2, -3.0, 10.0],
+  "iterations_per_snr": 50,
+  "trials_per_model": 250,
+  "payload_and_slot": "fresh payload each trial; slot cycles 0 through 19",
+  "seeds": {
+    "D": {"payload": 20359000, "channel": 59001},
+    "E": {"payload": 20360000, "channel": 60001}
+  },
+  "radio_profile": "MCS7/start0/DMRS0,5,10/TDI1/one TX/four RX/FP32 engine",
+  "engine_sha256": "39b536eec02e5e67e937706de2447130ab9ec4385dfec2aca6636046b3427724",
+  "acceptance": {
+    "structural": "exactly 250 paired records per model with declared strata, seeds, varying slots, and no runtime error",
+    "high_snr_pipeline": "at 10 dB, conventional >=49/50 and NeuralRx >=49/50 for each model",
+    "conditional_value": "over the four low-SNR strata, at least five NeuralRx-only correct TBs for each model",
+    "reporting": "report both-correct, NeuralRx-only, conventional-only, and neither for every stratum; do not use truth as an online policy input"
+  },
+  "claim_if_pass": "Finite-sample compatibility and conditional recovery value only for the frozen Sionna CDL-D/E mode; no TDL-A, field-IQ, WCET, or production-HARQ generalization.",
+  "source_sha256_before_execution": {
+    "probe_sionna_cdl_holdout.py": "a0bea6856656e47cfec41f3714b7fc38cbb08c93076a9f576ab1826df30e8d7d",
+    "run_sionna_cdl_holdout.sh": "7207225dd66865e61a3b10356dcd8c7f98129b6948cd9f8ea48963c971b510ce",
+    "dual_receiver_phy.py": "cfef726c67f011295abc600c7e12b8fc6dda38d61b8803a8ca73435014a429dc",
+    "probe_sionna_cdl_family_development.py": "4ceaf01a64d343f22fde48fdb263b6a19dfc2e28a8ca3fe49fdf016a3bde9c47"
+  }
+}

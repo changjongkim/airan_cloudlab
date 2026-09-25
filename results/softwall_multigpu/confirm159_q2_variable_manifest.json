@@ -1,0 +1,691 @@
+{
+  "all_pass": true,
+  "artifact_history_limitation": "Q2a was a 24-epoch pre-correction pilot. Q2b completed 600 epochs but failed one stale atomic lease after a 23.530143 ms control tail. Q2c verified bounded revalidation and the physical latest-start gate. Q2d stopped after 349 epochs because retry replay exposed an artificial sequential partial-outcome state. Q2e verified atomic observed-success batch transition. Only Q2f and the independent-node Q2g holdout are authoritative passing qualification campaigns.",
+  "claim_scope": "Two-node finite-sample qualification of six variable Qwen prefill classes under the warm synthetic P180/D155 actual-NeuralRx mode. It validates class-specific bounded admission, bounded launch-time revalidation, a physical latest-start gate, and an atomic batch transition for outcomes observed at one cutoff. It is not an online BurstGPT performance result, WCET proof, cold/long-idle qualification, production d_MAC result, or integrated fault qualification.",
+  "file_count": 162,
+  "files": {
+    "data/current/softwall_c159_calibration_burst_windows_v1.json": {
+      "bytes": 1893471,
+      "sha256": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f"
+    },
+    "docs/current/SOFTWALL_CONFIRM159_Q2_VARIABLE_RESULT_KO.md": {
+      "bytes": 7959,
+      "sha256": "62741c8bad87c89117cd887f62eb90c20afb007b523de6ca7a44efbb81f35144"
+    },
+    "docs/current/SOFTWALL_CONFIRM159_TRACE_PROTOCOL_KO.md": {
+      "bytes": 11995,
+      "sha256": "6b25f4dc912ee4418eba51833ea86104dc52e83eb4c678eec2d1bd4398e7d244"
+    },
+    "results/softwall_multigpu/confirm159_experiment_prespec_v1.json": {
+      "bytes": 2923,
+      "sha256": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b"
+    },
+    "results/softwall_multigpu/confirm159_q2_variable_two_node.json": {
+      "bytes": 18413,
+      "sha256": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692"
+    },
+    "results/softwall_multigpu/confirm159q2a_pilot_j58857672_peer_spec.json": {
+      "bytes": 3210,
+      "sha256": "d98715b36760411e46f929acf57aa1ab82c9b8b2280972969bc0e75972bb006f"
+    },
+    "results/softwall_multigpu/confirm159q2a_pilot_j58857672_protocol.json": {
+      "bytes": 7868,
+      "sha256": "07b4019da2cb78d636472ed21ce4b2a4c3be4e65d5c8a832af865c9309d6c48f"
+    },
+    "results/softwall_multigpu/confirm159q2a_pilot_j58857672_result.json": {
+      "bytes": 6818,
+      "sha256": "56b5474eebb16034319befa7b18b1b7ef86df152a7244ad97d9f7f9b4c7048eb"
+    },
+    "results/softwall_multigpu/confirm159q2b_dev_j58857672_peer_spec.json": {
+      "bytes": 3168,
+      "sha256": "2442a04ec5cc600750eec4b00e5f5f89ad96a466d1dd90cccae0382948923902"
+    },
+    "results/softwall_multigpu/confirm159q2b_dev_j58857672_protocol.json": {
+      "bytes": 7874,
+      "sha256": "eeb7a544fe42942c9ca2e4910ddceb61eb944647a6a4c683c181e70fcf7ed751"
+    },
+    "results/softwall_multigpu/confirm159q2b_dev_j58857672_result.json": {
+      "bytes": 6878,
+      "sha256": "fc2767e6a2851da744aeb7d35dd8627188d9254d5cec120b74427712b29d9278"
+    },
+    "results/softwall_multigpu/confirm159q2b_launch_control_failure.json": {
+      "bytes": 2219,
+      "sha256": "ef93354a42b4b7fe3e44ff00bcc72d8b88006cb436a577ad20c5646f508be030"
+    },
+    "results/softwall_multigpu/confirm159q2c_guarded_pilot_j58857672_peer_spec.json": {
+      "bytes": 3378,
+      "sha256": "3a0f82dc3662e114395e629b31b3ed5b6c1731752f00ccc1a43855a7c5de1d8d"
+    },
+    "results/softwall_multigpu/confirm159q2c_guarded_pilot_j58857672_protocol.json": {
+      "bytes": 8447,
+      "sha256": "5829b986949ca580627972f424bbecb0d7375f08f437793e3b805f5e026b28b8"
+    },
+    "results/softwall_multigpu/confirm159q2c_guarded_pilot_j58857672_result.json": {
+      "bytes": 7279,
+      "sha256": "423d5288e76ae95a106e79ece7694b8ac8e49f4aa3f52dcc23d8c9b069db390c"
+    },
+    "results/softwall_multigpu/confirm159q2d_guarded_dev_j58857672_peer_spec.json": {
+      "bytes": 3336,
+      "sha256": "a6d8ffca7c42f905124b92c6b0f97175c1cf0266c7a144f4efa6f6a862bf999d"
+    },
+    "results/softwall_multigpu/confirm159q2d_guarded_dev_j58857672_protocol.json": {
+      "bytes": 8453,
+      "sha256": "73bb33c16391fe6655f40f14a2577e81b0bd4c46bc25867897230a1078bfff16"
+    },
+    "results/softwall_multigpu/confirm159q2d_sequential_revalidation_failure.json": {
+      "bytes": 1771,
+      "sha256": "3275b54d1cd3ddafb76f7fdc4ea288e9dda8a6c0cf4cc380500bb121ab38c5a3"
+    },
+    "results/softwall_multigpu/confirm159q2e_batch_pilot_j58857672_peer_spec.json": {
+      "bytes": 3336,
+      "sha256": "13f6d73ceae4e38481fa2bc194307ee742acb89ea61f1b26121f1e1f288acd97"
+    },
+    "results/softwall_multigpu/confirm159q2e_batch_pilot_j58857672_protocol.json": {
+      "bytes": 8892,
+      "sha256": "5cc83dbdef090a5b072e6ef71f3678e27e5ebdd1a090e23cd4c795a4c85f5b2c"
+    },
+    "results/softwall_multigpu/confirm159q2e_batch_pilot_j58857672_result.json": {
+      "bytes": 7286,
+      "sha256": "fc59b6940e470870c5f4a4e7885ca0d9433717d6d5f94f07c4b7311b25a50cd8"
+    },
+    "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_peer_spec.json": {
+      "bytes": 3294,
+      "sha256": "d4d9408192bbaee80d709b2f69299d0c6c05ef42d20e216df5dc344e122527a0"
+    },
+    "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_protocol.json": {
+      "bytes": 8898,
+      "sha256": "a8bd890067653e5939be79dc8de27b1d08c78b30fa9a095fb342df7f629b9cfc"
+    },
+    "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_result.json": {
+      "bytes": 7367,
+      "sha256": "00481d5450458186e7984bb22d0d9910d3f3b66713399be1021f2c6049295cd2"
+    },
+    "results/softwall_multigpu/confirm159q2g_batch_holdout_j58858194_peer_spec.json": {
+      "bytes": 3378,
+      "sha256": "084f31d6627ee3b479f811d09cf2bb5d92b8ad9b0f7a9b0dac1ad99eb01e68f9"
+    },
+    "results/softwall_multigpu/confirm159q2g_batch_holdout_j58858194_protocol.json": {
+      "bytes": 8915,
+      "sha256": "3ef03f8ae70879db18b3fcdb0fb8efd75f9fddb0724dfbcf42408ce32841cee9"
+    },
+    "results/softwall_multigpu/confirm159q2g_batch_holdout_j58858194_result.json": {
+      "bytes": 7407,
+      "sha256": "df1c503207c789ae3a0fac028deece9365744bf92016c78c442a8027502e99f8"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_coordinator.json": {
+      "bytes": 101642,
+      "sha256": "a3d9c9ef040351e2df69412cc350c770ef9d05d972314dcd5d518fe9e34ed73c"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_coordinator.log": {
+      "bytes": 640,
+      "sha256": "b3920991a0255d7112afdf293064e3b5d6fe6058e5ffb3dcc83ea6534d6e28c1"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_gpu_inventory.csv": {
+      "bytes": 344,
+      "sha256": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r0_owner.json": {
+      "bytes": 33805,
+      "sha256": "93cfeb489e21187904b8b76d8114357cc20ba7b53476ac6633a6f3dba30c94dd"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "b9d3aa4874397f5a5752f48049c1ba7a4067b5a59d0d55f64cb3bcbe8475ccf3"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r1_owner.json": {
+      "bytes": 34197,
+      "sha256": "63c7bf5d9d4bf4149cb6eb17d26ab630fbf6ff8fa89561ad153711a917914f0e"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r1_owner.log": {
+      "bytes": 160,
+      "sha256": "806b7f45a50dbed866af6515d82e9e790b92c2558345d055da07b949562d7261"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r2_owner.json": {
+      "bytes": 34308,
+      "sha256": "cdd38336c740e8c0ac8d2dd6c7afc191ec54b5ababc04bc977f102f70d0e691a"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r2_owner.log": {
+      "bytes": 160,
+      "sha256": "add2324fffcd5cab1b80dd0733a592de007cb3ffeb6e9938f3919079c948e424"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home1_h1-r0_owner.json": {
+      "bytes": 33796,
+      "sha256": "49ba38298ae87700575f4753a522724c46478c26a6eadc7fb7be7935be31ce3f"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home1_h1-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "aae66be64c5c75673859ee2f2ce2ab30393b14d685df3e2cafe6dd65fe1e83fc"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_nrx_worker.json": {
+      "bytes": 73205,
+      "sha256": "841a6124ab5d4d2c5becb7c8a1df8f5211e09299a5e9bb8f1243a2aaabbb3d0c"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_nrx_worker.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_qwen.json": {
+      "bytes": 7293,
+      "sha256": "9c6024b176c6a25e01f92173cc535e735c645945ad9e34c6081096b1d68f42a3"
+    },
+    "results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_qwen.log": {
+      "bytes": 195,
+      "sha256": "d30b00ea84ad9a4afcfeec74954e70785d1afb59e9cf957c18d481ff6c542b93"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_coordinator.json": {
+      "bytes": 2475287,
+      "sha256": "1292029a8d6ec2992cd93a601be5444f17fb4342d894167a6b337bffb75619c1"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_coordinator.log": {
+      "bytes": 640,
+      "sha256": "d7f4aefba603c139ead911867686304e5e4061ac86663e48379ff7ff305bec27"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_gpu_inventory.csv": {
+      "bytes": 344,
+      "sha256": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home0_h0-r0_owner.json": {
+      "bytes": 827424,
+      "sha256": "25cfabf7b789a321cb2e1307e36bf560e986d633b255416b3ef37d24109d0583"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home0_h0-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "6a8f91cd52f81795c75ac2a3721ad04edc7496690dbe94ec62f7f970a3513e8f"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home0_h0-r1_owner.json": {
+      "bytes": 839531,
+      "sha256": "5a60fc75799351ba91e54e94a45472185577c176e8d2de00388f3197bbfe6210"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home0_h0-r1_owner.log": {
+      "bytes": 160,
+      "sha256": "8d31df0c3d7990c87a746b6756ca851593beb84bf305dceb0efaad5bca9185a2"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home0_h0-r2_owner.json": {
+      "bytes": 839700,
+      "sha256": "b0c439ec21ea14c21b33196baac6c371eb29b96ccef46e4bb88d8719e8342dbd"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home0_h0-r2_owner.log": {
+      "bytes": 160,
+      "sha256": "43b50b8afba82757ff2d88d550326646f3b73fe5ed879791b5533cc30a9762b0"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home1_h1-r0_owner.json": {
+      "bytes": 827432,
+      "sha256": "3908e8454dae13eeb576bb63d21f1b7477c3426ee0316e860e644f4602004cfd"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_home1_h1-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "d34c5a3dc5e842c42eb83da3bbdeda974a8111482d55c969dbd3f13cad26d02e"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_nrx_worker.json": {
+      "bytes": 1792332,
+      "sha256": "5426caa7e4b4c3dd49984c524287fa9ef659402e972bf0bf176030bfeffe48df"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_nrx_worker.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_qwen.json": {
+      "bytes": 116775,
+      "sha256": "651e0b616ddd7d6de4d976c73141cdd5c7b031e29154d26eefff88324ed6f2f9"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_qwen.log": {
+      "bytes": 195,
+      "sha256": "d30b00ea84ad9a4afcfeec74954e70785d1afb59e9cf957c18d481ff6c542b93"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_coordinator.json": {
+      "bytes": 130629,
+      "sha256": "bf10dca9def2ef984406f10d28b57496e5d5bc2ad0685b6f0a7f091d7556a38a"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_coordinator.log": {
+      "bytes": 640,
+      "sha256": "be155be141f34004b0e4e2646ca83df05221fa1f9d79de4fc6d311e5437d90be"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_gpu_inventory.csv": {
+      "bytes": 344,
+      "sha256": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home0_h0-r0_owner.json": {
+      "bytes": 33806,
+      "sha256": "c2489106c24bd9f16a0d64dbcf2c6cbfb49a639aa3a5ea81516eecb04fd0c932"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home0_h0-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "ca771670daa8e40cf6914a150878bfb586c65fc1f8a5e6fc704a405a98e1cd3a"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home0_h0-r1_owner.json": {
+      "bytes": 34344,
+      "sha256": "a2bc9d03f9045fac494a093b1c64e98e44773fdbabe78158f1d3f49d9efdad5f"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home0_h0-r1_owner.log": {
+      "bytes": 160,
+      "sha256": "c0be4948590fd6b97f83062a44855c0a9fa1e59da9c06a3756547a8319ad8a10"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home0_h0-r2_owner.json": {
+      "bytes": 34262,
+      "sha256": "e4769eac05ce81f49ebfc16cad8341a8d4439e0bee912cf5005c9b5638ff1edd"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home0_h0-r2_owner.log": {
+      "bytes": 160,
+      "sha256": "bacc84ea617639faf53fa780773ac69bb2d14a0808ff5989efaf292a1c4c7fd8"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home1_h1-r0_owner.json": {
+      "bytes": 33795,
+      "sha256": "b6c98f8befc42e546162d2acd36504dec3b1b95203e6cd92e556a49fca244c3c"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_home1_h1-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "9a4a2fbcd6f34556fc24e8d36b7bad739afafe8522a0a4dbabf07acc98f534ee"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_nrx_worker.json": {
+      "bytes": 73164,
+      "sha256": "80e573cb58bbfc8f0b7386d665a41fd0b6a7877b9a5080c8c37cae8c3fc9973b"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_nrx_worker.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_qwen.json": {
+      "bytes": 8267,
+      "sha256": "e268b633398722c90ff761bb15356b3014e1fc6a515c9fc186f71cc99529871e"
+    },
+    "results/softwall_multigpu/raw/confirm159q2c_guarded_pilot_j58857672_qwen.log": {
+      "bytes": 195,
+      "sha256": "d30b00ea84ad9a4afcfeec74954e70785d1afb59e9cf957c18d481ff6c542b93"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_coordinator.json": {
+      "bytes": 1807405,
+      "sha256": "8f4093eabed1aaf392b606b0e164f09f1c0f96ced16082e3b56aaf470a4f0669"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_coordinator.log": {
+      "bytes": 1305,
+      "sha256": "8e29dc08a6660abcd519abbc567961a556ff04aadebf7f20dfdf9cfb3153bb14"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_gpu_inventory.csv": {
+      "bytes": 344,
+      "sha256": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home0_h0-r0_owner.json": {
+      "bytes": 481609,
+      "sha256": "49bb6bfaa98fc92d57b3f712a58b9a7bdbc9a8b0ae66f77cfbb7e90006b28b35"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home0_h0-r0_owner.log": {
+      "bytes": 357,
+      "sha256": "025a48af931ca5111103d0c32f339417bfcd1ab8ed7d1b4c57fb73badfcfc277"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home0_h0-r1_owner.json": {
+      "bytes": 488511,
+      "sha256": "5cc457e35fc165c16cc7980375ee0f77f36a69ec4adce4f925ac9949bfac8664"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home0_h0-r1_owner.log": {
+      "bytes": 357,
+      "sha256": "025a48af931ca5111103d0c32f339417bfcd1ab8ed7d1b4c57fb73badfcfc277"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home0_h0-r2_owner.json": {
+      "bytes": 488874,
+      "sha256": "f362a2774b768d820cbb64c79d45e4a7086981d6d4512404f01094fa3bf8785b"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home0_h0-r2_owner.log": {
+      "bytes": 357,
+      "sha256": "025a48af931ca5111103d0c32f339417bfcd1ab8ed7d1b4c57fb73badfcfc277"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home1_h1-r0_owner.json": {
+      "bytes": 481597,
+      "sha256": "94dc2fd3a54d806f950d21d4ea94c9eb439e504aa086820561f3d489fcf6e6e9"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_home1_h1-r0_owner.log": {
+      "bytes": 357,
+      "sha256": "025a48af931ca5111103d0c32f339417bfcd1ab8ed7d1b4c57fb73badfcfc277"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_nrx_worker.json": {
+      "bytes": 1046061,
+      "sha256": "460b2e205c1275986df140004f20a0762fb265d1f2cac0098633cf853d9e064d"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_nrx_worker.log": {
+      "bytes": 402,
+      "sha256": "a496038a5128961a12dde6ab04e9f3f180407b4eec67e300d8b1a5f7f2dd9c0b"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_qwen.json": {
+      "bytes": 81551,
+      "sha256": "96ccab5f08f6d61b6f207b093edd472d38a78e541884d2acbbf918d4fba3f756"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_qwen.log": {
+      "bytes": 195,
+      "sha256": "d30b00ea84ad9a4afcfeec74954e70785d1afb59e9cf957c18d481ff6c542b93"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_coordinator.json": {
+      "bytes": 134905,
+      "sha256": "59812a2188e85c3c0b674c4c855faebce51117e3c6870bf152dcd57a966051e0"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_coordinator.log": {
+      "bytes": 640,
+      "sha256": "65949c7d85637cb7921d1d76cdc5fd6ca881cd823226bec89bb0e6a5cc5a26b4"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_gpu_inventory.csv": {
+      "bytes": 344,
+      "sha256": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home0_h0-r0_owner.json": {
+      "bytes": 33810,
+      "sha256": "c0bb6ebcdd8bbc091536a29baf41b03ebfe3dff8b08004719a9e5a8d6ee6dfdd"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home0_h0-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "0662c99b89a8f6f57f57b719501a675972cb38dd894e84d5236191a5c0600b44"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home0_h0-r1_owner.json": {
+      "bytes": 34343,
+      "sha256": "511d1b9c939ad475f8aa62c26b36d0d50304048488ef33a0be3e41ca7b974fc7"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home0_h0-r1_owner.log": {
+      "bytes": 160,
+      "sha256": "c0eda0d0855422a3334f4290e48e949cf17b5e7572a39ebfdb371f6e6f4d4740"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home0_h0-r2_owner.json": {
+      "bytes": 34058,
+      "sha256": "c0d6f49754dabc2af6b62fe07ffbed99569af4fcc5d3cfb3381abe8a47a7f2bb"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home0_h0-r2_owner.log": {
+      "bytes": 160,
+      "sha256": "fda8e5be26167848db3e73e0d6da82d63e056616917acf7c35bc5dfe2340d4d3"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home1_h1-r0_owner.json": {
+      "bytes": 33798,
+      "sha256": "d314216f55240cb9ec7c16d85228483abc3f4b0820dc4b22deea55e5aae19da6"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_home1_h1-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "673b7e8bf6dd20cfcf5d11eeb02c974b499f4f22627953aebf4a7c58d522612d"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_nrx_worker.json": {
+      "bytes": 73137,
+      "sha256": "fd038bf12d2e6b0ade1668990c1b81de862a4a58563b7a2d5b35ca811f580414"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_nrx_worker.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_qwen.json": {
+      "bytes": 8261,
+      "sha256": "af63bfa0e6031222dc42fdb267ed9db793ced20cddb6946c3a2d8c5f40c4010e"
+    },
+    "results/softwall_multigpu/raw/confirm159q2e_batch_pilot_j58857672_qwen.log": {
+      "bytes": 195,
+      "sha256": "d30b00ea84ad9a4afcfeec74954e70785d1afb59e9cf957c18d481ff6c542b93"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json": {
+      "bytes": 3348576,
+      "sha256": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.log": {
+      "bytes": 640,
+      "sha256": "eb2f5043f4ef0e355fa535d8f7075307df4f71b7b8b0790e11df91f8f38c1951"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_gpu_inventory.csv": {
+      "bytes": 344,
+      "sha256": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r0_owner.json": {
+      "bytes": 827431,
+      "sha256": "049462a4c2fe8c26f0d0be728f24172736512b3692e843dffc76fbd76d7e93d4"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "f96783aeb06adcb71e125cb40cd7d0f8fe6bf2d213ed25fa53d9e4e16af3e034"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r1_owner.json": {
+      "bytes": 839200,
+      "sha256": "520753284948b5105cf2f8bbc58ca8609c35d7998c00d7639071d109a44ec260"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r1_owner.log": {
+      "bytes": 160,
+      "sha256": "4fe664a6dccac696b850c96b9158462ecbc8735041cd7c4bcb691cf294e5e827"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r2_owner.json": {
+      "bytes": 838959,
+      "sha256": "da77e9e07cf6e415a6827b3094c21ca1dbc840c2d9d65753887521b3dc3cdf46"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r2_owner.log": {
+      "bytes": 160,
+      "sha256": "1942b445dd317df4d565afa55984a590ad7ba900d0ec85d2f79aa7bfbb60cdb9"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home1_h1-r0_owner.json": {
+      "bytes": 827427,
+      "sha256": "69463399abc965e4b30214e19bf8554710344516fa121433e658e312e5eccc1a"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home1_h1-r0_owner.log": {
+      "bytes": 160,
+      "sha256": "b817a65bffe37cebf35046d7f4ba0f068c41454d32dde7212f267834fea6de8b"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_nrx_worker.json": {
+      "bytes": 1792269,
+      "sha256": "2d08ba07634f82af26d92afc6eec20ef4fd2074aaa1da5274196086d2bf27452"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_nrx_worker.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_qwen.json": {
+      "bytes": 138422,
+      "sha256": "0bbd981c08c83ba3c9346a0e067101d3b99559ae6408740c291ea55a98ba3f4d"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_qwen.log": {
+      "bytes": 195,
+      "sha256": "d30b00ea84ad9a4afcfeec74954e70785d1afb59e9cf957c18d481ff6c542b93"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json": {
+      "bytes": 3345851,
+      "sha256": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.log": {
+      "bytes": 644,
+      "sha256": "23e0b85395d2c4392b274c574bfdec7ae8e9963a2891a0628da2564fab58c9f3"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_gpu_inventory.csv": {
+      "bytes": 344,
+      "sha256": "44e4247c66acd7d336d5d6cb11a5f3739c9f60fb16ae427b09621aaec141de91"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r0_owner.json": {
+      "bytes": 827374,
+      "sha256": "7bd03c8864ce5b04e6ad979b5db693faae18259fa9ec18c35e637befe18f4015"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r0_owner.log": {
+      "bytes": 161,
+      "sha256": "8844242b0fa661fb7d1d19540d622a98f5ea68f3c23b676b5e229660459ed660"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r1_owner.json": {
+      "bytes": 839754,
+      "sha256": "735954cba154e2cc6afa39920c7b42664413121dfb2fbb67f9c012b1117a2e68"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r1_owner.log": {
+      "bytes": 161,
+      "sha256": "0051dbbfe693429d24e199a4133035662a1496f6334c4b416b44925787612777"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r2_owner.json": {
+      "bytes": 838806,
+      "sha256": "637feb01901db24e2538e0a29f4c2ff327577616bad1f07a27e16411c82ad00a"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r2_owner.log": {
+      "bytes": 161,
+      "sha256": "ed54b631a67b54fc85229de368ea6d530c31049c93c6a6a8ed8771126bbb9713"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home1_h1-r0_owner.json": {
+      "bytes": 827411,
+      "sha256": "71549f218e3708ee394a74860cefab093debe0fbf044a1d82f7b74d86329feab"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home1_h1-r0_owner.log": {
+      "bytes": 161,
+      "sha256": "089b396b682ba754e199feff142305ad260fbdf3252a3a68ce769244a6f83b8d"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_nrx_worker.json": {
+      "bytes": 1792611,
+      "sha256": "bbfc33bd5cbb8839d6d55819b88cb1f0465f4a8a277233486a8386c58265a3df"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_nrx_worker.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_qwen.json": {
+      "bytes": 135673,
+      "sha256": "ce3c03d80dfd65124810a7546d38da7d28d94a8ed02931b6354d98ea1efb46b6"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_qwen.log": {
+      "bytes": 195,
+      "sha256": "6bdd6336f3d619cda6006556710edf4c9012e6747acca5da251b3e841fbebf6d"
+    },
+    "scripts_for_node/softwall_same_gpu/actual_nrx_batch_recovery_plan_v1.py": {
+      "bytes": 5952,
+      "sha256": "8729b20cb6f6a817f6171f0071211f864832c0f68cca2f19793c3ef7f9a4cf26"
+    },
+    "scripts_for_node/softwall_same_gpu/actual_nrx_integrated_coordinator.py": {
+      "bytes": 13519,
+      "sha256": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d"
+    },
+    "scripts_for_node/softwall_same_gpu/actual_nrx_integrated_owner.py": {
+      "bytes": 11034,
+      "sha256": "0b3ad90dd898bd9abeea832c83ac2b07bb571304eae6476f52ecb0611ed2e210"
+    },
+    "scripts_for_node/softwall_same_gpu/actual_nrx_multi_peer_worker.py": {
+      "bytes": 10391,
+      "sha256": "062e82a652535de86ccd024a38dbae1e3907b2ba7ffa607f9a4b6f50335bc298"
+    },
+    "scripts_for_node/softwall_same_gpu/actual_nrx_repeated_control.py": {
+      "bytes": 4625,
+      "sha256": "c3a5b5c29a6f0eb8beb686e119acf466ebc5e8f2da32d756f81c922dd9c77323"
+    },
+    "scripts_for_node/softwall_same_gpu/actual_nrx_shared_recovery_plan_v1.py": {
+      "bytes": 5074,
+      "sha256": "c9e036f23f2bf913d1b5c4b27ba9a6bb82acfdcb166400b3a9abb4c0fc6b1041"
+    },
+    "scripts_for_node/softwall_same_gpu/analyze_confirm159_q2.py": {
+      "bytes": 22707,
+      "sha256": "c04480839fba8e68d8433b6e129ccaf0b3ae748e667ddd47e3d79d80ed1ca879"
+    },
+    "scripts_for_node/softwall_same_gpu/analyze_confirm159_q2_two_node.py": {
+      "bytes": 13915,
+      "sha256": "c6e7224bbd1f0db62697dade1cb7fec430755a36d1eb3e26a85ba653f40e8dc9"
+    },
+    "scripts_for_node/softwall_same_gpu/bounded_launch_revalidation.py": {
+      "bytes": 1379,
+      "sha256": "725da11d755d6bba1ad1a23552bff28da09f5bb35a59a065384160d67e678819"
+    },
+    "scripts_for_node/softwall_same_gpu/build_confirm159_q2_manifest.py": {
+      "bytes": 6026,
+      "sha256": "c0ea65bf227f65d4e292d11e5a70d85f5e34ec51d867ca1027a7e9afe312a359"
+    },
+    "scripts_for_node/softwall_same_gpu/build_confirm159_q2_protocol.py": {
+      "bytes": 12769,
+      "sha256": "95191e3dccc3962686230b2a90c45543c9f875b3eebda2c390597d17df3fe037"
+    },
+    "scripts_for_node/softwall_same_gpu/c159_persistent_nrx_worker.py": {
+      "bytes": 10464,
+      "sha256": "d43a1310a27f98c8cc5247e8d84ab0f8784c561a308be65e611f74b4aa238943"
+    },
+    "scripts_for_node/softwall_same_gpu/c159_prestaged_owner.py": {
+      "bytes": 17625,
+      "sha256": "bd0bf68a6cc8a5e41190ea1073df7cd46936fbd49733f3b1544fc50d8a344d75"
+    },
+    "scripts_for_node/softwall_same_gpu/c159_q2_classes.py": {
+      "bytes": 222,
+      "sha256": "34c5b0d8353bf3ece6e603b381eddd306ce5bcc1c4830a5ee73da51b516f483b"
+    },
+    "scripts_for_node/softwall_same_gpu/c159_q2_coordinator.py": {
+      "bytes": 24609,
+      "sha256": "1d9bb65d033c52a25d9305989840b4f823cd183c1347bbab2bccb5341da83d23"
+    },
+    "scripts_for_node/softwall_same_gpu/c159_q2_qwen_worker.py": {
+      "bytes": 9855,
+      "sha256": "1b5e9c207354fa897b6586d6cf1ccc894edf49a095c293f8f022a0f679d524dd"
+    },
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": {
+      "bytes": 23152,
+      "sha256": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06"
+    },
+    "scripts_for_node/softwall_same_gpu/integrated_shared_recovery_launch_plan_v1.py": {
+      "bytes": 4768,
+      "sha256": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9"
+    },
+    "scripts_for_node/softwall_same_gpu/integrated_shared_recovery_plan_v1.py": {
+      "bytes": 6215,
+      "sha256": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04"
+    },
+    "scripts_for_node/softwall_same_gpu/integrated_shared_recovery_worker.py": {
+      "bytes": 12643,
+      "sha256": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a"
+    },
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_ipc_gate.py": {
+      "bytes": 13060,
+      "sha256": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a"
+    },
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_nrx_worker.py": {
+      "bytes": 7578,
+      "sha256": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759"
+    },
+    "scripts_for_node/softwall_same_gpu/run_confirm159_q2.sh": {
+      "bytes": 7432,
+      "sha256": "03f8ccab3f2f4f4f6965cb9d9a5df74c53b4366b835ed77cd629a40942e83bd2"
+    },
+    "scripts_for_node/softwall_same_gpu/shared_conventional_owner.py": {
+      "bytes": 6366,
+      "sha256": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0"
+    },
+    "scripts_for_node/softwall_same_gpu/shared_conventional_worker.py": {
+      "bytes": 10076,
+      "sha256": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33"
+    },
+    "scripts_for_node/softwall_same_gpu/shared_recovery_certificate_v1.py": {
+      "bytes": 10195,
+      "sha256": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441"
+    },
+    "scripts_for_node/softwall_same_gpu/test_actual_nrx_batch_recovery_plan_v1.py": {
+      "bytes": 2554,
+      "sha256": "3c04b5f952a38608a534920721d78e836c9f1504810f71692e45fe2ba0ccaf1f"
+    },
+    "scripts_for_node/softwall_same_gpu/test_bounded_launch_revalidation.py": {
+      "bytes": 1511,
+      "sha256": "2170d0a1b3bddbaa2c4d35d3c83562e74a1b16e750614db9dd1a71e54dbd1589"
+    },
+    "scripts_for_node/softwall_same_gpu/test_c159_q2_variable_plan.py": {
+      "bytes": 2172,
+      "sha256": "08e6b066d1845cf9f5ba2f05bbd78ecb4eb5770e921c6350122a2183b8660521"
+    },
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": {
+      "bytes": 5471,
+      "sha256": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+    }
+  },
+  "gates": {
+    "all_six_classes_qualified_per_node": true,
+    "burstgpt_holdout_still_unmaterialized": true,
+    "combined_sample_1200_rounds_4800_nrx": true,
+    "distinct_job_node_seed": true,
+    "failure_history_preserved": true,
+    "no_missing_selected_artifact": true,
+    "passing_source_still_matches": true,
+    "two_node_combined_pass": true,
+    "zero_safety_transport_contract_violation": true
+  },
+  "missing": [],
+  "passing_jobs": [
+    "58857672",
+    "58858194"
+  ],
+  "passing_labels": [
+    "confirm159q2f_batch_dev_j58857672",
+    "confirm159q2g_batch_holdout_j58858194"
+  ],
+  "passing_nodes": [
+    "nid001204",
+    "nid001632"
+  ],
+  "schema": "softwall-confirm159-q2-artifact-manifest-v1",
+  "selected_labels": [
+    "confirm159q2a_pilot_j58857672",
+    "confirm159q2b_dev_j58857672",
+    "confirm159q2c_guarded_pilot_j58857672",
+    "confirm159q2d_guarded_dev_j58857672",
+    "confirm159q2e_batch_pilot_j58857672",
+    "confirm159q2f_batch_dev_j58857672",
+    "confirm159q2g_batch_holdout_j58858194"
+  ],
+  "status": "C159_Q2_TWO_NODE_VARIABLE_P180_PASS"
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm94_new_synthetic_phy_seed_joint_vs_staged_cpu_replication",
+  "frozen_before_trace_execution": true,
+  "job": "58745713",
+  "node": "nid001048",
+  "trace_prefix": "confirm94_newphy_job58745713",
+  "phy_seed": 20994094,
+  "trials_per_snr": 250,
+  "snrs_db": [
+    -10.0,
+    -9.0,
+    -8.0,
+    -7.0
+  ],
+  "physical_qualification": "confirm91_conv12_nrx30_gc_off_job58743005.json",
+  "q_model": "confirm77_train_only_q_model.json",
+  "sampling_seed": 20994194,
+  "cases": 100,
+  "cells": 4,
+  "nrx_endpoint_capacity": 2,
+  "radio_deadline_ms": 155,
+  "commit_guard_ms": 2,
+  "nrx_bound_ms": 30,
+  "conventional_bound_ms": 12,
+  "ai_bound_ms": 15,
+  "ai_units": 7,
+  "ai_deadline_ms": 153,
+  "radio_floor_choices": [
+    0.1,
+    0.2
+  ],
+  "staged_baseline": "smallest safe NRx cardinality meeting q floor; among that cardinality maximize q rescue; then exact same visible-AI recourse and all-fail safety",
+  "joint_policy": "joint greedy with same information and safety, compared against exact joint reference; no future data",
+  "frozen_gates": "A new 4-SNR synthetic PHY trace must be generated after this protocol from seed20994094, 250 trials/SNR with observed features and no train/test seed reuse. Fixed train-only C77 q model, no test labels as policy inputs. Sample 100 PHY quartets with seed20994194, 7 visible 15-ms equal-value AI units due153, D155, four cells, two endpoints, q floor0.1/0.2. Report exact-versus-joint-greedy, joint-versus-staged expected timely AI, q-radio differences, and actual paired CRC correct counts from hidden labels after selection. No minimum positive effect is required for a valid screen; a zero/negative result remains negative. This is CPU synthetic and does not prove online/GPU 7-unit burst, hard deadline or production DU noninferiority.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_confirm94_new_phy_test.sh": "54543b54e13f8b8e7dd4f648ca9626e7b4d010347d8285ab480af9b83338d7cf",
+    "scripts_for_node/softwall_same_gpu/screen_confirm94_independent_phy.py": "41d512956a545efd250e9775521bda2ca5569bcca5749ebbee84986d7cb9bb58",
+    "scripts_for_node/softwall_same_gpu/offline_contingent_phy_ai_v3.py": "8c6ae6d65d6ffb7f083e951df92458d5fc444aecc08388b4ac95a9b1d4df5be5",
+    "scripts_for_node/softwall_same_gpu/offline_recovery_exchange.py": "36ecc9adc538929e1c7e16030c56853ee78d808464615cf9c381ccf67b5229e3",
+    "scripts_for_node/softwall_same_gpu/mixed_snr_phy_value_model.py": "a330e60e82f515fe57f9b4d914e37ba63f4d7be5f39ccb07bac6bf8d5a43db69",
+    "scripts_for_node/softwall_same_gpu/sweep_dual_receiver_snr.py": "25cba74ea9a7f2c6de78182fa08d15d022fe801dbccf44cd5b27ea1f5c75fbf6",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/softwall_phy.py": "200e46fce5837ccb3d08f1291b9a0394c956285bc7e7f8a5a12a1fad51d69355",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "results/softwall_same_gpu/confirm77_train_only_q_model.json": "20ff0fc3249928e59e0a153a4ee64728c823c5ff6e3374ba0305f75440bd17d0",
+    "results/softwall_same_gpu/confirm91_conv12_nrx30_gc_off_job58743005.json": "fb8f70d2531339303f6f36e0e8ffbd401ea494c78b3b758a6ce5012b83661a01"
+  }
+}

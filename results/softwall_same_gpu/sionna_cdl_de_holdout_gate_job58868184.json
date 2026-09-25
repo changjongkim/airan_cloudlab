@@ -1,0 +1,151 @@
+{
+  "schema": "softwall-external-channel-holdout-v1",
+  "frozen_before_execution": true,
+  "disjoint_from_development": true,
+  "model_channel_contract_declared": true,
+  "qualified_scope_if_pass": "Finite-sample compatibility and conditional recovery value only for the frozen Sionna CDL-D/E mode; no TDL-A, field-IQ, WCET, or production-HARQ generalization.",
+  "input_sha256": {
+    "protocol": "5d43eac85e37690740f48241f5d308bd3a4954a982033bacbb0a3f4ba4be31fd",
+    "model_D": "1ebb3195cc7c427ac992325dd015c2898839ef49d4ce3ea8295373acda47938f",
+    "model_E": "03e6e7219ccef3484cab06f03a14589cf54343861d22f397d4ce5edc8061d7ab"
+  },
+  "checks": {
+    "conventional_pipeline_operational": true,
+    "neural_pipeline_operational": true,
+    "bler_grid_complete": true,
+    "observable_only_policy": true,
+    "conditional_recovery_value": true
+  },
+  "models": {
+    "D": {
+      "structural": true,
+      "high_snr_pipeline": true,
+      "conditional_value": true,
+      "crc_payload_consistent": true,
+      "low_snr_neural_only": 16,
+      "low_snr_conventional_only": 5,
+      "paired_exact_pvalue": 0.02660369873046875,
+      "strata": [
+        {
+          "esno_db": -4.0,
+          "trials": 50,
+          "conventional_correct": 0,
+          "neural_correct": 0,
+          "both_correct": 0,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 0,
+          "neither_correct": 50
+        },
+        {
+          "esno_db": -3.6,
+          "trials": 50,
+          "conventional_correct": 5,
+          "neural_correct": 21,
+          "both_correct": 5,
+          "neural_only_correct": 16,
+          "conventional_only_correct": 0,
+          "neither_correct": 29
+        },
+        {
+          "esno_db": -3.2,
+          "trials": 50,
+          "conventional_correct": 48,
+          "neural_correct": 44,
+          "both_correct": 44,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 4,
+          "neither_correct": 2
+        },
+        {
+          "esno_db": -3.0,
+          "trials": 50,
+          "conventional_correct": 50,
+          "neural_correct": 49,
+          "both_correct": 49,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 1,
+          "neither_correct": 0
+        },
+        {
+          "esno_db": 10.0,
+          "trials": 50,
+          "conventional_correct": 50,
+          "neural_correct": 50,
+          "both_correct": 50,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 0,
+          "neither_correct": 0
+        }
+      ]
+    },
+    "E": {
+      "structural": true,
+      "high_snr_pipeline": true,
+      "conditional_value": true,
+      "crc_payload_consistent": true,
+      "low_snr_neural_only": 15,
+      "low_snr_conventional_only": 7,
+      "paired_exact_pvalue": 0.13380050659179688,
+      "strata": [
+        {
+          "esno_db": -4.0,
+          "trials": 50,
+          "conventional_correct": 0,
+          "neural_correct": 0,
+          "both_correct": 0,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 0,
+          "neither_correct": 50
+        },
+        {
+          "esno_db": -3.6,
+          "trials": 50,
+          "conventional_correct": 7,
+          "neural_correct": 19,
+          "both_correct": 4,
+          "neural_only_correct": 15,
+          "conventional_only_correct": 3,
+          "neither_correct": 28
+        },
+        {
+          "esno_db": -3.2,
+          "trials": 50,
+          "conventional_correct": 48,
+          "neural_correct": 44,
+          "both_correct": 44,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 4,
+          "neither_correct": 2
+        },
+        {
+          "esno_db": -3.0,
+          "trials": 50,
+          "conventional_correct": 50,
+          "neural_correct": 50,
+          "both_correct": 50,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 0,
+          "neither_correct": 0
+        },
+        {
+          "esno_db": 10.0,
+          "trials": 50,
+          "conventional_correct": 50,
+          "neural_correct": 50,
+          "both_correct": 50,
+          "neural_only_correct": 0,
+          "conventional_only_correct": 0,
+          "neither_correct": 0
+        }
+      ]
+    }
+  },
+  "aggregate_low_snr_paired": {
+    "neural_only": 31,
+    "conventional_only": 12,
+    "exact_pvalue": 0.005401572654591291
+  },
+  "all_pass": true,
+  "status": "P3_PASS",
+  "claim_boundary": "Truth labels are used only for offline BLER and paired-outcome evaluation. The result does not qualify A/B/C, TDL-A, field IQ, timing, or production HARQ."
+}

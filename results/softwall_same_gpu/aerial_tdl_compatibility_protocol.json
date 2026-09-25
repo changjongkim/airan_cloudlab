@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "aerial_tdl_compatibility_canary",
+  "frozen_before_execution": true,
+  "question": "Can the same valid 273-PRB paired PUSCH slot pass through Aerial's TDL-A UL channel and still be decoded by both full PHY receiver branches when AWGN is disabled?",
+  "channel": {
+    "implementation": "Aerial pycuphy FadingChan/TdlChan",
+    "profile": "TDL-A",
+    "delay_spread_ns": 30,
+    "maximum_doppler_hz": 10,
+    "frequency_grid_subcarriers": 3276,
+    "tx_antennas": 4,
+    "rx_antennas": 4,
+    "awgn_disabled": true,
+    "tti_count": 10,
+    "payload_seed": 20357000,
+    "tdl_seed": 20357001,
+    "receiver_order": "conventional then NeuralRx on identical channel output"
+  },
+  "gate": {
+    "all_ten_conventional_payloads_and_crcs_valid": true,
+    "all_ten_neural_payloads_and_crcs_valid": true,
+    "input_output_shapes_checked": true
+  },
+  "if_fail": "Do not use this TDL path as a radio workload until the transmit-grid/UL channel/receiver interface mismatch is attributed. Do not add AWGN, AI, or policy comparisons to this failed canary.",
+  "if_pass": "Only interface compatibility is qualified. A separate fixed-noise/SNR sweep, independent traces, online feature cost, same-GPU MPS timing, and production HARQ expiry are still required.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/probe_aerial_tdl_compatibility.py": "85d72af94facf129b75003e314fb1d03fbb7a937af1ad4de7646ec6b73c654c5",
+    "scripts_for_node/softwall_same_gpu/run_aerial_tdl_compatibility.sh": "a5ddc9ef520a62fe8fce9437c82a746ed24af255047bfd80da3e6e32d90b975c"
+  },
+  "evidence_grade": "Compatibility canary only; zero-noise synthetic channel, no deadline or novelty claim."
+}

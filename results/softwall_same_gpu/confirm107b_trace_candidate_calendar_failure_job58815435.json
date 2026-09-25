@@ -1,0 +1,44 @@
+{
+  "schema": "softwall-trace-candidate-failure-v1",
+  "campaign": "confirm107b_trace_candidate_softwall_canary",
+  "date_utc": "2026-09-24",
+  "job": "58815435",
+  "node": "nid001016",
+  "system": "softwall",
+  "iterations_requested": 100,
+  "last_release_index": 56,
+  "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+  "operational_requalification": {
+    "path": "results/softwall_same_gpu/raw/confirm107b_candidate_softwall_job58815435_requalification.json",
+    "sha256": "356577615cc7526be0005fe31ea01952732841516ba042137e9f81ca497f2ade",
+    "iterations": 100,
+    "deadline_misses": 0,
+    "passed": true
+  },
+  "integration_progress": {
+    "four_receiver_construction": "passed",
+    "nrx_worker0_units": 94,
+    "nrx_worker1_units": 88,
+    "qwen_units": 146,
+    "qwen_gpu_ms_max": 62.30681610107422
+  },
+  "failure": {
+    "stage": "mandatory fallback dispatch",
+    "exception": "RuntimeError: mandatory fallback failed to start index=56 cell=0",
+    "controller_result_written": false,
+    "performance_conclusion": false,
+    "missing_diagnostic": "The pre-instrumentation controller did not persist transaction state or its partial scheduling trace on exception."
+  },
+  "raw_sha256": {
+    "background": "49d286b8a81508a319748e170dce52517945a65070f517a848f53cc42e983012",
+    "worker0": "5d66573725ff089b19aa5dc842931755f9f476344257c5159a79a40fcf23efbf",
+    "worker1": "94d475f532dbc01db9d7ec261681dfe40671d447fa1e119d72e8ec833d55745f"
+  },
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": "96485d1d861dab817fddf6a58b0fd25cce2883f96690077946030823db451be8",
+    "scripts_for_node/softwall_same_gpu/run_trace_baseline_arm.sh": "9057d395c6cb53cba618ad1c61d981ba258c99cc83121b86dad3bad560927276",
+    "scripts_for_node/softwall_same_gpu/trace_background_client.py": "f6fc4de63df7b31cb907b63b6971048ee3706ef18595df0b3ecd5834a91e1d8c"
+  },
+  "interpretation": "The memory correction let the complete four-cell/Qwen mode execute, but the first integrated scheduling canary exposed a recovery-start failure. This is a failed canary, not safety or performance evidence. The controller must persist partial state on exceptions and the multi-credit tail-compaction plan must be exercised before another candidate run."
+}

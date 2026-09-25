@@ -1,0 +1,39 @@
+{
+  "artifacts": {
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt2_job58854900_peer_spec.json": "77008a6fb5fb1b05b7784148a1325ed5cecd415bc458303f77ee31cc2ca60435",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt2_job58854900_protocol.json": "d8b61feddbc99d4f54a99b64be407555fe1b92d254c577e583bf8cd664532362",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt2_job58854900_coordinator.json": "5b628902bc093c62e365ee2f3247db2716a37bb87c878ea62822199a6ac0cdc6",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt2_job58854900_home0_h0-r0_owner.json": "058d0336a8a78fb57be5e626d9d6784ca1900bee36a8a30ab936b80edcf66d30",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt2_job58854900_home0_h0-r1_owner.json": "a20fefa1a14493393a3c6ec9b674157a50108f6ce3a734892ad3fcf77640d668",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt2_job58854900_home0_h0-r2_owner.json": "3e09e07bf9ee636a107cc279ef805c199c3055f34f4ecfe6d5b763cfea34c617",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt2_job58854900_home1_h1-r0_owner.json": "e3cb7a1ac2c88f15a96518c6aabf02ed6a84ab9875e12f706bc4ca06207fb06f",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt2_job58854900_nrx_worker.json": "7fab0f1180f36a648dce909f7a5cab4bc1a1eea3afb7a73638968999aed51b2b",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt2_job58854900_qwen.json": "c19fc0f689d3960fdb39d20e0858407e5bd960018adcfaf62be9de1f4e57ce24"
+  },
+  "attempt": 2,
+  "corrections": [
+    "Exercise forward P2P, TensorRT graph, and backward P2P once for every imported peer before mark_ready.",
+    "Use CRC-semantic recovery equivalence: exact payload when oracle CRC passes; matching nonzero CRC when it fails."
+  ],
+  "job": "58854900",
+  "node": "nid001109",
+  "observations": {
+    "coordinator_missing_at_cutoff": 4,
+    "deadline_misses_on_completed_owners": 0,
+    "lease_accepted": false,
+    "nrx_worker_paths_ms": [
+      64.774985,
+      1.552677,
+      1.50262,
+      1.612282
+    ],
+    "recoveries": 4
+  },
+  "reasons": [
+    "The first multi-peer P2P path incurred a 64.775 ms cold host path because each imported peer mapping was not exercised before readiness; all four outcomes therefore missed the frozen 45 ms cutoff and the coordinator correctly kept all four debts.",
+    "The owner incorrectly required payload-bit identity after a CRC failure. Failed-CRC payload bits are invalid; semantic conventional equivalence requires matching failure status, while CRC-success results require payload identity."
+  ],
+  "schema": "softwall-confirm157a-attempt-failure-v1",
+  "scientific_outcome_opened": false,
+  "status": "PHYSICAL_GATE_FAIL"
+}

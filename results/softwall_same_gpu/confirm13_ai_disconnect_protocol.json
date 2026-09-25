@@ -1,0 +1,31 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm13_paired2_nrx_disconnect",
+  "purpose": "Verify that an allowed AI worker disconnect fails closed without stopping subsequent RAN releases.",
+  "ran": {
+    "input": "Aerial PdschTx-generated valid 273-PRB PUSCH slot",
+    "cells_per_release": 2,
+    "period_ms": 25,
+    "deadline_ms": 21,
+    "iterations": 500,
+    "seed": 20270301
+  },
+  "ai": {
+    "kind": "NeuralRx TensorRT CUDA Graph",
+    "mode": "S0 RPC",
+    "end_to_end_budget_ms": 6,
+    "guard_ms": 1,
+    "rpc_timeout_ms": 7,
+    "fault": "close RPC connection before unit 6"
+  },
+  "primary_gate": {
+    "ran_records_after_fault": 494,
+    "ran_deadline_misses": 0,
+    "incorrect_transport_blocks": 0,
+    "ai_fault_count": 1,
+    "ai_disabled_after_fault": true,
+    "ai_units_after_fault": 0
+  },
+  "interpretation_limit": "This validates process/channel failure handling. It cannot preempt an unbounded GPU kernel, so admitted GPU work must still satisfy the bounded-unit contract."
+}

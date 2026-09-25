@@ -1,0 +1,4994 @@
+{
+  "schema": "softwall-v14-ai45-pipelined-arm-result-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c142_v14_ai45_canary_job58833253_protocol.json",
+  "broker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_broker.json",
+  "broker_summary": {
+    "offered_requests": 161,
+    "offered_value_tokens": 10304,
+    "timely_requests": 0,
+    "timely_value_tokens": 0,
+    "states": {
+      "expired": 161,
+      "future": 559
+    },
+    "per_home": {},
+    "registered_homes": [
+      0,
+      1
+    ],
+    "finalized_homes": [
+      0,
+      1
+    ],
+    "outstanding_tokens": 0,
+    "duplicate_commit_count": 0
+  },
+  "homes": [
+    {
+      "home": 0,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h0_controller.json",
+      "first_release_ns": 121963901594293,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c142_v14_ai45_canary_job58833253/barrier",
+        "member": 0,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 61,
+          "expected_units": 61,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 54,
+          "expected_units": 54,
+          "count_match": true
+        }
+      ],
+      "rpc_telemetry": {
+        "schema": "softwall-pipelined-broker-rpc-telemetry-v1",
+        "timeout_ms": 5.0,
+        "critical_path_operations": [
+          "commit"
+        ],
+        "deferred_operations": [
+          "prepare",
+          "abort",
+          "complete"
+        ],
+        "records": [
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121963909968727,
+            "end_ns": 121963912032556,
+            "elapsed_ms": 2.063829,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121963921772580,
+            "end_ns": 121963925030723,
+            "elapsed_ms": 3.258143,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g1:h0:rsoftwall-ai35-0000",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964088278179,
+            "end_ns": 121964094097765,
+            "elapsed_ms": 5.819586,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g1:h0:rsoftwall-ai35-0000",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964094112835,
+            "end_ns": 121964101515629,
+            "elapsed_ms": 7.402794,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g2:h0:rsoftwall-ai35-0000",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964267726237,
+            "end_ns": 121964273429428,
+            "elapsed_ms": 5.703191,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g2:h0:rsoftwall-ai35-0000",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964273450950,
+            "end_ns": 121964280908630,
+            "elapsed_ms": 7.45768,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g5:h0:rsoftwall-ai35-0001",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964450495430,
+            "end_ns": 121964455128677,
+            "elapsed_ms": 4.633247,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g5:h0:rsoftwall-ai35-0001",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964455143005,
+            "end_ns": 121964461632751,
+            "elapsed_ms": 6.489746,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g7:h0:rsoftwall-ai35-0001",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964628746087,
+            "end_ns": 121964632664200,
+            "elapsed_ms": 3.918113,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g7:h0:rsoftwall-ai35-0001",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964632679269,
+            "end_ns": 121964639978863,
+            "elapsed_ms": 7.299594,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g8:h0:rsoftwall-ai35-0000",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964809157111,
+            "end_ns": 121964812734062,
+            "elapsed_ms": 3.576951,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g8:h0:rsoftwall-ai35-0000",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964812754261,
+            "end_ns": 121964823208989,
+            "elapsed_ms": 10.454728,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g10:h0:rsoftwall-ai35-0000",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964989200623,
+            "end_ns": 121964993165345,
+            "elapsed_ms": 3.964722,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g10:h0:rsoftwall-ai35-0000",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964993180114,
+            "end_ns": 121964994434324,
+            "elapsed_ms": 1.25421,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964997070492,
+            "end_ns": 121964999672414,
+            "elapsed_ms": 2.601922,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965168819391,
+            "end_ns": 121965170296103,
+            "elapsed_ms": 1.476712,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965170601915,
+            "end_ns": 121965172946579,
+            "elapsed_ms": 2.344664,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965178880727,
+            "end_ns": 121965181473632,
+            "elapsed_ms": 2.592905,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965345538070,
+            "end_ns": 121965347929995,
+            "elapsed_ms": 2.391925,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965356430306,
+            "end_ns": 121965359169163,
+            "elapsed_ms": 2.738857,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965529172410,
+            "end_ns": 121965530438864,
+            "elapsed_ms": 1.266454,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965530954523,
+            "end_ns": 121965533270701,
+            "elapsed_ms": 2.316178,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965539339240,
+            "end_ns": 121965541237719,
+            "elapsed_ms": 1.898479,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965708601260,
+            "end_ns": 121965710447829,
+            "elapsed_ms": 1.846569,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965710770343,
+            "end_ns": 121965713141097,
+            "elapsed_ms": 2.370754,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965721212136,
+            "end_ns": 121965723816663,
+            "elapsed_ms": 2.604527,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965888708045,
+            "end_ns": 121965890344485,
+            "elapsed_ms": 1.63644,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965890940621,
+            "end_ns": 121965893305623,
+            "elapsed_ms": 2.365002,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965896803381,
+            "end_ns": 121965899512701,
+            "elapsed_ms": 2.70932,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966068850017,
+            "end_ns": 121966070284266,
+            "elapsed_ms": 1.434249,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966071021344,
+            "end_ns": 121966073744260,
+            "elapsed_ms": 2.722916,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966076682754,
+            "end_ns": 121966079360183,
+            "elapsed_ms": 2.677429,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966248835336,
+            "end_ns": 121966250042405,
+            "elapsed_ms": 1.207069,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966250589204,
+            "end_ns": 121966253179804,
+            "elapsed_ms": 2.5906,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966256516169,
+            "end_ns": 121966259286377,
+            "elapsed_ms": 2.770208,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966429150854,
+            "end_ns": 121966430356320,
+            "elapsed_ms": 1.205466,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966430911656,
+            "end_ns": 121966433228706,
+            "elapsed_ms": 2.31705,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966436663602,
+            "end_ns": 121966439093019,
+            "elapsed_ms": 2.429417,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966609172383,
+            "end_ns": 121966610430892,
+            "elapsed_ms": 1.258509,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966610939247,
+            "end_ns": 121966613113169,
+            "elapsed_ms": 2.173922,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966619253157,
+            "end_ns": 121966621807166,
+            "elapsed_ms": 2.554009,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966788438439,
+            "end_ns": 121966790134535,
+            "elapsed_ms": 1.696096,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966790688419,
+            "end_ns": 121966793364353,
+            "elapsed_ms": 2.675934,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966796522733,
+            "end_ns": 121966799278584,
+            "elapsed_ms": 2.755851,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966968678010,
+            "end_ns": 121966970606467,
+            "elapsed_ms": 1.928457,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966970952978,
+            "end_ns": 121966973353479,
+            "elapsed_ms": 2.400501,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966976824124,
+            "end_ns": 121966979349378,
+            "elapsed_ms": 2.525254,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967148923543,
+            "end_ns": 121967150166241,
+            "elapsed_ms": 1.242698,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967150414542,
+            "end_ns": 121967152966146,
+            "elapsed_ms": 2.551604,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967158731949,
+            "end_ns": 121967161413896,
+            "elapsed_ms": 2.681947,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967328864266,
+            "end_ns": 121967330307532,
+            "elapsed_ms": 1.443266,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967330652801,
+            "end_ns": 121967332961815,
+            "elapsed_ms": 2.309014,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967336501885,
+            "end_ns": 121967339236323,
+            "elapsed_ms": 2.734438,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967508019877,
+            "end_ns": 121967510354220,
+            "elapsed_ms": 2.334343,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967519835271,
+            "end_ns": 121967522268486,
+            "elapsed_ms": 2.433215,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967688344963,
+            "end_ns": 121967689848447,
+            "elapsed_ms": 1.503484,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967690519276,
+            "end_ns": 121967693076482,
+            "elapsed_ms": 2.557206,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967696134979,
+            "end_ns": 121967698586088,
+            "elapsed_ms": 2.451109,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967868814070,
+            "end_ns": 121967870362160,
+            "elapsed_ms": 1.54809,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967870586474,
+            "end_ns": 121967872528488,
+            "elapsed_ms": 1.942014,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967876408255,
+            "end_ns": 121967878281745,
+            "elapsed_ms": 1.87349,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968048630461,
+            "end_ns": 121968050554219,
+            "elapsed_ms": 1.923758,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968050829593,
+            "end_ns": 121968053674736,
+            "elapsed_ms": 2.845143,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968056616796,
+            "end_ns": 121968059357888,
+            "elapsed_ms": 2.741092,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968228320788,
+            "end_ns": 121968229993570,
+            "elapsed_ms": 1.672782,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968230502797,
+            "end_ns": 121968233086753,
+            "elapsed_ms": 2.583956,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968236413851,
+            "end_ns": 121968239169901,
+            "elapsed_ms": 2.75605,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968408837126,
+            "end_ns": 121968410234965,
+            "elapsed_ms": 1.397839,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968410578481,
+            "end_ns": 121968412894078,
+            "elapsed_ms": 2.315597,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968421535542,
+            "end_ns": 121968424018113,
+            "elapsed_ms": 2.482571,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968589119521,
+            "end_ns": 121968590311751,
+            "elapsed_ms": 1.19223,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968590830797,
+            "end_ns": 121968593414002,
+            "elapsed_ms": 2.583205,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968596614103,
+            "end_ns": 121968599231314,
+            "elapsed_ms": 2.617211,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968768294539,
+            "end_ns": 121968770124676,
+            "elapsed_ms": 1.830137,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968779597602,
+            "end_ns": 121968782066475,
+            "elapsed_ms": 2.468873,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968948260170,
+            "end_ns": 121968949943011,
+            "elapsed_ms": 1.682841,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968950475343,
+            "end_ns": 121968952873850,
+            "elapsed_ms": 2.398507,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968956228741,
+            "end_ns": 121968958695871,
+            "elapsed_ms": 2.46713,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969128991555,
+            "end_ns": 121969130669837,
+            "elapsed_ms": 1.678282,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969131207779,
+            "end_ns": 121969133593382,
+            "elapsed_ms": 2.385603,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969139632604,
+            "end_ns": 121969142081679,
+            "elapsed_ms": 2.449075,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969308589843,
+            "end_ns": 121969310289176,
+            "elapsed_ms": 1.699333,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969310808894,
+            "end_ns": 121969313434652,
+            "elapsed_ms": 2.625758,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969321870437,
+            "end_ns": 121969324616619,
+            "elapsed_ms": 2.746182,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969488296422,
+            "end_ns": 121969490227264,
+            "elapsed_ms": 1.930842,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969497151300,
+            "end_ns": 121969499719817,
+            "elapsed_ms": 2.568517,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969669187787,
+            "end_ns": 121969670458569,
+            "elapsed_ms": 1.270782,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969670967305,
+            "end_ns": 121969673326817,
+            "elapsed_ms": 2.359512,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969676917635,
+            "end_ns": 121969679318828,
+            "elapsed_ms": 2.401193,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969849011542,
+            "end_ns": 121969850356499,
+            "elapsed_ms": 1.344957,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969850529664,
+            "end_ns": 121969853176864,
+            "elapsed_ms": 2.6472,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969856381093,
+            "end_ns": 121969858755423,
+            "elapsed_ms": 2.37433,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970029154517,
+            "end_ns": 121970030461800,
+            "elapsed_ms": 1.307283,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970030991767,
+            "end_ns": 121970033704724,
+            "elapsed_ms": 2.712957,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970036938800,
+            "end_ns": 121970038863901,
+            "elapsed_ms": 1.925101,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970208679784,
+            "end_ns": 121970210448201,
+            "elapsed_ms": 1.768417,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970221154236,
+            "end_ns": 121970223538626,
+            "elapsed_ms": 2.38439,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970388516885,
+            "end_ns": 121970389983438,
+            "elapsed_ms": 1.466553,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970390538142,
+            "end_ns": 121970392723497,
+            "elapsed_ms": 2.185355,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970398962266,
+            "end_ns": 121970401711543,
+            "elapsed_ms": 2.749277,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970569175850,
+            "end_ns": 121970570628495,
+            "elapsed_ms": 1.452645,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970570974515,
+            "end_ns": 121970573387501,
+            "elapsed_ms": 2.412986,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970576729807,
+            "end_ns": 121970579503882,
+            "elapsed_ms": 2.774075,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970747725386,
+            "end_ns": 121970750190102,
+            "elapsed_ms": 2.464716,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970757068361,
+            "end_ns": 121970759792810,
+            "elapsed_ms": 2.724449,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970928449307,
+            "end_ns": 121970930104544,
+            "elapsed_ms": 1.655237,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970930449042,
+            "end_ns": 121970932808093,
+            "elapsed_ms": 2.359051,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970935698123,
+            "end_ns": 121970936625430,
+            "elapsed_ms": 0.927307,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          }
+        ],
+        "handoffs": [
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121963908104736,
+            "end_ns": 121963908125225,
+            "elapsed_ms": 0.020489,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121963910939288,
+            "end_ns": 121963910941192,
+            "elapsed_ms": 0.001904,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121963921263594,
+            "end_ns": 121963921278051,
+            "elapsed_ms": 0.014457,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964086052496,
+            "end_ns": 121964086068527,
+            "elapsed_ms": 0.016031,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964088916004,
+            "end_ns": 121964088924912,
+            "elapsed_ms": 0.008908,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964097659207,
+            "end_ns": 121964097661110,
+            "elapsed_ms": 0.001903,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964266003729,
+            "end_ns": 121964266023798,
+            "elapsed_ms": 0.020069,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964268801380,
+            "end_ns": 121964268809476,
+            "elapsed_ms": 0.008096,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964277445820,
+            "end_ns": 121964277447594,
+            "elapsed_ms": 0.001774,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964447231666,
+            "end_ns": 121964447250763,
+            "elapsed_ms": 0.019097,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964452097454,
+            "end_ns": 121964452105960,
+            "elapsed_ms": 0.008506,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964457986986,
+            "end_ns": 121964457988599,
+            "elapsed_ms": 0.001613,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964626903647,
+            "end_ns": 121964626919929,
+            "elapsed_ms": 0.016282,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964630490858,
+            "end_ns": 121964630498944,
+            "elapsed_ms": 0.008086,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964636329111,
+            "end_ns": 121964636330985,
+            "elapsed_ms": 0.001874,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964807236109,
+            "end_ns": 121964807252200,
+            "elapsed_ms": 0.016091,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964810916080,
+            "end_ns": 121964810924145,
+            "elapsed_ms": 0.008065,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964819663008,
+            "end_ns": 121964819664632,
+            "elapsed_ms": 0.001624,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964987343093,
+            "end_ns": 121964987357571,
+            "elapsed_ms": 0.014478,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964990938410,
+            "end_ns": 121964990946455,
+            "elapsed_ms": 0.008045,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964996564040,
+            "end_ns": 121964996577567,
+            "elapsed_ms": 0.013527,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965166966651,
+            "end_ns": 121965166980648,
+            "elapsed_ms": 0.013997,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965170507532,
+            "end_ns": 121965170520528,
+            "elapsed_ms": 0.012996,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965178390978,
+            "end_ns": 121965178403262,
+            "elapsed_ms": 0.012284,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965345343734,
+            "end_ns": 121965345357701,
+            "elapsed_ms": 0.013967,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965355892825,
+            "end_ns": 121965355904938,
+            "elapsed_ms": 0.012113,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965527282197,
+            "end_ns": 121965527296114,
+            "elapsed_ms": 0.013917,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965530858998,
+            "end_ns": 121965530872213,
+            "elapsed_ms": 0.013215,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965538801278,
+            "end_ns": 121965538814924,
+            "elapsed_ms": 0.013646,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965706875186,
+            "end_ns": 121965706889102,
+            "elapsed_ms": 0.013916,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965710671061,
+            "end_ns": 121965710685258,
+            "elapsed_ms": 0.014197,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965720838282,
+            "end_ns": 121965720852239,
+            "elapsed_ms": 0.013957,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965887305086,
+            "end_ns": 121965887318753,
+            "elapsed_ms": 0.013667,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965890847179,
+            "end_ns": 121965890860646,
+            "elapsed_ms": 0.013467,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965896264627,
+            "end_ns": 121965896278374,
+            "elapsed_ms": 0.013747,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966067414635,
+            "end_ns": 121966067429224,
+            "elapsed_ms": 0.014589,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966070928073,
+            "end_ns": 121966070941169,
+            "elapsed_ms": 0.013096,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966076316464,
+            "end_ns": 121966076329349,
+            "elapsed_ms": 0.012885,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966247000100,
+            "end_ns": 121966247014528,
+            "elapsed_ms": 0.014428,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966250496705,
+            "end_ns": 121966250509640,
+            "elapsed_ms": 0.012935,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966255957637,
+            "end_ns": 121966255972165,
+            "elapsed_ms": 0.014528,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966427288897,
+            "end_ns": 121966427303144,
+            "elapsed_ms": 0.014247,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966430817724,
+            "end_ns": 121966430831461,
+            "elapsed_ms": 0.013737,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966436117764,
+            "end_ns": 121966436130599,
+            "elapsed_ms": 0.012835,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966607329562,
+            "end_ns": 121966607344902,
+            "elapsed_ms": 0.01534,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966610846006,
+            "end_ns": 121966610859462,
+            "elapsed_ms": 0.013456,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966618748950,
+            "end_ns": 121966618763408,
+            "elapsed_ms": 0.014458,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966787056080,
+            "end_ns": 121966787072121,
+            "elapsed_ms": 0.016041,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966790592433,
+            "end_ns": 121966790605899,
+            "elapsed_ms": 0.013466,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966796020250,
+            "end_ns": 121966796033505,
+            "elapsed_ms": 0.013255,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966967290461,
+            "end_ns": 121966967305190,
+            "elapsed_ms": 0.014729,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966970859317,
+            "end_ns": 121966970872382,
+            "elapsed_ms": 0.013065,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966976282755,
+            "end_ns": 121966976296181,
+            "elapsed_ms": 0.013426,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967146860716,
+            "end_ns": 121967146874693,
+            "elapsed_ms": 0.013977,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967150320049,
+            "end_ns": 121967150332884,
+            "elapsed_ms": 0.012835,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967158220678,
+            "end_ns": 121967158233563,
+            "elapsed_ms": 0.012885,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967327035522,
+            "end_ns": 121967327050541,
+            "elapsed_ms": 0.015019,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967330559010,
+            "end_ns": 121967330571884,
+            "elapsed_ms": 0.012874,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967335986496,
+            "end_ns": 121967336009080,
+            "elapsed_ms": 0.022584,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967506311566,
+            "end_ns": 121967506325704,
+            "elapsed_ms": 0.014138,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967509122803,
+            "end_ns": 121967509124827,
+            "elapsed_ms": 0.002024,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967519324161,
+            "end_ns": 121967519337336,
+            "elapsed_ms": 0.013175,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967686971713,
+            "end_ns": 121967686986241,
+            "elapsed_ms": 0.014528,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967690434212,
+            "end_ns": 121967690446516,
+            "elapsed_ms": 0.012304,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967695614540,
+            "end_ns": 121967695627325,
+            "elapsed_ms": 0.012785,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967866975467,
+            "end_ns": 121967866990947,
+            "elapsed_ms": 0.01548,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967870493484,
+            "end_ns": 121967870506580,
+            "elapsed_ms": 0.013096,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967875873800,
+            "end_ns": 121967875886684,
+            "elapsed_ms": 0.012884,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968047243323,
+            "end_ns": 121968047257290,
+            "elapsed_ms": 0.013967,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968050736913,
+            "end_ns": 121968050749858,
+            "elapsed_ms": 0.012945,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968056104223,
+            "end_ns": 121968056117118,
+            "elapsed_ms": 0.012895,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968226877822,
+            "end_ns": 121968226892591,
+            "elapsed_ms": 0.014769,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968230409816,
+            "end_ns": 121968230422741,
+            "elapsed_ms": 0.012925,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968235871640,
+            "end_ns": 121968235885968,
+            "elapsed_ms": 0.014328,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968406996350,
+            "end_ns": 121968407010998,
+            "elapsed_ms": 0.014648,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968410481954,
+            "end_ns": 121968410495250,
+            "elapsed_ms": 0.013296,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968421032127,
+            "end_ns": 121968421046134,
+            "elapsed_ms": 0.014007,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968587261070,
+            "end_ns": 121968587276159,
+            "elapsed_ms": 0.015089,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968590738508,
+            "end_ns": 121968590751122,
+            "elapsed_ms": 0.012614,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968596077062,
+            "end_ns": 121968596089517,
+            "elapsed_ms": 0.012455,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968766022928,
+            "end_ns": 121968766037496,
+            "elapsed_ms": 0.014568,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968768812593,
+            "end_ns": 121968768814487,
+            "elapsed_ms": 0.001894,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968779101080,
+            "end_ns": 121968779113353,
+            "elapsed_ms": 0.012273,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968946884916,
+            "end_ns": 121968946899664,
+            "elapsed_ms": 0.014748,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968950380920,
+            "end_ns": 121968950394155,
+            "elapsed_ms": 0.013235,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968955744904,
+            "end_ns": 121968955758299,
+            "elapsed_ms": 0.013395,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969127290258,
+            "end_ns": 121969127304646,
+            "elapsed_ms": 0.014388,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969131112615,
+            "end_ns": 121969131126121,
+            "elapsed_ms": 0.013506,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969139094771,
+            "end_ns": 121969139109380,
+            "elapsed_ms": 0.014609,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969307202365,
+            "end_ns": 121969307218656,
+            "elapsed_ms": 0.016291,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969310712116,
+            "end_ns": 121969310725011,
+            "elapsed_ms": 0.012895,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969321322355,
+            "end_ns": 121969321337154,
+            "elapsed_ms": 0.014799,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969486281188,
+            "end_ns": 121969486295796,
+            "elapsed_ms": 0.014608,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969489073348,
+            "end_ns": 121969489075382,
+            "elapsed_ms": 0.002034,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969496609470,
+            "end_ns": 121969496623538,
+            "elapsed_ms": 0.014068,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969667313645,
+            "end_ns": 121969667328444,
+            "elapsed_ms": 0.014799,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969670874044,
+            "end_ns": 121969670887129,
+            "elapsed_ms": 0.013085,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969676371386,
+            "end_ns": 121969676385984,
+            "elapsed_ms": 0.014598,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969846849844,
+            "end_ns": 121969846865644,
+            "elapsed_ms": 0.0158,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969850435692,
+            "end_ns": 121969850448096,
+            "elapsed_ms": 0.012404,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969855851807,
+            "end_ns": 121969855865193,
+            "elapsed_ms": 0.013386,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970027288441,
+            "end_ns": 121970027305133,
+            "elapsed_ms": 0.016692,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970030896883,
+            "end_ns": 121970030910399,
+            "elapsed_ms": 0.013516,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970036433341,
+            "end_ns": 121970036446857,
+            "elapsed_ms": 0.013516,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970206902931,
+            "end_ns": 121970206917990,
+            "elapsed_ms": 0.015059,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970210350672,
+            "end_ns": 121970210352826,
+            "elapsed_ms": 0.002154,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970220615743,
+            "end_ns": 121970220630050,
+            "elapsed_ms": 0.014307,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970386916945,
+            "end_ns": 121970386930852,
+            "elapsed_ms": 0.013907,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970390441365,
+            "end_ns": 121970390454931,
+            "elapsed_ms": 0.013566,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970398424614,
+            "end_ns": 121970398439002,
+            "elapsed_ms": 0.014388,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970567301779,
+            "end_ns": 121970567316066,
+            "elapsed_ms": 0.014287,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970570879691,
+            "end_ns": 121970570892857,
+            "elapsed_ms": 0.013166,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970576225079,
+            "end_ns": 121970576238986,
+            "elapsed_ms": 0.013907,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970746011075,
+            "end_ns": 121970746026986,
+            "elapsed_ms": 0.015911,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970748804758,
+            "end_ns": 121970748806612,
+            "elapsed_ms": 0.001854,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970756528635,
+            "end_ns": 121970756542481,
+            "elapsed_ms": 0.013846,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970926849056,
+            "end_ns": 121970926863684,
+            "elapsed_ms": 0.014628,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970930355911,
+            "end_ns": 121970930369518,
+            "elapsed_ms": 0.013607,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970935655400,
+            "end_ns": 121970935668525,
+            "elapsed_ms": 0.013125,
+            "accepted": true
+          }
+        ],
+        "by_operation": {
+          "prepare": {
+            "count": 102,
+            "faults": 0,
+            "wall_timeout_exceeded": 5,
+            "max_elapsed_ms": 10.454728,
+            "path": "async-control"
+          },
+          "abort": {
+            "count": 6,
+            "faults": 0,
+            "wall_timeout_exceeded": 2,
+            "max_elapsed_ms": 5.819586,
+            "path": "async-control"
+          }
+        },
+        "state": {
+          "staged": false,
+          "offered": 0,
+          "inflight": 0,
+          "prepare_pending": false
+        }
+      },
+      "summary": {
+        "records": 160,
+        "correct_cells": 78,
+        "nrx_commits": 53,
+        "conv_commits": 107,
+        "atomic_exchange": 0,
+        "ai_timely_value_tokens": 0
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    },
+    {
+      "home": 1,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h1_controller.json",
+      "first_release_ns": 121963901594293,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c142_v14_ai45_canary_job58833253/barrier",
+        "member": 1,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 62,
+          "expected_units": 62,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 56,
+          "expected_units": 56,
+          "count_match": true
+        }
+      ],
+      "rpc_telemetry": {
+        "schema": "softwall-pipelined-broker-rpc-telemetry-v1",
+        "timeout_ms": 5.0,
+        "critical_path_operations": [
+          "commit"
+        ],
+        "deferred_operations": [
+          "prepare",
+          "abort",
+          "complete"
+        ],
+        "records": [
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121963911396885,
+            "end_ns": 121963913051300,
+            "elapsed_ms": 1.654415,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121963913286165,
+            "end_ns": 121963915655026,
+            "elapsed_ms": 2.368861,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121963924021418,
+            "end_ns": 121963926796885,
+            "elapsed_ms": 2.775467,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964087791906,
+            "end_ns": 121964092037203,
+            "elapsed_ms": 4.245297,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964092618008,
+            "end_ns": 121964094035805,
+            "elapsed_ms": 1.417797,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964103788724,
+            "end_ns": 121964108046414,
+            "elapsed_ms": 4.25769,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g3:h1:rsoftwall-ai35-0001",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964268454668,
+            "end_ns": 121964273352138,
+            "elapsed_ms": 4.89747,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g3:h1:rsoftwall-ai35-0001",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964273368650,
+            "end_ns": 121964279927679,
+            "elapsed_ms": 6.559029,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g4:h1:rsoftwall-ai35-0000",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964448811557,
+            "end_ns": 121964453676163,
+            "elapsed_ms": 4.864606,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g4:h1:rsoftwall-ai35-0000",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964453692084,
+            "end_ns": 121964460285500,
+            "elapsed_ms": 6.593416,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g6:h1:rsoftwall-ai35-0000",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964628319601,
+            "end_ns": 121964633107739,
+            "elapsed_ms": 4.788138,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0000",
+            "broker_token": "g6:h1:rsoftwall-ai35-0000",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964633123560,
+            "end_ns": 121964639984404,
+            "elapsed_ms": 6.860844,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g9:h1:rsoftwall-ai35-0001",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964808638366,
+            "end_ns": 121964813189074,
+            "elapsed_ms": 4.550708,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g9:h1:rsoftwall-ai35-0001",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964813205165,
+            "end_ns": 121964822937683,
+            "elapsed_ms": 9.732518,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g11:h1:rsoftwall-ai35-0001",
+            "selected": true,
+            "confirmed": true
+          },
+          {
+            "operation": "abort",
+            "path": "async-control",
+            "begin_ns": 121964988963673,
+            "end_ns": 121964994700259,
+            "elapsed_ms": 5.736586,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": true,
+            "faulted": false,
+            "request_id": "softwall-ai35-0001",
+            "broker_token": "g11:h1:rsoftwall-ai35-0001",
+            "selected": null,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964994715589,
+            "end_ns": 121964997480316,
+            "elapsed_ms": 2.764727,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121964998185993,
+            "end_ns": 121965000684956,
+            "elapsed_ms": 2.498963,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965168788421,
+            "end_ns": 121965170225676,
+            "elapsed_ms": 1.437255,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965170567278,
+            "end_ns": 121965173212875,
+            "elapsed_ms": 2.645597,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965176341667,
+            "end_ns": 121965178586056,
+            "elapsed_ms": 2.244389,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965348886228,
+            "end_ns": 121965350120299,
+            "elapsed_ms": 1.234071,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965350637101,
+            "end_ns": 121965352950654,
+            "elapsed_ms": 2.313553,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965356430326,
+            "end_ns": 121965358822692,
+            "elapsed_ms": 2.392366,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965528671188,
+            "end_ns": 121965530320194,
+            "elapsed_ms": 1.649006,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965530904335,
+            "end_ns": 121965533578076,
+            "elapsed_ms": 2.673741,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965536608869,
+            "end_ns": 121965538753255,
+            "elapsed_ms": 2.144386,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965707926372,
+            "end_ns": 121965710805291,
+            "elapsed_ms": 2.878919,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965719559795,
+            "end_ns": 121965722191063,
+            "elapsed_ms": 2.631268,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965889093361,
+            "end_ns": 121965890508313,
+            "elapsed_ms": 1.414952,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965890850806,
+            "end_ns": 121965893538424,
+            "elapsed_ms": 2.687618,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121965896708407,
+            "end_ns": 121965899448536,
+            "elapsed_ms": 2.740129,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966069275301,
+            "end_ns": 121966070505324,
+            "elapsed_ms": 1.230023,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966071022657,
+            "end_ns": 121966073392098,
+            "elapsed_ms": 2.369441,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966076679037,
+            "end_ns": 121966079448955,
+            "elapsed_ms": 2.769918,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966248451122,
+            "end_ns": 121966250076190,
+            "elapsed_ms": 1.625068,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966250671333,
+            "end_ns": 121966252972422,
+            "elapsed_ms": 2.301089,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966256537611,
+            "end_ns": 121966259229176,
+            "elapsed_ms": 2.691565,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966428723356,
+            "end_ns": 121966430226358,
+            "elapsed_ms": 1.503002,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966430976602,
+            "end_ns": 121966433407242,
+            "elapsed_ms": 2.43064,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966439148887,
+            "end_ns": 121966441752182,
+            "elapsed_ms": 2.603295,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966608662215,
+            "end_ns": 121966609926364,
+            "elapsed_ms": 1.264149,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966610830376,
+            "end_ns": 121966613417108,
+            "elapsed_ms": 2.586732,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966619210965,
+            "end_ns": 121966621714466,
+            "elapsed_ms": 2.503501,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966787767669,
+            "end_ns": 121966790244328,
+            "elapsed_ms": 2.476659,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966797069182,
+            "end_ns": 121966799609134,
+            "elapsed_ms": 2.539952,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966968597414,
+            "end_ns": 121966970328779,
+            "elapsed_ms": 1.731365,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966970921868,
+            "end_ns": 121966973658931,
+            "elapsed_ms": 2.737063,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121966976978414,
+            "end_ns": 121966979743191,
+            "elapsed_ms": 2.764777,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967148684720,
+            "end_ns": 121967150264611,
+            "elapsed_ms": 1.579891,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967150436574,
+            "end_ns": 121967152994161,
+            "elapsed_ms": 2.557587,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967158689898,
+            "end_ns": 121967161232765,
+            "elapsed_ms": 2.542867,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967328364928,
+            "end_ns": 121967329847761,
+            "elapsed_ms": 1.482833,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967330567626,
+            "end_ns": 121967333141013,
+            "elapsed_ms": 2.573387,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967336432520,
+            "end_ns": 121967339146960,
+            "elapsed_ms": 2.71444,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967508635530,
+            "end_ns": 121967510149303,
+            "elapsed_ms": 1.513773,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967510837686,
+            "end_ns": 121967513241624,
+            "elapsed_ms": 2.403938,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967521639667,
+            "end_ns": 121967524304080,
+            "elapsed_ms": 2.664413,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967688421912,
+            "end_ns": 121967690012595,
+            "elapsed_ms": 1.590683,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967690567680,
+            "end_ns": 121967693290937,
+            "elapsed_ms": 2.723257,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967698660312,
+            "end_ns": 121967700328334,
+            "elapsed_ms": 1.668022,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967868712614,
+            "end_ns": 121967870251285,
+            "elapsed_ms": 1.538671,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967870528642,
+            "end_ns": 121967873227953,
+            "elapsed_ms": 2.699311,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121967876388587,
+            "end_ns": 121967878819227,
+            "elapsed_ms": 2.43064,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968048609280,
+            "end_ns": 121968050583826,
+            "elapsed_ms": 1.974546,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968050814964,
+            "end_ns": 121968053404993,
+            "elapsed_ms": 2.590029,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968056615795,
+            "end_ns": 121968059045743,
+            "elapsed_ms": 2.429948,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968228686026,
+            "end_ns": 121968229949254,
+            "elapsed_ms": 1.263228,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968230453952,
+            "end_ns": 121968232777925,
+            "elapsed_ms": 2.323973,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968236326682,
+            "end_ns": 121968238743946,
+            "elapsed_ms": 2.417264,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968408721021,
+            "end_ns": 121968410263190,
+            "elapsed_ms": 1.542169,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968410493707,
+            "end_ns": 121968413104405,
+            "elapsed_ms": 2.610698,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968418965142,
+            "end_ns": 121968421728125,
+            "elapsed_ms": 2.762983,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968588694377,
+            "end_ns": 121968590316400,
+            "elapsed_ms": 1.622023,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968590831969,
+            "end_ns": 121968592730588,
+            "elapsed_ms": 1.898619,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968598976170,
+            "end_ns": 121968601518807,
+            "elapsed_ms": 2.542637,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968768296323,
+            "end_ns": 121968769935119,
+            "elapsed_ms": 1.638796,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968770524370,
+            "end_ns": 121968773246395,
+            "elapsed_ms": 2.722025,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968776407751,
+            "end_ns": 121968779058387,
+            "elapsed_ms": 2.650636,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968948289557,
+            "end_ns": 121968949904697,
+            "elapsed_ms": 1.61514,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968950493568,
+            "end_ns": 121968953110889,
+            "elapsed_ms": 2.617321,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121968956327703,
+            "end_ns": 121968959007315,
+            "elapsed_ms": 2.679612,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969129189057,
+            "end_ns": 121969130426966,
+            "elapsed_ms": 1.237909,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969130948717,
+            "end_ns": 121969133356162,
+            "elapsed_ms": 2.407445,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969136733075,
+            "end_ns": 121969139245403,
+            "elapsed_ms": 2.512328,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969308629250,
+            "end_ns": 121969310320567,
+            "elapsed_ms": 1.691317,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969310839623,
+            "end_ns": 121969313477264,
+            "elapsed_ms": 2.637641,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969321938189,
+            "end_ns": 121969324688799,
+            "elapsed_ms": 2.75061,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969487967385,
+            "end_ns": 121969490748845,
+            "elapsed_ms": 2.78146,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969497079882,
+            "end_ns": 121969499813980,
+            "elapsed_ms": 2.734098,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969668756351,
+            "end_ns": 121969670362884,
+            "elapsed_ms": 1.606533,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969670958738,
+            "end_ns": 121969672956529,
+            "elapsed_ms": 1.997791,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969676855404,
+            "end_ns": 121969679270855,
+            "elapsed_ms": 2.415451,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969848233064,
+            "end_ns": 121969850330558,
+            "elapsed_ms": 2.097494,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969850501670,
+            "end_ns": 121969853206181,
+            "elapsed_ms": 2.704511,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121969858714404,
+            "end_ns": 121969861023318,
+            "elapsed_ms": 2.308914,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970029421945,
+            "end_ns": 121970031318660,
+            "elapsed_ms": 1.896715,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970033003886,
+            "end_ns": 121970034544150,
+            "elapsed_ms": 1.540264,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970044376492,
+            "end_ns": 121970045544035,
+            "elapsed_ms": 1.167543,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970208647892,
+            "end_ns": 121970210373857,
+            "elapsed_ms": 1.725965,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970210915637,
+            "end_ns": 121970213509302,
+            "elapsed_ms": 2.593665,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970219303279,
+            "end_ns": 121970222107944,
+            "elapsed_ms": 2.804665,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970387606832,
+            "end_ns": 121970390509517,
+            "elapsed_ms": 2.902685,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970397057154,
+            "end_ns": 121970399756615,
+            "elapsed_ms": 2.699461,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970569149559,
+            "end_ns": 121970570677440,
+            "elapsed_ms": 1.527881,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970570938185,
+            "end_ns": 121970572900157,
+            "elapsed_ms": 1.961972,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970576718796,
+            "end_ns": 121970578583519,
+            "elapsed_ms": 1.864723,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970748260323,
+            "end_ns": 121970749871645,
+            "elapsed_ms": 1.611322,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970750437953,
+            "end_ns": 121970753153184,
+            "elapsed_ms": 2.715231,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970756356701,
+            "end_ns": 121970759054870,
+            "elapsed_ms": 2.698169,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970928289086,
+            "end_ns": 121970930008718,
+            "elapsed_ms": 1.719632,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970930529999,
+            "end_ns": 121970933157299,
+            "elapsed_ms": 2.6273,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          },
+          {
+            "operation": "prepare",
+            "path": "async-control",
+            "begin_ns": 121970935784670,
+            "end_ns": 121970936414671,
+            "elapsed_ms": 0.630001,
+            "timeout_ms": 5.0,
+            "wall_timeout_exceeded": false,
+            "faulted": false,
+            "request_id": null,
+            "broker_token": null,
+            "selected": false,
+            "confirmed": true
+          }
+        ],
+        "handoffs": [
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121963909266547,
+            "end_ns": 121963909297306,
+            "elapsed_ms": 0.030759,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121963913166874,
+            "end_ns": 121963913180561,
+            "elapsed_ms": 0.013687,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121963923651842,
+            "end_ns": 121963923664937,
+            "elapsed_ms": 0.013095,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964086077003,
+            "end_ns": 121964086091281,
+            "elapsed_ms": 0.014278,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964092420094,
+            "end_ns": 121964092454932,
+            "elapsed_ms": 0.034838,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964103699611,
+            "end_ns": 121964103714179,
+            "elapsed_ms": 0.014568,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964266986323,
+            "end_ns": 121964267003126,
+            "elapsed_ms": 0.016803,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964270645193,
+            "end_ns": 121964270653799,
+            "elapsed_ms": 0.008606,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964276421816,
+            "end_ns": 121964276423860,
+            "elapsed_ms": 0.002044,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964447380053,
+            "end_ns": 121964447395112,
+            "elapsed_ms": 0.015059,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964450936785,
+            "end_ns": 121964450945362,
+            "elapsed_ms": 0.008577,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964456687308,
+            "end_ns": 121964456689412,
+            "elapsed_ms": 0.002104,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964626924587,
+            "end_ns": 121964626940709,
+            "elapsed_ms": 0.016122,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964630499695,
+            "end_ns": 121964630508122,
+            "elapsed_ms": 0.008427,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964636288302,
+            "end_ns": 121964636290206,
+            "elapsed_ms": 0.001904,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964807230318,
+            "end_ns": 121964807245417,
+            "elapsed_ms": 0.015099,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964810818030,
+            "end_ns": 121964810826346,
+            "elapsed_ms": 0.008316,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964819477058,
+            "end_ns": 121964819479312,
+            "elapsed_ms": 0.002254,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964986378063,
+            "end_ns": 121964986393383,
+            "elapsed_ms": 0.01532,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964989125547,
+            "end_ns": 121964989135306,
+            "elapsed_ms": 0.009759,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121964997682418,
+            "end_ns": 121964997696675,
+            "elapsed_ms": 0.014257,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965166957994,
+            "end_ns": 121965166971911,
+            "elapsed_ms": 0.013917,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965170474498,
+            "end_ns": 121965170487584,
+            "elapsed_ms": 0.013086,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965175819415,
+            "end_ns": 121965175832841,
+            "elapsed_ms": 0.013426,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965347032296,
+            "end_ns": 121965347047054,
+            "elapsed_ms": 0.014758,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965350542247,
+            "end_ns": 121965350556244,
+            "elapsed_ms": 0.013997,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965355900520,
+            "end_ns": 121965355913465,
+            "elapsed_ms": 0.012945,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965527258731,
+            "end_ns": 121965527273159,
+            "elapsed_ms": 0.014428,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965530809472,
+            "end_ns": 121965530823128,
+            "elapsed_ms": 0.013656,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965536244603,
+            "end_ns": 121965536257799,
+            "elapsed_ms": 0.013196,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965705968749,
+            "end_ns": 121965705982866,
+            "elapsed_ms": 0.014117,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965708976207,
+            "end_ns": 121965708978010,
+            "elapsed_ms": 0.001803,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965719055628,
+            "end_ns": 121965719069074,
+            "elapsed_ms": 0.013446,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965887239609,
+            "end_ns": 121965887252765,
+            "elapsed_ms": 0.013156,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965890757155,
+            "end_ns": 121965890770150,
+            "elapsed_ms": 0.012995,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121965896162499,
+            "end_ns": 121965896177027,
+            "elapsed_ms": 0.014528,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966067417812,
+            "end_ns": 121966067432590,
+            "elapsed_ms": 0.014778,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966070928695,
+            "end_ns": 121966070942251,
+            "elapsed_ms": 0.013556,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966076272449,
+            "end_ns": 121966076285424,
+            "elapsed_ms": 0.012975,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966247014518,
+            "end_ns": 121966247029296,
+            "elapsed_ms": 0.014778,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966250577351,
+            "end_ns": 121966250591278,
+            "elapsed_ms": 0.013927,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966255995520,
+            "end_ns": 121966256019977,
+            "elapsed_ms": 0.024457,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966427317412,
+            "end_ns": 121966427332521,
+            "elapsed_ms": 0.015109,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966430880235,
+            "end_ns": 121966430893992,
+            "elapsed_ms": 0.013757,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966438640933,
+            "end_ns": 121966438653648,
+            "elapsed_ms": 0.012715,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966607282932,
+            "end_ns": 121966607298252,
+            "elapsed_ms": 0.01532,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966610737266,
+            "end_ns": 121966610751132,
+            "elapsed_ms": 0.013866,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966618661130,
+            "end_ns": 121966618675468,
+            "elapsed_ms": 0.014338,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966786052074,
+            "end_ns": 121966786071883,
+            "elapsed_ms": 0.019809,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966788857941,
+            "end_ns": 121966788859785,
+            "elapsed_ms": 0.001844,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966796572149,
+            "end_ns": 121966796586287,
+            "elapsed_ms": 0.014138,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966967288237,
+            "end_ns": 121966967303146,
+            "elapsed_ms": 0.014909,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966970828707,
+            "end_ns": 121966970842594,
+            "elapsed_ms": 0.013887,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121966976481270,
+            "end_ns": 121966976495819,
+            "elapsed_ms": 0.014549,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967146898248,
+            "end_ns": 121967146912636,
+            "elapsed_ms": 0.014388,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967150341681,
+            "end_ns": 121967150354415,
+            "elapsed_ms": 0.012734,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967158184067,
+            "end_ns": 121967158198826,
+            "elapsed_ms": 0.014759,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967326984874,
+            "end_ns": 121967327002207,
+            "elapsed_ms": 0.017333,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967330473093,
+            "end_ns": 121967330487691,
+            "elapsed_ms": 0.014598,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967335893436,
+            "end_ns": 121967335908405,
+            "elapsed_ms": 0.014969,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967507232872,
+            "end_ns": 121967507246448,
+            "elapsed_ms": 0.013576,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967510739627,
+            "end_ns": 121967510753694,
+            "elapsed_ms": 0.014067,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967521108588,
+            "end_ns": 121967521122776,
+            "elapsed_ms": 0.014188,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967687045856,
+            "end_ns": 121967687059833,
+            "elapsed_ms": 0.013977,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967690480802,
+            "end_ns": 121967690493797,
+            "elapsed_ms": 0.012995,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967698150113,
+            "end_ns": 121967698164231,
+            "elapsed_ms": 0.014118,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967866871165,
+            "end_ns": 121967866886866,
+            "elapsed_ms": 0.015701,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967870435131,
+            "end_ns": 121967870448788,
+            "elapsed_ms": 0.013657,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121967875856606,
+            "end_ns": 121967875869602,
+            "elapsed_ms": 0.012996,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968047230719,
+            "end_ns": 121968047245227,
+            "elapsed_ms": 0.014508,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968050721202,
+            "end_ns": 121968050734398,
+            "elapsed_ms": 0.013196,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968056108501,
+            "end_ns": 121968056121497,
+            "elapsed_ms": 0.012996,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968226820501,
+            "end_ns": 121968226835330,
+            "elapsed_ms": 0.014829,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968230360521,
+            "end_ns": 121968230374027,
+            "elapsed_ms": 0.013506,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968235778129,
+            "end_ns": 121968235792627,
+            "elapsed_ms": 0.014498,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968406881457,
+            "end_ns": 121968406895364,
+            "elapsed_ms": 0.013907,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968410398652,
+            "end_ns": 121968410411838,
+            "elapsed_ms": 0.013186,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968418430135,
+            "end_ns": 121968418444372,
+            "elapsed_ms": 0.014237,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968587257513,
+            "end_ns": 121968587272251,
+            "elapsed_ms": 0.014738,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968590736534,
+            "end_ns": 121968590750401,
+            "elapsed_ms": 0.013867,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968598503644,
+            "end_ns": 121968598516780,
+            "elapsed_ms": 0.013136,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968766884457,
+            "end_ns": 121968766900218,
+            "elapsed_ms": 0.015761,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968770428254,
+            "end_ns": 121968770441890,
+            "elapsed_ms": 0.013636,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968775865851,
+            "end_ns": 121968775880469,
+            "elapsed_ms": 0.014618,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968946916607,
+            "end_ns": 121968946931145,
+            "elapsed_ms": 0.014538,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968950396770,
+            "end_ns": 121968950410848,
+            "elapsed_ms": 0.014078,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121968955806232,
+            "end_ns": 121968955820730,
+            "elapsed_ms": 0.014498,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969127294797,
+            "end_ns": 121969127308223,
+            "elapsed_ms": 0.013426,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969130853643,
+            "end_ns": 121969130867179,
+            "elapsed_ms": 0.013536,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969136317580,
+            "end_ns": 121969136332048,
+            "elapsed_ms": 0.014468,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969307243064,
+            "end_ns": 121969307258624,
+            "elapsed_ms": 0.01556,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969310741784,
+            "end_ns": 121969310755470,
+            "elapsed_ms": 0.013686,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969321396810,
+            "end_ns": 121969321411518,
+            "elapsed_ms": 0.014708,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969486269986,
+            "end_ns": 121969486284474,
+            "elapsed_ms": 0.014488,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969489033390,
+            "end_ns": 121969489035264,
+            "elapsed_ms": 0.001874,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969496542661,
+            "end_ns": 121969496557209,
+            "elapsed_ms": 0.014548,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969667316290,
+            "end_ns": 121969667330308,
+            "elapsed_ms": 0.014018,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969670862852,
+            "end_ns": 121969670877310,
+            "elapsed_ms": 0.014458,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969676319346,
+            "end_ns": 121969676333162,
+            "elapsed_ms": 0.013816,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969846823102,
+            "end_ns": 121969846837670,
+            "elapsed_ms": 0.014568,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969850404732,
+            "end_ns": 121969850417888,
+            "elapsed_ms": 0.013156,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121969858245555,
+            "end_ns": 121969858258460,
+            "elapsed_ms": 0.012905,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970027233945,
+            "end_ns": 121970027248253,
+            "elapsed_ms": 0.014308,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970032859717,
+            "end_ns": 121970032873503,
+            "elapsed_ms": 0.013786,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970044302359,
+            "end_ns": 121970044316596,
+            "elapsed_ms": 0.014237,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970207215356,
+            "end_ns": 121970207229524,
+            "elapsed_ms": 0.014168,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970210821214,
+            "end_ns": 121970210835291,
+            "elapsed_ms": 0.014077,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970218854790,
+            "end_ns": 121970218869399,
+            "elapsed_ms": 0.014609,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970385902710,
+            "end_ns": 121970385916838,
+            "elapsed_ms": 0.014128,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970388676014,
+            "end_ns": 121970388677767,
+            "elapsed_ms": 0.001753,
+            "accepted": false
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970396516607,
+            "end_ns": 121970396530885,
+            "elapsed_ms": 0.014278,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970567291398,
+            "end_ns": 121970567305466,
+            "elapsed_ms": 0.014068,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970570845505,
+            "end_ns": 121970570858841,
+            "elapsed_ms": 0.013336,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970576180563,
+            "end_ns": 121970576194179,
+            "elapsed_ms": 0.013616,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970746882323,
+            "end_ns": 121970746896551,
+            "elapsed_ms": 0.014228,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970750352667,
+            "end_ns": 121970750365622,
+            "elapsed_ms": 0.012955,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970755806956,
+            "end_ns": 121970755821294,
+            "elapsed_ms": 0.014338,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970926891609,
+            "end_ns": 121970926905616,
+            "elapsed_ms": 0.014007,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970930436147,
+            "end_ns": 121970930450144,
+            "elapsed_ms": 0.013997,
+            "accepted": true
+          },
+          {
+            "operation": "poll_prepare",
+            "begin_ns": 121970935741577,
+            "end_ns": 121970935754843,
+            "elapsed_ms": 0.013266,
+            "accepted": true
+          }
+        ],
+        "by_operation": {
+          "prepare": {
+            "count": 107,
+            "faults": 0,
+            "wall_timeout_exceeded": 4,
+            "max_elapsed_ms": 9.732518,
+            "path": "async-control"
+          },
+          "abort": {
+            "count": 5,
+            "faults": 0,
+            "wall_timeout_exceeded": 1,
+            "max_elapsed_ms": 5.736586,
+            "path": "async-control"
+          }
+        },
+        "state": {
+          "staged": false,
+          "offered": 0,
+          "inflight": 0,
+          "prepare_pending": false
+        }
+      },
+      "summary": {
+        "records": 160,
+        "correct_cells": 84,
+        "nrx_commits": 55,
+        "conv_commits": 105,
+        "atomic_exchange": 0,
+        "ai_timely_value_tokens": 0
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    }
+  ],
+  "candidate_evidence": {
+    "branches": 42,
+    "exchanges": 0,
+    "minimum_reserved_horizon_margin_ms": null,
+    "maximum_admitted_nrx_per_home_release": 2
+  },
+  "control_evidence": {
+    "records": 220,
+    "by_operation": {
+      "prepare": 209,
+      "abort": 11
+    },
+    "max_elapsed_ms": 10.454728,
+    "faulted": 0,
+    "commit_records": 0,
+    "commit_max_elapsed_ms": null,
+    "commit_admission_bound_exceeded": 0,
+    "handoffs": 239,
+    "handoff_max_elapsed_ms": 0.034838
+  },
+  "gates": {
+    "two_homes": true,
+    "same_first_release": true,
+    "eight_cells": true,
+    "worker_count_match": true,
+    "system_safety": true,
+    "broker_homes": true,
+    "global_unique_requests": true,
+    "broker_drained": true,
+    "both_homes_ai": false,
+    "physical_ring_depth_conformance": true,
+    "candidate_branch_coverage": true,
+    "ai45_candidate_exchange_observed": false,
+    "candidate_horizon_margin_nonnegative": false,
+    "control_budget_accounted": true,
+    "rpc_telemetry_present": true,
+    "only_commit_declared_critical": true,
+    "rpc_prepare_commit_complete_coverage": false,
+    "commit_admission_wall_bound": false,
+    "deferred_complete_not_mislabeled_ack": true
+  },
+  "all_pass": false,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c142_v14_ai45_canary_job58833253_protocol.json": "e800ceff925aac66330db1962866efd8570e12e05c96cc8e0aab88f2e92a14a9",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_broker.json": "fcbda68100ba2972cc51e08bd540a4e4184e0998d6cb37cb5cf06911177be79e",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h0_controller.json": "512b8e89012c8baa42678da067e3bb0ceb8f668fa2e1a9a7932aeef6ce298692",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h0_worker0.json": "4d5f78a714fb4388fbb748819644525cfca6d5550ac6219bf76c01ebadf8c254",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h0_worker1.json": "fb7fe3d775d1c942774707805f808b3c8aab8e228efb7b798c1089d5ce45e1db",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h0_background.json": "7095c01376d6455946f0c8325473bd7a9aa5a6abd2a1631e81da3625993e0473",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h0_requalification.json": "9f25ef8a2da9bfa6dd42598e6a271bcae37170ae5c16f15e9b4c89f5c8b72258",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h1_controller.json": "6fc8685e797a4f044a6fccbb16779678d1989e8883c64af36c88883d9ad280ae",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h1_worker0.json": "e03226d48e9568cdc48185ccf9f3ed1a0a61b5338c4bf38e5467deec18d30e75",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h1_worker1.json": "63178f7c6ab6b44a3d9bc0f200e165255a503f9cd0b8899f6e8497178f1a4b69",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h1_background.json": "062014e53426d87455adc9b4c2edb9b6e1dfabf2ffae9fa7c9c63dabb0b7b593",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c142_v14_ai45_canary_job58833253_h1_requalification.json": "fe2cea38beec447da3123de0f4e4e48236eaa6fbe02dd4d352059ad6fe01c00c"
+  },
+  "scope": "synthetic context64-only mechanism qualification for exchange-only AI45 with one 7 ms launch-commit charge and 2 ms completion guard; prepare/complete execute on a separate control connection across two disjoint four-cell recovery homes"
+}

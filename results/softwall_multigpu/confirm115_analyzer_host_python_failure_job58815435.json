@@ -1,0 +1,10 @@
+{
+  "schema": "softwall-confirm115-analysis-environment-failure-v1",
+  "job": "58815435",
+  "stage": "aggregate analyzer after all ten arms completed",
+  "command": "python3 scripts_for_node/softwall_same_gpu/analyze_confirm115_multigpu_strong_baselines.py",
+  "error": "SyntaxError: future feature annotations is not defined",
+  "cause": "compute-node host Python is older than the frozen analyzer syntax",
+  "effect": "no experimental arm or artifact was lost; the unchanged frozen analyzer was rerun in the project GPU container",
+  "recovery_result": "results/softwall_multigpu/confirm115_multigpu_strong_baselines_job58815435.json"
+}

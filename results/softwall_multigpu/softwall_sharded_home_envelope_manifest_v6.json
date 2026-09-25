@@ -1,0 +1,24 @@
+{
+  "schema": "softwall-sharded-home-envelope-manifest-v6",
+  "status": "post-C132",
+  "files": {
+    "scripts_for_node/softwall_same_gpu/softwall_envelope_checker_v4.py": "06008652a1018f58dc8e8f6889c260edbef544a9faa6ebef91e1b0bb6df56d26",
+    "scripts_for_node/softwall_same_gpu/test_softwall_envelope_checker_v4.py": "f4ba5eb44e3a41685bb8888b95c4e5ca3ccb19607b1306e6b13dc8cf7206cd08",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_grid_v6.json": "4c2745cc30fd7ebe13a9bc0e50a5d15b84f843e021907a51444bc7adf4775035",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v6.json": "b4fa01a8bbfde7fef1b40fefbdc994f9f62f00fc0297c308229bd37fddd306c9",
+    "results/softwall_multigpu/confirm129_first_arm_failure.json": "3f9a2399e59c4892e260738e091e6c1e7ab16e32a2f0b0d92bf063e3984d76cb",
+    "results/softwall_multigpu/confirm130_deadline_broker_crash_result.json": "6a95dccabf67b0f02daf9f9f93d0a3129317b7962c4c230635522bc01c9279d8",
+    "results/softwall_multigpu/confirm131_budgeted_broker_crash_result.json": "e598ccedaf5355b8645023de7a26840b87a18eff2f1f5be7d5f6b531985cbcd8",
+    "results/softwall_multigpu/confirm132_fully_budgeted_broker_crash_protocol.json": "818539a50a76c3cd7a8c1cd79d6c305777fb4765a0145c51653c9cdf61a962e2",
+    "results/softwall_multigpu/confirm132_fully_budgeted_broker_crash_result.json": "ee805866e04fd00c8e5155e566ce816cfa2f47ee966161552becf5d0e574e968",
+    "results/softwall_multigpu/confirm128_132_artifact_manifest.json": "1afe5beecc3188c016a69e1da4e7680577a9ebd9ef289319716be0d9057e0929",
+    "results/softwall_multigpu/confirm132_validation_summary.json": "9d74ab50293637a11c28f6ccdf0d006c1a89a3e5e4ee0e6296d0254264fe4de8"
+  },
+  "classification_counts": {
+    "QSU": 5,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 10
+  },
+  "claim": "A broker fail-stop mode is qualified only when every synchronous prepare, commit, and complete RPC has a bound and the full control-transaction budget is charged to AI admission. C129 and C131 are UQ counterexamples; C132 is the tested QSU point."
+}

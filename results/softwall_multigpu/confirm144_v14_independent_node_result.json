@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-confirm144-v14-independent-node-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm144_v14_independent_node_protocol.json",
+  "protocol_sha256": "deb1252af8a2aa900ddfa145cda8001a1d2fcbfbce619df6150bdc452c131b9a",
+  "nodes": [
+    "nid002049"
+  ],
+  "ai45_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm144_ai45_job58833925_result.json",
+  "fault_results": [
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm144_prepare_job58833925_result.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm144_commit_job58833925_result.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm144_complete_job58833925_result.json"
+  ],
+  "totals": {
+    "radio_records": 6080,
+    "ai45_exchanges": 2,
+    "radio_after_fault": 3730,
+    "fault_arms": 3
+  },
+  "source_hash_mismatches": [],
+  "gates": {
+    "one_independent_node": true,
+    "ai45_arm_pass": true,
+    "ai45_exchange_observed": true,
+    "three_fault_points": true,
+    "all_fault_arms_pass": true,
+    "all_radio_continues_after_fault": true,
+    "no_source_mismatch": true
+  },
+  "all_pass": true,
+  "claim_boundary": "Independent A100-node finite-sample requalification of one V14 AI45 conditional-exchange arm and one post-apply fault arm per broker control point. This is same-family, not cross-family or WCET evidence."
+}

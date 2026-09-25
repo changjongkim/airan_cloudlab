@@ -1,0 +1,346 @@
+{
+  "schema": "softwall-confirm139-qualified-control-bound-v1",
+  "campaign_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_qualified_control_bound_protocol.json",
+  "campaign_protocol_sha256": "34894d8db391f4424c995e210278b7c283d061191fccfeb66b429eac276cadd3",
+  "nodes": [
+    "nid001252"
+  ],
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177",
+    "nid001144"
+  ],
+  "arms": [
+    {
+      "label": "confirm139_prepare1_job58831575",
+      "operation": "prepare",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_prepare1_job58831575_result.json",
+      "expected_arm": {
+        "name": "s1",
+        "label": "confirm139_prepare1_job58831575",
+        "operation": "prepare",
+        "iterations": 340,
+        "warmup": 20,
+        "payload_seeds": [
+          30000051,
+          30010051
+        ],
+        "channel_seeds": [
+          30001000,
+          30011000
+        ]
+      },
+      "configuration_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "all_pass": true,
+      "radio_records": 2720,
+      "radio_records_after_fault_detection": 2488,
+      "ai_units_before_containment": 14,
+      "control_evidence": {
+        "records": 332,
+        "by_operation": {
+          "prepare": 216,
+          "commit": 58,
+          "complete": 58
+        },
+        "max_elapsed_ms": 5.208644,
+        "socket_timeout_elapsed_exceeded": 2,
+        "admission_bound_exceeded": 0,
+        "faulted": 2,
+        "faulted_by_operation": {
+          "prepare": 2
+        },
+        "target_fault_records": 1
+      }
+    },
+    {
+      "label": "confirm139_prepare2_job58831575",
+      "operation": "prepare",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_prepare2_job58831575_result.json",
+      "expected_arm": {
+        "name": "s2",
+        "label": "confirm139_prepare2_job58831575",
+        "operation": "prepare",
+        "iterations": 340,
+        "warmup": 20,
+        "payload_seeds": [
+          30020051,
+          30030051
+        ],
+        "channel_seeds": [
+          30021000,
+          30031000
+        ]
+      },
+      "configuration_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "all_pass": true,
+      "radio_records": 2720,
+      "radio_records_after_fault_detection": 2491,
+      "ai_units_before_containment": 14,
+      "control_evidence": {
+        "records": 325,
+        "by_operation": {
+          "prepare": 213,
+          "commit": 56,
+          "complete": 56
+        },
+        "max_elapsed_ms": 5.183736,
+        "socket_timeout_elapsed_exceeded": 2,
+        "admission_bound_exceeded": 0,
+        "faulted": 2,
+        "faulted_by_operation": {
+          "prepare": 2
+        },
+        "target_fault_records": 1
+      }
+    },
+    {
+      "label": "confirm139_commit1_job58831575",
+      "operation": "commit",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_commit1_job58831575_result.json",
+      "expected_arm": {
+        "name": "s3",
+        "label": "confirm139_commit1_job58831575",
+        "operation": "commit",
+        "iterations": 340,
+        "warmup": 20,
+        "payload_seeds": [
+          30040051,
+          30050051
+        ],
+        "channel_seeds": [
+          30041000,
+          30051000
+        ]
+      },
+      "configuration_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "all_pass": true,
+      "radio_records": 2720,
+      "radio_records_after_fault_detection": 2484,
+      "ai_units_before_containment": 23,
+      "control_evidence": {
+        "records": 339,
+        "by_operation": {
+          "prepare": 217,
+          "commit": 62,
+          "complete": 60
+        },
+        "max_elapsed_ms": 5.176602,
+        "socket_timeout_elapsed_exceeded": 2,
+        "admission_bound_exceeded": 0,
+        "faulted": 2,
+        "faulted_by_operation": {
+          "commit": 2
+        },
+        "target_fault_records": 1
+      }
+    },
+    {
+      "label": "confirm139_commit2_job58831575",
+      "operation": "commit",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_commit2_job58831575_result.json",
+      "expected_arm": {
+        "name": "s4",
+        "label": "confirm139_commit2_job58831575",
+        "operation": "commit",
+        "iterations": 340,
+        "warmup": 20,
+        "payload_seeds": [
+          30060051,
+          30070051
+        ],
+        "channel_seeds": [
+          30061000,
+          30071000
+        ]
+      },
+      "configuration_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "all_pass": true,
+      "radio_records": 2720,
+      "radio_records_after_fault_detection": 2480,
+      "ai_units_before_containment": 17,
+      "control_evidence": {
+        "records": 350,
+        "by_operation": {
+          "prepare": 223,
+          "commit": 64,
+          "complete": 63
+        },
+        "max_elapsed_ms": 5.361661,
+        "socket_timeout_elapsed_exceeded": 2,
+        "admission_bound_exceeded": 0,
+        "faulted": 2,
+        "faulted_by_operation": {
+          "commit": 1,
+          "complete": 1
+        },
+        "target_fault_records": 1
+      }
+    },
+    {
+      "label": "confirm139_complete1_job58831575",
+      "operation": "complete",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_complete1_job58831575_result.json",
+      "expected_arm": {
+        "name": "s5",
+        "label": "confirm139_complete1_job58831575",
+        "operation": "complete",
+        "iterations": 340,
+        "warmup": 20,
+        "payload_seeds": [
+          30080051,
+          30090051
+        ],
+        "channel_seeds": [
+          30081000,
+          30091000
+        ]
+      },
+      "configuration_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "all_pass": true,
+      "radio_records": 2720,
+      "radio_records_after_fault_detection": 2488,
+      "ai_units_before_containment": 15,
+      "control_evidence": {
+        "records": 336,
+        "by_operation": {
+          "prepare": 216,
+          "commit": 60,
+          "complete": 60
+        },
+        "max_elapsed_ms": 5.219776,
+        "socket_timeout_elapsed_exceeded": 2,
+        "admission_bound_exceeded": 0,
+        "faulted": 2,
+        "faulted_by_operation": {
+          "complete": 2
+        },
+        "target_fault_records": 1
+      }
+    },
+    {
+      "label": "confirm139_complete2_job58831575",
+      "operation": "complete",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_complete2_job58831575_result.json",
+      "expected_arm": {
+        "name": "s6",
+        "label": "confirm139_complete2_job58831575",
+        "operation": "complete",
+        "iterations": 340,
+        "warmup": 20,
+        "payload_seeds": [
+          30100051,
+          30110051
+        ],
+        "channel_seeds": [
+          30101000,
+          30111000
+        ]
+      },
+      "configuration_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "all_pass": true,
+      "radio_records": 2720,
+      "radio_records_after_fault_detection": 2488,
+      "ai_units_before_containment": 17,
+      "control_evidence": {
+        "records": 338,
+        "by_operation": {
+          "prepare": 216,
+          "commit": 61,
+          "complete": 61
+        },
+        "max_elapsed_ms": 5.653235,
+        "socket_timeout_elapsed_exceeded": 2,
+        "admission_bound_exceeded": 0,
+        "faulted": 2,
+        "faulted_by_operation": {
+          "complete": 1,
+          "prepare": 1
+        },
+        "target_fault_records": 1
+      }
+    }
+  ],
+  "totals": {
+    "arms": 6,
+    "radio_records": 16320,
+    "radio_records_after_fault_detection": 14919,
+    "ai_units_before_containment": 100
+  },
+  "control_evidence": {
+    "socket_timeout_ms": 5.0,
+    "declared_per_rpc_admission_bound_ms": 7.0,
+    "records": 2020,
+    "by_operation": {
+      "commit": 361,
+      "complete": 358,
+      "prepare": 1301
+    },
+    "faulted_by_operation": {
+      "commit": 3,
+      "complete": 4,
+      "prepare": 5
+    },
+    "max_elapsed_ms_by_operation": {
+      "commit": 5.176602,
+      "complete": 5.361661,
+      "prepare": 5.653235
+    },
+    "max_faulted_elapsed_ms_by_operation": {
+      "commit": 5.176602,
+      "complete": 5.361661,
+      "prepare": 5.653235
+    },
+    "maximum_elapsed_ms": 5.653235,
+    "maximum_faulted_elapsed_ms": 5.653235,
+    "socket_timeout_elapsed_exceeded": 12,
+    "admission_bound_exceeded": 0,
+    "gates": {
+      "telemetry_on_every_home": true,
+      "prepare_commit_complete_coverage": true,
+      "faulted_call_each_arm": true,
+      "faulted_call_present_at_each_control_point": true,
+      "socket_timeout_and_admission_bound_distinct": true,
+      "no_admission_bound_exceedance": true,
+      "maximum_within_admission_bound": true
+    },
+    "all_pass": true
+  },
+  "artifact_hash_mismatches": [],
+  "arm_source_hash_mismatches": [],
+  "source_hash_mismatches": [],
+  "gates": {
+    "six_expected_arms": true,
+    "two_arms_per_control_point": true,
+    "all_arm_configurations_match": true,
+    "all_arm_gates_pass": true,
+    "all_artifact_hashes_match": true,
+    "all_arm_sources_match": true,
+    "prospective_sources_match": true,
+    "single_new_physical_node": true,
+    "control_fault_telemetry": true
+  },
+  "all_pass": true,
+  "claim_boundary": "Finite-sample wall-clock qualification of the actual prepare, commit, and complete broker fail-stop detection calls with a 5 ms socket timeout and distinct prospective 7 ms admission charge on one new A100 node. This is not WCET, production d_MAC, cross-family, scheduler-isolation, restart, or exactly-once evidence."
+}

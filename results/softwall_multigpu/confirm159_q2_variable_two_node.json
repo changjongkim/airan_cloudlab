@@ -1,0 +1,491 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_peer_spec.json": "d4d9408192bbaee80d709b2f69299d0c6c05ef42d20e216df5dc344e122527a0",
+    "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_protocol.json": "a8bd890067653e5939be79dc8de27b1d08c78b30fa9a095fb342df7f629b9cfc",
+    "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_result.json": "00481d5450458186e7984bb22d0d9910d3f3b66713399be1021f2c6049295cd2",
+    "results/softwall_multigpu/confirm159q2g_batch_holdout_j58858194_peer_spec.json": "084f31d6627ee3b479f811d09cf2bb5d92b8ad9b0f7a9b0dac1ad99eb01e68f9",
+    "results/softwall_multigpu/confirm159q2g_batch_holdout_j58858194_protocol.json": "3ef03f8ae70879db18b3fcdb0fb8efd75f9fddb0724dfbcf42408ce32841cee9",
+    "results/softwall_multigpu/confirm159q2g_batch_holdout_j58858194_result.json": "df1c503207c789ae3a0fac028deece9365744bf92016c78c442a8027502e99f8",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_gpu_inventory.csv": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r0_owner.json": "049462a4c2fe8c26f0d0be728f24172736512b3692e843dffc76fbd76d7e93d4",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r1_owner.json": "520753284948b5105cf2f8bbc58ca8609c35d7998c00d7639071d109a44ec260",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home0_h0-r2_owner.json": "da77e9e07cf6e415a6827b3094c21ca1dbc840c2d9d65753887521b3dc3cdf46",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_home1_h1-r0_owner.json": "69463399abc965e4b30214e19bf8554710344516fa121433e658e312e5eccc1a",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_nrx_worker.json": "2d08ba07634f82af26d92afc6eec20ef4fd2074aaa1da5274196086d2bf27452",
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_qwen.json": "0bbd981c08c83ba3c9346a0e067101d3b99559ae6408740c291ea55a98ba3f4d",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_gpu_inventory.csv": "44e4247c66acd7d336d5d6cb11a5f3739c9f60fb16ae427b09621aaec141de91",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r0_owner.json": "7bd03c8864ce5b04e6ad979b5db693faae18259fa9ec18c35e637befe18f4015",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r1_owner.json": "735954cba154e2cc6afa39920c7b42664413121dfb2fbb67f9c012b1117a2e68",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home0_h0-r2_owner.json": "637feb01901db24e2538e0a29f4c2ff327577616bad1f07a27e16411c82ad00a",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_home1_h1-r0_owner.json": "71549f218e3708ee394a74860cefab093debe0fbf044a1d82f7b74d86329feab",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_nrx_worker.json": "bbfc33bd5cbb8839d6d55819b88cb1f0465f4a8a277233486a8386c58265a3df",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_qwen.json": "ce3c03d80dfd65124810a7546d38da7d28d94a8ed02931b6354d98ea1efb46b6"
+  },
+  "campaigns": [
+    {
+      "campaign": "development",
+      "job_id": "58857672",
+      "label": "confirm159q2f_batch_dev_j58857672",
+      "node": "nid001204",
+      "seed_base": 34500000,
+      "summary": {
+        "actual_nrx_requests": 2400,
+        "actual_nrx_successes": 1750,
+        "bank_copy_gpu_ms": {
+          "count": 2400,
+          "max": 0.48947200179100037,
+          "mean": 0.11847365330904722,
+          "p50": 0.1128000020980835,
+          "p99": 0.17609600722789764
+        },
+        "deadline_misses": 0,
+        "launch_revalidation_attempts": {
+          "count": 600,
+          "max": 2.0,
+          "mean": 1.0016666666666667,
+          "p50": 1.0,
+          "p99": 1.0
+        },
+        "launch_revalidation_retry_rounds": 1,
+        "local_shared_class_disagreements": 0,
+        "nrx_release_to_complete_ms": {
+          "count": 2400,
+          "max": 18.051598,
+          "mean": 5.179273929999999,
+          "p50": 5.859769,
+          "p99": 7.889534
+        },
+        "oracle_equivalent_recoveries": 650,
+        "physical_recoveries": 650,
+        "prestage_ms": {
+          "count": 4,
+          "max": 4764.245123,
+          "mean": 4627.361013,
+          "p50": 4729.829385,
+          "p99": 4764.245123
+        },
+        "qwen_certificate_rejected_by_class": {
+          "128": 0,
+          "16": 0,
+          "256": 30,
+          "32": 0,
+          "512": 26,
+          "64": 0
+        },
+        "qwen_executed_by_class": {
+          "128": 100,
+          "16": 100,
+          "256": 70,
+          "32": 100,
+          "512": 74,
+          "64": 100
+        },
+        "qwen_execution_ms": {
+          "count": 544,
+          "max": 67.144383,
+          "mean": 30.504585851102988,
+          "p50": 23.222804,
+          "p99": 66.79083
+        },
+        "qwen_execution_ms_by_class": {
+          "128": {
+            "count": 100,
+            "max": 25.769817,
+            "mean": 23.755341490000006,
+            "p50": 23.712962,
+            "p99": 24.219832
+          },
+          "16": {
+            "count": 100,
+            "max": 25.000951,
+            "mean": 22.752156309999982,
+            "p50": 22.630098,
+            "p99": 24.702715
+          },
+          "256": {
+            "count": 70,
+            "max": 40.578518,
+            "mean": 36.301122114285704,
+            "p50": 36.243901,
+            "p99": 36.564591
+          },
+          "32": {
+            "count": 100,
+            "max": 24.144015,
+            "mean": 22.31801087000001,
+            "p50": 22.22281,
+            "p99": 23.579013
+          },
+          "512": {
+            "count": 74,
+            "max": 67.144383,
+            "mean": 66.62540587837837,
+            "p50": 66.593128,
+            "p99": 67.099557
+          },
+          "64": {
+            "count": 100,
+            "max": 24.481347,
+            "mean": 22.40585253,
+            "p50": 22.234424,
+            "p99": 24.320284
+          }
+        },
+        "qwen_launch_guard_rejected_by_class": {
+          "128": 0,
+          "16": 0,
+          "256": 0,
+          "32": 0,
+          "512": 0,
+          "64": 0
+        },
+        "qwen_offered_by_class": {
+          "128": 100,
+          "16": 100,
+          "256": 100,
+          "32": 100,
+          "512": 100,
+          "64": 100
+        },
+        "qwen_units": 544,
+        "radio_commits": 2400,
+        "radio_release_to_commit_ms": {
+          "count": 2400,
+          "max": 117.236182,
+          "mean": 55.24189062916669,
+          "p50": 46.131079,
+          "p99": 116.368745
+        },
+        "raw_zero_normalized_failures": 5,
+        "recovery_path_ms": {
+          "count": 650,
+          "max": 4.932874,
+          "mean": 3.3934121969230744,
+          "p50": 3.37851,
+          "p99": 3.687517
+        },
+        "recovery_preflight_path_ms": {
+          "count": 4,
+          "max": 63.890175,
+          "mean": 19.4153855,
+          "p50": 5.357725,
+          "p99": 63.890175
+        },
+        "rounds": 600
+      }
+    },
+    {
+      "campaign": "holdout",
+      "job_id": "58858194",
+      "label": "confirm159q2g_batch_holdout_j58858194",
+      "node": "nid001632",
+      "seed_base": 35000000,
+      "summary": {
+        "actual_nrx_requests": 2400,
+        "actual_nrx_successes": 1738,
+        "bank_copy_gpu_ms": {
+          "count": 2400,
+          "max": 0.45286399126052856,
+          "mean": 0.11772938673074047,
+          "p50": 0.1093439981341362,
+          "p99": 0.1807039976119995
+        },
+        "deadline_misses": 0,
+        "launch_revalidation_attempts": {
+          "count": 600,
+          "max": 2.0,
+          "mean": 1.0016666666666667,
+          "p50": 1.0,
+          "p99": 1.0
+        },
+        "launch_revalidation_retry_rounds": 1,
+        "local_shared_class_disagreements": 0,
+        "nrx_release_to_complete_ms": {
+          "count": 2400,
+          "max": 18.123007,
+          "mean": 5.206389321666659,
+          "p50": 5.866374,
+          "p99": 8.205462
+        },
+        "oracle_equivalent_recoveries": 662,
+        "physical_recoveries": 662,
+        "prestage_ms": {
+          "count": 4,
+          "max": 4803.429448,
+          "mean": 4649.31162925,
+          "p50": 4767.707282,
+          "p99": 4803.429448
+        },
+        "qwen_certificate_rejected_by_class": {
+          "128": 0,
+          "16": 0,
+          "256": 25,
+          "32": 0,
+          "512": 42,
+          "64": 0
+        },
+        "qwen_executed_by_class": {
+          "128": 100,
+          "16": 100,
+          "256": 75,
+          "32": 100,
+          "512": 58,
+          "64": 100
+        },
+        "qwen_execution_ms": {
+          "count": 533,
+          "max": 67.337736,
+          "mean": 29.649278834896815,
+          "p50": 23.517037,
+          "p99": 66.76106
+        },
+        "qwen_execution_ms_by_class": {
+          "128": {
+            "count": 100,
+            "max": 25.220081,
+            "mean": 23.736427210000006,
+            "p50": 23.636748,
+            "p99": 24.775302
+          },
+          "16": {
+            "count": 100,
+            "max": 28.831136,
+            "mean": 23.254322449999982,
+            "p50": 22.999024,
+            "p99": 25.898677
+          },
+          "256": {
+            "count": 75,
+            "max": 37.421232,
+            "mean": 36.220527199999985,
+            "p50": 36.151233,
+            "p99": 36.951814
+          },
+          "32": {
+            "count": 100,
+            "max": 24.549745,
+            "mean": 22.62004512,
+            "p50": 22.453981,
+            "p99": 23.936032
+          },
+          "512": {
+            "count": 58,
+            "max": 67.337736,
+            "mean": 66.5649839827586,
+            "p50": 66.525015,
+            "p99": 66.9244
+          },
+          "64": {
+            "count": 100,
+            "max": 25.466321,
+            "mean": 22.646775299999995,
+            "p50": 22.53396,
+            "p99": 25.085019
+          }
+        },
+        "qwen_launch_guard_rejected_by_class": {
+          "128": 0,
+          "16": 0,
+          "256": 0,
+          "32": 0,
+          "512": 0,
+          "64": 0
+        },
+        "qwen_offered_by_class": {
+          "128": 100,
+          "16": 100,
+          "256": 100,
+          "32": 100,
+          "512": 100,
+          "64": 100
+        },
+        "qwen_units": 533,
+        "radio_commits": 2400,
+        "radio_release_to_commit_ms": {
+          "count": 2400,
+          "max": 118.022282,
+          "mean": 55.22080723583337,
+          "p50": 46.137176,
+          "p99": 116.434461
+        },
+        "raw_zero_normalized_failures": 2,
+        "recovery_path_ms": {
+          "count": 662,
+          "max": 13.465105,
+          "mean": 3.56310541389728,
+          "p50": 3.461164,
+          "p99": 4.275299
+        },
+        "recovery_preflight_path_ms": {
+          "count": 4,
+          "max": 71.595172,
+          "mean": 31.19137875,
+          "p50": 19.56348,
+          "p99": 71.595172
+        },
+        "rounds": 600
+      }
+    }
+  ],
+  "claim_scope": "Two-node finite-sample qualification of six variable Qwen prefill classes under the warm synthetic P180/D155 actual-NeuralRx mode. It validates class-specific bounded admission, bounded launch-time revalidation, a physical latest-start gate, and an atomic batch transition for outcomes observed at one cutoff. It is not an online BurstGPT performance result, WCET proof, cold/long-idle qualification, production d_MAC result, or integrated fault qualification.",
+  "gates": {
+    "all_physical_qwen_within_class_bound": true,
+    "atomic_observed_outcome_batch_all_rounds": true,
+    "both_campaigns_pass_all_frozen_gates": true,
+    "bounded_revalidation_activated_both_nodes": true,
+    "burstgpt_holdout_still_unmaterialized": true,
+    "combined_sample_exactly_1200_rounds_4800_nrx": true,
+    "development_node_excluded_from_holdout": true,
+    "development_then_holdout": true,
+    "distinct_job_node_seed": true,
+    "each_class_offered_200_and_qualified_per_node": true,
+    "frozen_source_equal_and_current": true,
+    "same_p180_variable_context_mode": true,
+    "zero_deadline_transport_recovery_or_start_guard_violation": true
+  },
+  "schema": "softwall-confirm159-q2-two-node-result-v1",
+  "source_sha256": {
+    "scripts/actual_nrx_batch_recovery_plan_v1.py": "8729b20cb6f6a817f6171f0071211f864832c0f68cca2f19793c3ef7f9a4cf26",
+    "scripts/actual_nrx_integrated_coordinator.py": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d",
+    "scripts/actual_nrx_integrated_owner.py": "0b3ad90dd898bd9abeea832c83ac2b07bb571304eae6476f52ecb0611ed2e210",
+    "scripts/actual_nrx_multi_peer_worker.py": "062e82a652535de86ccd024a38dbae1e3907b2ba7ffa607f9a4b6f50335bc298",
+    "scripts/actual_nrx_repeated_control.py": "c3a5b5c29a6f0eb8beb686e119acf466ebc5e8f2da32d756f81c922dd9c77323",
+    "scripts/actual_nrx_shared_recovery_plan_v1.py": "c9e036f23f2bf913d1b5c4b27ba9a6bb82acfdcb166400b3a9abb4c0fc6b1041",
+    "scripts/analyze_confirm159_q2.py": "c04480839fba8e68d8433b6e129ccaf0b3ae748e667ddd47e3d79d80ed1ca879",
+    "scripts/bounded_launch_revalidation.py": "725da11d755d6bba1ad1a23552bff28da09f5bb35a59a065384160d67e678819",
+    "scripts/build_confirm159_q2_protocol.py": "95191e3dccc3962686230b2a90c45543c9f875b3eebda2c390597d17df3fe037",
+    "scripts/c159_persistent_nrx_worker.py": "d43a1310a27f98c8cc5247e8d84ab0f8784c561a308be65e611f74b4aa238943",
+    "scripts/c159_prestaged_owner.py": "bd0bf68a6cc8a5e41190ea1073df7cd46936fbd49733f3b1544fc50d8a344d75",
+    "scripts/c159_q2_classes.py": "34c5b0d8353bf3ece6e603b381eddd306ce5bcc1c4830a5ee73da51b516f483b",
+    "scripts/c159_q2_coordinator.py": "1d9bb65d033c52a25d9305989840b4f823cd183c1347bbab2bccb5341da83d23",
+    "scripts/c159_q2_qwen_worker.py": "1b5e9c207354fa897b6586d6cf1ccc894edf49a095c293f8f022a0f679d524dd",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_launch_plan_v1.py": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts/run_confirm159_q2.sh": "03f8ccab3f2f4f4f6965cb9d9a5df74c53b4366b835ed77cd629a40942e83bd2",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/test_actual_nrx_batch_recovery_plan_v1.py": "3c04b5f952a38608a534920721d78e836c9f1504810f71692e45fe2ba0ccaf1f",
+    "scripts/test_bounded_launch_revalidation.py": "2170d0a1b3bddbaa2c4d35d3c83562e74a1b16e750614db9dd1a71e54dbd1589",
+    "scripts/test_c159_q2_variable_plan.py": "08e6b066d1845cf9f5ba2f05bbd78ecb4eb5770e921c6350122a2183b8660521",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "C159_Q2_TWO_NODE_VARIABLE_P180_PASS",
+  "summary": {
+    "actual_nrx_requests": 4800,
+    "actual_nrx_successes": 3488,
+    "deadline_misses": 0,
+    "input_roundtrip_violations": 0,
+    "launch_revalidation_retry_rounds": 2,
+    "nrx_release_to_complete_ms": {
+      "count": 4800,
+      "max": 18.123007,
+      "mean": 5.192831625833324,
+      "p50": 5.862303,
+      "p99": 8.098506
+    },
+    "physical_recoveries": 1312,
+    "qwen_certificate_rejected_by_class": {
+      "128": 0,
+      "16": 0,
+      "256": 55,
+      "32": 0,
+      "512": 68,
+      "64": 0
+    },
+    "qwen_executed_by_class": {
+      "128": 200,
+      "16": 200,
+      "256": 145,
+      "32": 200,
+      "512": 132,
+      "64": 200
+    },
+    "qwen_execution_ms_by_class": {
+      "128": {
+        "count": 200,
+        "max": 25.769817,
+        "mean": 23.745884350000004,
+        "p50": 23.682577,
+        "p99": 24.775302
+      },
+      "16": {
+        "count": 200,
+        "max": 28.831136,
+        "mean": 23.00323938000001,
+        "p50": 22.74482,
+        "p99": 25.287171
+      },
+      "256": {
+        "count": 145,
+        "max": 40.578518,
+        "mean": 36.259435089655156,
+        "p50": 36.226509,
+        "p99": 37.421232
+      },
+      "32": {
+        "count": 200,
+        "max": 24.549745,
+        "mean": 22.46902799499999,
+        "p50": 22.351639,
+        "p99": 23.936032
+      },
+      "512": {
+        "count": 132,
+        "max": 67.337736,
+        "mean": 66.59885686363636,
+        "p50": 66.579098,
+        "p99": 67.144383
+      },
+      "64": {
+        "count": 200,
+        "max": 25.466321,
+        "mean": 22.526313914999996,
+        "p50": 22.397145,
+        "p99": 25.012008
+      }
+    },
+    "qwen_launch_guard_rejected_by_class": {
+      "128": 0,
+      "16": 0,
+      "256": 0,
+      "32": 0,
+      "512": 0,
+      "64": 0
+    },
+    "qwen_offered_by_class": {
+      "128": 200,
+      "16": 200,
+      "256": 200,
+      "32": 200,
+      "512": 200,
+      "64": 200
+    },
+    "qwen_units": 1077,
+    "radio_commits": 4800,
+    "radio_release_to_commit_ms": {
+      "count": 4800,
+      "max": 118.022282,
+      "mean": 55.23134893250004,
+      "p50": 46.134182,
+      "p99": 116.376222
+    },
+    "recovery_contract_violations": 0,
+    "recovery_path_ms": {
+      "count": 1312,
+      "max": 13.465105,
+      "mean": 3.4790348414634127,
+      "p50": 3.40418,
+      "p99": 4.239559
+    },
+    "response_echo_violations": 0,
+    "rounds": 1200
+  }
+}

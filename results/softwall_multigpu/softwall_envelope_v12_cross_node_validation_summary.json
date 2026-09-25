@@ -1,0 +1,105 @@
+{
+  "schema": "softwall-envelope-v12-cross-node-validation-summary-v1",
+  "status": "PASS_WITH_SCOPE",
+  "model": {
+    "classification_counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "decision_time_exchange_home_class_pairs": 2,
+    "checker_sha256": "60a28dd3e4d8d1436c0058fb6be96e2bd899a08602967d2166cd89d3a93148d2",
+    "input_sha256": "df519722e1ec6013beaa46acbd7b0c4af663e246250a357d39ac86dd422ddf66",
+    "complete_transaction_ms": 57,
+    "static_all_fail_slack_ms": 53,
+    "static_margin_ms": -4,
+    "conditional_window_ms": 58,
+    "conditional_margin_ms": 1,
+    "runtime_complete_guard_ms": 17
+  },
+  "exact_oracle": {
+    "status": "PASS",
+    "grid_scenarios": 18,
+    "endpoint_pools": 39,
+    "bounded_exhaustive_cases": 10920,
+    "cardinality_gaps": 0,
+    "scenario_failures": 0,
+    "scope": "Finite-state endpoint admission cardinality and schedule consistency; the AI completion guard correction is outside this endpoint-only oracle."
+  },
+  "physical_requalification": {
+    "campaigns": [
+      "C135",
+      "C136"
+    ],
+    "nodes": 2,
+    "all_38_events_static_reject_conditional_accept": true,
+    "minimum_physical_guarded_horizon_margin_ms": 45.97009,
+    "c136_job_id": 58829672,
+    "c136_node": "nid002817",
+    "c136_arms": 6,
+    "arms": 8,
+    "radio_records": 10240,
+    "home_releases": 2560,
+    "atomic_exchanges": 72,
+    "candidate_branches": 1196,
+    "ai40_candidate_exchanges": 38,
+    "declared_safety_violations": 0,
+    "node_names": [
+      "nid001245",
+      "nid002817"
+    ]
+  },
+  "statistical_evidence_hierarchy": {
+    "confidence": 0.95,
+    "formula": "p_u <= 1 - alpha^(1/N_u) for zero failures under the stated IID unit",
+    "units": {
+      "radio_tb": {
+        "N": 10240,
+        "iid_upper": 0.000292509190681578
+      },
+      "home_release": {
+        "N": 2560,
+        "iid_upper": 0.0011695234930695353
+      },
+      "arm_process_lifecycle": {
+        "N": 8,
+        "iid_upper": 0.3123439780663678
+      },
+      "physical_node": {
+        "N": 2,
+        "iid_upper": 0.776393202250021
+      }
+    },
+    "interpretation": "The four units are alternative IID assumptions, not four simultaneous guarantees. Node-level evidence is only two A100 nodes and remains statistically weak; no result is WCET or cross-family evidence.",
+    "reporting_rule": "Use the coarsest defensible independent unit for the target population; do not promote TB-level sensitivity to WCET or hardware-population reliability."
+  },
+  "validation": {
+    "new_v12_c136_tests_passed": 30,
+    "preserved_v11_tests_passed": 33,
+    "model_and_analyzer_tests_total": 63,
+    "preserved_gpu_allocation_tests_passed": 188,
+    "v12_manifest_items": 46,
+    "v12_manifest_hash_mismatches": 0,
+    "c136_manifest_items": 107,
+    "c136_manifest_hash_mismatches": 0
+  },
+  "documentation_audit": {
+    "status": "PASS",
+    "authoritative_documents": 12,
+    "local_links_checked": 362,
+    "missing_links": [],
+    "outside_workspace_links": [],
+    "top_level_multigpu_json_artifacts_parsed": 337,
+    "json_parse_failures": [],
+    "git_diff_check": "PASS"
+  },
+  "remaining_qualification_gaps": [
+    "production DU/FAPI d_MAC trace and same-clock timing contract",
+    "defensible service-bound/WCET methodology beyond finite samples",
+    "cross-family GPU qualification",
+    "broker restart and durable ambiguous-token reconciliation",
+    "shared mandatory recovery or non-separable multi-home certificate"
+  ],
+  "claim_boundary": "V12 predicts and C135/C136 realize one synthetic two-home A100/MPS conditional AI40 class whose complete 57 ms transaction is outside static 53 ms slack and inside a 58 ms conditional window. Evidence is two-node same-family finite-sample mechanism requalification, not throughput superiority, WCET, production d_MAC, cross-family reliability, restart, durable reconciliation, or exactly-once evidence."
+}

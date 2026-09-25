@@ -1,0 +1,127 @@
+{
+  "schema": "softwall-confirm134-independent-node-control-matrix-protocol-v1",
+  "status": "frozen-before-run",
+  "created_utc": "2026-09-24",
+  "allocation": {
+    "job_id": 58823497,
+    "node": "nid002688",
+    "gpus": 4,
+    "gpu_family": "NVIDIA A100-SXM4-40GB",
+    "independent_from": {
+      "job_id": 58819952,
+      "node": "nid001049"
+    }
+  },
+  "mode": {
+    "homes": 2,
+    "cells_per_home": 4,
+    "period_ms": 180,
+    "deadline_ms": 155,
+    "nrx_bound_ms": 45,
+    "conv_bound_ms": 25,
+    "broker_rpc_bound_ms": 5,
+    "broker_rpc_count": 3,
+    "control_transaction_budget_ms": 15,
+    "physical_guard_ms": 2,
+    "admission_ai_guard_ms": 17,
+    "iterations_per_arm": 340,
+    "warmup": 20,
+    "mps": true,
+    "mig": false
+  },
+  "arms": [
+    {
+      "label": "confirm134_prepare_r1_job58823497",
+      "operation": "prepare",
+      "repeat": 1,
+      "payload_seed0": 34000051,
+      "payload_seed1": 34010051,
+      "channel_seed0": 34001000,
+      "channel_seed1": 34011000,
+      "crash_operation_number": 30
+    },
+    {
+      "label": "confirm134_prepare_r2_job58823497",
+      "operation": "prepare",
+      "repeat": 2,
+      "payload_seed0": 35000051,
+      "payload_seed1": 35010051,
+      "channel_seed0": 35001000,
+      "channel_seed1": 35011000,
+      "crash_operation_number": 30
+    },
+    {
+      "label": "confirm134_commit_r1_job58823497",
+      "operation": "commit",
+      "repeat": 1,
+      "payload_seed0": 36000051,
+      "payload_seed1": 36010051,
+      "channel_seed0": 36001000,
+      "channel_seed1": 36011000,
+      "crash_operation_number": 30
+    },
+    {
+      "label": "confirm134_commit_r2_job58823497",
+      "operation": "commit",
+      "repeat": 2,
+      "payload_seed0": 37000051,
+      "payload_seed1": 37010051,
+      "channel_seed0": 37001000,
+      "channel_seed1": 37011000,
+      "crash_operation_number": 30
+    },
+    {
+      "label": "confirm134_complete_r1_job58823497",
+      "operation": "complete",
+      "repeat": 1,
+      "payload_seed0": 38000051,
+      "payload_seed1": 38010051,
+      "channel_seed0": 38001000,
+      "channel_seed1": 38011000,
+      "crash_operation_number": 30
+    },
+    {
+      "label": "confirm134_complete_r2_job58823497",
+      "operation": "complete",
+      "repeat": 2,
+      "payload_seed0": 39000051,
+      "payload_seed1": 39010051,
+      "channel_seed0": 39001000,
+      "channel_seed1": 39011000,
+      "crash_operation_number": 30
+    }
+  ],
+  "order": [
+    "confirm134_prepare_r1_job58823497",
+    "confirm134_prepare_r2_job58823497",
+    "confirm134_commit_r1_job58823497",
+    "confirm134_commit_r2_job58823497",
+    "confirm134_complete_r1_job58823497",
+    "confirm134_complete_r2_job58823497"
+  ],
+  "gates": [
+    "source hashes match",
+    "two arms per prepare/commit/complete",
+    "every arm all_pass",
+    "every arm artifact hash matches",
+    "full 15 ms control budget charged",
+    "all clients fail closed",
+    "all local credits drain",
+    "no duplicate physical execution",
+    "zero deadline/bound/horizon violations"
+  ],
+  "source_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/control_point_crash_global_trace_lease_broker.py": "ae2ca3d39df3f92b8200d7fc4ef52be395b06dc4362e054aa0f1de71d9a01c4e",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/run_global_ai_control_point_broker_crash_arm.sh": "c9640aeccb53dde1e3484bbe5618520ca545d8d10f30e15fdde05783499bb2f3",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/analyze_confirm134_independent_node_control_matrix.py": "b316097031cecb8ad330a5414eea533f571c72f2b0e762e2e09e3696f02df164",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_control_point_crash_broker.py": "177cbc1e89b6e7d012f2ebd1b2254a7851385b92f5c3bc61aeff4a7831ccf6f1",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_global_control_budget_v2.py": "70b8f76fe6c4a5bf6f10b528aab681974002472cfcbf2e02009871c3ef1ff883",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "claim_boundary": "independent allocation and node in the same A100 family; no production WCET, cross-family generalization, durable restart, exactly-once, partition, GPU hang, or throughput-superiority claim"
+}

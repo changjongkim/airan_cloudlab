@@ -1,0 +1,68 @@
+{
+  "schema": "softwall-confirm82-tail-localization-posthoc-v1",
+  "runs": [
+    {
+      "arm": "a",
+      "controller_sha256": "bd02de2af70cb78e4034b75fd9dbe97f99cefd1334479489debde462f75543b7",
+      "nrx_above_30_ms": [
+        {
+          "release_index": 620,
+          "cell": 1,
+          "endpoint": "nrx0",
+          "response_ms": 37.336701,
+          "release_to_dispatch_ms": 25.994889,
+          "dispatch_to_observation_ms": 11.341812,
+          "features_done_to_first_dispatch_ms": 22.721247,
+          "worker_gpu_ms": 2.134176015853882,
+          "worker_observed_after_dispatch_ms": 0.001443,
+          "worker_published_after_observation_ms": 2.156205
+        },
+        {
+          "release_index": 620,
+          "cell": 2,
+          "endpoint": "nrx1",
+          "response_ms": 38.178691,
+          "release_to_dispatch_ms": 26.967221,
+          "dispatch_to_observation_ms": 11.21147,
+          "features_done_to_first_dispatch_ms": 22.721247,
+          "worker_gpu_ms": 1.8826240301132202,
+          "worker_observed_after_dispatch_ms": 0.001303,
+          "worker_published_after_observation_ms": 1.923855
+        }
+      ],
+      "worst_conventional": {
+        "release_index": 1287,
+        "cell": 0,
+        "host_path_ms": 5.731999,
+        "gpu_ms": 5.356863975524902
+      },
+      "requalification_max_gpu_ms": 3.2623679637908936
+    },
+    {
+      "arm": "b",
+      "controller_sha256": "6f817a3fcf4e063c569cdcb57286ca482ff33bc688c5257e3c4604589fcc5c82",
+      "nrx_above_30_ms": [
+        {
+          "release_index": 623,
+          "cell": 3,
+          "endpoint": "nrx0",
+          "response_ms": 44.588554,
+          "release_to_dispatch_ms": 31.779719,
+          "dispatch_to_observation_ms": 12.808835,
+          "features_done_to_first_dispatch_ms": 28.248794,
+          "worker_gpu_ms": 1.6961599588394165,
+          "worker_observed_after_dispatch_ms": 0.00013,
+          "worker_published_after_observation_ms": 1.713218
+        }
+      ],
+      "worst_conventional": {
+        "release_index": 2358,
+        "cell": 0,
+        "host_path_ms": 7.97801,
+        "gpu_ms": 7.782656192779541
+      },
+      "requalification_max_gpu_ms": 10.770400047302246
+    }
+  ],
+  "interpretation": "The >30 ms NRx response samples have a large feature-completion-to-dispatch gap while the matched endpoint worker GPU intervals remain near 2 ms. The uninstrumented gap includes admission and prepare_neural_ipc; this audit cannot uniquely attribute it. The separate one-cell requalification GPU tail is outside the four-cell co-run candidate mode."
+}

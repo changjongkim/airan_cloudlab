@@ -1,0 +1,58 @@
+{
+  "artifacts": {
+    "results/softwall_multigpu/confirm159q2b_dev_j58857672_protocol.json": {
+      "bytes": 7874,
+      "sha256": "eeb7a544fe42942c9ca2e4910ddceb61eb944647a6a4c683c181e70fcf7ed751"
+    },
+    "results/softwall_multigpu/confirm159q2b_dev_j58857672_result.json": {
+      "bytes": 6878,
+      "sha256": "fc2767e6a2851da744aeb7d35dd8627188d9254d5cec120b74427712b29d9278"
+    },
+    "results/softwall_multigpu/raw/confirm159q2b_dev_j58857672_coordinator.json": {
+      "bytes": 2475287,
+      "sha256": "1292029a8d6ec2992cd93a601be5444f17fb4342d894167a6b337bffb75619c1"
+    }
+  },
+  "claim_limit": "This failed run is retained as evidence that certificate construction alone is insufficient unless launch-time freshness and physical kernel-start enforcement are part of the lease lifecycle.",
+  "completed_rounds": 600,
+  "correction": "Discard a certificate whose build-to-dispatch control path exceeds 5 ms, rebuild from the current clock for at most three attempts, and pass an absolute latest-start deadline to the physical Qwen worker.",
+  "deadline_misses": 0,
+  "diagnosis": "The certificate was valid at construction, but a 23.530143 ms host scheduling tail occurred before physical Qwen dispatch. The 128-token GPU execution itself remained below its 40 ms class bound, while the stale lease interval and the frozen 5 ms launch-control bound were violated.",
+  "failed_gate": "atomic_qwen_lease",
+  "job_id": "58857672",
+  "label": "confirm159q2b_dev_j58857672",
+  "node": "nid001204",
+  "schema": "softwall-confirm159-q2-failure-v1",
+  "status": "AUTHORITATIVE_DEVELOPMENT_FAILURE_PRESERVED",
+  "violating_rounds": [
+    {
+      "context_length": 128,
+      "execution_ms": 23.894026,
+      "launch_control_bound_violation": true,
+      "launch_revalidation_host_ms": 23.530143,
+      "lease_interval_violation": true,
+      "physical_recoveries": [
+        [
+          "home0",
+          "h0-r1"
+        ]
+      ],
+      "release_to_send_ms": 68.570698,
+      "sequence": 352,
+      "success_keys": [
+        [
+          "home0",
+          "h0-r0"
+        ],
+        [
+          "home0",
+          "h0-r2"
+        ],
+        [
+          "home1",
+          "h1-r0"
+        ]
+      ]
+    }
+  ]
+}

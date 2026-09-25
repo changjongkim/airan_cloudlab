@@ -1,0 +1,14 @@
+{
+  "schema": "softwall-confirm153-development-failure-v1",
+  "job_id": "58852725",
+  "node": "nid001176",
+  "state": "CANCELLED_AFTER_DEVELOPMENT_FAILURE",
+  "failure_stage": "qwen_unix_socket_bind_before_owner_or_certificate_execution",
+  "error": "OSError: AF_UNIX path too long",
+  "cause": "The Qwen socket was placed under the long per-label run_state path, exceeding the AF_UNIX pathname limit.",
+  "correction": "Move the socket to project-local mps/$SLURM_JOB_ID/c153.sock and detect worker exit during readiness polling.",
+  "mechanism_evidence": "NONE",
+  "claim_use": "Preserved development failure only; excluded from C153 mechanism gates and all performance or safety claims.",
+  "protocol": "results/softwall_multigpu/confirm153_integrated_shared_recovery_job58852725_protocol.json",
+  "inventory": "results/softwall_multigpu/raw/confirm153_integrated_shared_recovery_job58852725_gpu_inventory.csv"
+}

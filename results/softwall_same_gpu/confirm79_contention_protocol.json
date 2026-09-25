@@ -1,0 +1,46 @@
+{
+  "schema": "softwall-frozen-exploratory-protocol-v1",
+  "campaign": "confirm79_phy_feature_conditioned_contention_screen",
+  "heldout_raw": "confirm77_multisnr_job58738952_test.json",
+  "heldout_seed": 20910001,
+  "sampling_seed": 20979001,
+  "cases": 500,
+  "cells": 4,
+  "nrx_endpoint_capacity": 2,
+  "nrx_ready_ms": 50,
+  "conventional_bound_ms": 25,
+  "commit_guard_ms": 2,
+  "radio_deadline_range_ms": [
+    115,
+    155
+  ],
+  "radio_floor_choices": [
+    0.1,
+    0.2
+  ],
+  "ai_count_choices": [
+    2,
+    3
+  ],
+  "ai_durations_ms": [
+    15,
+    30
+  ],
+  "ai_deadline_range_ms": [
+    30,
+    110
+  ],
+  "ai_value_range": [
+    1,
+    3
+  ],
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/screen_confirm79_contention.py": "22972a45fc59f1d1f35bc77f580d29aa40cb98a62f0d6ea9f7d0721dd60709e7",
+    "scripts_for_node/softwall_same_gpu/offline_contingent_phy_ai.py": "11e00aa25aaca44840d4df0dcb6ff3b40e8168cd8c1370c79f634d1f670c14be",
+    "scripts_for_node/softwall_same_gpu/offline_recovery_exchange.py": "36ecc9adc538929e1c7e16030c56853ee78d808464615cf9c381ccf67b5229e3",
+    "scripts_for_node/softwall_same_gpu/mixed_snr_phy_value_model.py": "a330e60e82f515fe57f9b4d914e37ba63f4d7be5f39ccb07bac6bf8d5a43db69",
+    "results/softwall_same_gpu/confirm77_train_only_q_model.json": "20ff0fc3249928e59e0a153a4ee64728c823c5ff6e3374ba0305f75440bd17d0",
+    "results/softwall_same_gpu/raw/confirm77_multisnr_job58738952_test.json": "6115de38c9c4a616462477558c5adf497220f3265ca3c1a27aadd6ef3803219e"
+  },
+  "limitations": "Diagnostic sampling after Confirm77 aggregate evaluation. AI jobs and timing are hypothetical. True SNR and PHY outcome labels are excluded from policy inputs. Positive exact-greedy gaps are not by themselves AI-RAN novelty."
+}

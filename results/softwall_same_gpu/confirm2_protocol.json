@@ -1,0 +1,33 @@
+{
+  "status": "frozen before confirm2 execution",
+  "frozen_utc": "2026-09-20",
+  "campaign": "confirm2",
+  "purpose": "Independent check after the exploratory 25 ms contract failed on RAN-alone samples",
+  "hardware": "one A100-SXM4-40GB, MIG disabled, one MPS server, same physical GPU",
+  "mps_default_active_thread_percentage": 100,
+  "ran_path": "CE+NI+EQ+de-rate-match+LDPC+CRC",
+  "ran_input": "fixed-seed synthetic complex RX tensor",
+  "period_ms": 50,
+  "deadline_ms": 35,
+  "iterations_per_run": 500,
+  "runs_per_condition": 5,
+  "seed_base": 20261000,
+  "ai_workloads": {
+    "gemm": "2048x2048 FP32 GEMM, one matmul per unit",
+    "hbm": "256 MiB FP32 buffer, copy there and back per unit"
+  },
+  "protected_s0": {
+    "ai_end_to_end_budget_ms": 10,
+    "guard_ms": 2,
+    "one_outstanding_ai_unit": true,
+    "admit_rule": "now + AI budget + guard <= next RAN release"
+  },
+  "primary_checks": {
+    "ran_alone_deadline_misses": 0,
+    "protected_deadline_misses": 0,
+    "protected_ai_budget_violations": 0,
+    "protected_release_crossings": 0,
+    "protected_ai_throughput": "greater than zero"
+  },
+  "interpretation_limit": "Zero observed misses is statistical evidence, not an unconditional hard-real-time proof."
+}

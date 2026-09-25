@@ -1,0 +1,30 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm37b_external_background_robust",
+  "purpose": "Validate a persistent separate-process same-request NeuralRx endpoint while a third MPS client executes bounded optional NeuralRx work in post-RAN slack.",
+  "radio": {
+    "releases": 500,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "payload_seed": 20321038,
+    "channel_seed_base": 20328000
+  },
+  "endpoint": {
+    "cap": 80,
+    "timeout_ms": 30,
+    "persistent_through_timed_epoch": true
+  },
+  "background": {
+    "kind": "NeuralRx",
+    "cap": 20,
+    "repeats_per_work_unit": 1,
+    "budget_ms": 40,
+    "guard_ms": 2,
+    "rpc_timeout_ms": 45,
+    "one_outstanding_rpc": true
+  },
+  "primary_gate": "zero RAN misses, zero endpoint timeouts, completed background units >0, zero AI budget violations/crossings/faults, worker accounting and node/job match",
+  "interpretation_limit": "This is an integration smoke, not a paired throughput comparison or universal deadline proof."
+}

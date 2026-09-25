@@ -1,0 +1,25 @@
+{
+  "schema": "softwall-development-protocol-amendment-v1",
+  "campaign": "c163_raw_p2p_v5_stage_profile",
+  "amends": "c163_raw_p2p_v5_stage_profile_protocol.json",
+  "frozen_before_execution": true,
+  "reason": "dual_receiver_phy.py acquired an explicit num_ul_streams argument during the independent channel-compatibility diagnosis after this diagnostic protocol was frozen.",
+  "semantic_effect_on_this_campaign": "none; the default remains four UL streams and the P2 stage-profile runner does not override it",
+  "unchanged": [
+    "warmup",
+    "iterations",
+    "seed",
+    "deadline",
+    "engine",
+    "same-stream path",
+    "busy-poll path",
+    "diagnostic-only decision rule"
+  ],
+  "source_sha256_before_execution": {
+    "c163_raw_p2p_nrx_worker.py": "93efe4107e4cec00cca40fd38d34cee21d567c497d5457d1570864bc2c6f34ca",
+    "c163_raw_p2p_controller.py": "c55af86e5e37ed143e3592ca006853635402eff3942ee5ac8990733e093ad38f",
+    "run_c163_raw_p2p_v5_stage_profile.sh": "676e1a343f28017f5f7a05ccebe1da6b15418cd1a81c5d837500826fa08c430e",
+    "dual_receiver_phy.py": "0aa91d359b467cb73fb075f269f3dac1ad704cf901a772d7bfb3834e9809bddf",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

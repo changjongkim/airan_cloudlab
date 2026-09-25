@@ -1,0 +1,113 @@
+{
+  "all_inputs_consistent": true,
+  "artifact_sha256": {
+    "gc": "52f024d4cadf5030abbce90dd04f7ab8e8fafaabcda68ea9efbafd0bda4694cd",
+    "idle": "6da96135a61ecf294d51a3ff22b4180f56eb850b739e00272b1d5c7c2cadcd43",
+    "model": "f9b4727edb26989bf21e88e23792fe17fd3b48d5aa04414d2d816ea90d58505e",
+    "process_replacement": "a43b4c2ccb6acbad1573c286c5166a053fc5b972f5b4c13c2b242c337d4dc3a7",
+    "reconnect_model": "c47a20c41cf1d302cdaf95544a4c3937f32ba9448b1b911769eb986b22d2fe4e",
+    "reconnect_physical": "cca74a66971d1077e0376d12d0e9cb6981aa72ca2b09f274f84abd58999790d4",
+    "reload": "6ab11e15d6eee5751644d99e2a11f6902bacec043c4a8356f94f92596cb45c12",
+    "restart": "b0b07c007bec4f80b769a788a9a6414141ae44d781041e02ca3a4b276474209f",
+    "warm": "2daa077c46ffadc55d45e5149ac6eb51d2a753589713ea37d24a5875a18c207f"
+  },
+  "checks": {
+    "gc_failure_preserved": true,
+    "idle_input_pass": true,
+    "matrix_intentionally_partial": true,
+    "process_replacement_canary_not_promoted": true,
+    "qwen_reload_not_promoted_to_optional_availability": true,
+    "reconnect_model_and_same_worker_physical_pass": true,
+    "reload_input_pass": true,
+    "restart_downtime_not_promoted_to_availability": true,
+    "restart_input_pass": true,
+    "state_model_pass": true,
+    "unmeasured_modes_remain_uq": true,
+    "warm_input_pass": true
+  },
+  "claim_boundary": "C164 intentionally stops at five claim-scoped qualified subsets; the other five modes remain explicitly unqualified rather than forming a completion checklist. This is not a universal lifecycle guarantee. Production d_MAC, WCET and cross-family qualification are outside this matrix.",
+  "claim_scope_complete": true,
+  "complete": false,
+  "counts": {
+    "qualified_or_partial_modes": 5,
+    "total_modes": 10,
+    "unqualified_modes": 5
+  },
+  "modes": {
+    "cold_first": {
+      "availability_during_transition": false,
+      "evidence": null,
+      "mandatory_continuity": null,
+      "optional_boundary": false,
+      "status": "UQ_NO_WHOLE_MODE_EVIDENCE"
+    },
+    "gc_on": {
+      "availability_during_transition": null,
+      "evidence": "confirm89_a_on sample_safety=false",
+      "mandatory_continuity": null,
+      "optional_boundary": false,
+      "status": "UQ_OBSERVED_BOUND_FAILURE"
+    },
+    "idle_30m_first": {
+      "availability_during_transition": null,
+      "evidence": null,
+      "mandatory_continuity": null,
+      "optional_boundary": false,
+      "status": "UQ_NO_PHYSICAL_SAMPLE"
+    },
+    "idle_30s_first": {
+      "availability_during_transition": true,
+      "evidence": "C164_IDLE30_TWO_NODE_PASS",
+      "mandatory_continuity": true,
+      "optional_boundary": true,
+      "status": "QUALIFIED_BOUNDARY_SUBSET"
+    },
+    "idle_5m_first": {
+      "availability_during_transition": null,
+      "evidence": null,
+      "mandatory_continuity": null,
+      "optional_boundary": false,
+      "status": "UQ_NO_PHYSICAL_SAMPLE"
+    },
+    "mps_restart_first": {
+      "availability_during_transition": false,
+      "evidence": "C164_MPS_RESTART_TWO_NODE_PASS",
+      "mandatory_continuity": null,
+      "optional_boundary": true,
+      "status": "QUALIFIED_AFTER_REQUALIFICATION_SUBSET"
+    },
+    "qwen_reload_first": {
+      "availability_during_transition": false,
+      "evidence": "C164_QWEN_RELOAD_TWO_NODE_PASS",
+      "mandatory_continuity": true,
+      "optional_boundary": false,
+      "status": "QUALIFIED_MANDATORY_ONLY_SUBSET"
+    },
+    "warm_persistent": {
+      "availability_during_transition": null,
+      "evidence": "C162_TWO_NODE_BOUNDARY_PASS",
+      "mandatory_continuity": true,
+      "optional_boundary": true,
+      "status": "QUALIFIED_BOUNDARY_SUBSET"
+    },
+    "worker_channel_reconnect_same_epoch": {
+      "availability_during_transition": false,
+      "evidence": "C164_RECONNECT_TWO_NODE_PASS",
+      "mandatory_continuity": true,
+      "optional_boundary": false,
+      "status": "QUALIFIED_RECONCILIATION_SUBSET"
+    },
+    "worker_process_replacement": {
+      "availability_during_transition": false,
+      "evidence": "C164_PROCESS_REPLACEMENT_PHYSICAL_PASS",
+      "mandatory_continuity": null,
+      "optional_boundary": false,
+      "status": "UQ_SINGLE_NODE_DEVELOPMENT_ONLY"
+    }
+  },
+  "next_internal_gate": "convert the audited manuscript draft into the venue submission by consolidating claims, figures, bibliography, and reviewer-objection responses; run no new experiment unless this review identifies a claim-critical evidence gap",
+  "paper_gate_status": "C164_CLAIM_SCOPED_LIFECYCLE_COMPLETE",
+  "schema": "softwall-c164-lifecycle-qualification-summary-v1",
+  "source_sha256": "90bbf229811b128cac2f79035ec1984e1691520bc83c9ce01a7b790cb72aed3e",
+  "status": "C164_LIFECYCLE_MATRIX_PARTIAL"
+}

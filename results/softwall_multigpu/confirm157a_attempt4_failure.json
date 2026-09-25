@@ -1,0 +1,43 @@
+{
+  "artifacts": {
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt4_job58854900_peer_spec.json": "01f3971b2044dc4b4644952025b582e95b5f37f9b90d307342586cffbf5b932c",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt4_job58854900_protocol.json": "3367c3a4bf93df03aed306cf48b2918cca2b1c5a262f23a76436c90ec0992bcf",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt4_job58854900_result.json": "0184123c971c6570ffd3026dfa910c5c534f767168897c3b25e9ae159de34d7d",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt4_job58854900_coordinator.json": "b65d5caf820a4cfaed8bc10382d18d1f7a3cdb3b55fb58f25432d97271eb6d4b",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt4_job58854900_home0_h0-r0_owner.json": "ea85922068a9ee1e330f1b8fba7a4a66bda390250e6efb93093ba07aa9214935",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt4_job58854900_home0_h0-r1_owner.json": "da4217a86d8dfdedb43112e7c11063f38d0ba96f658c9282a91329a4b8bfe829",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt4_job58854900_home0_h0-r2_owner.json": "965eff6020e854509e9d8db89029a8e49d56c80aad1a1fbdb19905208e179179",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt4_job58854900_home1_h1-r0_owner.json": "124d48d19cbf34874d7ed2034dc1e1a304bc9b548cc6d4538e904eb39fdb359c",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt4_job58854900_nrx_worker.json": "9f5b70a8450ef84da49d8e10268cafd116a6e8ed653cdb57fa9bfb97f8d1eb48",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt4_job58854900_qwen.json": "28786abde2e789ab25509506e120a88e552fabfcf64ef565876624bd15677895"
+  },
+  "attempt": 4,
+  "correction": "Tighten the explicitly qualified warm-periodic activation from 100 ms to 20 ms before release; report this keep-warm requirement and do not generalize it to cold or long-idle modes.",
+  "job": "58854900",
+  "node": "nid001109",
+  "observations": {
+    "actual_nrx_crc_pattern": [
+      true,
+      false,
+      false,
+      true
+    ],
+    "deadline_misses": 0,
+    "lease_accepted": false,
+    "nrx_worker_paths_ms": [
+      50.476385,
+      1.500727,
+      1.464086,
+      1.493512
+    ],
+    "oracle_equivalent_recoveries": 4,
+    "radio_commits": 4,
+    "recoveries": 4,
+    "release_prewarm_finish_lead_ms": 91.964095,
+    "timely_successes": 0
+  },
+  "reason": "A one-shot activation completed 91.964 ms before release, but the first actual path still incurred a 50.476 ms host tail. All actual outcomes therefore arrived after the 45 ms cutoff; the all-fail response was safe and semantically equivalent.",
+  "schema": "softwall-confirm157a-attempt-failure-v1",
+  "scientific_outcome_opened": true,
+  "status": "WARM_LIFECYCLE_GATE_FAIL"
+}

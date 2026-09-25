@@ -1,0 +1,27 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "aerial_tdl_exact_transmitter_and_execution_mode_screen",
+  "frozen_before_execution": true,
+  "role": "Post-failure development diagnosis only; no channel qualification or performance claim.",
+  "prior_development_outcomes": [
+    "normalization did not repair NeuralRx (0/10 in every arm)",
+    "DMRS, MCS, start-symbol, and TDI profile alignment did not repair NeuralRx (0/10 in every arm)"
+  ],
+  "hypothesis": "The remaining mismatch is the one-antenna transmitter contract or Aerial frequency-domain TDL processing rather than the radio profile.",
+  "radio_profile": "NVIDIA public example: MCS7, start0, DMRS 0/5/10, TDI1, one UE TX",
+  "channel": "Aerial TDL-A, 30 ns, 10 Hz, 1x4 UL, no AWGN",
+  "arms": [
+    "frequency_delay0",
+    "frequency_delay1us",
+    "time_delay1us"
+  ],
+  "iterations_per_arm": 10,
+  "payload_seed": 20357400,
+  "tdl_seed": 57401,
+  "next_gate": "Any successful arm must be frozen before a disjoint-seed holdout; development outcomes alone cannot establish compatibility.",
+  "source_sha256_before_execution": {
+    "probe_aerial_tdl_tx_contract_development.py": "77f131240fe339f79a853fd4332f95b5c23366a30887b58a71d72f6be95e4623",
+    "run_aerial_tdl_tx_contract_development.sh": "f4c5603e75d1666ccd51731c5894e68a94bbe3c59b1da1177c57d6ac79df074b",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

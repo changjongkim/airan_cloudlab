@@ -1,0 +1,65 @@
+{
+  "schema": "softwall-nsys-client-pair-overlap-v1",
+  "granularity": "graph",
+  "clock_alignment": "systemClockNs plus Nsight activity timestamp, cross-checked against controller monotonic request windows",
+  "nrx_session_start_ns": 459321064937900,
+  "ai_session_start_ns": 459321362534672,
+  "first_release_ns": 459330068397713,
+  "runtime_nrx_intervals": 7,
+  "runtime_ai_intervals": 261,
+  "runtime_overlap_pairs": 7,
+  "runtime_overlap_ms_sum": 7.075822,
+  "early_ai_records": [
+    {
+      "release_index": 0,
+      "nrx_intervals": 1,
+      "ai_intervals": 1,
+      "overlap_pairs": 1,
+      "overlap_ms": 0.628318
+    },
+    {
+      "release_index": 2,
+      "nrx_intervals": 1,
+      "ai_intervals": 1,
+      "overlap_pairs": 1,
+      "overlap_ms": 1.103166
+    },
+    {
+      "release_index": 3,
+      "nrx_intervals": 1,
+      "ai_intervals": 1,
+      "overlap_pairs": 1,
+      "overlap_ms": 1.314783
+    },
+    {
+      "release_index": 4,
+      "nrx_intervals": 1,
+      "ai_intervals": 1,
+      "overlap_pairs": 1,
+      "overlap_ms": 1.421152
+    },
+    {
+      "release_index": 6,
+      "nrx_intervals": 1,
+      "ai_intervals": 1,
+      "overlap_pairs": 1,
+      "overlap_ms": 0.642699
+    },
+    {
+      "release_index": 8,
+      "nrx_intervals": 1,
+      "ai_intervals": 1,
+      "overlap_pairs": 1,
+      "overlap_ms": 0.596308
+    },
+    {
+      "release_index": 9,
+      "nrx_intervals": 1,
+      "ai_intervals": 1,
+      "overlap_pairs": 1,
+      "overlap_ms": 1.369396
+    }
+  ],
+  "controller_deadline_misses": 0,
+  "interpretation": "Graph granularity reports overlapping GPU graph execution windows, not necessarily individual kernel concurrency. Kernel granularity can show simultaneous kernel execution intervals but this profiled small sample does not establish a worst-case service bound or deadline guarantee."
+}

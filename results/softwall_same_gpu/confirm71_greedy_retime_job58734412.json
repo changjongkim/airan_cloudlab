@@ -1,0 +1,63 @@
+{
+  "schema": "softwall-confirm71-greedy-recovery-canary-v1",
+  "job": "58734412",
+  "gates": {
+    "source_hashes": true,
+    "confirm71_pair1_off_job58734412_contract": true,
+    "confirm71_pair1_off_job58734412_provenance": true,
+    "confirm71_pair1_off_job58734412_safety": true,
+    "confirm71_pair1_off_job58734412_lease_evidence": true,
+    "confirm71_pair1_off_job58734412_greedy_disabled": true,
+    "confirm71_pair1_on_job58734412_contract": true,
+    "confirm71_pair1_on_job58734412_provenance": true,
+    "confirm71_pair1_on_job58734412_safety": true,
+    "confirm71_pair1_on_job58734412_lease_evidence": true,
+    "confirm71_pair1_on_job58734412_greedy_path": true,
+    "confirm71_pair2_on_job58734412_contract": true,
+    "confirm71_pair2_on_job58734412_provenance": true,
+    "confirm71_pair2_on_job58734412_safety": true,
+    "confirm71_pair2_on_job58734412_lease_evidence": true,
+    "confirm71_pair2_on_job58734412_greedy_path": true,
+    "confirm71_pair2_off_job58734412_contract": true,
+    "confirm71_pair2_off_job58734412_provenance": true,
+    "confirm71_pair2_off_job58734412_safety": true,
+    "confirm71_pair2_off_job58734412_lease_evidence": true,
+    "confirm71_pair2_off_job58734412_greedy_disabled": true,
+    "pair1_paired_trace": true,
+    "pair1_radio_noninferiority": true,
+    "pair2_paired_trace": true,
+    "pair2_radio_noninferiority": true
+  },
+  "all_pass": true,
+  "pairs": [
+    {
+      "name": "pair1",
+      "off_correct": 204,
+      "on_correct": 204,
+      "off_ai_units": 5906,
+      "on_ai_units": 5984,
+      "off_timely_ai": 2411,
+      "on_timely_ai": 2426,
+      "ai_gain_percent": 1.3206908228919743,
+      "on_retime_count": 11,
+      "on_before_recovery_ai": 10,
+      "off_commit_p99_ms": 13.18351545,
+      "on_commit_p99_ms": 14.66855053
+    },
+    {
+      "name": "pair2",
+      "off_correct": 199,
+      "on_correct": 199,
+      "off_ai_units": 5961,
+      "on_ai_units": 5980,
+      "off_timely_ai": 2423,
+      "on_timely_ai": 2426,
+      "ai_gain_percent": 0.3187384667002181,
+      "on_retime_count": 11,
+      "on_before_recovery_ai": 9,
+      "off_commit_p99_ms": 12.878230919999998,
+      "on_commit_p99_ms": 13.82916487
+    }
+  ],
+  "interpretation": "Greedy AI-aware recovery retime and one physical AI unit before fallback after NRx observation. Same async pre-NRx AI in both arms. Synthetic P150/D130, AI deadline 50 ms; not atomic recovery+AI transaction, online joint policy, WCET, fault continuation, or production MAC expiry. AI throughput gain is recorded without a frozen gain gate."
+}

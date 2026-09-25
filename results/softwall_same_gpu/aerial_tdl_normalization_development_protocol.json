@@ -1,0 +1,33 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "aerial_tdl_normalization_root_cause_screen",
+  "frozen_before_execution": true,
+  "role": "Post-failure development diagnosis only; no channel qualification or performance claim.",
+  "prior_preserved_failures": [
+    "aerial_tdl_compatibility_job58694167.json",
+    "aerial_tdl_1x4_compatibility_job58694384.json"
+  ],
+  "hypothesis": "The Aerial TDL output and the NeuralRx reference channel differ in channel-power normalization.",
+  "reference_fact": "example_neural_receiver.ipynb configures Sionna OFDMChannel with normalize_channel=True.",
+  "arms": [
+    "raw",
+    "cfr_rms",
+    "match_ue_power",
+    "match_component_power"
+  ],
+  "radio": {
+    "profile": "Aerial TDL-A",
+    "delay_spread_ns": 30,
+    "maximum_doppler_hz": 10,
+    "geometry": "1x4 uplink",
+    "awgn_disabled": true,
+    "iterations": 10,
+    "payload_seed": 20357100,
+    "tdl_seed": 57101
+  },
+  "next_gate": "A successful deterministic convention must be frozen and repeated on disjoint payload/channel seeds before any external-channel compatibility claim."
+  ,"source_sha256_before_execution": {
+    "probe_aerial_tdl_normalization_development.py": "34a21d4c860f50c9b11ef71f49790f422dca91670d3719d79896b568e0e276f8",
+    "run_aerial_tdl_normalization_development.sh": "51ef2cf6869d32d25fb4a566ef357855074c07494a0a277790b12fa0f11f2b80"
+  }
+}

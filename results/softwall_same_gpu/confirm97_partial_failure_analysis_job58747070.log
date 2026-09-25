@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-confirm97-qwen-partial-failure-v1",
+  "posthoc_partial_audit": true,
+  "job": "58747070",
+  "node": "nid001053",
+  "source_hashes": true,
+  "protocol_sha256": "f7a63edcc65259782c9e5d9aa4b22128a42af1595455b66e49072bc5566c44ec",
+  "arm_a": {
+    "raw_sha256": "0c3dd7e4a498e57fd9a17859bc4538a48d782fe5c61fa3562d8a432e776cc6b5",
+    "completed_releases": 400,
+    "radio_deadline_misses": 0,
+    "nrx30_violations": 705,
+    "nrx_response_max_ms": 39.013913,
+    "nrx_response_median_ms": 33.957572,
+    "conv12_violations": 0,
+    "ai40_violations": 0,
+    "ai_host_max_ms": 26.197385,
+    "qwen_units": 2395,
+    "injected_all_fail_releases": 63,
+    "all_fail_below_seven_ai_by_d153": 63,
+    "all_fail_min_ai_by_d153": 5,
+    "all_fail_median_ai_by_d153": 6,
+    "all_fail_max_ai_by_d153": 6,
+    "joint_ai_leases_retired": 148
+  },
+  "arm_b": {
+    "worker_raw_sha256": "d819abb130d2d897935d9d6298bc02eda63866b1ce4f865d663b126f1c89d7ad",
+    "log_sha256": "939a3f5f7fba80b801cb9d1a18dcefe3496b0290ae73de7c3ca08f210fb55150",
+    "controller_raw_exists": false,
+    "qwen_gpu_units_before_abort": 2,
+    "qwen_gpu_max_ms_before_abort": 36.24620819091797,
+    "qwen_gpu_exceeded_rpc_timeout35": true,
+    "unconfirmed_joint_lease_error_in_log": true,
+    "broken_pipe_in_log": true
+  },
+  "overall_pass": false,
+  "interpretation": "Frozen Confirm97 failed: arm A finished with 705 NRx30 bound violations; arm B aborted before controller JSON after an unconfirmed joint AI completion. Its Qwen worker recorded a 36.246-ms GPU unit, above the 35-ms RPC timeout, then BrokenPipe. The timeout is a supported inference, not directly timestamped in a surviving controller fault record. Arm A's fewer-than-seven Qwen returns by D153 show pressure under this controller, not optimal infeasibility."
+}

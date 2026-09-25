@@ -1,0 +1,135 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "development": "7a15de40af7190c34eeb5530f304eb26345ce9ee12c192253e248fcb4015e1e6",
+    "development_protocol": "9bdc0809fd9853f4a2c2879521264eb875046ffeadbdebd274099c80d371534d",
+    "holdout": "17111cfb0b7d7414c6f1b624bb00155da798e5fe88dab56f55266a7b300d7f48",
+    "holdout_protocol": "639dbefbfae4a3d05025b78c49e9706e5ae08ea40f8aaf439496fa3c0c628364"
+  },
+  "claim_boundary": "Two-node finite-sample mandatory four-cell continuity during 60 fresh Qwen load/warmup episodes on the same MPS GPU. Optional inference was closed. Optional-work availability, a reload WCET, production d_MAC, and cross-family generalization remain UQ.",
+  "counts": {
+    "cell_decodes": 13336,
+    "component_bound_violations": 0,
+    "deadline_misses": 0,
+    "mandatory_releases": 3334,
+    "optional_inference_units": 0,
+    "overlap_releases": 2658,
+    "quiet_releases": 676,
+    "reload_episodes": 60
+  },
+  "gates": {
+    "all_sixty_reload_episodes": true,
+    "both_campaigns_pass": true,
+    "combined_mandatory_safety": true,
+    "development_holdout_roles": true,
+    "development_node_excluded_from_holdout": true,
+    "frozen_source_equality": true,
+    "independent_job_and_node": true,
+    "independent_seed": true,
+    "same_reload_contract": true
+  },
+  "jobs": [
+    "58862152",
+    "58862161"
+  ],
+  "maxima_ms": {
+    "cell_gpu_all": 13.749792098999023,
+    "cell_gpu_reload_overlap": 12.468511581420898,
+    "mandatory_response_all": 52.674487,
+    "mandatory_response_quiet": 52.674487,
+    "mandatory_response_reload_overlap": 34.834687,
+    "reload_load_and_warmup": 19615.393013
+  },
+  "node_summaries": {
+    "nid001288": {
+      "counts": {
+        "cell_decodes": 6660,
+        "component_bound_violations": 0,
+        "deadline_misses": 0,
+        "mandatory_releases": 1665,
+        "optional_inference_units": 0,
+        "overlap_releases": 1329,
+        "quiet_releases": 336,
+        "reload_episodes": 30
+      },
+      "reload_ms": {
+        "count": 30,
+        "max": 19615.393013,
+        "mean": 7939.7510204,
+        "p50": 7440.313966,
+        "p99": 19615.393013
+      },
+      "response_ms": {
+        "all": {
+          "count": 1665,
+          "max": 52.485618,
+          "mean": 17.003351878078092,
+          "p50": 16.653889,
+          "p99": 24.963247
+        },
+        "quiet": {
+          "count": 336,
+          "max": 52.485618,
+          "mean": 16.305831011904758,
+          "p50": 15.152523,
+          "p99": 51.415365
+        },
+        "reload_overlap": {
+          "count": 1329,
+          "max": 30.010215,
+          "mean": 17.179700268623037,
+          "p50": 16.8393,
+          "p99": 23.657298
+        }
+      }
+    },
+    "nid001381": {
+      "counts": {
+        "cell_decodes": 6676,
+        "component_bound_violations": 0,
+        "deadline_misses": 0,
+        "mandatory_releases": 1669,
+        "optional_inference_units": 0,
+        "overlap_releases": 1329,
+        "quiet_releases": 340,
+        "reload_episodes": 30
+      },
+      "reload_ms": {
+        "count": 30,
+        "max": 19576.278252,
+        "mean": 7947.630155999999,
+        "p50": 7443.579748,
+        "p99": 19576.278252
+      },
+      "response_ms": {
+        "all": {
+          "count": 1669,
+          "max": 52.674487,
+          "mean": 18.58556050629119,
+          "p50": 18.184772,
+          "p99": 31.905045
+        },
+        "quiet": {
+          "count": 340,
+          "max": 52.674487,
+          "mean": 18.178854326470592,
+          "p50": 16.640309,
+          "p99": 52.332433
+        },
+        "reload_overlap": {
+          "count": 1329,
+          "max": 34.834687,
+          "mean": 18.689608738901438,
+          "p50": 18.414197,
+          "p99": 28.735444
+        }
+      }
+    }
+  },
+  "nodes": [
+    "nid001288",
+    "nid001381"
+  ],
+  "schema": "softwall-c164-qwen-reload-two-node-result-v1",
+  "status": "C164_QWEN_RELOAD_TWO_NODE_PASS"
+}

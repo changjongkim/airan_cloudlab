@@ -1,0 +1,28 @@
+{
+  "artifacts": {
+    "results/softwall_multigpu/confirm159q2d_guarded_dev_j58857672_protocol.json": {
+      "bytes": 8453,
+      "sha256": "73bb33c16391fe6655f40f14a2577e81b0bd4c46bc25867897230a1078bfff16"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_coordinator.json": {
+      "bytes": 1807405,
+      "sha256": "8f4093eabed1aaf392b606b0e164f09f1c0f96ced16082e3b56aaf470a4f0669"
+    },
+    "results/softwall_multigpu/raw/confirm159q2d_guarded_dev_j58857672_coordinator.log": {
+      "bytes": 1305,
+      "sha256": "8e29dc08a6660abcd519abbc567961a556ff04aadebf7f20dfdf9cfb3153bb14"
+    }
+  },
+  "claim_limit": "The run stopped before the predeclared 600 rounds and is not a performance or qualification sample. It is retained as a semantics counterexample for sequential outcome replay.",
+  "completed_rounds": 349,
+  "correction": "At the common cutoff, remove the complete observed-success set in one atomic transition and rebuild the current-time certificate only from unresolved accepted recovery obligations.",
+  "deadline_misses_before_failure": 0,
+  "diagnosis": "A launch-time retry reconstructed the current state by replaying already-observed NeuralRx successes one at a time. At the later retry time an intermediate partial-success state was infeasible even though the physically observed success set was simultaneous at the common cutoff. The runtime therefore rejected a state that never existed.",
+  "error": "RuntimeError(\"actual success transition failed: ('home0', 'h0-r0')\")",
+  "failed_sequence": 350,
+  "job_id": "58857672",
+  "label": "confirm159q2d_guarded_dev_j58857672",
+  "node": "nid001204",
+  "schema": "softwall-confirm159-q2-failure-v1",
+  "status": "AUTHORITATIVE_PARTIAL_DEVELOPMENT_FAILURE_PRESERVED"
+}

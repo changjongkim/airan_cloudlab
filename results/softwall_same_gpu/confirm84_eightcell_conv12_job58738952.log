@@ -1,0 +1,25 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=6.248ms max=11.751ms miss=0 correct=79 nrx=0 conv=200 bg=0 duplicate=0
+08:22:55.243661 cuphy.hpp:122    CON[947186] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x562e8d3e2c80).
+confirm84 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58738952/a.sock
+[SAME-REQUEST-NRX] ready tag=f4a15_58738952_947142_c0
+[SAME-REQUEST-NRX] ready tag=f4a15_58738952_947142_c1
+Traceback (most recent call last):
+  File "/softwall/eight_cell_bound_probe_controller.py", line 608, in <module>
+    main()
+  File "/softwall/eight_cell_bound_probe_controller.py", line 119, in main
+    receiver = PairedDualReceiver(
+  File "/softwall/dual_receiver_phy.py", line 136, in __init__
+    self.equalizer = ChannelEqualizer(
+  File "/opt/nvidia/cuBB/pyaerial/src/aerial/phy5g/algorithms/channel_equalizer.py", line 74, in __init__
+    self.channel_equalizer = pycuphy.ChannelEqualizer(self.cuda_stream)
+RuntimeError: out of memory
+08:23:45.313388 cuphy.hpp:122    CON[949570] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f1a0133170).
+08:23:46.287264 cuphy.hpp:122    CON[949570] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f1a7be3600).
+08:23:46.732989 cuphy.hpp:122    CON[949570] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f1a8483fc0).
+08:23:47.179457 cuphy.hpp:122    CON[949570] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f1a7b351e0).
+08:23:47.625010 cuphy.hpp:122    CON[949570] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f1a8441410).
+MPS quit command did not return within 5 seconds
+srun: error: nid001229: task 0: Exited with exit code 1
+srun: Terminating StepId=58738952.28

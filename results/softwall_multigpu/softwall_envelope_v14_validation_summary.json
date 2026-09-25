@@ -1,0 +1,337 @@
+{
+  "schema": "softwall-envelope-v14-validation-summary-v1",
+  "status": "PASS",
+  "inputs": {
+    "results/softwall_multigpu/softwall_sharded_home_envelope_grid_v14.json": "f3420daf0fb3e97965b22946443c7e1d3176b5d477064faf38f488bb8e46093d",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v14.json": "890743ab058ca57e446a265d9aa0c8c5a2320bcbb9afbb4084be9f5c782a8981",
+    "results/softwall_multigpu/confirm142_v14_pipelined_result.json": "8193b98ec09519f1a924b69786b5740f53af1027ff819a0bab538f1f7f27b10f",
+    "results/softwall_multigpu/confirm143_v14_control_faults_result.json": "335bab3424a011f17b45d91ebb542ab326bdb51996b48a75ef40c905c19f352a",
+    "results/softwall_multigpu/confirm144_v14_independent_node_result.json": "10fd06e7f6bdc6d006caa816c32270997e7f350de044275514a284a6158aec55",
+    "results/softwall_multigpu/softwall_pipelined_control_model_v1.json": "f79a110d2e64013195be9e28314b25a5cb1cb59477d694c1919a4427bf6ae3ec"
+  },
+  "model_counts": {
+    "QSU": 6,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 11
+  },
+  "v14_mode": {
+    "id": "sharded_home_g2_c8_broker_crash_pipelined_control_c142_c144",
+    "gpu_count": 2,
+    "cells": 8,
+    "status": "QSU",
+    "reason": "safe mode admits at least one bounded AI class",
+    "mandatory_capacity_ms": 153.0,
+    "mandatory_demand_ms": 200.0,
+    "home_cell_counts": [
+      4,
+      4
+    ],
+    "home_mandatory_demand_ms": [
+      100.0,
+      100.0
+    ],
+    "home_base_all_fail_slack_ms": [
+      53.0,
+      53.0
+    ],
+    "base_all_fail_slack_ms": 53.0,
+    "home_max_released_recovery_slack_ms": [
+      50.0,
+      50.0
+    ],
+    "max_released_recovery_slack_ms": 50.0,
+    "home_decision_time_exchange_windows": [
+      {
+        "home": 0,
+        "admitted_nrx": 2,
+        "rejected_nrx": 2,
+        "rejected_recovery_before_exchange": false,
+        "max_observed_successes_used": 2,
+        "remaining_recovery_obligations": 2,
+        "exchange_phase_possible": true,
+        "latest_nrx_observation_bound_ms": 45.0,
+        "rejected_conventional_charge_ms": 0.0,
+        "decision_time_bound_ms": 45.0,
+        "one_pending_recovery_start_ms": 103.0,
+        "max_safe_exchange_transaction_ms": 58.0
+      },
+      {
+        "home": 1,
+        "admitted_nrx": 2,
+        "rejected_nrx": 2,
+        "rejected_recovery_before_exchange": false,
+        "max_observed_successes_used": 2,
+        "remaining_recovery_obligations": 2,
+        "exchange_phase_possible": true,
+        "latest_nrx_observation_bound_ms": 45.0,
+        "rejected_conventional_charge_ms": 0.0,
+        "decision_time_bound_ms": 45.0,
+        "one_pending_recovery_start_ms": 103.0,
+        "max_safe_exchange_transaction_ms": 58.0
+      }
+    ],
+    "home_max_safe_exchange_transaction_ms": [
+      58.0,
+      58.0
+    ],
+    "endpoint_admitted_cells": 4,
+    "endpoint_rejected_cells": 4,
+    "endpoint_admitted_cells_by_home": [
+      2,
+      2
+    ],
+    "endpoint_rejected_cells_by_home": [
+      2,
+      2
+    ],
+    "endpoint_scope": "disjoint-per-home",
+    "endpoint_ring_depths": null,
+    "home_endpoint_ring_depths": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "rejected_recovery_before_exchange": [
+      false,
+      false
+    ],
+    "control_fault_model": "broker_fail_stop_async_prepare_complete_sync_commit7",
+    "control_fault_qualified": true,
+    "control_rpc_budget_required": true,
+    "control_rpc_bound_ms": 7,
+    "control_rpc_count": 1,
+    "control_critical_operations": [
+      "commit"
+    ],
+    "control_deferred_operations": [
+      "prepare",
+      "abort",
+      "complete"
+    ],
+    "required_control_transaction_budget_ms": 7,
+    "declared_control_transaction_budget_ms": 7,
+    "control_budget_accounted_in_admission": true,
+    "control_budget_qualified": true,
+    "ai_completion_guard_ms": 2.0,
+    "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+    "endpoint_schedule_is_timing_only_counterfactual": false,
+    "endpoint_schedule": [
+      {
+        "cell": 0,
+        "home": 0,
+        "home_local_cell": 0,
+        "cutoff_ms": 53.0,
+        "endpoint": "h0:e0",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 1,
+        "home": 0,
+        "home_local_cell": 1,
+        "cutoff_ms": 78.0,
+        "endpoint": "h0:e1",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 2,
+        "home": 0,
+        "home_local_cell": 2,
+        "cutoff_ms": 103.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      },
+      {
+        "cell": 3,
+        "home": 0,
+        "home_local_cell": 3,
+        "cutoff_ms": 128.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      },
+      {
+        "cell": 4,
+        "home": 1,
+        "home_local_cell": 0,
+        "cutoff_ms": 53.0,
+        "endpoint": "h1:e0",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 5,
+        "home": 1,
+        "home_local_cell": 1,
+        "cutoff_ms": 78.0,
+        "endpoint": "h1:e1",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 6,
+        "home": 1,
+        "home_local_cell": 2,
+        "cutoff_ms": 103.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      },
+      {
+        "cell": 7,
+        "home": 1,
+        "home_local_cell": 3,
+        "cutoff_ms": 128.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      }
+    ],
+    "ai_classes": [
+      {
+        "bound_ms": 35.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 44.0,
+        "static_admissible": true,
+        "static_admissible_homes": [
+          0,
+          1
+        ],
+        "exchange_only_geometry_candidate": false,
+        "exchange_only_geometry_candidate_homes": [],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": false
+      },
+      {
+        "bound_ms": 40.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 49.0,
+        "static_admissible": true,
+        "static_admissible_homes": [
+          0,
+          1
+        ],
+        "exchange_only_geometry_candidate": false,
+        "exchange_only_geometry_candidate_homes": [],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": false
+      },
+      {
+        "bound_ms": 45.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 54.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_geometry_candidate": true,
+        "exchange_only_geometry_candidate_homes": [
+          0,
+          1
+        ],
+        "exchange_only_candidate": true,
+        "exchange_only_candidate_homes": [
+          0,
+          1
+        ],
+        "too_large_even_after_exchange": false
+      },
+      {
+        "bound_ms": 65.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 74.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_geometry_candidate": true,
+        "exchange_only_geometry_candidate_homes": [
+          0,
+          1
+        ],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": true
+      },
+      {
+        "bound_ms": 75.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 84.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_geometry_candidate": true,
+        "exchange_only_geometry_candidate_homes": [
+          0,
+          1
+        ],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": true
+      }
+    ],
+    "evidence": [
+      "The finite V14 protocol model exhausts 16 states and 20 transitions including every before/after-apply control failure branch with zero invariant violations",
+      "C142 two AI45 arms on nid001361: 2,560 TB, 305 target branches, 9 exchange-only executions, zero safety/bound/credit violations",
+      "The V14 transaction charges AI45 + synchronous launch commit7 + completion guard2 = 54 ms; static all-fail slack is 53 ms and conditional window is 58 ms",
+      "C143 six fault arms on nid001361: 16,320 TB, 14,184 after fault, commit max 5.148988 ms, zero safety or duplicate violations",
+      "C143 deferred prepare/abort/complete reached 9.614963 ms and exceeded 7 ms 50 times without blocking RAN recovery",
+      "C144 independently requalified AI45 and all three fault points on nid002049: 6,080 TB and 3,730 after fault, all gates pass",
+      "Prepared work is never launched without commit ACK and is revalidated against the current local horizon"
+    ]
+  },
+  "c142": {
+    "radio_records": 2560,
+    "candidate_branches": 305,
+    "ai45_candidate_exchanges": 9,
+    "minimum_physical_guarded_horizon_margin_ms": 53.114836,
+    "maximum_commit_rpc_ms": 0.612807,
+    "maximum_deferred_rpc_ms": 9.780886
+  },
+  "c143": {
+    "arms": 6,
+    "radio_records": 16320,
+    "radio_records_after_fault": 14184,
+    "rpc_records": 1924,
+    "commit_records": 340,
+    "maximum_commit_ms": 5.148988,
+    "deferred_records": 1584,
+    "maximum_deferred_ms": 9.614963,
+    "deferred_over_7ms": 50
+  },
+  "c144": {
+    "radio_records": 6080,
+    "ai45_exchanges": 2,
+    "radio_after_fault": 3730,
+    "fault_arms": 3
+  },
+  "finite_model": {
+    "states": 16,
+    "edges": 20,
+    "violations": 0
+  },
+  "gates": {
+    "v14_mode_is_qsu": true,
+    "only_commit_is_critical": true,
+    "ai45_predicted_exchange_only": true,
+    "c142_ai45_pass": true,
+    "c143_fault_matrix_pass": true,
+    "deferred_rpc_really_exceeded_commit_bound": true,
+    "c144_independent_node_pass": true,
+    "two_v14_nodes": true,
+    "finite_model_pass": true,
+    "v14_expected_counts": true
+  },
+  "all_pass": true,
+  "claim_boundary": "V14 closes a finite-sample model/implementation loop for pipelined global control and an exchange-only AI45 class on two A100 nodes. It does not qualify production d_MAC, cross-family behavior, or WCET."
+}

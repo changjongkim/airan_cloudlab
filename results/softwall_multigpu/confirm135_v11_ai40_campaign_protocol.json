@@ -1,0 +1,96 @@
+{
+  "schema": "softwall-confirm135-v11-ai40-campaign-protocol-v1",
+  "status": "frozen-before-all-physical-arms",
+  "hypothesis": "The v11 full-control two-home mode physically exercises raw AI40 requests only in a branch that retains an executable two-recovery certificate, with the 15 ms broker budget and 2 ms physical guard charged.",
+  "model_witness": {
+    "admitted_nrx": 2,
+    "successful_nrx": 2,
+    "rejected_live_recoveries": 2,
+    "observation_bound_ms": 45,
+    "earliest_recovery_start_ms": 103,
+    "transaction_window_ms": 58,
+    "raw_ai_bound_ms": 40,
+    "control_budget_ms": 15,
+    "effective_transaction_ms": 55,
+    "model_margin_ms": 3
+  },
+  "mode": {
+    "gpu_homes": 2,
+    "cells_per_home": 4,
+    "period_ms": 180,
+    "deadline_ms": 155,
+    "conv_bound_ms": 25,
+    "nrx_bound_ms": 45,
+    "endpoint_count_per_home": 2,
+    "endpoint_ring_depth": 1,
+    "mps_nrx_cap_each": 40,
+    "mps_ai_cap": 20,
+    "global_rpc_bound_ms": 5,
+    "global_rpc_count": 3,
+    "admission_guard_ms": 17,
+    "gc": "off",
+    "trace": "synthetic context128 only"
+  },
+  "arms": [
+    {
+      "name": "s1",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        25000051,
+        25010051
+      ],
+      "channel_seeds": [
+        25001000,
+        25011000
+      ]
+    },
+    {
+      "name": "s2",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        25020051,
+        25030051
+      ],
+      "channel_seeds": [
+        25021000,
+        25031000
+      ]
+    }
+  ],
+  "gates": [
+    "each arm passes all existing deadline/bound/horizon/credit/uniqueness gates",
+    "endpoint admission never exceeds two per home release",
+    "each arm contains at least one two-admitted/two-success/two-rejected branch",
+    "each arm completes at least one raw AI40 exchange in that branch",
+    "reserved horizon margin is nonnegative",
+    "all artifacts and frozen sources match"
+  ],
+  "stop_rule": "Stop on the first physical safety/bound/credit failure; preserve the failure and do not widen a bound post hoc.",
+  "claim_boundary": "mechanism qualification only; no throughput superiority, BurstGPT representativeness, WCET, production d_MAC, cross-family, restart, durable reconciliation, or exactly-once claim",
+  "container_source_map": {
+    "/softwall/global_trace_fully_budgeted_fault_contained_controller.py": "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py",
+    "/softwall/global_trace_lease_broker.py": "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py",
+    "/softwall/same_request_ipc_worker.py": "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py",
+    "/softwall/trace_qwen_worker.py": "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py",
+    "/softwall_task1/isca_v2/dart_runtime.py": "scripts_for_node/task1/isca_v2/dart_runtime.py",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py"
+  },
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "campaign_source_sha256": {
+    "scripts_for_node/softwall_same_gpu/run_v11_ai40_candidate_arm.sh": "cecd9c556a4702cbc7d8f38b06e656311e0984e45ad80be836407cd52b9bb972",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm135_v11_ai40.py": "64c10e8667a873db3434f139359f2a09aed2e89e8cc0308ba7008ca08b27d652",
+    "scripts_for_node/softwall_same_gpu/analyze_softwall_v11_candidate_evidence.py": "88d27deb92e6c7a1d76fa5dd6cece257610c102295058fe8bed397cdd94279a3",
+    "data/current/softwall_context128_mechanism_trace_v1.json": "9c3ebdb3d7db3fec05048653529837c083115b0ec554280a79fea2dfbe565bf2",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_grid_v11.json": "4efdb9bbc904950fc1e658f01a061d1fc600c6f2e1ce5bd2e39713347f7533ae",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v11.json": "7e315da2400161f283a3d2c144c3166e049472ae908840346961db384bd11a46"
+  }
+}

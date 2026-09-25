@@ -1,0 +1,78 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm55_two_endpoint_bringup_retry1",
+  "retry_of": "confirm55_two_endpoint_bringup_protocol.json",
+  "operational_change_only": "The first allocation, job 58693257, aborted before worker readiness because the AI Unix socket pathname exceeded AF_UNIX length. This retry shortens only that pathname within the authorized project directory; radio, contract, seed, worker caps, and frozen gates are identical.",
+  "frozen_before_execution": true,
+  "research_question": "Can two persistent cap40 NeuralRx MPS endpoints and a cap20 AI worker share one GPU at the analytically feasible two-cell P150/D130 point while mandatory-first reservations, full-PHY correctness, and measured timing gates all hold?",
+  "decision_at_stake": {
+    "pass": "If all physical, radio, AI, and credit gates pass, use this two-endpoint transport as the substrate for a separate strong-combined-baseline versus joint-policy comparison; do not count bring-up as novelty.",
+    "fail": "If any frozen gate fails, stop the multi-endpoint comparison path and attribute the failing bound or transport before changing the physical contract. Do not add seeds to turn this protocol into PASS."
+  },
+  "if_both_outcomes_lead_to_same_action": "Cancel if both outcomes would lead directly to the same comparison campaign.",
+  "comparison_role": "Physical transport and mandatory-first integration qualification. No policy superiority claim.",
+  "strongest_realistic_opponent": "The channel-gated, queue-aware, fixed-recovery, bounded-AI combined baseline described in docs/current/SOFTWALL_STRONG_BASELINE_SPEC_KO.md; both it and any joint policy receive this same qualified transport, early retiming, and work bounds.",
+  "radio": {
+    "cells": 2,
+    "simultaneous_release": true,
+    "period_ms": 150,
+    "deadline_ms": 130,
+    "iterations": 1000,
+    "snr_db": -8.5,
+    "payload_seed": 20321055,
+    "channel_seed_base": 20355000,
+    "fallback_latest_starts_ms_from_release": [78, 103]
+  },
+  "execution": {
+    "one_node_one_gpu_one_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_arm": 20,
+    "operational_requalification": "200 conventional-only P90/D80 releases with zero misses",
+    "two_endpoint_cap_each": 40,
+    "background_cap": 20,
+    "conventional_cap": "controller priority 0; not assumed isolated by MPS caps",
+    "same_trace_for_all_future_policy_comparisons": false
+  },
+  "contract": {
+    "nrx_end_to_end_bound_ms": 50,
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "endpoint_physical_wait_timeout_ms": 100,
+    "ai_host_budget_ms": 40,
+    "ai_rpc_timeout_ms": 35,
+    "ai_guard_ms": 2,
+    "mandatory_first": true,
+    "worker_to_cell_routing": "pinned for transport qualification; queue-aware cross-routing requires separate request-owned buffers and is not claimed here",
+    "fallback_rule": "wait for both physical NRx completions; then process invalid/unadmitted requests on one conventional lane with atomic early reservation retiming"
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/two_endpoint_bringup_controller.py": "05aac5370a38fac643ede59490faddda946744dcd90359f0ed362682aa60275a",
+    "scripts_for_node/softwall_same_gpu/run_two_endpoint_bringup.sh": "7edcb7f234e6b0f1f48ec8cbc0ff2bb921715518d87087cd32cdbdfaad4c0186",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "638a9b0e2010b24b8a0ebc6e7b7d6cabb03411525a7376bb848b3e6a798620b5"
+  },
+  "frozen_gates": {
+    "completed_cell_records": 2000,
+    "correct_cells_at_least": 1950,
+    "deadline_misses": 0,
+    "nrx_bound_violations": 0,
+    "conv_bound_violations": 0,
+    "admission_rejections": 0,
+    "retime_rejections": 0,
+    "background_units_greater_than_zero": true,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0,
+    "background_faults": 0,
+    "endpoint_faults": 0,
+    "fallback_calendar_outstanding": 0,
+    "both_endpoint_outstanding": 0,
+    "exactly_one_commit_per_cell": true
+  },
+  "measurement_sources": {
+    "controller": "results/softwall_same_gpu/raw/confirm55_two_endpoint_job{job}_controller.json:records, summary counters, runtime_metrics, fallback_calendar_final, endpoint_final",
+    "endpoint_workers": "results/softwall_same_gpu/raw/confirm55_two_endpoint_job{job}_worker{0,1}.json:host, slurm_job_id, visible_sm_count, completed_units",
+    "ai_worker": "results/softwall_same_gpu/raw/confirm55_two_endpoint_job{job}_background.json:host, slurm_job_id, mps_active_thread_percentage, completed_units",
+    "requalification": "results/softwall_same_gpu/raw/confirm55_requalification_job{job}.json:deadline_misses, host, slurm_job_id"
+  },
+  "evidence_grade": "C physical bring-up if PASS; never a baseline superiority result.",
+  "interpretation_limits": "P150/D130 is a synthetic and permissive PHY timing contract. Two worker caps and zero observed violations do not prove MPS hardware isolation or WCET. This pinned routing does not test queue-aware policy, concurrent fallback with NRx, multi-period overlap, correlated long-tail faults, or production HARQ expiry."
+}

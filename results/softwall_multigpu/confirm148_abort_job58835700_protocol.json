@@ -1,0 +1,56 @@
+{
+  "schema": "softwall-v16-abort-fault-arm-protocol-v1",
+  "status": "frozen-before-run",
+  "label": "confirm148_abort_job58835700",
+  "iterations": 200,
+  "warmup": 20,
+  "global_policy": "global",
+  "payload_seeds": [
+    41000051,
+    41010051
+  ],
+  "channel_seeds": [
+    41001000,
+    41011000
+  ],
+  "placement": {
+    "gpu0": "four-cell home + two local NRx + Qwen",
+    "gpu1": "four-cell home + two local NRx + Qwen"
+  },
+  "shared_resources": "one serializable BurstGPT request queue; recovery, NRx endpoint/IPC, Qwen execution and physical credits remain per-home",
+  "transaction_order": "asynchronous prepare -> current-horizon revalidation -> local atomic recovery replan+AI lease -> bounded synchronous commit ACK -> physical AI -> local fence/retire -> asynchronous complete; broker fail-stop disables new global AI without blocking certificate-ordered RAN recovery",
+  "ownership_contract": "at-most-one-staged-or-offered-token-per-home",
+  "fault_injection": {
+    "home": 0,
+    "operation": "abort",
+    "operation_number": 3,
+    "point": "process calls os._exit(86) immediately after the configured state transition, before reply; attempted-RPC wall time includes the detecting call and excludes post-quarantine no-ops",
+    "expected_exit_code": 86,
+    "broker_rpc_socket_timeout_ms": 5.0
+  },
+  "cuda_module_loading": "LAZY",
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 25.0,
+  "guard_ms": 2,
+  "global_broker_rpc_timeout_ms": 5.0,
+  "global_broker_rpc_admission_bound_ms": 7.0,
+  "global_broker_transaction_budget_ms": 7.0,
+  "admission_ai_guard_ms": 9.0,
+  "fault_every": 5,
+  "rpc_telemetry_required": true,
+  "source_sha256": {
+    "/softwall/global_trace_fully_budgeted_fault_contained_controller.py": "b5afa2828de1897f4029e9c49774d56d198db370891ff114036735f29397b324",
+    "/softwall/global_trace_single_token_pipelined_controller.py": "d8b44dce96d347032608faab0afd6f551715ddcb2512cc43a21cfed25b7ba4e3",
+    "/softwall/single_token_pipelined_global_trace_client.py": "3a1dc830967758df16ab76e1053d8e016adde8cf582bc2cfd8b0f32d7d132277",
+    "/softwall/pipelined_global_trace_client.py": "108c13e2db0c3db46ca84a1b8461a820699e0e85567c6fde433d8b841eef01fa",
+    "/softwall/test_single_token_pipelined_global_trace_client.py": "ee33623d7b4aaec3824530d78adfc2aafe540117e3f94131e3a5713d7b012bb7",
+    "/softwall/four_point_crash_global_trace_lease_broker.py": "353087075e6c5d6abc043d880936ed845b6d06b14f682fca254694a5dcca761d",
+    "/softwall/run_v16_abort_fault_arm.sh": "866548f2cbc75d523ea5f80a4f0a904f8f5bfb22459ae887f9f716243418b1eb",
+    "/softwall/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/softwall/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/softwall_task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

@@ -1,0 +1,426 @@
+{
+  "schema": "softwall-confirm140-v13-ai35-conditional-exchange-v1",
+  "campaign_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_v13_ai35_protocol.json",
+  "campaign_protocol_sha256": "071b5640aee0dcd1f40e38b152124be286bd70b92146fba58dc9b43c2cddfe38",
+  "nodes": [
+    "nid001252"
+  ],
+  "arms": [
+    {
+      "name": "s1",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s1_job58831575_result.json",
+      "all_pass": true,
+      "seed_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "radio_records": 1280,
+      "atomic_exchanges": 8,
+      "candidate_evidence": {
+        "branches": 158,
+        "exchanges": 5,
+        "minimum_reserved_horizon_margin_ms": 44.611728,
+        "maximum_admitted_nrx_per_home_release": 2
+      },
+      "control_evidence": {
+        "records": 1002,
+        "by_operation": {
+          "prepare": 960,
+          "commit": 21,
+          "complete": 21
+        },
+        "max_elapsed_ms": 1.064954,
+        "faulted": 0,
+        "admission_bound_exceeded": 0
+      },
+      "counterfactual_events": 5
+    },
+    {
+      "name": "s2",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s2_job58831575_result.json",
+      "all_pass": true,
+      "seed_match": true,
+      "nodes": [
+        "nid001252"
+      ],
+      "radio_records": 1280,
+      "atomic_exchanges": 10,
+      "candidate_evidence": {
+        "branches": 151,
+        "exchanges": 3,
+        "minimum_reserved_horizon_margin_ms": 43.647277,
+        "maximum_admitted_nrx_per_home_release": 2
+      },
+      "control_evidence": {
+        "records": 993,
+        "by_operation": {
+          "prepare": 955,
+          "commit": 19,
+          "complete": 19
+        },
+        "max_elapsed_ms": 2.021658,
+        "faulted": 0,
+        "admission_bound_exceeded": 0
+      },
+      "counterfactual_events": 3
+    }
+  ],
+  "totals": {
+    "radio_records": 2560,
+    "atomic_exchanges": 18,
+    "candidate_branches": 309,
+    "ai35_candidate_exchanges": 8,
+    "minimum_physical_guarded_horizon_margin_ms": 43.647277
+  },
+  "model_counterfactual": {
+    "static_all_fail_slack_ms": 53.0,
+    "effective_transaction_bound_ms": 58.0,
+    "conditional_decision_window_ms": 58.0,
+    "static_margin_ms": -5.0,
+    "conditional_margin_ms": 0.0,
+    "events": [
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s1_job58831575_result.json",
+        "home": 0,
+        "release_index": 1,
+        "request_id": "softwall-ai35-0002",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 8.641221,
+          "ai_admitted_ms": 10.025935,
+          "ai_returned_ms": 34.720047,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 45.279953
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      },
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s1_job58831575_result.json",
+        "home": 0,
+        "release_index": 3,
+        "request_id": "softwall-ai35-0010",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 8.709816,
+          "ai_admitted_ms": 10.040826,
+          "ai_returned_ms": 33.142973,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 46.857027
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      },
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s1_job58831575_result.json",
+        "home": 1,
+        "release_index": 1,
+        "request_id": "softwall-ai35-0003",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 8.701108,
+          "ai_admitted_ms": 10.188089,
+          "ai_returned_ms": 35.011902,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 44.988098
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      },
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s1_job58831575_result.json",
+        "home": 1,
+        "release_index": 2,
+        "request_id": "softwall-ai35-0007",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 8.9805,
+          "ai_admitted_ms": 10.263165,
+          "ai_returned_ms": 35.388272,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 44.611728
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      },
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s1_job58831575_result.json",
+        "home": 1,
+        "release_index": 3,
+        "request_id": "softwall-ai35-0009",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 8.537883,
+          "ai_admitted_ms": 9.873702,
+          "ai_returned_ms": 34.855351,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 45.144649
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      },
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s2_job58831575_result.json",
+        "home": 0,
+        "release_index": 4,
+        "request_id": "softwall-ai35-0016",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 9.07751,
+          "ai_admitted_ms": 10.390544,
+          "ai_returned_ms": 36.352723,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 43.647277
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      },
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s2_job58831575_result.json",
+        "home": 1,
+        "release_index": 1,
+        "request_id": "softwall-ai35-0003",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 9.034436,
+          "ai_admitted_ms": 10.345867,
+          "ai_returned_ms": 34.765988,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 45.234012
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      },
+      {
+        "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_s2_job58831575_result.json",
+        "home": 1,
+        "release_index": 2,
+        "request_id": "softwall-ai35-0006",
+        "phase": "after_nrx_before_recovery",
+        "terms": {
+          "cells": 4,
+          "successful_nrx": 2,
+          "live_recoveries": 2,
+          "radio_commit_guard_ms": 2.0,
+          "ai_completion_guard_ms": 2.0,
+          "broker_control_budget_ms": 21.0,
+          "admission_guard_ms": 23.0,
+          "all_fail_base_slack_ms": 53.0,
+          "conditional_recovery_start_ms": 103.0,
+          "decision_time_bound_ms": 45.0,
+          "conditional_transaction_window_ms": 58.0,
+          "raw_ai_bound_ms": 35.0,
+          "effective_transaction_bound_ms": 58.0,
+          "static_margin_ms": -5.0,
+          "conditional_margin_ms": 0.0
+        },
+        "observed": {
+          "latest_nrx_observation_ms": 8.806855,
+          "ai_admitted_ms": 10.108748,
+          "ai_returned_ms": 33.355384,
+          "reserved_horizon_ms": 103.0,
+          "physical_guarded_horizon_margin_ms": 46.644616
+        },
+        "checks": {
+          "static_contract_rejects": true,
+          "conditional_contract_accepts": true,
+          "runtime_horizon_matches_model": true,
+          "nrx_observation_within_bound": true,
+          "physical_guarded_horizon_pass": true,
+          "correct_execution_phase": true,
+          "global_complete_confirmed": true
+        }
+      }
+    ]
+  },
+  "artifact_hash_mismatches": [],
+  "arm_source_hash_mismatches": [],
+  "campaign_source_hash_mismatches": [],
+  "gates": {
+    "two_declared_arms": true,
+    "seed_pairs_match": true,
+    "seed_pairs_unique": true,
+    "all_arm_gates_pass": true,
+    "candidate_branch_each_arm": true,
+    "ai35_exchange_each_arm": true,
+    "nonnegative_physical_margin_each_arm": true,
+    "static_counterfactual_rejects_every_exchange": true,
+    "conditional_contract_accepts_every_exchange": true,
+    "effective_transaction_is_58_ms": true,
+    "all_event_execution_checks_pass": true,
+    "one_allowed_physical_node": true,
+    "artifact_hashes_match": true,
+    "arm_sources_match": true,
+    "campaign_sources_match": true
+  },
+  "all_pass": true,
+  "claim_boundary": "Two-arm finite-sample physical mechanism validation of a synthetic context64 AI35+control21+completion2 transaction that static all-fail reservation rejects but conditional recovery release admits. Same A100 node as C139; not throughput superiority, WCET, production d_MAC, cross-family, or independent-node requalification."
+}

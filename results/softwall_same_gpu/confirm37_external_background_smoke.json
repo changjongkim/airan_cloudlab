@@ -1,0 +1,45 @@
+{
+  "schema": "softwall-external-background-smoke-v1",
+  "campaign": "confirm37_external_background_smoke",
+  "job": "58678749",
+  "host": "nid001084",
+  "correct": 493,
+  "releases": 500,
+  "deadline_misses": 0,
+  "response_ms": {
+    "n": 500,
+    "mean": 3.0290935,
+    "p50": 2.974036,
+    "p95": 3.1743012999999998,
+    "p99": 5.42228237,
+    "p99_9": 6.665770027000024,
+    "min": 2.679065,
+    "max": 7.019325
+  },
+  "background_units": 76,
+  "background_gpu_ms": {
+    "n": 76,
+    "mean": 3.095882519295341,
+    "p50": 3.0948959589004517,
+    "p95": 3.105736017227173,
+    "p99": 3.1070480346679688,
+    "p99_9": 3.108020067214966,
+    "min": 3.0855040550231934,
+    "max": 3.108128070831299
+  },
+  "gates": {
+    "exactly_500_releases": true,
+    "zero_deadline_misses": true,
+    "zero_endpoint_timeouts": true,
+    "background_work_positive": true,
+    "background_units_match": true,
+    "background_budget_violations_zero": false,
+    "background_release_crossings_zero": true,
+    "background_faults_zero": false,
+    "endpoint_units_match": true,
+    "same_node": true,
+    "same_job": true,
+    "background_visible_sms_limited": true,
+    "all_pass": false
+  }
+}

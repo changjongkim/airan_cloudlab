@@ -1,0 +1,91 @@
+{
+  "schema": "softwall-confirm87-matched-gc-posthoc-v1",
+  "frozen_tail_attribution_gate_pass": false,
+  "pairs": [
+    {
+      "on": "a_on",
+      "off": "b_off",
+      "on_controller_sha256": "cf97b25dfb23178d9dd6502a6cf33e57c2495a25d9d9baf15cbde8c4eba2c9a6",
+      "off_controller_sha256": "ac429368c1aa09f8f6e01d6e27fb8571cc6c2f709306d73a31230d84d6e68dd5",
+      "matched_channel_seeds": true,
+      "exact_feature_matches": 3200,
+      "same_admission_decisions": 3200,
+      "total_records": 3200,
+      "matched_nrx_count": 1186,
+      "matched_nrx_median_delta_ms": 0.38392049999999855,
+      "matched_nrx_p99_delta_ms": 2.391266,
+      "gc_release_index": 609,
+      "gc_start_after_release_ms": 15.306049,
+      "gc_end_after_release_ms": 44.150915,
+      "gc_duration_ms": 28.844866,
+      "off_gen2_gc_events": 0,
+      "matched_nrx": [
+        {
+          "cell": 2,
+          "on_nrx_response_ms": 44.618622,
+          "off_nrx_response_ms": 16.19377,
+          "on_minus_off_response_ms": 28.424852,
+          "worker_gpu_ms": 2.1040639877319336,
+          "worker_published_after_release_ms": 6.699422,
+          "on_controller_observed_after_release_ms": 44.618622,
+          "worker_published_before_gc_start": true,
+          "controller_observed_after_gc_end": true
+        },
+        {
+          "cell": 3,
+          "on_nrx_response_ms": 45.567111,
+          "off_nrx_response_ms": 17.077403,
+          "on_minus_off_response_ms": 28.489707999999997,
+          "worker_gpu_ms": 1.885856032371521,
+          "worker_published_after_release_ms": 7.362317,
+          "on_controller_observed_after_release_ms": 45.567111,
+          "worker_published_before_gc_start": true,
+          "controller_observed_after_gc_end": true
+        }
+      ]
+    },
+    {
+      "on": "d_on",
+      "off": "c_off",
+      "on_controller_sha256": "63e23d6c26ecc6183fc21043b850a2be0187b04dbfd8cfc6bbef63b92f2bae5d",
+      "off_controller_sha256": "2f6673495bbeb4ee2d3e1f212cf56251b760fb6fc55d464cee668a69123dafa2",
+      "matched_channel_seeds": true,
+      "exact_feature_matches": 3200,
+      "same_admission_decisions": 3200,
+      "total_records": 3200,
+      "matched_nrx_count": 1185,
+      "matched_nrx_median_delta_ms": -0.5007269999999977,
+      "matched_nrx_p99_delta_ms": 0.9038119999999985,
+      "gc_release_index": 602,
+      "gc_start_after_release_ms": 14.905705,
+      "gc_end_after_release_ms": 42.578049,
+      "gc_duration_ms": 27.672344,
+      "off_gen2_gc_events": 0,
+      "matched_nrx": [
+        {
+          "cell": 1,
+          "on_nrx_response_ms": 43.063,
+          "off_nrx_response_ms": 15.756458,
+          "on_minus_off_response_ms": 27.306542,
+          "worker_gpu_ms": 2.116544008255005,
+          "worker_published_after_release_ms": 6.819678,
+          "on_controller_observed_after_release_ms": 43.063,
+          "worker_published_before_gc_start": true,
+          "controller_observed_after_gc_end": true
+        },
+        {
+          "cell": 2,
+          "on_nrx_response_ms": 44.03286,
+          "off_nrx_response_ms": 16.621315,
+          "on_minus_off_response_ms": 27.411545,
+          "worker_gpu_ms": 1.883903980255127,
+          "worker_published_after_release_ms": 7.461652,
+          "on_controller_observed_after_release_ms": 44.03286,
+          "worker_published_before_gc_start": true,
+          "controller_observed_after_gc_end": true
+        }
+      ]
+    }
+  ],
+  "interpretation": "Posthoc secondary paired response analysis. Both seeds match all channel features and admission decisions; natural gen-2 GC falls between physical worker publication and host observation for the listed late NRx requests. This supports a causal host-observation mechanism but does not revise the failed frozen C87 primary gate. Independent prospective replication is required."
+}

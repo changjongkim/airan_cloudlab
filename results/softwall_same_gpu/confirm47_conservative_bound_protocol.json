@@ -1,0 +1,49 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "pre_execution_revision": "2026-09-21 UTC: AI RPC socket timeout reduced from 45 to 35 ms before any Confirm47 run, because the former exceeded the 40 ms admission budget. Both comparison conditions use the same new value; all outcomes remain prospective.",
+  "campaign": "confirm47_conservative_bound",
+  "purpose": "Prospectively re-qualify the fully transactional external path with a 50 ms NRx end-to-end admission bound after Confirm43 observed a maximum 46.990 ms response and three violations of the original 30 ms bound. Compare against eager-dual on two new identical-trace seed/order pairs. This is a new protocol, not a reclassification of Confirm43 or Confirm45.",
+  "radio": {
+    "iterations_per_condition": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "rounds": [
+      {"round": 1, "payload_seed": 20321047, "channel_seed_base": 20337000, "order": ["eager_dual", "external_transaction"]},
+      {"round": 2, "payload_seed": 20321048, "channel_seed_base": 20338000, "order": ["external_transaction", "eager_dual"]}
+    ]
+  },
+  "execution": {
+    "same_node_allocation_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 conventional-only releases with zero deadline misses"
+  },
+  "external_transaction": {
+    "endpoint_mps_cap": 80,
+    "endpoint_timeout_ms": 30,
+    "nrx_end_to_end_bound_ms": 50,
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "fallback_calendar_capacity": 1,
+    "recovery_gap_ai": true
+  },
+  "background_both_conditions": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "repeats_per_unit": 1,
+    "rpc_budget_ms": 40,
+    "rpc_timeout_ms": 35,
+    "guard_ms": 2
+  },
+  "primary_gate": {
+    "all_runs_complete_same_node_job_trace": true,
+    "both_policies_zero_ran_deadline_misses": true,
+    "both_policies_zero_ai_budget_violations_crossings_faults": true,
+    "external_zero_endpoint_timeout_bounds_duplicate_commits_outstanding_credits": true,
+    "external_radio_utility_noninferior_to_eager_each_round_margin_pp": -0.25,
+    "external_completed_ai_units_exceed_eager_each_round": true
+  },
+  "interpretation_limit": "The 50+25+2=77 ms admission sum leaves only 3 ms of release lateness before the 53 ms fallback start. Report any admission rejections and all bound violations. A pass on new seeds is empirical qualification, not an upper bound proof; the 35 ms socket timeout now fits within the 40 ms AI host budget, but OS scheduling and any in-flight GPU work still need a separate fault test. Compare both seed/order pairs including a failure."
+}

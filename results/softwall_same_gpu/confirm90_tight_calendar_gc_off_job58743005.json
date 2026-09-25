@@ -1,0 +1,50 @@
+{
+  "schema": "softwall-confirm90-actual-tight-calendar-gc-off-v1",
+  "job": "58743005",
+  "source_hashes": true,
+  "prior_go_condition": true,
+  "arms": [
+    {
+      "name": "a",
+      "prefix": "confirm90_a_tight_job58743005",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": false,
+        "physical_coverage": true
+      },
+      "all_pass": false,
+      "nrx_paths": 5137,
+      "nrx_max_ms": 26.874811,
+      "conv_paths": 8383,
+      "conv_max_ms": 7.115847,
+      "two_admitted_releases": 2262,
+      "injected_all_fail_releases": 461,
+      "joint_ai_units": 1031,
+      "background_units": 130117,
+      "deadline_misses": 0
+    },
+    {
+      "name": "b",
+      "prefix": "confirm90_b_tight_job58743005",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true,
+        "physical_coverage": true
+      },
+      "all_pass": true,
+      "nrx_paths": 5186,
+      "nrx_max_ms": 24.051208,
+      "conv_paths": 8356,
+      "conv_max_ms": 3.372429,
+      "two_admitted_releases": 2295,
+      "injected_all_fail_releases": 467,
+      "joint_ai_units": 1047,
+      "background_units": 130782,
+      "deadline_misses": 0
+    }
+  ],
+  "all_pass": false,
+  "interpretation": "Two independent physical runs with an actual B_NRx25/B_conv12 calendar and cyclic GC disabled during timed traffic, conditional on Confirm88 observational candidates. PASS is finite synthetic-mode qualification only, not WCET, production DU, eight-cell support, or PHY-value joint-policy advantage."
+}

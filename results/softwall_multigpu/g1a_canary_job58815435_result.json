@@ -1,0 +1,66 @@
+{
+  "schema": "softwall-multigpu-p2p-ipc-gate-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1a_canary_job58815435_protocol.json",
+  "protocol_sha256": "a98d76c747d6c24412cdcac8c3d8dab0146813872ef2148c49740bd6ddd3aeaa",
+  "owner": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1a_canary_job58815435_owner.json",
+  "owner_sha256": "9948b5daee0a50c521819290d44f04ec7dbdb0e75b5ce84a85db908c1c467d4b",
+  "worker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1a_canary_job58815435_worker.json",
+  "worker_sha256": "26709b16ecc88aa8e0c9b8c310de406fd1eb5173f5f268dc58821f0c365c97d0",
+  "iterations": 100,
+  "payload": {
+    "forward_bytes": 1415232,
+    "backward_bytes": 314496
+  },
+  "timing_us": {
+    "round_trip": {
+      "count": 100,
+      "mean": 3421.424010000003,
+      "p50": 229.123,
+      "p99": 364.113,
+      "max": 319575.514
+    },
+    "forward_gpu": {
+      "count": 100,
+      "mean": 20.65663993358612,
+      "p50": 19.168000668287277,
+      "p99": 68.03199648857117,
+      "max": 71.29599899053574
+    },
+    "forward_host": {
+      "count": 100,
+      "mean": 33.266529999999996,
+      "p50": 29.807,
+      "p99": 84.394,
+      "max": 256.766
+    },
+    "backward_gpu": {
+      "count": 100,
+      "mean": 23.22719994932413,
+      "p50": 21.91999927163124,
+      "p99": 40.672000497579575,
+      "max": 48.767998814582825
+    },
+    "backward_host": {
+      "count": 100,
+      "mean": 31.799940000000003,
+      "p50": 30.539,
+      "p99": 48.814,
+      "max": 65.446
+    }
+  },
+  "gates": {
+    "protocol_hash_matches_owner": true,
+    "protocol_hash_matches_worker": true,
+    "iteration_count": true,
+    "owner_integrity": true,
+    "worker_integrity": true,
+    "owner_sequence": true,
+    "worker_sequence": true,
+    "termination_lifecycle": true,
+    "bidirectional_peer_access": true,
+    "payload_contract": true,
+    "no_recorded_error": true
+  },
+  "all_pass": true,
+  "scope": "cross-process CUDA IPC mapping plus bidirectional full-GPU P2P transport integrity; no NeuralRx service, MPS co-run, or deadline claim"
+}

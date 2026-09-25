@@ -1,0 +1,147 @@
+{
+  "schema": "softwall-confirm136-v12-cross-node-requalification-v1",
+  "campaign_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_v12_ai40_requalification_protocol.json",
+  "campaign_protocol_sha256": "a44ad7d918cdd1e4663dd7348afa0d9f8371ae47341b11b5d2bee139979f8dbd",
+  "nodes": [
+    "nid002817"
+  ],
+  "excluded_nodes": [
+    "nid001245",
+    "nid002688",
+    "nid001781"
+  ],
+  "arms": [
+    {
+      "name": "s1",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s1_job58829672_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s1_job58829672_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid002817"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 8,
+      "candidate_branches": 153,
+      "ai40_candidate_exchanges": 4,
+      "minimum_reserved_horizon_margin_ms": 52.255538,
+      "counterfactual_events": 4
+    },
+    {
+      "name": "s2",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s2_job58829672_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s2_job58829672_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid002817"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 9,
+      "candidate_branches": 161,
+      "ai40_candidate_exchanges": 4,
+      "minimum_reserved_horizon_margin_ms": 50.261626,
+      "counterfactual_events": 4
+    },
+    {
+      "name": "s3",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s3_job58829672_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s3_job58829672_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid002817"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 10,
+      "candidate_branches": 149,
+      "ai40_candidate_exchanges": 6,
+      "minimum_reserved_horizon_margin_ms": 50.845083,
+      "counterfactual_events": 6
+    },
+    {
+      "name": "s4",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s4_job58829672_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s4_job58829672_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid002817"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 9,
+      "candidate_branches": 137,
+      "ai40_candidate_exchanges": 4,
+      "minimum_reserved_horizon_margin_ms": 51.463137,
+      "counterfactual_events": 4
+    },
+    {
+      "name": "s5",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s5_job58829672_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s5_job58829672_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid002817"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 9,
+      "candidate_branches": 153,
+      "ai40_candidate_exchanges": 5,
+      "minimum_reserved_horizon_margin_ms": 48.965305,
+      "counterfactual_events": 5
+    },
+    {
+      "name": "s6",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s6_job58829672_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_s6_job58829672_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid002817"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 8,
+      "candidate_branches": 155,
+      "ai40_candidate_exchanges": 5,
+      "minimum_reserved_horizon_margin_ms": 45.97009,
+      "counterfactual_events": 5
+    }
+  ],
+  "totals": {
+    "arms": 6,
+    "radio_records": 7680,
+    "home_releases": 1920,
+    "atomic_exchanges": 53,
+    "candidate_branches": 908,
+    "ai40_candidate_exchanges": 28,
+    "counterfactual_events": 28,
+    "minimum_physical_guarded_horizon_margin_ms": 45.97009
+  },
+  "zero_failure_sensitivity": {
+    "confidence": 0.95,
+    "tb_level_iid_upper": 0.0003899932393112149,
+    "home_release_level_iid_upper": 0.0015590606261252082,
+    "arm_level_iid_upper": 0.39303776899708265,
+    "scope": "Exact binomial zero-failure sensitivity under the stated IID unit; persistent-process and within-arm dependence mean the arm-level value is the conservative reported qualification summary. None of these values is a WCET proof."
+  },
+  "artifact_hash_mismatches": [],
+  "source_hash_mismatches": [],
+  "gates": {
+    "all_declared_arms_present": true,
+    "all_seed_pairs_match": true,
+    "all_seed_pairs_unique": true,
+    "all_arm_gates_pass": true,
+    "candidate_branch_each_arm": true,
+    "ai40_exchange_each_arm": true,
+    "nonnegative_physical_margin_each_arm": true,
+    "static_counterfactual_rejects_every_exchange": true,
+    "conditional_contract_accepts_every_exchange": true,
+    "all_event_execution_checks_pass": true,
+    "single_new_physical_node": true,
+    "artifact_hashes_match": true,
+    "source_hashes_match": true
+  },
+  "all_pass": true,
+  "claim_boundary": "Same-family cross-node finite-sample requalification of the V12 synthetic AI40 mechanism class; not cross-family, production d_MAC, WCET, BurstGPT throughput, restart, or exactly-once evidence."
+}

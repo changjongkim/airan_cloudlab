@@ -1,0 +1,130 @@
+{
+  "schema": "softwall-confirm138-service-bound-fault-telemetry-protocol-v1",
+  "status": "frozen-after-canary-before-formal-arms",
+  "allocation_node": "nid001144",
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177"
+  ],
+  "arms": [
+    {
+      "name": "s1",
+      "label": "confirm138_prepare1_job58831304",
+      "operation": "prepare",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        29000051,
+        29010051
+      ],
+      "channel_seeds": [
+        29001000,
+        29011000
+      ]
+    },
+    {
+      "name": "s2",
+      "label": "confirm138_prepare2_job58831304",
+      "operation": "prepare",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        29020051,
+        29030051
+      ],
+      "channel_seeds": [
+        29021000,
+        29031000
+      ]
+    },
+    {
+      "name": "s3",
+      "label": "confirm138_commit1_job58831304",
+      "operation": "commit",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        29040051,
+        29050051
+      ],
+      "channel_seeds": [
+        29041000,
+        29051000
+      ]
+    },
+    {
+      "name": "s4",
+      "label": "confirm138_commit2_job58831304",
+      "operation": "commit",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        29060051,
+        29070051
+      ],
+      "channel_seeds": [
+        29061000,
+        29071000
+      ]
+    },
+    {
+      "name": "s5",
+      "label": "confirm138_complete1_job58831304",
+      "operation": "complete",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        29080051,
+        29090051
+      ],
+      "channel_seeds": [
+        29081000,
+        29091000
+      ]
+    },
+    {
+      "name": "s6",
+      "label": "confirm138_complete2_job58831304",
+      "operation": "complete",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        29100051,
+        29110051
+      ],
+      "channel_seeds": [
+        29101000,
+        29111000
+      ]
+    }
+  ],
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 25,
+  "global_broker_rpc_timeout_ms": 5,
+  "global_broker_transaction_budget_ms": 15,
+  "admission_ai_guard_ms": 17,
+  "crash_after_operation_number": 30,
+  "fault_model": "broker process exits with status 86 immediately after applying the selected home0 operation and before replying",
+  "telemetry_semantics": "record every socket-attempted RPC, including the detecting call; exclude calls after client quarantine",
+  "failure_rule": "stop on first formal arm failure; preserve failure; do not widen the 5 ms bound post hoc",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "scripts_for_node/softwall_same_gpu/global_trace_service_bound_fault_controller.py": "ffdbfad94dbcb6f889de16c866d972488d747f3cc32134ec8a9d7d4559a7afdc",
+    "scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "scripts_for_node/softwall_same_gpu/instrumented_deadline_global_trace_client_v2.py": "de3b0e95e0f62851cb4181791d27b61094c2d0754feb88554a2c4bf6437230a8",
+    "scripts_for_node/softwall_same_gpu/test_instrumented_deadline_global_trace_client_v2.py": "98ab3af833f1ae5dd0a44d4e6537b70d9f86bd0a26257250469fe7dfc6df7d47",
+    "scripts_for_node/softwall_same_gpu/run_service_bound_fault_telemetry_arm.sh": "33a92d7cfa9c813498fe99bc70d234ab712a5ff16b740d277ea9bee98a8afd3b",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm138_service_bound_fault_telemetry.py": "29fcfe0a7df13973f5d5c741075c2abdbdd3cd7345d4a692c1ae89c38e71b32f",
+    "scripts_for_node/softwall_same_gpu/control_point_crash_global_trace_lease_broker.py": "ae2ca3d39df3f92b8200d7fc4ef52be395b06dc4362e054aa0f1de71d9a01c4e",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

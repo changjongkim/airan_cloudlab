@@ -1,0 +1,110 @@
+{
+  "schema": "softwall-multigpu-p2p-ipc-gate-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1a_formal_job58815435_protocol.json",
+  "protocol_sha256": "49544ad077109816999afe645bf0ccc83c86bb05dd6636eff70e9c9d0c27ef16",
+  "owner": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1a_formal_job58815435_owner.json",
+  "owner_sha256": "c51109057f6a266dde1bc9db9890f5be89b7df13007e6495ad276eda8ff2c00c",
+  "worker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1a_formal_job58815435_worker.json",
+  "worker_sha256": "4e918294c6b8078eadc50b06a597c279520d5964badd607e1065aae874dd0470",
+  "iterations": 10000,
+  "payload": {
+    "forward_bytes": 1415232,
+    "backward_bytes": 314496
+  },
+  "timing_us": {
+    "round_trip": {
+      "count": 10000,
+      "mean": 226.49592339999964,
+      "p50": 213.132,
+      "p99": 248.761,
+      "max": 85492.41
+    },
+    "forward_gpu": {
+      "count": 10000,
+      "mean": 19.909385608509183,
+      "p50": 19.039999693632126,
+      "p99": 44.863998889923096,
+      "max": 72.28799909353256
+    },
+    "forward_host": {
+      "count": 10000,
+      "mean": 30.535369299999832,
+      "p50": 29.427,
+      "p99": 54.756,
+      "max": 252.818
+    },
+    "backward_gpu": {
+      "count": 10000,
+      "mean": 22.68754558339715,
+      "p50": 21.503999829292297,
+      "p99": 40.22400081157684,
+      "max": 48.73599857091904
+    },
+    "backward_host": {
+      "count": 10000,
+      "mean": 31.050116699999982,
+      "p50": 29.738,
+      "p99": 48.544,
+      "max": 829.643
+    }
+  },
+  "timing_warmup_units": 20,
+  "cold_first_unit_us": {
+    "round_trip": 85492.41,
+    "forward_gpu": 67.48799979686737,
+    "backward_gpu": 48.73599857091904
+  },
+  "steady_timing_us": {
+    "round_trip": {
+      "count": 9980,
+      "mean": 217.9448435871742,
+      "p50": 213.122,
+      "p99": 248.53,
+      "max": 1307.105
+    },
+    "forward_gpu": {
+      "count": 9980,
+      "mean": 19.90092505881925,
+      "p50": 19.039999693632126,
+      "p99": 44.863998889923096,
+      "max": 72.28799909353256
+    },
+    "forward_host": {
+      "count": 9980,
+      "mean": 30.50903777555095,
+      "p50": 29.427,
+      "p99": 54.736,
+      "max": 153.567
+    },
+    "backward_gpu": {
+      "count": 9980,
+      "mean": 22.685784352140757,
+      "p50": 21.503999829292297,
+      "p99": 40.22400081157684,
+      "max": 48.25599864125252
+    },
+    "backward_host": {
+      "count": 9980,
+      "mean": 31.04768637274547,
+      "p50": 29.738,
+      "p99": 48.544,
+      "max": 829.643
+    }
+  },
+  "analyzer_sha256": "216c7ecc8296a23ad1d2579d710030d176166bcede635e6049bac1b2f091c3fa",
+  "gates": {
+    "protocol_hash_matches_owner": true,
+    "protocol_hash_matches_worker": true,
+    "iteration_count": true,
+    "owner_integrity": true,
+    "worker_integrity": true,
+    "owner_sequence": true,
+    "worker_sequence": true,
+    "termination_lifecycle": true,
+    "bidirectional_peer_access": true,
+    "payload_contract": true,
+    "no_recorded_error": true
+  },
+  "all_pass": true,
+  "scope": "cross-process CUDA IPC mapping plus bidirectional full-GPU P2P transport integrity; no NeuralRx service, MPS co-run, or deadline claim"
+}

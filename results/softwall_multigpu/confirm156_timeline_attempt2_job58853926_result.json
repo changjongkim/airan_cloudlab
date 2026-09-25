@@ -1,0 +1,178 @@
+{
+  "all_pass": false,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm156_timeline_attempt2_job58853926_peer_spec.json": "2a28442d33e4104da5ddd405398a935936acb488163333bce1c58077d257dfd3",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm156_timeline_attempt2_job58853926_protocol.json": "4fae40fe33f0f510841219ccb8b1abee0430b5f1cbf78bc95118a6c77214807b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm156_timeline_attempt2_job58853926_gpu_inventory.csv": "d457e402902d40a8e515808bc4a5beff7da2b79adff692f9d0aba3e80f93c7ce",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm156_timeline_attempt2_job58853926_home0_h0-r2_owner.json": "66d48fb60fcadb9270b1310a4891b82c9fc481b5929439d137b0b7dd4aeb5b32",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm156_timeline_attempt2_job58853926_home1_h1-r0_owner.json": "4f315752aa5fdc5beb4f41c9ef76e07848e428cb1cbb3ec76213a7eed371778d",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm156_timeline_attempt2_job58853926_qwen.json": "76e1c7c63816c1e4a0f871242008aa3a6539c8b1a5576c7db9edff0fd5d260db",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm156_timeline_attempt2_job58853926_qwen_profile.sqlite": "5faf9c7c54712e549d0a55252beeca25214b5aacfc10328c92aa9c0e2f15aca3",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm156_timeline_attempt2_job58853926_worker.json": "0b1f3a40b8ce04ddb8ec133b9335982d61136a4bd8d1978606f134469af6e107",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm156_timeline_attempt2_job58853926_worker_profile.sqlite": "e10419625f4224430aa8c8a21efecdc1c3d64c67966e219542983809f237df59"
+  },
+  "gates": {
+    "controlled_certificate_decisions": true,
+    "home_commit_correct_and_timely": true,
+    "node_inventory_and_provenance": true,
+    "p2p_ipc_and_process_lifecycle": true,
+    "phase_gpu_causality_and_nvtx": true,
+    "profile_files_and_session_clocks": true,
+    "qwen_fence_and_lease": false,
+    "qwen_recovery_kernel_overlap_zero": true,
+    "recovery_certificate_and_gpu_order": true,
+    "source_hash_match": true,
+    "worker_runtime_activity_fully_attributed": true
+  },
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-74ded36d-0fc5-3bba-70d5-fd305e9324a2"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-5f11de2a-0c57-5924-ac13-ace79f5dd734"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-61de9514-f950-9a21-7f73-1da88d7dbbf1"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-2201893a-1ca2-cd9f-abe1-bcbab8e2b538"
+    }
+  ],
+  "job_id": "58853926",
+  "lease_interval_ns": {
+    "end_ns": 145234371162026,
+    "start_ns": 145234336162026
+  },
+  "node": "nid001085",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm156_timeline_attempt2_job58853926_protocol.json",
+  "qwen_profile_session_start_ns": 1790312353300091415,
+  "recovery_phase_audit": [
+    {
+      "gpu_phase_order": true,
+      "host_phase_order": true,
+      "key": [
+        "home0",
+        "h0-r2"
+      ],
+      "nvtx_complete": true,
+      "nvtx_expected": [
+        "c156:home0:h0-r2:backward_p2p",
+        "c156:home0:h0-r2:conventional",
+        "c156:home0:h0-r2:forward_p2p",
+        "c156:home0:h0-r2:install"
+      ],
+      "nvtx_host_aligned": true,
+      "nvtx_observed": [
+        "c156:home0:h0-r2:backward_p2p",
+        "c156:home0:h0-r2:conventional",
+        "c156:home0:h0-r2:forward_p2p",
+        "c156:home0:h0-r2:install"
+      ],
+      "phase_activity_counts": {
+        "backward_p2p": {
+          "kernel": 0,
+          "memcpy": 1,
+          "memset": 0
+        },
+        "conventional": {
+          "kernel": 49,
+          "memcpy": 18,
+          "memset": 4
+        },
+        "forward_p2p": {
+          "kernel": 0,
+          "memcpy": 1,
+          "memset": 0
+        },
+        "install": {
+          "kernel": 4,
+          "memcpy": 0,
+          "memset": 0
+        }
+      },
+      "phase_nonempty": {
+        "backward_p2p": true,
+        "conventional": true,
+        "forward_p2p": true,
+        "install": true
+      }
+    },
+    {
+      "gpu_phase_order": true,
+      "host_phase_order": true,
+      "key": [
+        "home1",
+        "h1-r0"
+      ],
+      "nvtx_complete": true,
+      "nvtx_expected": [
+        "c156:home1:h1-r0:backward_p2p",
+        "c156:home1:h1-r0:conventional",
+        "c156:home1:h1-r0:forward_p2p",
+        "c156:home1:h1-r0:install"
+      ],
+      "nvtx_host_aligned": true,
+      "nvtx_observed": [
+        "c156:home1:h1-r0:backward_p2p",
+        "c156:home1:h1-r0:conventional",
+        "c156:home1:h1-r0:forward_p2p",
+        "c156:home1:h1-r0:install"
+      ],
+      "phase_activity_counts": {
+        "backward_p2p": {
+          "kernel": 0,
+          "memcpy": 1,
+          "memset": 0
+        },
+        "conventional": {
+          "kernel": 49,
+          "memcpy": 18,
+          "memset": 4
+        },
+        "forward_p2p": {
+          "kernel": 0,
+          "memcpy": 1,
+          "memset": 0
+        },
+        "install": {
+          "kernel": 4,
+          "memcpy": 0,
+          "memset": 0
+        }
+      },
+      "phase_nonempty": {
+        "backward_p2p": true,
+        "conventional": true,
+        "forward_p2p": true,
+        "install": true
+      }
+    }
+  ],
+  "schema": "softwall-confirm156-gpu-timeline-result-v1",
+  "scope": "Profiler-perturbed one-node controlled conditional-open arm. Passing validates GPU timeline semantics only; it is not a service bound, WCET, actual NeuralRx, throughput or production d_MAC result.",
+  "status": "GPU_TIMELINE_GATE_FAIL",
+  "summary": {
+    "correct_home_commits": 2,
+    "deadline_misses": 0,
+    "forbidden_qwen_recovery_kernel_overlap_ns": 0,
+    "nvtx_ranges": 8,
+    "physical_recoveries": 2,
+    "qwen_runtime_kernels": 1224,
+    "recovery_runtime_kernels": 106,
+    "uncovered_worker_events": 0,
+    "worker_runtime_events": 154
+  },
+  "worker_profile_session_start_ns": 1790312369779233886
+}

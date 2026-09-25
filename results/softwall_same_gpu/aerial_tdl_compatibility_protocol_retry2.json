@@ -1,0 +1,30 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "aerial_tdl_compatibility_canary_retry2",
+  "retry_of": "aerial_tdl_compatibility_protocol_retry1.json",
+  "frozen_before_execution": true,
+  "prior_attempts": "Jobs 58694049 and 58694074 both stopped before constructing TDL or producing any radio record. The first passed a 5-D buffer where pybind requires 1-D. The second passed a 1-D complex64 buffer but vendored FadingChan forwarded a CUDA Python CUstream object to pycuphy.TdlChan, whose constructor requires an integer handle.",
+  "operational_change_only": "Use int(self.stream) for the four TdlChan/CdlChan constructor handles in the vendored Aerial FadingChan wrapper. Radio channel, seeds, no-AWGN condition, ten TTIs, receiver order, and all-pass gate are unchanged.",
+  "radio": {
+    "profile": "Aerial TDL-A",
+    "delay_spread_ns": 30,
+    "maximum_doppler_hz": 10,
+    "antennas": "4x4 uplink",
+    "awgn_disabled": true,
+    "iterations": 10,
+    "payload_seed": 20357000,
+    "tdl_seed": 20357001
+  },
+  "gate": {
+    "conventional_correct": 10,
+    "neural_correct": 10,
+    "payload_and_crc_checked": true,
+    "shape_checked": true
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/probe_aerial_tdl_compatibility.py": "64f12451e51482bbb98fd91792cd059736dbb21bbb7b5c5e743c11b027ff7bf8",
+    "scripts_for_node/softwall_same_gpu/run_aerial_tdl_compatibility.sh": "a5ddc9ef520a62fe8fce9437c82a746ed24af255047bfd80da3e6e32d90b975c",
+    "third_party/aerial-cuda-accelerated-ran/pyaerial/src/aerial/phy5g/chan_models/fading_chan.py": "1a7a018579f8c0ca526b1d7260d7d1b0113b98271e2c8605c7118b23116b63d0"
+  },
+  "interpretation_limit": "Clean no-noise transport compatibility only. If this or a later decoder gate fails, do not add noise, AI, or policy comparisons to rescue the compatibility question."
+}

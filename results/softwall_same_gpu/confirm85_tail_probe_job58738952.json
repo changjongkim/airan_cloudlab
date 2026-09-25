@@ -1,0 +1,36 @@
+{
+  "schema": "softwall-confirm85-fourcell-tail-probe-v1",
+  "job": "58738952",
+  "gates": {
+    "source_hashes": true,
+    "contract": true,
+    "provenance": true,
+    "measurement_complete": true,
+    "current_contract_sample": true,
+    "late_tail_reproduced": true
+  },
+  "all_pass": true,
+  "admitted_nrx": 1053,
+  "late_nrx_over_30_ms": [
+    {
+      "release_index": 616,
+      "cell": 2,
+      "response_ms": 44.038421,
+      "features_done_to_prepare_start_ms": 0.153898,
+      "admission_host_ms": 0.042252,
+      "prepare_host_ms": 0.767035,
+      "prepare_gpu_ms": 0.7076799869537354,
+      "prepare_start_after_release_ms": 30.630809,
+      "dispatch_after_release_ms": 31.402734,
+      "dispatch_to_observation_ms": 12.635687,
+      "worker_gpu_ms": 1.679103970527649,
+      "worker_observed_after_dispatch_ms": 0.000681
+    }
+  ],
+  "max_nrx_response_ms": 44.038421,
+  "max_nrx_prepare_host_ms": 1.150007,
+  "max_nrx_prepare_gpu_ms": 1.067903995513916,
+  "max_conv_host_ms": 3.838253,
+  "deadline_misses": 0,
+  "interpretation": "Direct admission, prepare_neural_ipc host/GPU, and endpoint worker timing for a reproducible around-release-620 tail. This is a single synthetic mode diagnostic, not WCET or policy superiority."
+}

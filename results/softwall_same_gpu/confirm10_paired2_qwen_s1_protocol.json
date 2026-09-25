@@ -1,0 +1,36 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm10_paired2_qwen_s1_p25",
+  "purpose": "Qualify MPS active-thread caps for continuous Qwen2.5-1.5B prefill overlap when a full Qwen unit does not fit the 25 ms S0 quiet window.",
+  "ran": {
+    "input": "Aerial PdschTx-generated valid 273-PRB PUSCH slot",
+    "path": "CE+NI+EQ+de-rate-match+LDPC+CRC+payload comparison",
+    "cells_per_release": 2,
+    "period_ms": 25,
+    "deadline_ms": 21,
+    "iterations_per_run": 500,
+    "runs": 2,
+    "seed_base": 20270000
+  },
+  "ai": {
+    "model": "Qwen/Qwen2.5-1.5B",
+    "phase": "prefill",
+    "context_tokens": 16,
+    "dtype": "float16",
+    "batch": 1
+  },
+  "configurations": [
+    {"active_thread_percentage": 100, "priority": 0},
+    {"active_thread_percentage": 80, "priority": 0},
+    {"active_thread_percentage": 60, "priority": 0},
+    {"active_thread_percentage": 40, "priority": 0},
+    {"active_thread_percentage": 20, "priority": 0}
+  ],
+  "qualification_gate": {
+    "ran_deadline_misses": 0,
+    "incorrect_transport_blocks": 0,
+    "selection_rule": "Among configurations passing both RAN gates in both runs, choose the highest mean Qwen throughput; otherwise fall back to S0 or reject this workload contract."
+  },
+  "interpretation_limit": "MPS caps do not bound HBM bandwidth or launch blocking; any passing cap remains a workload-specific statistical SLO."
+}

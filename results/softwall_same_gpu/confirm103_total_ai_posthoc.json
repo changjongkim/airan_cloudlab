@@ -1,0 +1,55 @@
+{
+  "schema": "softwall-confirm103-total-ai-count-posthoc-v1",
+  "posthoc": true,
+  "raw_sha256": {
+    "results/softwall_same_gpu/raw/confirm103_a_one_job58788499_controller.json": "3cf335a94fbcfe70fa46d6db544d494e70b1347673505aa548ab7c8c64b373f7",
+    "results/softwall_same_gpu/raw/confirm103_b_two_job58788499_controller.json": "890ad8798d795cc041aa343d21ce92d2a8e1ac4c9c889baf76640f1d86f47537",
+    "results/softwall_same_gpu/raw/confirm103_d_one_job58788499_controller.json": "b365920e180ef7b292b17c6f0a4db479a9176775e4e281170d0967760ed0e610",
+    "results/softwall_same_gpu/raw/confirm103_c_two_job58788499_controller.json": "b8c0a879e1d0951c79737285f41421c031b1b3562518cce246f22fe092cb15c3"
+  },
+  "pairs": [
+    {
+      "one": "a_one",
+      "two": "b_two",
+      "paired_releases": 300,
+      "one_timely_ai": 1767,
+      "two_timely_ai": 1740,
+      "two_minus_one_ai": -27,
+      "mean_per_release": -0.09,
+      "paired_bootstrap_mean_95": [
+        -0.14333333333333334,
+        -0.04
+      ],
+      "difference_histogram": {
+        "-1": 45,
+        "0": 237,
+        "1": 18
+      },
+      "one_correct": 549,
+      "two_correct": 570,
+      "two_minus_one_correct": 21
+    },
+    {
+      "one": "d_one",
+      "two": "c_two",
+      "paired_releases": 300,
+      "one_timely_ai": 1722,
+      "two_timely_ai": 1705,
+      "two_minus_one_ai": -17,
+      "mean_per_release": -0.056666666666666664,
+      "paired_bootstrap_mean_95": [
+        -0.12,
+        0.006666666666666667
+      ],
+      "difference_histogram": {
+        "-1": 56,
+        "0": 205,
+        "1": 39
+      },
+      "one_correct": 531,
+      "two_correct": 549,
+      "two_minus_one_correct": 18
+    }
+  ],
+  "interpretation": "Posthoc total D153-timely Qwen and correct-TB comparison. Not a frozen C103 gate or policy result. NRx=2 gains radio correctness but has lower mean timely AI in both orders; only the first AI bootstrap interval excludes zero."
+}

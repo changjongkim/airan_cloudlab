@@ -1,0 +1,44 @@
+{
+  "trace_prefix": "confirm94_newphy_job58745713",
+  "phy_seed": 20994094,
+  "trials_per_snr": 250,
+  "snrs_db": [
+    -10.0,
+    -9.0,
+    -8.0,
+    -7.0
+  ],
+  "q_model": "confirm77_train_only_q_model.json",
+  "sampling_seed": 20994194,
+  "cases": 100,
+  "cells": 4,
+  "nrx_endpoint_capacity": 2,
+  "radio_deadline_ms": 155,
+  "commit_guard_ms": 2,
+  "nrx_bound_ms": 30,
+  "conventional_bound_ms": 12,
+  "ai_units": 7,
+  "ai_deadline_ms": 153,
+  "radio_floor_choices": [
+    0.1,
+    0.2
+  ],
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm96_contingent_ai8_capacity_model_check",
+  "frozen_before_confirm95_second_arm_result": true,
+  "physical_qualification": "confirm95_ai8_fourcell_job58746343.json",
+  "physical_job": "58746343",
+  "ai_bound_ms": 8,
+  "common_trace_already_used_for_confirm94": true,
+  "scope": "Deterministic same-trace duration sensitivity, not independent PHY replication.",
+  "frozen_gates": "Run only if Confirm95 physical report all_pass. On the exact already-used Confirm94 100 PHY quartets, with actual candidate AI8 duration, report feasible states, AI value under exact joint, joint greedy, staged minimal and max-radio baselines with identical all-fail safety and exact visible-AI recourse. If all seven are feasible under all policies, the former AI15 seven-unit capacity pressure disappears in this model. No GPU seven-lease implementation or production WCET is inferred.",
+  "trace_sha256": "71e4aad920c21c4ade69485d1ef842c7b8c21d16d923f29a50a276894ff1449f",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/screen_confirm96_ai8_capacity.py": "a6783fce9540c3d5e3a1c546eec6a7b08d670aa9ea4621d848df342bc6005cdf",
+    "scripts_for_node/softwall_same_gpu/offline_contingent_phy_ai_v3.py": "8c6ae6d65d6ffb7f083e951df92458d5fc444aecc08388b4ac95a9b1d4df5be5",
+    "scripts_for_node/softwall_same_gpu/offline_recovery_exchange.py": "36ecc9adc538929e1c7e16030c56853ee78d808464615cf9c381ccf67b5229e3",
+    "scripts_for_node/softwall_same_gpu/mixed_snr_phy_value_model.py": "a330e60e82f515fe57f9b4d914e37ba63f4d7be5f39ccb07bac6bf8d5a43db69",
+    "results/softwall_same_gpu/confirm77_train_only_q_model.json": "20ff0fc3249928e59e0a153a4ee64728c823c5ff6e3374ba0305f75440bd17d0",
+    "results/softwall_same_gpu/confirm95_ai8_fourcell_protocol.json": "e2c81179f614320a60f94d8e4a03caedf6040a278d34623968fe6a0a0131bb8b"
+  }
+}

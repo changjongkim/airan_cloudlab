@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-v16-abort-node-requalification-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm147_v16_abort_protocol.json",
+  "protocol_sha256": "f1f1fd96fc873194ca115c1120b93c20872fc24b8a0433c29b5fb4693b54deb9",
+  "arm_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm147_abort_job58835729_result.json",
+  "arm_result_sha256": "18603e1edf9d79efac5a5b78f92d1dfdb4d91a33d4ff0e6d0d103cb1bfae8bad",
+  "nodes": [
+    "nid003197"
+  ],
+  "totals": {
+    "radio_records": 1600,
+    "radio_after_fault": 1332,
+    "fault_arms": 1,
+    "suppressed_prepare_due_owned_token": 66,
+    "maximum_unlaunched_tokens": 1
+  },
+  "source_hash_mismatches": [],
+  "gates": {
+    "one_expected_node": true,
+    "excluded_nodes_avoided": true,
+    "abort_arm_pass": true,
+    "abort_fault_injected": true,
+    "target_not_executed": true,
+    "both_homes_radio_continue": true,
+    "all_four_operations_observed": true,
+    "single_unlaunched_token": true,
+    "retained_token_branch_exercised": true,
+    "no_source_mismatch": true
+  },
+  "all_pass": true,
+  "claim_boundary": "One A100-node finite-sample post-apply abort reply-loss arm. It extends the V15 two-node evidence; it is not WCET, production d_MAC, or cross-GPU-family evidence."
+}

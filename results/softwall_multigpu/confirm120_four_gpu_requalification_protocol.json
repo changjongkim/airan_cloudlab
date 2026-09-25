@@ -1,0 +1,43 @@
+{
+  "schema": "softwall-confirm120-four-gpu-requalification-protocol-v1",
+  "status": "frozen-before-run",
+  "job": "58815435",
+  "predecessor": "confirm119_four_gpu_job58815435.json",
+  "predecessor_outcome": "System safety, four-endpoint use/counts, and all components except one backward P2P sample passed; GPU2->GPU0 backward max 109.824 us rejected the 100 us candidate.",
+  "mode": "GPU0 four-cell Aerial+local NRx+Qwen; GPU1/2/3 remote NRx; four endpoints; CUDA_MODULE_LOADING=LAZY; MPS; mixed fault; P180/D155",
+  "arms": [
+    {
+      "label": "c120_four_gpu_s3_job58815435",
+      "payload_seed": 23600768,
+      "channel_seed": 27934000
+    },
+    {
+      "label": "c120_four_gpu_s4_job58815435",
+      "payload_seed": 23700879,
+      "channel_seed": 28653000
+    }
+  ],
+  "warmup": 20,
+  "iterations": 340,
+  "candidate_component_bounds": {
+    "front_gpu_ms": 3.0,
+    "remote_forward_gpu_us": 250.0,
+    "remote_nrx_gpu_ms": 2.5,
+    "remote_backward_gpu_us": 125.0,
+    "remote_worker_path_ms": 6.0,
+    "back_gpu_ms": 3.0,
+    "end_to_end_nrx_ms": 25.0
+  },
+  "gate_rule": "Both new independent arms must pass all wrapper safety gates, use all four endpoints, match controller admissions to worker completions, preserve hashes, and have zero component-bound violations.",
+  "claim_rule": "A pass is finite-sample qualification only for this exact warm lazy-loading four-GPU co-run mode; C119 remains failed and no WCET or throughput superiority is claimed.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_multigpu_four_endpoint_arm.sh": "49fab079b9ae5a4e4520ae8e27698a98e3d439043eef591cde2bf98ccb87a045",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm120_four_gpu_requalification.py": "c1fe8061b195b49f9aaa3729727cfb1451422a7fe3010a06a26f52c12a739751",
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": "8db5fe06f81b2ece2a0aa6d982095e0638b36962c7f95c69c5962738a4f821cb",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm100_observe_first_qwen_fourcell",
+  "frozen_before_execution": true,
+  "job": "58747620",
+  "node": "nid001545",
+  "physical_predecessor": "confirm98_qwen_nrx45_ai50_job58747070.json",
+  "selected_after_failure": "confirm99_qwen_fault_abba_job58747070.json",
+  "iterations": 1000,
+  "cells": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 12,
+  "ai_budget_ms": 50,
+  "ai_rpc_timeout_ms": 45,
+  "ai_deadline_ms": 153,
+  "gc_mode": "off",
+  "ai_guard_ns": 2000000,
+  "ai": {
+    "model": "Qwen/Qwen2.5-1.5B",
+    "phase": "prefill",
+    "context_length": 16,
+    "batch_size": 1,
+    "mps_cap_pct": 20
+  },
+  "min_one_admitted": 100,
+  "min_two_admitted": 100,
+  "min_injected_all_fail": 50,
+  "min_ai_units": 1000,
+  "min_joint_ai": 50,
+  "min_observed_pressure_releases": 50,
+  "arms": [
+    {
+      "name": "a",
+      "payload_seed": 20900131,
+      "channel_seed_base": 21510000,
+      "prefix": "confirm100_a_observe_job58747620"
+    },
+    {
+      "name": "b",
+      "payload_seed": 20900132,
+      "channel_seed_base": 21520000,
+      "prefix": "confirm100_b_observe_job58747620"
+    }
+  ],
+  "frozen_gates": "After frozen C99 NRx45 observation-order failure, a source-separated controller consumes NRx completion while Qwen RPC is asynchronous and before any early mandatory conventional commit. Two independent new-seed 1000-release physical runs must pass provenance/source hash, baseline requalification, exact NRx45/conv12/AI50/RPC45 calendar, zero deadline/bound/guard/credit/fault violations, >=100 one-NRx and two-NRx releases, >=50 correlated all-fail releases, >=1000 physical Qwen units, >=50 joint AI lease retirements and all-fail pressure releases per arm. For every mixed admitted/mandatory release, NRx observation must precede early mandatory fallback start. Any failure leaves C99 failure intact and disqualifies this mode. Pass is finite warm GC-OFF sample, not WCET, AI-RAN-specific workload, or policy superiority.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/qwen_worker.py": "92835cf0ce9e789edab9109d85cc8764eb620c213ab87120fb18e01a8094622b",
+    "scripts_for_node/softwall_same_gpu/s2_runner.py": "8bb2f65e2c7c1cac655b7c2d82e7ae8d3500b377b8ecde44ef491333a855be7c",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+    "results/softwall_same_gpu/confirm95_ai8_fourcell_job58746343.json": "837722f76cb1301899f405c82f9ca38ab44f5aa0e1f6a878bc3e8bc9e80c8ea3",
+    "results/softwall_same_gpu/confirm97_qwen_fourcell_failure_job58747070.json": "0e8b9e290afd390f9f721738dc4a92e8cbbbd36b306c78cf718fd6f9fd736b0e",
+    "scripts_for_node/softwall_same_gpu/run_confirm100_observe_first_qwen.sh": "d3b7ac42deba16b054b402854577be4bf2bb82b63c6d9709ac94a7b5231b44cb",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm100_observe_first_qwen.py": "00c11d3ddd7017bc519b9a773e6f4cfb71524f55cad0f5d25ea5f5e43b71cf94",
+    "scripts_for_node/softwall_same_gpu/four_cell_observe_first_controller.py": "857fc8705f25d736a2639995d249e6b7fc9248b01af0eab1cc3ac9c2d1be739e",
+    "results/softwall_same_gpu/confirm98_qwen_nrx45_ai50_job58747070.json": "6b647627e0492661ca050cb50adf9b49f8cf72947d935227dca49cc3de0ea3ad",
+    "results/softwall_same_gpu/confirm99_qwen_fault_abba_job58747070.json": "d0f2297ac91815881bad821e86ee20b1996879959dfd87163b2a27e3ce4b73ce"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema": "softwall-external-endpoint-baseline-v1",
+  "campaign": "confirm36_same_node_baselines",
+  "releases": 10000,
+  "correct": {
+    "conventional": 3688,
+    "eager": 9835,
+    "external": 9840
+  },
+  "deadline_misses": {
+    "conventional": 0,
+    "eager": 0,
+    "external": 0
+  },
+  "external_fallbacks": 203,
+  "external_recoveries": 43,
+  "external_endpoint_requests": 10000,
+  "external_endpoint_timeouts": 0,
+  "external_worker": {
+    "completed_units": 10021,
+    "expected_units": 10021,
+    "visible_sm_count": 86,
+    "gpu_ms": {
+      "n": 10021,
+      "mean": 1.2280771760821116,
+      "p50": 1.2325760126113892,
+      "p95": 1.2442560195922852,
+      "p99": 1.2486079931259155,
+      "p99_9": 1.2533721661567692,
+      "min": 0.9636160135269165,
+      "max": 1.268447995185852
+    }
+  },
+  "external_minus_eager_percentage_points": 0.05,
+  "confidence_interval_95_percentage_points": [
+    -0.008794772578250972,
+    0.10879477257825097
+  ],
+  "external_wins": 7,
+  "eager_wins": 2,
+  "channel_seed_mismatches": 0,
+  "trace_provenance": {
+    "frozen_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_same_gpu/confirm36_same_node_full_comparison_protocol.json",
+    "external_execution_manifest": null,
+    "payload_seed": 20321036,
+    "channel_seed_base": 20326000,
+    "host": "nid001069",
+    "slurm_job_id": "58676333"
+  },
+  "gates": {
+    "channel_seeds_match": true,
+    "deadline_misses_zero": true,
+    "external_natural_recoveries_positive": true,
+    "external_endpoint_timeouts_zero": true,
+    "external_endpoint_requests_all": true,
+    "external_conventional_accounting": true,
+    "external_worker_units_match": true,
+    "external_worker_visible_sms_match": true,
+    "external_utility_noninferior": true,
+    "external_uses_fewer_conventional_executions": true,
+    "all_pass": true
+  }
+}

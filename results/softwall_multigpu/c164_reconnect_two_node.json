@@ -1,0 +1,41 @@
+{
+  "all_pass": true,
+  "checks": {
+    "both_node_results_pass": true,
+    "campaign_roles": true,
+    "combined_safety_zero": true,
+    "frozen_source_equality": true,
+    "holdout_excludes_development_node": true,
+    "independent_jobs_and_nodes": true,
+    "independent_seed_epoch": true,
+    "same_mode_and_sample_size": true
+  },
+  "claim_boundary": "Two independent A100 nodes qualify the same-process, same-worker-epoch channel reconnect subset. Worker-process replacement, arbitrary crash windows, direct kernel-overlap tracing, production d_MAC and WCET remain UQ.",
+  "counts": {
+    "cell_decodes": 580,
+    "component_bound_violations": 0,
+    "deadline_misses": 0,
+    "mandatory_releases": 145,
+    "overlap_releases": 60,
+    "physical_qwen_launches": 60,
+    "post_fence_loss": 60,
+    "prepare_loss": 60,
+    "terminal_fences": 120,
+    "tokens": 120
+  },
+  "jobs": [
+    "58862429",
+    "58862501"
+  ],
+  "maxima_ms": {
+    "mandatory_component_gpu": 7.5878400802612305,
+    "mandatory_response": 19.353059,
+    "qwen_gpu": 66.79424285888672
+  },
+  "nodes": [
+    "nid001057",
+    "nid001104"
+  ],
+  "schema": "softwall-c164-reconnect-two-node-v1",
+  "status": "C164_RECONNECT_TWO_NODE_PASS"
+}

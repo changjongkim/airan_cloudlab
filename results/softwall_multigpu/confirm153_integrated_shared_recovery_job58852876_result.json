@@ -1,0 +1,64 @@
+{
+  "all_pass": false,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm153_integrated_shared_recovery_job58852876_protocol.json": "090ef4885190ff63e3c61735e1f92bdda30baf8b4409c54aea595156eb9fe4f4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm153_integrated_shared_recovery_job58852876_gpu_inventory.csv": "3a8174cd86a9d20931ddc672eda18ea908620436cc46a8e82f04a496e55b16f4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm153_integrated_shared_recovery_job58852876_owner0.json": "0e1450f6af5f0c8060e7e4b3a8d304e35b590e4106d12171172e8b84221e6af5",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm153_integrated_shared_recovery_job58852876_owner1.json": "90b6d8bebab4b9c4a71c5b29477689b506bd85f87156d39c32024eaded495daa",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm153_integrated_shared_recovery_job58852876_qwen.json": "9db163de46f2a0bce8c1b710f0a9f9a2c50f5cd52aede83a58ba3f0b1d44f3d6",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm153_integrated_shared_recovery_job58852876_worker.json": "da2354d96570ff3acb5e38e94b3f3d0071471204a8906908f75d47deb8483331"
+  },
+  "gates": {
+    "certificate_drives_physical_order": true,
+    "conditional_ai_threshold": true,
+    "configuration_match": true,
+    "four_a100_mig_off": true,
+    "home_commits_correct_and_timely": false,
+    "local_feasible_global_fifth_rejected": true,
+    "no_process_error": true,
+    "p2p_ipc_lifecycle": false,
+    "qwen_physical_fence_and_bound": true,
+    "source_hash_match": true
+  },
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-261d52a7-2859-1ca5-c50b-e81ccd5be46e"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-c3ecb14a-da84-0cd8-e848-61957787cab2"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-c82386fc-3e0b-07a3-372c-629a7d41a3fa"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-ae415327-3478-5e48-a0d9-7949bfdcd2cb"
+    }
+  ],
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm153_integrated_shared_recovery_job58852876_protocol.json",
+  "schema": "softwall-confirm153-integrated-shared-recovery-result-v1",
+  "scope": "Injected-outcome C153 mechanism canary only. Passing closes the model-to-shared-cuPHY/Qwen glue path but does not qualify actual NeuralRx outcomes, independent nodes, WCET, production d_MAC, fault coverage, throughput, or V17 QSU.",
+  "status": "DEVELOPMENT_CANARY_FAIL",
+  "summary": {
+    "accepted_debts": 4,
+    "correct_home_commits": 2,
+    "deadline_misses": 2,
+    "max_home_release_to_commit_ms": 293.912256,
+    "max_recovery_release_to_complete_ms": 293.755632,
+    "physical_recoveries": 2,
+    "qwen_execution_ms": 26.293569,
+    "qwen_gpu_ms": 25.194080352783203,
+    "rejected_debts": 1
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "aerial_tdl_compatibility_canary_retry1",
+  "retry_of": "aerial_tdl_compatibility_protocol.json",
+  "frozen_before_execution": true,
+  "first_attempt": "Job 58694049 failed before TDL channel construction or any timed radio sample. The pybind TdlChan constructor requires a 1-D complex64 host buffer; the initial source passed a 5-D complex64 view. No receiver results exist from that attempt.",
+  "operational_change_only": "Flatten the same [cell, UE, antenna, symbol, subcarrier] C-order frequency buffer to 1-D for the pybind constructor. TDL profile, seeds, ten TTIs, no-AWGN contract, receiver order, and all-pass gate are unchanged.",
+  "radio": {
+    "profile": "Aerial TDL-A",
+    "delay_spread_ns": 30,
+    "maximum_doppler_hz": 10,
+    "antennas": "4x4 uplink",
+    "awgn_disabled": true,
+    "iterations": 10,
+    "payload_seed": 20357000,
+    "tdl_seed": 20357001
+  },
+  "gate": {
+    "conventional_correct": 10,
+    "neural_correct": 10,
+    "payload_and_crc_checked": true,
+    "shape_checked": true
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/probe_aerial_tdl_compatibility.py": "64f12451e51482bbb98fd91792cd059736dbb21bbb7b5c5e743c11b027ff7bf8",
+    "scripts_for_node/softwall_same_gpu/run_aerial_tdl_compatibility.sh": "a5ddc9ef520a62fe8fce9437c82a746ed24af255047bfd80da3e6e32d90b975c"
+  },
+  "interpretation_limit": "Clean no-noise transport compatibility only, not SNR calibration, deadline protection, MPS interference or novelty."
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "softwall-envelope-v10-v11-regression-v1",
+  "scope": "Regression audit for the frozen two-home, four-cell-per-home, full-control-budget mode. It checks model fidelity, not WCET.",
+  "inputs": {
+    "v10": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v10.json",
+    "v10_sha256": "ef71054c8339b9e62d9bd31dc3f0819d91f73f35f227e0efa70fea26c5ba2435",
+    "v11": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v11.json",
+    "v11_sha256": "7e315da2400161f283a3d2c144c3166e049472ae908840346961db384bd11a46"
+  },
+  "scenario": "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134",
+  "v10": {
+    "admitted_by_home": [
+      4,
+      4
+    ],
+    "rejected_by_home": [
+      0,
+      0
+    ],
+    "released_recovery_slack_ms": [
+      75.0,
+      75.0
+    ],
+    "decision_window_ms": [
+      38.0,
+      38.0
+    ],
+    "ai40_exchange_only_candidate": false
+  },
+  "v11": {
+    "ring_depths_by_home": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "admitted_by_home": [
+      2,
+      2
+    ],
+    "rejected_by_home": [
+      2,
+      2
+    ],
+    "rejected_recovery_before_exchange": [
+      false,
+      false
+    ],
+    "released_recovery_slack_ms": [
+      50.0,
+      50.0
+    ],
+    "decision_window_ms": [
+      58.0,
+      58.0
+    ],
+    "effective_ai40_transaction_ms": 55.0,
+    "model_margin_ms": [
+      3.0,
+      3.0
+    ],
+    "ai40_exchange_only_candidate": true
+  },
+  "interpretation": "Finite endpoint credits reduce admitted NeuralRx jobs from four to two per home. In this executor the two rejected recoveries remain live, so two successful NeuralRx observations can release 50 ms while two recoveries still gate the transaction. The resulting 58 ms window admits the 55 ms AI-plus-control class with 3 ms margin.",
+  "gates": {
+    "v10_assumed_four_admissions_per_home": true,
+    "v11_caps_admission_at_physical_ring_slots": true,
+    "v11_keeps_rejected_recoveries_live_at_exchange": true,
+    "v10_rejected_ai40_at_decision_time": true,
+    "v11_admits_ai40_at_decision_time": true,
+    "effective_transaction_is_55_ms": true,
+    "v11_window_is_58_ms_per_home": true,
+    "v11_margin_is_3_ms_per_home": true,
+    "classification_is_unchanged": true
+  },
+  "all_pass": true
+}

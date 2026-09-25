@@ -1,0 +1,80 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "development": "eaa7bcc05d26ce3aa9b4e9004ed0fc56f5b7b3a0aa372d5a24bedda0e56308fe",
+    "development_protocol": "d672ebb7b7386b6ce61b443502cff78965a0e6f2076fd267d45a3803e1dad1c0",
+    "holdout": "404f33d80fa882990e8252e9ee026b2e7356fa2e3a35e6197b2c26dd4cd3e9e9",
+    "holdout_protocol": "cfa7d78364947d872a66aa0b3c44c3c63510846cecc131db30767d95aedd08d6"
+  },
+  "claim_boundary": "Two-node finite-sample first-RAN-request boundary after a proven quiescent MPS daemon restart and full fresh-client requalification. Optional service is closed during restart. Restart availability, full six-class lifecycle qualification, production d_MAC, cross-family, and WCET remain UQ.",
+  "counts": {
+    "actual_nrx": 720,
+    "deadline_misses": 0,
+    "injected_recoveries": 330,
+    "qwen_units": 90,
+    "radio_commits": 720
+  },
+  "gates": {
+    "both_campaigns_pass": true,
+    "both_physical_restart_proofs_pass": true,
+    "combined_safety": true,
+    "development_holdout_roles": true,
+    "development_node_excluded_from_holdout": true,
+    "frozen_base_source_equality": true,
+    "frozen_restart_source_equality": true,
+    "independent_job_and_node": true,
+    "independent_seed_and_reverse_order": true,
+    "same_restart_contract": true
+  },
+  "jobs": [
+    "58861897",
+    "58861911"
+  ],
+  "maxima_ms": {
+    "nrx_release_to_complete": 22.712971,
+    "qwen_execution": 67.90722,
+    "radio_commit": 126.225796,
+    "recovery_path": 10.719992
+  },
+  "nodes": [
+    "nid001192",
+    "nid001200"
+  ],
+  "restart_identity": {
+    "nid001192": {
+      "after_control_inode": 144140610406711600,
+      "after_control_pids": [
+        1677602
+      ],
+      "after_server_pids": [
+        1677837
+      ],
+      "before_control_inode": 144140610406711590,
+      "before_control_pids": [
+        1677299
+      ],
+      "before_server_pids": [
+        1677538
+      ]
+    },
+    "nid001200": {
+      "after_control_inode": 144140638709874724,
+      "after_control_pids": [
+        1120947
+      ],
+      "after_server_pids": [
+        1121181
+      ],
+      "before_control_inode": 144140638709874714,
+      "before_control_pids": [
+        1120647
+      ],
+      "before_server_pids": [
+        1120882
+      ]
+    }
+  },
+  "rounds": 180,
+  "schema": "softwall-c164-mps-restart-two-node-result-v1",
+  "status": "C164_MPS_RESTART_TWO_NODE_PASS"
+}

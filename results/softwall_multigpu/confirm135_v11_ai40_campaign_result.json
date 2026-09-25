@@ -1,0 +1,52 @@
+{
+  "schema": "softwall-confirm135-v11-ai40-campaign-result-v1",
+  "campaign_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm135_v11_ai40_campaign_protocol.json",
+  "campaign_protocol_sha256": "eda360212c0f0f87cb97b5789d583dc84e357ac2ae5ae4778e15854865d1e58d",
+  "arms": [
+    {
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm135_s1_job58826874_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm135_s1_job58826874_protocol.json",
+      "all_pass": true,
+      "candidate_evidence": {
+        "branches": 141,
+        "exchanges": 5,
+        "minimum_reserved_horizon_margin_ms": 51.056189,
+        "maximum_admitted_nrx_per_home_release": 2
+      },
+      "radio_records": 1280,
+      "atomic_exchanges": 10
+    },
+    {
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm135_s2_job58826874_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm135_s2_job58826874_protocol.json",
+      "all_pass": true,
+      "candidate_evidence": {
+        "branches": 147,
+        "exchanges": 5,
+        "minimum_reserved_horizon_margin_ms": 51.287019,
+        "maximum_admitted_nrx_per_home_release": 2
+      },
+      "radio_records": 1280,
+      "atomic_exchanges": 9
+    }
+  ],
+  "totals": {
+    "radio_records": 2560,
+    "atomic_exchanges": 19,
+    "candidate_branches": 288,
+    "ai40_candidate_exchanges": 10
+  },
+  "artifact_hash_mismatches": [],
+  "source_hash_mismatches": [],
+  "gates": {
+    "two_independent_arms": true,
+    "all_arm_gates_pass": true,
+    "candidate_branch_each_arm": true,
+    "ai40_exchange_each_arm": true,
+    "nonnegative_margin_each_arm": true,
+    "artifact_hashes_match": true,
+    "source_hashes_match": true
+  },
+  "all_pass": true,
+  "claim_boundary": "Synthetic context128 mechanism qualification in the declared two-home A100/MPS mode; not BurstGPT throughput, WCET, production d_MAC, cross-family, or restart evidence."
+}

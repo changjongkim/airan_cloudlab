@@ -1,0 +1,174 @@
+{
+  "accepted_physical_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "campaign": "development",
+  "cases": [
+    {
+      "case_id": "E1_four_unresolved_no_ai",
+      "conservative_prediction_time_ms": 45,
+      "context_length": null,
+      "expected_lease": false,
+      "expected_state": "QSN",
+      "model_ai_safe": false,
+      "model_state": "QSN",
+      "success_count": 0,
+      "target_decision_ms": 45
+    },
+    {
+      "case_id": "E3_two_unresolved_context128",
+      "conservative_prediction_time_ms": 45,
+      "context_length": 128,
+      "expected_lease": true,
+      "expected_state": "QSU",
+      "model_ai_safe": true,
+      "model_state": "QSU",
+      "success_count": 2,
+      "target_decision_ms": 45
+    },
+    {
+      "case_id": "E4_two_unresolved_context256",
+      "conservative_prediction_time_ms": 45,
+      "context_length": 256,
+      "expected_lease": false,
+      "expected_state": "QSN",
+      "model_ai_safe": false,
+      "model_state": "QSN",
+      "success_count": 2,
+      "target_decision_ms": 45
+    },
+    {
+      "case_id": "E5_one_unresolved_context512",
+      "conservative_prediction_time_ms": 45,
+      "context_length": 512,
+      "expected_lease": true,
+      "expected_state": "QSU",
+      "model_ai_safe": true,
+      "model_state": "QSU",
+      "success_count": 3,
+      "target_decision_ms": 45
+    },
+    {
+      "case_id": "E6a_latest_safe_context64",
+      "conservative_prediction_time_ms": 88,
+      "context_length": 64,
+      "expected_lease": true,
+      "expected_state": "QSU",
+      "model_ai_safe": true,
+      "model_state": "QSU",
+      "success_count": 3,
+      "target_decision_ms": 87
+    },
+    {
+      "case_id": "E6b_first_unsafe_context64",
+      "conservative_prediction_time_ms": 89,
+      "context_length": 64,
+      "expected_lease": false,
+      "expected_state": "QSN",
+      "model_ai_safe": false,
+      "model_state": "QSN",
+      "success_count": 3,
+      "target_decision_ms": 88
+    }
+  ],
+  "excluded_nodes": [
+    "nid001025",
+    "nid001044",
+    "nid001064",
+    "nid001069",
+    "nid001085",
+    "nid001109",
+    "nid001124",
+    "nid001145",
+    "nid001177",
+    "nid001204",
+    "nid001308",
+    "nid001632",
+    "nid001824",
+    "nid002100",
+    "nid002288"
+  ],
+  "expected_global_reject": [
+    "home1",
+    "h1-r1"
+  ],
+  "fault_injection": "After physical NRx completion, each frozen case converts a suffix of successful requests to failed outcomes before one atomic transition; every injected failure executes physical shared-cuPHY recovery.",
+  "gates": {
+    "admission": "the fifth all-fail debt is rejected without state mutation in every round",
+    "boundary": "E6a is observed no later than integer-ms 88 and admitted; E6b is observed at integer-ms 89 or later and rejected",
+    "physical": "all actual NRx, injected recoveries, admitted Qwen units, commits, whole-path bounds and lifecycle gates pass",
+    "prediction": "observed conservative decision time maps to the frozen state and every lease decision matches it",
+    "sample": "every case completes the frozen samples_per_case"
+  },
+  "grid": {
+    "path": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c162_feasibility_grid_v1.json",
+    "sha256": "f5da8016215c2896ef4d9f19be4e8ea386529a46c590407602fb116daddc60c7"
+  },
+  "iterations": 60,
+  "label": "c162a_boundary_dev_j58860486",
+  "mode": {
+    "conventional_bound_ms": 25,
+    "expiry_ms": 155,
+    "guard_ms": 2,
+    "launch_control_bound_ms": 5,
+    "lifecycle": "warm persistent actual NeuralRx/shared cuPHY/Qwen",
+    "nrx_bound_ms": 45,
+    "period_ms": 180.0,
+    "release_lead_ms": 3000.0,
+    "warmup": 10
+  },
+  "physical_input": "All four accepted NeuralRx paths use +20 dB stable inputs and must physically succeed by NRx45.",
+  "placement": {
+    "home0": "GPU0",
+    "home1": "GPU1",
+    "persistent_actual_nrx": "GPU3 under MPS 80",
+    "shared_cuphy_and_qwen": "GPU2 under MPS 80/20"
+  },
+  "reverse_cases": false,
+  "samples_per_case": 10,
+  "schema": "softwall-c162-boundary-protocol-v1",
+  "seed_base": 43000000,
+  "source_sha256": {
+    "scripts/actual_nrx_batch_recovery_plan_v1.py": "8729b20cb6f6a817f6171f0071211f864832c0f68cca2f19793c3ef7f9a4cf26",
+    "scripts/actual_nrx_integrated_coordinator.py": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d",
+    "scripts/actual_nrx_repeated_control.py": "c3a5b5c29a6f0eb8beb686e119acf466ebc5e8f2da32d756f81c922dd9c77323",
+    "scripts/analyze_c162_boundary.py": "a20fca3590d0e803e61e19a496416623c5e6f85e72bfb248ab60592447803f9d",
+    "scripts/bounded_launch_revalidation.py": "725da11d755d6bba1ad1a23552bff28da09f5bb35a59a065384160d67e678819",
+    "scripts/build_c162_boundary_protocol.py": "53806d000808063c5e62dc8320e0bc55b7657a1eca96fa0416f36af348aa82be",
+    "scripts/c159_persistent_nrx_worker.py": "d43a1310a27f98c8cc5247e8d84ab0f8784c561a308be65e611f74b4aa238943",
+    "scripts/c159_prestaged_owner.py": "bd0bf68a6cc8a5e41190ea1073df7cd46936fbd49733f3b1544fc50d8a344d75",
+    "scripts/c159_q2_classes.py": "34c5b0d8353bf3ece6e603b381eddd306ce5bcc1c4830a5ee73da51b516f483b",
+    "scripts/c159_q2_qwen_worker.py": "1b5e9c207354fa897b6586d6cf1ccc894edf49a095c293f8f022a0f679d524dd",
+    "scripts/c162_boundary_cases.py": "552a180e122b8b13a6b41e18fc5af6bda98d151e58afbc197ee99a77f6d7ad22",
+    "scripts/c162_boundary_coordinator.py": "1bb4abd91c10b538be9c54ff4af93b61656164488663a63fd97a405fe04db553",
+    "scripts/c162_boundary_plan.py": "8f3e376bd35c3041497be7ffac23b3c70eff4f118327320757abbf96764cf9c5",
+    "scripts/c162_feasibility_model_v1.py": "4f5a21d71749d0ee47724f1f83f38cfac12e8d0c92bb09720ce5d22e9af6295f",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_launch_plan_v1.py": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts/run_c162_boundary.sh": "d28b083e5de7ad45a905745db43d356d2968fc0fef1841f0af3746acc3ce6624",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/test_c162_boundary_plan.py": "c909837289d9e05b94e38bf6770e0c657b0dbeb45c404edc179a668e57184da1",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run"
+}

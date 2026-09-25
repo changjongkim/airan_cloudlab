@@ -1,0 +1,19 @@
+{
+  "schema": "softwall-c163-diagnostic-protocol-v1",
+  "frozen_before_execution": true,
+  "purpose": "Remove the measured serialized GPU0 NeuralRx front/post stages from the 4.5 ms path by moving the full NeuralRx pipeline to GPU1.",
+  "claim_boundary": "This two-GPU clean isolated test is neither a production d_MAC qualification nor a WCET bound. It omits MPS, external AI, a real DU clock, and real channels.",
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "iterations": 1000,
+  "seed": 20358100,
+  "mechanism": "GPU0 copies raw frequency-domain IQ and starts conventional; GPU1 performs NeuralRx channel estimation through CRC and returns a small result.",
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "decision_rule": "Report pair-completion counts at 4.5 ms; do not promote sample statistics to a bound.",
+  "source_sha256_before_execution": {
+    "c163_raw_p2p_nrx_worker.py": "290c178500f306b2b355c75aeb9ca083114454fdc05a6c19220e9d597febbd66",
+    "c163_raw_p2p_controller.py": "8111cc8151dd0f08eb90a69217becdc7c42018dc4aba45e9fa23d61393b4d3b5",
+    "run_c163_raw_p2p.sh": "6df7856f941b44f9e5fdfd53886b95b56f299f48f09d3f2031f842323a816f65",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

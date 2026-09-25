@@ -1,0 +1,27 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "sionna_cdl_family_development",
+  "frozen_before_execution": true,
+  "role": "Compatibility-boundary development screen after the public Rayleigh control passed and CDL-A/100 ns failed; not a BLER holdout.",
+  "fixed_arms": [
+    {"model": "A", "delay_spread_ns": 1},
+    {"model": "A", "delay_spread_ns": 10},
+    {"model": "A", "delay_spread_ns": 30},
+    {"model": "A", "delay_spread_ns": 100},
+    {"model": "B", "delay_spread_ns": 100},
+    {"model": "C", "delay_spread_ns": 100},
+    {"model": "D", "delay_spread_ns": 100},
+    {"model": "E", "delay_spread_ns": 100}
+  ],
+  "iterations_per_arm": 10,
+  "esno_db": 30.0,
+  "payload_seed": 20358960,
+  "channel_seed_rule": "58961 plus fixed arm index",
+  "radio_profile": "MCS7/start0/DMRS0,5,10/TDI1/one TX/four RX/FP32 engine",
+  "decision_rule": "Report every fixed arm. A passing arm only identifies a development support boundary and requires a disjoint-seed, prespecified BLER holdout before qualification. If all arms fail, keep standardized selective channels unqualified and do not tune further for the submission claim.",
+  "source_sha256_before_execution": {
+    "probe_sionna_cdl_family_development.py": "4ceaf01a64d343f22fde48fdb263b6a19dfc2e28a8ca3fe49fdf016a3bde9c47",
+    "run_sionna_cdl_family_development.sh": "f8b6dd8015fd8b1765c2547e230c74e64017782bc18277961e6c89823113b713",
+    "dual_receiver_phy.py": "fe71fc08a62ffe1d96c76241fc62b895c92d2e36ed1d4b16d6918e55e79b4a9c"
+  }
+}

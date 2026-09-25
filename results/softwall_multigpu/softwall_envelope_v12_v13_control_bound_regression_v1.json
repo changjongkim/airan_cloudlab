@@ -1,0 +1,53 @@
+{
+  "schema": "softwall-envelope-v12-v13-control-bound-regression-v1",
+  "former_mode": "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134",
+  "corrected_mode": "sharded_home_g2_c8_broker_crash_qualified_wall_bound_c139_c140",
+  "v12_status": "QSU",
+  "v13_former_status": "UQ",
+  "v13_corrected_status": "QSU",
+  "v13_corrected_ai35": {
+    "bound_ms": 35.0,
+    "control_budget_ms": 21,
+    "ai_completion_guard_ms": 2.0,
+    "effective_transaction_bound_ms": 58.0,
+    "static_admissible": false,
+    "static_admissible_homes": [],
+    "exchange_only_geometry_candidate": true,
+    "exchange_only_geometry_candidate_homes": [
+      0,
+      1
+    ],
+    "exchange_only_candidate": true,
+    "exchange_only_candidate_homes": [
+      0,
+      1
+    ],
+    "too_large_even_after_exchange": false
+  },
+  "v13_corrected_ai40": {
+    "bound_ms": 40.0,
+    "control_budget_ms": 21,
+    "ai_completion_guard_ms": 2.0,
+    "effective_transaction_bound_ms": 63.0,
+    "static_admissible": false,
+    "static_admissible_homes": [],
+    "exchange_only_geometry_candidate": true,
+    "exchange_only_geometry_candidate_homes": [
+      0,
+      1
+    ],
+    "exchange_only_candidate": false,
+    "exchange_only_candidate_homes": [],
+    "too_large_even_after_exchange": true
+  },
+  "gates": {
+    "v12_former_mode_was_qsu": true,
+    "v13_invalidates_former_5ms_mode": true,
+    "v13_corrected_mode_is_qsu": true,
+    "corrected_control_budget_is_21ms": true,
+    "ai35_is_exchange_only_at_58ms": true,
+    "ai40_no_longer_fits_decision_window": true
+  },
+  "all_pass": true,
+  "interpretation": "C138 invalidates the former 5 ms wall-bound assumption. V13 charges three 7 ms RPC bounds, removes AI40 from the conditional decision window, and retains an exchange-only AI35 class at the exact 58 ms boundary validated physically by C140."
+}

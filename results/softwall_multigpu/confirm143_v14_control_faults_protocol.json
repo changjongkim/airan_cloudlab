@@ -1,0 +1,141 @@
+{
+  "schema": "softwall-confirm143-v14-control-faults-protocol-v1",
+  "status": "frozen-after-three-point-canary-before-formal-arms",
+  "allocation_node": "nid001361",
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177",
+    "nid001144",
+    "nid001252",
+    "nid001372"
+  ],
+  "arms": [
+    {
+      "name": "f1",
+      "label": "confirm143_prepare1_job58833253",
+      "operation": "prepare",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        34700051,
+        34710051
+      ],
+      "channel_seeds": [
+        34701000,
+        34711000
+      ]
+    },
+    {
+      "name": "f2",
+      "label": "confirm143_prepare2_job58833253",
+      "operation": "prepare",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        34720051,
+        34730051
+      ],
+      "channel_seeds": [
+        34721000,
+        34731000
+      ]
+    },
+    {
+      "name": "f3",
+      "label": "confirm143_commit1_job58833253",
+      "operation": "commit",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        34740051,
+        34750051
+      ],
+      "channel_seeds": [
+        34741000,
+        34751000
+      ]
+    },
+    {
+      "name": "f4",
+      "label": "confirm143_commit2_job58833253",
+      "operation": "commit",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        34760051,
+        34770051
+      ],
+      "channel_seeds": [
+        34761000,
+        34771000
+      ]
+    },
+    {
+      "name": "f5",
+      "label": "confirm143_complete1_job58833253",
+      "operation": "complete",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        34780051,
+        34790051
+      ],
+      "channel_seeds": [
+        34781000,
+        34791000
+      ]
+    },
+    {
+      "name": "f6",
+      "label": "confirm143_complete2_job58833253",
+      "operation": "complete",
+      "iterations": 340,
+      "warmup": 20,
+      "payload_seeds": [
+        34800051,
+        34810051
+      ],
+      "channel_seeds": [
+        34801000,
+        34811000
+      ]
+    }
+  ],
+  "socket_timeout_ms": 5,
+  "commit_bound_ms": 7,
+  "critical_control_budget_ms": 7,
+  "ai_completion_guard_ms": 2,
+  "crash_after_operation_number": 30,
+  "finite_model_artifact": "results/softwall_multigpu/softwall_pipelined_control_model_v1.json",
+  "fault_model": "broker exits after applying the selected home0 transition and before sending its reply",
+  "failure_rule": "stop on first formal arm failure; preserve failure; never widen commit bound post hoc",
+  "container_source_map": {
+    "/softwall/global_trace_fully_budgeted_fault_contained_controller.py": "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py",
+    "/softwall/global_trace_pipelined_control_controller.py": "scripts_for_node/softwall_same_gpu/global_trace_pipelined_control_controller.py",
+    "/softwall/pipelined_global_trace_client.py": "scripts_for_node/softwall_same_gpu/pipelined_global_trace_client.py",
+    "/softwall/test_pipelined_global_trace_client.py": "scripts_for_node/softwall_same_gpu/test_pipelined_global_trace_client.py",
+    "/softwall/control_point_crash_global_trace_lease_broker.py": "scripts_for_node/softwall_same_gpu/control_point_crash_global_trace_lease_broker.py",
+    "/softwall/same_request_ipc_worker.py": "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py",
+    "/softwall/trace_qwen_worker.py": "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py",
+    "/softwall_task1/isca_v2/dart_runtime.py": "scripts_for_node/task1/isca_v2/dart_runtime.py",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py"
+  },
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "b5afa2828de1897f4029e9c49774d56d198db370891ff114036735f29397b324",
+    "scripts_for_node/softwall_same_gpu/global_trace_pipelined_control_controller.py": "9e7f40a497723627163443f7ca8628b91f745e9d401cab60272a186b3b3a4867",
+    "scripts_for_node/softwall_same_gpu/pipelined_global_trace_client.py": "108c13e2db0c3db46ca84a1b8461a820699e0e85567c6fde433d8b841eef01fa",
+    "scripts_for_node/softwall_same_gpu/test_pipelined_global_trace_client.py": "f39842fe11c9134a3af57b4a0fe05ada6007579a50e27484d0797aebf13df776",
+    "scripts_for_node/softwall_same_gpu/control_point_crash_global_trace_lease_broker.py": "ae2ca3d39df3f92b8200d7fc4ef52be395b06dc4362e054aa0f1de71d9a01c4e",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+    "scripts_for_node/softwall_same_gpu/run_v14_pipelined_control_fault_arm.sh": "9d677667dd45e45d51f5b4c508ee9b6cb1c730e99e6be36310b2d6943fad3021",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm143_v14_control_faults.py": "74e2bcf7458885829ff116ef4e81d3cae8b0739e5a5eca05464e919d526594c9",
+    "scripts_for_node/softwall_same_gpu/verify_pipelined_control_model.py": "d18626eb053f84ba47ab498a0509af28a964b6b8d148e08e001cdef0017aadce"
+  }
+}

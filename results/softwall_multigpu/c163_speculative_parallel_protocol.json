@@ -1,0 +1,18 @@
+{
+  "schema": "softwall-c163-diagnostic-protocol-v1",
+  "frozen_before_execution": true,
+  "purpose": "Test whether speculative parallel NeuralRx and conventional execution can fit the Aerial testMAC 4.5 ms threshold after sequential wait-then-recover was 0/1000.",
+  "claim_boundary": "This is neither a production d_MAC qualification nor a WCET bound. It omits MPS, external AI, IPC, controller RPC, real DU release timing, and real channels.",
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "iterations": 1000,
+  "seed": 20357900,
+  "mechanism": "Release two persistent same-process threads together; one runs NeuralRx and one runs conventional on independent receiver objects/streams; wait for both physical completions.",
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "decision_rule": "Report pair completion counts at 4.5 ms; do not promote any sample statistic to a bound.",
+  "source_sha256_before_execution": {
+    "probe_c163_speculative_parallel.py": "0573f2933bd524dc186e32d23a880a73821b7a9bb9e4ad9d009698f3d5a5c71a",
+    "run_c163_speculative_parallel.sh": "481e4d935a98b2b5beaa3044349c1a82756dd82db28f21dda3ce7d21ff0d1a85",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

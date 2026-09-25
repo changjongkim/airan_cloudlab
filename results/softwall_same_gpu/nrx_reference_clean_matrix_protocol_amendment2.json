@@ -1,0 +1,25 @@
+{
+  "schema": "softwall-development-protocol-amendment-v1",
+  "campaign": "nrx_reference_clean_matrix",
+  "amends": "nrx_reference_clean_matrix_protocol.json",
+  "frozen_before_retry": true,
+  "preserved_prior_outcomes": {
+    "historical_mcs2_stream4_tx4_direct": "10/10 conventional and 10/10 NeuralRx decoded",
+    "reference_attempt2": "infrastructure-invalid: a clean one-TX grid with one receive dimension was passed to the four-RX channel estimator; the process aborted before a reference-profile result was serialized"
+  },
+  "correction": "For clean TX1 reference profiles only, replicate the transmitted grid across four receive antennas as a deterministic unit-gain 1x4 channel before receiver execution.",
+  "unchanged": [
+    "profile definitions",
+    "iteration count",
+    "seed",
+    "engine",
+    "decision rule"
+  ],
+  "execution_isolation": "Each remaining reference profile runs in a fresh container process after the prior combined-process CUDA fault.",
+  "source_sha256_before_retry": {
+    "probe_nrx_reference_clean_matrix.py": "7977c205aa4ec9895eb84d2d8dfea2f07f68c9ae28b91fb00d5c39a1cf64c05f",
+    "run_nrx_reference_clean_matrix_v3.sh": "93293145c4202b800e5ca3622b6d8b1b98108623907530f6b18bbeb84cf9a0d1",
+    "dual_receiver_phy.py": "0aa91d359b467cb73fb075f269f3dac1ad704cf901a772d7bfb3834e9809bddf",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

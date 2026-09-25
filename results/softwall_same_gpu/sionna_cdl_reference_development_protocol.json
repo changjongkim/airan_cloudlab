@@ -1,0 +1,21 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "sionna_cdl_public_notebook_reproduction",
+  "frozen_before_execution": true,
+  "role": "Development model/interface localization; not an external-channel qualification.",
+  "prior_result": "Aerial CDL-A conventional 60/60 and NeuralRx 0/60.",
+  "hypothesis": "If the exact Sionna CDL path succeeds, the incompatibility is in the Aerial-to-model adapter/channel convention. If it fails, the engine/model reference path is not reproduced.",
+  "channel": "Sionna 1.0.2 CDL-A, 100 ns, 0.8333 m/s, normalized, 1x4 uplink, EsNo30dB",
+  "radio_profile": "public notebook MCS7/start0/DMRS0,5,10/TDI1/FP32",
+  "iterations": 20,
+  "payload_seed": 20358700,
+  "channel_seed": 58701,
+  "decision_rule": "Require conventional=20/20 and NeuralRx=20/20 to proceed to adapter differential diagnosis; otherwise stop and retain the failed reference reproduction.",
+  "environment": "Project-local TensorFlow 2.19.0 and sionna-no-rt 1.0.2 under runtime/sionna_deps.",
+  "source_sha256_before_execution": {
+    "probe_sionna_cdl_reference_development.py": "ec09510d8600193259bdfdfad80376398c55a1fad6a415352ffb3e4556335a9f",
+    "run_sionna_cdl_reference_development.sh": "dae11e8aa6ce0fa4e941d1e29ed003da06eee8c26692324b78f425b2129fc141",
+    "dual_receiver_phy.py": "40b4561636a5037f398b534ca0739b4bd35cdd590bf3386c70bbf97fa46e78d5",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

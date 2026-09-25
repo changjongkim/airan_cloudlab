@@ -1,0 +1,286 @@
+{
+  "schema": "softwall-pre-confirm82-bound-mode-audit-v1",
+  "historical_nrx_30ms_failures": [
+    {
+      "source": "raw/confirm43_gap_r1_off_cap80_job58682997_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": [
+        {
+          "release_index": 2762,
+          "front_gpu_ms": 0.9580479860305786,
+          "post_gpu_ms": 34.667327880859375,
+          "response_ms": 37.056966,
+          "start_lateness_ms": 0.001518,
+          "deadline_miss": false
+        }
+      ]
+    },
+    {
+      "source": "raw/confirm43_gap_r2_on_cap80_job58682997_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": [
+        {
+          "release_index": 2749,
+          "front_gpu_ms": 0.7761279940605164,
+          "post_gpu_ms": 28.843904495239258,
+          "response_ms": 30.975425,
+          "start_lateness_ms": 0.001899,
+          "deadline_miss": false
+        }
+      ]
+    },
+    {
+      "source": "raw/confirm43_gap_r3_on_cap80_job58682997_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": []
+    },
+    {
+      "source": "raw/confirm43_gap_r4_off_cap80_job58682997_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": [
+        {
+          "release_index": 2762,
+          "front_gpu_ms": 0.7666559815406799,
+          "post_gpu_ms": 44.74639892578125,
+          "response_ms": 46.989556,
+          "start_lateness_ms": 0.001618,
+          "deadline_miss": false
+        }
+      ]
+    },
+    {
+      "source": "raw/confirm44_gap_r1_on_cap80_job58685929_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": [
+        {
+          "release_index": 2740,
+          "front_gpu_ms": 28.97279930114746,
+          "post_gpu_ms": 0.862559974193573,
+          "response_ms": 31.218787,
+          "start_lateness_ms": 0.001048,
+          "deadline_miss": false
+        }
+      ]
+    },
+    {
+      "source": "raw/confirm44_gap_r2_off_cap80_job58685929_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": []
+    },
+    {
+      "source": "raw/confirm44_gap_r3_off_cap80_job58685929_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": [
+        {
+          "release_index": 2754,
+          "front_gpu_ms": 1.081536054611206,
+          "post_gpu_ms": 39.96518325805664,
+          "response_ms": 42.448216,
+          "start_lateness_ms": 0.001341,
+          "deadline_miss": false
+        }
+      ]
+    },
+    {
+      "source": "raw/confirm44_gap_r4_on_cap80_job58685929_controller.json",
+      "releases": 10000,
+      "declared_nrx_bound_ms": 30.0,
+      "violations": [
+        {
+          "release_index": 2743,
+          "front_gpu_ms": 0.7920960187911987,
+          "post_gpu_ms": 39.97916793823242,
+          "response_ms": 42.102736,
+          "start_lateness_ms": 0.000775,
+          "deadline_miss": false
+        }
+      ]
+    }
+  ],
+  "historical_violation_count": 6,
+  "shorter_prewarmed_samples": [
+    {
+      "source": "raw/confirm56_host_path_job58729926_controller.json",
+      "cells": 2,
+      "releases": 1000,
+      "nrx_n": 2000,
+      "nrx_max_ms": 9.029913,
+      "nrx_over_25_ms": 0,
+      "nrx_over_30_ms": 0,
+      "conv_host_n": 48,
+      "conv_host_max_ms": 3.11443,
+      "conv_host_over_8_ms": 0,
+      "deadline_misses": 0
+    },
+    {
+      "source": "raw/confirm76_ai15_job58738952_controller.json",
+      "cells": 3,
+      "releases": 500,
+      "nrx_n": 743,
+      "nrx_max_ms": 16.355682,
+      "nrx_over_25_ms": 0,
+      "nrx_over_30_ms": 0,
+      "conv_host_n": 983,
+      "conv_host_max_ms": 4.249297,
+      "conv_host_over_8_ms": 0,
+      "deadline_misses": 0
+    },
+    {
+      "source": "raw/confirm80_fourcell_job58738952_controller.json",
+      "cells": 4,
+      "releases": 300,
+      "nrx_n": 449,
+      "nrx_max_ms": 19.548208,
+      "nrx_over_25_ms": 0,
+      "nrx_over_30_ms": 0,
+      "conv_host_n": 880,
+      "conv_host_max_ms": 4.934576,
+      "conv_host_over_8_ms": 0,
+      "deadline_misses": 0
+    },
+    {
+      "source": "raw/confirm81_fenced_fault_job58738952_controller.json",
+      "cells": 4,
+      "releases": 100,
+      "nrx_n": 150,
+      "nrx_max_ms": 18.589296,
+      "nrx_over_25_ms": 0,
+      "nrx_over_30_ms": 0,
+      "conv_host_n": 291,
+      "conv_host_max_ms": 3.406206,
+      "conv_host_over_8_ms": 0,
+      "deadline_misses": 0
+    }
+  ],
+  "cold_conventional_source": "confirm40_cold_start_ablation.json",
+  "cold_conventional_audit": {
+    "schema": "softwall-recovery-cold-start-abba-v1",
+    "job": "58684071",
+    "rows": [
+      {
+        "round": 1,
+        "mode": "off",
+        "job": "58684071",
+        "host": "nid001084",
+        "worker_job": "58684071",
+        "worker_host": "nid001084",
+        "worker_visible_sms": 86,
+        "payload_seed": 20321035,
+        "channel_seed_base": 20325000,
+        "snr_db": -8.5,
+        "period_ms": 90.0,
+        "deadline_ms": 80.0,
+        "conventional_warmup": "off",
+        "iterations": 500,
+        "correct": 494,
+        "deadline_misses": 0,
+        "endpoint_timeouts": 0,
+        "warmup_units": 0,
+        "first_fallback_index": 103,
+        "first_fallback_gpu_ms": 22.75574493408203,
+        "first_fallback_response_ms": 26.161021,
+        "later_fallback_gpu_median_ms": 2.280287981033325,
+        "endpoint_worker_units": 521
+      },
+      {
+        "round": 2,
+        "mode": "on",
+        "job": "58684071",
+        "host": "nid001084",
+        "worker_job": "58684071",
+        "worker_host": "nid001084",
+        "worker_visible_sms": 86,
+        "payload_seed": 20321035,
+        "channel_seed_base": 20325000,
+        "snr_db": -8.5,
+        "period_ms": 90.0,
+        "deadline_ms": 80.0,
+        "conventional_warmup": "on",
+        "iterations": 500,
+        "correct": 493,
+        "deadline_misses": 0,
+        "endpoint_timeouts": 0,
+        "warmup_units": 21,
+        "first_fallback_index": 103,
+        "first_fallback_gpu_ms": 2.276576042175293,
+        "first_fallback_response_ms": 5.276288,
+        "later_fallback_gpu_median_ms": 2.2682559490203857,
+        "endpoint_worker_units": 521
+      },
+      {
+        "round": 3,
+        "mode": "on",
+        "job": "58684071",
+        "host": "nid001084",
+        "worker_job": "58684071",
+        "worker_host": "nid001084",
+        "worker_visible_sms": 86,
+        "payload_seed": 20321035,
+        "channel_seed_base": 20325000,
+        "snr_db": -8.5,
+        "period_ms": 90.0,
+        "deadline_ms": 80.0,
+        "conventional_warmup": "on",
+        "iterations": 500,
+        "correct": 494,
+        "deadline_misses": 0,
+        "endpoint_timeouts": 0,
+        "warmup_units": 21,
+        "first_fallback_index": 103,
+        "first_fallback_gpu_ms": 2.2859840393066406,
+        "first_fallback_response_ms": 5.18893,
+        "later_fallback_gpu_median_ms": 2.2964160442352295,
+        "endpoint_worker_units": 521
+      },
+      {
+        "round": 4,
+        "mode": "off",
+        "job": "58684071",
+        "host": "nid001084",
+        "worker_job": "58684071",
+        "worker_host": "nid001084",
+        "worker_visible_sms": 86,
+        "payload_seed": 20321035,
+        "channel_seed_base": 20325000,
+        "snr_db": -8.5,
+        "period_ms": 90.0,
+        "deadline_ms": 80.0,
+        "conventional_warmup": "off",
+        "iterations": 500,
+        "correct": 493,
+        "deadline_misses": 0,
+        "endpoint_timeouts": 0,
+        "warmup_units": 0,
+        "first_fallback_index": 103,
+        "first_fallback_gpu_ms": 35.302528381347656,
+        "first_fallback_response_ms": 38.570259,
+        "later_fallback_gpu_median_ms": 2.321120023727417,
+        "endpoint_worker_units": 521
+      }
+    ],
+    "first_fallback_off_median_ms": 29.029136657714844,
+    "first_fallback_on_median_ms": 2.281280040740967,
+    "gates": {
+      "protocol_identity": true,
+      "all_same_host_job_seed": true,
+      "all_match_frozen_radio": true,
+      "all_500_complete": true,
+      "channel_trace_identical": true,
+      "first_fallback_same_release": true,
+      "all_deadline_misses_zero": true,
+      "all_endpoint_timeouts_zero": true,
+      "warmup_modes_applied": true,
+      "endpoint_units_match": true,
+      "both_off_runs_slower_than_both_on_runs_by_frozen_margin": true,
+      "all_pass": true
+    }
+  },
+  "interpretation": "The 30 ms NeuralRx failures in the long older cap80 mode include GPU front/post intervals of tens of milliseconds around release 2740; they are not explained by host wait alone. Short four-cell warm samples cannot qualify 8/25/30 ms bounds. Confirm40's unprewarmed first fallback is a distinct cold mode with a 35.303 ms GPU sample."
+}

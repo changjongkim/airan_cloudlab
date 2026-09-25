@@ -1,0 +1,20 @@
+{
+  "schema": "softwall-confirm86-posthoc-stage-gc-overlap-v1",
+  "source_sha256": "20077d86ee01a92d6fa2e92fa7d8e541eaa698a1e64054e873c1867a4cd4b55a",
+  "frozen_tail_gt30_gate_pass": false,
+  "release_index": 608,
+  "channel_prep_begin_after_release_ms": -16.630079,
+  "channel_prep_host_ms": 30.271238,
+  "wait_return_lateness_ms": 13.643243,
+  "first_feature_begin_lateness_ms": 13.645207,
+  "max_nrx_response_in_release_ms": 29.781664,
+  "overlapping_gc": [
+    {
+      "generation": 2,
+      "begin_after_release_ms": -15.859317,
+      "duration_ms": 27.26667,
+      "collected": 20
+    }
+  ],
+  "interpretation": "Frozen >30 ms NRx tail gate failed because worst response was 29.782 ms, but the maximal channel-preparation overrun at release 608 overlapped a 27.267 ms Python generation-2 GC. This is a posthoc temporal diagnostic, not causal proof. A pre-registered GC ON/OFF intervention follows."
+}

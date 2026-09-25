@@ -1,0 +1,61 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm101_observe_first_qwen_fault_abba",
+  "frozen_before_execution": true,
+  "conditional_on_predecessor_pass": true,
+  "job": "58747620",
+  "node": "nid001545",
+  "physical_predecessor": "confirm100_observe_first_qwen_job58747620.json",
+  "iterations": 300,
+  "cells": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 12,
+  "ai_budget_ms": 50,
+  "ai_deadline_ms": 153,
+  "payload_seed": 20900141,
+  "channel_seed_base": 21530000,
+  "min_eligible_per_pair": 20,
+  "min_ai_units_per_arm": 1000,
+  "arms": [
+    {
+      "name": "a_nofault",
+      "prefix": "confirm101_a_nofault_job58747620",
+      "failure_every": 0
+    },
+    {
+      "name": "b_fault",
+      "prefix": "confirm101_b_fault_job58747620",
+      "failure_every": 5
+    },
+    {
+      "name": "c_fault",
+      "prefix": "confirm101_c_fault_job58747620",
+      "failure_every": 5
+    },
+    {
+      "name": "d_nofault",
+      "prefix": "confirm101_d_nofault_job58747620",
+      "failure_every": 0
+    }
+  ],
+  "frozen_gates": "Run only if C100 two-arm observe-first mode passes. Same new PHY/payload trace across N,F,F,N 300-release arms, actual NRx45/conv12/AI50/RPC45 GC-OFF Qwen b1c16 cap20. Every arm must pass source/provenance/contract/requalification, zero miss/bound/guard/credit/fault, observe NRx before mandatory conventional, and >=1000 Qwen units. Adjacent N/F pairs require >=20 releases divisible by five with identical PHY feature/truth and exactly identical two-NRx admission. Primary fault-minus-no-fault timely Qwen return counts on those releases; negative directional sign in both pairs is separate from safety and does not establish policy superiority, finite six-job admissions, or AI-RAN-specific workload.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/qwen_worker.py": "92835cf0ce9e789edab9109d85cc8764eb620c213ab87120fb18e01a8094622b",
+    "scripts_for_node/softwall_same_gpu/s2_runner.py": "8bb2f65e2c7c1cac655b7c2d82e7ae8d3500b377b8ecde44ef491333a855be7c",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+    "results/softwall_same_gpu/confirm95_ai8_fourcell_job58746343.json": "837722f76cb1301899f405c82f9ca38ab44f5aa0e1f6a878bc3e8bc9e80c8ea3",
+    "results/softwall_same_gpu/confirm97_qwen_fourcell_failure_job58747070.json": "0e8b9e290afd390f9f721738dc4a92e8cbbbd36b306c78cf718fd6f9fd736b0e",
+    "scripts_for_node/softwall_same_gpu/run_confirm100_observe_first_qwen.sh": "d3b7ac42deba16b054b402854577be4bf2bb82b63c6d9709ac94a7b5231b44cb",
+    "scripts_for_node/softwall_same_gpu/four_cell_observe_first_controller.py": "857fc8705f25d736a2639995d249e6b7fc9248b01af0eab1cc3ac9c2d1be739e",
+    "results/softwall_same_gpu/confirm99_qwen_fault_abba_job58747070.json": "d0f2297ac91815881bad821e86ee20b1996879959dfd87163b2a27e3ce4b73ce",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm101_observe_first_fault_abba.py": "7e1484fe6bbff563d0debb0d42eec12fb47dab8f772159c93b4fd7fc0053c24b",
+    "results/softwall_same_gpu/confirm100_observe_first_qwen_protocol.json": "ac077a384c0e6b67647311eece2c0c964ac62a0785dec2fd58c8a5b5693c9117"
+  }
+}

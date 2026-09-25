@@ -1,0 +1,218 @@
+{
+  "schema": "softwall-global-ai-control-point-broker-crash-arm-result-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm134_complete_r1_job58823497_protocol.json",
+  "crash_operation": "complete",
+  "broker_exit_status": 86,
+  "fault_detected_ns": 149838320539552,
+  "target_request_id": "burstgpt-839412",
+  "operational_global_queue_faults": [
+    [
+      {
+        "operation": "complete",
+        "type": "TimeoutError",
+        "message": "timed out",
+        "detected_ns": 149838320539552,
+        "home": 0,
+        "request_id": "burstgpt-839412",
+        "broker_token": "g59:h0:rburstgpt-839412",
+        "rpc_timeout_ms": 5.0,
+        "action": "disable-new-global-ai; never retry ambiguous operation"
+      }
+    ],
+    [
+      {
+        "operation": "complete",
+        "type": "TimeoutError",
+        "message": "timed out",
+        "detected_ns": 149838327458812,
+        "home": 1,
+        "request_id": "burstgpt-839414",
+        "broker_token": "g61:h1:rburstgpt-839414",
+        "rpc_timeout_ms": 5.0,
+        "action": "disable-new-global-ai; never retry ambiguous operation"
+      }
+    ]
+  ],
+  "radio_records_after_fault_detection": [
+    1244,
+    1244
+  ],
+  "homes": [
+    {
+      "home": 0,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h0_controller.json",
+      "first_release_ns": 149833176331522,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/confirm134_complete_r1_job58823497/barrier",
+        "member": 0,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 365,
+          "expected_units": 365,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 293,
+          "expected_units": 293,
+          "count_match": true
+        }
+      ],
+      "global_queue_status": {
+        "enabled": false,
+        "faults": [
+          {
+            "operation": "complete",
+            "type": "TimeoutError",
+            "message": "timed out",
+            "detected_ns": 149838320539552,
+            "home": 0,
+            "request_id": "burstgpt-839412",
+            "broker_token": "g59:h0:rburstgpt-839412",
+            "rpc_timeout_ms": 5.0,
+            "action": "disable-new-global-ai; never retry ambiguous operation"
+          },
+          {
+            "operation": "metadata_finalize",
+            "type": "ConnectionRefusedError",
+            "message": "[Errno 111] Connection refused",
+            "detected_ns": 149894210047572,
+            "home": 0,
+            "action": "retain fail-closed quarantine"
+          },
+          {
+            "operation": "metadata_summary",
+            "type": "ConnectionRefusedError",
+            "message": "[Errno 111] Connection refused",
+            "detected_ns": 149894413228051,
+            "home": 0,
+            "action": "return last confirmed summary"
+          }
+        ]
+      },
+      "summary": {
+        "records": 1360,
+        "correct_cells": 628,
+        "nrx_commits": 437,
+        "conv_commits": 923,
+        "atomic_exchange": 9,
+        "ai_timely_value_tokens": 8124,
+        "last_release_index": 339
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "physical_faults": true,
+        "credits": true
+      }
+    },
+    {
+      "home": 1,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h1_controller.json",
+      "first_release_ns": 149833176331522,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/confirm134_complete_r1_job58823497/barrier",
+        "member": 1,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 360,
+          "expected_units": 360,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 307,
+          "expected_units": 307,
+          "count_match": true
+        }
+      ],
+      "global_queue_status": {
+        "enabled": false,
+        "faults": [
+          {
+            "operation": "complete",
+            "type": "TimeoutError",
+            "message": "timed out",
+            "detected_ns": 149838327458812,
+            "home": 1,
+            "request_id": "burstgpt-839414",
+            "broker_token": "g61:h1:rburstgpt-839414",
+            "rpc_timeout_ms": 5.0,
+            "action": "disable-new-global-ai; never retry ambiguous operation"
+          },
+          {
+            "operation": "metadata_finalize",
+            "type": "ConnectionRefusedError",
+            "message": "[Errno 111] Connection refused",
+            "detected_ns": 149894210114422,
+            "home": 1,
+            "action": "retain fail-closed quarantine"
+          },
+          {
+            "operation": "metadata_summary",
+            "type": "ConnectionRefusedError",
+            "message": "[Errno 111] Connection refused",
+            "detected_ns": 149894413335039,
+            "home": 1,
+            "action": "return last confirmed summary"
+          }
+        ]
+      },
+      "summary": {
+        "records": 1360,
+        "correct_cells": 641,
+        "nrx_commits": 432,
+        "conv_commits": 928,
+        "atomic_exchange": 7,
+        "ai_timely_value_tokens": 7941,
+        "last_release_index": 339
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "physical_faults": true,
+        "credits": true
+      }
+    }
+  ],
+  "gates": {
+    "two_homes": true,
+    "same_first_release": true,
+    "full_radio_continuity": true,
+    "worker_count_match": true,
+    "system_safety": true,
+    "control_budget_accounted": true,
+    "expected_broker_exit": true,
+    "home0_target_operation_fault": true,
+    "both_homes_fail_closed": true,
+    "both_homes_radio_after_detection": true,
+    "target_execution_semantics": true,
+    "no_duplicate_execution": true,
+    "both_homes_executed_ai": true
+  },
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm134_complete_r1_job58823497_protocol.json": "88890d2719c4ffc958258901bbe6ad0a6fb1c07bad72565564939d10854117fb",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h0_controller.json": "bf1a8aebdcfd9bc49380dec89313c044eb546180bbf9fa0a44a56305d9369ed7",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h0_worker0.json": "33e8b6b68f79c42477eabb9333aa16ec4c8a35f1c4dbbd5acb12c9e65a16a80a",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h0_worker1.json": "249fbc6e81ded7217dcf68e92f26b955b3cd6d78d3cd3ee4176d9c552e10dd4b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h0_background.json": "e47424c27a276632a2498983965d0d2fd737d113c117fae6a8d39425b9bb98a4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h0_requalification.json": "f83209c5cc7d2d330b9d60c04e9a533621012b840f681b2c4c24e10587f04f71",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h1_controller.json": "a76ceab31e53d5646d9372b91222bf190130e1b8a0edb22c87b958fbaf69a2a1",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h1_worker0.json": "df447bbe158dca2dfc39e44660e84265006f1324ce7e87eb4ec416c023d8af01",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h1_worker1.json": "c7014b58bcb1d9750ba1f8f0d00700bb70379f3f351a561e0ca5006bd61f3775",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h1_background.json": "8ea7ac4aa452d5e0ab6731702663d38283e260b2aa1a95e94f3207d7b934cb5f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm134_complete_r1_job58823497_h1_requalification.json": "9e15835c3005fdf947ff95547f59147ce90dc156900ac07ccb192e02f5cf1dcc"
+  },
+  "scope": "5 ms per-RPC and 15 ms fully admission-budgeted broker fail-stop after applying home0 complete30; no synchronous fault-path logging; all global AI clients fail closed while local RAN certificates continue"
+}

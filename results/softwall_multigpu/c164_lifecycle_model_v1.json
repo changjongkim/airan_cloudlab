@@ -1,0 +1,383 @@
+{
+  "all_pass": true,
+  "checks": {
+    "all_lifecycles_covered": true,
+    "all_profiles_qualify_only_after_complete_evidence": true,
+    "bound_violation_quarantines": true,
+    "identity_mismatch_is_fail_closed": true,
+    "idle_revokes_token": true,
+    "no_unqualified_optional_admission": true,
+    "qualification_tokens_unique": true,
+    "restart_requires_distinct_requalification": true
+  },
+  "claim_boundary": "This is a pure lifecycle/provenance state-model result. Physical cold/restart/idle timing remains unqualified until C164 GPU runs.",
+  "counts": {
+    "lifecycle_modes": 9,
+    "restart_transitions": 8,
+    "unsafe_optional_admissions": 0
+  },
+  "restart_transitions": [
+    {
+      "lifecycle": "cold_first",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    },
+    {
+      "lifecycle": "mps_restart_first",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    },
+    {
+      "lifecycle": "worker_reconnect_first",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    },
+    {
+      "lifecycle": "idle_30s_first",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    },
+    {
+      "lifecycle": "idle_5m_first",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    },
+    {
+      "lifecycle": "idle_30m_first",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    },
+    {
+      "lifecycle": "gc_on",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    },
+    {
+      "lifecycle": "qwen_reload_first",
+      "new_status": "qualified",
+      "new_token_distinct": true,
+      "old_token_accepted": false,
+      "restart_accepted": true
+    }
+  ],
+  "schema": "softwall-c164-lifecycle-model-result-v1",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/c164_lifecycle_qualification_v1.py": "ba92fa5193b1be8fb15cef969c69462ae6f10266564e03556603772d468a2a43",
+    "scripts_for_node/softwall_same_gpu/run_c164_lifecycle_model_v1.py": "f3be536715396f89ecb3ad1dbefe3fc76c867144f5b8f98e86a5cbd28d13e66a",
+    "scripts_for_node/softwall_same_gpu/test_c164_lifecycle_qualification_v1.py": "749389a07316b37335e2f1641c0c35c715aa4fa73ddd4339a9d1a36be0381b33"
+  },
+  "status": "C164_LIFECYCLE_MODEL_PASS",
+  "transitions": [
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "warm_persistent",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "2cf46506a164517d97c62847a75b987636a2a0a761c568a4378e1603ac2ac873",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "cold_first",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "be3f97fb780f09e9c1c88019a2ce957be74ccf2a8fb1c895b1dc67fc4e3130e6",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "mps_restart_first",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "f03767e7e5b6b88ea5676bb5e3221e5ecffecd4fcb6caf7905fa3c4d33d0b707",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "worker_reconnect_first",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "22e00c3c9e14677a60abbeb87912aa412b05893ebaffb2005efbbf2fce579fa0",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "idle_30s_first",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "f24e8b1b5eb4f5657a49d44992b31dc580f34b39e0cdc45a10aac4be2b71d733",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "idle_5m_first",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "eb63b869ebf630d160a66e63544e8665e6ec6300bad73c0714a69af266dfcb83",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "idle_30m_first",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "65e789817e9b79544404047308e34921b97cbe141fe96e56c2a912dfa03fff41",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "gc_on",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "7faa9ba0e718762ff76a08952fc55c50184c6daca79fcb7e0b086ecdefaa41b7",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    },
+    {
+      "cold_reason": "mode_not_qualified",
+      "idle_reason": "idle_requalification_required",
+      "idle_status": "stale",
+      "invalid_admissions": [
+        {
+          "accepted": false,
+          "case": "wrong_token",
+          "reason": "qualification_token_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "wrong_profile",
+          "reason": "profile_fingerprint_mismatch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_epoch",
+          "reason": "stale_lifecycle_epoch"
+        },
+        {
+          "accepted": false,
+          "case": "stale_generation",
+          "reason": "stale_generation"
+        }
+      ],
+      "lifecycle": "qwen_reload_first",
+      "post_violation_accepted": false,
+      "qualification_status": "qualified",
+      "qualified_token": "f8c81191e80736b0d0066d63fb3cbd30da9e3562ecb24407d5488748aad5e3f8",
+      "valid_admission": true,
+      "violation_status": "quarantined"
+    }
+  ]
+}

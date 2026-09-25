@@ -1,0 +1,79 @@
+{
+  "schema": "softwall-confirm133-validation-summary-v1",
+  "status": "PASS",
+  "campaign": {
+    "all_pass": true,
+    "new_c133_arms": 4,
+    "combined_c132_c133_fault_point_arms": {
+      "prepare": 2,
+      "commit": 2,
+      "complete": 2
+    },
+    "totals": {
+      "radio_records": 16320,
+      "radio_records_after_crash": 14938,
+      "new_c133_radio_records": 10880,
+      "new_c133_radio_records_after_crash": 9962,
+      "new_c133_ai_units_before_containment": 234,
+      "deadline_misses": 0,
+      "nrx_bound_violations": 0,
+      "conv_bound_violations": 0,
+      "ai_bound_violations": 0,
+      "ai_horizon_violations": 0,
+      "duplicate_executions": 0
+    },
+    "gates": {
+      "prospective_sources_match": true,
+      "two_arms_per_control_point": true,
+      "all_arm_gates_pass": true,
+      "full_15ms_control_budget_admission_charged": true,
+      "both_homes_continue_radio": true,
+      "all_global_ai_clients_fail_closed": true,
+      "prepare_ambiguous_request_not_launched": true,
+      "commit_ambiguous_request_not_launched": true,
+      "complete_ambiguous_request_executed_once": true,
+      "no_duplicate_execution": true,
+      "all_safety_gates_zero": true
+    }
+  },
+  "unit_validation": {
+    "aerial_container_tests_passed": 77,
+    "qwen_runtime_tests_passed": 3,
+    "dart_runtime_tests_passed": 21,
+    "total_tests_passed": 101,
+    "new_c133_tests_passed": 2,
+    "environment_split": "trace_qwen_worker tests require the Qwen PyTorch runtime; all other softwall tests ran in the Aerial runtime, and DART runtime tests ran separately in the Aerial runtime"
+  },
+  "fault_regression": {
+    "artifact": "results/softwall_multigpu/confirm132_runtime_fault_regression.json",
+    "iterations": 10000,
+    "seed": 20260924,
+    "pass": true,
+    "note": "core DART runtime was unchanged by C133; C132 frozen regression remains applicable"
+  },
+  "envelope_v7": {
+    "counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "c132_c133_full_budget_control_matrix_status": "QSU",
+    "manifest_items": 8,
+    "manifest_hash_mismatches": 0
+  },
+  "artifact_integrity": {
+    "formal_artifact_count": 51,
+    "source_check_count": 11,
+    "all_source_checks_match": true,
+    "artifact_hash_mismatches": 0
+  },
+  "documentation_audit": {
+    "documents": 10,
+    "local_links_checked": 448,
+    "missing_links": 0,
+    "outside_workspace_links": 0,
+    "git_diff_check": "PASS"
+  },
+  "claim_boundary": "finite-sample bounded volatile broker fail-stop containment at post-apply prepare, commit, and complete with all three 5 ms RPC budgets admission-charged; no restart, durable reconciliation, exactly-once, partition, GPU hang, production WCET, or throughput-superiority claim"
+}

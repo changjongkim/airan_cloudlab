@@ -55,12 +55,20 @@ def wait_value(control: _Control, offset: int, expected: int, timeout_s: float) 
 
 
 class CudaIpcOwner:
-    def __init__(self, tag: str, forward: cp.ndarray, backward: cp.ndarray):
+    def __init__(
+        self,
+        tag: str,
+        forward: cp.ndarray,
+        backward: cp.ndarray,
+        directory: str | Path = "/dev/shm",
+    ):
         self.tag = tag
         self.forward = forward
         self.backward = backward
-        self.info_path = Path(f"/dev/shm/cuda_ipc_{tag}.info")
-        self.control_path = Path(f"/dev/shm/cuda_ipc_{tag}.ctrl")
+        root = Path(directory)
+        root.mkdir(parents=True, exist_ok=True)
+        self.info_path = root / f"cuda_ipc_{tag}.info"
+        self.control_path = root / f"cuda_ipc_{tag}.ctrl"
         self.session = uuid.uuid4().hex
         self.control = _Control(self.control_path, create=True)
         info = {
@@ -99,9 +107,15 @@ class CudaIpcOwner:
 
 
 class CudaIpcPeer:
-    def __init__(self, tag: str, timeout_s: float):
-        self.info_path = Path(f"/dev/shm/cuda_ipc_{tag}.info")
-        self.control_path = Path(f"/dev/shm/cuda_ipc_{tag}.ctrl")
+    def __init__(
+        self,
+        tag: str,
+        timeout_s: float,
+        directory: str | Path = "/dev/shm",
+    ):
+        root = Path(directory)
+        self.info_path = root / f"cuda_ipc_{tag}.info"
+        self.control_path = root / f"cuda_ipc_{tag}.ctrl"
         deadline = time.monotonic() + timeout_s
         while time.monotonic() < deadline and not self.info_path.is_file():
             time.sleep(0.001)

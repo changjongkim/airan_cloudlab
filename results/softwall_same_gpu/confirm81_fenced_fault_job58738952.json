@@ -1,0 +1,29 @@
+{
+  "schema": "softwall-confirm81-fenced-ai-timeout-v1",
+  "job": "58738952",
+  "gates": {
+    "source_hashes": true,
+    "contract": true,
+    "provenance": true,
+    "safety": true,
+    "two_endpoint_route": true,
+    "correlated_all_fail": true,
+    "joint_physical_path": true,
+    "fenced_fault_continuation": true
+  },
+  "all_pass": true,
+  "correct_cells": 196,
+  "background_units": 2,
+  "two_admitted_releases": 56,
+  "cell2_routed": 56,
+  "cell3_routed": 49,
+  "four_conventional_releases": 31,
+  "correlated_all_fail_releases": 10,
+  "joint_ai_units": 1,
+  "joint_retimes": 1,
+  "fault_release": 0,
+  "releases_after_fault": 99,
+  "fault_fenced_ai_units": 1,
+  "max_ai_host_ms": 12.782803,
+  "interpretation": "A GPU-synchronized worker marker certifies one joint AI unit after its RPC response is delayed beyond the 12 ms timeout. The controller retires that lease, disables future AI admissions and continues four-cell radio releases. Only post-GPU-response delay is tested; no GPU hang/worker crash proof, WCET, real DU expiry or joint-policy superiority claim."
+}

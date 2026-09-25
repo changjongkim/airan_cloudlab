@@ -1,0 +1,47 @@
+{
+  "schema": "softwall-same-request-ipc-analysis-v1",
+  "campaign": "confirm32_same_request_persistent_ipc",
+  "gates": {
+    "all_correct": true,
+    "deadline_misses_zero": true,
+    "endpoint_timeouts_zero": true,
+    "worker_units_match": true,
+    "persistent_lifecycle": true,
+    "cap80_visible_sms": true,
+    "all_pass": true
+  },
+  "totals": {
+    "releases": 10000,
+    "correct": 10000,
+    "misses": 0,
+    "nrx_commits": 10000,
+    "fallbacks": 0,
+    "recoveries": 0,
+    "unrecovered": 0,
+    "timeouts": 0
+  },
+  "rows": [
+    {
+      "cap": 80,
+      "job": 58673249,
+      "iterations": 10000,
+      "snr_db": null,
+      "correct": 10000,
+      "misses": 0,
+      "nrx_commits": 10000,
+      "fallbacks": 0,
+      "recoveries": 0,
+      "unrecovered": 0,
+      "timeouts": 0,
+      "response_p99_ms": 4.125358820000001,
+      "response_max_ms": 8.729917,
+      "front_mean_ms": 1.4992237443089484,
+      "post_mean_ms": 0.7826314658641815,
+      "worker_units": 10020,
+      "expected_worker_units": 10020,
+      "worker_gpu_mean_ms": 1.0806216332964793,
+      "visible_sms": 86,
+      "lifecycle": "persistent during RAN epoch; teardown after final release"
+    }
+  ]
+}

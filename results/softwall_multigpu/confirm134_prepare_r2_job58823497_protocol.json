@@ -1,0 +1,41 @@
+{
+  "schema": "softwall-global-ai-control-point-broker-crash-arm-protocol-v1",
+  "status": "frozen-before-run",
+  "label": "confirm134_prepare_r2_job58823497",
+  "iterations": 340,
+  "warmup": 20,
+  "global_policy": "global",
+  "placement": {
+    "gpu0": "four-cell home + two local NRx + Qwen",
+    "gpu1": "four-cell home + two local NRx + Qwen"
+  },
+  "shared_resources": "one serializable BurstGPT request queue; recovery, NRx endpoint/IPC, Qwen execution and physical credits remain per-home",
+  "transaction_order": "observe NRx -> certificate order -> bounded global prepare/hold -> local atomic replan+AI lease -> bounded global commit -> physical AI -> bounded global complete; broker fail-stop disables global AI clients without retry; local RAN certificates continue",
+  "fault_injection": {
+    "home": 0,
+    "operation": "prepare",
+    "operation_number": 30,
+    "point": "process calls os._exit(86) immediately after the configured state transition, before reply; no synchronous fault-path logging",
+    "expected_exit_code": 86,
+    "broker_rpc_timeout_ms": 5
+  },
+  "cuda_module_loading": "LAZY",
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 25.0,
+  "guard_ms": 2,
+  "global_broker_rpc_timeout_ms": 5,
+  "global_broker_transaction_budget_ms": 15,
+  "admission_ai_guard_ms": 17,
+  "fault_every": 5,
+  "source_sha256": {
+    "/softwall/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "/softwall/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "/softwall/control_point_crash_global_trace_lease_broker.py": "ae2ca3d39df3f92b8200d7fc4ef52be395b06dc4362e054aa0f1de71d9a01c4e",
+    "/softwall/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/softwall/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/softwall_task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

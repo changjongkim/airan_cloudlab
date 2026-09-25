@@ -1,0 +1,70 @@
+{
+  "schema": "softwall-frozen-exploratory-protocol-v1",
+  "campaign": "confirm92_qualified_duration_fourcell_stratified_decision_screen",
+  "frozen_before_execution": true,
+  "physical_qualification": "confirm91_conv12_nrx30_gc_off_job58743005.json",
+  "q_model": "confirm77_train_only_q_model.json",
+  "heldout_raw": "confirm77_multisnr_job58738952_test.json",
+  "heldout_seed": 20910001,
+  "sampling_seed": 20992092,
+  "cases_per_stratum": 160,
+  "cells": 4,
+  "nrx_endpoint_capacity": 2,
+  "nrx_bound_ms": 30,
+  "conventional_bound_ms": 12,
+  "ai_bound_ms": 15,
+  "commit_guard_ms": 2,
+  "ai_units": 4,
+  "ai_deadline_choices_ms": [
+    35,
+    45,
+    55,
+    65,
+    75,
+    85,
+    95,
+    105,
+    115,
+    130
+  ],
+  "ai_value_range": [
+    1,
+    3
+  ],
+  "radio_floor_choices": [
+    0.1,
+    0.2
+  ],
+  "strata": [
+    {
+      "name": "d155_equal",
+      "radio_deadline_ms": 155,
+      "heterogeneous_ai_values": false
+    },
+    {
+      "name": "d155_varied",
+      "radio_deadline_ms": 155,
+      "heterogeneous_ai_values": true
+    },
+    {
+      "name": "d115_equal",
+      "radio_deadline_ms": 115,
+      "heterogeneous_ai_values": false
+    },
+    {
+      "name": "d115_varied",
+      "radio_deadline_ms": 115,
+      "heterogeneous_ai_values": true
+    }
+  ],
+  "frozen_gates": "Source/model/heldout raw/physical C91 hashes must match. Predeclared 160 sampled PHY quartets reused across four strata with only online observable features; exact joint and strong AI-aware 1-swap greedy share exact safety and recourse evaluator; no exact-below-greedy or feasibility mismatch. Record feasible count, positive expected-AI gaps and NRx subset differences for D155 and unqualified candidate D115, equal and varied AI values. No minimum positive-gap success criterion: a zero-gap result is preserved as negative evidence. Physical and online novelty claims are prohibited.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/screen_confirm92_qualified_fourcell.py": "b8b674d19e4e84a2f77f50dce41fa49eb9603bd6b0c0cd553dd84434ab1c457e",
+    "scripts_for_node/softwall_same_gpu/offline_contingent_phy_ai_v2.py": "208e57005bb968c5c3d0d278d3a0363ecc1e6fe05224c5b968814062225194ba",
+    "scripts_for_node/softwall_same_gpu/offline_recovery_exchange.py": "36ecc9adc538929e1c7e16030c56853ee78d808464615cf9c381ccf67b5229e3",
+    "scripts_for_node/softwall_same_gpu/mixed_snr_phy_value_model.py": "a330e60e82f515fe57f9b4d914e37ba63f4d7be5f39ccb07bac6bf8d5a43db69",
+    "results/softwall_same_gpu/confirm77_train_only_q_model.json": "20ff0fc3249928e59e0a153a4ee64728c823c5ff6e3374ba0305f75440bd17d0",
+    "results/softwall_same_gpu/raw/confirm77_multisnr_job58738952_test.json": "6115de38c9c4a616462477558c5adf497220f3265ca3c1a27aadd6ef3803219e",
+    "results/softwall_same_gpu/confirm91_conv12_nrx30_gc_off_job58743005.json": "fb8f70d2531339303f6f36e0e8ffbd401ea494c78b3b758a6ce5012b83661a01"
+  }
+}

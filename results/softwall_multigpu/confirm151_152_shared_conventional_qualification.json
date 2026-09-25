@@ -1,0 +1,96 @@
+{
+  "all_pass": true,
+  "claim_scope": "two-node finite-sample physical qualification of the shared conventional P2P data path and deterministic global execution order; no integrated all-fail admission, external-AI lease, deadline service bound, WCET, or V17 QSU claim",
+  "gates": {
+    "artifact_hashes_valid": true,
+    "both_individual_pass": true,
+    "global_order_and_lifecycle": true,
+    "identical_frozen_sources": true,
+    "independent_nodes": true,
+    "independent_workload_seeds": true,
+    "nine_gates_each": true,
+    "owner_counts_and_integrity": true,
+    "two_results": true,
+    "worker_counts": true
+  },
+  "individual_results": [
+    "results/softwall_multigpu/confirm151_shared_conv_qualified_job58851949_result.json",
+    "results/softwall_multigpu/confirm152_shared_conv_holdout_job58852015_result.json"
+  ],
+  "nodes": [
+    "nid001253",
+    "nid001280"
+  ],
+  "per_node_timing": [
+    {
+      "backward_gpu_us": {
+        "count": 500,
+        "max": 33.215999603271484,
+        "mean": 14.723455984145403,
+        "p50": 14.14399966597557,
+        "p99": 23.264000192284584
+      },
+      "conventional_gpu_ms": {
+        "count": 500,
+        "max": 6.612671852111816,
+        "mean": 2.385647678375244,
+        "p50": 2.3535358905792236,
+        "p99": 2.5611519813537598
+      },
+      "forward_gpu_us": {
+        "count": 500,
+        "max": 65.05600363016129,
+        "mean": 32.51193605363369,
+        "p50": 42.01599955558777,
+        "p99": 53.69599908590317
+      },
+      "node": "nid001253",
+      "worker_path_ms": {
+        "count": 500,
+        "max": 11.870798,
+        "mean": 2.7271500459999998,
+        "p50": 2.68062,
+        "p99": 3.14624
+      }
+    },
+    {
+      "backward_gpu_us": {
+        "count": 500,
+        "max": 35.0399985909462,
+        "mean": 14.827647989615798,
+        "p50": 14.4640002399683,
+        "p99": 23.072000592947006
+      },
+      "conventional_gpu_ms": {
+        "count": 500,
+        "max": 5.458240032196045,
+        "mean": 2.3849789447784424,
+        "p50": 2.360991954803467,
+        "p99": 2.5547521114349365
+      },
+      "forward_gpu_us": {
+        "count": 500,
+        "max": 74.0479975938797,
+        "mean": 32.85324804857373,
+        "p50": 41.79200157523155,
+        "p99": 52.57600173354149
+      },
+      "node": "nid001280",
+      "worker_path_ms": {
+        "count": 500,
+        "max": 10.908668,
+        "mean": 2.7234798519999965,
+        "p50": 2.690128,
+        "p99": 2.918389
+      }
+    }
+  ],
+  "schema": "softwall-confirm151-152-shared-conventional-qualification-v1",
+  "status": "TWO_NODE_PHYSICAL_PATH_PASS_V17_REMAINS_UQ",
+  "totals": {
+    "correct_units": 1000,
+    "decode_errors": 0,
+    "home_units": 1000,
+    "worker_units": 1000
+  }
+}

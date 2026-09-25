@@ -1,0 +1,21 @@
+{
+  "schema": "softwall-blinded-phy-protocol-v1",
+  "campaign": "confirm102_blinded_independent_phy_for_multi_event_policy",
+  "frozen_before_trace_execution": true,
+  "job": "58788060",
+  "node": "nid001193",
+  "trace_prefix": "confirm102_blinded_newphy_job58788060",
+  "phy_seed": 20994102,
+  "trials_per_snr": 250,
+  "snrs_db": [
+    -10.0,
+    -9.0,
+    -8.0,
+    -7.0
+  ],
+  "q_model": "confirm77_train_only_q_model.json",
+  "embargo": "Do not inspect PHY records or labels until the multi-event workload, policies, comparators, ablations, metrics, and decision gates are frozen in a separate protocol.",
+  "frozen_gates": "Generate exactly one independent four-SNR synthetic PHY trace using the stated seed and trial count, with observed features recorded and prewarmed. This protocol freezes only trace generation. It does not define or validate a policy, workload, service bound, online claim, GPU throughput claim, hard deadline, or production DU result. The trace remains blinded until a separate prospective policy protocol is frozen.",
+  "generator": "scripts_for_node/softwall_same_gpu/run_confirm94_new_phy_test.sh",
+  "generator_sha256": "54543b54e13f8b8e7dd4f648ca9626e7b4d010347d8285ab480af9b83338d7cf"
+}

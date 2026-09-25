@@ -1,0 +1,27 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "sionna_nrx_layout_development",
+  "frozen_before_execution": true,
+  "role": "Post-failure interface localization only; not a BLER holdout or production qualification.",
+  "established_inputs": [
+    "MCS7/stream1/TX1 clean direct and wrapper paths decoded 10/10",
+    "Sionna CDL-A official-profile direct and wrapper paths decoded NeuralRx 0/600",
+    "the public notebook passes the TensorFlow DLPack result without an explicit Fortran conversion"
+  ],
+  "arms": [
+    "native TensorFlow/Numpy C-contiguous layout",
+    "explicit CuPy Fortran-contiguous layout used by the prior probes"
+  ],
+  "channel": "Sionna CDL-A, 100 ns, 0.8333 m/s, normalized, 1x4 uplink",
+  "esno_db": 30.0,
+  "iterations_per_arm": 20,
+  "payload_seed": 20358920,
+  "channel_seed": 58921,
+  "decision_rule": "If native passes while Fortran fails, correct the channel handoff and then preregister a disjoint BLER holdout. If both fail, reject memory layout as the cause and continue channel-estimate/tensor-value diagnosis. Preserve both arms.",
+  "source_sha256_before_execution": {
+    "probe_sionna_nrx_layout_development.py": "ff911d625b3711161ef1d2aee7033e9ae4eb66dbc1f075a36d1676ddc7c83c6d",
+    "run_sionna_nrx_layout_development.sh": "167ed4aabc3e6366d0040b558fda4e1998f8650b92a046b0a680b5412b643f33",
+    "dual_receiver_phy.py": "fe71fc08a62ffe1d96c76241fc62b895c92d2e36ed1d4b16d6918e55e79b4a9c",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

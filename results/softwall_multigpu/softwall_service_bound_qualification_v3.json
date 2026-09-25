@@ -1,0 +1,87 @@
+{
+  "all_pass": true,
+  "claim_boundary": "C138--C140 establish a finite-sample correction chain on A100: a socket timeout is not a controller-return bound, a distinct 7 ms per-RPC admission charge passed six fault arms, and the resulting AI35+control21+guard2 class executed eight conditional exchanges. This is not WCET, production d_MAC, independent-node C140, cross-family, or throughput-superiority evidence.",
+  "control_contract": {
+    "ai_completion_guard_ms": 2.0,
+    "conditional_decision_window_ms": 58.0,
+    "control_transaction_bound_ms": 21.0,
+    "effective_transaction_bound_ms": 58.0,
+    "per_rpc_admission_bound_ms": 7.0,
+    "raw_ai_bound_ms": 35.0,
+    "socket_timeout_ms": 5.0,
+    "static_all_fail_slack_ms": 53.0,
+    "synchronous_rpc_count": 3
+  },
+  "corrected_conditional_class": {
+    "ai35_candidate_exchanges": 8,
+    "arms": 2,
+    "campaign": "C140",
+    "candidate_branches": 309,
+    "conditional_margin_ms": 0.0,
+    "minimum_physical_guarded_horizon_margin_ms": 43.647277,
+    "nodes": [
+      "nid001252"
+    ],
+    "radio_records": 2560,
+    "static_margin_ms": -5.0
+  },
+  "corrected_fault_qualification": {
+    "admission_bound_exceedances": 0,
+    "arms": 6,
+    "attempted_rpc_records": 2020,
+    "campaign": "C139",
+    "maximum_rpc_wall_ms": 5.653235,
+    "nodes": [
+      "nid001252"
+    ],
+    "radio_records": 16320,
+    "radio_records_after_fault_detection": 14919
+  },
+  "falsification": {
+    "attempted_rpc_records": 351,
+    "campaign": "C138",
+    "faulting_rpc_max_ms": 5.830741,
+    "five_ms_exceedances": 2,
+    "node": "nid001144",
+    "system_safety_preserved": true
+  },
+  "gates": {
+    "c138_falsifies_timeout_as_wall_bound": true,
+    "c139_corrected_fault_matrix_passes": true,
+    "c140_corrected_conditional_class_passes": true,
+    "full_control_charge_is_21_ms": true,
+    "historical_v2_was_finite_sample_pass": true,
+    "socket_timeout_separated_from_admission_bound": true,
+    "v13_validation_chain_passes": true
+  },
+  "hard_real_time_status": "UNPROVEN",
+  "inputs": {
+    "c138_falsification": {
+      "path": "results/softwall_multigpu/confirm138_prepare1_job58831304_result.json",
+      "sha256": "cf7aacdd1628f8bdb0751502ae0664d3c0e412fc420a5ac20990b36b682f0788"
+    },
+    "c139_corrected_fault_matrix": {
+      "path": "results/softwall_multigpu/confirm139_qualified_control_bound_result.json",
+      "sha256": "5c35649c19510f859943375e5d40a2d037c5e5b41328cd2a318ab0de74e4c7af"
+    },
+    "c140_corrected_conditional_class": {
+      "path": "results/softwall_multigpu/confirm140_v13_ai35_result.json",
+      "sha256": "55aeeb54a0337b64f72caec01ef004e084d84df21183c35eac1ff547dde810a6"
+    },
+    "historical_v2": {
+      "path": "results/softwall_multigpu/softwall_service_bound_qualification_v2.json",
+      "sha256": "56a836d5ee45ca40fdabfd69bf7244bddad869cbd5618b09e03ea8995820e464"
+    },
+    "v13_validation": {
+      "path": "results/softwall_multigpu/softwall_envelope_v13_validation_summary.json",
+      "sha256": "4b178233cece247bfce1967e797e0d93a35f9ca2eac0485880a069d4d832bb1c"
+    }
+  },
+  "schema": "softwall-service-bound-qualification-v3",
+  "status": "FINITE_SAMPLE_CORRECTED_CONTROL_PASS",
+  "supersession": {
+    "current_contract": "V13_AI35_CONTROL21_GUARD2",
+    "reason": "C138 observed controller-return wall time above the 5 ms socket timeout; the timeout therefore cannot be reused as the admission bound.",
+    "superseded_contract": "V12_AI40_CONTROL15_GUARD2"
+  }
+}

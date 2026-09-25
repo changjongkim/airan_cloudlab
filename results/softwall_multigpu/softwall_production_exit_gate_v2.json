@@ -1,0 +1,604 @@
+{
+  "schema": "softwall-production-exit-gate-v2",
+  "all_pass": false,
+  "status": "FAIL_CURRENT_DESIGN_NOT_PRODUCTION_QUALIFIED",
+  "timing_contract": {
+    "status": "VENDOR_TESTMAC_THRESHOLD_IDENTIFIED_NOT_PRODUCTION_D_MAC",
+    "source_role": "NVIDIA describes testMAC as a developer tool acting as L2 in a controlled environment; it is a stronger integration target than the synthetic P180/D155 contract but not a field DU trace.",
+    "early_harq_deadline_ns": 2000000,
+    "ul_ind_deadline_ns": 4500000,
+    "prach_ind_deadline_ns": 4500000,
+    "uci_ind_deadline_ns": 4500000,
+    "validator_semantics": "testMAC reconstructs slot T0 with sfn_to_tai and marks the indication late when handler-entry time minus T0 exceeds the configured threshold.",
+    "source_sha256": {
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/README.md": "fa0779f6a3f2e7a6951be9a60539164cc5b939c4667a0b8f41cd09d443521379",
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/testMAC/test_mac_config.yaml": "3c9fa6cfa152c860b30bfb7cc6f5502c5b46ebeda604b390f5ced242b434a78f",
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/testMAC/test_mac_configs.cpp": "14ec700e67bc96e52bcf58c382a9259e1a038e9b3c977a867594bdee7534ce60",
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/testMAC/scf_fapi_handler.cpp": "4aa84c7ed18a645b551a85ab862fa0cd669402a8ad6c6c3d28fad8a3ed3bbd46"
+    }
+  },
+  "current_timing_diagnosis": {
+    "gate_pass": false,
+    "live_du_trace_available": false,
+    "wait_then_recover_diagnostic_pass": false,
+    "raw_iq_full_remote_diagnostic_pass": false,
+    "qualification_rule": "Production timing requires both a target-DU trace-derived d_MAC and a physically requalified implementation under that contract. Passing the testMAC microbenchmark alone is insufficient.",
+    "local_isolated_clean": {
+      "neural_wall_ms": {
+        "count": 1000,
+        "mean": 3.024594017,
+        "p50": 3.0073505000000003,
+        "p95": 3.1487620499999998,
+        "p99": 3.18159802,
+        "min": 2.964938,
+        "max": 3.666388
+      },
+      "conventional_wall_ms": {
+        "count": 1000,
+        "mean": 3.627196293,
+        "p50": 3.599879,
+        "p95": 3.75226505,
+        "p99": 3.80916563,
+        "min": 3.541156,
+        "max": 7.106327
+      },
+      "wait_then_recover_wall_ms": {
+        "count": 1000,
+        "mean": 6.65179031,
+        "p50": 6.608893,
+        "p95": 6.8659471,
+        "p99": 6.984433309999999,
+        "min": 6.538606,
+        "max": 10.114819
+      },
+      "deadline_counts": {
+        "neural_wall_le_deadline": 1000,
+        "conventional_wall_le_deadline": 997,
+        "wait_then_recover_wall_le_deadline": 0
+      }
+    },
+    "speculative_same_gpu_parallel": {
+      "parallel_pair_wall_ms": {
+        "count": 1000,
+        "mean": 7.5836441709999995,
+        "p50": 6.828067,
+        "p95": 13.559387899999994,
+        "p99": 17.552368639999994,
+        "min": 6.056101,
+        "max": 29.424393
+      },
+      "deadline_counts": {
+        "parallel_pair_wall_le_deadline": 0,
+        "parallel_pair_wall_gt_deadline": 1000
+      }
+    },
+    "cross_gpu_candidates": {
+      "precomputed_ls_split": {
+        "parallel_pair_wall_ms": {
+          "n": 1000,
+          "mean": 6.492539013,
+          "p50": 5.9424305,
+          "p95": 10.321105449999997,
+          "p99": 11.896979589999987,
+          "p99_9": 20.12331251500006,
+          "min": 5.78287,
+          "max": 20.785165
+        },
+        "deadline_counts": {
+          "parallel_pair_wall_le_deadline": 0,
+          "parallel_pair_wall_gt_deadline": 1000
+        }
+      },
+      "raw_iq_full_remote": {
+        "parallel_pair_wall_ms": {
+          "n": 1000,
+          "mean": 4.226587075,
+          "p50": 3.8313275,
+          "p95": 6.671513199999998,
+          "p99": 9.506097289999998,
+          "p99_9": 14.500585940000088,
+          "min": 3.782834,
+          "max": 15.48554
+        },
+        "deadline_counts": {
+          "parallel_pair_wall_le_deadline": 852,
+          "parallel_pair_wall_gt_deadline": 148
+        }
+      },
+      "raw_iq_full_remote_gc_off": {
+        "parallel_pair_wall_ms": {
+          "n": 1000,
+          "mean": 4.399739771,
+          "p50": 3.987641,
+          "p95": 6.704602999999999,
+          "p99": 10.040892099999999,
+          "p99_9": 17.301237882000052,
+          "min": 3.93597,
+          "max": 17.889531
+        },
+        "deadline_counts": {
+          "parallel_pair_wall_le_deadline": 838,
+          "parallel_pair_wall_gt_deadline": 162
+        }
+      },
+      "raw_iq_full_remote_same_stream": {
+        "parallel_pair_wall_ms": {
+          "n": 1000,
+          "mean": 4.267979391000001,
+          "p50": 3.9294645,
+          "p95": 6.218840949999999,
+          "p99": 11.696084169999999,
+          "p99_9": 15.430659768000005,
+          "min": 3.875817,
+          "max": 15.486372
+        },
+        "deadline_counts": {
+          "parallel_pair_wall_le_deadline": 885,
+          "parallel_pair_wall_gt_deadline": 115
+        },
+        "correctness": {
+          "neural_correct": 1000,
+          "conventional_correct": 1000
+        }
+      },
+      "raw_iq_single_stream_wrapper": {
+        "controller_outcome": "endpoint timeout on first timed request",
+        "completed_worker_units": 101,
+        "neural_gpu_ms": {
+          "count": 101,
+          "mean": 106.92192991653292,
+          "p50": 106.88809967041016,
+          "p99": 107.57743835449219,
+          "max": 107.59107208251953
+        }
+      }
+    },
+    "same_stream_stage_diagnosis": {
+      "analysis_role": "Mechanism diagnosis only; profiling events alter timing and do not qualify the fast path.",
+      "timely_units": 265,
+      "late_units": 35,
+      "channel_estimation": {
+        "gpu_ms": {
+          "n": 300,
+          "mean": 1.2845400547981263,
+          "p50": 0.8664640188217163,
+          "p95": 3.895593583583832,
+          "p99": 4.873409118652329,
+          "max": 9.592415809631348
+        },
+        "pearson_with_worker_total": 0.993403615679862,
+        "pearson_with_pair_wall": 0.9602820841334867,
+        "late_mean_gpu_ms": 3.9719634430749076,
+        "timely_mean_gpu_ms": 0.9295973431389287
+      },
+      "tensorrt_graph": {
+        "gpu_ms": {
+          "n": 300,
+          "mean": 0.8623288534084956,
+          "p50": 0.857375979423523,
+          "p95": 0.8849647969007493,
+          "p99": 0.8863686168193817,
+          "max": 0.8871679902076721
+        },
+        "pearson_with_worker_total": 0.1117324911781864,
+        "pearson_with_pair_wall": 0.07579145503536515,
+        "late_mean_gpu_ms": 0.8648182885987418,
+        "timely_mean_gpu_ms": 0.8620000600814819
+      },
+      "forward_copy_gpu_us": {
+        "n": 300,
+        "mean": 36.26122652242581,
+        "p50": 20.735999569296837,
+        "p95": 67.58400052785873,
+        "p99": 69.26303833723067,
+        "max": 85.75999736785889
+      },
+      "interpretation": "Profiling events alter timing, so this is mechanism evidence only. Channel estimation carried the dominant tail and correlated 0.9603 with pair wall time; TensorRT and P2P remained comparatively stable."
+    },
+    "qualified_q2_context": {
+      "nrx_release_to_complete_ms": {
+        "count": 4800,
+        "max": 18.123007,
+        "mean": 5.192831625833324,
+        "p50": 5.862303,
+        "p99": 8.098506
+      },
+      "recovery_path_ms": {
+        "count": 1312,
+        "max": 13.465105,
+        "mean": 3.4790348414634127,
+        "p50": 3.40418,
+        "p99": 4.239559
+      }
+    },
+    "interpretation": "The current wait-then-recover path missed the 4.5 ms diagnostic in 1000/1000 clean isolated trials. Same-GPU speculative dual execution and the precomputed-LS cross-GPU split also missed 1000/1000. Moving the full NeuralRx path behind raw-IQ P2P improved completion to 852/1000, while GC OFF produced 838/1000. Caller-owned same-stream execution improved this to 885/1000 but retained 115 late completions. Stage diagnosis localized the tail to cuPHY channel estimation rather than TensorRT or P2P. These are sample diagnostics and do not qualify the path at 4.5 ms."
+  },
+  "external_channel_diagnosis": {
+    "gate_pass": true,
+    "supported_channel_holdout_available": true,
+    "aerial_tdl_development_has_any_neural_success": false,
+    "qualification_rule": "External-channel support requires a model with an explicit supported-channel contract and a frozen disjoint-seed holdout; development-screen success alone would not qualify the mode.",
+    "aerial_tdl_a": {
+      "channel": "Aerial TDL-A, 30 ns, 10 Hz, 1x4 UL, no AWGN",
+      "qualified": false,
+      "campaigns": [
+        {
+          "campaign": "prior_corrected_1x4",
+          "arms": [
+            {
+              "name": "raw",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            }
+          ]
+        },
+        {
+          "campaign": "normalization",
+          "arms": [
+            {
+              "name": "raw",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "cfr_rms",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "match_ue_power",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "match_component_power",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            }
+          ]
+        },
+        {
+          "campaign": "radio_profile",
+          "arms": [
+            {
+              "name": "historical",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "reference_dmrs_spacing",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "reference_dmrs_and_mcs",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "nvidia_reference",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            }
+          ]
+        },
+        {
+          "campaign": "tx_and_channel_mode",
+          "arms": [
+            {
+              "name": "frequency_delay0",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "frequency_delay1us",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "time_delay1us",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            }
+          ]
+        },
+        {
+          "campaign": "official_fp32",
+          "arms": [
+            {
+              "name": "frequency_delay0",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "frequency_delay1us",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            },
+            {
+              "name": "time_delay1us",
+              "conventional_correct": 10,
+              "neural_correct": 0
+            }
+          ]
+        }
+      ]
+    },
+    "interface_controls": {
+      "clean_reference": {
+        "conventional_correct": 10,
+        "neural_correct": 10
+      },
+      "public_default_sionna_rayleigh": {
+        "conventional_correct": 20,
+        "neural_correct": 20
+      }
+    },
+    "sionna_cdl_development_boundary": [
+      {
+        "model": "A",
+        "delay_spread_ns": 1.0,
+        "conventional_correct": 10,
+        "neural_correct": 10
+      },
+      {
+        "model": "A",
+        "delay_spread_ns": 10.0,
+        "conventional_correct": 10,
+        "neural_correct": 2
+      },
+      {
+        "model": "A",
+        "delay_spread_ns": 30.0,
+        "conventional_correct": 10,
+        "neural_correct": 0
+      },
+      {
+        "model": "A",
+        "delay_spread_ns": 100.0,
+        "conventional_correct": 10,
+        "neural_correct": 0
+      },
+      {
+        "model": "B",
+        "delay_spread_ns": 100.0,
+        "conventional_correct": 10,
+        "neural_correct": 0
+      },
+      {
+        "model": "C",
+        "delay_spread_ns": 100.0,
+        "conventional_correct": 10,
+        "neural_correct": 0
+      },
+      {
+        "model": "D",
+        "delay_spread_ns": 100.0,
+        "conventional_correct": 10,
+        "neural_correct": 10
+      },
+      {
+        "model": "E",
+        "delay_spread_ns": 100.0,
+        "conventional_correct": 10,
+        "neural_correct": 10
+      }
+    ],
+    "sionna_cdl_de_holdout": {
+      "schema": "softwall-external-channel-holdout-v1",
+      "frozen_before_execution": true,
+      "disjoint_from_development": true,
+      "model_channel_contract_declared": true,
+      "qualified_scope_if_pass": "Finite-sample compatibility and conditional recovery value only for the frozen Sionna CDL-D/E mode; no TDL-A, field-IQ, WCET, or production-HARQ generalization.",
+      "input_sha256": {
+        "protocol": "5d43eac85e37690740f48241f5d308bd3a4954a982033bacbb0a3f4ba4be31fd",
+        "model_D": "1ebb3195cc7c427ac992325dd015c2898839ef49d4ce3ea8295373acda47938f",
+        "model_E": "03e6e7219ccef3484cab06f03a14589cf54343861d22f397d4ce5edc8061d7ab"
+      },
+      "checks": {
+        "conventional_pipeline_operational": true,
+        "neural_pipeline_operational": true,
+        "bler_grid_complete": true,
+        "observable_only_policy": true,
+        "conditional_recovery_value": true
+      },
+      "models": {
+        "D": {
+          "structural": true,
+          "high_snr_pipeline": true,
+          "conditional_value": true,
+          "crc_payload_consistent": true,
+          "low_snr_neural_only": 16,
+          "low_snr_conventional_only": 5,
+          "paired_exact_pvalue": 0.02660369873046875,
+          "strata": [
+            {
+              "esno_db": -4.0,
+              "trials": 50,
+              "conventional_correct": 0,
+              "neural_correct": 0,
+              "both_correct": 0,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 0,
+              "neither_correct": 50
+            },
+            {
+              "esno_db": -3.6,
+              "trials": 50,
+              "conventional_correct": 5,
+              "neural_correct": 21,
+              "both_correct": 5,
+              "neural_only_correct": 16,
+              "conventional_only_correct": 0,
+              "neither_correct": 29
+            },
+            {
+              "esno_db": -3.2,
+              "trials": 50,
+              "conventional_correct": 48,
+              "neural_correct": 44,
+              "both_correct": 44,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 4,
+              "neither_correct": 2
+            },
+            {
+              "esno_db": -3.0,
+              "trials": 50,
+              "conventional_correct": 50,
+              "neural_correct": 49,
+              "both_correct": 49,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 1,
+              "neither_correct": 0
+            },
+            {
+              "esno_db": 10.0,
+              "trials": 50,
+              "conventional_correct": 50,
+              "neural_correct": 50,
+              "both_correct": 50,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 0,
+              "neither_correct": 0
+            }
+          ]
+        },
+        "E": {
+          "structural": true,
+          "high_snr_pipeline": true,
+          "conditional_value": true,
+          "crc_payload_consistent": true,
+          "low_snr_neural_only": 15,
+          "low_snr_conventional_only": 7,
+          "paired_exact_pvalue": 0.13380050659179688,
+          "strata": [
+            {
+              "esno_db": -4.0,
+              "trials": 50,
+              "conventional_correct": 0,
+              "neural_correct": 0,
+              "both_correct": 0,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 0,
+              "neither_correct": 50
+            },
+            {
+              "esno_db": -3.6,
+              "trials": 50,
+              "conventional_correct": 7,
+              "neural_correct": 19,
+              "both_correct": 4,
+              "neural_only_correct": 15,
+              "conventional_only_correct": 3,
+              "neither_correct": 28
+            },
+            {
+              "esno_db": -3.2,
+              "trials": 50,
+              "conventional_correct": 48,
+              "neural_correct": 44,
+              "both_correct": 44,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 4,
+              "neither_correct": 2
+            },
+            {
+              "esno_db": -3.0,
+              "trials": 50,
+              "conventional_correct": 50,
+              "neural_correct": 50,
+              "both_correct": 50,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 0,
+              "neither_correct": 0
+            },
+            {
+              "esno_db": 10.0,
+              "trials": 50,
+              "conventional_correct": 50,
+              "neural_correct": 50,
+              "both_correct": 50,
+              "neural_only_correct": 0,
+              "conventional_only_correct": 0,
+              "neither_correct": 0
+            }
+          ]
+        }
+      },
+      "aggregate_low_snr_paired": {
+        "neural_only": 31,
+        "conventional_only": 12,
+        "exact_pvalue": 0.005401572654591291
+      },
+      "all_pass": true,
+      "status": "P3_PASS",
+      "claim_boundary": "Truth labels are used only for offline BLER and paired-outcome evaluation. The result does not qualify A/B/C, TDL-A, field IQ, timing, or production HARQ."
+    },
+    "interpretation": "Aerial TDL-A remains unqualified: conventional succeeded in every reported arm and NeuralRx in none. The clean MCS7 and public-default Sionna Rayleigh controls both passed 20/20, localizing the gap to the selective-channel domain. A fixed development screen found support for CDL-D/E at 100 ns; the disjoint-seed paired holdout then passed its preregistered P3 checks. Across low-SNR D/E pairs NeuralRx-only correctness was 31 versus 12 conventional-only (two-sided exact p=0.00540). This qualifies only the declared Sionna CDL-D/E finite-sample mode, not TDL-A or field IQ."
+  },
+  "claim_decision": {
+    "production_harq_guarantee": "REJECT",
+    "external_tdl_neuralrx_support": "REJECT",
+    "sionna_cdl_de_neuralrx_support": "FINITE_SAMPLE_PASS",
+    "synthetic_qualified_substrate": "RETAIN",
+    "reason": "P3 is now closed for the narrowly declared Sionna CDL-D/E mode. P1 has no target-DU clock contract and P2 retains 4.5 ms tail violations, so the current implementation still cannot be presented as production PUSCH/HARQ capable."
+  },
+  "required_exit_gates": [
+    {
+      "id": "P1_LIVE_DU_CLOCK",
+      "requirement": "Capture IQ-ready, PHY submit, CRC/FAPI publish, and MAC consume/expiry on one clock from the target DU; derive d_MAC from that trace."
+    },
+    {
+      "id": "P2_FAST_PATH",
+      "requirement": "Implement a path whose qualified all-fail completion fits the derived deadline. Same-stream raw-IQ full-remote P2P is the best measured candidate but still exceeded 4.5 ms in 115/1000 trials; the measured tail is dominated by remote cuPHY channel estimation."
+    },
+    {
+      "id": "P3_CHANNEL_COMPATIBILITY",
+      "status": "PASS_FOR_SIONNA_CDL_D_E_ONLY",
+      "requirement": "Completed for the declared Sionna CDL-D/E 100 ns mode. Field-IQ or Aerial TDL-A use requires a new model/domain contract and holdout."
+    },
+    {
+      "id": "P4_INTEGRATED_REQUALIFICATION",
+      "requirement": "Re-run MPS plus bounded Qwen plus correlated all-fail recovery under the P1 timing contract and P3 channel workload on independent nodes."
+    }
+  ],
+  "staged_gate_status": {
+    "schema": "softwall-production-gates-v1",
+    "all_pass": false,
+    "status": "PRODUCTION_NOT_QUALIFIED",
+    "first_blocker": "P1_LIVE_DU_CLOCK",
+    "stages": {
+      "P1_LIVE_DU_CLOCK": {
+        "pass": false,
+        "failures": [
+          "missing target-DU timing contract"
+        ]
+      },
+      "P2_FAST_PATH": {
+        "pass": false,
+        "failures": [
+          "fast path has late pair completions",
+          "P1 contract hash is unavailable",
+          "fast path is not an independent holdout"
+        ]
+      },
+      "P3_CHANNEL_COMPATIBILITY": {
+        "pass": true,
+        "failures": []
+      },
+      "P4_INTEGRATED_REQUALIFICATION": {
+        "pass": false,
+        "failures": [
+          "missing integrated production requalification"
+        ]
+      }
+    },
+    "artifact_sha256": {
+      "p1": null,
+      "p2": "92697d1239ae1f32951cc70dba364cbf364d07544bff6cc5f5d29483c763f950",
+      "p3": "578296af73cdd4acd842ee7833769a3ea441bf2b20f4e220311bbe2ab2172528",
+      "p4": null
+    }
+  }
+}

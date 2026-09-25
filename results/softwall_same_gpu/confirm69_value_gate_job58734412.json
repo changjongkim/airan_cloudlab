@@ -1,0 +1,53 @@
+{
+  "schema": "softwall-confirm69-value-gate-baseline-v1",
+  "job": "58734412",
+  "gates": {
+    "source_hashes": true,
+    "confirm69_pair1_low_job58734412_contract": true,
+    "confirm69_pair1_low_job58734412_provenance": true,
+    "confirm69_pair1_low_job58734412_safety": true,
+    "confirm69_pair1_low_job58734412_online_gate": true,
+    "confirm69_pair1_value_job58734412_contract": true,
+    "confirm69_pair1_value_job58734412_provenance": true,
+    "confirm69_pair1_value_job58734412_safety": true,
+    "confirm69_pair1_value_job58734412_online_gate": true,
+    "confirm69_pair2_value_job58734412_contract": true,
+    "confirm69_pair2_value_job58734412_provenance": true,
+    "confirm69_pair2_value_job58734412_safety": true,
+    "confirm69_pair2_value_job58734412_online_gate": true,
+    "confirm69_pair2_low_job58734412_contract": true,
+    "confirm69_pair2_low_job58734412_provenance": true,
+    "confirm69_pair2_low_job58734412_safety": true,
+    "confirm69_pair2_low_job58734412_online_gate": true,
+    "pair1_paired_trace": true,
+    "pair1_extra_value_skips": true,
+    "pair1_radio_noninferiority": true,
+    "pair2_paired_trace": true,
+    "pair2_extra_value_skips": true,
+    "pair2_radio_noninferiority": true
+  },
+  "all_pass": true,
+  "pairs": [
+    {
+      "name": "pair1",
+      "low_correct": 463,
+      "value_correct": 463,
+      "low_ai_units": 14716,
+      "value_ai_units": 14721,
+      "ai_gain_percent": 0.03397662408263115,
+      "low_gate_skips": 458,
+      "value_gate_skips": 826
+    },
+    {
+      "name": "pair2",
+      "low_correct": 451,
+      "value_correct": 451,
+      "low_ai_units": 14892,
+      "value_ai_units": 14882,
+      "ai_gain_percent": -0.067150147730325,
+      "low_gate_skips": 475,
+      "value_gate_skips": 826
+    }
+  ],
+  "interpretation": "Train-derived incremental-PHY-value bin as a stronger component baseline. Synthetic P150/D130; AI only after radio. AI gain sign is not a frozen pass gate. This is neither AI-aware recovery replan nor joint policy, and no production deadline or novelty claim follows."
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "softwall-envelope-v13-validation-summary-v1",
+  "status": "PASS",
+  "inputs": {
+    "../../results/softwall_multigpu/softwall_sharded_home_envelope_grid_v13.json": "f8e7d9090d80856238ab61bbd840037c2b9d277ae4815225e371afcd09301103",
+    "../../results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v13.json": "9ea65509d401d7135e61bf6136517ab487df8bf434a1a0005e5e507f8bd6ddcd",
+    "../../results/softwall_multigpu/softwall_envelope_v12_v13_control_bound_regression_v1.json": "1c75dc944962843c6c867778af499aee03390486916411fb01be45488a96067e",
+    "../../results/softwall_multigpu/confirm138_prepare1_job58831304_result.json": "cf7aacdd1628f8bdb0751502ae0664d3c0e412fc420a5ac20990b36b682f0788",
+    "../../results/softwall_multigpu/confirm139_qualified_control_bound_result.json": "5c35649c19510f859943375e5d40a2d037c5e5b41328cd2a318ab0de74e4c7af",
+    "../../results/softwall_multigpu/confirm140_v13_ai35_result.json": "55aeeb54a0337b64f72caec01ef004e084d84df21183c35eac1ff547dde810a6"
+  },
+  "model_counts": {
+    "QSU": 5,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 11
+  },
+  "c138": {
+    "node": "nid001144",
+    "failed_gates": [
+      "rpc_wall_bound"
+    ],
+    "rpc_max_elapsed_ms": 5.830741,
+    "socket_timeout_elapsed_exceeded": 2
+  },
+  "c139": {
+    "nodes": [
+      "nid001252"
+    ],
+    "arms": 6,
+    "radio_records": 16320,
+    "radio_records_after_fault_detection": 14919,
+    "rpc_records": 2020,
+    "rpc_max_elapsed_ms": 5.653235,
+    "socket_timeout_elapsed_exceeded": 12,
+    "admission_bound_exceeded": 0
+  },
+  "c140": {
+    "nodes": [
+      "nid001252"
+    ],
+    "radio_records": 2560,
+    "candidate_branches": 309,
+    "ai35_candidate_exchanges": 8,
+    "minimum_physical_guarded_horizon_margin_ms": 43.647277
+  },
+  "gates": {
+    "c138_isolated_5ms_wall_bound_failure": true,
+    "c139_corrected_bound_passes": true,
+    "c140_corrected_exchange_passes": true,
+    "v13_supersedes_old_mode": true,
+    "v12_v13_regression_passes": true,
+    "v13_expected_counts": true
+  },
+  "all_pass": true,
+  "claim_boundary": "V13 closes one finite-sample model/implementation loop: C138 falsifies timeout-equals-wall-bound, C139 qualifies the separated 7 ms admission charge, and C140 realizes the resulting exchange-only AI35 class. It is not WCET, production d_MAC, independent-node C140, or cross-family evidence."
+}

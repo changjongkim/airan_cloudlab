@@ -1,0 +1,92 @@
+{
+  "schema": "softwall-confirm144-v14-independent-node-protocol-v1",
+  "status": "frozen-before-arms",
+  "allocation_node": "nid002049",
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177",
+    "nid001144",
+    "nid001252",
+    "nid001372",
+    "nid001361"
+  ],
+  "ai_arm": {
+    "label": "confirm144_ai45_job58833925",
+    "iterations": 160,
+    "warmup": 20,
+    "payload_seeds": [
+      36000051,
+      36010051
+    ],
+    "channel_seeds": [
+      36001000,
+      36011000
+    ]
+  },
+  "fault_arms": [
+    {
+      "operation": "prepare",
+      "label": "confirm144_prepare_job58833925",
+      "iterations": 200,
+      "warmup": 20,
+      "payload_seeds": [
+        36100051,
+        36110051
+      ],
+      "channel_seeds": [
+        36101000,
+        36111000
+      ]
+    },
+    {
+      "operation": "commit",
+      "label": "confirm144_commit_job58833925",
+      "iterations": 200,
+      "warmup": 20,
+      "payload_seeds": [
+        36120051,
+        36130051
+      ],
+      "channel_seeds": [
+        36121000,
+        36131000
+      ]
+    },
+    {
+      "operation": "complete",
+      "label": "confirm144_complete_job58833925",
+      "iterations": 200,
+      "warmup": 20,
+      "payload_seeds": [
+        36140051,
+        36150051
+      ],
+      "channel_seeds": [
+        36141000,
+        36151000
+      ]
+    }
+  ],
+  "ai_contract": {
+    "raw_ms": 45,
+    "commit_ms": 7,
+    "guard_ms": 2,
+    "effective_ms": 54,
+    "static_slack_ms": 53,
+    "conditional_window_ms": 58
+  },
+  "failure_rule": "stop on first failure; preserve failure; no post-hoc bound widening",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "b5afa2828de1897f4029e9c49774d56d198db370891ff114036735f29397b324",
+    "scripts_for_node/softwall_same_gpu/global_trace_pipelined_control_controller.py": "9e7f40a497723627163443f7ca8628b91f745e9d401cab60272a186b3b3a4867",
+    "scripts_for_node/softwall_same_gpu/pipelined_global_trace_client.py": "108c13e2db0c3db46ca84a1b8461a820699e0e85567c6fde433d8b841eef01fa",
+    "scripts_for_node/softwall_same_gpu/run_v14_ai45_pipelined_arm.sh": "2e8e3fd955936e63e065c997933af3cd067706a732e88cbabf6506de47abd665",
+    "scripts_for_node/softwall_same_gpu/run_v14_pipelined_control_fault_arm.sh": "9d677667dd45e45d51f5b4c508ee9b6cb1c730e99e6be36310b2d6943fad3021",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm144_v14_independent_node.py": "9bab40f4dff81bf76f0cd71644385c2e90bcb6ea266f729de893d365a672b4c3",
+    "scripts_for_node/softwall_same_gpu/verify_pipelined_control_model.py": "d18626eb053f84ba47ab498a0509af28a964b6b8d148e08e001cdef0017aadce"
+  }
+}

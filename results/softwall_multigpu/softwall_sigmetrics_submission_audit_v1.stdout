@@ -1,0 +1,79 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "docs/current/figures/softwall_c162_envelope_scalability.pdf": "69aa287f13ea614157210314efcfee403a3531ad6c832aa667ffb31f5082176b",
+    "docs/current/figures/softwall_system_contract.pdf": "83cef1b8cd4fe3c6c238e991c70df0f0676519439dd1204baf8137dbd3e9cd56",
+    "paper/softwall_sigmetrics27/main.bbl": "52ab7536638520d68fd78feb0f387a22286de1826dde97968b1626dc7043d2c7",
+    "paper/softwall_sigmetrics27/main.pdf": "5ca1e6f04d68d17827de00062724a64df281f62e7695976e37a5a7614d4fe12c",
+    "paper/softwall_sigmetrics27/main.tex": "72c9b3799a45fe640460d5ece96779da76bba6a0b0a58e63e69aded03956d638",
+    "paper/softwall_sigmetrics27/references.bib": "56af1376ddfd3031918ff3a9fff45bf77a654c34a7a11a8790e44ca026bda66a",
+    "results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json": "e56cab58cbb0db923aaacef3bea5d8dcdfd466b7376fe476368073b644cd24a6",
+    "results/softwall_multigpu/sigmetrics27_cfp_recheck_v1.json": "51ab23882418c58a374422dd3f981ec145f525b5f4a2b2caa6b66bf637daf43a",
+    "results/softwall_multigpu/softwall_manuscript_claim_audit_v1.json": "edc945960f9d8067fac9824a75f5fd103ce7d1169fbce62b8a67128fdbf17adb",
+    "results/softwall_multigpu/softwall_necessity_witness_v2.json": "3f881db8250c01d5fe86eb247ba1523286c134d5bf83f7b477985c28fe1b8fea",
+    "results/softwall_multigpu/softwall_production_exit_gate_v2.json": "b00759035ec1870b982eeae457f867f1ef42b62461fb171cf88b10e0ede8ace1"
+  },
+  "checks": {
+    "acmart_review_anonymous": true,
+    "all_citations_resolve": true,
+    "all_references_resolve": true,
+    "ccs_and_keywords_present": true,
+    "conference_metadata_present": true,
+    "core_numbers_match_audited_claims": true,
+    "figures_present": true,
+    "formal_contract_present": true,
+    "four_way_envelope_present": true,
+    "generative_ai_disclosure_present": true,
+    "intro_artifact_plan_present": true,
+    "lifecycle_scope_preserved": true,
+    "necessity_witness_preserved": true,
+    "negative_optimizer_result_preserved": true,
+    "no_author_block": true,
+    "no_identity_or_local_path_leak": true,
+    "no_overfull_boxes": true,
+    "official_cfp_rechecked": true,
+    "page_count_within_20": true,
+    "pdf_compiled": true,
+    "process_replacement_not_promoted": true,
+    "production_and_wcet_limits_present": true,
+    "reproducibility_statement_present": true,
+    "required_artifacts_present": true,
+    "title_and_abstract_present": true,
+    "upstream_claim_audit_pass": true
+  },
+  "evidence": {
+    "cited_entries": 16,
+    "core_numbers_required": {
+      "boundary_rounds": "180",
+      "decision_p99": "1.494",
+      "fault_nrx": "2,800",
+      "fault_recovery": "942",
+      "model_states": "16,023",
+      "oracle_tokens": "385,262",
+      "q2_nrx": "4,800",
+      "q2_qwen": "1,077",
+      "q2_recovery": "1,312"
+    },
+    "identity_hits": [],
+    "lifecycle_qualified_or_partial": 5,
+    "lifecycle_unqualified": 5,
+    "necessity": {
+      "maximum_contract_excess_ms": 12,
+      "minimum_contract_excess_ms": 1,
+      "physical_softwall_reject_rounds": 60,
+      "prespecified_false_safe_cases": 2,
+      "recovery_first_timely_tokens": 385262,
+      "softwall_timely_tokens": 385262
+    },
+    "pages_including_references": 15,
+    "production_exit": {
+      "channel_gate_pass": true,
+      "raw_iq_timely": 885,
+      "status": "FAIL_CURRENT_DESIGN_NOT_PRODUCTION_QUALIFIED",
+      "timing_gate_pass": false
+    },
+    "unresolved_citation_keys": []
+  },
+  "schema": "softwall-sigmetrics-submission-audit-v1",
+  "status": "SOFTWALL_SIGMETRICS_SUBMISSION_AUDIT_PASS"
+}

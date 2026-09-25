@@ -1,0 +1,48 @@
+{
+  "schema": "softwall-recovery-cold-start-audit-v1",
+  "rows": [
+    {
+      "controller": "results/softwall_same_gpu/raw/confirm33_same_request_natural_s2_cap80_job58673249_controller.json",
+      "job": "58673249",
+      "host": "nid001068",
+      "releases": 10000,
+      "conventional_warmup_units": 0,
+      "first_fallback_index": 112,
+      "first_fallback_gpu_ms": 27.2891845703125,
+      "first_fallback_response_ms": 30.669448,
+      "later_fallbacks": 220,
+      "later_gpu_median_ms": 2.5529919862747192,
+      "later_gpu_max_ms": 2.922015905380249,
+      "first_over_later_median": 10.689099189117469
+    },
+    {
+      "controller": "results/softwall_same_gpu/raw/confirm35_same_request_natural_s2_cap80_job58674868_controller.json",
+      "job": "58674868",
+      "host": "nid001128",
+      "releases": 10000,
+      "conventional_warmup_units": 0,
+      "first_fallback_index": 103,
+      "first_fallback_gpu_ms": 30.13644790649414,
+      "first_fallback_response_ms": 33.77376,
+      "later_fallbacks": 211,
+      "later_gpu_median_ms": 2.5203840732574463,
+      "later_gpu_max_ms": 3.071552038192749,
+      "first_over_later_median": 11.9570855197258
+    },
+    {
+      "controller": "results/softwall_same_gpu/raw/confirm36_same_request_natural_s2_cap80_job58676333_controller.json",
+      "job": "58676333",
+      "host": "nid001069",
+      "releases": 10000,
+      "conventional_warmup_units": 0,
+      "first_fallback_index": 6,
+      "first_fallback_gpu_ms": 19.163007736206055,
+      "first_fallback_response_ms": 22.390005,
+      "later_fallbacks": 202,
+      "later_gpu_median_ms": 2.513983964920044,
+      "later_gpu_max_ms": 2.7036800384521484,
+      "first_over_later_median": 7.622565618399052
+    }
+  ],
+  "interpretation": "The first timed conventional fallback is much slower in these runs. This is consistent with an unprimed conventional path, but causal attribution requires a frozen warmed-versus-unwarmed experiment."
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "nrx_reference_clean_matrix",
+  "frozen_before_execution": true,
+  "role": "Post-failure model/interface localization only.",
+  "prior_result": "Both caller-owned and public-wrapper paths decoded 0/600 on Sionna CDL-A in the public SNR range.",
+  "profiles": [
+    "historical MCS2/stream4/TX4 direct",
+    "reference MCS7/stream1/TX1 direct",
+    "reference MCS7/stream1/TX1 wrapper",
+    "reference MCS7/stream4/TX1 direct"
+  ],
+  "iterations_per_profile": 10,
+  "seed": 20358900,
+  "channel": "none; clean transmitter grid",
+  "decision_rule": "If reference MCS7 fails in clean conditions while historical MCS2 passes, stop channel experiments and audit model/radio-profile compatibility. If MCS7 clean passes, continue tensor differential on channel outputs.",
+  "source_sha256_before_execution": {
+    "probe_nrx_reference_clean_matrix.py": "dd4b116efc651b14a24aca26347d5f871b6f14d80cf8ea54db759494eb82ee25",
+    "run_nrx_reference_clean_matrix.sh": "787348bb5e78d8cf34a24aba0daf27648c77495733cf2923fab53086b8e5cae8",
+    "dual_receiver_phy.py": "0aa91d359b467cb73fb075f269f3dac1ad704cf901a772d7bfb3834e9809bddf",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

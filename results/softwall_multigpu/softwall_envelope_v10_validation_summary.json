@@ -1,0 +1,76 @@
+{
+  "schema": "softwall-envelope-v10-validation-summary-v1",
+  "status": "PASS",
+  "model_correction": {
+    "capacity_geometry": "W < B_eff <= W + Delta_h remains a necessary capacity condition only",
+    "decision_time_rule": "B_eff <= D_h - guard_h - recovery_h - T_dec,h",
+    "decision_time_bound": "T_dec,h = latest admitted NRx finish bound + rejected_nrx_h * recovery_bound_h for the current observe-all sequential-recovery controller",
+    "v5_regression_status": "QSU",
+    "v6_regression_status": "QSN",
+    "cause": "v5 treated W+Delta capacity geometry as sufficient. v6 charges the observe-all decision time before testing the AI transaction.",
+    "frozen_v9_modified": false
+  },
+  "exact_oracle": {
+    "status": "PASS",
+    "current_grid_scenarios": 18,
+    "endpoint_pools": 39,
+    "bounded_exhaustive_cases": 3640,
+    "cardinality_gaps": 0,
+    "scenario_failures": 0,
+    "scope": "simultaneous release-zero jobs with endpoint-specific but job-independent service bounds; no general online queueing or WCET claim"
+  },
+  "envelope_v10": {
+    "counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "classification_changes_from_v9": 0,
+    "geometry_exchange_home_class_pairs": 42,
+    "decision_time_exchange_home_class_pairs": 0,
+    "geometry_only_pairs_removed_from_usefulness": 42
+  },
+  "unit_validation": {
+    "allocation_job_id": 58824789,
+    "node": "nid001513",
+    "gpu_family": "NVIDIA A100-SXM4-40GB",
+    "aerial_container_tests_passed": 122,
+    "qwen_runtime_tests_passed": 3,
+    "dart_suite_tests_passed": 30,
+    "dart_runtime_tests_within_suite": 21,
+    "total_tests_passed": 155,
+    "logs": [
+      "results/softwall_multigpu/raw/envelope_v10_aerial_tests_job58824789_compute.log",
+      "results/softwall_multigpu/raw/envelope_v10_qwen_tests_job58824789_compute.log",
+      "results/softwall_multigpu/raw/envelope_v10_dart_tests_job58824789_compute.log"
+    ],
+    "invocation_note": "A first login-node/container invocation could not load libcuda. The PASS suite was rerun through an srun compute step while preserving the Shifter GPU module environment."
+  },
+  "preserved_evidence": {
+    "confirm134_artifacts": 76,
+    "confirm134_artifact_hash_mismatches": 0,
+    "confirm134_source_checks": 11,
+    "confirm134_source_hash_mismatches": 0,
+    "runtime_fault_regression_iterations": 10000,
+    "runtime_fault_regression_pass": true
+  },
+  "claim_boundary": "V10 removes a false worst-case usefulness implication. Under declared bounds, the current observe-all controller has zero exchange-only AI class/home pairs in the 18-scenario grid. Physical exchanges remain finite-sample mechanism evidence, not a guaranteed extra-throughput service. Production d_MAC, WCET, online arrivals, cross-family hardware, restart, durable reconciliation, and throughput superiority remain unqualified.",
+  "targeted_model_tests": {
+    "passed": 23,
+    "checker_v6": 15,
+    "decision_time_analyzer": 4,
+    "exact_oracle": 4
+  },
+  "documentation_audit": {
+    "documents": 10,
+    "local_links_checked": 506,
+    "missing_links": 0,
+    "outside_workspace_links": 0,
+    "git_diff_check": "PASS"
+  },
+  "artifact_manifest": {
+    "items": 17,
+    "hash_mismatches": 0
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "schema": "softwall-confirm124-global-vs-static-protocol-v1",
+  "status": "frozen-before-run",
+  "job": "58819952",
+  "predecessor": "confirm123_global_ai_broker_result.json",
+  "question": "With identical two-home GPU/RAN resources and one offered AI trace, does dynamic global leasing deliver at least 2% more timely token value than a source-order static partition while preserving radio parity and every safety gate?",
+  "design": "two seeds; GSSG for seed1 and SGGS for seed2; two repeats per policy and seed; same PHY inputs within seed",
+  "arms": [
+    {
+      "label": "c124_s1_g1_job58819952",
+      "seed": 1,
+      "policy": "global",
+      "order": 1,
+      "payload_seed0": 26400051,
+      "payload_seed1": 26410051,
+      "channel_seed0": 26401000,
+      "channel_seed1": 26411000
+    },
+    {
+      "label": "c124_s1_p1_job58819952",
+      "seed": 1,
+      "policy": "static_partition",
+      "order": 2,
+      "payload_seed0": 26400051,
+      "payload_seed1": 26410051,
+      "channel_seed0": 26401000,
+      "channel_seed1": 26411000
+    },
+    {
+      "label": "c124_s1_p2_job58819952",
+      "seed": 1,
+      "policy": "static_partition",
+      "order": 3,
+      "payload_seed0": 26400051,
+      "payload_seed1": 26410051,
+      "channel_seed0": 26401000,
+      "channel_seed1": 26411000
+    },
+    {
+      "label": "c124_s1_g2_job58819952",
+      "seed": 1,
+      "policy": "global",
+      "order": 4,
+      "payload_seed0": 26400051,
+      "payload_seed1": 26410051,
+      "channel_seed0": 26401000,
+      "channel_seed1": 26411000
+    },
+    {
+      "label": "c124_s2_p1_job58819952",
+      "seed": 2,
+      "policy": "static_partition",
+      "order": 1,
+      "payload_seed0": 26500061,
+      "payload_seed1": 26510061,
+      "channel_seed0": 26501000,
+      "channel_seed1": 26511000
+    },
+    {
+      "label": "c124_s2_g1_job58819952",
+      "seed": 2,
+      "policy": "global",
+      "order": 2,
+      "payload_seed0": 26500061,
+      "payload_seed1": 26510061,
+      "channel_seed0": 26501000,
+      "channel_seed1": 26511000
+    },
+    {
+      "label": "c124_s2_g2_job58819952",
+      "seed": 2,
+      "policy": "global",
+      "order": 3,
+      "payload_seed0": 26500061,
+      "payload_seed1": 26510061,
+      "channel_seed0": 26501000,
+      "channel_seed1": 26511000
+    },
+    {
+      "label": "c124_s2_p2_job58819952",
+      "seed": 2,
+      "policy": "static_partition",
+      "order": 4,
+      "payload_seed0": 26500061,
+      "payload_seed1": 26510061,
+      "channel_seed0": 26501000,
+      "channel_seed1": 26511000
+    }
+  ],
+  "iterations": 340,
+  "warmup": 20,
+  "homes": 2,
+  "cells_per_home": 4,
+  "common_mechanisms": "same broker state machine, local all-fail certificates, atomic recovery/AI lease, Qwen workers, MPS caps, PHY policy, trace, fault pattern and bounds; only request eligibility differs",
+  "global_policy": "any home with a fitting certified horizon may prepare the EDF request",
+  "static_policy": "request source_order modulo 2 fixes the eligible home before arrival",
+  "structural_gate": "all eight arms pass safety/provenance/unique-drain gates; each seed has radio decision parity and two arms per policy",
+  "outcome_gate": "for both seeds, global mean timely token value improves by at least 2% and the source-second bootstrap 95% lower bound of token delta is above zero",
+  "decision_rule": "If structural gates pass but outcome fails, retain global broker as a correctness/load-routing mechanism and reject throughput-superiority novelty.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_global_ai_two_home_arm.sh": "c8a3feb5fab1adeff328b757e0f4de5315804609cffaeef378e908de853bea82",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm124_global_vs_static.py": "4f04556ec15375280a84893f42efb886b48021ad37f6111af284655fb72c8557",
+    "scripts_for_node/softwall_same_gpu/global_trace_baseline_controller.py": "1520dc7556370758a8f1f50e55c0ce42df5c8c7834361c2380c72b24c91d1ff1",
+    "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "softwall-envelope-v11-v12-ai-guard-regression-v1",
+  "scope": "Regression audit for the frozen two-home full-control mode. V12 charges the runtime's physical AI completion guard separately; the comparison is a model correction, not new physical evidence.",
+  "inputs": {
+    "v11": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v11.json",
+    "v11_sha256": "7e315da2400161f283a3d2c144c3166e049472ae908840346961db384bd11a46",
+    "v12": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v12.json",
+    "v12_sha256": "29a16dfe94e1cf4cf6a94e53366160dc50ed11c6203c17be6df29bafacc5328b"
+  },
+  "scenario": "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134",
+  "v11": {
+    "effective_ai40_transaction_ms": 55.0,
+    "model_margin_ms": [
+      3.0,
+      3.0
+    ],
+    "ai40_exchange_only_candidate": true
+  },
+  "v12": {
+    "raw_ai_bound_ms": 40.0,
+    "broker_control_budget_ms": 15,
+    "ai_completion_guard_ms": 2.0,
+    "effective_ai40_transaction_ms": 57.0,
+    "decision_window_ms": [
+      58.0,
+      58.0
+    ],
+    "model_margin_ms": [
+      1.0,
+      1.0
+    ],
+    "ai40_exchange_only_candidate": true
+  },
+  "gates": {
+    "mode_counts_unchanged": true,
+    "physical_geometry_unchanged": true,
+    "v11_omitted_ai_completion_guard": true,
+    "v12_charges_two_ms_ai_completion_guard": true,
+    "candidate_survives_complete_charge": true,
+    "corrected_margin_is_one_ms_per_home": true,
+    "classification_is_unchanged": true
+  },
+  "all_pass": true
+}

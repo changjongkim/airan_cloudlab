@@ -1,0 +1,26 @@
+{
+  "channel": {
+    "noise_reference": "pre_fading",
+    "snr_db": 20.0
+  },
+  "global_execution_order": "(sequence, home_id)",
+  "iterations": 100,
+  "label": "confirm149_shared_conv_job58851722_attempt1",
+  "placement": {
+    "home0_source": "GPU0",
+    "home1_source": "GPU1",
+    "shared_conventional_worker": "GPU2"
+  },
+  "schema": "softwall-v17-shared-conventional-canary-protocol-v1",
+  "scope": "physical shared conventional data-path and global-order canary only; no deadline, all-fail admission, AI lease, WCET, or V17 QSU claim",
+  "source_sha256": {
+    "/softwall/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "/softwall/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "/softwall/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "/softwall/shared_conventional_worker.py": "63618abd989f9cb18123afa7a9727f7fa0ac0a15f8be0bc5993e30b82b9fa9ec",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run",
+  "transport": "cross-process CUDA IPC handles plus NVLink P2P; payload remains in GPU memory",
+  "warmup": 10
+}

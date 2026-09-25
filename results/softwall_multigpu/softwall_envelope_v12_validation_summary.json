@@ -1,0 +1,105 @@
+{
+  "schema": "softwall-envelope-v12-validation-summary-v1",
+  "status": "PASS",
+  "model_correction": {
+    "v11_issue": "V11 charged the 15 ms broker budget but omitted the separate 2 ms physical AI completion guard from effective transaction length; the C135 runtime itself already charged both through admission_ai_guard_ms=17.",
+    "v12_rule": "B_eff equals raw AI service bound plus bounded synchronous control plus physical AI completion guard; radio commit guard remains separately deducted from recovery capacity.",
+    "full_control_witness": {
+      "requests_per_home": 4,
+      "admitted_nrx": 2,
+      "rejected_live_recoveries": 2,
+      "released_recovery_ms": 50,
+      "decision_time_ms": 45,
+      "remaining_recoveries": 2,
+      "recovery_boundary_ms": 103,
+      "transaction_window_ms": 58,
+      "raw_ai_ms": 40,
+      "control_ms": 15,
+      "ai_completion_guard_ms": 2,
+      "effective_transaction_ms": 57,
+      "static_all_fail_slack_ms": 53,
+      "static_margin_ms": -4,
+      "conditional_margin_ms": 1
+    },
+    "v11_to_v12_regression_status": "PASS",
+    "classification_changed": false,
+    "candidate_set_changed": false,
+    "v12_missing_guard_policy": "Every v8 mode must declare ai_completion_guard_ms explicitly; omission is an input error rather than a zero default."
+  },
+  "envelope_v12": {
+    "counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "geometry_exchange_home_class_pairs": 39,
+    "decision_time_exchange_home_class_pairs": 2,
+    "decision_candidates": [
+      "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134:home0:AI40",
+      "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134:home1:AI40"
+    ],
+    "checker_sha256": "60a28dd3e4d8d1436c0058fb6be96e2bd899a08602967d2166cd89d3a93148d2",
+    "input_sha256": "df519722e1ec6013beaa46acbd7b0c4af663e246250a357d39ac86dd422ddf66"
+  },
+  "exact_oracle": {
+    "status": "PASS",
+    "grid_scenarios": 18,
+    "endpoint_pools": 39,
+    "bounded_exhaustive_cases": 10920,
+    "cardinality_gaps": 0,
+    "scenario_failures": 0,
+    "scope": "Finite-state endpoint admission cardinality and schedule consistency; the AI completion guard correction is outside this endpoint-only oracle."
+  },
+  "confirm135": {
+    "status": "PASS",
+    "allocation_job_id": 58826874,
+    "node": "nid001245",
+    "arms": 2,
+    "radio_records": 2560,
+    "atomic_exchanges": 19,
+    "candidate_branches": 288,
+    "ai40_candidate_exchanges": 10,
+    "minimum_observed_reserved_horizon_margin_ms": 51.056189,
+    "runtime_admission_guard_ms": 17,
+    "runtime_already_charged_control_and_completion_guard": true
+  },
+  "same_event_static_counterfactual": {
+    "status": "PASS",
+    "candidate_exchanges": 10,
+    "target_branches": 288,
+    "static_rejects_all_events": true,
+    "conditional_accepts_all_events": true,
+    "minimum_physical_guarded_horizon_margin_ms": 51.056189,
+    "interpretation": "Model counterfactual on the same C135 physical events, not a separately measured static-baseline throughput comparison."
+  },
+  "validation": {
+    "new_v12_and_audit_tests_passed": 25,
+    "preserved_v11_model_and_analyzer_tests_passed": 33,
+    "model_and_analyzer_tests_total": 58,
+    "preserved_gpu_allocation_validation": {
+      "job_id": 58828266,
+      "node": "nid001781",
+      "aerial_tests": 155,
+      "qwen_tests": 3,
+      "dart_tests": 30,
+      "total_tests": 188,
+      "reason_not_rerun": "V12 changes only the offline envelope charge; C135 runtime and physical admission already used the complete 17 ms guard."
+    }
+  },
+  "documentation_audit": {
+    "status": "PASS",
+    "authoritative_documents": 11,
+    "local_links_checked": 322,
+    "missing_links": 0,
+    "outside_workspace_links": 0,
+    "top_level_multigpu_json_artifacts_parsed": 319,
+    "json_parse_failures": 0,
+    "git_diff_check": "PASS"
+  },
+  "claim_boundary": "V12 predicts, and frozen C135 executions realize, one synthetic two-home A100/MPS conditional AI40 class with the full 57 ms admission charge. This is mechanism evidence, not BurstGPT throughput superiority, WCET, production d_MAC, cross-family hardware, restart, durable reconciliation, or exactly-once evidence.",
+  "artifact_manifest": {
+    "items": 46,
+    "hash_mismatches": 0
+  }
+}

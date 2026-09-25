@@ -1,0 +1,22 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=12.236ms max=15.517ms miss=0 correct=77 nrx=0 conv=200 bg=0 duplicate=0
+03:45:40.549933 cuphy.hpp:122    CON[871032] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55addb584260).
+confirm58 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58729926/a.sock
+[SAME-REQUEST-NRX] ready tag=g1t_58729926_870986_c0
+[SAME-REQUEST-NRX] ready tag=g1t_58729926_870986_c1
+[SAME-REQUEST-NRX] stopped units=20
+[SAME-REQUEST-NRX] stopped units=20
+Traceback (most recent call last):
+  File "/softwall/two_endpoint_channel_gate_controller.py", line 386, in <module>
+    main()
+  File "/softwall/two_endpoint_channel_gate_controller.py", line 141, in main
+    ctx["receiver"].observed_channel_features()
+  File "/softwall/dual_receiver_phy.py", line 252, in observed_channel_features
+    "received_grid_power": float(received_power.get()),
+AttributeError: 'numpy.float32' object has no attribute 'get'
+03:46:31.305380 cuphy.hpp:122    CON[872093] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563d04a3c7a0).
+03:46:32.294090 cuphy.hpp:122    CON[872093] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563d0c4ec590).
+MPS quit command did not return within 5 seconds
+srun: error: nid001217: task 0: Exited with exit code 1
+srun: Terminating StepId=58729926.4

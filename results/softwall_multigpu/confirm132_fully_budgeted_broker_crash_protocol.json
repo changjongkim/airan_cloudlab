@@ -1,0 +1,75 @@
+{
+  "schema": "softwall-confirm132-fully-budgeted-broker-crash-protocol-v1",
+  "status": "frozen-before-formal-arms",
+  "predecessors": [
+    "C128 synchronous marker instrumentation failed with one D155 miss per home",
+    "C129 direct broker fail-stop exposed an unbounded synchronous RPC and failed before recovery",
+    "C130 bounded every broker RPC at 5 ms and passed, but the admission test did not charge control cost",
+    "C131 charged commit+complete and passed physically, but proof audit found prepare was omitted"
+  ],
+  "developmental_canary": "c132_fully_budgeted_final_canary_job58819952 (excluded)",
+  "hypothesis": "Charging all three 5 ms broker RPC bounds plus the 2 ms physical guard to every global-AI admission preserves each local recovery certificate when the broker fails after commit.",
+  "contract": "B_prepare_rpc + B_commit_rpc + B_AI + B_complete_rpc + G_physical <= min(AI deadline, recovery horizon)",
+  "fault": {
+    "home": 0,
+    "commit_number": 30,
+    "injection": "direct os._exit(86) after applied commit, before reply",
+    "rpc_bound_ms": 5,
+    "rpc_count_per_ai_transaction": 3,
+    "broker_transaction_budget_ms": 15,
+    "physical_guard_ms": 2,
+    "admission_guard_ms": 17
+  },
+  "arms": [
+    {
+      "label": "confirm132_s1_job58819952",
+      "payload_seed0": 24000101,
+      "payload_seed1": 24010101,
+      "channel_seed0": 24011000,
+      "channel_seed1": 24021000
+    },
+    {
+      "label": "confirm132_s2_job58819952",
+      "payload_seed0": 24000102,
+      "payload_seed1": 24010102,
+      "channel_seed0": 24012000,
+      "channel_seed1": 24022000
+    }
+  ],
+  "mode": {
+    "gpus": 2,
+    "homes": 2,
+    "cells_per_home": 4,
+    "iterations": 340,
+    "warmup": 20,
+    "period_ms": 180,
+    "deadline_ms": 155,
+    "nrx_bound_ms": 45,
+    "conv_bound_ms": 25
+  },
+  "primary_gates": [
+    "controller artifacts show 15 ms broker transaction budget and 17 ms admission guard",
+    "broker exit86 and all operational faults record the 5 ms per-RPC bound",
+    "both homes complete every RAN release after broker failure detection",
+    "ambiguous request is absent from Qwen executions and all executed request IDs are unique",
+    "zero deadline, NRx, conventional, AI-bound, and recovery-horizon violations",
+    "all local recovery, endpoint, and AI credits drain"
+  ],
+  "negative_control_interpretation": "C129 demonstrates that fail-closed state alone is insufficient; a blocking control RPC must be bounded and its full transaction cost charged before AI admission.",
+  "trace": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/data/public/burstgpt/softwall_burst60_prefill_trace.json",
+  "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+  "source_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/low_perturbation_crash_global_trace_lease_broker.py": "d0f66f5a514dfa75ec370405c6623da8fa5a8e9a9ed61818a4603d4358ff7791",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/run_global_ai_fully_budgeted_broker_crash_arm.sh": "772dafb3fe4ade2eb1fceca8e43b387987ef4017b9600ec639937cd1317d6515",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/analyze_confirm132_fully_budgeted_broker_crash_campaign.py": "0d2976c429aaa76fd347b93819ded4bb13e7a196c857c1e1e2c6ab112baf4496",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_deadline_global_trace_client.py": "0fd95aa31f205be98254ad88ba7af00c6513ab59e45d9c1ef24c6c5de5f6b816",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_global_control_budget_v2.py": "70b8f76fe6c4a5bf6f10b528aab681974002472cfcbf2e02009871c3ef1ff883",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "scope": "finite-sample volatile broker fail-stop with all prepare/commit/complete RPC bounds charged in admission; excludes restart, durable recovery, exactly-once completion, network partition, GPU hang, and production WCET"
+}

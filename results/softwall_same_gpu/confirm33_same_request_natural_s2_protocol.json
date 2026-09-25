@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm33_same_request_natural_s2",
+  "purpose": "Validate natural NeuralRx failures and conventional recovery on request-specific noisy PUSCH data through a separate persistent MPS/CUDA-IPC endpoint.",
+  "mandatory_ran": {
+    "channel": "block-Rayleigh plus AWGN",
+    "snr_db": -8.5,
+    "channel_seed_base": 20323000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "iterations": 10000,
+    "warmup_clean_requests": 20,
+    "warmup_noisy_requests": 1
+  },
+  "endpoint": {
+    "mps_active_thread_percentage": 80,
+    "expected_visible_sms": 86,
+    "transport": "same-device CUDA IPC with request-specific rx_slot/channel estimate and output LLR",
+    "timeout_ms": 30,
+    "lifecycle": "persistent for the entire timed epoch; teardown only after the final release"
+  },
+  "policy": {
+    "primary": "NeuralRx plus local LDPC/CRC",
+    "recovery": "run conventional full path on the same request when NeuralRx CRC/payload verification fails or the endpoint is disabled",
+    "commit": "one branch result is exposed per release"
+  },
+  "primary_gate": {
+    "deadline_misses": 0,
+    "endpoint_timeouts": 0,
+    "fallbacks_positive": true,
+    "natural_recoveries_positive": true,
+    "correct_releases_at_least_nrx_commits": true,
+    "worker_completed_units": 10021,
+    "worker_visible_sms": 86
+  },
+  "interpretation_limit": "This gate establishes a physical separate-process S2 vertical slice and natural recovery utility. A statistical utility comparison against strong eager and conventional baselines remains a separate paired gate."
+}

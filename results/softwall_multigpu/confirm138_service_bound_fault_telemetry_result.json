@@ -1,0 +1,118 @@
+{
+  "schema": "softwall-confirm138-service-bound-fault-telemetry-v1",
+  "campaign_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm138_service_bound_fault_telemetry_protocol.json",
+  "campaign_protocol_sha256": "15d3112c62fea9e22d33553a1c60bc0c3a4b48ed1bee447394af45424867e1c0",
+  "nodes": [
+    "nid001144"
+  ],
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177"
+  ],
+  "arms": [
+    {
+      "label": "confirm138_prepare1_job58831304",
+      "operation": "prepare",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm138_prepare1_job58831304_result.json",
+      "expected_arm": {
+        "name": "s1",
+        "label": "confirm138_prepare1_job58831304",
+        "operation": "prepare",
+        "iterations": 340,
+        "warmup": 20,
+        "payload_seeds": [
+          29000051,
+          29010051
+        ],
+        "channel_seeds": [
+          29001000,
+          29011000
+        ]
+      },
+      "configuration_match": true,
+      "nodes": [
+        "nid001144"
+      ],
+      "all_pass": false,
+      "radio_records": 2720,
+      "radio_records_after_fault_detection": 2482,
+      "ai_units_before_containment": 15,
+      "control_evidence": {
+        "records": 351,
+        "by_operation": {
+          "prepare": 225,
+          "commit": 63,
+          "complete": 63
+        },
+        "max_elapsed_ms": 5.830741,
+        "wall_timeout_exceeded": 2,
+        "faulted": 2,
+        "faulted_by_operation": {
+          "prepare": 1,
+          "complete": 1
+        },
+        "target_fault_records": 1
+      }
+    }
+  ],
+  "totals": {
+    "arms": 1,
+    "radio_records": 2720,
+    "radio_records_after_fault_detection": 2482,
+    "ai_units_before_containment": 15
+  },
+  "control_evidence": {
+    "declared_per_rpc_bound_ms": 5.0,
+    "records": 351,
+    "by_operation": {
+      "commit": 63,
+      "complete": 63,
+      "prepare": 225
+    },
+    "faulted_by_operation": {
+      "complete": 1,
+      "prepare": 1
+    },
+    "max_elapsed_ms_by_operation": {
+      "commit": 0.55916,
+      "complete": 5.830741,
+      "prepare": 5.205092
+    },
+    "max_faulted_elapsed_ms_by_operation": {
+      "complete": 5.830741,
+      "prepare": 5.205092
+    },
+    "maximum_elapsed_ms": 5.830741,
+    "maximum_faulted_elapsed_ms": 5.830741,
+    "wall_timeout_exceeded": 2,
+    "gates": {
+      "telemetry_on_every_home": true,
+      "prepare_commit_complete_coverage": true,
+      "faulted_call_each_arm": true,
+      "faulted_call_present_at_each_control_point": false,
+      "no_wall_timeout_exceedance": false,
+      "maximum_within_declared_timeout": false
+    },
+    "all_pass": false
+  },
+  "artifact_hash_mismatches": [],
+  "arm_source_hash_mismatches": [],
+  "source_hash_mismatches": [],
+  "gates": {
+    "six_expected_arms": false,
+    "two_arms_per_control_point": false,
+    "all_arm_configurations_match": true,
+    "all_arm_gates_pass": false,
+    "all_artifact_hashes_match": true,
+    "all_arm_sources_match": true,
+    "prospective_sources_match": true,
+    "single_new_physical_node": true,
+    "control_fault_telemetry": false
+  },
+  "all_pass": false,
+  "claim_boundary": "Finite-sample wall-clock qualification of the actual prepare, commit, and complete broker fail-stop detection calls under a prospective 5 ms per-RPC budget on one new A100 node. This is not WCET, production d_MAC, cross-family, scheduler-isolation, restart, or exactly-once evidence."
+}

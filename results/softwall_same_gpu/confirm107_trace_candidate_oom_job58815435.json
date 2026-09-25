@@ -1,0 +1,53 @@
+{
+  "schema": "softwall-trace-candidate-failure-v1",
+  "campaign": "confirm107_trace_candidate_softwall_canary",
+  "date_utc": "2026-09-23",
+  "job": "58815435",
+  "node": "nid001016",
+  "system": "softwall",
+  "iterations_requested": 100,
+  "cells": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 12,
+  "ai_bound_map_ms": {
+    "16": 35,
+    "32": 35,
+    "64": 35,
+    "128": 40,
+    "256": 45,
+    "512": 75
+  },
+  "trace": "data/public/burstgpt/softwall_burst60_prefill_trace.json",
+  "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+  "operational_requalification": {
+    "path": "results/softwall_same_gpu/raw/confirm107_candidate_softwall_job58815435_requalification.json",
+    "sha256": "7daaff74913d2382c72bd89dcc32345c24c0473b78580847e55b40e6d8a2e8f9",
+    "iterations": 100,
+    "deadline_misses": 0,
+    "max_end_to_end_ms": 12.900,
+    "passed": true
+  },
+  "failure": {
+    "stage": "four-cell controller construction",
+    "exception": "RuntimeError: out of memory",
+    "detail": "The controller failed while constructing the fourth PairedDualReceiver after both persistent NeuralRx endpoints and the variable-length Qwen worker were ready.",
+    "controller_result_written": false,
+    "performance_conclusion": false
+  },
+  "post_failure_observation": {
+    "qwen_worker_used_memory_mib": 4628,
+    "nrx_worker0_used_memory_mib": 348,
+    "nrx_worker1_used_memory_mib": 350,
+    "note": "The failed controller process had already exited, so its cuPHY allocations were absent from this observation. The values do not identify the peak allocation or sole cause."
+  },
+  "source_sha256_before_fix": {
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "8c82f41b36b1b6cb9e353c66600ae1e1c3084f53fcad1cc946cac8f2b2f98e0c",
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": "96485d1d861dab817fddf6a58b0fd25cce2883f96690077946030823db451be8",
+    "scripts_for_node/softwall_same_gpu/run_trace_baseline_arm.sh": "9057d395c6cb53cba618ad1c61d981ba258c99cc83121b86dad3bad560927276",
+    "scripts_for_node/softwall_same_gpu/trace_background_client.py": "f6fc4de63df7b31cb907b63b6971048ee3706ef18595df0b3ecd5834a91e1d8c",
+    "scripts_for_node/softwall_same_gpu/common.sh": "cad7418e26cc3afbf97fad16dd498da054e94bfce0c27daa9e81e50d11ab9adc"
+  },
+  "interpretation": "This is a preserved integration canary failure and a candidate resident-memory envelope point. It is not a baseline performance result. The next step must isolate allocator retention and loading-order effects, then use a new prefix for any corrected rerun."
+}

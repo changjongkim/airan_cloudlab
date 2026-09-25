@@ -1,0 +1,39 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm57_disjoint_feature_gate",
+  "frozen_before_execution": true,
+  "prior_result": "The earlier channel_feature_gate_job58693851 was invalid for held-out evaluation because train/test channel seeds overlapped 499/500. Its neural-only-count and cold first-call gates also failed. This is a new calibration with entirely fresh, disjoint seeds and explicit feature prewarm; it does not relabel the earlier result.",
+  "research_question": "On the synthetic fixed pre-fading-noise Rayleigh workload, can a prewarmed observable channel-power threshold selected on fresh training channels skip at least 10% of NeuralRx calls on held-out channels while losing at most 1% of neural-only successes?",
+  "role": "Qualify a possible strong-baseline input only; never count as joint-policy novelty or real-time PHY evidence.",
+  "execution_command": "srun --jobid=58729926 --overlap --ntasks=1 bash scripts_for_node/softwall_same_gpu/run_confirm57_disjoint_feature_gate.sh",
+  "radio": {
+    "snr_db": -8.5,
+    "trials_per_seed_mode": 500,
+    "train_seed": 20456001,
+    "test_seed": 20457001,
+    "channel_seed_generation": "seed + trial, 0 through 499",
+    "noise_modes": ["pre_fading", "post_fading"],
+    "mode_order": "train pre/post, test post/pre"
+  },
+  "feature": {
+    "name": "channel_estimate_power",
+    "prewarm": "one observed_channel_features call during receiver startup, before the first timed channel trial",
+    "selection": "maximize training NeuralRx skips with at most 2/500 neural-only correct TBs lost; keep the threshold unchanged on test",
+    "online_future_information_forbidden": ["channel seed", "generator SNR", "future CRC", "transmitted payload truth"]
+  },
+  "frozen_gates": {
+    "train_neural_only_lost_at_most": 2,
+    "heldout_skip_at_least": 50,
+    "heldout_neural_only_lost_at_most": 5,
+    "feature_gpu_max_below_ms": 5.0
+  },
+  "scope_change_from_prior": "The earlier requirement of at least 50 neural-only cases is reported descriptively rather than used as a gate. Baseline qualification here concerns the skip/loss decision on this workload; a small neural-only denominator will limit any radio-utility claim. This choice was fixed before the new trace and must be disclosed with the earlier failed gate.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/sweep_dual_receiver_snr.py": "25cba74ea9a7f2c6de78182fa08d15d022fe801dbccf44cd5b27ea1f5c75fbf6",
+    "scripts_for_node/softwall_same_gpu/analyze_channel_feature_gate.py": "d980285cdd22793d1d84514c203900b4279ffcc89fc58f43fb3efe035d499c34",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm57_channel_gate.py": "fc3451a97a8947fe6547a74baf5c95d7f2912b4530a203b30cb5c01078ce63e0",
+    "scripts_for_node/softwall_same_gpu/run_confirm57_disjoint_feature_gate.sh": "c1203ae3ddd0bdcd429bbd0713904d33551a4e2552a6a076ca3df6fe462c2d33",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06"
+  },
+  "interpretation_limits": "Prewarmed feature GPU time excludes startup; its host-to-decision latency still requires online measurement. No MPS co-run, actual MAC expiry, or external TDL channel is tested. Passing observed skip/loss gates does not establish a worst-case radio-utility guarantee."
+}

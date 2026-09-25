@@ -1,0 +1,18 @@
+{
+  "allocated_node": "nid001169",
+  "artifact_sha256": {
+    "results/softwall_multigpu/c164a_idle30_dev_j58861564_peer_spec.json": "af6da8f756a0916cb6980b40a7c7b6e4fb42e753bbbd99e747048b8d59496884",
+    "results/softwall_multigpu/c164a_idle30_dev_j58861564_protocol.json": "30653f0f1dd7b8f7149babbba709aaef6dcf593efb3804223cf7381991206ed2",
+    "results/softwall_multigpu/raw/c164a_idle30_dev_j58861564_gpu_inventory.csv": "2a4c8e8953938025ccd423d9c47ecbc3ae2223d434c125cd7cd66d2b20ff7081",
+    "results/softwall_multigpu/raw/c164a_idle30_dev_j58861564_qwen.log": "f4f61b0fd18c94a0c57673d1469f38c12db8140397ccae1e3759edb05c4dcdc9"
+  },
+  "attempt": 1,
+  "cause": "salloc reserved the compute node but the shell remained on login03; the Qwen container therefore saw no allocated compute GPUs",
+  "correction": "entered the existing allocation with srun --pty and used a new label",
+  "executed_host": "login03",
+  "job": "58861564",
+  "qualification_sample": false,
+  "schema": "softwall-c164-development-failure-v1",
+  "status": "PRE_READINESS_ORCHESTRATION_FAIL",
+  "timed_radio_started": false
+}

@@ -1,0 +1,24 @@
+{
+  "status": "frozen before confirm6_paired2_s1 execution",
+  "frozen_utc": "2026-09-20",
+  "campaign": "confirm6_paired2_s1",
+  "purpose": "Evaluate limited NeuralRx overlap against the measured paired-radio S0 throughput",
+  "hardware": "one A100-SXM4-40GB, MIG disabled, one MPS server, same physical GPU",
+  "ran_workload": "two sequential valid 273-PRB PUSCH decodes per 20 ms release",
+  "ran_mps": {"active_thread_percentage": 100, "client_priority": 0},
+  "ai_configurations": [
+    {"active_thread_percentage": 40, "client_priority": 0},
+    {"active_thread_percentage": 50, "client_priority": 0},
+    {"active_thread_percentage": 60, "client_priority": 0},
+    {"active_thread_percentage": 70, "client_priority": 0},
+    {"active_thread_percentage": 80, "client_priority": 0}
+  ],
+  "period_ms": 20,
+  "deadline_ms": 18,
+  "iterations_per_run": 1000,
+  "runs_per_condition": 5,
+  "seed_base": 20269000,
+  "ai_workload": "Aerial NeuralRx TensorRT FP16 CUDA Graph, continuous overlap",
+  "s0_reference_inferences_per_s": 245.5,
+  "selection_rule": "Among caps with zero observed deadline misses and zero incorrect TBs, select the highest mean NeuralRx throughput; require throughput above the independent S0 reference."
+}

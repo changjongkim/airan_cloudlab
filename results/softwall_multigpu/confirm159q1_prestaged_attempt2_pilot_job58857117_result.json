@@ -1,0 +1,117 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159_experiment_prespec_v1.json": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159q1_prestaged_attempt2_pilot_job58857117_peer_spec.json": "717de2d315089a979a636c58e058d8f01792addfbc4c9bbc8f5d3c9b95aa5d2d",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159q1_prestaged_attempt2_pilot_job58857117_protocol.json": "cd4222707ed564e58c8c2a0b3e744fb291fea2417ff62a7ef476b8432a838460",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_coordinator.json": "03256182843c1b50520e96a41ef772015c66e4d1a2b2b531965c8d2ffbd0a38b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_gpu_inventory.csv": "67b16380b4be583e34d9261c1c3556915e2409f4f4fb4e643b5d9296d100fcf0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_home0_h0-r0_owner.json": "f5be57ef0bb33485152015b88b64f8355113aedeabf5c1e22877fea7d9c418ff",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_home0_h0-r1_owner.json": "beca149f462cf05d1047ed7694dfa514abcb788814cab779ae85a5e29c9d946d",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_home0_h0-r2_owner.json": "789dc17be0360873932852b89ba4e99573fc78e008ac8df82091d9dd0dc5221f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_home1_h1-r0_owner.json": "e73d82537fbbe5f90a1c17b735cfba15676c38dd1f5a11a956f56988f0f94715",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_nrx_worker.json": "00d35133ef9ddef6c3c09ea6f70bdb09db4e9ca0a0976836d4f5f1765d5548a5",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q1_prestaged_attempt2_pilot_job58857117_qwen.json": "7430e0d671c0f330afcf6ae8776fb18cf972d0ed5ff3382bee55b17146006079"
+  },
+  "campaign": "development",
+  "gates": {
+    "atomic_qwen_lease": true,
+    "certificate_recovery_conformance": true,
+    "complete_request_sample": true,
+    "global_certificate_each_round": true,
+    "no_process_error": true,
+    "node_inventory_and_exclusion": true,
+    "nrx_bound": true,
+    "outcome_driven_transition": true,
+    "physical_p2p_ipc_lifecycle": true,
+    "pre_staged_input_and_p180_copy": true,
+    "single_timely_radio_commit": true,
+    "source_hash_match": true
+  },
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-eefe4afb-1221-02a1-25ac-e85b32678616"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-78cac301-f1cb-a7cb-f44a-579d9172863f"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-8981b8a1-0329-3f56-3a1c-8cd51a6630bd"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-dcb24c5b-2b3b-bc84-c09a-cb9461d7c96b"
+    }
+  ],
+  "job_id": "58857117",
+  "node": "nid001052",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159q1_prestaged_attempt2_pilot_job58857117_protocol.json",
+  "schema": "softwall-confirm159-q1-result-v1",
+  "scope": "C159-Q1 P180 qualification, excluded from performance confidence intervals. Passing two nodes supports only the frozen context64 warm synthetic mode; variable-context trace performance, WCET, cold/long-idle, production d_MAC and integrated faults remain UQ.",
+  "status": "C159_Q1_PRESTAGED_P180_PASS",
+  "summary": {
+    "actual_nrx_requests": 40,
+    "actual_nrx_successes": 30,
+    "bank_copy_gpu_ms": {
+      "count": 40,
+      "max": 0.4959680140018463,
+      "mean": 0.15917520150542258,
+      "p50": 0.10367999970912933,
+      "p99": 0.4959680140018463
+    },
+    "deadline_misses": 0,
+    "local_shared_class_disagreements": 0,
+    "nrx_release_to_complete_ms": {
+      "count": 40,
+      "max": 22.239888,
+      "mean": 6.26645205,
+      "p50": 5.295584,
+      "p99": 22.239888
+    },
+    "oracle_equivalent_recoveries": 10,
+    "physical_recoveries": 10,
+    "prestage_ms": {
+      "count": 4,
+      "max": 688.59244,
+      "mean": 674.8333395,
+      "p50": 687.033867,
+      "p99": 688.59244
+    },
+    "qwen_execution_ms": {
+      "count": 10,
+      "max": 25.029314,
+      "mean": 22.6338085,
+      "p50": 22.208108,
+      "p99": 25.029314
+    },
+    "qwen_units": 10,
+    "radio_commits": 40,
+    "radio_release_to_commit_ms": {
+      "count": 40,
+      "max": 102.991724,
+      "mean": 56.08562004999999,
+      "p50": 46.214001,
+      "p99": 102.991724
+    },
+    "raw_zero_normalized_failures": 0,
+    "recovery_path_ms": {
+      "count": 10,
+      "max": 17.094911,
+      "mean": 5.0918583,
+      "p50": 3.235538,
+      "p99": 17.094911
+    },
+    "rounds": 10
+  }
+}

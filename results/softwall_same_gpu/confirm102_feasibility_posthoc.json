@@ -1,0 +1,1266 @@
+{
+  "schema": "softwall-confirm102-feasibility-posthoc-v1",
+  "status_counts": {
+    "radio_floor_unreachable": 61,
+    "feasible": 39
+  },
+  "feasible_cases": 39,
+  "feasible_with_nonconstant_conditional_capacity": 37,
+  "feasible_with_multiple_guarded_subsets": 20,
+  "feasible_with_guarded_ai_improvement_over_max_radio": 0,
+  "feasible_with_ai_improvement_only_outside_radio_guard": 8,
+  "interpretation": "Post-hoc decomposition of the frozen C102 cases. Infeasibility caused by an unreachable predicted-radio floor is distinct from an all-fail scheduling failure. A nonconstant capacity span does not itself imply a radio-noninferior policy opportunity.",
+  "cases": [
+    {
+      "case": 0,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 1,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.023809523809523808,
+      "max_radio_safe": 0.023809523809523808,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 2,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.023809523809523808,
+      "max_radio_safe": 0.023809523809523808,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 3,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 4,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.031746031746031744,
+      "max_radio_safe": 0.031746031746031744,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 5,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.40476190476190477,
+      "max_radio_safe": 0.40476190476190477,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.278391912320483,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 6,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.35714285714285715,
+      "max_radio_safe": 0.35714285714285715,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.794453892668178,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 7,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 8,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.11904761904761904,
+      "max_radio_safe": 0.11904761904761904,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 9,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 10,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.031746031746031744,
+      "max_radio_safe": 0.031746031746031744,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 11,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 12,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 1.1587301587301586,
+      "max_radio_safe": 1.1587301587301586,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "a",
+        "c"
+      ],
+      "max_radio_expected_ai": 4.796941924918115,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 13,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 14,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.7301587301587301,
+      "max_radio_safe": 0.7301587301587301,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "a",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.732032627865961,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 15,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.4761904761904762,
+      "max_radio_safe": 0.4761904761904762,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.78812358276644,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 16,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 17,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.5634920634920635,
+      "max_radio_safe": 0.5634920634920635,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.873504031242127,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 18,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.06349206349206349,
+      "max_radio_safe": 0.06349206349206349,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 19,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.015873015873015872,
+      "max_radio_safe": 0.015873015873015872,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 20,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 21,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.5634920634920635,
+      "max_radio_safe": 0.5634920634920635,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.873504031242127,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 22,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.13492063492063494,
+      "max_radio_safe": 0.13492063492063494,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "b"
+      ],
+      "max_radio_expected_ai": 4.648919753086419,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 23,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.35714285714285715,
+      "max_radio_safe": 0.35714285714285715,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.70582955404384,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 24,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.7936507936507936,
+      "max_radio_safe": 0.7936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.183909674981104,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 25,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 26,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.11904761904761904,
+      "max_radio_safe": 0.11904761904761904,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 27,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 28,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.015873015873015872,
+      "max_radio_safe": 0.015873015873015872,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 29,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.11904761904761904,
+      "max_radio_safe": 0.11904761904761904,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 30,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.6031746031746031,
+      "max_radio_safe": 0.6031746031746031,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.320940413202318,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 31,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.031746031746031744,
+      "max_radio_safe": 0.031746031746031744,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 32,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 33,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 34,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.6190476190476191,
+      "max_radio_safe": 0.6190476190476191,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "c"
+      ],
+      "max_radio_expected_ai": 4.052201436130007,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 35,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.18253968253968253,
+      "max_radio_safe": 0.18253968253968253,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 36,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 37,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 38,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.5317460317460317,
+      "max_radio_safe": 0.5317460317460317,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.033777399848828,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 39,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.031746031746031744,
+      "max_radio_safe": 0.031746031746031744,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 40,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 41,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.6190476190476191,
+      "max_radio_safe": 0.6190476190476191,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "c"
+      ],
+      "max_radio_expected_ai": 4.052201436130007,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 42,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.023809523809523808,
+      "max_radio_safe": 0.023809523809523808,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 43,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.5634920634920635,
+      "max_radio_safe": 0.5634920634920635,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "c"
+      ],
+      "max_radio_expected_ai": 4.873504031242127,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 44,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 45,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.11904761904761904,
+      "max_radio_safe": 0.11904761904761904,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.9841742252456545,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 46,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.023809523809523808,
+      "max_radio_safe": 0.023809523809523808,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 47,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 48,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.12698412698412698,
+      "max_radio_safe": 0.12698412698412698,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 49,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.06349206349206349,
+      "max_radio_safe": 0.06349206349206349,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 50,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.06349206349206349,
+      "max_radio_safe": 0.06349206349206349,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 51,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.2142857142857143,
+      "max_radio_safe": 0.2142857142857143,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.201577853363568,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 52,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 53,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 54,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 55,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 1.0317460317460316,
+      "max_radio_safe": 1.0317460317460316,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.497653691106072,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 56,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.12698412698412698,
+      "max_radio_safe": 0.12698412698412698,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.001369992441421,
+      "guarded_subset_count": 3,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 57,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.5634920634920635,
+      "max_radio_safe": 0.5634920634920635,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "b"
+      ],
+      "max_radio_expected_ai": 4.873504031242127,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 58,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.5634920634920635,
+      "max_radio_safe": 0.5634920634920635,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.003480095742001,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 59,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.35714285714285715,
+      "max_radio_safe": 0.35714285714285715,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.003165154950869,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 60,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.35714285714285715,
+      "max_radio_safe": 0.35714285714285715,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.794453892668178,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 61,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 1.1984126984126984,
+      "max_radio_safe": 1.1984126984126984,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "a",
+        "c"
+      ],
+      "max_radio_expected_ai": 4.82579050138574,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 62,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.6031746031746031,
+      "max_radio_safe": 0.6031746031746031,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.905124086671706,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 63,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 64,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.14285714285714285,
+      "max_radio_safe": 0.14285714285714285,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 65,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 66,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.14285714285714285,
+      "max_radio_safe": 0.14285714285714285,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 67,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.5634920634920635,
+      "max_radio_safe": 0.5634920634920635,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.873504031242127,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 68,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.7142857142857143,
+      "max_radio_safe": 0.7142857142857143,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.104576089695137,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 69,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.07142857142857142,
+      "max_radio_safe": 0.07142857142857142,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 70,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.6031746031746031,
+      "max_radio_safe": 0.6031746031746031,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.457120811287478,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 71,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 72,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 73,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.47619047619047616,
+      "max_radio_safe": 0.47619047619047616,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "c"
+      ],
+      "max_radio_expected_ai": 4.565208490803729,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 74,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.03968253968253968,
+      "max_radio_safe": 0.03968253968253968,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 75,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.023809523809523808,
+      "max_radio_safe": 0.023809523809523808,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 76,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.11904761904761904,
+      "max_radio_safe": 0.11904761904761904,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 77,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 78,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 79,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 80,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.06349206349206349,
+      "max_radio_safe": 0.06349206349206349,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 81,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.25396825396825395,
+      "max_radio_safe": 0.25396825396825395,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 1,
+      "max_radio_selection": [
+        "a",
+        "b"
+      ],
+      "max_radio_expected_ai": 4.795965608465608,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": false
+    },
+    {
+      "case": 82,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 83,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 84,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.626984126984127,
+      "max_radio_safe": 0.626984126984127,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.905124086671706,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 85,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.8253968253968254,
+      "max_radio_safe": 0.8253968253968254,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.452617157974301,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 86,
+      "radio_floor": 0.1,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 87,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.19841269841269843,
+      "max_radio_safe": 0.19841269841269843,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 88,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 89,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.7063492063492064,
+      "max_radio_safe": 0.7063492063492064,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 7,
+      "max_radio_selection": [
+        "a",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.636196145124717,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": true,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 90,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.47619047619047616,
+      "max_radio_safe": 0.47619047619047616,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.502157344419249,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 91,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.23809523809523808,
+      "max_radio_safe": 0.23809523809523808,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 1,
+      "max_radio_selection": [
+        "a",
+        "c"
+      ],
+      "max_radio_expected_ai": 4.113709372637944,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": false
+    },
+    {
+      "case": 92,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.13492063492063494,
+      "max_radio_safe": 0.13492063492063494,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.802358906525573,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 93,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.35714285714285715,
+      "max_radio_safe": 0.35714285714285715,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "b",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.319680650037793,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 94,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 95,
+      "radio_floor": 0.2,
+      "status": "feasible",
+      "max_radio_any": 0.3412698412698413,
+      "max_radio_safe": 0.3412698412698413,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "c",
+        "d"
+      ],
+      "max_radio_expected_ai": 4.01677059712774,
+      "guarded_subset_count": 1,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    },
+    {
+      "case": 96,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.007936507936507936,
+      "max_radio_safe": 0.007936507936507936,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 97,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.13492063492063494,
+      "max_radio_safe": 0.13492063492063494,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 98,
+      "radio_floor": 0.2,
+      "status": "radio_floor_unreachable",
+      "max_radio_any": 0.11904761904761904,
+      "max_radio_safe": 0.11904761904761904,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 0
+    },
+    {
+      "case": 99,
+      "radio_floor": 0.1,
+      "status": "feasible",
+      "max_radio_any": 0.11904761904761904,
+      "max_radio_safe": 0.11904761904761904,
+      "safe_subset_count": 11,
+      "floor_feasible_subset_count": 4,
+      "max_radio_selection": [
+        "a",
+        "b"
+      ],
+      "max_radio_expected_ai": 4.537178760393046,
+      "guarded_subset_count": 4,
+      "guarded_ai_improvement_available": false,
+      "outside_guard_ai_improvement_available": false,
+      "conditional_capacity_nonconstant": true
+    }
+  ]
+}

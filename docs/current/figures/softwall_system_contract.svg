@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#37474f"/></marker>
+<pattern id="recoveryHatch" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#56b4a9"/><path d="M-2,2 l4,-4 M0,12 l12,-12 M10,14 l4,-4" stroke="#1b5e55" stroke-width="2"/></pattern>
+<pattern id="aiDots" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#b39ddb"/><circle cx="3" cy="3" r="1.8" fill="#4a3475"/><circle cx="9" cy="9" r="1.8" fill="#4a3475"/></pattern>
+<style>.small{font:20px Arial,Helvetica,sans-serif;fill:#202124}.tiny{font:17px Arial,Helvetica,sans-serif;fill:#202124}.axis{stroke:#202124;stroke-width:2}.panel{fill:#ffffff;stroke:#9aa0a6;stroke-width:2}</style>
+</defs>
+<rect width="1600" height="760" fill="#ffffff"/>
+<rect x="22" y="34" width="690" height="690" rx="14" fill="#ffffff" stroke="#9aa0a6" stroke-width="2.5"/>
+<rect x="736" y="34" width="842" height="690" rx="14" fill="#ffffff" stroke="#9aa0a6" stroke-width="2.5"/>
+<text x="54" y="75" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" text-anchor="start" fill="#202124">(a) Certificate-preserving AI-RAN path</text>
+<text x="768" y="75" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" text-anchor="start" fill="#202124">(b) One certificate covers all failure subsets</text>
+<rect x="62" y="125" width="190" height="92" rx="12" fill="#d9ecff" stroke="#2f5597" stroke-width="2.5"/>
+<text x="157" y="164" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" text-anchor="middle" fill="#202124">RAN home 0</text>
+<text x="157" y="193" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">2 TB debts</text>
+<rect x="62" y="265" width="190" height="92" rx="12" fill="#d9ecff" stroke="#2f5597" stroke-width="2.5"/>
+<text x="157" y="304" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" text-anchor="middle" fill="#202124">RAN home 1</text>
+<text x="157" y="333" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">2 TB debts</text>
+<rect x="329" y="112" width="310" height="118" rx="12" fill="#ffe3b3" stroke="#a65f00" stroke-width="2.5"/>
+<text x="484" y="150" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" text-anchor="middle" fill="#202124">GPU 3: optional NeuralRx</text>
+<text x="484" y="181" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">actual TensorRT outcomes</text>
+<text x="484" y="207" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">success deletes one debt</text>
+<rect x="329" y="270" width="310" height="138" rx="12" fill="url(#recoveryHatch)" stroke="#1b5e55" stroke-width="2.5"/>
+<text x="484" y="311" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" text-anchor="middle" fill="#202124">GPU 2: shared cuPHY</text>
+<text x="484" y="342" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">conventional recovery lane</text>
+<text x="484" y="371" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">CUDA IPC + NVLink P2P</text>
+<rect x="329" y="463" width="310" height="105" rx="12" fill="url(#aiDots)" stroke="#4a3475" stroke-width="2.5"/>
+<text x="484" y="505" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" text-anchor="middle" fill="#202124">GPU 2: external AI</text>
+<text x="484" y="537" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">bounded Qwen work class</text>
+<rect x="62" y="455" width="205" height="145" rx="12" fill="#eceff1" stroke="#455a64" stroke-width="2.5"/>
+<text x="165" y="491" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" text-anchor="middle" fill="#202124">SoftWall</text>
+<text x="165" y="523" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="middle" fill="#202124">global all-fail</text>
+<text x="165" y="550" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="middle" fill="#202124">certificate</text>
+<text x="165" y="579" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" text-anchor="middle" fill="#202124">+ independent verifier</text>
+<line x1="252" y1="166" x2="329" y2="166" stroke="#37474f" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="252" y1="306" x2="329" y2="182" stroke="#37474f" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="252" y1="196" x2="329" y2="317" stroke="#37474f" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="252" y1="336" x2="329" y2="348" stroke="#37474f" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="267" y1="505" x2="329" y2="358" stroke="#455a64" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="267" y1="527" x2="329" y2="510" stroke="#455a64" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="329" y1="548" x2="267" y2="560" stroke="#455a64" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="284" y="437" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">atomic calendar + AI lease</text>
+<line x1="484" y1="230" x2="484" y2="270" stroke="#a65f00" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="505" y="256" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#202124">outcome</text>
+<rect x="62" y="640" width="577" height="52" rx="8" fill="#f5f7f8" stroke="#78909c" stroke-width="2.5"/>
+<text x="350" y="672" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" text-anchor="middle" fill="#202124">Physical fence → credit retire → exactly one radio commit</text>
+<text x="780" y="123" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="start" fill="#202124">Initial all-fail state: four unresolved debts</text>
+<line x1="795" y1="190" x2="1518" y2="190" stroke="#202124" stroke-width="2"/>
+<line x1="795" y1="181" x2="795" y2="199" stroke="#202124" stroke-width="2"/>
+<text x="795" y="221" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">0</text>
+<line x1="1004" y1="181" x2="1004" y2="199" stroke="#202124" stroke-width="2"/>
+<text x="1004" y="221" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">45</text>
+<line x1="1392" y1="181" x2="1392" y2="199" stroke="#202124" stroke-width="2"/>
+<text x="1392" y="221" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">128</text>
+<line x1="1518" y1="181" x2="1518" y2="199" stroke="#202124" stroke-width="2"/>
+<text x="1518" y="221" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">155</text>
+<text x="1530" y="196" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#202124">ms</text>
+<rect x="795" y="139" width="209" height="38" rx="4" fill="#ffe3b3" stroke="#a65f00" stroke-width="2.5"/>
+<text x="899" y="165" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">NRx window</text>
+<rect x="1042" y="239" width="116" height="45" rx="4" fill="url(#recoveryHatch)" stroke="#1b5e55" stroke-width="2.5"/>
+<text x="1100" y="268" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">R0</text>
+<rect x="1158" y="239" width="116" height="45" rx="4" fill="url(#recoveryHatch)" stroke="#1b5e55" stroke-width="2.5"/>
+<text x="1217" y="268" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">R1</text>
+<rect x="1275" y="239" width="116" height="45" rx="4" fill="url(#recoveryHatch)" stroke="#1b5e55" stroke-width="2.5"/>
+<text x="1333" y="268" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">R2</text>
+<rect x="1392" y="239" width="116" height="45" rx="4" fill="url(#recoveryHatch)" stroke="#1b5e55" stroke-width="2.5"/>
+<text x="1450" y="268" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">R3</text>
+<rect x="1508" y="239" width="9" height="45" rx="4" fill="#d9dde0" stroke="#616161" stroke-width="2.5"/>
+<text x="1513" y="268" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124"></text>
+<text x="780" y="267" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#202124">all-fail executable certificate</text>
+<text x="780" y="329" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="start" fill="#202124">After three observed successes: delete three credits atomically</text>
+<line x1="795" y1="397" x2="1518" y2="397" stroke="#202124" stroke-width="2"/>
+<line x1="795" y1="388" x2="795" y2="406" stroke="#202124" stroke-width="2"/>
+<text x="795" y="428" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">0</text>
+<line x1="1004" y1="388" x2="1004" y2="406" stroke="#202124" stroke-width="2"/>
+<text x="1004" y="428" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">45</text>
+<line x1="1205" y1="388" x2="1205" y2="406" stroke="#202124" stroke-width="2"/>
+<text x="1205" y="428" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">88</text>
+<line x1="1392" y1="388" x2="1392" y2="406" stroke="#202124" stroke-width="2"/>
+<text x="1392" y="428" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">128</text>
+<line x1="1518" y1="388" x2="1518" y2="406" stroke="#202124" stroke-width="2"/>
+<text x="1518" y="428" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="middle" fill="#202124">155</text>
+<rect x="795" y="346" width="209" height="38" rx="4" fill="#ffe3b3" stroke="#a65f00" stroke-width="2.5"/>
+<text x="899" y="372" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">NRx window</text>
+<rect x="1205" y="454" width="186" height="48" rx="4" fill="url(#aiDots)" stroke="#4a3475" stroke-width="2.5"/>
+<text x="1298" y="485" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">control 5 + Qwen 35</text>
+<rect x="1392" y="454" width="116" height="48" rx="4" fill="url(#recoveryHatch)" stroke="#1b5e55" stroke-width="2.5"/>
+<text x="1450" y="485" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124">R3</text>
+<rect x="1508" y="454" width="9" height="48" rx="4" fill="#d9dde0" stroke="#616161" stroke-width="2.5"/>
+<text x="1513" y="485" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="#202124"></text>
+<text x="780" y="483" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#202124">retimed certificate</text>
+<rect x="793" y="558" width="336" height="102" rx="10" fill="#e8f4ff" stroke="#2f5597" stroke-width="2.5"/>
+<text x="961" y="596" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="#202124">decision at 88 ms</text>
+<text x="961" y="630" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">40 + 25 + 2 = 67 ms → QSU</text>
+<rect x="1170" y="558" width="346" height="102" rx="10" fill="#fff1e6" stroke="#b64b00" stroke-width="2.5"/>
+<text x="1343" y="596" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="#202124">decision at ≥89 ms</text>
+<text x="1343" y="630" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" text-anchor="middle" fill="#202124">40 + 25 + 2 &gt; 66 ms → QSN</text>
+<text x="1156" y="700" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="#202124">QSU/QSN boundary is predicted before physical execution</text>
+</svg>

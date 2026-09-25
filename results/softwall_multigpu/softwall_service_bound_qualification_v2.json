@@ -1,0 +1,199 @@
+{
+  "all_pass": true,
+  "c137_component_evidence": {
+    "ai_execution_ms": {
+      "arm_process_exceedances": 0,
+      "arm_process_units": 6,
+      "declared_bound_ms": 40.0,
+      "observed_headroom_ms": 9.34301,
+      "observed_max_ms": 30.65699,
+      "per_arm_max_ms": [
+        27.169769,
+        27.139755,
+        24.936037,
+        29.229829,
+        30.65699,
+        27.296683
+      ],
+      "per_node_max_ms": {
+        "nid001177": 30.65699
+      },
+      "physical_node_exceedances": 0,
+      "physical_node_units": 1,
+      "sample_exceedances": 0,
+      "samples": 124,
+      "zero_failure_95_upper_if_iid": {
+        "arm_process": 0.39303776899708265,
+        "physical_node": 0.95,
+        "sample": 0.023869635435592396
+      }
+    },
+    "conv_host_path_ms": {
+      "arm_process_exceedances": 0,
+      "arm_process_units": 6,
+      "declared_bound_ms": 25.0,
+      "observed_headroom_ms": 13.408725,
+      "observed_max_ms": 11.591275,
+      "per_arm_max_ms": [
+        5.235172,
+        3.232012,
+        5.100153,
+        5.875886,
+        4.753862,
+        11.591275
+      ],
+      "per_node_max_ms": {
+        "nid001177": 11.591275
+      },
+      "physical_node_exceedances": 0,
+      "physical_node_units": 1,
+      "sample_exceedances": 0,
+      "samples": 5232,
+      "zero_failure_95_upper_if_iid": {
+        "arm_process": 0.39303776899708265,
+        "physical_node": 0.95,
+        "sample": 0.0005724149065037265
+      }
+    },
+    "nrx_response_ms": {
+      "arm_process_exceedances": 0,
+      "arm_process_units": 6,
+      "declared_bound_ms": 45.0,
+      "observed_headroom_ms": 19.264359,
+      "observed_max_ms": 25.735641,
+      "per_arm_max_ms": [
+        23.610915,
+        12.81885,
+        16.812515,
+        25.735641,
+        15.168332,
+        21.003483
+      ],
+      "per_node_max_ms": {
+        "nid001177": 25.735641
+      },
+      "physical_node_exceedances": 0,
+      "physical_node_units": 1,
+      "sample_exceedances": 0,
+      "samples": 3295,
+      "zero_failure_95_upper_if_iid": {
+        "arm_process": 0.39303776899708265,
+        "physical_node": 0.95,
+        "sample": 0.0009087620222859583
+      }
+    }
+  },
+  "c137_control_rpc_evidence": {
+    "all_pass": true,
+    "by_operation": {
+      "commit": 124,
+      "complete": 124,
+      "prepare": 5745
+    },
+    "declared_per_rpc_bound_ms": 5.0,
+    "faulted": 0,
+    "gates": {
+      "every_arm_prepare_commit_complete_coverage": true,
+      "maximum_within_declared_timeout": true,
+      "no_rpc_fault": true,
+      "no_wall_timeout_exceedance": true,
+      "rpc_record_counts_reconcile": true
+    },
+    "max_elapsed_ms_by_operation": {
+      "commit": 0.388313,
+      "complete": 1.046257,
+      "prepare": 2.593595
+    },
+    "maximum_elapsed_ms": 2.593595,
+    "records": 5993,
+    "wall_timeout_exceeded": 0
+  },
+  "claim_boundary": "C137 directly measured 5,993 on-path broker calls on a third A100 node and kept every prepare/commit/complete call within the frozen 5 ms budget while the PHY, AI40 conditional exchange, and credit gates passed. This removes a telemetry gap but remains finite-sample evidence, not WCET or production timing.",
+  "gates": {
+    "control_rpc_telemetry_pass": true,
+    "logical_contract_fields_match": true,
+    "one_new_telemetry_node": true,
+    "original_mode_finite_sample_pass": true,
+    "six_telemetry_arms": true,
+    "telemetry_campaign_pass": true,
+    "telemetry_components_within_declared_bounds": true
+  },
+  "hard_real_time_status": "UNPROVEN",
+  "inputs": {
+    "c135_c136_combined": "results/softwall_multigpu/confirm135_136_combined_v12_qualification.json",
+    "c137": "results/softwall_multigpu/confirm137_service_bound_telemetry_result.json",
+    "c137_sha256": "a3926dcb2719a5d0e2e7678b1ff297f9a202ac7b271d74b4f5ed4019eae6c403",
+    "combined_sha256": "674f17cfb45c83c846bdd323fe67807cc26e0336f9a6328cbfa947a13ccc0f5a",
+    "original_clustered_qualification": "results/softwall_multigpu/softwall_v12_clustered_bound_qualification_v1.json",
+    "original_sha256": "d605bd84d8cda3000b93a9dcec8fef0f3c99c11cb184145999b7a2bf0c6d2300"
+  },
+  "logical_mode_signature": {
+    "admission_ai_guard_ms": 17.0,
+    "ai128_bound_ms": 40.0,
+    "ai_during_nrx": "async_one_if_edf_fit",
+    "cells": 4,
+    "commit_guard_ms": 2.0,
+    "conv_bound_ms": 25.0,
+    "deadline_ms": 155.0,
+    "early_mandatory": "on",
+    "fault_pattern": "mixed",
+    "gc_mode": "off",
+    "global_broker_rpc_timeout_ms": 5.0,
+    "global_broker_transaction_budget_ms": 15.0,
+    "nrx_bound_ms": 45.0,
+    "nrx_endpoints": 2,
+    "period_ms": 180.0,
+    "routing_policy": "shortest_queue",
+    "system": "softwall",
+    "trace_sha256": "9c3ebdb3d7db3fec05048653529837c083115b0ec554280a79fea2dfbe565bf2"
+  },
+  "mechanism_cross_mode_reproduction": {
+    "interpretation": "Mechanism reproduction spans three A100 nodes, but one node uses added RPC telemetry. Treat the node statistic as cross-mode sensitivity, not an exact-mode hardware-population guarantee.",
+    "node_names": [
+      "nid001177",
+      "nid001245",
+      "nid002817"
+    ],
+    "totals": {
+      "ai40_candidate_exchanges": 66,
+      "arms": 14,
+      "atomic_exchanges": 124,
+      "candidate_branches": 2100,
+      "declared_safety_violations": 0,
+      "home_releases": 4480,
+      "nodes": 3,
+      "radio_records": 17920
+    },
+    "zero_failure_95_upper_if_iid": {
+      "arm_process_lifecycle": 0.19263617565013524,
+      "home_release": 0.0006684667161397373,
+      "physical_node": 0.6315968501359612,
+      "radio_tb": 0.00016715858735438793
+    }
+  },
+  "mode_partition": {
+    "original_uninstrumented": {
+      "arms": 8,
+      "campaigns": [
+        "C135",
+        "C136"
+      ],
+      "nodes": [
+        "nid001245",
+        "nid002817"
+      ],
+      "status": "FINITE_SAMPLE_PASS"
+    },
+    "rpc_instrumented": {
+      "arms": 6,
+      "campaign": "C137",
+      "nodes": [
+        "nid001177"
+      ],
+      "status": "FINITE_SAMPLE_PASS"
+    },
+    "rule": "Instrumentation is a mode axis. Component and mechanism evidence may be compared across the two partitions, but C137 does not retroactively turn the uninstrumented C135/C136 control path into measured RPC telemetry."
+  },
+  "schema": "softwall-service-bound-qualification-v2",
+  "status": "FINITE_SAMPLE_TELEMETRY_PASS"
+}

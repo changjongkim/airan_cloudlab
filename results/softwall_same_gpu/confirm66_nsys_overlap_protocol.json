@@ -1,0 +1,10 @@
+{
+  "schema": "softwall-confirm66-exploratory-profiler-protocol-v1",
+  "job": "58734412",
+  "purpose": "Check whether actual GPU kernels from the allowed early AI unit and NeuralRx endpoint overlap in time; this is a service-mode input for the joint lease, not a MPS-isolation novelty experiment.",
+  "runner": "scripts_for_node/softwall_same_gpu/run_confirm65_async_arm.sh",
+  "mode": "async_one",
+  "iterations": 10,
+  "profiler": "nsys profile --trace=cuda,nvtx --sample=none --cpuctxsw=none --force-overwrite=true",
+  "predeclared_interpretation": "If one profiler session exposes GPU kernel timestamps for AI and NeuralRx processes on one clock, count interval overlaps. If not, report profiling failure or missing attribution. Profiling overhead precludes deadline and throughput claims."
+}

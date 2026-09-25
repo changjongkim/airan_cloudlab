@@ -1,0 +1,26 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "aerial_cdl_public_contract_screen",
+  "frozen_before_execution": true,
+  "role": "Development compatibility screen on an explicitly advertised channel family; not a channel qualification outcome.",
+  "premise": "The public NeuralRx notebook exposes Rayleigh and CDL-A--E branches and no TDL branch.",
+  "channel": "Aerial CDL-A, 30 ns, 10 Hz, 1x4 UL, no AWGN",
+  "radio_profile": "NVIDIA public example: MCS7, start0, DMRS 0/5/10, TDI1, one UE TX, FP32 engine",
+  "arms": [
+    "frequency_delay0",
+    "frequency_delay1us",
+    "time_delay1us"
+  ],
+  "iterations_per_arm": 20,
+  "payload_seed": 20358500,
+  "channel_seed": 58501,
+  "decision_rule": "Only conventional=20/20 and NeuralRx=20/20 in every arm may open a frozen disjoint-seed CDL holdout. Otherwise stop and diagnose the model/interface.",
+  "official_onnx_sha256": "773b92a35a8a86903915bc0bbba2ce0b0ffe35d8c5839b64af8a8391dbac633c",
+  "source_sha256_before_execution": {
+    "probe_aerial_cdl_reference_development.py": "5ecb3726bf5a38d6d7bf5e93adf4887914bc2c9642c9c35b5f4afd8619b0926d",
+    "run_aerial_cdl_reference_development.sh": "b427b5f77a4100408b7e82f77064816bd3ae791938ee906406a15b84a2659cde",
+    "dual_receiver_phy.py": "3000868ee98aa71c3737335ac304a1dc942f8b75e7a95bfed2a96a07e0f79db0",
+    "nrx_trt_direct.py": "c50798fb17d953c5064cf972b0795dc0c2e4c6017885e250127a661d438c1309",
+    "analyze_nrx_public_contract.py": "ed95327293d725369c4f0ff50575db4390a34dfbff863118e787c435e5751c5b"
+  }
+}

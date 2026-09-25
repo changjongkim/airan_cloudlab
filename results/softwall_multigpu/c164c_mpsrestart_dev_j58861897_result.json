@@ -1,0 +1,58 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "base_result": "e89d70b5f560fc5eda3ffc8ca152a33f1b4d5004615f539e5ad5c9397017db2b",
+    "coordinator": "5cf5cb20beddaa38e0f12264353a406d35def6f2406f01335440982f0fcf08e2",
+    "marker": "ea19226577c22bbf2941f0fdb6a7dbcf42f49a6e6b5c17370c3b5278365bb7de",
+    "nrx_worker": "e148640f04fedaa4a91115dc67659f56c27e383101fe83bbbc2c04cee84c13cc",
+    "protocol": "d672ebb7b7386b6ce61b443502cff78965a0e6f2076fd267d45a3803e1dad1c0",
+    "qwen": "09ae8e1eea16f3b8dd468d27f7a627e84b7572ed946aeaee1929fd09a5020edc"
+  },
+  "campaign": "development",
+  "counts": {
+    "actual_nrx": 240,
+    "deadline_misses": 0,
+    "injected_recoveries": 110,
+    "qwen_units": 30,
+    "radio_commits": 240
+  },
+  "first_round_case": "E1_four_unresolved_no_ai",
+  "gates": {
+    "base_c162_boundary_all_pass": true,
+    "c164_restart_source_hash_match": true,
+    "first_round_actual_nrx_complete": true,
+    "first_round_certificate_and_commit_safe": true,
+    "frozen_restart_contract": true,
+    "new_epoch_before_first_release": true,
+    "physical_restart_marker_pass": true,
+    "same_host_job_clock_domain": true
+  },
+  "host": "nid001192",
+  "label": "c164c_mpsrestart_dev_j58861897",
+  "maxima_ms": {
+    "nrx_release_to_complete": 22.712971,
+    "qwen_execution": 67.90722,
+    "radio_commit": 126.225796,
+    "recovery_path": 6.781201
+  },
+  "qualification_scope": "First RAN request and frozen C162 boundary subset after a quiescent MPS daemon restart and full fresh-client requalification. Optional service is closed during restart; restart availability, full six-class qualification, production d_MAC, cross-family, and WCET remain UQ.",
+  "restart_identity": {
+    "after_control_inode": 144140610406711600,
+    "after_control_pids": [
+      1677602
+    ],
+    "after_server_pids": [
+      1677837
+    ],
+    "before_control_inode": 144140610406711590,
+    "before_control_pids": [
+      1677299
+    ],
+    "before_server_pids": [
+      1677538
+    ]
+  },
+  "schema": "softwall-c164-mps-restart-result-v1",
+  "slurm_job_id": "58861897",
+  "status": "C164_MPS_RESTART_BOUNDARY_PASS"
+}

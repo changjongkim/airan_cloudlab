@@ -1,0 +1,499 @@
+{
+  "schema": "softwall-endpoint-admission-exact-oracle-audit-v1",
+  "status": "PASS",
+  "scope": "Exact finite-state cardinality and schedule-consistency audit for the synchronous release-zero, endpoint-specific but job-independent service-bound model; not a queueing or WCET proof.",
+  "oracle_sha256": "bf43639646a8bcba1735cce66a12e1094c6339311228fc7fa5617b67c0ee6b49",
+  "grid": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_grid_v9.json",
+  "grid_sha256": "e720c82d22714f68652f394e8052b887e501b91b9ae98dca386fbd7d1a74ebdd",
+  "prediction": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v9.json",
+  "prediction_sha256": "22a7fd07d2a0402894b1f765e3be5d1a39b3e74f60484ec72e1cfcca1c2f966d",
+  "scenario_count": 18,
+  "endpoint_pool_count": 39,
+  "scenario_failures": [],
+  "bounded_exhaustive": {
+    "cases": 3640,
+    "cardinality_gaps": [],
+    "max_oracle_states": 315,
+    "all_pass": true
+  },
+  "scenarios": [
+    {
+      "id": "sharded_home_g1_c4",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 31,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g1_c8",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 8,
+          "endpoints": 2,
+          "checker_admitted": 5,
+          "oracle_admitted": 5,
+          "oracle_states": 62,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g1_c12",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 12,
+          "endpoints": 2,
+          "checker_admitted": 5,
+          "oracle_admitted": 5,
+          "oracle_states": 69,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c4",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 2,
+          "endpoints": 2,
+          "checker_admitted": 2,
+          "oracle_admitted": 2,
+          "oracle_states": 10,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 2,
+          "endpoints": 2,
+          "checker_admitted": 2,
+          "oracle_admitted": 2,
+          "oracle_states": 10,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_conv12_legacy_executor",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 31,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 31,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_class_order_executor",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c12",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 6,
+          "endpoints": 2,
+          "checker_admitted": 5,
+          "oracle_admitted": 5,
+          "oracle_states": 51,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 6,
+          "endpoints": 2,
+          "checker_admitted": 5,
+          "oracle_admitted": 5,
+          "oracle_states": 51,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g4_c4",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 1,
+          "endpoints": 2,
+          "checker_admitted": 1,
+          "oracle_admitted": 1,
+          "oracle_states": 4,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 1,
+          "endpoints": 2,
+          "checker_admitted": 1,
+          "oracle_admitted": 1,
+          "oracle_states": 4,
+          "cardinality_match": true
+        },
+        {
+          "home": 2,
+          "jobs": 1,
+          "endpoints": 2,
+          "checker_admitted": 1,
+          "oracle_admitted": 1,
+          "oracle_states": 4,
+          "cardinality_match": true
+        },
+        {
+          "home": 3,
+          "jobs": 1,
+          "endpoints": 2,
+          "checker_admitted": 1,
+          "oracle_admitted": 1,
+          "oracle_states": 4,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g4_c8",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 2,
+          "endpoints": 2,
+          "checker_admitted": 2,
+          "oracle_admitted": 2,
+          "oracle_states": 10,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 2,
+          "endpoints": 2,
+          "checker_admitted": 2,
+          "oracle_admitted": 2,
+          "oracle_states": 10,
+          "cardinality_match": true
+        },
+        {
+          "home": 2,
+          "jobs": 2,
+          "endpoints": 2,
+          "checker_admitted": 2,
+          "oracle_admitted": 2,
+          "oracle_states": 10,
+          "cardinality_match": true
+        },
+        {
+          "home": 3,
+          "jobs": 2,
+          "endpoints": 2,
+          "checker_admitted": 2,
+          "oracle_admitted": 2,
+          "oracle_states": 10,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g4_c12",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 3,
+          "endpoints": 2,
+          "checker_admitted": 3,
+          "oracle_admitted": 3,
+          "oracle_states": 20,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 3,
+          "endpoints": 2,
+          "checker_admitted": 3,
+          "oracle_admitted": 3,
+          "oracle_states": 20,
+          "cardinality_match": true
+        },
+        {
+          "home": 2,
+          "jobs": 3,
+          "endpoints": 2,
+          "checker_admitted": 3,
+          "oracle_admitted": 3,
+          "oracle_states": 20,
+          "cardinality_match": true
+        },
+        {
+          "home": 3,
+          "jobs": 3,
+          "endpoints": 2,
+          "checker_admitted": 3,
+          "oracle_admitted": 3,
+          "oracle_states": 20,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor_commit_fault_unhandled",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor_commit_fault_quarantine",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_sync_marker_c128",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_unbounded_rpc_c129",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_timeout_unaccounted_c130",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_partial_budget_c131",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134",
+      "schedule_errors": [],
+      "pools": [
+        {
+          "home": 0,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        },
+        {
+          "home": 1,
+          "jobs": 4,
+          "endpoints": 2,
+          "checker_admitted": 4,
+          "oracle_admitted": 4,
+          "oracle_states": 25,
+          "cardinality_match": true
+        }
+      ],
+      "all_pass": true
+    }
+  ],
+  "all_pass": true
+}

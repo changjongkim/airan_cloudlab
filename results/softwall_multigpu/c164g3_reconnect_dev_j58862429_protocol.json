@@ -1,0 +1,82 @@
+{
+  "campaign": "development",
+  "contract": {
+    "claim_scope": "same-process worker channel reconnect subset; worker process replacement, production d_MAC and WCET remain UQ",
+    "mandatory": "all four conventional cells <=25 ms and release <=155 ms",
+    "overlap_gate": "post-fence Qwen launches are aligned before mandatory releases and the launch-call-to-fence wall interval must overlap mandatory execution; this is not a new kernel-overlap trace",
+    "post_fence_loss": "matching durable fenced record retires the lease exactly once",
+    "prepare_loss": "durable prepared record becomes nonlaunch_fenced under reconnect token lock",
+    "same_worker_epoch": true
+  },
+  "excluded_nodes": [
+    "nid001025",
+    "nid001044",
+    "nid001064",
+    "nid001069",
+    "nid001085",
+    "nid001109",
+    "nid001124",
+    "nid001137",
+    "nid001145",
+    "nid001169",
+    "nid001177",
+    "nid001192",
+    "nid001200",
+    "nid001204",
+    "nid001265",
+    "nid001288",
+    "nid001308",
+    "nid001353",
+    "nid001381",
+    "nid001632",
+    "nid001824",
+    "nid002100",
+    "nid002288"
+  ],
+  "label": "c164g3_reconnect_dev_j58862429",
+  "lifecycle_epoch": 51020000,
+  "mode": {
+    "ai_bounds_ms": {
+      "128": 40,
+      "512": 75
+    },
+    "cells": 4,
+    "component_bound_ms": 25,
+    "contexts": [
+      128,
+      512
+    ],
+    "deadline_ms": 155,
+    "expected_per_context_fault": 15,
+    "expected_per_fault": 30,
+    "faults": [
+      "drop_after_prepare",
+      "drop_after_fence"
+    ],
+    "mps_caps": {
+      "mandatory": 80,
+      "qwen": 20
+    },
+    "period_ms": 180,
+    "post_fence_launch_alignment": "10 ms before the next mandatory release"
+  },
+  "schema": "softwall-c164-reconnect-protocol-v1",
+  "seed": 51020000,
+  "source_sha256": {
+    "scripts/analyze_c164_reconnect.py": "5701b239fda2243e65a08eaf74f1df053140986d345080194c97644d7bcd2c6b",
+    "scripts/build_c164_reconnect_protocol.py": "5926fca9731ea6cba4331a207d9ee0e2e121e393171180e2699db8e7576f1bdd",
+    "scripts/c161_phase2_qwen_worker.py": "ca3e4555f9f638589012c9a615dd55492eda197a084dde95bf6fcacbe9a7f2af",
+    "scripts/c164_mandatory_continuity_runner.py": "597278510b1739cb14b4f6601124b87548b8766da0080355de9210c98320c646",
+    "scripts/c164_reconnect_client.py": "5c175d6bc0b4a95c78f550aabbfe3dd3629e9ad5603bb335bb085a8694df6128",
+    "scripts/c164_reconnect_qwen_worker.py": "e74c6e391f58535fc830cac12b8bf6d2e70c260865f322af41f2d11033b3f64c",
+    "scripts/c164_reconnect_state_model_v1.py": "210c220e46b71004fc86806c00ff8aa6ef52fa7340ffeb5c96da77c72b250857",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/run_c164_reconnect.sh": "c875035a14020421e24b21d04a98ff49f53d3fe2c18db757b82e636257771bdd",
+    "scripts/softwall_phy.py": "200e46fce5837ccb3d08f1291b9a0394c956285bc7e7f8a5a12a1fad51d69355",
+    "scripts/test_c164_reconnect_physical.py": "880ebff9ffd07102664a1a8e8cee1745c71c5af50b1ddbbc694ea2340966e822",
+    "task1/nrx_trt_direct.py": "9dd7d019368295edfae4c3a76870ce917165d1cbe89e9e8315f94948c6d38b70"
+  },
+  "status": "frozen-before-run",
+  "tokens": 60,
+  "worker_epoch": "c164g3_reconnect_dev_j58862429-worker"
+}

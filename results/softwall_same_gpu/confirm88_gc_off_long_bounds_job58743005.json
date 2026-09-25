@@ -1,0 +1,67 @@
+{
+  "schema": "softwall-confirm88-gc-off-long-bound-screen-v1",
+  "job": "58743005",
+  "source_hashes": true,
+  "arms": [
+    {
+      "name": "a",
+      "prefix": "confirm88_gc_off_a_job58743005",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "current_contract_sample": true,
+        "gc_disabled_and_tail_window": true
+      },
+      "all_pass": true,
+      "nrx_paths": 7400,
+      "nrx_max_ms": 21.223441,
+      "nrx_p99_9_ms": 19.771522,
+      "nrx_over_25_ms": 0,
+      "nrx_over_30_ms": 0,
+      "tail_window_nrx": 3698,
+      "tail_window_nrx_max_ms": 21.223441,
+      "conv_paths": 14771,
+      "conv_max_ms": 8.45824,
+      "conv_p99_9_ms": 3.47602,
+      "conv_over_8_ms": 1,
+      "conv_over_12_ms": 0,
+      "background_units": 217863,
+      "joint_ai_units": 1586,
+      "deadline_misses": 0
+    },
+    {
+      "name": "b",
+      "prefix": "confirm88_gc_off_b_job58743005",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "current_contract_sample": true,
+        "gc_disabled_and_tail_window": true
+      },
+      "all_pass": true,
+      "nrx_paths": 7396,
+      "nrx_max_ms": 20.116185,
+      "nrx_p99_9_ms": 19.277523,
+      "nrx_over_25_ms": 0,
+      "nrx_over_30_ms": 0,
+      "tail_window_nrx": 3675,
+      "tail_window_nrx_max_ms": 18.814632,
+      "conv_paths": 14826,
+      "conv_max_ms": 5.135778,
+      "conv_p99_9_ms": 3.551777,
+      "conv_over_8_ms": 0,
+      "conv_over_12_ms": 0,
+      "background_units": 217267,
+      "joint_ai_units": 1612,
+      "deadline_misses": 0
+    }
+  ],
+  "candidate_gates": {
+    "nrx25_observed": true,
+    "nrx30_observed": true,
+    "conv8_observed": false,
+    "conv12_observed": true
+  },
+  "all_current_contract_gates_pass": true,
+  "interpretation": "Two independent 5,000-release prewarmed four-cell runs with Python cyclic GC disabled only during timed traffic. Candidate thresholds are observational; an actual tighter calendar, cold/restart modes, independent nodes, other interference and hard WCET remain unqualified. Confirm43/44 old-mode GPU tails are not erased by this test."
+}

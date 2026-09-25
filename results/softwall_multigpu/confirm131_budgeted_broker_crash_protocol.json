@@ -1,0 +1,73 @@
+{
+  "schema": "softwall-confirm131-budgeted-broker-crash-protocol-v1",
+  "status": "frozen-before-formal-arms",
+  "predecessors": [
+    "C128 synchronous marker instrumentation failed",
+    "C129 unbounded broker RPC failed",
+    "C130 5ms RPC timeout passed two arms but did not charge commit+complete budgets to admission"
+  ],
+  "developmental_canary": "c131_budgeted_broker_crash_canary_job58819952 (excluded)",
+  "hypothesis": "Charging two 5ms broker RPC bounds plus the 2ms physical guard to every global-AI admission preserves the local recovery certificate when the broker fails after commit.",
+  "contract": "B_commit_rpc + B_AI + B_complete_rpc + G_physical <= min(AI deadline, recovery horizon)",
+  "fault": {
+    "home": 0,
+    "commit_number": 30,
+    "injection": "direct os._exit(86) after applied commit, before reply",
+    "rpc_bound_ms": 5,
+    "rpc_count_per_ai_transaction": 2,
+    "broker_transaction_budget_ms": 10,
+    "physical_guard_ms": 2,
+    "admission_guard_ms": 12
+  },
+  "arms": [
+    {
+      "label": "confirm131_s1_job58819952",
+      "payload_seed0": 24000091,
+      "payload_seed1": 24010091,
+      "channel_seed0": 24009000,
+      "channel_seed1": 24019000
+    },
+    {
+      "label": "confirm131_s2_job58819952",
+      "payload_seed0": 24000092,
+      "payload_seed1": 24010092,
+      "channel_seed0": 24010000,
+      "channel_seed1": 24020000
+    }
+  ],
+  "mode": {
+    "gpus": 2,
+    "homes": 2,
+    "cells_per_home": 4,
+    "iterations": 340,
+    "warmup": 20,
+    "period_ms": 180,
+    "deadline_ms": 155,
+    "nrx_bound_ms": 45,
+    "conv_bound_ms": 25
+  },
+  "primary_gates": [
+    "controller artifacts show 10ms broker transaction budget and 12ms admission guard",
+    "broker exit86 and all operational faults record 5ms RPC bound",
+    "both homes complete all RAN releases after detection",
+    "ambiguous request absent from Qwen executions and actual IDs unique",
+    "zero deadline/NRx/conventional/AI-bound/horizon violations",
+    "all local credits drain"
+  ],
+  "trace": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/data/public/burstgpt/softwall_burst60_prefill_trace.json",
+  "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+  "source_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/global_trace_budgeted_fault_contained_controller.py": "8dc4ad7d8a2cfe4eb6524b3b29be497aed46c8ae65c3fa2fa3693cdd0757e286",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/low_perturbation_crash_global_trace_lease_broker.py": "d0f66f5a514dfa75ec370405c6623da8fa5a8e9a9ed61818a4603d4358ff7791",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/run_global_ai_budgeted_broker_crash_arm.sh": "464e2ee9c55827207597ed41d649f1976f3239dfc0e78a0863d17aac510c6d21",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/analyze_confirm131_budgeted_broker_crash_campaign.py": "569ce3d8a930071a379d83ae8b015d93960801007789e3304651a2772dbe9c27",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_deadline_global_trace_client.py": "0fd95aa31f205be98254ad88ba7af00c6513ab59e45d9c1ef24c6c5de5f6b816",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_global_control_budget.py": "e01b88f2b398119fe50ea5feef482382dce95303b66e750db2cb8e923226e39d",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "scope": "finite-sample volatile broker fail-stop with control budget accounted in admission; excludes restart/durable recovery/exactly-once/network partition/GPU hang/production WCET"
+}

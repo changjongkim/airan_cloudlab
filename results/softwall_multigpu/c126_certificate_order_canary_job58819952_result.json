@@ -1,0 +1,148 @@
+{
+  "schema": "softwall-global-ai-two-home-certificate-arm-result-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_certificate_order_canary_job58819952_protocol.json",
+  "broker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_broker.json",
+  "broker_summary": {
+    "offered_requests": 629,
+    "offered_value_tokens": 160190,
+    "timely_requests": 620,
+    "timely_value_tokens": 158051,
+    "states": {
+      "completed": 620,
+      "expired": 2,
+      "ready": 7,
+      "future": 507
+    },
+    "per_home": {
+      "0": {
+        "committed": 305,
+        "completed": 305,
+        "timely_value_tokens": 78649
+      },
+      "1": {
+        "committed": 315,
+        "completed": 315,
+        "timely_value_tokens": 79402
+      }
+    },
+    "registered_homes": [
+      0,
+      1
+    ],
+    "finalized_homes": [
+      0,
+      1
+    ],
+    "outstanding_tokens": 0,
+    "duplicate_commit_count": 0
+  },
+  "homes": [
+    {
+      "home": 0,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h0_controller.json",
+      "first_release_ns": 139034565906024,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c126_certificate_order_canary_job58819952/barrier",
+        "member": 0,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 215,
+          "expected_units": 215,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 185,
+          "expected_units": 185,
+          "count_match": true
+        }
+      ],
+      "summary": {
+        "records": 720,
+        "correct_cells": 339,
+        "nrx_commits": 234,
+        "conv_commits": 486,
+        "atomic_exchange": 94,
+        "ai_timely_value_tokens": 78649
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    },
+    {
+      "home": 1,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h1_controller.json",
+      "first_release_ns": 139034565906024,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c126_certificate_order_canary_job58819952/barrier",
+        "member": 1,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 214,
+          "expected_units": 214,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 177,
+          "expected_units": 177,
+          "count_match": true
+        }
+      ],
+      "summary": {
+        "records": 720,
+        "correct_cells": 339,
+        "nrx_commits": 233,
+        "conv_commits": 487,
+        "atomic_exchange": 89,
+        "ai_timely_value_tokens": 79402
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    }
+  ],
+  "gates": {
+    "two_homes": true,
+    "same_first_release": true,
+    "eight_cells": true,
+    "worker_count_match": true,
+    "system_safety": true,
+    "broker_homes": true,
+    "global_unique_requests": true,
+    "broker_drained": true,
+    "both_homes_ai": true
+  },
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_certificate_order_canary_job58819952_protocol.json": "565adaf17c42f806bc6ba4e12a99d6858d62d3128dad3e80c54dd93fdb8e8281",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_broker.json": "02f6dece936c185412659ddc7749d74964f0d651de119984287ebfe161df4d4f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h0_controller.json": "33feb3344f1e4ebd7a13ec565e42eb7bc19f6df08359571d4d964c5f998f4d5e",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h0_worker0.json": "3364e3b774ee2d3c0259569267f7a2abb03f9d731114ac5f91e84dec85a2603c",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h0_worker1.json": "05739f187447b4d02b8eabaab2b73963c894074c64d3dc2a3bb590335966df36",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h0_background.json": "5d6acecd41d5c20c496dbc27ed813b24c89d02d784b4e3cb105fa6cca43dd1dc",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h0_requalification.json": "23680db9fbe780e4fdadbd96e1db6506150ea6eaff5f7dc12786b7cc613a07b4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h1_controller.json": "dc452e3439544ae4fedd79b6af41d11c60a97166479bf688b9ad2e36ea2262a5",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h1_worker0.json": "a7b88d38b600be0a6e557948bb3b5d196fe93cdfef6c4a01e295aefd0b68a00d",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h1_worker1.json": "23ee86e10535dfddbe25faae2fce6fa27ca882fc6e931d15fa764cd6a64c871a",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h1_background.json": "f55358b9f982e9110c3186cf7976945a3533d25e3add459cd9dde47c13f7e28c",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c126_certificate_order_canary_job58819952_h1_requalification.json": "0a1da5a2d2cebc50fcf9a1641f79991033dc472d90cd776d33cf9dff470766df"
+  },
+  "scope": "one globally leased BurstGPT queue across two disjoint four-cell recovery homes; per-home execution credits; live-certificate recovery dispatch order"
+}

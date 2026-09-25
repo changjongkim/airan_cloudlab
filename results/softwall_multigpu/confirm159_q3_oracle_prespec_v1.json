@@ -1,0 +1,60 @@
+{
+  "confirmatory_holdout_materialized": false,
+  "created_utc": "2026-09-25",
+  "dataset_partition": "calibration",
+  "gate": {
+    "open_confirmatory_holdout_if": "aggregate exact-oracle timely-token gain over empirical recovery-first baseline >=5% and positive in all four calibration windows",
+    "otherwise": "do not materialize the performance holdout; report no material headroom for this trace/mode and continue safety/fault/envelope evaluation"
+  },
+  "minimum_effect_pct": 5.0,
+  "primary_comparison": "softwall atomic AI-first order versus event-driven physical recovery-first order, both using the same exact offline weighted selector",
+  "schema": "softwall-confirm159-q3-oracle-prespec-v1",
+  "scope": "Calibration-only structural opportunity screen. Q2 samples and trace windows are excluded from any confirmatory performance confidence interval.",
+  "source_sha256": {
+    "q2_combined": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692",
+    "q2_development_coordinator": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "q2_holdout_coordinator": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881",
+    "screen_source": "a24bd8d058370c7e13e7654f757d57706dad37328b3e8dd515f41ccba1380d5b",
+    "trace": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f"
+  },
+  "state_mapping": [
+    {
+      "q2_stream": "development",
+      "window_index": 0,
+      "zero_based_offset": 0
+    },
+    {
+      "q2_stream": "development",
+      "window_index": 1,
+      "zero_based_offset": 266
+    },
+    {
+      "q2_stream": "holdout",
+      "window_index": 2,
+      "zero_based_offset": 0
+    },
+    {
+      "q2_stream": "holdout",
+      "window_index": 3,
+      "zero_based_offset": 266
+    }
+  ],
+  "state_mapping_reason": "Each 600-epoch independent-node stream supplies its first and last 334 P180 epochs; overlap is 68 calibration states per node and is not treated as an independent confidence sample.",
+  "status": "FROZEN_BEFORE_CALIBRATION_SCREEN",
+  "timing": {
+    "ai_class_bounds_ms": {
+      "128": 40,
+      "16": 35,
+      "256": 65,
+      "32": 35,
+      "512": 75,
+      "64": 35
+    },
+    "ai_slo_ms": 1000,
+    "cutoff_ms": 45,
+    "launch_control_ms": 5,
+    "period_ms": 180,
+    "recovery_bound_ms": 25,
+    "recovery_deadline_ms": 153
+  }
+}

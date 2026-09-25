@@ -1,0 +1,48 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm23_s2_two_cell_burst",
+  "purpose": "Stress atomic endpoint and fallback-calendar reservations with two simultaneous cells and correlated natural receiver failures.",
+  "selection_source": {
+    "confirm21": "One-cell utility noninferiority passed with zero deadline and branch-bound violations under the P90/D80 timing contract.",
+    "smoke23": "Two cells completed 100/100 releases for both eager and S2 with zero misses and no admission failure at P150/D130."
+  },
+  "radio": {
+    "input": "two logical cells decode the same immutable noisy 273-PRB PUSCH, intentionally creating a correlated fallback burst",
+    "channel": "block-Rayleigh plus AWGN",
+    "snr_db": -8.5,
+    "cells_per_release": 2,
+    "period_ms": 150,
+    "deadline_ms": 130,
+    "iterations_per_run": 1000,
+    "runs": 3,
+    "payload_seed_base": 20300000,
+    "channel_seed_base": 404100000
+  },
+  "timing_contract": {
+    "nrx_bound_ms_per_cell": 50,
+    "conventional_bound_ms_per_cell": 24,
+    "commit_guard_ms": 2,
+    "fallback_windows_ms": [[80, 104], [104, 128]],
+    "endpoint_ring_depth": 2,
+    "fallback_capacity": 1
+  },
+  "background": {
+    "kind": "separate MPS NeuralRx CUDA Graph client",
+    "end_to_end_budget_ms": 10,
+    "guard_ms": 1,
+    "rpc_timeout_ms": 12
+  },
+  "policies": ["eager_dual", "s2_reserved"],
+  "primary_gate": {
+    "s2_deadline_misses": 0,
+    "s2_duplicate_commits": 0,
+    "s2_admission_rejections": 0,
+    "s2_bound_violations": 0,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0,
+    "s2_mean_background_throughput_must_exceed_eager": true,
+    "s2_aggregate_correctness_difference_must_be_within_percentage_points": 0.5
+  },
+  "interpretation_limit": "The identical per-cell trace is a correlated recovery-calendar stress rather than a model of statistically independent users."
+}

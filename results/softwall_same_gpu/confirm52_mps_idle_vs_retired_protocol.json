@@ -1,0 +1,62 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm52_mps_lifecycle_boundary",
+  "research_question": "Do RAN deadline misses arise from stop acknowledgement while GPU-client teardown is unfinished, from the fully exited client residual state, or from retaining an initialized idle client?",
+  "decision_at_stake": {
+    "ack_only_excess": "If stop-ack-only has significantly more misses than fully-exited in paired rounds (one-sided exact sign p<0.05), classify incomplete client retirement as the phase-linked hazard and require an actual process-exit barrier before a live RAN epoch.",
+    "fully_exited_excess": "If fully-exited still misses more often than idle, classify a residual teardown-state hazard and next distinguish CUDA reset from MPS detach.",
+    "idle_excess_or_all_zero": "If idle also misses or all conditions have zero misses, do not claim a unique retirement phase; report the observed boundary and stop without seed extension."
+  },
+  "if_both_outcomes_lead_to_same_action": "Cancel the experiment if the result would not choose among retirement, persistent-context, and nonreproduction explanations.",
+  "single_question_rule": "Only the GPU-client lifecycle phase is varied; no N1 load scaling or AI throughput experiment is included.",
+  "strongest_realistic_opponent": "The same initialized cap20 MPS NeuralRx client under three lifecycle boundaries: kept alive but idle, stop RPC acknowledged without waiting for process exit, and actual process exit confirmed before first RAN release.",
+  "execution": {
+    "same_node_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 conventional-only P60/D35 releases with zero misses",
+    "rounds": 10,
+    "seed_formula": "20322000 + round, with round in 1..10",
+    "order": "odd rounds: mps_idle, mps_ack_only, mps_retired; even rounds: reverse",
+    "no_posthoc_seeds_or_threshold_changes": true
+  },
+  "radio": {
+    "iterations_per_condition": 1000,
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "warmup": 20,
+    "fault_every": 100000
+  },
+  "worker": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "mps_priority": 1,
+    "pre_ready_gpu_warmup_units": 10,
+    "timed_epoch_gpu_units": 0,
+    "idle_condition": "quiesce RPC acknowledgement before first release; process and CUDA context remain alive until stop RPC after final release",
+    "retired_condition": "stop RPC acknowledgement, then launcher waits for actual worker process exit before allowing the first timed RAN release",
+    "ack_only_condition": "stop RPC acknowledgement before first release; no process-exit barrier; launcher records process-exit confirmation separately, which may occur before or after first release"
+  },
+  "measurement_sources": {
+    "ran": "results/softwall_same_gpu/raw/confirm52_r{round}_{condition}_job{job}_ran.json",
+    "worker": "results/softwall_same_gpu/raw/confirm52_r{round}_{condition}_job{job}_worker.json",
+    "deadline": "ran JSON:deadline_misses and records[*].deadline_miss/response_ms/release_ns",
+    "radio_correctness": "ran JSON:correct_releases and records[*].correct",
+    "timed_gpu_activity": "ran JSON:injected_overruns, worker_active_releases, records[*].worker_active_during_conventional; worker JSON:completed_units",
+    "lifecycle": "ran JSON:quiesce_response, stop_response, pre_epoch_stop_ack_ns, gpu_client_live_during_epoch, endpoint_retired_at_release, lifecycle_handshake.worker_state/confirmed_ns, first_release_ns; runner waits for actual process exit before writing retired-condition start handshake",
+    "ordering": "ran JSON:host, slurm_job_id, seed, iterations, period_ms, deadline_ms",
+    "launcher": "raw/confirm52_r{round}_mps_ack_only_job{job}_launcher.json:worker_state, confirmed_ns"
+  },
+  "primary_gate": {
+    "all_30_conditions_complete_same_node_job_mps_epoch": true,
+    "same_seed_per_triplet_reversed_order": true,
+    "all_radio_releases_correct": true,
+    "zero_optional_gpu_work_during_timed_epoch": true,
+    "idle_alive_and_retired_exited_before_first_release": true,
+    "ack_only_stop_ack_before_first_release": true,
+    "one_sided_exact_paired_sign_p_below": 0.05
+  },
+  "evidence_grade": "A only for a clean significant paired ack-only versus fully-exited contrast; otherwise B diagnostic. Idle versus fully-exited is secondary. This localizes a lifecycle boundary but does not identify a single CUDA or MPS internal operation.",
+  "interpretation_limits": "The paired unit is the seed/condition triplet, not individual RAN releases. A launcher exit-confirmation timestamp after the first release is only an upper bound on actual process exit and cannot by itself prove overlap; the experimental intervention is whether the controller waits for actual exit before admitting the first RAN release. Universal hard isolation and top-conference novelty remain unproven."
+}

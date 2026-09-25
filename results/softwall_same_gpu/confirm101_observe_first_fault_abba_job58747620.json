@@ -1,0 +1,98 @@
+{
+  "schema": "softwall-confirm101-observe-first-fault-abba-v1",
+  "job": "58747620",
+  "node": "nid001545",
+  "source_hashes": true,
+  "physical_predecessor_pass": true,
+  "arms": [
+    {
+      "name": "a_nofault",
+      "failure_every": 0,
+      "contract": true,
+      "provenance": true,
+      "sample_safety": true,
+      "observe_before_mandatory": true,
+      "workload_coverage": true,
+      "nrx_max_ms": 10.596222,
+      "conv_max_ms": 4.018112,
+      "ai_host_max_ms": 27.087657,
+      "timely_ai_total": 1791
+    },
+    {
+      "name": "b_fault",
+      "failure_every": 5,
+      "contract": true,
+      "provenance": true,
+      "sample_safety": true,
+      "observe_before_mandatory": true,
+      "workload_coverage": true,
+      "nrx_max_ms": 10.134221,
+      "conv_max_ms": 4.773263,
+      "ai_host_max_ms": 26.243856,
+      "timely_ai_total": 1780
+    },
+    {
+      "name": "c_fault",
+      "failure_every": 5,
+      "contract": true,
+      "provenance": true,
+      "sample_safety": true,
+      "observe_before_mandatory": true,
+      "workload_coverage": true,
+      "nrx_max_ms": 10.559875,
+      "conv_max_ms": 4.379372,
+      "ai_host_max_ms": 26.363168,
+      "timely_ai_total": 1772
+    },
+    {
+      "name": "d_nofault",
+      "failure_every": 0,
+      "contract": true,
+      "provenance": true,
+      "sample_safety": true,
+      "observe_before_mandatory": true,
+      "workload_coverage": true,
+      "nrx_max_ms": 10.049292,
+      "conv_max_ms": 4.629045,
+      "ai_host_max_ms": 24.031677,
+      "timely_ai_total": 1794
+    }
+  ],
+  "pairs": [
+    {
+      "nofault": "a_nofault",
+      "fault": "b_fault",
+      "matched_phy": true,
+      "eligible_two_nrx_indices": 49,
+      "nofault_timely_ai": 294,
+      "fault_timely_ai": 287,
+      "fault_minus_nofault_ai": -7,
+      "fault_minus_nofault_mean_per_release": -0.14285714285714285,
+      "difference_histogram": {
+        "-1": 7,
+        "0": 42
+      },
+      "coverage": true,
+      "directional_mechanism": true
+    },
+    {
+      "nofault": "d_nofault",
+      "fault": "c_fault",
+      "matched_phy": true,
+      "eligible_two_nrx_indices": 49,
+      "nofault_timely_ai": 294,
+      "fault_timely_ai": 280,
+      "fault_minus_nofault_ai": -14,
+      "fault_minus_nofault_mean_per_release": -0.2857142857142857,
+      "difference_histogram": {
+        "-1": 14,
+        "0": 35
+      },
+      "coverage": true,
+      "directional_mechanism": true
+    }
+  ],
+  "safety_and_coverage_pass": true,
+  "directional_mechanism_both_pairs": true,
+  "interpretation": "Fault vs no-fault ABBA on identical synthetic PHY inputs tests whether correlated conventional recovery reduces timely Qwen returns under the separately qualified observe-first controller. It is not a policy comparison, six-job arrival trace, AI-RAN application, WCET, or proof of conditional optimality."
+}

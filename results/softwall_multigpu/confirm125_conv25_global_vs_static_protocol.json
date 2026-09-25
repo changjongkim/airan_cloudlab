@@ -1,0 +1,114 @@
+{
+  "schema": "softwall-confirm125-conv25-global-vs-static-protocol-v1",
+  "status": "frozen-before-run",
+  "job": "58819952",
+  "predecessor": "confirm124_global_vs_static_result.json",
+  "predecessor_outcome": "Structural FAIL: final arm had one conventional host-to-commit sample 12.535096 ms above the 12 ms contract; global throughput effects were -0.068%/-0.132% and outcome failed.",
+  "candidate_rationale": "Use the pre-existing conservative 25 ms recovery class rather than fitting the 12.535 ms observation. The exact arithmetic is 45 + 4*25 + 2 = 147 ms <= D155. The 40-release C125 canary passed.",
+  "question": "In the prospectively qualified conv25 two-home mode, can dynamic global AI leasing provide at least 2% timely-token gain over static partition at radio noninferiority?",
+  "design": "two seeds; GSSG and SGGS; two repeats per policy and seed; same PHY inputs within seed",
+  "arms": [
+    {
+      "label": "c125_s1_g1_job58819952",
+      "seed": 1,
+      "policy": "global",
+      "order": 1,
+      "payload_seed0": 26700051,
+      "payload_seed1": 26710051,
+      "channel_seed0": 26701000,
+      "channel_seed1": 26711000
+    },
+    {
+      "label": "c125_s1_p1_job58819952",
+      "seed": 1,
+      "policy": "static_partition",
+      "order": 2,
+      "payload_seed0": 26700051,
+      "payload_seed1": 26710051,
+      "channel_seed0": 26701000,
+      "channel_seed1": 26711000
+    },
+    {
+      "label": "c125_s1_p2_job58819952",
+      "seed": 1,
+      "policy": "static_partition",
+      "order": 3,
+      "payload_seed0": 26700051,
+      "payload_seed1": 26710051,
+      "channel_seed0": 26701000,
+      "channel_seed1": 26711000
+    },
+    {
+      "label": "c125_s1_g2_job58819952",
+      "seed": 1,
+      "policy": "global",
+      "order": 4,
+      "payload_seed0": 26700051,
+      "payload_seed1": 26710051,
+      "channel_seed0": 26701000,
+      "channel_seed1": 26711000
+    },
+    {
+      "label": "c125_s2_p1_job58819952",
+      "seed": 2,
+      "policy": "static_partition",
+      "order": 1,
+      "payload_seed0": 26800061,
+      "payload_seed1": 26810061,
+      "channel_seed0": 26801000,
+      "channel_seed1": 26811000
+    },
+    {
+      "label": "c125_s2_g1_job58819952",
+      "seed": 2,
+      "policy": "global",
+      "order": 2,
+      "payload_seed0": 26800061,
+      "payload_seed1": 26810061,
+      "channel_seed0": 26801000,
+      "channel_seed1": 26811000
+    },
+    {
+      "label": "c125_s2_g2_job58819952",
+      "seed": 2,
+      "policy": "global",
+      "order": 3,
+      "payload_seed0": 26800061,
+      "payload_seed1": 26810061,
+      "channel_seed0": 26801000,
+      "channel_seed1": 26811000
+    },
+    {
+      "label": "c125_s2_p2_job58819952",
+      "seed": 2,
+      "policy": "static_partition",
+      "order": 4,
+      "payload_seed0": 26800061,
+      "payload_seed1": 26810061,
+      "channel_seed0": 26801000,
+      "channel_seed1": 26811000
+    }
+  ],
+  "iterations": 340,
+  "warmup": 20,
+  "homes": 2,
+  "cells_per_home": 4,
+  "conv_bound_ms": 25,
+  "nrx_bound_ms": 45,
+  "deadline_ms": 155,
+  "guard_ms": 2,
+  "conditional_window": "base all-fail slack is 155-2-4*25=53 ms; AI65/75 do not fit statically but may fit after recovery debt deletion/retiming",
+  "structural_gate": "all eight arms pass safety/provenance/unique-drain gates; radio admission/endpoint/fault/commit decisions match within seed; two arms per policy",
+  "outcome_gate": "for both seeds global timely token gain >=2%, source-second bootstrap95 lower delta >0, and mean radio correct is no lower than static",
+  "decision_rule": "Structural pass with outcome fail supports the broker/certificate mechanism and rejects routing-throughput superiority. Any bound violation makes this exact mode unqualified regardless of deadline outcome.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_global_ai_two_home_bound_arm.sh": "a878c6159534c64438a60fe27736fa73140a195b9335fd8439ab108f03945fd3",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm125_conv25_global_vs_static.py": "7086e9a9736782a1b464fb50291e3444d77254e392e8a2702b277809c7f00ee0",
+    "scripts_for_node/softwall_same_gpu/global_trace_baseline_controller.py": "1520dc7556370758a8f1f50e55c0ce42df5c8c7834361c2380c72b24c91d1ff1",
+    "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

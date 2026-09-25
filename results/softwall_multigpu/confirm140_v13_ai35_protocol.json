@@ -1,0 +1,81 @@
+{
+  "schema": "softwall-confirm140-v13-ai35-protocol-v1",
+  "status": "frozen-after-canary-before-formal-arms",
+  "allocation_node": "nid001252",
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177",
+    "nid001144"
+  ],
+  "arms": [
+    {
+      "name": "s1",
+      "label": "confirm140_s1_job58831575",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        31000051,
+        31010051
+      ],
+      "channel_seeds": [
+        31001000,
+        31011000
+      ]
+    },
+    {
+      "name": "s2",
+      "label": "confirm140_s2_job58831575",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        31020051,
+        31030051
+      ],
+      "channel_seeds": [
+        31021000,
+        31031000
+      ]
+    }
+  ],
+  "trace": "data/current/softwall_context64_mechanism_trace_v1.json",
+  "trace_sha256": "b14388c7356878458031d4e881a0510f42f1b4414493f876cd13d2b881979277",
+  "raw_ai_bound_ms": 35,
+  "socket_timeout_ms": 5,
+  "rpc_admission_bound_ms": 7,
+  "control_transaction_budget_ms": 21,
+  "ai_completion_guard_ms": 2,
+  "static_all_fail_slack_ms": 53,
+  "conditional_decision_window_ms": 58,
+  "effective_transaction_bound_ms": 58,
+  "failure_rule": "stop on first formal arm failure; do not change the AI or control bound post hoc",
+  "container_source_map": {
+    "/softwall/global_trace_fully_budgeted_fault_contained_controller.py": "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py",
+    "/softwall/global_trace_qualified_control_bound_controller.py": "scripts_for_node/softwall_same_gpu/global_trace_qualified_control_bound_controller.py",
+    "/softwall/deadline_fault_contained_global_trace_client.py": "scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py",
+    "/softwall/instrumented_deadline_global_trace_client_v2.py": "scripts_for_node/softwall_same_gpu/instrumented_deadline_global_trace_client_v2.py",
+    "/softwall/global_trace_lease_broker.py": "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py",
+    "/softwall/same_request_ipc_worker.py": "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py",
+    "/softwall/trace_qwen_worker.py": "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py",
+    "/softwall_task1/isca_v2/dart_runtime.py": "scripts_for_node/task1/isca_v2/dart_runtime.py",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py"
+  },
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "scripts_for_node/softwall_same_gpu/global_trace_qualified_control_bound_controller.py": "c57b426b400425e47700102216797a68671c3b2a5982cda34929c63d4d45b5b0",
+    "scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "scripts_for_node/softwall_same_gpu/instrumented_deadline_global_trace_client_v2.py": "de3b0e95e0f62851cb4181791d27b61094c2d0754feb88554a2c4bf6437230a8",
+    "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+    "scripts_for_node/softwall_same_gpu/run_v13_ai35_candidate_arm.sh": "096a8efff6898e19da7e733b2a3053a834792dad57ec2f58aa76555d66b57976",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm140_v13_ai35.py": "5e71c6d605c5903a499434079da2ca8c96fa7add2fd18886bb61d43cae706219",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm135_static_counterfactual.py": "400473f604b8e28b6ca5d36984086f1cbc1d6e675cd8d3d43922e93f3b0d9032",
+    "scripts_for_node/softwall_same_gpu/build_softwall_context64_mechanism_trace.py": "a56b145ab120a959f6518591acdc6cf3a487db132fe38a8bd02e49c79e4b91eb"
+  }
+}

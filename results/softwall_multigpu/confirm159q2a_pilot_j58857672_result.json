@@ -1,0 +1,194 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159_experiment_prespec_v1.json": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159q2a_pilot_j58857672_peer_spec.json": "d98715b36760411e46f929acf57aa1ab82c9b8b2280972969bc0e75972bb006f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159q2a_pilot_j58857672_protocol.json": "07b4019da2cb78d636472ed21ce4b2a4c3be4e65d5c8a832af865c9309d6c48f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_coordinator.json": "a3d9c9ef040351e2df69412cc350c770ef9d05d972314dcd5d518fe9e34ed73c",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_gpu_inventory.csv": "c0888b66de120ec472c93c9c5972416534a3c73618988ba360da60f46b5fd651",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r0_owner.json": "93cfeb489e21187904b8b76d8114357cc20ba7b53476ac6633a6f3dba30c94dd",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r1_owner.json": "63c7bf5d9d4bf4149cb6eb17d26ab630fbf6ff8fa89561ad153711a917914f0e",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home0_h0-r2_owner.json": "cdd38336c740e8c0ac8d2dd6c7afc191ec54b5ababc04bc977f102f70d0e691a",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_home1_h1-r0_owner.json": "49ba38298ae87700575f4753a522724c46478c26a6eadc7fb7be7935be31ce3f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_nrx_worker.json": "841a6124ab5d4d2c5becb7c8a1df8f5211e09299a5e9bb8f1243a2aaabbb3d0c",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm159q2a_pilot_j58857672_qwen.json": "9c6024b176c6a25e01f92173cc535e735c645945ad9e34c6081096b1d68f42a3"
+  },
+  "campaign": "development",
+  "gates": {
+    "atomic_qwen_lease": true,
+    "certificate_recovery_conformance": true,
+    "complete_request_sample": true,
+    "full_recovery_path_preflight": true,
+    "global_certificate_each_round": true,
+    "no_process_error": true,
+    "node_inventory_and_exclusion": true,
+    "nrx_bound": true,
+    "outcome_driven_transition": true,
+    "physical_p2p_ipc_lifecycle": true,
+    "pre_staged_input_and_p180_copy": true,
+    "single_timely_radio_commit": true,
+    "source_hash_match": true,
+    "variable_context_class_qualification": true
+  },
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-5b13e72f-892d-8524-f89b-aa0619bde990"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-becfc016-0536-3da8-5ac8-2707338355f0"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-8959e073-f8bb-8643-249a-50a318ec9dd8"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-4879963a-59d4-7d56-6bc6-33508ce0b082"
+    }
+  ],
+  "job_id": "58857672",
+  "node": "nid001204",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159q2a_pilot_j58857672_protocol.json",
+  "schema": "softwall-confirm159-q2-result-v1",
+  "scope": "C159-Q2 variable-context P180 qualification, excluded from performance confidence intervals. Passing two nodes qualifies only the six frozen class bounds in this warm synthetic placement; online BurstGPT performance, WCET, cold/long-idle, production d_MAC and integrated faults remain UQ.",
+  "status": "C159_Q2_VARIABLE_P180_PASS",
+  "summary": {
+    "actual_nrx_requests": 96,
+    "actual_nrx_successes": 71,
+    "bank_copy_gpu_ms": {
+      "count": 96,
+      "max": 1.1419520378112793,
+      "mean": 0.18951666673334935,
+      "p50": 0.13289600610733032,
+      "p99": 0.7629119753837585
+    },
+    "deadline_misses": 0,
+    "local_shared_class_disagreements": 0,
+    "nrx_release_to_complete_ms": {
+      "count": 96,
+      "max": 17.53441,
+      "mean": 5.882697624999999,
+      "p50": 5.883778,
+      "p99": 17.00152
+    },
+    "oracle_equivalent_recoveries": 25,
+    "physical_recoveries": 25,
+    "prestage_ms": {
+      "count": 4,
+      "max": 926.730914,
+      "mean": 907.5884105,
+      "p50": 913.602588,
+      "p99": 926.730914
+    },
+    "qwen_certificate_rejected_by_class": {
+      "128": 0,
+      "16": 0,
+      "256": 1,
+      "32": 0,
+      "512": 1,
+      "64": 0
+    },
+    "qwen_executed_by_class": {
+      "128": 4,
+      "16": 4,
+      "256": 3,
+      "32": 4,
+      "512": 3,
+      "64": 4
+    },
+    "qwen_execution_ms": {
+      "count": 22,
+      "max": 66.385088,
+      "mean": 31.843347318181817,
+      "p50": 23.827177,
+      "p99": 66.385088
+    },
+    "qwen_execution_ms_by_class": {
+      "128": {
+        "count": 4,
+        "max": 29.634121,
+        "mean": 24.829251250000002,
+        "p50": 23.294176,
+        "p99": 29.634121
+      },
+      "16": {
+        "count": 4,
+        "max": 30.879598,
+        "mean": 25.230752,
+        "p50": 24.518372,
+        "p99": 30.879598
+      },
+      "256": {
+        "count": 3,
+        "max": 36.207546,
+        "mean": 36.05742033333334,
+        "p50": 36.059772,
+        "p99": 36.207546
+      },
+      "32": {
+        "count": 4,
+        "max": 29.357166,
+        "mean": 26.17500475,
+        "p50": 28.971019,
+        "p99": 29.357166
+      },
+      "512": {
+        "count": 3,
+        "max": 66.385088,
+        "mean": 66.28512533333333,
+        "p50": 66.290987,
+        "p99": 66.385088
+      },
+      "64": {
+        "count": 4,
+        "max": 23.827177,
+        "mean": 22.146493,
+        "p50": 21.790649,
+        "p99": 23.827177
+      }
+    },
+    "qwen_offered_by_class": {
+      "128": 4,
+      "16": 4,
+      "256": 4,
+      "32": 4,
+      "512": 4,
+      "64": 4
+    },
+    "qwen_units": 22,
+    "radio_commits": 96,
+    "radio_release_to_commit_ms": {
+      "count": 96,
+      "max": 116.099008,
+      "mean": 55.443087989583326,
+      "p50": 47.042914,
+      "p99": 105.696966
+    },
+    "raw_zero_normalized_failures": 0,
+    "recovery_path_ms": {
+      "count": 25,
+      "max": 4.375027,
+      "mean": 3.461728479999999,
+      "p50": 3.400673,
+      "p99": 4.375027
+    },
+    "recovery_preflight_path_ms": {
+      "count": 4,
+      "max": 87.792709,
+      "mean": 27.414483250000004,
+      "p50": 9.299576,
+      "p99": 87.792709
+    },
+    "rounds": 24
+  }
+}

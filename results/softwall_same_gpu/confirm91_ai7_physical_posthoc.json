@@ -1,0 +1,34 @@
+{
+  "schema": "softwall-confirm91-ai7-physical-posthoc-v1",
+  "posthoc": true,
+  "predecessor_sha256": "fb8f70d2531339303f6f36e0e8ffbd401ea494c78b3b758a6ce5012b83661a01",
+  "arms": [
+    {
+      "name": "a",
+      "raw_sha256": "8adec16005c6a6ee1128bfccd440b3fb05e328446f4c82904a0f85d146d4f6da",
+      "ai_units": 130676,
+      "ai_host_max_ms": 6.724037,
+      "ai_host_above_8ms": 0,
+      "all_fail_releases": 457,
+      "all_fail_with_at_least_seven_ai_by_d153": 457,
+      "all_fail_min_ai_by_d153": 36,
+      "all_fail_median_ai_by_d153": 39,
+      "all_fail_max_ai_by_d153": 39
+    },
+    {
+      "name": "b",
+      "raw_sha256": "8f9cd72fb1ed4abfab68a7b7eb7efeb9b8763a039401928a3be56cf7a184c1f1",
+      "ai_units": 130355,
+      "ai_host_max_ms": 6.887243,
+      "ai_host_above_8ms": 0,
+      "all_fail_releases": 473,
+      "all_fail_with_at_least_seven_ai_by_d153": 473,
+      "all_fail_min_ai_by_d153": 36,
+      "all_fail_median_ai_by_d153": 39,
+      "all_fail_max_ai_by_d153": 39
+    }
+  ],
+  "arithmetic_if_ai8_qualifies_ms": 136,
+  "deadline_ms": 155,
+  "interpretation": "Descriptive raw-trace reanalysis selected after Confirm93's 15-ms abstract seven-unit pressure. All AI host durations were measured under an actual AI15 calendar; sub-8-ms samples do not qualify a new AI8 calendar. AI returned by D153 includes after-radio work without seven atomic pre-recovery leases. The observed physical workload is far shorter than the abstract 15-ms unit, so Confirm93 contention must not be treated as physically established."
+}

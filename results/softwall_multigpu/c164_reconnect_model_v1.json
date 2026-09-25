@@ -1,0 +1,576 @@
+{
+  "all_pass": true,
+  "checks": {
+    "all_other_cases_fail_closed": true,
+    "only_two_matched_quiesced_terminal_resolutions": true,
+    "state_product_complete": true,
+    "zero_invariant_violations": true
+  },
+  "claim_boundary": "Pure same-worker-epoch durable reconciliation model. Physical channel reconnect, worker-process replacement, production d_MAC, and WCET remain unqualified.",
+  "counts": {
+    "allowed_retire": 2,
+    "fail_closed": 41,
+    "invariant_violations": 0,
+    "state_product": 43
+  },
+  "scenarios": [
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "absent",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": false,
+      "reason": "absent_record_is_ambiguous",
+      "stage": "absent",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "absent",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "absent_record_is_ambiguous",
+      "stage": "absent",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "absent",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "absent_record_is_ambiguous",
+      "stage": "absent",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "absent",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "absent_record_is_ambiguous",
+      "stage": "absent",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "absent",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "absent_record_is_ambiguous",
+      "stage": "absent",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "prepared",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": true,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": true,
+      "reason": "prepared_aborted_with_nonlaunch_fence",
+      "stage": "prepared",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "prepared",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "prepared",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "prepared",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "prepared",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "prepared",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "prepared",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "prepared",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "prepared",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "launched",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": false,
+      "reason": "launched_without_fence_retained",
+      "stage": "launched",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "launched",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "launched",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "launched",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "launched",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "launched",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "launched",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "launched",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "launched",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "fenced",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": true,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "match",
+      "lease_retired": true,
+      "reason": "terminal_record_reconciled",
+      "stage": "fenced",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "fenced",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_token",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "fenced",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "fenced",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_payload",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "fenced",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "fenced",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_lifecycle",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "fenced",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "worker_token_lock_required",
+      "stage": "fenced",
+      "worker_quiesced": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "all_safety_invariants": true,
+        "decision_matches_rule": true,
+        "lease_retired_only_when_allowed": true
+      },
+      "identity_case": "wrong_worker",
+      "lease_retired": false,
+      "reason": "observed_identity_mismatch",
+      "stage": "fenced",
+      "worker_quiesced": true
+    },
+    {
+      "accepted": false,
+      "adversary": "launched_to_nonlaunch",
+      "checks": {
+        "all_safety_invariants": true,
+        "expected_reason": true,
+        "fail_closed": true
+      },
+      "reason": "illegal_journal_stage_transition"
+    },
+    {
+      "accepted": false,
+      "adversary": "journal_rollback",
+      "checks": {
+        "all_safety_invariants": true,
+        "expected_reason": true,
+        "fail_closed": true
+      },
+      "reason": "journal_rollback_detected"
+    },
+    {
+      "accepted": false,
+      "adversary": "prepared_to_fenced_without_two_journal_steps",
+      "checks": {
+        "all_safety_invariants": true,
+        "expected_reason": true,
+        "fail_closed": true
+      },
+      "reason": "journal_sequence_gap_too_small"
+    }
+  ],
+  "schema": "softwall-c164-reconnect-model-audit-v1",
+  "source_sha256": {
+    "build_c164_reconnect_model.py": "d1f8eb7e96edc2a456d3ea65594e3cb68490c19f5739d8ddd777a41c54811498",
+    "c164_reconnect_state_model_v1.py": "210c220e46b71004fc86806c00ff8aa6ef52fa7340ffeb5c96da77c72b250857",
+    "test_c164_reconnect_state_model_v1.py": "4d9738b81c4e7acd181591867ec087c9f68f2dd043e04324ae539c76bc7415d3"
+  },
+  "status": "C164_RECONNECT_MODEL_PASS",
+  "violations": []
+}

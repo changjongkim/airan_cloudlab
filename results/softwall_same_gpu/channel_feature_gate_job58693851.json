@@ -1,0 +1,36 @@
+{
+  "schema": "softwall-channel-feature-gate-v1",
+  "feature": "channel_estimate_power",
+  "train_seed": 20356001,
+  "test_seed": 20356002,
+  "snr_db": -8.5,
+  "trials_per_arm": 500,
+  "train_auc_conventional_correct": 0.9987444964226747,
+  "test_auc_conventional_correct": 0.9992295048284364,
+  "post_fading_auc_train": 0.5137589433131535,
+  "post_fading_auc_test": 0.5002648169346159,
+  "threshold_selected_on_train": 2.0381035804748535,
+  "train_gate": {
+    "skipped_nrx": 182,
+    "skipped_fraction": 0.364,
+    "neural_only_lost": 2,
+    "radio_loss_fraction": 0.004
+  },
+  "test_gate": {
+    "skipped_nrx": 182,
+    "skipped_fraction": 0.364,
+    "neural_only_lost": 2,
+    "radio_loss_fraction": 0.004
+  },
+  "test_neural_only_correct": 28,
+  "max_feature_gpu_ms": 303.9315490722656,
+  "diagnostic_gates": {
+    "train_loss_at_most_two": true,
+    "heldout_skip_at_least_ten_percent": true,
+    "heldout_radio_loss_at_most_one_percent": true,
+    "heldout_has_neural_only_cases": false,
+    "feature_gpu_max_under_five_ms": false
+  },
+  "evidence_scope": "offline paired-branch calibration only; no online admission, AI throughput, PHY expiry or WCET claim",
+  "diagnostic_pass": false
+}

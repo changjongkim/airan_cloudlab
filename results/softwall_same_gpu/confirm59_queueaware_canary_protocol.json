@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm59_queueaware_canary",
+  "frozen_before_execution": true,
+  "research_question": "Can one request-owned PHY payload be sent through either endpoint-owned CUDA IPC buffer under the queue-aware runtime, with alternating cell-to-endpoint mappings, without contamination, deadline miss, or credit leak?",
+  "role": "Transport and queue-aware API canary only. Idle endpoint queues provide no scheduling-performance comparison.",
+  "execution_command": "srun --jobid=58729926 --overlap --ntasks=1 bash scripts_for_node/softwall_same_gpu/run_confirm59_queueaware_canary.sh",
+  "allocation_job": "58729926",
+  "iterations": 100,
+  "cells": 2,
+  "period_ms": 150,
+  "deadline_ms": 130,
+  "clean_channel": true,
+  "gate_mode": "always",
+  "routing_policy": "shortest_queue",
+  "routing_test": "on odd releases admit cell 1 first so it uses endpoint 0; cell 0 then uses endpoint 1",
+  "expected_cross_routed_cells": 100,
+  "frozen_gates": {
+    "correct_cells": 200,
+    "deadline_misses": 0,
+    "nrx_bound_violations": 0,
+    "conventional_host_path_bound_violations": 0,
+    "admission_rejections": 0,
+    "fallbacks": 0,
+    "background_units_positive": true,
+    "credit_outstanding": 0
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/two_endpoint_queueaware_controller.py": "7e74b6024f2b29959642f91b6c873edd935271a113fae08cba715dc3697e07ac",
+    "scripts_for_node/softwall_same_gpu/run_confirm59_queueaware_canary.sh": "cd0c22a7ab43a76e2e70f9cbc0ab69295ddf4dcda2d7670e22d1d3262973bc1d",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm59_queueaware.py": "2717e7b46f653f3f7c086ee71830cbf0a4a33db358620a0b8fe71cc570ff378d",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "f3517db693aa8754512bcc3a358a7b264a6d595b2fb61a108cf2d215670869ba",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "4573034b0f3b09c27f756d661a77eb4e7660c7981a711c7f9e5665e8a0716279",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0"
+  },
+  "interpretation_limits": "The clean channel and artificially alternated admission order test buffer ownership, not real queue contention, radio adaptation, joint optimization, or production MAC expiry."
+}

@@ -1,0 +1,123 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "coordinator": "12a3bf43c3cf874381831025a9931e37763ebf66d69ce4c3a0a530d491a84a9c",
+    "inventory": "5abe32498c3508de06b821fc6de1240dddf905abe0b38d0325acc4ef00d81ad6",
+    "nrx_worker": "fdd170af18c34406244e424d030b829a66e107c9953aa32e9e6949bc7982f18d",
+    "peer_spec": "01440a6bb676dbe1df095632cd70d9ae777bed6f80150327501e419abe487705",
+    "protocol": "4c35e68b26671b1935ae9edcabf6d87552ce0cd9bbf05857b0cdeabb8203eef0",
+    "qwen": "79a54fd10951e47ca49b5db84abcffc2546be10ac9e2ee22a7a32caa24434ae9"
+  },
+  "campaign": "development",
+  "case_counts": {
+    "E1_four_unresolved_no_ai": 10,
+    "E3_two_unresolved_context128": 10,
+    "E4_two_unresolved_context256": 10,
+    "E5_one_unresolved_context512": 10,
+    "E6a_latest_safe_context64": 10,
+    "E6b_first_unsafe_context64": 10
+  },
+  "counts": {
+    "actual_nrx": 240,
+    "deadline_misses": 0,
+    "injected_recoveries": 110,
+    "qwen_units": 30,
+    "radio_commits": 240
+  },
+  "gates": {
+    "atomic_injection_and_fifth_reject": true,
+    "complete_physical_sample": true,
+    "e6_one_ms_boundary_observed": true,
+    "model_predicts_every_lease_decision": true,
+    "node_inventory_and_exclusion": true,
+    "p2p_and_lifecycle": true,
+    "physical_nrx45_stable_success": true,
+    "physical_recovery25": true,
+    "prespecified_case_sample": true,
+    "qwen_physical_execution_and_fence": true,
+    "single_commit_d155_semantics": true,
+    "source_and_grid_hash_match": true
+  },
+  "host": "nid001169",
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-77b7fc02-60e5-50da-eda0-16981b2da5f0"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-1a07abdb-bb32-41a8-9ac5-ea81aceb50f3"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-07e0922a-ca77-77fc-d551-975e074d4a7c"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-83ea7693-dec9-433c-3eee-623a3e99d973"
+    }
+  ],
+  "iterations": 60,
+  "label": "c164a3_idle30_dev_j58861564",
+  "maxima_ms": {
+    "nrx_release_to_complete": 25.07175,
+    "qwen_execution": 54.214612,
+    "radio_commit": 126.03762,
+    "recovery_path": 6.598797
+  },
+  "observed_conservative_decision_ms": {
+    "E1_four_unresolved_no_ai": {
+      "count": 10,
+      "max": 48,
+      "mean": 46.2,
+      "p50": 46,
+      "p99": 48
+    },
+    "E3_two_unresolved_context128": {
+      "count": 10,
+      "max": 46,
+      "mean": 46.0,
+      "p50": 46,
+      "p99": 46
+    },
+    "E4_two_unresolved_context256": {
+      "count": 10,
+      "max": 46,
+      "mean": 46.0,
+      "p50": 46,
+      "p99": 46
+    },
+    "E5_one_unresolved_context512": {
+      "count": 10,
+      "max": 46,
+      "mean": 46.0,
+      "p50": 46,
+      "p99": 46
+    },
+    "E6a_latest_safe_context64": {
+      "count": 10,
+      "max": 88,
+      "mean": 88.0,
+      "p50": 88,
+      "p99": 88
+    },
+    "E6b_first_unsafe_context64": {
+      "count": 10,
+      "max": 89,
+      "mean": 89.0,
+      "p50": 89,
+      "p99": 89
+    }
+  },
+  "schema": "softwall-c162-boundary-result-v1",
+  "slurm_job_id": "58861564",
+  "status": "C162_BOUNDARY_PASS"
+}

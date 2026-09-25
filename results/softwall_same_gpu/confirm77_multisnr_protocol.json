@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm77_mixed_snr_observable_phy_rescue_calibration",
+  "frozen_before_full_execution": true,
+  "job": "58738952",
+  "node": "nid001229",
+  "prefix": "confirm77_multisnr_job58738952",
+  "trials_per_snr": 2000,
+  "snrs_db": [
+    -10.0,
+    -9.0,
+    -8.0,
+    -7.0
+  ],
+  "train_seed": 20900001,
+  "test_seed": 20910001,
+  "x_bins": 5,
+  "min_leaf_n": 200,
+  "min_rescue_events": 100,
+  "max_weighted_mace": 0.05,
+  "smoke": "Disjoint 20-trial-per-SNR train and test pipeline smoke passed for four SNR levels; excluded from full calibration.",
+  "frozen_gates": "Recorded prewarmed observed channel-estimate and received-grid power for four -10/-9/-8/-7 dB synthetic SNRs, 2,000 trials per SNR per split. No seed reuse; 5 train-only x quantiles, each split by train-only y median into ten leaves, >=200 samples per leaf/split and >=100 rescue events per split. Held-out weighted absolute calibration error <=0.05; 2D model Brier better than train-prevalence constant. Report x-only Brier without gate. True SNR is evaluation label only.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_confirm77_multisnr_phy_value.sh": "a4617018badc38c8b66c1e21d7f6911cc2c14ba29ec33bdfa94e10929e446bef",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm77_multisnr_phy_value.py": "b7dc0e3deb789bde9b09142fc7d40b73f5fee0ee65b8db7e2ffe1c50840d4016",
+    "scripts_for_node/softwall_same_gpu/sweep_dual_receiver_snr.py": "25cba74ea9a7f2c6de78182fa08d15d022fe801dbccf44cd5b27ea1f5c75fbf6",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/softwall_phy.py": "200e46fce5837ccb3d08f1291b9a0394c956285bc7e7f8a5a12a1fad51d69355",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1"
+  },
+  "limits": "Synthetic independent block Rayleigh/pre-fading AWGN only. Even a calibrated mixed-SNR model is not a DU/TDL q_use or joint scheduling result."
+}

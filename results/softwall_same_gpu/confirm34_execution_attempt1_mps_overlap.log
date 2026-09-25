@@ -1,0 +1,4 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  the remote procedural call between the MPS server and the MPS client failed
+/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/common.sh: line 26: 848765 Aborted                 shifter --module=gpu --image="$AERIAL_IMAGE" --volume="$AERIAL_REPO:/opt/nvidia/cuBB" --volume="$SOFTWALL_SCRIPTS:/softwall" --volume="$SOFTWALL_TASK1:/softwall_task1" --volume="$SOFTWALL_RUNTIME:/softwall_runtime" --env=LD_LIBRARY_PATH="$GPU_LD_PATH" --env=PYTHONPATH=/opt/nvidia/cuBB/pyaerial/src:/softwall:/softwall_task1 --env=SOFTWALL_NRX_ENGINE=/softwall_runtime/engines/neural_rx_fp16_full.trt --env=CUDA_VISIBLE_DEVICES=0 "$@"

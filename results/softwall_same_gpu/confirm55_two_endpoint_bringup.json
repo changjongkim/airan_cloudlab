@@ -1,0 +1,68 @@
+{
+  "schema": "softwall-confirm55-bringup-audit-v1",
+  "job": "58693395",
+  "host": "nid001153",
+  "summary": {
+    "correct_cells": 1958,
+    "deadline_misses": 0,
+    "nrx_bound_violations": 0,
+    "conv_bound_violations": 0,
+    "admission_rejections": 0,
+    "retime_rejections": 0,
+    "fallbacks": 48,
+    "early_fallbacks": 48,
+    "background_units": 29910,
+    "response_ms": {
+      "n": 2000,
+      "mean": 4.8497761200000005,
+      "p50": 4.881541,
+      "p95": 5.6331329,
+      "p99": 7.7386813100000005,
+      "p99_9": 10.10820075900033,
+      "min": 3.84141,
+      "max": 13.502767
+    },
+    "nrx_response_ms": {
+      "n": 2000,
+      "mean": 4.7772849934999995,
+      "p50": 4.803578,
+      "p95": 5.51229925,
+      "p99": 5.88791461,
+      "p99_9": 7.591921557000843,
+      "min": 3.84141,
+      "max": 13.502767
+    }
+  },
+  "gates": {
+    "requalification": true,
+    "same_host_job": true,
+    "fixed_input": true,
+    "contract": true,
+    "worker_counts": true,
+    "record_integrity": true,
+    "mandatory_first": true,
+    "background_integrity": true,
+    "source_sha256_two_endpoint_bringup_controller.py": true,
+    "source_sha256_run_two_endpoint_bringup.sh": true,
+    "source_sha256_dart_runtime.py": true,
+    "completed_cell_records": true,
+    "correct_cells_at_least": true,
+    "deadline_misses": true,
+    "nrx_bound_violations": true,
+    "conv_bound_violations": true,
+    "admission_rejections": true,
+    "retime_rejections": true,
+    "background_units_greater_than_zero": true,
+    "background_budget_violations": true,
+    "background_release_crossings": true,
+    "background_faults": true,
+    "endpoint_faults": true,
+    "fallback_calendar_outstanding": true,
+    "both_endpoint_outstanding": true,
+    "exactly_one_commit_per_cell": true,
+    "all_pass": true
+  },
+  "descriptive_double_fallback_indices": [
+    854
+  ]
+}

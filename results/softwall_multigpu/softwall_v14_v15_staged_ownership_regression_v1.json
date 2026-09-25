@@ -1,0 +1,31 @@
+{
+  "schema": "softwall-v14-v15-staged-ownership-regression-v1",
+  "scope": "deterministic two-request fake broker; no CUDA or timing claim",
+  "v14": {
+    "prepare_calls": 21,
+    "broker_request_states": [
+      "held",
+      "held"
+    ],
+    "broker_held_tokens": 2,
+    "client_tracked_unlaunched_tokens": 1,
+    "untracked_held_tokens": 1
+  },
+  "v15": {
+    "prepare_calls": 1,
+    "broker_request_states": [
+      "held",
+      "ready"
+    ],
+    "broker_held_tokens": 1,
+    "client_tracked_unlaunched_tokens": 1,
+    "untracked_held_tokens": 0
+  },
+  "gates": {
+    "v14_regression_reproduced": true,
+    "v15_one_prepare_while_staged": true,
+    "v15_no_untracked_held_token": true
+  },
+  "all_pass": true,
+  "interpretation": "V14 physical campaigns ended with zero outstanding tokens, but the implementation admitted an unexercised second-prepare branch. V15 suppresses prepare while a staged/offered token is owned."
+}

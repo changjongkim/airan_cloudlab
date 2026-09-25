@@ -1,0 +1,22 @@
+{
+  "schema": "softwall-confirm75-three-cell-two-endpoint-canary-v1",
+  "job": "58738952",
+  "gates": {
+    "source_hashes": true,
+    "contract": true,
+    "provenance": true,
+    "safety": true,
+    "two_endpoint_route": true,
+    "correlated_all_fail": true
+  },
+  "all_pass": true,
+  "correct_cells": 295,
+  "background_units": 5661,
+  "two_admitted_releases": 104,
+  "cell2_routed": 105,
+  "three_conventional_releases": 66,
+  "correlated_all_fail_releases": 18,
+  "joint_ai_units": 0,
+  "joint_retimes": 0,
+  "interpretation": "Three simultaneous radio TBs, two cap40 NeuralRx endpoints, one cap20 AI client and one conservative conventional recovery lane on one GPU. Injected branch outcome forces simultaneous fallback for both admitted NeuralRx in qualifying releases. Synthetic P150/D130 and sample bounds only; no actual GPU WCET or production MAC expiry. Fixed low gate, so not a PHY-value joint-policy or strong-baseline throughput comparison."
+}

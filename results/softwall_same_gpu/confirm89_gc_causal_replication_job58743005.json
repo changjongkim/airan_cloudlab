@@ -1,0 +1,82 @@
+{
+  "schema": "softwall-confirm89-gc-causal-replication-v1",
+  "job": "58743005",
+  "source_hashes": true,
+  "arm_gates": {
+    "a_on": {
+      "contract": true,
+      "provenance": true,
+      "sample_safety": false
+    },
+    "b_off": {
+      "contract": true,
+      "provenance": true,
+      "sample_safety": true
+    },
+    "c_off": {
+      "contract": true,
+      "provenance": true,
+      "sample_safety": true
+    },
+    "d_on": {
+      "contract": true,
+      "provenance": true,
+      "sample_safety": true
+    }
+  },
+  "all_contract_gates_pass": false,
+  "pairs": [
+    {
+      "on": "a_on",
+      "off": "b_off",
+      "on_gen2_max_ms": 40.34322,
+      "off_gen2_events": 0,
+      "exact_feature_matches": 3200,
+      "same_admission_decisions": 3200,
+      "total_records": 3200,
+      "selected_matched_nrx": {
+        "release_index": 608,
+        "cell": 3,
+        "on_response_ms": 55.323433,
+        "off_response_ms": 16.526349,
+        "on_minus_off_response_ms": 38.797084,
+        "on_worker_gpu_ms": 2.074079990386963,
+        "on_worker_published_after_release_ms": 49.09116,
+        "on_controller_observed_after_release_ms": 55.323433,
+        "gc_start_after_release_ms": 4.098065,
+        "gc_end_after_release_ms": 44.441285,
+        "worker_published_before_gc_start": false,
+        "controller_observed_after_gc_end": true
+      },
+      "candidate_nrx_count": 2,
+      "frozen_mechanism_gate": true
+    },
+    {
+      "on": "d_on",
+      "off": "c_off",
+      "on_gen2_max_ms": 20.824174,
+      "off_gen2_events": 0,
+      "exact_feature_matches": 3200,
+      "same_admission_decisions": 3200,
+      "total_records": 3200,
+      "selected_matched_nrx": {
+        "release_index": 606,
+        "cell": 3,
+        "on_response_ms": 24.734531,
+        "off_response_ms": 16.665365,
+        "on_minus_off_response_ms": 8.069166,
+        "on_worker_gpu_ms": 1.6810879707336426,
+        "on_worker_published_after_release_ms": 14.180518,
+        "on_controller_observed_after_release_ms": 24.734531,
+        "gc_start_after_release_ms": -15.090804,
+        "gc_end_after_release_ms": 5.73337,
+        "worker_published_before_gc_start": false,
+        "controller_observed_after_gc_end": true
+      },
+      "candidate_nrx_count": 1,
+      "frozen_mechanism_gate": false
+    }
+  ],
+  "mechanism_gate_pass": false,
+  "interpretation": "Independent prospective two-seed ON/OFF/OFF/ON replication using matched NRx response at the longest natural gen-2 GC event, with identical PHY features/admission inside each pair. Passing supports a causal GC host-latency mechanism in this synthetic mode, not hard WCET, universal tail elimination or joint-policy advantage."
+}

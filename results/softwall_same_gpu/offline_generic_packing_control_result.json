@@ -1,0 +1,125 @@
+{
+  "schema": "softwall-offline-decision-screen-v1",
+  "state": "results/softwall_same_gpu/offline_generic_packing_control_state.json",
+  "scope": "visible jobs after physical NRx completion; one serial lane; no future AI",
+  "fixed": {
+    "value": 125,
+    "admitted": [
+      "A",
+      "D"
+    ],
+    "schedule": [
+      {
+        "job": "A",
+        "start_ms": 0,
+        "finish_ms": 25
+      },
+      {
+        "job": "D",
+        "start_ms": 25,
+        "finish_ms": 30
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 40,
+        "finish_ms": 65
+      }
+    ]
+  },
+  "greedy_density": {
+    "value": 125,
+    "admitted": [
+      "A",
+      "D"
+    ],
+    "schedule": [
+      {
+        "job": "A",
+        "start_ms": 0,
+        "finish_ms": 25
+      },
+      {
+        "job": "D",
+        "start_ms": 25,
+        "finish_ms": 30
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 30,
+        "finish_ms": 55
+      }
+    ]
+  },
+  "greedy_deadline": {
+    "value": 125,
+    "admitted": [
+      "A",
+      "D"
+    ],
+    "schedule": [
+      {
+        "job": "A",
+        "start_ms": 0,
+        "finish_ms": 25
+      },
+      {
+        "job": "D",
+        "start_ms": 25,
+        "finish_ms": 30
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 30,
+        "finish_ms": 55
+      }
+    ]
+  },
+  "greedy_value": {
+    "value": 125,
+    "admitted": [
+      "A",
+      "D"
+    ],
+    "schedule": [
+      {
+        "job": "A",
+        "start_ms": 0,
+        "finish_ms": 25
+      },
+      {
+        "job": "D",
+        "start_ms": 25,
+        "finish_ms": 30
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 30,
+        "finish_ms": 55
+      }
+    ]
+  },
+  "joint_exact": {
+    "value": 150,
+    "admitted": [
+      "B",
+      "C"
+    ],
+    "schedule": [
+      {
+        "job": "B",
+        "start_ms": 0,
+        "finish_ms": 20
+      },
+      {
+        "job": "C",
+        "start_ms": 20,
+        "finish_ms": 40
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 40,
+        "finish_ms": 65
+      }
+    ]
+  }
+}

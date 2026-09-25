@@ -1,0 +1,52 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm50_requalified_gap_abba",
+  "purpose": "Re-test the incremental recovery-gap AI lease against an otherwise identical fixed-reservation and bounded-AI policy under Confirm47's requalified 50 ms NRx admission and 35 ms AI socket timeout. The two ABBA seed pairs are a mechanism comparison, not the full channel-gate/queue-aware combined baseline.",
+  "radio": {
+    "iterations_per_condition": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "pairs": [
+      {"pair": 1, "payload_seed": 20321050, "channel_seed_base": 20340000, "order": ["gap_off", "gap_on"]},
+      {"pair": 2, "payload_seed": 20321051, "channel_seed_base": 20341000, "order": ["gap_on", "gap_off"]}
+    ]
+  },
+  "execution": {
+    "same_node_allocation_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 conventional-only releases with zero deadline misses"
+  },
+  "endpoint": {
+    "mps_cap": 80,
+    "rpc_timeout_ms": 30,
+    "nrx_end_to_end_bound_ms": 50
+  },
+  "recovery": {
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "fallback_latest_start_ms_after_release": 53,
+    "fallback_calendar_capacity": 1
+  },
+  "background_both_conditions": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "repeats_per_unit": 1,
+    "rpc_budget_ms": 40,
+    "rpc_timeout_ms": 35,
+    "guard_ms": 2
+  },
+  "primary_gate": {
+    "all_conditions_same_node_job_and_paired_input": true,
+    "all_conditions_zero_ran_deadline_misses": true,
+    "all_conditions_zero_endpoint_nrx_conventional_ai_contract_violations": true,
+    "all_conditions_zero_duplicate_commits_and_outstanding_credits": true,
+    "gap_off_zero_gap_units_and_gap_on_positive_gap_units": true,
+    "each_gap_on_radio_utility_noninferior_to_paired_off_margin_pp": -0.25,
+    "gap_on_completed_ai_units_exceed_paired_off_in_both_pairs": true
+  },
+  "stopping_rule": "Evaluate both seed/order pairs exactly once and report all failures. Do not add seeds or tune thresholds after reading outcomes.",
+  "interpretation_limit": "The OFF condition already has atomic recovery reservation, a persistent MPS endpoint, single commit, and bounded AI between releases. This isolates only the incremental gap lease. With one cell and one endpoint, queue-aware endpoint choice and channel-gate policies are not tested; even a pass is not proof against the full prior-technique combination or a hard worst-case deadline guarantee."
+}

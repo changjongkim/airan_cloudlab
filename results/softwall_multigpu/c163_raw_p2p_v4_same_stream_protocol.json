@@ -1,0 +1,21 @@
+{
+  "schema": "softwall-c163-fast-path-development-protocol-v1",
+  "campaign": "c163_raw_p2p_same_stream_development",
+  "frozen_before_execution": true,
+  "role": "Development test of a CUDA-stream dependency correction; not production qualification or WCET evidence.",
+  "hypothesis": "Binding caller-owned TensorRT to the cuPHY stream removes two host synchronizations and transient input allocations that appear inside the measured NeuralRx tail.",
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "iterations": 1000,
+  "seed": 20358400,
+  "mechanism": "GPU0 publishes raw IQ and starts conventional; GPU1 uses busy polling, P2P, and one ordered cuPHY/TensorRT stream through CRC.",
+  "decision_rule": "Only 1000/1000 correct pair completions at 4.5 ms may open a disjoint-seed holdout; any late or incorrect request rejects this implementation.",
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "source_sha256_before_execution": {
+    "c163_raw_p2p_nrx_worker.py": "c109b02ecd22938ed75e5cfd9db528b934c80062e26b8e384da9d7dd2918d6ab",
+    "c163_raw_p2p_controller.py": "c55af86e5e37ed143e3592ca006853635402eff3942ee5ac8990733e093ad38f",
+    "run_c163_raw_p2p_v4_same_stream.sh": "1246057dbed5ea7e4685df38675f1c8c66627e54b736a2bdc6156dc3791185ef",
+    "dual_receiver_phy.py": "3000868ee98aa71c3737335ac304a1dc942f8b75e7a95bfed2a96a07e0f79db0",
+    "nrx_trt_direct.py": "c50798fb17d953c5064cf972b0795dc0c2e4c6017885e250127a661d438c1309"
+  }
+}

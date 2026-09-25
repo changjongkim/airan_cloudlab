@@ -1,0 +1,37 @@
+{
+  "artifacts": {
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt6_job58854900_peer_spec.json": "5ae842907550f93804d52f5672c1d9775fbe37203404506563429598eb844540",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt6_job58854900_protocol.json": "88dfa77b094e8d692ab15796a21f456e0b4fec62052ede3490e7d0fbfc5654dd",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt6_job58854900_result.json": "14cf3225ff74c1d049322ad86247f0012d103afa7906b6b413cd9c276709bec8",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt6_job58854900_coordinator.json": "73713e2e2181326c679eab5174e88eff7bcdb3dc799a2c123e90d91533c3ed42",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt6_job58854900_home0_h0-r0_owner.json": "b87b5cb3c770fb782b8253baad2d293103049c593b89cb910151daa705c1fa61",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt6_job58854900_home0_h0-r1_owner.json": "e717d4833f6dbac7efac6930ed69c9257f9b8bf46a8f5968d76b205cd380b786",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt6_job58854900_home0_h0-r2_owner.json": "34e7824dcec2e27c559c680dcec8ba15561080a390164bc20db6074ba44a0222",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt6_job58854900_home1_h1-r0_owner.json": "906ae635bca487d3fd78eb41414472d5e32216927886d827aa6c6c120788e375",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt6_job58854900_nrx_worker.json": "16ea519e86d88ab92373dae70e2b923b2fe283b6d12eed21b83179a7df26436e",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt6_job58854900_qwen.json": "65f42c85832209d023f61a8730a49588419480cdec79e6af422ed95aaed22cac"
+  },
+  "attempt": 6,
+  "correction": "Compile and execute the output-finiteness reduction before readiness. Restore the less intrusive 100 ms lifecycle activation because the apparent idle tail was monitor JIT, not the P2P service path.",
+  "job": "58854900",
+  "node": "nid001109",
+  "observations": {
+    "deadline_misses": 0,
+    "first_backward_host_ms": 0.049154,
+    "first_forward_host_ms": 0.076648,
+    "first_nrx_host_ms": 1.257147,
+    "first_path_ms": 59.236544,
+    "later_paths_ms": [
+      1.498412,
+      1.465428,
+      1.493663
+    ],
+    "oracle_equivalent_recoveries": 4,
+    "recoveries": 4,
+    "timely_successes": 0
+  },
+  "reason": "The first path was 59.237 ms although measured forward P2P host time was 0.077 ms, TensorRT host time 1.257 ms, and backward P2P host time 0.049 ms. The unmeasured interval is the first cp.isfinite reduction/JIT used only by the safety monitor.",
+  "schema": "softwall-confirm157a-attempt-failure-v1",
+  "scientific_outcome_opened": true,
+  "status": "INSTRUMENTATION_JIT_FAIL"
+}

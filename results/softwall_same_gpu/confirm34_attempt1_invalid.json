@@ -1,0 +1,17 @@
+{
+  "schema": "softwall-invalid-attempt-v1",
+  "campaign": "confirm34_external_endpoint_baselines",
+  "attempt": 1,
+  "valid": false,
+  "reason": "A pre-existing confirm31_sham_client_retirement campaign was active on the same GPU, and an MPS quit/backoff sequence overlapped baseline startup. The conventional-only client aborted with an MPS RPC failure before producing a result JSON.",
+  "evidence": {
+    "execution_log": "confirm34_execution_attempt1_mps_overlap.log",
+    "mps_control_log_events": [
+      "2026-09-20T21:43:48 client 848765 connected",
+      "2026-09-20T21:43:50 quit requested with active clients",
+      "2026-09-20T21:46:52 new control daemon started"
+    ],
+    "contaminating_campaign_artifacts": "raw/contaminated_confirm31_sham_rerun_20260920T2146Z/"
+  },
+  "disposition": "Excluded. Re-run only after GPU idle, clean MPS maintenance, and requalification smoke."
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "softwall-confirm80-four-cell-ai15-canary-v1",
+  "job": "58738952",
+  "gates": {
+    "source_hashes": true,
+    "contract": true,
+    "provenance": true,
+    "safety": true,
+    "two_endpoint_route": true,
+    "correlated_all_fail": true,
+    "joint_physical_path": true
+  },
+  "all_pass": true,
+  "correct_cells": 547,
+  "background_units": 13001,
+  "two_admitted_releases": 172,
+  "cell2_routed": 168,
+  "cell3_routed": 143,
+  "four_conventional_releases": 89,
+  "correlated_all_fail_releases": 37,
+  "joint_ai_units": 92,
+  "joint_retimes": 38,
+  "max_ai_host_ms": 7.000626,
+  "interpretation": "Four-cell/two-NeuralRx-endpoint synthetic P180/D155 physical canary with all-fail conventional fallback and 15 ms AI unit atomic lease. Sample bounds are not WCET; fixed low gate, no AI timeout continuation, joint-policy versus greedy comparison or production MAC expiry claim."
+}

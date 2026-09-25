@@ -1,0 +1,47 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm38_external_background_comparison",
+  "purpose": "Measure the fully separate MPS same-request S2 endpoint while bounded useful AI occupies slack, versus local S2 and eager dual with the same background client and radio trace.",
+  "radio": {
+    "iterations": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "payload_seed": 20321038,
+    "channel_seed_base": 20328000
+  },
+  "execution": {
+    "same_node": true,
+    "same_slurm_allocation": true,
+    "one_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "order": ["external_s2", "local_s2_reserved", "local_eager_dual"],
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 release conventional-only D80, excluded from comparison"
+  },
+  "endpoint": {
+    "mps_cap": 80,
+    "timeout_ms": 30,
+    "persistent_through_timed_epoch": true
+  },
+  "background": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "repeats_per_unit": 1,
+    "budget_ms": 6,
+    "guard_ms": 2,
+    "rpc_timeout_ms": 6,
+    "same_workload_each_condition": true
+  },
+  "primary_gate": {
+    "zero_ran_deadline_misses": true,
+    "zero_ai_budget_violations_or_release_crossings": true,
+    "positive_completed_external_ai_units": true,
+    "external_endpoint_timeout_zero": true,
+    "external_utility_margin_pp": -0.25,
+    "utility_margin_pp": -0.25,
+    "external_background_units_exceed_eager": true
+  },
+  "interpretation_limit": "The first same-node sequential comparison is descriptive for background throughput; order effects require counterbalanced replicates, and observed zero misses do not prove WCET."
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm44_recovery_gap_baab",
+  "purpose": "Independently seeded reverse-order replication of Confirm43's transactional recovery-gap AI lease ablation, regardless of Confirm43 outcome.",
+  "radio": {
+    "iterations_per_condition": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "payload_seed": 20321044,
+    "channel_seed_base": 20334000
+  },
+  "execution": {
+    "one_fresh_node_allocation": true,
+    "one_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "order": ["gap_on", "gap_off", "gap_off", "gap_on"],
+    "independent_controller_and_worker_processes": true,
+    "operational_requalification": "200 conventional-only releases with zero deadline misses"
+  },
+  "endpoint": {
+    "mps_cap": 80,
+    "rpc_timeout_ms": 30,
+    "nrx_end_to_end_bound_ms": 30
+  },
+  "recovery": {
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "fallback_latest_start_ms_after_release": 53,
+    "fallback_calendar_capacity": 1
+  },
+  "background": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "repeats_per_unit": 1,
+    "rpc_budget_ms": 40,
+    "rpc_timeout_ms": 45,
+    "guard_ms": 2
+  },
+  "primary_gate": {
+    "all_runs_complete_same_job_node_trace": true,
+    "all_ran_deadline_misses_zero": true,
+    "all_endpoint_timeouts_zero": true,
+    "all_nrx_and_conventional_bound_violations_zero": true,
+    "all_ai_budget_violations_crossings_faults_zero": true,
+    "all_duplicate_commits_and_outstanding_credits_zero": true,
+    "gap_off_units_zero_gap_on_units_positive": true,
+    "each_gap_on_radio_utility_noninferior_to_matched_off_margin_pp": -0.25,
+    "gap_on_completed_ai_total_exceeds_gap_off_total": true
+  },
+  "interpretation_limit": "Report Confirm43 and Confirm44 jointly, including a negative or failed campaign; two seeds and four pairs still do not establish WCET or generality beyond the allowed workload."
+}

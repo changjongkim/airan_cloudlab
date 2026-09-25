@@ -1,0 +1,103 @@
+{
+  "schema": "softwall-confirm44-recovery-gap-baab-v1",
+  "job": "58685929",
+  "host": "nid001001",
+  "rows": [
+    {
+      "round": 1,
+      "mode": "on",
+      "correct": 9827,
+      "ran_misses": 0,
+      "natural_fallbacks": 225,
+      "background_units": 128887,
+      "recovery_gap_ai_units": 675
+    },
+    {
+      "round": 2,
+      "mode": "off",
+      "correct": 9827,
+      "ran_misses": 0,
+      "natural_fallbacks": 225,
+      "background_units": 127205,
+      "recovery_gap_ai_units": 0
+    },
+    {
+      "round": 3,
+      "mode": "off",
+      "correct": 9823,
+      "ran_misses": 0,
+      "natural_fallbacks": 225,
+      "background_units": 127237,
+      "recovery_gap_ai_units": 0
+    },
+    {
+      "round": 4,
+      "mode": "on",
+      "correct": 9827,
+      "ran_misses": 0,
+      "natural_fallbacks": 225,
+      "background_units": 128872,
+      "recovery_gap_ai_units": 675
+    }
+  ],
+  "on_minus_off_completed_ai_units": 3317,
+  "on_minus_off_completed_ai_percent": 1.3036369781718404,
+  "matched_radio_pairs": [
+    {
+      "difference_pp": 0,
+      "confidence_interval_95_pp": [
+        -0.06198374140385397,
+        0.06198374140385397
+      ],
+      "on_only_correct": 5,
+      "off_only_correct": 5
+    },
+    {
+      "difference_pp": 0.04,
+      "confidence_interval_95_pp": [
+        -0.027895259927568302,
+        0.10789525992756831
+      ],
+      "on_only_correct": 8,
+      "off_only_correct": 4
+    }
+  ],
+  "gates": {
+    "frozen_reverse_order": true,
+    "requalification": true,
+    "r1_on_trace": true,
+    "r1_on_transaction": true,
+    "r1_on_worker_accounting": true,
+    "r1_on_radio_and_bounds": false,
+    "r1_on_ai_contract": true,
+    "r1_on_commit_and_credits": true,
+    "r1_on_serial": true,
+    "r2_off_trace": true,
+    "r2_off_transaction": true,
+    "r2_off_worker_accounting": true,
+    "r2_off_radio_and_bounds": true,
+    "r2_off_ai_contract": true,
+    "r2_off_commit_and_credits": true,
+    "r2_off_serial": true,
+    "r3_off_trace": true,
+    "r3_off_transaction": true,
+    "r3_off_worker_accounting": true,
+    "r3_off_radio_and_bounds": false,
+    "r3_off_ai_contract": true,
+    "r3_off_commit_and_credits": true,
+    "r3_off_serial": true,
+    "r4_on_trace": true,
+    "r4_on_transaction": true,
+    "r4_on_worker_accounting": true,
+    "r4_on_radio_and_bounds": false,
+    "r4_on_ai_contract": true,
+    "r4_on_commit_and_credits": true,
+    "r4_on_serial": true,
+    "same_host_job": true,
+    "same_release_trace": true,
+    "gap_unit_switch": true,
+    "both_radio_pairs_noninferior": true,
+    "gap_on_ai_gain": true,
+    "all_pass": false
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm89_prospective_gc_to_matched_nrx_latency_replication",
+  "frozen_before_execution": true,
+  "job": "58743005",
+  "node": "nid001101",
+  "iterations": 800,
+  "cells": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 50,
+  "conv_bound_ms": 25,
+  "ai_budget_ms": 15,
+  "arms": [
+    {
+      "name": "a_on",
+      "gc_mode": "on",
+      "payload_seed": 20900061,
+      "channel_seed_base": 20932000,
+      "prefix": "confirm89_a_on_job58743005"
+    },
+    {
+      "name": "b_off",
+      "gc_mode": "off",
+      "payload_seed": 20900061,
+      "channel_seed_base": 20932000,
+      "prefix": "confirm89_b_off_job58743005"
+    },
+    {
+      "name": "c_off",
+      "gc_mode": "off",
+      "payload_seed": 20900062,
+      "channel_seed_base": 20942000,
+      "prefix": "confirm89_c_off_job58743005"
+    },
+    {
+      "name": "d_on",
+      "gc_mode": "on",
+      "payload_seed": 20900062,
+      "channel_seed_base": 20942000,
+      "prefix": "confirm89_d_on_job58743005"
+    }
+  ],
+  "min_on_gen2_ms": 10,
+  "min_matched_nrx_delay_ms": 10,
+  "frozen_gates": "Two new independent seed pairs, ON/OFF/OFF/ON, 800 releases each, separate MPS epochs and same trace within each pair. All arms: source/contract/provenance and zero observed current deadline/NRx50/conv25/AI15/guard/fault/credit violations. Each pair: all 3,200 PHY features and NRx admission decisions exactly match; ON has a natural >=10ms generation-2 GC, OFF has zero generation-2 events, and at least one NRx request whose critical interval from channel preparation to controller observation overlaps that GC has ON response >=10ms slower than exactly matched OFF request. This is prospective correction of Confirm87 primary metric. Failure remains failure; passing is not WCET or joint-policy novelty.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_confirm87_gc_intervention.sh": "a30aa6b8b16dd3f1bdd596a19439787f23f0efb02e5f0f8bded867dc6e0ba995",
+    "scripts_for_node/softwall_same_gpu/four_cell_gc_intervention_controller.py": "7f562188b8c5c705448b75b053a20ad2608a6047682b9a9b2dd2f1061ba91016",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm89_gc_causal_replication.py": "fd9e6ff348314b2834c1cd9353889c5f1bb8342ce12dc0d07270b49d621194ca",
+    "scripts_for_node/softwall_same_gpu/s2_runner.py": "8bb2f65e2c7c1cac655b7c2d82e7ae8d3500b377b8ecde44ef491333a855be7c",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "4573034b0f3b09c27f756d661a77eb4e7660c7981a711c7f9e5665e8a0716279",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

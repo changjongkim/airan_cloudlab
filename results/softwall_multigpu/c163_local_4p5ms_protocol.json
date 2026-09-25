@@ -1,0 +1,18 @@
+{
+  "schema": "softwall-c163-diagnostic-protocol-v1",
+  "frozen_before_execution": true,
+  "purpose": "Test whether even the optimistic local clean receiver path can fit the Aerial testMAC UL indication threshold.",
+  "claim_boundary": "This is neither a production d_MAC qualification nor a WCET bound. It omits MPS, external AI, IPC, controller RPC, real DU release timing, and real channels.",
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "iterations": 1000,
+  "seed": 20357800,
+  "order": "NeuralRx then conventional recovery in each iteration",
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "decision_rule": "Report receiver-alone and wait-then-recover wall-time counts at 4.5 ms; do not promote any sample statistic to a bound.",
+  "source_sha256_before_execution": {
+    "probe_c163_local_4p5ms.py": "433685b8b6083c5d5e6012f4a0eb604be0d780629e4cd6f6c3549d4d1a285ad5",
+    "run_c163_local_4p5ms.sh": "237880882934dbc233946a7b757c2b85c4daa2fdd4d0d64faca5ea4b30cc7436",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

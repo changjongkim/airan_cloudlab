@@ -1,0 +1,140 @@
+{
+  "schema": "softwall-confirm98-branch-posthoc-v1",
+  "evidence_grade": "posthoc_descriptive",
+  "frozen_parent_pass": true,
+  "arms": [
+    {
+      "name": "a",
+      "categories": [
+        {
+          "admitted_nrx": 0,
+          "injected_failures": 0,
+          "releases": 16,
+          "timely_ai_min": 6,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 6.0,
+          "timely_ai_distribution": {
+            "6": 16
+          }
+        },
+        {
+          "admitted_nrx": 1,
+          "injected_failures": 0,
+          "releases": 62,
+          "timely_ai_min": 5,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.983870967741935,
+          "timely_ai_distribution": {
+            "5": 1,
+            "6": 61
+          }
+        },
+        {
+          "admitted_nrx": 1,
+          "injected_failures": 1,
+          "releases": 23,
+          "timely_ai_min": 5,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.869565217391305,
+          "timely_ai_distribution": {
+            "5": 3,
+            "6": 20
+          }
+        },
+        {
+          "admitted_nrx": 2,
+          "injected_failures": 0,
+          "releases": 244,
+          "timely_ai_min": 1,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.94672131147541,
+          "timely_ai_distribution": {
+            "1": 1,
+            "5": 8,
+            "6": 235
+          }
+        },
+        {
+          "admitted_nrx": 2,
+          "injected_failures": 2,
+          "releases": 55,
+          "timely_ai_min": 5,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.818181818181818,
+          "timely_ai_distribution": {
+            "5": 10,
+            "6": 45
+          }
+        }
+      ],
+      "seven_ai_observed_any_release": false
+    },
+    {
+      "name": "b",
+      "categories": [
+        {
+          "admitted_nrx": 0,
+          "injected_failures": 0,
+          "releases": 11,
+          "timely_ai_min": 6,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 6.0,
+          "timely_ai_distribution": {
+            "6": 11
+          }
+        },
+        {
+          "admitted_nrx": 1,
+          "injected_failures": 0,
+          "releases": 72,
+          "timely_ai_min": 1,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.902777777777778,
+          "timely_ai_distribution": {
+            "1": 1,
+            "5": 2,
+            "6": 69
+          }
+        },
+        {
+          "admitted_nrx": 1,
+          "injected_failures": 1,
+          "releases": 14,
+          "timely_ai_min": 5,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.857142857142857,
+          "timely_ai_distribution": {
+            "5": 2,
+            "6": 12
+          }
+        },
+        {
+          "admitted_nrx": 2,
+          "injected_failures": 0,
+          "releases": 239,
+          "timely_ai_min": 5,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.97071129707113,
+          "timely_ai_distribution": {
+            "5": 7,
+            "6": 232
+          }
+        },
+        {
+          "admitted_nrx": 2,
+          "injected_failures": 2,
+          "releases": 64,
+          "timely_ai_min": 5,
+          "timely_ai_max": 6,
+          "timely_ai_mean": 5.65625,
+          "timely_ai_distribution": {
+            "5": 22,
+            "6": 42
+          }
+        }
+      ],
+      "seven_ai_observed_any_release": false
+    }
+  ],
+  "interpretation": "C98 has real Qwen workload pressure but no seven-job conditional-capacity witness: no release, including releases without admitted NRx, completed seven by D153. All-fail and no-fail categories have different six-unit rates, but this unpaired observational split does not establish a causal recovery cost or a policy advantage."
+}

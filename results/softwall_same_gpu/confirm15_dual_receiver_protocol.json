@@ -1,0 +1,28 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm15_dual_receiver_valid_pusch",
+  "purpose": "Validate conventional cuPHY and optimized direct NeuralRx branches on the exact same valid PUSCH payload before S2 control experiments.",
+  "input": {
+    "generator": "Aerial PdschTx",
+    "prbs": 273,
+    "start_symbol": 2,
+    "symbols": 12,
+    "dmrs_symbols": [2, 7, 11],
+    "mcs_index": 2,
+    "rx_antennas": 4,
+    "seed": 20270410
+  },
+  "receiver_paths": [
+    "conventional CE+NI+EQ+de-rate-match+LDPC+CRC",
+    "LS CE+direct persistent TensorRT NeuralRx+de-rate-match+LDPC+CRC"
+  ],
+  "warmup": 30,
+  "iterations_per_path": 1000,
+  "gate": {
+    "conventional_correct": 1000,
+    "neural_correct": 1000,
+    "crc_failures": 0,
+    "payload_mismatches": 0
+  }
+}

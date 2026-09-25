@@ -1,0 +1,20 @@
+{
+  "schema": "softwall-analysis-repair-manifest-v1",
+  "campaign": "confirm42_transaction_gap_smoke",
+  "slurm_job_id": "58682735",
+  "node": "nid001145",
+  "protocol": "confirm42_transaction_gap_smoke_protocol.json",
+  "measurement": "completed: 500 radio releases, persistent external endpoint and bounded background worker",
+  "first_runner_exit_code": 1,
+  "first_analysis_failure": "KeyError: mps_active_thread_percentage in same_request_ipc_worker output; that worker reports visible_sm_count instead",
+  "repair_scope": "analyze_transaction_smoke.py only; raw GPU/controller/worker/background files unchanged",
+  "corrected_audit": "confirm42_transaction_gap_smoke.json",
+  "raw_prefix": "raw/confirm42_transaction_gap_smoke_cap80_job58682735",
+  "raw_sha256": {
+    "controller": "7636e85c0a7c46e6fc1760640180f563e27de9a9e7fe1b5df6589551602c27bc",
+    "endpoint_worker": "60da7b14ac70e5ff57cbc010678248b022025b0bb0b9ff5c727f2448f048dbd2",
+    "background_worker": "b76ac15d1cddbc0fcfedf77abe7775f01596b648f6226ea45114a022f9de1ce8",
+    "requalification": "e5acc05e94561004abd20566a91310a298008dda8c82ad9d33e8542c3aed840a"
+  },
+  "interpretation": "Frozen measurement gates evaluated from preserved raw data; the first orchestration run did not exit successfully because of an analyzer metadata assumption."
+}

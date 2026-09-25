@@ -1,0 +1,28 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "sionna_cdl_public_wrapper_screen",
+  "frozen_before_execution": true,
+  "role": "Post-failure implementation-path diagnosis; not a BLER holdout or timing result.",
+  "prior_result": "Corrected one-stream caller-owned DirectNrx path decoded 0/600 while conventional decoded 76/600.",
+  "hypothesis": "The caller-owned TensorRT binding or graph replay differs from the public pyAerial TrtEngine wrapper on real channel inputs.",
+  "only_semantic_change": "Use receiver.neural_once_wrapper with the same engine, tensors, channel samples, seeds, profile, and LDPC/CRC path.",
+  "esno_grid_db": [
+    -4.0,
+    -3.8,
+    -3.6,
+    -3.4,
+    -3.2,
+    -3.0
+  ],
+  "iterations_per_snr": 100,
+  "payload_seed": 20358800,
+  "channel_seed": 58801,
+  "decision_rule": "Any NeuralRx success localizes a direct-engine defect; 0/600 rejects that explanation and requires tensor/channel-estimator differential diagnosis.",
+  "claim_boundary": "Wrapper service time is intentionally ignored.",
+  "source_sha256_before_execution": {
+    "probe_sionna_cdl_official_snr_development.py": "cc82030c5a1fdfb07ac03c58d692bf48bc5e1ed1e610a4b794e7bfddf70e988a",
+    "probe_sionna_cdl_reference_development.py": "d34c3232d81801090f37916aa6831ee97ae6372085983f99ef2006f1ab5fed0d",
+    "run_sionna_cdl_wrapper_development.sh": "255499ff335583c691a5dd0d8d9a498f8a25b89140a1ba92793e333c8cafdb27",
+    "dual_receiver_phy.py": "0aa91d359b467cb73fb075f269f3dac1ad704cf901a772d7bfb3834e9809bddf"
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "schema": "softwall-global-ai-broker-fault-arm-result-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c127_broker_fault_canary_job58819952_protocol.json",
+  "broker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_broker.json",
+  "broker_summary": {
+    "offered_requests": 350,
+    "offered_value_tokens": 90126,
+    "timely_requests": 253,
+    "timely_value_tokens": 64835,
+    "states": {
+      "completed": 253,
+      "inflight": 1,
+      "expired": 77,
+      "ready": 19,
+      "future": 786
+    },
+    "per_home": {
+      "1": {
+        "committed": 224,
+        "completed": 224,
+        "timely_value_tokens": 57061
+      },
+      "0": {
+        "committed": 30,
+        "completed": 29,
+        "timely_value_tokens": 7774
+      }
+    },
+    "registered_homes": [
+      0,
+      1
+    ],
+    "finalized_homes": [
+      0,
+      1
+    ],
+    "outstanding_tokens": 1,
+    "duplicate_commit_count": 0
+  },
+  "broker_faults": [
+    {
+      "fault": "drop_commit_response_after_apply",
+      "home": 0,
+      "commit_number": 30,
+      "token": "g57:h0:rburstgpt-839410",
+      "request_id": "burstgpt-839410",
+      "injected_ns": 141341188298502
+    }
+  ],
+  "orphan_request": [
+    {
+      "request_id": "burstgpt-839410",
+      "source_row": 839410,
+      "source_timestamp_s": 3063936,
+      "arrival_ms": 5000.0,
+      "deadline_ms": 6000.0,
+      "raw_request_tokens": 255,
+      "raw_response_tokens": 1,
+      "context_length": 256,
+      "value_tokens": 255,
+      "model": "GPT-4",
+      "log_type": "API log",
+      "source_order": 56,
+      "arrival_ns": 141341139919999,
+      "deadline_ns": 141342139919999,
+      "state": "inflight",
+      "owner": 0,
+      "token": "g57:h0:rburstgpt-839410",
+      "committed_owner": 0,
+      "observed_ns": 141341184459094,
+      "held_ns": 141341187050350,
+      "committed_ns": 141341187843533
+    }
+  ],
+  "home1_ai_after_fault": 197,
+  "homes": [
+    {
+      "home": 0,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h0_controller.json",
+      "first_release_ns": 141336139919999,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c127_broker_fault_canary_job58819952/barrier",
+        "member": 0,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 117,
+          "expected_units": 117,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 101,
+          "expected_units": 101,
+          "count_match": true
+        }
+      ],
+      "global_queue_status": {
+        "enabled": false,
+        "faults": [
+          {
+            "operation": "commit",
+            "type": "ConnectionError",
+            "message": "global broker closed",
+            "detected_ns": 141341188347958,
+            "home": 0,
+            "request_id": "burstgpt-839410",
+            "broker_token": "g57:h0:rburstgpt-839410",
+            "action": "disable-new-global-ai; never retry ambiguous operation"
+          }
+        ]
+      },
+      "summary": {
+        "records": 400,
+        "correct_cells": 175,
+        "nrx_commits": 120,
+        "conv_commits": 280,
+        "atomic_exchange": 11,
+        "ai_timely_value_tokens": 7774,
+        "last_release_index": 99
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "physical_faults": true,
+        "credits": true
+      }
+    },
+    {
+      "home": 1,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h1_controller.json",
+      "first_release_ns": 141336139919999,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c127_broker_fault_canary_job58819952/barrier",
+        "member": 1,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 119,
+          "expected_units": 119,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 100,
+          "expected_units": 100,
+          "count_match": true
+        }
+      ],
+      "global_queue_status": {
+        "enabled": true,
+        "faults": []
+      },
+      "summary": {
+        "records": 400,
+        "correct_cells": 198,
+        "nrx_commits": 126,
+        "conv_commits": 274,
+        "atomic_exchange": 62,
+        "ai_timely_value_tokens": 57061,
+        "last_release_index": 99
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "physical_faults": true,
+        "credits": true
+      }
+    }
+  ],
+  "gates": {
+    "two_homes": true,
+    "same_first_release": true,
+    "full_radio_continuity": true,
+    "worker_count_match": true,
+    "system_safety": true,
+    "broker_homes": true,
+    "one_injected_fault": true,
+    "home0_fail_closed": true,
+    "home1_unaffected": true,
+    "orphan_isolated": true,
+    "no_duplicate_execution": true,
+    "expected_broker_residue": true,
+    "both_homes_executed_ai": true
+  },
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c127_broker_fault_canary_job58819952_protocol.json": "b53f90b869a629ed1c65459a8dc34b456792c41e5311aad31f7f20cf323890cf",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_broker.json": "0b64762ffcfb7a0c78b5d90d4b8435dab3d7f0fc697f1dced41456566be028dc",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h0_controller.json": "ffe95a82c7851a24731c8f575a434ebc186572b1d168fc4960137053b63a0917",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h0_worker0.json": "928c3011a1766d07a96c9c8dee79a970789f2cf8e737d7416516744b2ce02e2b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h0_worker1.json": "cc09907a761f7168482ead65c7cfb97856876b1a493ffb9dd28122ac7b6b5e41",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h0_background.json": "730950d1e73fc9e49b90195d52d5fa7dccdbbaf2579f3bd01d425b91d51df9a9",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h0_requalification.json": "d3c48a377277494e57925f75d0c11b002f5b05fde0fb0fd2ecb42a360094aaad",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h1_controller.json": "18d9302535f5a55a8cb4c1a51add315ad056e3aed03594c86835e051ae678889",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h1_worker0.json": "027a25d0915bc576612cfbd6e196c4dba39faeb8d7a2b609c1d54f4a837ffcb1",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h1_worker1.json": "8b18c2ad06a12be5c52fd47f4fd563fb2d8bc10175b1869919de8fb705d35239",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h1_background.json": "b3865a7c9536f47acc9a0438a65b3d0b6f62845338a8e5ecbce49151ed29a534",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c127_broker_fault_canary_job58819952_h1_requalification.json": "4b89a8d93ee82f3966fc41a0bc3fb69cded6c50692666114ebd88dff1f0614aa"
+  },
+  "scope": "post-commit response loss at home0; ambiguous request quarantined; home0 RAN and home1 RAN+AI continue under local recovery certificates"
+}

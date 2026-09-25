@@ -1,0 +1,71 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "inventory": "900e80cc46555dcb328fe917f1b688d30cfba5ed2f87952248df58206cdbce85",
+    "mandatory": "52621e7d6e2a09b20bf573f3a49bbfc08c6637e9c94e2536835247ec7ebd03e6",
+    "protocol": "8f98a64c8fe748b2c4d079c0bd692321da49dee04e64c5b5dfd76fcf1a745a7d"
+  },
+  "campaign": "development",
+  "claim_boundary": "Finite-sample MPS-assisted Qwen worker process replacement while mandatory four-cell cuPHY continues. It relies on Legacy MPS v2 terminate_client success; arbitrary GPU/driver failure, production d_MAC, WCET and optional-service availability during replacement remain UQ.",
+  "counts": {
+    "cell_decodes": 1944,
+    "component_bound_violations": 0,
+    "deadline_misses": 0,
+    "episodes": 8,
+    "launched_replacements": 4,
+    "mandatory_releases": 486,
+    "prepared_replacements": 4,
+    "terminate_client_success": 8
+  },
+  "gates": {
+    "a100_mig_off_inventory": true,
+    "complete_balanced_episode_product": true,
+    "distinct_target_processes": true,
+    "each_replacement_worker_consumes_predecessor_terminal": true,
+    "every_channel_loss_observed": true,
+    "every_mps_termination_returns_zero": true,
+    "every_quiescence_certificate_passes": true,
+    "final_replacement_worker_starts_and_stops_cleanly": true,
+    "frozen_source_hash_match": true,
+    "journal_terminal_transition_exact": true,
+    "launched_branch_physically_submitted": true,
+    "mandatory_sample_correct_deadline_and_bound": true,
+    "node_not_excluded": true,
+    "old_process_exits_and_client_disappears": true,
+    "same_host_job_and_epoch_chain": true,
+    "same_mps_server_and_mandatory_client_survive": true,
+    "single_surviving_mps_server_epoch": true
+  },
+  "host": "nid001061",
+  "label": "c164i3_processreplace_dev_j58862843",
+  "mandatory_component_gpu_ms": {
+    "count": 1944,
+    "max": 15.08687973022461,
+    "mean": 4.91192681627509,
+    "p50": 4.660831928253174,
+    "p99": 12.919872283935547
+  },
+  "mandatory_response_ms": {
+    "count": 486,
+    "max": 54.151262,
+    "mean": 19.89555119341563,
+    "p50": 18.904017,
+    "p99": 30.590615
+  },
+  "pair_counts": {
+    "drop_after_launch:128": 2,
+    "drop_after_launch:512": 2,
+    "drop_after_prepare:128": 2,
+    "drop_after_prepare:512": 2
+  },
+  "schema": "softwall-c164-process-replacement-result-v1",
+  "slurm_job_id": "58862843",
+  "status": "C164_PROCESS_REPLACEMENT_PHYSICAL_PASS",
+  "terminate_ms": {
+    "count": 8,
+    "max": 21.508444,
+    "mean": 18.294766125000002,
+    "p50": 17.858406,
+    "p99": 21.508444
+  }
+}

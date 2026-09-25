@@ -1,0 +1,18 @@
+{
+  "schema": "softwall-confirm86-stage-gc-probe-v1",
+  "job": "58738952",
+  "gates": {
+    "source_hashes": true,
+    "contract": true,
+    "provenance": true,
+    "sample_safety": true,
+    "tail_reproduced": false
+  },
+  "all_pass": false,
+  "late_nrx_over_30_ms": [],
+  "gc_events_count": 57,
+  "max_gc_duration_ms": 27.26667,
+  "max_wait_return_lateness_ms": 13.643243,
+  "max_channel_prep_host_ms": 30.271238,
+  "interpretation": "Prospectively instrumented release prep, wait, feature, admission, dispatch, and Python GC event intervals. Temporal overlap alone does not prove GC causality; no new service bound or policy advantage follows."
+}

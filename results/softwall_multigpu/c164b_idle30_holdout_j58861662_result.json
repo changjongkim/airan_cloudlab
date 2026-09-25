@@ -1,0 +1,46 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "base_result": "2ffe920deb52109f014d9a551dedbf98d15eac84633731bd7c85b49067045515",
+    "coordinator": "462b9812457c0fc7fd729bc8fbc66d5d045b0a4adec6f3fd3aae842ef1349f22",
+    "lifecycle_model": "f9b4727edb26989bf21e88e23792fe17fd3b48d5aa04414d2d816ea90d58505e",
+    "marker": "7defdfc057898ac55ec342944812b4f8c9eb34d2515016338c731af10b0b6bce",
+    "nrx_worker": "9ddbf8d8ea2169a20f650e181b3879152c6cde7fd20b277fa5aa0af397147f4a",
+    "protocol": "8db2e437cb0d9706f9a3868659714b831a6d39b72f4de7dd30c93b1ecfde299f",
+    "qwen": "e4a0b292e91575fc9378c2591835f904ccce4d09b192a67b8fd0bff373185e89"
+  },
+  "campaign": "holdout",
+  "counts": {
+    "actual_nrx": 480,
+    "deadline_misses": 0,
+    "injected_recoveries": 220,
+    "qwen_units": 60,
+    "radio_commits": 480
+  },
+  "first_round_case": "E6b_first_unsafe_context64",
+  "gates": {
+    "base_c162_boundary_all_pass": true,
+    "c164_source_hash_match": true,
+    "first_round_actual_nrx_complete": true,
+    "first_round_certificate_and_commit_safe": true,
+    "frozen_idle_mode": true,
+    "idle_after_readiness_before_schedule": true,
+    "lifecycle_model_pass": true,
+    "required_idle_physically_observed": true,
+    "same_host_job_clock_domain": true
+  },
+  "host": "nid001137",
+  "label": "c164b_idle30_holdout_j58861662",
+  "maxima_ms": {
+    "nrx_release_to_complete": 18.493168,
+    "qwen_execution": 53.84686,
+    "radio_commit": 123.585665,
+    "recovery_path": 6.289499
+  },
+  "observed_idle_s": 30.029711632,
+  "qualification_scope": "First-request-after-30s-idle boundary subset on this node. Full six-class lifecycle qualification, restart, and WCET remain UQ.",
+  "required_idle_s": 30.0,
+  "schema": "softwall-c164-idle-boundary-result-v1",
+  "slurm_job_id": "58861662",
+  "status": "C164_IDLE30_BOUNDARY_PASS"
+}

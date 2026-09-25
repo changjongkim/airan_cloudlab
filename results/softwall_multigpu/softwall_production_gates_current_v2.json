@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-production-gates-v1",
+  "all_pass": false,
+  "status": "PRODUCTION_NOT_QUALIFIED",
+  "first_blocker": "P1_LIVE_DU_CLOCK",
+  "stages": {
+    "P1_LIVE_DU_CLOCK": {
+      "pass": false,
+      "failures": [
+        "missing target-DU timing contract"
+      ]
+    },
+    "P2_FAST_PATH": {
+      "pass": false,
+      "failures": [
+        "fast path has late pair completions",
+        "P1 contract hash is unavailable",
+        "fast path is not an independent holdout"
+      ]
+    },
+    "P3_CHANNEL_COMPATIBILITY": {
+      "pass": true,
+      "failures": []
+    },
+    "P4_INTEGRATED_REQUALIFICATION": {
+      "pass": false,
+      "failures": [
+        "missing integrated production requalification"
+      ]
+    }
+  },
+  "artifact_sha256": {
+    "p1": null,
+    "p2": "92697d1239ae1f32951cc70dba364cbf364d07544bff6cc5f5d29483c763f950",
+    "p3": "578296af73cdd4acd842ee7833769a3ea441bf2b20f4e220311bbe2ab2172528",
+    "p4": null
+  }
+}

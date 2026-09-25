@@ -1,0 +1,83 @@
+{
+  "schema": "softwall-confirm47-transaction-vs-eager-v1",
+  "job": "58688541",
+  "host": "nid001084",
+  "rows": [
+    {
+      "round": 1,
+      "order": [
+        "eager_dual",
+        "external_transaction"
+      ],
+      "eager_correct": 9837,
+      "external_correct": 9838,
+      "eager_background_units": 126400,
+      "external_background_units": 128140,
+      "external_recovery_gap_ai_units": 602,
+      "external_admission_rejections": 0,
+      "eager_nrx_bound_violations_diagnostic": 2,
+      "external_vs_eager": {
+        "difference_pp": 0.01,
+        "confidence_interval_95_pp": [
+          -0.0418589483026016,
+          0.0618589483026016
+        ],
+        "external_only_correct": 4,
+        "eager_only_correct": 3
+      }
+    },
+    {
+      "round": 2,
+      "order": [
+        "external_transaction",
+        "eager_dual"
+      ],
+      "eager_correct": 9818,
+      "external_correct": 9823,
+      "eager_background_units": 126506,
+      "external_background_units": 127916,
+      "external_recovery_gap_ai_units": 670,
+      "external_admission_rejections": 0,
+      "eager_nrx_bound_violations_diagnostic": 3,
+      "external_vs_eager": {
+        "difference_pp": 0.05,
+        "confidence_interval_95_pp": [
+          -0.008794772578250972,
+          0.10879477257825097
+        ],
+        "external_only_correct": 7,
+        "eager_only_correct": 2
+      }
+    }
+  ],
+  "gates": {
+    "requalification": true,
+    "r1_eager_dual_trace": true,
+    "r1_eager_dual_radio_and_ai": true,
+    "r1_external_transaction_trace": true,
+    "r1_external_transaction_radio_and_ai": true,
+    "r1_same_release_trace": true,
+    "r1_background_accounting": true,
+    "r1_external_transaction": true,
+    "r1_utility_noninferior": true,
+    "r1_ai_exceeds_eager": true,
+    "r1_order": true,
+    "r1_eager_dual_serial": true,
+    "r1_external_transaction_serial": true,
+    "r2_eager_dual_trace": true,
+    "r2_eager_dual_radio_and_ai": true,
+    "r2_external_transaction_trace": true,
+    "r2_external_transaction_radio_and_ai": true,
+    "r2_same_release_trace": true,
+    "r2_background_accounting": true,
+    "r2_external_transaction": true,
+    "r2_utility_noninferior": true,
+    "r2_ai_exceeds_eager": true,
+    "r2_order": true,
+    "r2_external_transaction_serial": true,
+    "r2_eager_dual_serial": true,
+    "same_host_job": true,
+    "round_orders_reversed": true,
+    "all_pass": true
+  }
+}

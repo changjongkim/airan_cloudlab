@@ -1,0 +1,70 @@
+salloc: Granted job allocation 58692459
+salloc: Waiting for resource configuration
+salloc: Nodes nid001488 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=7.235ms max=10.601ms miss=0 correct=74 nrx=0 conv=200 bg=0 duplicate=0
+14:08:12.139350 cuphy.hpp:122    CON[1559285] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56087199e490).
+confirm53 operational requalification passed
+confirm53 start arm=1 timing=early_if_clear
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58692459/bg_sr_58692459_1559548.sock
+[SAME-REQUEST-NRX] ready tag=sr_58692459_1559548
+[SAME-REQUEST-NRX] stopped units=1021
+[SAME-REQUEST] correct=983/1000 miss=0 nrx=979 fallback=21 bg=343 p99=5.561ms
+14:09:03.414742 cuphy.hpp:122    CON[1560134] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55dbb8c1eda0).
+same-request IPC campaign completed: confirm53_arm1_early_if_clear_job58692459
+confirm53 done arm=1 timing=early_if_clear
+confirm53 start arm=2 timing=latest
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58692459/bg_sr_58692459_1561707.sock
+[SAME-REQUEST-NRX] ready tag=sr_58692459_1561707
+[SAME-REQUEST-NRX] stopped units=1002
+[SAME-REQUEST] correct=968/1000 miss=0 nrx=962 fallback=19 bg=197 p99=55.746ms
+14:10:19.707099 cuphy.hpp:122    CON[1562291] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x560a16757a10).
+same-request IPC campaign completed: confirm53_arm2_latest_job58692459
+confirm53 done arm=2 timing=latest
+# Confirm53 known-CRC-failure early recovery ablation
+
+| arm | pair | timing | correct/1000 | miss | AI units | NRx rejects | fallback/early | RAN p99 ms |
+|---:|---:|---|---:|---:|---:|---:|---|---:|
+| 1 | 1 | early_if_clear | 983 | 0 | 343 | 0 | 21/21 | 5.561 |
+| 2 | 1 | latest | 968 | 0 | 197 | 19 | 19/0 | 55.746 |
+
+| pair | early−latest correct TB | fewer NRx rejects | early-only correct | latest-only correct | frozen pair gate |
+|---:|---:|---:|---:|---:|---|
+| 1 | 15 | 19 | 16 | 1 | PASS |
+
+Completed arms: 2/4. Overall frozen gate: FAIL or incomplete.
+This only tests a one-cell known-failure timing mechanism. It is not a comparison to the strong combined baseline or a WCET proof.
+confirm53 start arm=3 timing=latest
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58692459/bg_sr_58692459_1562697.sock
+[SAME-REQUEST-NRX] ready tag=sr_58692459_1562697
+[SAME-REQUEST-NRX] stopped units=1002
+[SAME-REQUEST] correct=972/1000 miss=0 nrx=962 fallback=19 bg=384 p99=55.667ms
+14:11:37.499906 cuphy.hpp:122    CON[1563279] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56083cee4b00).
+same-request IPC campaign completed: confirm53_arm3_latest_job58692459
+confirm53 done arm=3 timing=latest
+confirm53 start arm=4 timing=early_if_clear
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58692459/bg_sr_58692459_1563520.sock
+[SAME-REQUEST-NRX] ready tag=sr_58692459_1563520
+[SAME-REQUEST-NRX] stopped units=1021
+[SAME-REQUEST] correct=983/1000 miss=0 nrx=981 fallback=19 bg=221 p99=5.579ms
+14:12:53.923711 cuphy.hpp:122    CON[1564106] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55dff8c77d50).
+same-request IPC campaign completed: confirm53_arm4_early_if_clear_job58692459
+confirm53 done arm=4 timing=early_if_clear
+# Confirm53 known-CRC-failure early recovery ablation
+
+| arm | pair | timing | correct/1000 | miss | AI units | NRx rejects | fallback/early | RAN p99 ms |
+|---:|---:|---|---:|---:|---:|---:|---|---:|
+| 1 | 1 | early_if_clear | 983 | 0 | 343 | 0 | 21/21 | 5.561 |
+| 2 | 1 | latest | 968 | 0 | 197 | 19 | 19/0 | 55.746 |
+| 3 | 2 | latest | 972 | 0 | 384 | 19 | 19/0 | 55.667 |
+| 4 | 2 | early_if_clear | 983 | 0 | 221 | 0 | 19/19 | 5.579 |
+
+| pair | early−latest correct TB | fewer NRx rejects | early-only correct | latest-only correct | frozen pair gate |
+|---:|---:|---:|---:|---:|---|
+| 1 | 15 | 19 | 16 | 1 | PASS |
+| 2 | 11 | 19 | 12 | 1 | PASS |
+
+Completed arms: 4/4. Overall frozen gate: PASS.
+This only tests a one-cell known-failure timing mechanism. It is not a comparison to the strong combined baseline or a WCET proof.
+confirm53 early fallback ABBA completed
+salloc: Relinquishing job allocation 58692459

@@ -1,0 +1,109 @@
+{
+  "schema": "softwall-v15-single-token-node-protocol-v1",
+  "status": "frozen-before-arms",
+  "campaign": "confirm146",
+  "allocation_node": "nid003417",
+  "job_id": 58834764,
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177",
+    "nid001144",
+    "nid001252",
+    "nid001372",
+    "nid001361",
+    "nid002049",
+    "nid001244"
+  ],
+  "ownership_contract": "at-most-one-staged-or-offered-token-per-home",
+  "ai_arm": {
+    "label": "confirm146_ai45_job58834764",
+    "iterations": 160,
+    "warmup": 20,
+    "payload_seeds": [
+      39000051,
+      39010051
+    ],
+    "channel_seeds": [
+      39001000,
+      39011000
+    ]
+  },
+  "fault_arms": [
+    {
+      "operation": "prepare",
+      "label": "confirm146_prepare_job58834764",
+      "iterations": 200,
+      "warmup": 20,
+      "payload_seeds": [
+        39100051,
+        39110051
+      ],
+      "channel_seeds": [
+        39101000,
+        39111000
+      ]
+    },
+    {
+      "operation": "commit",
+      "label": "confirm146_commit_job58834764",
+      "iterations": 200,
+      "warmup": 20,
+      "payload_seeds": [
+        39120051,
+        39130051
+      ],
+      "channel_seeds": [
+        39121000,
+        39131000
+      ]
+    },
+    {
+      "operation": "complete",
+      "label": "confirm146_complete_job58834764",
+      "iterations": 200,
+      "warmup": 20,
+      "payload_seeds": [
+        39140051,
+        39150051
+      ],
+      "channel_seeds": [
+        39141000,
+        39151000
+      ]
+    }
+  ],
+  "ai_contract": {
+    "raw_ms": 45,
+    "commit_ms": 7,
+    "guard_ms": 2,
+    "effective_ms": 54,
+    "static_slack_ms": 53,
+    "conditional_window_ms": 58
+  },
+  "required_physical_gates": [
+    "single_unlaunched_token",
+    "retained_token_branch_exercised",
+    "broker_drained",
+    "system_safety",
+    "commit_admission_wall_bound"
+  ],
+  "failure_rule": "stop on first failure; preserve failure; no post-hoc bound widening",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "b5afa2828de1897f4029e9c49774d56d198db370891ff114036735f29397b324",
+    "scripts_for_node/softwall_same_gpu/global_trace_single_token_pipelined_controller.py": "d8b44dce96d347032608faab0afd6f551715ddcb2512cc43a21cfed25b7ba4e3",
+    "scripts_for_node/softwall_same_gpu/single_token_pipelined_global_trace_client.py": "3a1dc830967758df16ab76e1053d8e016adde8cf582bc2cfd8b0f32d7d132277",
+    "scripts_for_node/softwall_same_gpu/pipelined_global_trace_client.py": "108c13e2db0c3db46ca84a1b8461a820699e0e85567c6fde433d8b841eef01fa",
+    "scripts_for_node/softwall_same_gpu/run_v15_ai45_single_token_arm.sh": "c9a104d1858ce9bb0e482e54e8773c5b51f4dee174d1cd26e73a0e7276d85530",
+    "scripts_for_node/softwall_same_gpu/run_v15_single_token_control_fault_arm.sh": "38ae841a7e52375d8b759599b8faff1a59168cd43af8173f38aa1193cabc5314",
+    "scripts_for_node/softwall_same_gpu/analyze_v15_single_token_node.py": "fa938cda2560b62089b471ed50049fcf8488127d45279bc7fc57d9f720c2bdd5",
+    "scripts_for_node/softwall_same_gpu/verify_pipelined_control_model_v2.py": "e291f7a0ba28f8eb5bc927d08c4a80766f34c4eecc4439c6e93784ded11ae6a2",
+    "scripts_for_node/softwall_same_gpu/audit_v14_v15_staged_ownership.py": "59df163cb706709f1eb35341bee20e58343d238cd175953bd4d5ce7a75a005ea",
+    "scripts_for_node/softwall_same_gpu/test_single_token_pipelined_global_trace_client.py": "ee33623d7b4aaec3824530d78adfc2aafe540117e3f94131e3a5713d7b012bb7",
+    "scripts_for_node/softwall_same_gpu/test_global_trace_single_token_pipelined_controller.py": "bdebf5fd8b1f7a6ad0a9332b1b7f0a1ef881718af795e31b0ff7375a5513fdf9",
+    "scripts_for_node/softwall_same_gpu/run_v15_single_token_node_requalification.sh": "7319367925e1494fbe185fcfe9e3b37f6cda2bf615a5623bf2d87ca5cec6baca"
+  }
+}

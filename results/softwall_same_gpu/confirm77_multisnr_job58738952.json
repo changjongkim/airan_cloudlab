@@ -1,0 +1,182 @@
+{
+  "schema": "softwall-confirm77-mixed-snr-phy-value-v1",
+  "job": "58738952",
+  "all_pass": true,
+  "gates": {
+    "source_hashes": true,
+    "provenance": true,
+    "disjoint": true,
+    "sample_size": true,
+    "calibration": true,
+    "predictive_value": true
+  },
+  "model_inputs": [
+    "channel_estimate_power",
+    "received_grid_power"
+  ],
+  "snr_is_online_input": false,
+  "train_only_x_edges": [
+    1.6205596923828125,
+    1.8964060544967651,
+    2.1751813888549805,
+    2.514772653579712
+  ],
+  "train_only_y_medians": [
+    1.2462754249572754,
+    1.5036476850509644,
+    1.8005766868591309,
+    2.0080974102020264,
+    2.3678040504455566
+  ],
+  "leaves": [
+    {
+      "index": 0,
+      "x_bin": 0,
+      "y_half": 0,
+      "train_n": 800,
+      "test_n": 796,
+      "train_rescue": 81,
+      "test_rescue": 71,
+      "train_q": 0.1017478152309613,
+      "train_p_neural": 0.31647940074906367,
+      "test_q": 0.08919597989949749
+    },
+    {
+      "index": 1,
+      "x_bin": 0,
+      "y_half": 1,
+      "train_n": 800,
+      "test_n": 831,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_q": 0.0006242197253433209,
+      "train_p_neural": 0.5611735330836455,
+      "test_q": 0.0
+    },
+    {
+      "index": 2,
+      "x_bin": 1,
+      "y_half": 0,
+      "train_n": 800,
+      "test_n": 744,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_q": 0.0006242197253433209,
+      "train_p_neural": 0.6510611735330837,
+      "test_q": 0.0
+    },
+    {
+      "index": 3,
+      "x_bin": 1,
+      "y_half": 1,
+      "train_n": 800,
+      "test_n": 788,
+      "train_rescue": 109,
+      "test_rescue": 97,
+      "train_q": 0.13670411985018727,
+      "train_p_neural": 0.5,
+      "test_q": 0.12309644670050761
+    },
+    {
+      "index": 4,
+      "x_bin": 2,
+      "y_half": 0,
+      "train_n": 800,
+      "test_n": 781,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_q": 0.0006242197253433209,
+      "train_p_neural": 0.8982521847690387,
+      "test_q": 0.0
+    },
+    {
+      "index": 5,
+      "x_bin": 2,
+      "y_half": 1,
+      "train_n": 800,
+      "test_n": 825,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_q": 0.0006242197253433209,
+      "train_p_neural": 0.0006242197253433209,
+      "test_q": 0.0
+    },
+    {
+      "index": 6,
+      "x_bin": 3,
+      "y_half": 0,
+      "train_n": 800,
+      "test_n": 837,
+      "train_rescue": 107,
+      "test_rescue": 95,
+      "train_q": 0.13420724094881398,
+      "train_p_neural": 0.799625468164794,
+      "test_q": 0.1135005973715651
+    },
+    {
+      "index": 7,
+      "x_bin": 3,
+      "y_half": 1,
+      "train_n": 800,
+      "test_n": 820,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_q": 0.0006242197253433209,
+      "train_p_neural": 0.15792759051186017,
+      "test_q": 0.0
+    },
+    {
+      "index": 8,
+      "x_bin": 4,
+      "y_half": 0,
+      "train_n": 800,
+      "test_n": 778,
+      "train_rescue": 0,
+      "test_rescue": 0,
+      "train_q": 0.0006242197253433209,
+      "train_p_neural": 0.3389513108614232,
+      "test_q": 0.0
+    },
+    {
+      "index": 9,
+      "x_bin": 4,
+      "y_half": 1,
+      "train_n": 800,
+      "test_n": 800,
+      "train_rescue": 82,
+      "test_rescue": 74,
+      "train_q": 0.10299625468164794,
+      "train_p_neural": 0.5686641697877652,
+      "test_q": 0.0925
+    }
+  ],
+  "train_rescue": 379,
+  "test_rescue": 337,
+  "weighted_mace": 0.00617821473158552,
+  "brier_2d": 0.037727421325718984,
+  "brier_x_only": 0.039895284255896384,
+  "brier_train_prevalence_constant": 0.04037804687499755,
+  "per_snr_evaluation_only": [
+    {
+      "snr_db": -10.0,
+      "train_rescue": 82,
+      "test_rescue": 74
+    },
+    {
+      "snr_db": -9.0,
+      "train_rescue": 107,
+      "test_rescue": 95
+    },
+    {
+      "snr_db": -8.0,
+      "train_rescue": 109,
+      "test_rescue": 97
+    },
+    {
+      "snr_db": -7.0,
+      "train_rescue": 81,
+      "test_rescue": 71
+    }
+  ],
+  "interpretation": "Train-only ten-leaf histogram based on two observable features across four synthetic SNR levels. Held-out evaluation does not use true SNR online. No DU/TDL generalization, q_use timing, policy performance or hard real-time proof."
+}

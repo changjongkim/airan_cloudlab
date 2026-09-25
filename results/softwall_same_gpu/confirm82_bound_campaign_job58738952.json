@@ -1,0 +1,122 @@
+{
+  "schema": "softwall-confirm82-persistent-bound-campaign-v1",
+  "job": "58738952",
+  "source_hashes": true,
+  "arms": [
+    {
+      "name": "a",
+      "prefix": "confirm82_bound_a_job58738952",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "current_contract_sample": true,
+        "tail_window_observed": true
+      },
+      "all_pass": true,
+      "nrx_paths": 4466,
+      "nrx_max_ms": 38.178691,
+      "nrx_p99_9_ms": 20.347866,
+      "nrx_after_tail_window": 734,
+      "nrx_tail_window_max_ms": 20.274889,
+      "nrx_above_25_ms": 2,
+      "nrx_above_30_ms": 2,
+      "worst_nrx_rows": [
+        {
+          "release_index": 620,
+          "cell": 2,
+          "response_ms": 38.178691
+        },
+        {
+          "release_index": 620,
+          "cell": 1,
+          "response_ms": 37.336701
+        },
+        {
+          "release_index": 2050,
+          "cell": 3,
+          "response_ms": 21.375964
+        },
+        {
+          "release_index": 1519,
+          "cell": 1,
+          "response_ms": 20.408042
+        },
+        {
+          "release_index": 866,
+          "cell": 3,
+          "response_ms": 20.347866
+        }
+      ],
+      "conv_paths": 8835,
+      "conv_max_ms": 5.731999,
+      "conv_p99_9_ms": 4.264547,
+      "conv_above_8_ms": 0,
+      "ai_units": 129783,
+      "ai_host_max_ms": 7.9011,
+      "joint_ai_units": 939,
+      "deadline_misses": 0
+    },
+    {
+      "name": "b",
+      "prefix": "confirm82_bound_b_job58738952",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "current_contract_sample": true,
+        "tail_window_observed": true
+      },
+      "all_pass": true,
+      "nrx_paths": 4533,
+      "nrx_max_ms": 44.588554,
+      "nrx_p99_9_ms": 20.918861,
+      "nrx_after_tail_window": 744,
+      "nrx_tail_window_max_ms": 18.126111,
+      "nrx_above_25_ms": 1,
+      "nrx_above_30_ms": 1,
+      "worst_nrx_rows": [
+        {
+          "release_index": 623,
+          "cell": 3,
+          "response_ms": 44.588554
+        },
+        {
+          "release_index": 2358,
+          "cell": 1,
+          "response_ms": 24.923738
+        },
+        {
+          "release_index": 172,
+          "cell": 3,
+          "response_ms": 22.019161
+        },
+        {
+          "release_index": 1770,
+          "cell": 2,
+          "response_ms": 21.480438
+        },
+        {
+          "release_index": 172,
+          "cell": 1,
+          "response_ms": 20.918861
+        }
+      ],
+      "conv_paths": 8797,
+      "conv_max_ms": 7.97801,
+      "conv_p99_9_ms": 4.248937,
+      "conv_above_8_ms": 0,
+      "ai_units": 129690,
+      "ai_host_max_ms": 5.662134,
+      "joint_ai_units": 962,
+      "deadline_misses": 0
+    }
+  ],
+  "candidate_gates": {
+    "warm_nrx_25ms_observed": false,
+    "warm_nrx_30ms_observed": false,
+    "warm_conv_8ms_observed": true
+  },
+  "all_current_contract_gates_pass": true,
+  "combined_nrx_max_ms": 44.588554,
+  "combined_conv_max_ms": 7.97801,
+  "interpretation": "Candidate thresholds are observational tests of the persistent prewarmed four-cell co-run mode only. Passing cannot establish WCET or permit a smaller bound in cold/lifecycle modes. Confirm40 and Confirm43/44 older-mode tails remain independent counterevidence."
+}

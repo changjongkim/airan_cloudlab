@@ -1,0 +1,860 @@
+{
+  "host": "nid001016",
+  "slurm_job_id": "58815435",
+  "role": "worker",
+  "tag": "g1a_canary_job58815435_943447",
+  "iterations": 100,
+  "source_device": 0,
+  "destination_device": 1,
+  "forward_elements": 353808,
+  "forward_bytes": 1415232,
+  "backward_elements": 78624,
+  "backward_bytes": 314496,
+  "source_sha256": {
+    "/softwall/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "schema": "softwall-multigpu-p2p-ipc-worker-v1",
+  "source_device_name": "NVIDIA A100-SXM4-40GB",
+  "destination_device_name": "NVIDIA A100-SXM4-40GB",
+  "peer_access": {
+    "0_to_1": 1,
+    "1_to_0": 1
+  },
+  "completed_units": 100,
+  "integrity_errors": 0,
+  "sequences_contiguous": true,
+  "ipc_handles_closed_before_ack": true,
+  "forward_gpu_us": {
+    "count": 100,
+    "mean": 20.65663993358612,
+    "p50": 19.168000668287277,
+    "p99": 68.03199648857117,
+    "max": 71.29599899053574
+  },
+  "forward_host_us": {
+    "count": 100,
+    "mean": 33.266529999999996,
+    "p50": 29.807,
+    "p99": 84.394,
+    "max": 256.766
+  },
+  "backward_gpu_us": {
+    "count": 100,
+    "mean": 23.22719994932413,
+    "p50": 21.91999927163124,
+    "p99": 40.672000497579575,
+    "max": 48.767998814582825
+  },
+  "backward_host_us": {
+    "count": 100,
+    "mean": 31.799940000000003,
+    "p50": 30.539,
+    "p99": 48.814,
+    "max": 65.446
+  },
+  "wall_s": 0.8167331849981565,
+  "error": null,
+  "records": [
+    {
+      "sequence": 1,
+      "forward_ok": true,
+      "forward_gpu_us": 68.03199648857117,
+      "forward_host_us": 256.766,
+      "backward_gpu_us": 48.767998814582825,
+      "backward_host_us": 65.446
+    },
+    {
+      "sequence": 2,
+      "forward_ok": true,
+      "forward_gpu_us": 71.29599899053574,
+      "forward_host_us": 84.394,
+      "backward_gpu_us": 23.711999878287315,
+      "backward_host_us": 32.593
+    },
+    {
+      "sequence": 3,
+      "forward_ok": true,
+      "forward_gpu_us": 20.031999796628952,
+      "forward_host_us": 30.779,
+      "backward_gpu_us": 18.015999346971512,
+      "backward_host_us": 26.973
+    },
+    {
+      "sequence": 4,
+      "forward_ok": true,
+      "forward_gpu_us": 20.096000283956528,
+      "forward_host_us": 30.579,
+      "backward_gpu_us": 22.975999861955643,
+      "backward_host_us": 31.651
+    },
+    {
+      "sequence": 5,
+      "forward_ok": true,
+      "forward_gpu_us": 19.807999953627586,
+      "forward_host_us": 30.559,
+      "backward_gpu_us": 22.816000506281853,
+      "backward_host_us": 31.541
+    },
+    {
+      "sequence": 6,
+      "forward_ok": true,
+      "forward_gpu_us": 20.22399939596653,
+      "forward_host_us": 30.359,
+      "backward_gpu_us": 23.584000766277313,
+      "backward_host_us": 32.182
+    },
+    {
+      "sequence": 7,
+      "forward_ok": true,
+      "forward_gpu_us": 18.912000581622124,
+      "forward_host_us": 30.009,
+      "backward_gpu_us": 22.87999913096428,
+      "backward_host_us": 31.641
+    },
+    {
+      "sequence": 8,
+      "forward_ok": true,
+      "forward_gpu_us": 19.711999222636223,
+      "forward_host_us": 30.739,
+      "backward_gpu_us": 22.272000089287758,
+      "backward_host_us": 31.12
+    },
+    {
+      "sequence": 9,
+      "forward_ok": true,
+      "forward_gpu_us": 18.751999363303185,
+      "forward_host_us": 30.379,
+      "backward_gpu_us": 22.87999913096428,
+      "backward_host_us": 31.491
+    },
+    {
+      "sequence": 10,
+      "forward_ok": true,
+      "forward_gpu_us": 19.231999292969704,
+      "forward_host_us": 30.118,
+      "backward_gpu_us": 23.16799946129322,
+      "backward_host_us": 31.821
+    },
+    {
+      "sequence": 11,
+      "forward_ok": true,
+      "forward_gpu_us": 19.551999866962433,
+      "forward_host_us": 30.119,
+      "backward_gpu_us": 23.19999970495701,
+      "backward_host_us": 31.981
+    },
+    {
+      "sequence": 12,
+      "forward_ok": true,
+      "forward_gpu_us": 18.97599920630455,
+      "forward_host_us": 30.339,
+      "backward_gpu_us": 23.104000836610794,
+      "backward_host_us": 31.621
+    },
+    {
+      "sequence": 13,
+      "forward_ok": true,
+      "forward_gpu_us": 19.967999309301376,
+      "forward_host_us": 30.359,
+      "backward_gpu_us": 22.048000246286392,
+      "backward_host_us": 31.04
+    },
+    {
+      "sequence": 14,
+      "forward_ok": true,
+      "forward_gpu_us": 19.519999623298645,
+      "forward_host_us": 31.049,
+      "backward_gpu_us": 22.975999861955643,
+      "backward_host_us": 31.781
+    },
+    {
+      "sequence": 15,
+      "forward_ok": true,
+      "forward_gpu_us": 20.320000126957893,
+      "forward_host_us": 33.685,
+      "backward_gpu_us": 22.336000576615334,
+      "backward_host_us": 30.769
+    },
+    {
+      "sequence": 16,
+      "forward_ok": true,
+      "forward_gpu_us": 18.719999119639397,
+      "forward_host_us": 29.968,
+      "backward_gpu_us": 23.19999970495701,
+      "backward_host_us": 31.731
+    },
+    {
+      "sequence": 17,
+      "forward_ok": true,
+      "forward_gpu_us": 19.680000841617584,
+      "forward_host_us": 29.898,
+      "backward_gpu_us": 22.5600004196167,
+      "backward_host_us": 31.14
+    },
+    {
+      "sequence": 18,
+      "forward_ok": true,
+      "forward_gpu_us": 19.487999379634857,
+      "forward_host_us": 30.499,
+      "backward_gpu_us": 23.391999304294586,
+      "backward_host_us": 32.222
+    },
+    {
+      "sequence": 19,
+      "forward_ok": true,
+      "forward_gpu_us": 18.719999119639397,
+      "forward_host_us": 30.539,
+      "backward_gpu_us": 22.655999287962914,
+      "backward_host_us": 31.19
+    },
+    {
+      "sequence": 20,
+      "forward_ok": true,
+      "forward_gpu_us": 19.071999937295914,
+      "forward_host_us": 29.977,
+      "backward_gpu_us": 22.71999977529049,
+      "backward_host_us": 31.28
+    },
+    {
+      "sequence": 21,
+      "forward_ok": true,
+      "forward_gpu_us": 19.007999449968338,
+      "forward_host_us": 30.058,
+      "backward_gpu_us": 22.463999688625336,
+      "backward_host_us": 31.07
+    },
+    {
+      "sequence": 22,
+      "forward_ok": true,
+      "forward_gpu_us": 18.592000007629395,
+      "forward_host_us": 30.398,
+      "backward_gpu_us": 23.360000923275948,
+      "backward_host_us": 32.182
+    },
+    {
+      "sequence": 23,
+      "forward_ok": true,
+      "forward_gpu_us": 20.096000283956528,
+      "forward_host_us": 30.258,
+      "backward_gpu_us": 22.84800074994564,
+      "backward_host_us": 31.24
+    },
+    {
+      "sequence": 24,
+      "forward_ok": true,
+      "forward_gpu_us": 19.168000668287277,
+      "forward_host_us": 30.179,
+      "backward_gpu_us": 23.231999948620796,
+      "backward_host_us": 32.042
+    },
+    {
+      "sequence": 25,
+      "forward_ok": true,
+      "forward_gpu_us": 19.487999379634857,
+      "forward_host_us": 30.108,
+      "backward_gpu_us": 22.016000002622604,
+      "backward_host_us": 30.429
+    },
+    {
+      "sequence": 26,
+      "forward_ok": true,
+      "forward_gpu_us": 19.392000511288643,
+      "forward_host_us": 30.599,
+      "backward_gpu_us": 23.231999948620796,
+      "backward_host_us": 31.731
+    },
+    {
+      "sequence": 27,
+      "forward_ok": true,
+      "forward_gpu_us": 19.936000928282738,
+      "forward_host_us": 30.308,
+      "backward_gpu_us": 22.304000332951546,
+      "backward_host_us": 30.88
+    },
+    {
+      "sequence": 28,
+      "forward_ok": true,
+      "forward_gpu_us": 18.751999363303185,
+      "forward_host_us": 30.058,
+      "backward_gpu_us": 22.336000576615334,
+      "backward_host_us": 30.539
+    },
+    {
+      "sequence": 29,
+      "forward_ok": true,
+      "forward_gpu_us": 19.231999292969704,
+      "forward_host_us": 29.687,
+      "backward_gpu_us": 40.352001786231995,
+      "backward_host_us": 48.744
+    },
+    {
+      "sequence": 30,
+      "forward_ok": true,
+      "forward_gpu_us": 18.783999606966972,
+      "forward_host_us": 30.269,
+      "backward_gpu_us": 35.26400029659271,
+      "backward_host_us": 43.684
+    },
+    {
+      "sequence": 31,
+      "forward_ok": true,
+      "forward_gpu_us": 25.98400041460991,
+      "forward_host_us": 36.15,
+      "backward_gpu_us": 21.75999991595745,
+      "backward_host_us": 30.299
+    },
+    {
+      "sequence": 32,
+      "forward_ok": true,
+      "forward_gpu_us": 19.680000841617584,
+      "forward_host_us": 30.098,
+      "backward_gpu_us": 22.52800017595291,
+      "backward_host_us": 31.221
+    },
+    {
+      "sequence": 33,
+      "forward_ok": true,
+      "forward_gpu_us": 18.52799952030182,
+      "forward_host_us": 30.018,
+      "backward_gpu_us": 21.91999927163124,
+      "backward_host_us": 30.459
+    },
+    {
+      "sequence": 34,
+      "forward_ok": true,
+      "forward_gpu_us": 19.680000841617584,
+      "forward_host_us": 30.459,
+      "backward_gpu_us": 21.888000890612602,
+      "backward_host_us": 30.96
+    },
+    {
+      "sequence": 35,
+      "forward_ok": true,
+      "forward_gpu_us": 19.071999937295914,
+      "forward_host_us": 29.647,
+      "backward_gpu_us": 22.463999688625336,
+      "backward_host_us": 31.02
+    },
+    {
+      "sequence": 36,
+      "forward_ok": true,
+      "forward_gpu_us": 19.328000023961067,
+      "forward_host_us": 29.507,
+      "backward_gpu_us": 21.79200015962124,
+      "backward_host_us": 29.307
+    },
+    {
+      "sequence": 37,
+      "forward_ok": true,
+      "forward_gpu_us": 18.079999834299088,
+      "forward_host_us": 29.417,
+      "backward_gpu_us": 24.191999807953835,
+      "backward_host_us": 32.193
+    },
+    {
+      "sequence": 38,
+      "forward_ok": true,
+      "forward_gpu_us": 19.45599913597107,
+      "forward_host_us": 29.597,
+      "backward_gpu_us": 21.503999829292297,
+      "backward_host_us": 29.968
+    },
+    {
+      "sequence": 39,
+      "forward_ok": true,
+      "forward_gpu_us": 20.99199965596199,
+      "forward_host_us": 32.162,
+      "backward_gpu_us": 20.38400061428547,
+      "backward_host_us": 28.465
+    },
+    {
+      "sequence": 40,
+      "forward_ok": true,
+      "forward_gpu_us": 19.039999693632126,
+      "forward_host_us": 29.387,
+      "backward_gpu_us": 22.592000663280487,
+      "backward_host_us": 31.401
+    },
+    {
+      "sequence": 41,
+      "forward_ok": true,
+      "forward_gpu_us": 19.648000597953796,
+      "forward_host_us": 29.949,
+      "backward_gpu_us": 22.336000576615334,
+      "backward_host_us": 30.9
+    },
+    {
+      "sequence": 42,
+      "forward_ok": true,
+      "forward_gpu_us": 19.551999866962433,
+      "forward_host_us": 30.139,
+      "backward_gpu_us": 22.495999932289124,
+      "backward_host_us": 31.1
+    },
+    {
+      "sequence": 43,
+      "forward_ok": true,
+      "forward_gpu_us": 18.303999677300453,
+      "forward_host_us": 29.918,
+      "backward_gpu_us": 22.23999984562397,
+      "backward_host_us": 30.99
+    },
+    {
+      "sequence": 44,
+      "forward_ok": true,
+      "forward_gpu_us": 19.7759997099638,
+      "forward_host_us": 29.056,
+      "backward_gpu_us": 20.735999569296837,
+      "backward_host_us": 28.996
+    },
+    {
+      "sequence": 45,
+      "forward_ok": true,
+      "forward_gpu_us": 18.751999363303185,
+      "forward_host_us": 29.346,
+      "backward_gpu_us": 20.927999168634415,
+      "backward_host_us": 29.216
+    },
+    {
+      "sequence": 46,
+      "forward_ok": true,
+      "forward_gpu_us": 19.487999379634857,
+      "forward_host_us": 29.297,
+      "backward_gpu_us": 21.60000056028366,
+      "backward_host_us": 29.748
+    },
+    {
+      "sequence": 47,
+      "forward_ok": true,
+      "forward_gpu_us": 18.400000408291817,
+      "forward_host_us": 29.767,
+      "backward_gpu_us": 20.767999812960625,
+      "backward_host_us": 29.076
+    },
+    {
+      "sequence": 48,
+      "forward_ok": true,
+      "forward_gpu_us": 19.328000023961067,
+      "forward_host_us": 29.587,
+      "backward_gpu_us": 21.75999991595745,
+      "backward_host_us": 30.118
+    },
+    {
+      "sequence": 49,
+      "forward_ok": true,
+      "forward_gpu_us": 18.112000077962875,
+      "forward_host_us": 29.728,
+      "backward_gpu_us": 21.27999998629093,
+      "backward_host_us": 29.477
+    },
+    {
+      "sequence": 50,
+      "forward_ok": true,
+      "forward_gpu_us": 19.487999379634857,
+      "forward_host_us": 29.647,
+      "backward_gpu_us": 20.99199965596199,
+      "backward_host_us": 29.026
+    },
+    {
+      "sequence": 51,
+      "forward_ok": true,
+      "forward_gpu_us": 17.75999926030636,
+      "forward_host_us": 29.527,
+      "backward_gpu_us": 20.927999168634415,
+      "backward_host_us": 29.297
+    },
+    {
+      "sequence": 52,
+      "forward_ok": true,
+      "forward_gpu_us": 19.74399946630001,
+      "forward_host_us": 29.717,
+      "backward_gpu_us": 20.735999569296837,
+      "backward_host_us": 29.016
+    },
+    {
+      "sequence": 53,
+      "forward_ok": true,
+      "forward_gpu_us": 18.880000337958336,
+      "forward_host_us": 29.317,
+      "backward_gpu_us": 21.536000072956085,
+      "backward_host_us": 29.768
+    },
+    {
+      "sequence": 54,
+      "forward_ok": true,
+      "forward_gpu_us": 19.168000668287277,
+      "forward_host_us": 29.427,
+      "backward_gpu_us": 21.727999672293663,
+      "backward_host_us": 30.028
+    },
+    {
+      "sequence": 55,
+      "forward_ok": true,
+      "forward_gpu_us": 18.432000651955605,
+      "forward_host_us": 29.377,
+      "backward_gpu_us": 23.615999147295952,
+      "backward_host_us": 31.762
+    },
+    {
+      "sequence": 56,
+      "forward_ok": true,
+      "forward_gpu_us": 19.1040001809597,
+      "forward_host_us": 29.397,
+      "backward_gpu_us": 21.856000646948814,
+      "backward_host_us": 30.139
+    },
+    {
+      "sequence": 57,
+      "forward_ok": true,
+      "forward_gpu_us": 18.303999677300453,
+      "forward_host_us": 29.247,
+      "backward_gpu_us": 21.056000143289566,
+      "backward_host_us": 29.347
+    },
+    {
+      "sequence": 58,
+      "forward_ok": true,
+      "forward_gpu_us": 19.168000668287277,
+      "forward_host_us": 29.547,
+      "backward_gpu_us": 20.8320003002882,
+      "backward_host_us": 28.986
+    },
+    {
+      "sequence": 59,
+      "forward_ok": true,
+      "forward_gpu_us": 18.239999189972878,
+      "forward_host_us": 29.497,
+      "backward_gpu_us": 30.7839997112751,
+      "backward_host_us": 44.636
+    },
+    {
+      "sequence": 60,
+      "forward_ok": true,
+      "forward_gpu_us": 18.81599985063076,
+      "forward_host_us": 30.109,
+      "backward_gpu_us": 31.936001032590866,
+      "backward_host_us": 40.348
+    },
+    {
+      "sequence": 61,
+      "forward_ok": true,
+      "forward_gpu_us": 19.26399953663349,
+      "forward_host_us": 29.787,
+      "backward_gpu_us": 40.672000497579575,
+      "backward_host_us": 48.814
+    },
+    {
+      "sequence": 62,
+      "forward_ok": true,
+      "forward_gpu_us": 19.45599913597107,
+      "forward_host_us": 30.118,
+      "backward_gpu_us": 22.431999444961548,
+      "backward_host_us": 30.869
+    },
+    {
+      "sequence": 63,
+      "forward_ok": true,
+      "forward_gpu_us": 19.519999623298645,
+      "forward_host_us": 30.048,
+      "backward_gpu_us": 22.23999984562397,
+      "backward_host_us": 31.11
+    },
+    {
+      "sequence": 64,
+      "forward_ok": true,
+      "forward_gpu_us": 63.90400230884552,
+      "forward_host_us": 75.626,
+      "backward_gpu_us": 20.864000543951988,
+      "backward_host_us": 29.006
+    },
+    {
+      "sequence": 65,
+      "forward_ok": true,
+      "forward_gpu_us": 19.168000668287277,
+      "forward_host_us": 29.257,
+      "backward_gpu_us": 21.663999184966087,
+      "backward_host_us": 29.798
+    },
+    {
+      "sequence": 66,
+      "forward_ok": true,
+      "forward_gpu_us": 20.160000771284103,
+      "forward_host_us": 30.508,
+      "backward_gpu_us": 22.336000576615334,
+      "backward_host_us": 30.879
+    },
+    {
+      "sequence": 67,
+      "forward_ok": true,
+      "forward_gpu_us": 19.26399953663349,
+      "forward_host_us": 29.858,
+      "backward_gpu_us": 22.816000506281853,
+      "backward_host_us": 31.22
+    },
+    {
+      "sequence": 68,
+      "forward_ok": true,
+      "forward_gpu_us": 18.559999763965607,
+      "forward_host_us": 29.878,
+      "backward_gpu_us": 22.71999977529049,
+      "backward_host_us": 31.31
+    },
+    {
+      "sequence": 69,
+      "forward_ok": true,
+      "forward_gpu_us": 19.328000023961067,
+      "forward_host_us": 30.249,
+      "backward_gpu_us": 22.52800017595291,
+      "backward_host_us": 31.09
+    },
+    {
+      "sequence": 70,
+      "forward_ok": true,
+      "forward_gpu_us": 19.007999449968338,
+      "forward_host_us": 29.938,
+      "backward_gpu_us": 20.959999412298203,
+      "backward_host_us": 29.166
+    },
+    {
+      "sequence": 71,
+      "forward_ok": true,
+      "forward_gpu_us": 19.231999292969704,
+      "forward_host_us": 29.127,
+      "backward_gpu_us": 20.99199965596199,
+      "backward_host_us": 29.177
+    },
+    {
+      "sequence": 72,
+      "forward_ok": true,
+      "forward_gpu_us": 18.20800080895424,
+      "forward_host_us": 29.407,
+      "backward_gpu_us": 20.735999569296837,
+      "backward_host_us": 28.826
+    },
+    {
+      "sequence": 73,
+      "forward_ok": true,
+      "forward_gpu_us": 19.200000911951065,
+      "forward_host_us": 29.176,
+      "backward_gpu_us": 21.023999899625778,
+      "backward_host_us": 29.187
+    },
+    {
+      "sequence": 74,
+      "forward_ok": true,
+      "forward_gpu_us": 18.848000094294548,
+      "forward_host_us": 29.688,
+      "backward_gpu_us": 21.663999184966087,
+      "backward_host_us": 32.883
+    },
+    {
+      "sequence": 75,
+      "forward_ok": true,
+      "forward_gpu_us": 19.29599978029728,
+      "forward_host_us": 29.377,
+      "backward_gpu_us": 21.727999672293663,
+      "backward_host_us": 29.888
+    },
+    {
+      "sequence": 76,
+      "forward_ok": true,
+      "forward_gpu_us": 18.015999346971512,
+      "forward_host_us": 29.637,
+      "backward_gpu_us": 20.927999168634415,
+      "backward_host_us": 29.137
+    },
+    {
+      "sequence": 77,
+      "forward_ok": true,
+      "forward_gpu_us": 19.168000668287277,
+      "forward_host_us": 29.186,
+      "backward_gpu_us": 21.407999098300934,
+      "backward_host_us": 29.717
+    },
+    {
+      "sequence": 78,
+      "forward_ok": true,
+      "forward_gpu_us": 19.61600035429001,
+      "forward_host_us": 29.728,
+      "backward_gpu_us": 21.183999255299568,
+      "backward_host_us": 29.497
+    },
+    {
+      "sequence": 79,
+      "forward_ok": true,
+      "forward_gpu_us": 18.688000738620758,
+      "forward_host_us": 29.186,
+      "backward_gpu_us": 21.43999934196472,
+      "backward_host_us": 29.918
+    },
+    {
+      "sequence": 80,
+      "forward_ok": true,
+      "forward_gpu_us": 18.400000408291817,
+      "forward_host_us": 29.287,
+      "backward_gpu_us": 25.248000398278236,
+      "backward_host_us": 33.434
+    },
+    {
+      "sequence": 81,
+      "forward_ok": true,
+      "forward_gpu_us": 19.168000668287277,
+      "forward_host_us": 29.807,
+      "backward_gpu_us": 21.376000717282295,
+      "backward_host_us": 29.437
+    },
+    {
+      "sequence": 82,
+      "forward_ok": true,
+      "forward_gpu_us": 18.52799952030182,
+      "forward_host_us": 29.376,
+      "backward_gpu_us": 21.12000063061714,
+      "backward_host_us": 29.457
+    },
+    {
+      "sequence": 83,
+      "forward_ok": true,
+      "forward_gpu_us": 18.97599920630455,
+      "forward_host_us": 29.096,
+      "backward_gpu_us": 21.503999829292297,
+      "backward_host_us": 29.276
+    },
+    {
+      "sequence": 84,
+      "forward_ok": true,
+      "forward_gpu_us": 18.079999834299088,
+      "forward_host_us": 29.477,
+      "backward_gpu_us": 20.8320003002882,
+      "backward_host_us": 28.936
+    },
+    {
+      "sequence": 85,
+      "forward_ok": true,
+      "forward_gpu_us": 18.94400082528591,
+      "forward_host_us": 29.217,
+      "backward_gpu_us": 20.959999412298203,
+      "backward_host_us": 29.066
+    },
+    {
+      "sequence": 86,
+      "forward_ok": true,
+      "forward_gpu_us": 19.29599978029728,
+      "forward_host_us": 29.758,
+      "backward_gpu_us": 20.287999883294106,
+      "backward_host_us": 28.725
+    },
+    {
+      "sequence": 87,
+      "forward_ok": true,
+      "forward_gpu_us": 19.071999937295914,
+      "forward_host_us": 28.926,
+      "backward_gpu_us": 21.75999991595745,
+      "backward_host_us": 29.727
+    },
+    {
+      "sequence": 88,
+      "forward_ok": true,
+      "forward_gpu_us": 18.880000337958336,
+      "forward_host_us": 32.433,
+      "backward_gpu_us": 21.407999098300934,
+      "backward_host_us": 30.098
+    },
+    {
+      "sequence": 89,
+      "forward_ok": true,
+      "forward_gpu_us": 19.26399953663349,
+      "forward_host_us": 29.307,
+      "backward_gpu_us": 20.864000543951988,
+      "backward_host_us": 29.087
+    },
+    {
+      "sequence": 90,
+      "forward_ok": true,
+      "forward_gpu_us": 18.65600049495697,
+      "forward_host_us": 29.287,
+      "backward_gpu_us": 20.959999412298203,
+      "backward_host_us": 29.487
+    },
+    {
+      "sequence": 91,
+      "forward_ok": true,
+      "forward_gpu_us": 19.680000841617584,
+      "forward_host_us": 29.677,
+      "backward_gpu_us": 39.423998445272446,
+      "backward_host_us": 47.572
+    },
+    {
+      "sequence": 92,
+      "forward_ok": true,
+      "forward_gpu_us": 18.144000321626663,
+      "forward_host_us": 34.286,
+      "backward_gpu_us": 39.23200070858002,
+      "backward_host_us": 47.401
+    },
+    {
+      "sequence": 93,
+      "forward_ok": true,
+      "forward_gpu_us": 19.392000511288643,
+      "forward_host_us": 29.457,
+      "backward_gpu_us": 20.416000857949257,
+      "backward_host_us": 28.715
+    },
+    {
+      "sequence": 94,
+      "forward_ok": true,
+      "forward_gpu_us": 18.94400082528591,
+      "forward_host_us": 29.347,
+      "backward_gpu_us": 21.727999672293663,
+      "backward_host_us": 30.099
+    },
+    {
+      "sequence": 95,
+      "forward_ok": true,
+      "forward_gpu_us": 19.42400075495243,
+      "forward_host_us": 29.076,
+      "backward_gpu_us": 21.43999934196472,
+      "backward_host_us": 29.748
+    },
+    {
+      "sequence": 96,
+      "forward_ok": true,
+      "forward_gpu_us": 18.719999119639397,
+      "forward_host_us": 29.517,
+      "backward_gpu_us": 21.856000646948814,
+      "backward_host_us": 30.158
+    },
+    {
+      "sequence": 97,
+      "forward_ok": true,
+      "forward_gpu_us": 19.007999449968338,
+      "forward_host_us": 29.237,
+      "backward_gpu_us": 20.800000056624413,
+      "backward_host_us": 29.157
+    },
+    {
+      "sequence": 98,
+      "forward_ok": true,
+      "forward_gpu_us": 19.200000911951065,
+      "forward_host_us": 30.239,
+      "backward_gpu_us": 21.344000473618507,
+      "backward_host_us": 29.467
+    },
+    {
+      "sequence": 99,
+      "forward_ok": true,
+      "forward_gpu_us": 18.783999606966972,
+      "forward_host_us": 29.447,
+      "backward_gpu_us": 20.927999168634415,
+      "backward_host_us": 29.186
+    },
+    {
+      "sequence": 100,
+      "forward_ok": true,
+      "forward_gpu_us": 18.33599992096424,
+      "forward_host_us": 29.547,
+      "backward_gpu_us": 21.056000143289566,
+      "backward_host_us": 29.247
+    }
+  ]
+}

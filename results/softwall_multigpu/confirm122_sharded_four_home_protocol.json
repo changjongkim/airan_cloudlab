@@ -1,0 +1,43 @@
+{
+  "schema": "softwall-confirm122-sharded-four-home-protocol-v1",
+  "status": "frozen-before-run",
+  "job": "58819952",
+  "question": "Does the prospective four-home x three-cell point compose under synchronized physical execution on four A100 GPUs and cross the one-home receiver-memory boundary?",
+  "preflight_failure": "c122_sharded_four_home_canary_failure_job58819952.json",
+  "canary": "c122b_sharded_four_home_canary_job58819952_result.json",
+  "canary_outcome": "PASS after using a 1--4-cell sharded controller and fail-fast controller/worker join order.",
+  "mode": "four A100 homes; each GPU runs three-cell Aerial/cuPHY, two same-device IPC NRx endpoints, and Qwen2.5-1.5B; CUDA_MODULE_LOADING=LAZY; MPS; mixed correlated faults; P180/D155; synchronized releases",
+  "arms": [
+    {
+      "label": "c122_sharded_s1_job58819952",
+      "payload_seed_base": 25200051,
+      "channel_seed_base": 25201000
+    },
+    {
+      "label": "c122_sharded_s2_job58819952",
+      "payload_seed_base": 25300061,
+      "channel_seed_base": 25301000
+    }
+  ],
+  "iterations": 340,
+  "warmup": 20,
+  "cells_per_home": 3,
+  "homes": 4,
+  "physical_gpus": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 12,
+  "guard_ms": 2,
+  "gate_rule": "Both independent arms must have identical first release across four homes, overlapping physical timed intervals, 4080 radio records, exact worker/controller counts, positive atomic exchange and timely AI in every home, zero system safety/credit/fault violations, and unchanged source/artifact hashes.",
+  "claim_rule": "A pass validates finite-sample disjoint-home certificate composition and horizontal receiver-memory scaling at the prospectively selected 4-home x 3-cell point. It does not validate shared endpoints, global cross-home AI leases, WCET, or production DU timing.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_sharded_four_home_arm.sh": "848bac794d69ac70eb7d2916ccc16c65e730fbed7a4318f1dde0a1dfe1aa229c",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm122_sharded_four_home.py": "d87e42a66803524653eabc57b03c5b0adfa60ce726d6d78977c00d2ed8a88bb7",
+    "scripts_for_node/softwall_same_gpu/sharded_trace_baseline_controller.py": "1b1f75b66796e85174664cd14a1d59374cbd7a0bd6b2cfb20904542cc9857ee9",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

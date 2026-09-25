@@ -1,0 +1,76 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm157b_actual_nrx_holdout_job58855194_peer_spec.json": "41afe6d5e318516aed04e1a2fe923edb09b2e9054bfa5452c55b727380dc4cab",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm157b_actual_nrx_holdout_job58855194_protocol.json": "409e0a8c0abe6a949b320ded37be1d783ddcd1257de78268664b35c838255b6f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_coordinator.json": "e14682307a6b5edec8241b6c1afb1894033433842c3daef88ecc90d582675a51",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_gpu_inventory.csv": "d457e402902d40a8e515808bc4a5beff7da2b79adff692f9d0aba3e80f93c7ce",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_home0_h0-r0_owner.json": "0a540ceccdd276e41502c506d461e9f5c7f195852b1602255e7fe208c959ac21",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_home0_h0-r1_owner.json": "279167c9d90ab567cd0c1a7cdec08134ce41b5a60456753e9d81a7346445491b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_home0_h0-r2_owner.json": "e245c8a75770a8b8f2d310fb224e90f068113f8926facf59d2a5d24380491eba",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_home1_h1-r0_owner.json": "ca24b9d71c3acb6eea42752bbf7b2db78459f9304e00c7b713c54bc31ef39be9",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_nrx_worker.json": "99633175b31b2f16caf0fc8b8229f693ff9dec07a0d6536f122fba8de12ed3df",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm157b_actual_nrx_holdout_job58855194_qwen.json": "61baafb510ca39c34283e95c1b5459e0af14429d7eb2290534ba9f840bfddafa"
+  },
+  "campaign": "holdout",
+  "gates": {
+    "actual_nrx_commit": true,
+    "actual_nrx_path": true,
+    "certificate_recovery_conformance": true,
+    "frozen_actual_outcome_pattern": true,
+    "local_global_divergence": true,
+    "no_process_error": true,
+    "node_inventory_and_exclusion": true,
+    "physical_lifecycle": true,
+    "same_tb_recovery_oracle": true,
+    "single_timely_radio_commit": true,
+    "source_hash_match": true,
+    "v17_1_atomic_lease": true
+  },
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-74ded36d-0fc5-3bba-70d5-fd305e9324a2"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-5f11de2a-0c57-5924-ac13-ace79f5dd734"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-61de9514-f950-9a21-7f73-1da88d7dbbf1"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-2201893a-1ca2-cd9f-abe1-bcbab8e2b538"
+    }
+  ],
+  "job_id": "58855194",
+  "node": "nid001085",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm157b_actual_nrx_holdout_job58855194_protocol.json",
+  "schema": "softwall-actual-nrx-integrated-result-v1",
+  "scope": "Finite-sample actual-NeuralRx transition canary. Passing does not establish WCET, cold/long-idle qualification, production d_MAC, fault coverage, throughput superiority, or cross-GPU-family generality.",
+  "status": "ACTUAL_NRX_TRANSITION_PASS",
+  "summary": {
+    "accepted_debts": 4,
+    "actual_nrx_successes": 2,
+    "deadline_misses": 0,
+    "max_nrx_release_to_complete_ms": 37.659848,
+    "max_radio_release_to_commit_ms": 107.054256,
+    "oracle_equivalent_recoveries": 2,
+    "physical_recoveries": 2,
+    "qwen_execution_ms": 26.385846,
+    "qwen_units": 1,
+    "radio_commits": 4,
+    "rejected_debts": 1,
+    "submitted_debts": 5
+  }
+}

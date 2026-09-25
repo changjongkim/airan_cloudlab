@@ -1,0 +1,28 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "sionna_cdl_ul_stream_contract_correction",
+  "frozen_before_execution": true,
+  "role": "Post-failure interface-contract diagnosis; not a BLER holdout.",
+  "prior_result": "With num_ul_streams=4, NeuralRx decoded 0/600 over the public -4 to -3 dB grid while conventional decoded 87/600.",
+  "hypothesis": "The harness confused four gNB receive antennas with one transmitted uplink stream. The public notebook leaves num_ul_streams at its default 1.",
+  "only_semantic_change": "Set PuschConfig.num_ul_streams=1 for the public one-layer/one-stream profile. Historical synthetic modes retain default 4.",
+  "esno_grid_db": [
+    -4.0,
+    -3.8,
+    -3.6,
+    -3.4,
+    -3.2,
+    -3.0
+  ],
+  "iterations_per_snr": 100,
+  "payload_seed": 20358800,
+  "channel_seed": 58801,
+  "decision_rule": "NeuralRx must decode at least one TB and aggregate correct must exceed conventional to open a variable-payload disjoint-seed holdout.",
+  "source_sha256_before_execution": {
+    "probe_sionna_cdl_official_snr_development.py": "5badb39036769cf70c79e529e8c4bbbd1b7d5e69604819a9c278d372441c716e",
+    "probe_sionna_cdl_reference_development.py": "d34c3232d81801090f37916aa6831ee97ae6372085983f99ef2006f1ab5fed0d",
+    "run_sionna_cdl_official_snr_development.sh": "49eb7c8fdc46726abc89fde0d344f6797a86f69b6f500abff86da6b3a24b19fb",
+    "dual_receiver_phy.py": "0aa91d359b467cb73fb075f269f3dac1ad704cf901a772d7bfb3834e9809bddf",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "softwall-confirm100-observe-first-qwen-fourcell-v1",
+  "job": "58747620",
+  "node": "nid001545",
+  "source_hashes": true,
+  "prior_mode_pass": true,
+  "arms": [
+    {
+      "name": "a",
+      "prefix": "confirm100_a_observe_job58747620",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true,
+        "coverage": true
+      },
+      "all_pass": true,
+      "nrx_paths": 1707,
+      "nrx_max_ms": 12.96781,
+      "conv_paths": 2768,
+      "conv_max_ms": 5.250597,
+      "ai_units": 5948,
+      "ai_host_max_ms": 26.083211,
+      "two_admitted_releases": 748,
+      "one_admitted_releases": 211,
+      "observe_before_mandatory": true,
+      "injected_all_fail_releases": 151,
+      "all_fail_releases_with_fewer_than_seven_ai_by_d153": 151,
+      "min_ai_completed_by_d153_in_all_fail": 5,
+      "median_ai_completed_by_d153_in_all_fail": 6,
+      "max_ai_completed_by_d153_in_all_fail": 6,
+      "joint_ai_units": 318,
+      "deadline_misses": 0
+    },
+    {
+      "name": "b",
+      "prefix": "confirm100_b_observe_job58747620",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true,
+        "coverage": true
+      },
+      "all_pass": true,
+      "nrx_paths": 1730,
+      "nrx_max_ms": 14.562246,
+      "conv_paths": 2791,
+      "conv_max_ms": 4.229962,
+      "ai_units": 5983,
+      "ai_host_max_ms": 26.800984,
+      "two_admitted_releases": 775,
+      "one_admitted_releases": 180,
+      "observe_before_mandatory": true,
+      "injected_all_fail_releases": 159,
+      "all_fail_releases_with_fewer_than_seven_ai_by_d153": 159,
+      "min_ai_completed_by_d153_in_all_fail": 5,
+      "median_ai_completed_by_d153_in_all_fail": 6,
+      "max_ai_completed_by_d153_in_all_fail": 6,
+      "joint_ai_units": 350,
+      "deadline_misses": 0
+    }
+  ],
+  "all_pass": true,
+  "interpretation": "Observe-first NRx45/conv12/AI50 four-cell calendar with Qwen2.5-1.5B b1c16 prefill cap20 and continuous backlog. This candidate was selected after Confirm99 failed NRx45 due to late controller observation, using new seeds and a source-separated controller. Fewer-than-seven Qwen returns by D153 under this controller show observed demand pressure, not optimal schedule infeasibility. Passing is finite prewarmed GC-OFF sample, not WCET, online seven-job lease, production DU, or policy superiority."
+}

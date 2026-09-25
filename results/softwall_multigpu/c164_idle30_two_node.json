@@ -1,0 +1,50 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "development": "1af04ad441a9ac9ed4848385f8a587fc99fc24346f95d65cc4bb89cfcf5749c0",
+    "development_protocol": "4c35e68b26671b1935ae9edcabf6d87552ce0cd9bbf05857b0cdeabb8203eef0",
+    "holdout": "c1bd9bea7890eb6719a0eb82ba41fbc94c6eb2be25d91cd3d6628e11a9480d82",
+    "holdout_protocol": "8db2e437cb0d9706f9a3868659714b831a6d39b72f4de7dd30c93b1ecfde299f"
+  },
+  "claim_boundary": "Two-node finite-sample first-request-after-30s-idle boundary qualification. Full six-class lifecycle vector, restart, longer idle, production d_MAC, cross-family, and WCET remain UQ.",
+  "counts": {
+    "actual_nrx": 720,
+    "deadline_misses": 0,
+    "injected_recoveries": 330,
+    "qwen_units": 90,
+    "radio_commits": 720
+  },
+  "gates": {
+    "both_campaigns_pass": true,
+    "both_idle_intervals_observed": true,
+    "combined_safety": true,
+    "development_holdout_roles": true,
+    "development_node_excluded_from_holdout": true,
+    "frozen_base_source_equality": true,
+    "frozen_c164_source_equality": true,
+    "independent_job_and_node": true,
+    "independent_seed_and_reverse_order": true,
+    "same_lifecycle_contract": true
+  },
+  "jobs": [
+    "58861564",
+    "58861662"
+  ],
+  "maxima_ms": {
+    "nrx_release_to_complete": 25.07175,
+    "qwen_execution": 54.214612,
+    "radio_commit": 126.03762,
+    "recovery_path": 6.598797
+  },
+  "nodes": [
+    "nid001169",
+    "nid001137"
+  ],
+  "observed_idle_s": [
+    30.029131136,
+    30.029711632
+  ],
+  "rounds": 180,
+  "schema": "softwall-c164-idle30-two-node-result-v1",
+  "status": "C164_IDLE30_TWO_NODE_PASS"
+}

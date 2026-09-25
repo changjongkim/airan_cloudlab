@@ -1,0 +1,31 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm39_clean_lifecycle",
+  "purpose": "Independently re-run the sham-retirement and maintenance-requalification gates after excluding concurrent-campaign and interrupted-step data.",
+  "allocation": "same fresh GPU0 allocation; one exclusive lock; separate MPS epochs for the two gates",
+  "operational_requalification": "fresh 200-release D35 conventional-only test, zero misses required before any gate",
+  "sham_retirement": {
+    "campaign": "confirm39_clean_sham_retirement",
+    "rounds": 5,
+    "caps": [100, 20],
+    "releases_per_run": 1000,
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "worker_completed_units_required": 0,
+    "endpoint_retired_before_first_release": true,
+    "success": "all correct, all 10000 releases have zero deadline misses and no optional work was submitted"
+  },
+  "maintenance_requalification": {
+    "campaign": "confirm39_clean_maintenance_requalification",
+    "rounds": 3,
+    "caps": [100, 20],
+    "fault_phase_releases_per_run": 100,
+    "post_maintenance_releases_per_run": 1000,
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "quiet_seconds_after_client_exit": 20,
+    "success": "each fault times out and drains, then all 6000 fresh conventional releases are correct with zero deadline misses"
+  },
+  "interpretation_limit": "A measured zero-miss run is not a universal deadline proof; any observed miss must be reported, including if the sham has no submitted optional work."
+}

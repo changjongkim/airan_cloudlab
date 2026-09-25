@@ -1,0 +1,65 @@
+{
+  "schema": "softwall-multigpu-one-remote-arm-gate-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c115_static_s1_j58815435_protocol.json",
+  "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_controller.json",
+  "local_worker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_local_worker.json",
+  "remote_worker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_remote_worker.json",
+  "background": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_background.json",
+  "requalification": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_requalification.json",
+  "summary": {
+    "system": "static",
+    "iterations": 340,
+    "radio_records": 1360,
+    "correct_cells": 619,
+    "nrx_commits": 427,
+    "conv_commits": 933,
+    "fallbacks": 933,
+    "recovery_retime_count": 0,
+    "joint_lease_retired_count": 0,
+    "ai_timely_units": 299,
+    "ai_timely_value_tokens": 74766,
+    "nrx_response_ms": {
+      "n": 581,
+      "mean": 7.762015227194493,
+      "p50": 7.610242,
+      "p95": 8.553153,
+      "p99": 8.6736562,
+      "p99_9": 9.389104340000042,
+      "min": 6.701908,
+      "max": 9.724708
+    },
+    "remote_worker_path_ms": {
+      "count": 296,
+      "mean": 2.036275418918919,
+      "p50": 1.873019,
+      "p99": 2.310774,
+      "max": 45.004055
+    }
+  },
+  "gates": {
+    "schema": true,
+    "requalification": true,
+    "radio_deadline": true,
+    "nrx_bound": true,
+    "conv_bound": true,
+    "ai_bound": true,
+    "pre_radio_guard": true,
+    "endpoint_faults": true,
+    "background_faults": true,
+    "local_worker": true,
+    "remote_worker": true,
+    "remote_sequence": true,
+    "recovery_credit_empty": true,
+    "endpoint_credit_restored": true
+  },
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c115_static_s1_j58815435_protocol.json": "dc10f1bf962fd8df6ffef34fe28be5de6de90cc64a2838d8bdf1fb5856851304",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_controller.json": "4403ce69ba601dac3658868d21ae024ff2af5b30c91b2232bbe445346f2782c6",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_local_worker.json": "8f16a83d26837bea5887c1f7e0c5fa02c37c4703d19829774f0781b3fad29cf9",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_remote_worker.json": "4af0418f05d918d68484786281a20bf3825d492bc85ab43dc1a5073b1cc72e06",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_background.json": "a15a9dd8c7fc61e56910347ac1a60411dd7b9068987364de87253853d2ed4e79",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c115_static_s1_j58815435_requalification.json": "d5bdd2b57af07e51be406366185792a9c51181550b9c012441aad444d9581a6c"
+  },
+  "scope": "one local IPC plus one remote P2P NRx endpoint in the four-cell SoftWall/Qwen/fault path"
+}

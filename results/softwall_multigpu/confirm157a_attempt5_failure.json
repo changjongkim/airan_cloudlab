@@ -1,0 +1,42 @@
+{
+  "artifacts": {
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt5_job58854900_peer_spec.json": "5705e512bcb300fa277f2071e627c3b19e31fe4c5cbda3e39d0120e06fc58e05",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt5_job58854900_protocol.json": "ef5f649d1951d8d918466b9d7c1b341978d6cbe4d476f4df29c6c45d490438ed",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt5_job58854900_result.json": "57e35c5133d0ec981ec7a08d26d62e485f9e2e61ce4e2442e681eb1703a3934b",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt5_job58854900_coordinator.json": "369fa7b5400e78f26f36f5957b2de361a824bc2f501e89849cc1e58b73d66cd3",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt5_job58854900_home0_h0-r0_owner.json": "334d404490c2bbc67605a12bce354233962534fe0a5d8b4825f8182b26fa0d14",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt5_job58854900_home0_h0-r1_owner.json": "a53d7fec7ff4ddeb1613d3fd963a1960298051df7eb0cc5d1d8a65c681a373e4",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt5_job58854900_home0_h0-r2_owner.json": "2305dbf12cc77ca1bf19a4becc57ecdb7617188aec656181d8043bc1f5d5fb7d",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt5_job58854900_home1_h1-r0_owner.json": "de7b1e8cecf0dd3c2604d3cf1073ec201d9e0bde60bdc4e30aad9ce352fc7d58",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt5_job58854900_nrx_worker.json": "e32c3780d645edf14c40a456f3148ee73d14bb8bbc54b3846d8bcc5788580c22",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt5_job58854900_qwen.json": "0b0eff5c2028ac4c0115c1893c80c452262a72b9705563258edb557bd5264cb5"
+  },
+  "attempt": 5,
+  "correction": "Issue forward cudaMemcpyPeerAsync from a destination-GPU stream so the NRx endpoint does not depend on a source-home MPS stream at the critical request boundary; preserve direct P2P and measure host/GPU copy times.",
+  "job": "58854900",
+  "node": "nid001109",
+  "observations": {
+    "actual_nrx_crc_pattern": [
+      true,
+      false,
+      false,
+      true
+    ],
+    "deadline_misses": 0,
+    "nrx_worker_paths_ms": [
+      102.618277,
+      1.492491,
+      1.474125,
+      1.519834
+    ],
+    "oracle_equivalent_recoveries": 4,
+    "radio_commits": 4,
+    "recoveries": 4,
+    "release_prewarm_finish_lead_ms": 13.956265,
+    "timely_successes": 0
+  },
+  "reason": "The per-peer activation finished 13.956 ms before release, yet the first actual source-side P2P path blocked for 102.618 ms while its GPU event remained 0.052 ms. Later requests were 1.474--1.520 ms. This isolates the tail to source-home MPS stream/control rather than TensorRT service or idle warmup.",
+  "schema": "softwall-confirm157a-attempt-failure-v1",
+  "scientific_outcome_opened": true,
+  "status": "SOURCE_STREAM_MPS_TAIL_FAIL"
+}

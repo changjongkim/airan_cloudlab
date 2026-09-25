@@ -1,0 +1,24 @@
+{
+  "schema": "softwall-confirm76-three-cell-ai15-canary-v1",
+  "job": "58738952",
+  "gates": {
+    "source_hashes": true,
+    "contract": true,
+    "provenance": true,
+    "safety": true,
+    "two_endpoint_route": true,
+    "correlated_all_fail": true,
+    "joint_physical_path": true
+  },
+  "all_pass": true,
+  "correct_cells": 707,
+  "background_units": 17849,
+  "two_admitted_releases": 282,
+  "cell2_routed": 230,
+  "three_conventional_releases": 162,
+  "correlated_all_fail_releases": 54,
+  "joint_ai_units": 170,
+  "joint_retimes": 78,
+  "max_ai_host_ms": 6.016548,
+  "interpretation": "A predeclared 15 ms AI host budget and 12 ms RPC timeout on one cap20 worker allow physically completed atomic AI leases before recovery in a three-cell synthetic P150/D130 workload. Injected correlated NRx outcome failures exercise all-fail recovery. Sample maximum is not WCET; no AI timeout continuation, PHY-value joint-policy, strong-baseline throughput comparison, or production MAC expiry claim."
+}

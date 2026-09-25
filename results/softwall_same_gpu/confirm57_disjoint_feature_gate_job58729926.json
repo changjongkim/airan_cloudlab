@@ -1,0 +1,54 @@
+{
+  "schema": "softwall-confirm57-disjoint-feature-gate-audit-v1",
+  "job": "58729926",
+  "train_seed": 20456001,
+  "test_seed": 20457001,
+  "train_channel_range": [
+    20456001,
+    20456500
+  ],
+  "test_channel_range": [
+    20457001,
+    20457500
+  ],
+  "feature": "channel_estimate_power",
+  "threshold_selected_on_train": 2.027073621749878,
+  "train_auc_conventional_correct": 0.9978020202020202,
+  "test_auc_conventional_correct": 0.9990402758800182,
+  "train_gate": {
+    "skipped_nrx": 219,
+    "skipped_fraction": 0.438,
+    "neural_only_lost": 2,
+    "radio_loss_fraction": 0.004
+  },
+  "test_gate": {
+    "skipped_nrx": 215,
+    "skipped_fraction": 0.43,
+    "neural_only_lost": 2,
+    "radio_loss_fraction": 0.004
+  },
+  "heldout_neural_only_correct": 30,
+  "feature_gpu_ms": {
+    "max": 3.452672004699707,
+    "median": 0.7237439751625061
+  },
+  "gates": {
+    "source_hashes": true,
+    "fresh_disjoint_channel_seeds": true,
+    "pre_post_paired": true,
+    "prewarmed_before_timed_trials": true,
+    "train_neural_only_lost_at_most": true,
+    "heldout_skip_at_least": true,
+    "heldout_neural_only_lost_at_most": true,
+    "heldout_neural_only_present": true,
+    "feature_gpu_max_below_ms": true
+  },
+  "all_pass": true,
+  "raw_sha256": {
+    "results/softwall_same_gpu/raw/confirm57_feature_job58729926_seed20456001_pre_fading.json": "53b1fdc321132673be0ffc5c60243464b8e62ffe64b5d47bf89d4313aa926bc5",
+    "results/softwall_same_gpu/raw/confirm57_feature_job58729926_seed20456001_post_fading.json": "9f6b363d5710f51d86075aa24efc7113161890bb61562facda143e3043929fd3",
+    "results/softwall_same_gpu/raw/confirm57_feature_job58729926_seed20457001_pre_fading.json": "80057ce6e0c38e8276aaa992b8d02b3742fc2a286c6f761dba05d3eba9d0b0a9",
+    "results/softwall_same_gpu/raw/confirm57_feature_job58729926_seed20457001_post_fading.json": "1ed9efeb08e6ddeccdd85c90ffbffd351b9c4db17fa445166df1409d8a690982"
+  },
+  "interpretation": "Synthetic fixed pre-fading-noise channel-gate calibration only. No online admission, MPS co-run, production deadline, or joint-policy result."
+}

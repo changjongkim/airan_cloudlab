@@ -1,0 +1,30 @@
+{
+  "schema": "softwall-confirm94-endpoint-count-posthoc-v1",
+  "posthoc": true,
+  "screen_sha256": "d239610ded49b89649bbb9dd71e716737ec58124b43bdb1b21c6a9e657affa33",
+  "feasible": 70,
+  "joint_uses_two_nrx": 70,
+  "max_radio_uses_two_nrx": 70,
+  "joint_equals_max_radio_subset": 46,
+  "by_staged_nrx_count": {
+    "0": {
+      "cases": 0,
+      "joint_ai_gain_cases": 0,
+      "mean_joint_minus_staged_ai": null,
+      "joint_uses_two_nrx": 0
+    },
+    "1": {
+      "cases": 48,
+      "joint_ai_gain_cases": 48,
+      "mean_joint_minus_staged_ai": 0.3053544635476979,
+      "joint_uses_two_nrx": 48
+    },
+    "2": {
+      "cases": 22,
+      "joint_ai_gain_cases": 2,
+      "mean_joint_minus_staged_ai": 0.001250777352279671,
+      "joint_uses_two_nrx": 22
+    }
+  },
+  "interpretation": "The large joint-versus-minimal-NRx AI gain is mostly use of a spare second NeuralRx endpoint, not an advantage over the two-endpoint max-radio baseline. Posthoc diagnostic, not a preregistered performance claim."
+}

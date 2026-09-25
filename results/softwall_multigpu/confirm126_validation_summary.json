@@ -1,0 +1,21 @@
+{
+  "schema": "softwall-confirm126-validation-summary-v1",
+  "runtime_unit_tests": 21,
+  "runtime_fault_iterations": 10000,
+  "runtime_fault_pass": true,
+  "broker_unit_tests": 7,
+  "broker_unit_pass": true,
+  "certificate_executor_unit_tests": 2,
+  "certificate_executor_unit_pass": true,
+  "envelope_v1_unit_tests": 6,
+  "envelope_v1_pass": true,
+  "envelope_v2_unit_tests": 8,
+  "envelope_v2_pass": true,
+  "total_unit_tests": 44,
+  "fault_artifact": "results/softwall_multigpu/confirm126_runtime_fault_regression.json",
+  "shell_syntax_checked": [
+    "run_global_ai_two_home_certificate_arm.sh",
+    "run_confirm126_campaign.sh"
+  ],
+  "note": "The first aggregate test wrapper exited after leaving the container and resolving /softwall on the host; remaining suites were rerun in correctly scoped container invocations."
+}

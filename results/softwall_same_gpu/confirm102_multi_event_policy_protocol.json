@@ -1,0 +1,126 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm102_independent_multi_event_conditional_recovery_policy",
+  "frozen_before_individual_trace_access": true,
+  "trace_aggregate_stdout_previously_visible": true,
+  "aggregate_exposure": "Only four per-SNR conventional/NeuralRx totals printed by the unchanged generator; no individual feature or CRC record was inspected before this freeze.",
+  "trace": "raw/confirm102_blinded_newphy_job58788060_test.json",
+  "manifest": "raw/confirm102_blinded_newphy_job58788060_manifest.json",
+  "trace_sha256": "3c71eb1ce72b3d11e271a58587c2f88a6acbb19f97f8e06be9070ff7fa68db51",
+  "manifest_sha256": "40d223768190f010b0ce2ec1cc2dbfce31bfce1c510af60d30358849592fc69b",
+  "phy_seed": 20994102,
+  "trials_per_snr": 250,
+  "snrs_db": [
+    -10.0,
+    -9.0,
+    -8.0,
+    -7.0
+  ],
+  "q_model": "confirm102_train_only_cv_grid_model.json",
+  "q_model_sha256": "43199b93cd736204688c952e75dd548d4422bcc59b2ba2e5558cc1d0299c9268",
+  "q_model_selection": "Five-fold C77-training-only grid selection; 16x4 chosen by minimum CV rescue Brier subject to every fold leaf n>=100. C77 test and C94 are development evidence, not Confirm102 selection inputs.",
+  "sampling_seed": 20994202,
+  "cases": 100,
+  "cells": 4,
+  "endpoint_capacity": 2,
+  "radio_floor_choices": [
+    0.1,
+    0.2
+  ],
+  "maximum_predicted_radio_loss": 0.01,
+  "minimum_support_fraction": 0.95,
+  "maximum_q_mace": 0.03,
+  "minimum_feasible_cases": 30,
+  "timing": {
+    "radio_deadline_ms": 153,
+    "nrx_observe_replay_ms": 15,
+    "nrx_admission_bound_ms": 45,
+    "conv_admission_bound_ms": 12,
+    "conv_replay_ms": 6
+  },
+  "timing_provenance": "Admission uses C100 declared bounds. Replay uses values rounded above C100 observed maxima for NRx (14.562->15) and conventional (5.251->6); AI replay 22 ms approximates the two C100 medians 21.650/21.498 while admission retains 50 ms. Replay constants are not new bounds or WCET evidence.",
+  "ai_jobs": [
+    {
+      "name": "ai0",
+      "release_ms": 0,
+      "deadline_ms": 153,
+      "bound_ms": 50,
+      "actual_ms": 22,
+      "value": 1
+    },
+    {
+      "name": "ai1",
+      "release_ms": 0,
+      "deadline_ms": 153,
+      "bound_ms": 50,
+      "actual_ms": 22,
+      "value": 1
+    },
+    {
+      "name": "ai2",
+      "release_ms": 0,
+      "deadline_ms": 153,
+      "bound_ms": 50,
+      "actual_ms": 22,
+      "value": 1
+    },
+    {
+      "name": "ai3",
+      "release_ms": 0,
+      "deadline_ms": 153,
+      "bound_ms": 50,
+      "actual_ms": 22,
+      "value": 1
+    },
+    {
+      "name": "ai4",
+      "release_ms": 0,
+      "deadline_ms": 153,
+      "bound_ms": 50,
+      "actual_ms": 22,
+      "value": 1
+    },
+    {
+      "name": "ai5",
+      "release_ms": 60,
+      "deadline_ms": 153,
+      "bound_ms": 50,
+      "actual_ms": 22,
+      "value": 1
+    },
+    {
+      "name": "ai6",
+      "release_ms": 90,
+      "deadline_ms": 153,
+      "bound_ms": 50,
+      "actual_ms": 22,
+      "value": 1
+    }
+  ],
+  "online_information": "At radio decision only five release-0 AI jobs and train-only feature predictions are visible. AI5/AI6 future arrivals, CRC outcomes, and future service times are hidden. Each event commits one nonpreemptive action then replans.",
+  "proposed": "Max-radio-relative guarded joint policy: require q_gain >= max(original radio floor, max-radio q_gain-0.01), then maximize expected visible timely AI; exact small-state reference and add/drop/1-swap implementation share the same all-fail evaluator.",
+  "baselines": {
+    "low_gate": "Confirm60 train-only low channel-power threshold; among eligible cells q-rank to the same two endpoints; exact online recovery/AI recourse.",
+    "staged_min": "Minimum NRx cardinality meeting the original q floor, maximize q within that cardinality, then exact online recovery/AI recourse.",
+    "max_radio": "Maximize q over all safe subsets, then exact online recovery/AI recourse.",
+    "joint_greedy": "Unconstrained AI-first add/drop/1-swap under the original q floor and identical all-fail evaluator.",
+    "exact_reference": "Full subset enumeration inside the max-radio-relative q guard."
+  },
+  "ablations": {
+    "always_mandatory": "Force every cell conventional obligation to remain even after NeuralRx success; require zero capacity span across NRx subsets.",
+    "uniform_q": "Replace per-cell q by a common batch mean capped by min p; report selection difference.",
+    "packing_control": "All AI jobs have identical bound, replay duration, deadline, and value, so a heterogeneous knapsack gap cannot explain a difference."
+  },
+  "frozen_validity_gates": "Model support >=0.95, independent q Brier better than the train-prevalence constant, q weighted MACE <=0.03, >=30 feasible quartets, no branch safety failure, guarded exact and guarded 1-swap select identically, always-mandatory ablation span zero for every feasible case, and per-case predicted q loss versus max-radio <=0.01.",
+  "frozen_positive_outcome_gate": "For a positive CPU policy witness, proposed total realized timely AI must exceed both max-radio and staged-min, while total realized correct TB must be no lower than either. Zero or negative remains negative. A pass is still only an independent synthetic-PHY deterministic CPU replay and requires paired GPU and actual AI-RAN workload validation.",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/analyze_confirm102_independent_multi_event.py": "ace5ca954aa4e6462f084a23b1cbf0f77c91204a0d7a3268542c379bb712bd5d",
+    "scripts_for_node/softwall_same_gpu/offline_online_recovery_v4.py": "fc2fdc73c009a50d311c961fa91ed0fdef8058ed176f0991522b914d5ba8e1fe",
+    "scripts_for_node/softwall_same_gpu/cv_grid_phy_value_model.py": "90597e4356178574c5cce0861cc36f6f2685fd1e24df5ec5d52bfb6e821b3dff",
+    "scripts_for_node/softwall_same_gpu/test_offline_online_recovery_v4.py": "51437e66b528decbd862ea21a0c31976d40e4ac7281b8e565ecedd7ba40d779f",
+    "results/softwall_same_gpu/confirm102_train_only_cv_grid_model.json": "43199b93cd736204688c952e75dd548d4422bcc59b2ba2e5558cc1d0299c9268",
+    "results/softwall_same_gpu/confirm60_low_gate_train_selection.json": "2f71b392f10ca7e12b2c722238160458d52a79987c6007bf45e67dfd43d4b9be",
+    "results/softwall_same_gpu/confirm102_blinded_phy_protocol.json": "a611f49c6ce1098b1db25b2114449cd2a3c828d1fd4f460d51810236ee6869c9",
+    "results/softwall_same_gpu/confirm102_blinded_phy_capture.json": "f263b2e737ba781eff26f96fbc3004ce498ab67cc20aaa7878f774e2530d4fcd"
+  }
+}

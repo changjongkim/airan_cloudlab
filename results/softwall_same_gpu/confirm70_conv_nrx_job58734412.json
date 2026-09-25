@@ -1,0 +1,117 @@
+{
+  "schema": "softwall-confirm70-conventional-nrx-kernel-overlap-v1",
+  "job": "58734412",
+  "gates": {
+    "source_hashes": true,
+    "provenance": true,
+    "safety_sample": true,
+    "runtime_kernel_tables": true,
+    "conventional_nrx_kernel_overlap": true
+  },
+  "all_pass": true,
+  "host_overlap_count_total": 21,
+  "profiled_cell1_windows": 12,
+  "physical_overlap_windows": 12,
+  "physical_overlap_ms_sum": 12.30898,
+  "controller_session_start_ns": 461151682778952,
+  "worker0_session_start_ns": 461146017657818,
+  "windows": [
+    {
+      "release_index": 0,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 45,
+      "overlap_segments": 48,
+      "unique_kernel_overlap_ms": 1.038247,
+      "conventional_host_path_ms": 3.119816
+    },
+    {
+      "release_index": 3,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 46,
+      "overlap_segments": 48,
+      "unique_kernel_overlap_ms": 1.045405,
+      "conventional_host_path_ms": 3.092623
+    },
+    {
+      "release_index": 5,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 44,
+      "overlap_segments": 46,
+      "unique_kernel_overlap_ms": 1.006181,
+      "conventional_host_path_ms": 3.147961
+    },
+    {
+      "release_index": 6,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 44,
+      "overlap_segments": 47,
+      "unique_kernel_overlap_ms": 1.036479,
+      "conventional_host_path_ms": 3.102533
+    },
+    {
+      "release_index": 8,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 46,
+      "overlap_segments": 48,
+      "unique_kernel_overlap_ms": 1.066149,
+      "conventional_host_path_ms": 3.021217
+    },
+    {
+      "release_index": 14,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 46,
+      "overlap_segments": 47,
+      "unique_kernel_overlap_ms": 1.028663,
+      "conventional_host_path_ms": 3.164562
+    },
+    {
+      "release_index": 15,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 44,
+      "overlap_segments": 48,
+      "unique_kernel_overlap_ms": 1.007561,
+      "conventional_host_path_ms": 3.097944
+    },
+    {
+      "release_index": 17,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 42,
+      "overlap_segments": 46,
+      "unique_kernel_overlap_ms": 1.034887,
+      "conventional_host_path_ms": 3.041104
+    },
+    {
+      "release_index": 19,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 45,
+      "overlap_segments": 50,
+      "unique_kernel_overlap_ms": 1.033729,
+      "conventional_host_path_ms": 3.061003
+    },
+    {
+      "release_index": 24,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 46,
+      "overlap_segments": 61,
+      "unique_kernel_overlap_ms": 1.002615,
+      "conventional_host_path_ms": 2.970567
+    },
+    {
+      "release_index": 27,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 46,
+      "overlap_segments": 49,
+      "unique_kernel_overlap_ms": 1.04219,
+      "conventional_host_path_ms": 3.070961
+    },
+    {
+      "release_index": 34,
+      "controller_kernel_segments": 47,
+      "nrx0_kernel_segments": 45,
+      "overlap_segments": 62,
+      "unique_kernel_overlap_ms": 0.966874,
+      "conventional_host_path_ms": 2.900163
+    }
+  ],
+  "interpretation": "One profiled NeuralRx worker and the radio controller physically overlap GPU kernel execution during early conventional host-call windows. Forty synthetic releases, profiler perturbation, and sampled conventional path times do not qualify an NRx-conventional worst-case service bound or production MAC deadline."
+}

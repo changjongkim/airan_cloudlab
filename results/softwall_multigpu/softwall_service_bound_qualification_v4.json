@@ -1,0 +1,74 @@
+{
+  "all_pass": true,
+  "claim_boundary": "The corrected V13 control-fault contract and exchange-only AI35 class were requalified on two A100 nodes with independent process lifecycles. This remains finite-sample evidence, not WCET, production d_MAC, cross-family, or throughput-superiority evidence.",
+  "conditional_ai35_evidence": {
+    "ai35_candidate_exchanges": 15,
+    "arms": 4,
+    "candidate_branches": 602,
+    "minimum_physical_guarded_horizon_margin_ms": 43.647277,
+    "nodes": 2,
+    "radio_records": 5120,
+    "zero_failure_95_upper_if_iid": {
+      "arm_process_lifecycle": 0.5271291954984121,
+      "physical_node": 0.7763932022500211
+    }
+  },
+  "control_fault_evidence": {
+    "admission_bound_exceedances": 0,
+    "arms": 12,
+    "attempted_rpc_records": 4030,
+    "maximum_rpc_wall_ms": 5.77566,
+    "nodes": 2,
+    "radio_records": 32640,
+    "radio_records_after_fault_detection": 29833,
+    "zero_failure_95_upper_if_iid": {
+      "arm_process_lifecycle": 0.22092219194555585,
+      "physical_node": 0.7763932022500211
+    }
+  },
+  "gates": {
+    "both_control_campaigns_use_7ms": true,
+    "c141_independent_requalification_passes": true,
+    "conditional_exchange_on_both_nodes": true,
+    "no_7ms_control_exceedance": true,
+    "same_ai35_counterfactual": true,
+    "two_distinct_a100_nodes": true,
+    "v3_correction_chain_passes": true
+  },
+  "hard_real_time_status": "UNPROVEN",
+  "inputs": {
+    "c139": {
+      "path": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm139_qualified_control_bound_result.json",
+      "sha256": "5c35649c19510f859943375e5d40a2d037c5e5b41328cd2a318ab0de74e4c7af"
+    },
+    "c140": {
+      "path": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm140_v13_ai35_result.json",
+      "sha256": "55aeeb54a0337b64f72caec01ef004e084d84df21183c35eac1ff547dde810a6"
+    },
+    "c141": {
+      "path": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm141_v13_independent_requalification_result.json",
+      "sha256": "61bee4df66a5d1ff7d17c47943524f60854101c51f0d73569a7ba079f8a397a0"
+    },
+    "v3": {
+      "path": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_service_bound_qualification_v3.json",
+      "sha256": "7ce1ad56009be9f22867f1138d0a009637eebb549c80f43de0fa0065274e5589"
+    }
+  },
+  "mode": {
+    "ai_completion_guard_ms": 2.0,
+    "conditional_decision_window_ms": 58.0,
+    "control_transaction_bound_ms": 21.0,
+    "effective_transaction_bound_ms": 58.0,
+    "hardware_family": "NVIDIA A100-SXM4-40GB",
+    "nodes": [
+      "nid001252",
+      "nid001372"
+    ],
+    "per_rpc_admission_bound_ms": 7.0,
+    "raw_ai_bound_ms": 35.0,
+    "socket_timeout_ms": 5.0,
+    "static_all_fail_slack_ms": 53.0
+  },
+  "schema": "softwall-service-bound-qualification-v4",
+  "status": "FINITE_SAMPLE_TWO_NODE_CORRECTED_CONTROL_PASS"
+}

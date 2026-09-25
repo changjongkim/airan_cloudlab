@@ -1,0 +1,17 @@
+{
+  "schema": "softwall-c159-q1-prelaunch-failure-v1",
+  "status": "PRELAUNCH_SCHEMA_COMPATIBILITY_FAIL",
+  "job_id": "58857067",
+  "node": "nid001285",
+  "label": "confirm159q1_prestaged_attempt1_job58857067",
+  "timed_radio_rounds": 0,
+  "cause": "C159 renamed the peer-spec schema while sealed shared path loaders require softwall-actual-nrx-peer-spec-v1.",
+  "correction": "Retain the established peer descriptor wire schema; keep C159 lifecycle differences in the protocol schema.",
+  "artifacts": {
+    "results/softwall_multigpu/confirm159q1_prestaged_attempt1_job58857067_protocol.json": "d7667dc3630525bddb3da1181b4238dbc3cf9b99dcd92776fb3393bddde65dd8",
+    "results/softwall_multigpu/confirm159q1_prestaged_attempt1_job58857067_peer_spec.json": "9ded50f7d9e04e76a659ee3555ba0f14045f181cc093a4087794bb7c036fed2c",
+    "results/softwall_multigpu/raw/confirm159q1_prestaged_attempt1_job58857067_coordinator.log": "84b150113e03d4d913791a6e21c9fc6ada903fbbf22b6126dd892184d4751eaf",
+    "results/softwall_multigpu/raw/confirm159q1_prestaged_attempt1_job58857067_nrx_worker.log": "d0ed77f52d2ef617bd8a17e0fa07f7a80155737b2075a302edd14a64d58db32a"
+  },
+  "claim_scope": "Analyzer/prelaunch compatibility failure only; no P180 safety or timing sample was produced."
+}

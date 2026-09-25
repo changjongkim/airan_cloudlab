@@ -1,0 +1,103 @@
+salloc: Granted job allocation 58689828
+salloc: Waiting for resource configuration
+salloc: Nodes nid001232 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=3.348ms max=3.510ms miss=0 correct=82 nrx=0 conv=200 bg=0 duplicate=0
+12:12:18.626197 cuphy.hpp:122    CON[156428] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56131a19d470).
+confirm51 operational requalification passed
+confirm51 start round=1 period=90 policy=conventional_only
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_conv.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=1000 p99=4.043ms max=5.585ms miss=0 correct=364 nrx=0 conv=1000 bg=13063 duplicate=0
+12:13:09.437010 cuphy.hpp:122    CON[157030] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x562af7d8d460).
+S2 campaign completed: tag=confirm51_r1_p90_conventional_only_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=90 policy=conventional_only
+confirm51 start round=1 period=90 policy=eager_dual
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=1000 p99=6.618ms max=13.601ms miss=0 correct=981 nrx=973 conv=27 bg=12966 duplicate=0
+12:15:10.513916 cuphy.hpp:122    CON[157630] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55b8541ed4b0).
+S2 campaign completed: tag=confirm51_r1_p90_eager_dual_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=90 policy=eager_dual
+confirm51 start round=1 period=90 policy=external_transaction
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58689828/bg_sr_58689828_159445.sock
+[SAME-REQUEST-NRX] ready tag=sr_58689828_159445
+[SAME-REQUEST-NRX] stopped units=1021
+[SAME-REQUEST] correct=979/1000 miss=0 nrx=973 fallback=27 bg=12723 p99=55.857ms
+12:17:11.652470 cuphy.hpp:122    CON[160027] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55e0af880cb0).
+same-request IPC campaign completed: confirm51_r1_p90_external_job58689828
+confirm51 done round=1 period=90 policy=external_transaction
+confirm51 start round=1 period=45 policy=conventional_only
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_conv.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=1000 p99=3.699ms max=7.941ms miss=0 correct=370 nrx=0 conv=1000 bg=722 duplicate=0
+12:19:12.467755 cuphy.hpp:122    CON[160627] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f914e263c0).
+S2 campaign completed: tag=confirm51_r1_p45_conventional_only_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=45 policy=conventional_only
+confirm51 start round=1 period=45 policy=eager_dual
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=1000 p99=7.142ms max=16.229ms miss=0 correct=980 nrx=973 conv=27 bg=0 duplicate=0
+12:20:28.509478 cuphy.hpp:122    CON[161221] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55af64143490).
+S2 campaign completed: tag=confirm51_r1_p45_eager_dual_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=45 policy=eager_dual
+confirm51 start round=1 period=45 policy=external_transaction
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58689828/bg_sr_58689828_161460.sock
+[SAME-REQUEST-NRX] ready tag=sr_58689828_161460
+[SAME-REQUEST-NRX] stopped units=996
+[SAME-REQUEST] correct=964/1000 miss=0 nrx=950 fallback=25 bg=149 p99=55.767ms
+12:21:44.509606 cuphy.hpp:122    CON[162039] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x559a9a5b6c20).
+same-request IPC campaign completed: confirm51_r1_p45_external_job58689828
+confirm51 done round=1 period=45 policy=external_transaction
+confirm51 start round=1 period=25 policy=conventional_only
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_conv.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=1000 p99=3.244ms max=6.753ms miss=0 correct=371 nrx=0 conv=1000 bg=0 duplicate=0
+12:23:00.279352 cuphy.hpp:122    CON[162649] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x560b85805490).
+S2 campaign completed: tag=confirm51_r1_p25_conventional_only_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=25 policy=conventional_only
+confirm51 start round=1 period=25 policy=eager_dual
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=1000 p99=8.065ms max=12.900ms miss=0 correct=979 nrx=973 conv=27 bg=0 duplicate=0
+12:23:56.513918 cuphy.hpp:122    CON[163240] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x564e17382840).
+S2 campaign completed: tag=confirm51_r1_p25_eager_dual_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=25 policy=eager_dual
+confirm51 start round=1 period=25 policy=external_transaction
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58689828/bg_sr_58689828_163477.sock
+[SAME-REQUEST-NRX] ready tag=sr_58689828_163477
+[SAME-REQUEST-NRX] stopped units=971
+[SAME-REQUEST] correct=947/1000 miss=0 nrx=925 fallback=25 bg=0 p99=55.652ms
+12:24:52.681614 cuphy.hpp:122    CON[164057] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x557ed9ebbd60).
+same-request IPC campaign completed: confirm51_r1_p25_external_job58689828
+confirm51 done round=1 period=25 policy=external_transaction
+confirm51 start round=1 period=12 policy=conventional_only
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_conv.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=1000 p99=3.005ms max=4.238ms miss=0 correct=351 nrx=0 conv=1000 bg=0 duplicate=0
+12:25:48.498145 cuphy.hpp:122    CON[164650] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55b5ce0684f0).
+S2 campaign completed: tag=confirm51_r1_p12_conventional_only_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=12 policy=conventional_only
+confirm51 start round=1 period=12 policy=eager_dual
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58689828/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=1000 p99=7.189ms max=11.017ms miss=0 correct=981 nrx=973 conv=27 bg=0 duplicate=0
+12:26:31.559787 cuphy.hpp:122    CON[165237] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55a0a9c0f550).
+S2 campaign completed: tag=confirm51_r1_p12_eager_dual_job58689828 rounds=1 iterations=1000 job=58689828
+confirm51 done round=1 period=12 policy=eager_dual
+confirm51 start round=1 period=12 policy=external_transaction
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58689828/bg_sr_58689828_165491.sock
+[SAME-REQUEST-NRX] ready tag=sr_58689828_165491
+[SAME-REQUEST-NRX] stopped units=911
+[SAME-REQUEST] correct=916/1000 miss=0 nrx=868 fallback=22 bg=0 p99=55.628ms
+12:27:14.537961 cuphy.hpp:122    CON[166070] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x557c29a8cc90).
+same-request IPC campaign completed: confirm51_r1_p12_external_job58689828
+confirm51 done round=1 period=12 policy=external_transaction
+confirm51 start round=2 period=90 policy=external_transaction
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58689828/bg_sr_58689828_167640.sock
+[SAME-REQUEST-NRX] ready tag=sr_58689828_167640
+[2026-09-21T12:28:02.434] error: *** STEP 58689828.0 ON nid001232 CANCELLED AT 2026-09-21T12:28:02 DUE to SIGNAL Terminated ***
+salloc: Job allocation 58689828 has been revoked.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: error: nid001232: task 0: Killed
+srun: Terminating StepId=58689828.0

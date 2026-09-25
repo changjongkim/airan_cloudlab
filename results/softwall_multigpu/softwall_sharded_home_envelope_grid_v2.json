@@ -1,0 +1,277 @@
+{
+  "schema": "softwall-sharded-home-envelope-input-v2",
+  "status": "frozen prospective model input 2026-09-24",
+  "scope": "Synchronous P180/D155 batch with cells evenly distributed across 1/2/4 RAN home GPUs; shared endpoint list schedule; multi-home modes remain unqualified until physical implementation.",
+  "classification": {
+    "QSU": "qualified-safe-useful",
+    "QSN": "qualified-safe-no-slack",
+    "MI": "mandatory timing or per-home memory infeasible",
+    "UQ": "memory/timing arithmetic is feasible but multi-home timing/lifecycle bounds are not physically qualified"
+  },
+  "scenarios": [
+    {
+      "id": "sharded_home_g1_c4",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 1,
+      "cells": 4,
+      "home_cell_counts": [
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C113 qualifies the single-home four-cell reference"
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c8",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 1,
+      "cells": 8,
+      "home_cell_counts": [
+        8
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c12",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 1,
+      "cells": 12,
+      "home_cell_counts": [
+        12
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c4",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 2,
+      "cells": 4,
+      "home_cell_counts": [
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified"
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c8",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified"
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c12",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 2,
+      "cells": 12,
+      "home_cell_counts": [
+        6,
+        6
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c4",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 4,
+      "cells": 4,
+      "home_cell_counts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0,
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified"
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c8",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 4,
+      "cells": 8,
+      "home_cell_counts": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0,
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified"
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c12",
+      "architecture": "one local recovery certificate per RAN home GPU plus shared endpoint coordinator",
+      "gpu_count": 4,
+      "cells": 12,
+      "home_cell_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "endpoint_path_bounds_ms": [
+        45.0,
+        45.0,
+        45.0,
+        45.0
+      ],
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "sharded-home physical timing/lifecycle profile not yet qualified"
+      ]
+    }
+  ]
+}

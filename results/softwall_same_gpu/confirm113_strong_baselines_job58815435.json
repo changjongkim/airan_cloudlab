@@ -1,0 +1,497 @@
+{
+  "schema": "softwall-confirm113-strong-baselines-v1",
+  "protocol_sha256": "ef1041770042898d5ad4cd9af1b711f8e504d59c110872e87e3eb9e69b7e84e0",
+  "trace_sha256_observed": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+  "source_audit": {
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": {
+      "expected": "05153f6af5f3e89102c220f9bf429c9167022767408908681cf3b0b32b7bb477",
+      "observed": "05153f6af5f3e89102c220f9bf429c9167022767408908681cf3b0b32b7bb477",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/run_trace_baseline_arm.sh": {
+      "expected": "6f1f94e328ebee18faf62f2c45237ae143268dc0dfe7e5577494bea06635c644",
+      "observed": "6f1f94e328ebee18faf62f2c45237ae143268dc0dfe7e5577494bea06635c644",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/run_confirm113_strong_baselines.sh": {
+      "expected": "735273475c847c205b2551d5efc72b714d54ae184dca442497bca60c233c63ad",
+      "observed": "735273475c847c205b2551d5efc72b714d54ae184dca442497bca60c233c63ad",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": {
+      "expected": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "observed": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/trace_background_client.py": {
+      "expected": "f6fc4de63df7b31cb907b63b6971048ee3706ef18595df0b3ecd5834a91e1d8c",
+      "observed": "f6fc4de63df7b31cb907b63b6971048ee3706ef18595df0b3ecd5834a91e1d8c",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/analyze_confirm113_strong_baselines.py": {
+      "expected": "5f3fd7f75207173f3974998e645dace8572f5915d021f1b05ec8478cef612b08",
+      "observed": "5f3fd7f75207173f3974998e645dace8572f5915d021f1b05ec8478cef612b08",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": {
+      "expected": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "observed": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": {
+      "expected": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+      "observed": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+      "match": true
+    },
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": {
+      "expected": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+      "observed": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+      "match": true
+    },
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": {
+      "expected": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "observed": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/common.sh": {
+      "expected": "cad7418e26cc3afbf97fad16dd498da054e94bfce0c27daa9e81e50d11ab9adc",
+      "observed": "cad7418e26cc3afbf97fad16dd498da054e94bfce0c27daa9e81e50d11ab9adc",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": {
+      "expected": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+      "observed": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+      "match": true
+    },
+    "data/public/burstgpt/softwall_burst60_prefill_trace.json": {
+      "expected": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "observed": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/test_trace_baseline_controller.py": {
+      "expected": "a0235d76b6b5a02e0063d6d3aa2fd4dad9b9aa1419f5020d740ff876f8923c79",
+      "observed": "a0235d76b6b5a02e0063d6d3aa2fd4dad9b9aa1419f5020d740ff876f8923c79",
+      "match": true
+    }
+  },
+  "arms": {
+    "static_s1": {
+      "path": "results/softwall_same_gpu/raw/c113_static_s1_j58815435_controller.json",
+      "sha256": "5f0150d3d085070f6645d0c7b54caf6477450cd57da76c6f9fa1fe2dffdd3b95",
+      "system": "static",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 293,
+      "timely_value_tokens": 73841,
+      "correct_cells": 636,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "wc_s1_a": {
+      "path": "results/softwall_same_gpu/raw/c113_wc_s1a_j58815435_controller.json",
+      "sha256": "6c3dfa76b652b08ba9c05e2fa220207b2f82ad40584e8e8fa023c42fcc8b4467",
+      "system": "work_conserving",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 887,
+      "timely_value_tokens": 224862,
+      "correct_cells": 637,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "sw_s1_a": {
+      "path": "results/softwall_same_gpu/raw/c113_sw_s1a_j58815435_controller.json",
+      "sha256": "a23fdbc76fb201f78d9674ae01d55e87c8e14090d90561cc1fe0cf1253065bfc",
+      "system": "softwall",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 889,
+      "timely_value_tokens": 225273,
+      "correct_cells": 636,
+      "recovery_retime_count": 81,
+      "joint_lease_retired_count": 81,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "sw_s1_b": {
+      "path": "results/softwall_same_gpu/raw/c113_sw_s1b_j58815435_controller.json",
+      "sha256": "9fff6eaec0ca8d7bdb4f6d6d062cd7d377d4c23971c1354efb262d8cd3a15b8d",
+      "system": "softwall",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 887,
+      "timely_value_tokens": 225020,
+      "correct_cells": 638,
+      "recovery_retime_count": 81,
+      "joint_lease_retired_count": 81,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "wc_s1_b": {
+      "path": "results/softwall_same_gpu/raw/c113_wc_s1b_j58815435_controller.json",
+      "sha256": "ea8fecb4bc01210572222abce846191315e7f6c40b80316068a9c345575e0e92",
+      "system": "work_conserving",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 887,
+      "timely_value_tokens": 224921,
+      "correct_cells": 637,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "static_s2": {
+      "path": "results/softwall_same_gpu/raw/c113_static_s2_j58815435_controller.json",
+      "sha256": "76a890378b44bea8d4e0f24b8253c2fe32441d796a12c142d47b806444e3608e",
+      "system": "static",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 293,
+      "timely_value_tokens": 73770,
+      "correct_cells": 608,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "sw_s2_a": {
+      "path": "results/softwall_same_gpu/raw/c113_sw_s2a_j58815435_controller.json",
+      "sha256": "4b7a6c144e39a3311cc7279c2254b275cb5a1dbbdd30be7666985c2ff7883adc",
+      "system": "softwall",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 889,
+      "timely_value_tokens": 224877,
+      "correct_cells": 608,
+      "recovery_retime_count": 88,
+      "joint_lease_retired_count": 88,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "wc_s2_a": {
+      "path": "results/softwall_same_gpu/raw/c113_wc_s2a_j58815435_controller.json",
+      "sha256": "bb5c827976630c994c0d4b1ec5d3d3dbfcf75f84129473ef09f7c0dbc2c4d27c",
+      "system": "work_conserving",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 886,
+      "timely_value_tokens": 224723,
+      "correct_cells": 608,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "wc_s2_b": {
+      "path": "results/softwall_same_gpu/raw/c113_wc_s2b_j58815435_controller.json",
+      "sha256": "f8efed58c945acddef7d76f486ff8891775b0f5704058214260839434b505682",
+      "system": "work_conserving",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 885,
+      "timely_value_tokens": 224493,
+      "correct_cells": 606,
+      "recovery_retime_count": 0,
+      "joint_lease_retired_count": 0,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    },
+    "sw_s2_b": {
+      "path": "results/softwall_same_gpu/raw/c113_sw_s2b_j58815435_controller.json",
+      "sha256": "061bd93b396124814ef61a9043f633f3a2e63ee4e8ccb6852a8e06354973d247",
+      "system": "softwall",
+      "iterations": 340,
+      "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+      "timely_requests": 887,
+      "timely_value_tokens": 224783,
+      "correct_cells": 608,
+      "recovery_retime_count": 88,
+      "joint_lease_retired_count": 88,
+      "safety": {
+        "zero_fields": {
+          "deadline_misses": 0,
+          "nrx_bound_violations": 0,
+          "conv_bound_violations": 0,
+          "conv_path_bound_violations": 0,
+          "background_budget_violations": 0,
+          "background_horizon_violations": 0,
+          "retime_rejections": 0
+        },
+        "calendar_outstanding": 0,
+        "joint_leases_outstanding": 0,
+        "endpoint_outstanding": {
+          "nrx0": 0,
+          "nrx1": 0,
+          "ai": 0
+        },
+        "background_faults": 0,
+        "endpoint_faults": 0,
+        "pass": true
+      }
+    }
+  },
+  "radio_parity": {
+    "seed1": {
+      "arms": [
+        "static_s1",
+        "wc_s1_a",
+        "sw_s1_a",
+        "sw_s1_b",
+        "wc_s1_b"
+      ],
+      "structural_signature_equal": true,
+      "correct_cells": {
+        "static_s1": 636,
+        "wc_s1_a": 637,
+        "sw_s1_a": 636,
+        "sw_s1_b": 638,
+        "wc_s1_b": 637
+      }
+    },
+    "seed2": {
+      "arms": [
+        "static_s2",
+        "sw_s2_a",
+        "wc_s2_a",
+        "wc_s2_b",
+        "sw_s2_b"
+      ],
+      "structural_signature_equal": true,
+      "correct_cells": {
+        "static_s2": 608,
+        "sw_s2_a": 608,
+        "wc_s2_a": 608,
+        "wc_s2_b": 606,
+        "sw_s2_b": 608
+      }
+    }
+  },
+  "paired_comparisons": [
+    {
+      "name": "seed1_ABBA",
+      "softwall_arms": [
+        "sw_s1_a",
+        "sw_s1_b"
+      ],
+      "work_conserving_arms": [
+        "wc_s1_a",
+        "wc_s1_b"
+      ],
+      "softwall_mean_timely_value": 225146.5,
+      "work_conserving_mean_timely_value": 224891.5,
+      "delta_tokens": 255.0,
+      "effect_pct": 0.1133880115522374,
+      "paired_source_second_bootstrap_95_ci": [
+        -121.5,
+        710.0
+      ],
+      "effect_at_least_2pct": false,
+      "bootstrap_lower_positive": false
+    },
+    {
+      "name": "seed2_BAAB",
+      "softwall_arms": [
+        "sw_s2_a",
+        "sw_s2_b"
+      ],
+      "work_conserving_arms": [
+        "wc_s2_a",
+        "wc_s2_b"
+      ],
+      "softwall_mean_timely_value": 224830.0,
+      "work_conserving_mean_timely_value": 224608.0,
+      "delta_tokens": 222.0,
+      "effect_pct": 0.09883886593531842,
+      "paired_source_second_bootstrap_95_ci": [
+        -457.5,
+        948.5
+      ],
+      "effect_at_least_2pct": false,
+      "bootstrap_lower_positive": false
+    }
+  ],
+  "gates": {
+    "provenance": true,
+    "safety": true,
+    "radio_structural_parity": true,
+    "outcome": false,
+    "all_pass": false
+  },
+  "interpretation": "The outcome gate requires both independent ABBA groups to show at least 2% more timely token value than safe work-conserving and a positive paired source-second bootstrap lower bound. Failure ends the throughput-superiority claim but does not invalidate a passing conditional-recovery substrate."
+}

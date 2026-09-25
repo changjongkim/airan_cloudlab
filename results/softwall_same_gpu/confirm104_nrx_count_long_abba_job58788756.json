@@ -1,0 +1,86 @@
+{
+  "schema": "softwall-confirm104-nrx-count-long-abba-v1",
+  "source_hashes": true,
+  "arms": [
+    {
+      "name": "a_one",
+      "nrx_count": 1,
+      "host": "nid001320",
+      "job": "58788756",
+      "exact_nrx_count": true,
+      "pre_ai_count": 1000,
+      "pre_ai_execution_median_ms": 21.827870500000003,
+      "pre_ai_execution_p95_ms": 22.999985,
+      "pre_ai_execution_max_ms": 25.425079,
+      "safety": true
+    },
+    {
+      "name": "b_two",
+      "nrx_count": 2,
+      "host": "nid001320",
+      "job": "58788756",
+      "exact_nrx_count": true,
+      "pre_ai_count": 1000,
+      "pre_ai_execution_median_ms": 22.942897000000002,
+      "pre_ai_execution_p95_ms": 24.282714,
+      "pre_ai_execution_max_ms": 26.08443,
+      "safety": true
+    },
+    {
+      "name": "c_two",
+      "nrx_count": 2,
+      "host": "nid001320",
+      "job": "58788756",
+      "exact_nrx_count": true,
+      "pre_ai_count": 1000,
+      "pre_ai_execution_median_ms": 22.4114805,
+      "pre_ai_execution_p95_ms": 23.61417,
+      "pre_ai_execution_max_ms": 27.628508,
+      "safety": true
+    },
+    {
+      "name": "d_one",
+      "nrx_count": 1,
+      "host": "nid001320",
+      "job": "58788756",
+      "exact_nrx_count": true,
+      "pre_ai_count": 1000,
+      "pre_ai_execution_median_ms": 22.4889055,
+      "pre_ai_execution_p95_ms": 24.087056,
+      "pre_ai_execution_max_ms": 30.596036,
+      "safety": true
+    }
+  ],
+  "pairs": [
+    {
+      "one": "a_one",
+      "two": "b_two",
+      "matched_phy": true,
+      "paired_releases": 1000,
+      "two_minus_one_mean_ms": 1.061856824,
+      "two_minus_one_median_ms": 1.0787934999999997,
+      "two_slower_fraction": 0.922,
+      "paired_bootstrap_mean_95_ms": [
+        1.013138369,
+        1.109836241
+      ]
+    },
+    {
+      "one": "d_one",
+      "two": "c_two",
+      "matched_phy": true,
+      "paired_releases": 1000,
+      "two_minus_one_mean_ms": -0.163993836,
+      "two_minus_one_median_ms": -0.07758099999999857,
+      "two_slower_fraction": 0.446,
+      "paired_bootstrap_mean_95_ms": [
+        -0.22422642200000004,
+        -0.10574470099999998
+      ]
+    }
+  ],
+  "all_safety": true,
+  "both_bootstrap_lower_positive": false,
+  "all_pass": false,
+  "interpretation": "Independent long same-PHY ABBA confirmation of the physical one-to-two NeuralRx count cost on pre-observation Qwen. This does not establish policy throughput, AI-RAN workload value, or a WCET."
+}

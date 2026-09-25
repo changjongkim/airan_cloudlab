@@ -1,0 +1,31 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm28_conventional_tail_p60d35",
+  "purpose": "Measure the mandatory conventional path without any AI worker after confirm27 observed a 36.076 ms GPU event on a non-overlapped release.",
+  "selection_source": {
+    "confirm27": "The only D35 miss occurred at r1 cap100 index708 with no worker outstanding or injected; response 36.148 ms and conventional GPU event 36.076 ms.",
+    "question": "Does the same deadline contract fail from the mandatory path alone?"
+  },
+  "radio": {
+    "input": "clean valid 273-PRB PUSCH",
+    "policy": "conventional_only",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations": 10000,
+    "warmup": 30,
+    "payload_seed": 20340001
+  },
+  "concurrency": {
+    "AI_worker": false,
+    "socket": false,
+    "other_experiment_clients": false
+  },
+  "metrics": [
+    "deadline misses",
+    "response distribution",
+    "GPU event service distribution",
+    "correct TB and CRC/payload mismatch"
+  ],
+  "interpretation": "Any miss demonstrates that MPS admission alone cannot establish the D35 contract until the mandatory receiver tail is bounded or the deadline is enlarged."
+}

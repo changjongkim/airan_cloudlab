@@ -1,0 +1,72 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "client": "32d947e3ad607cffb66a8b3be3e15c5f68a872b27f077764615dd2ea49232ebc",
+    "inventory": "77251e4f1d23a8ab899902ed18fe968a12a6e33c12ab91275fbaa77bd01d8ab5",
+    "mandatory": "82c036df59074fce3a8a8eae46e0806e5d03973658c9b69ea54dea811b94a9a4",
+    "protocol": "e377ec0536b0f6bc4560eeaa191bca3882d345b2268b8e1de5ffb633744ca374",
+    "worker": "ea7962826096e5a3af3b0844c7ffceeb58ca5f8dd28fdd16439619b65fd8a4cb"
+  },
+  "campaign": "holdout",
+  "claim_boundary": "Finite-sample same-process Qwen worker channel reconnect with fsync-backed prepared/fenced journal reconciliation and concurrent mandatory four-cell cuPHY. Overlap is launch-call-to-fence wall interval evidence, not a new kernel-overlap trace. Worker-process replacement, arbitrary crash windows, production d_MAC and WCET remain unqualified.",
+  "counts": {
+    "cell_decodes": 292,
+    "component_bound_violations": 0,
+    "deadline_misses": 0,
+    "mandatory_releases": 73,
+    "overlap_releases": 30,
+    "physical_qwen_launches": 30,
+    "post_fence_loss": 30,
+    "prepare_loss": 30,
+    "terminal_fences": 60,
+    "tokens": 60
+  },
+  "gates": {
+    "a100_mig_off_inventory": true,
+    "aligned_launch_call_to_fence_spans_mandatory_release": true,
+    "client_worker_journal_exact_match": true,
+    "complete_balanced_token_product": true,
+    "duplicate_reconcile_is_idempotent": true,
+    "every_fault_loses_channel_then_reconnects": true,
+    "frozen_source_hash_match": true,
+    "mandatory_correct_deadline_and_component_bound": true,
+    "mandatory_sample_complete": true,
+    "node_not_excluded": true,
+    "post_fence_loss_has_one_launch_and_fence": true,
+    "prepare_loss_never_launches_and_nonlaunch_fences": true,
+    "qwen_launch_to_fence_and_mandatory_wall_overlap_observed": true,
+    "same_host_job_worker_epoch": true
+  },
+  "host": "nid001104",
+  "label": "c164h_reconnect_holdout_j58862501",
+  "mandatory_component_gpu_ms": {
+    "count": 292,
+    "max": 4.576767921447754,
+    "mean": 4.058588601138494,
+    "p50": 3.9015040397644043,
+    "p99": 4.573440074920654
+  },
+  "mandatory_response_ms": {
+    "count": 73,
+    "max": 18.114143,
+    "mean": 16.459624465753425,
+    "p50": 15.582649,
+    "p99": 18.101504
+  },
+  "pair_counts": {
+    "drop_after_fence:128": 15,
+    "drop_after_fence:512": 15,
+    "drop_after_prepare:128": 15,
+    "drop_after_prepare:512": 15
+  },
+  "qwen_gpu_ms": {
+    "count": 30,
+    "max": 66.79424285888672,
+    "mean": 45.51722367604574,
+    "p50": 27.05561637878418,
+    "p99": 66.79424285888672
+  },
+  "schema": "softwall-c164-reconnect-physical-result-v1",
+  "slurm_job_id": "58862501",
+  "status": "C164_RECONNECT_PHYSICAL_PASS"
+}

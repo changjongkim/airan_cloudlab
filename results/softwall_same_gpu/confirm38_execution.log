@@ -1,0 +1,31 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=7.519ms max=17.754ms miss=0 correct=69 nrx=0 conv=200 bg=0 duplicate=0
+06:26:57.832089 cuphy.hpp:122    CON[99845 ] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55a5f9fe6c60).
+confirm38 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58678990/bg_sr_58678990_100090.sock
+[SAME-REQUEST-NRX] ready tag=sr_58678990_100090
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9845/10000 miss=0 nrx=9806 fallback=194 bg=130177 p99=5.308ms
+06:27:49.035225 cuphy.hpp:122    CON[100678] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x555fdf868ef0).
+same-request IPC campaign completed: confirm38_external_background_main
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58678990/s2_1_s2_r.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=s2_reserved n=10000 p99=56.202ms max=69.002ms miss=0 correct=9841 nrx=9806 conv=194 bg=127180 duplicate=0
+06:43:21.446057 cuphy.hpp:122    CON[104485] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x556e67ae9be0).
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58678990/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=10000 p99=16.235ms max=42.885ms miss=0 correct=9843 nrx=9806 conv=194 bg=126477 duplicate=0
+06:58:53.986995 cuphy.hpp:122    CON[106532] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x557870d6dad0).
+S2 campaign completed: tag=confirm38_local_background_baselines rounds=1 iterations=10000 job=58678990
+# Same-trace external S2 with bounded background AI
+
+| condition | correct | RAN misses | background units | background units/s |
+|---|---:|---:|---:|---:|
+| external_s2 | 9845 | 0 | 130177 | 144.641 |
+| s2_reserved | 9841 | 0 | 127180 | 141.311 |
+| eager_dual | 9843 | 0 | 126477 | 140.530 |
+External minus eager correct: 0.0200 pp; 95% paired CI [-0.0354, 0.0754] pp.
+External minus local S2 correct: 0.0400 pp; 95% paired CI [-0.0080, 0.0880] pp.
+
+All frozen gates pass: True.
+confirm38 background comparison completed

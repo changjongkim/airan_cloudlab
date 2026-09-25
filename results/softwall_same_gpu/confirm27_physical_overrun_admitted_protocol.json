@@ -1,0 +1,39 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm27_physical_overrun_admitted",
+  "purpose": "Retest the separate-client physical overrun only under a deadline contract that includes the observed mandatory-path interference tail and an explicit guard.",
+  "selection_source": {
+    "confirm26_failure": "D25 failed with one physically overlapped miss at cap100, one at cap20, and one independent conventional tail miss.",
+    "observed_worst_ms": 28.763,
+    "new_deadline_ms": 35,
+    "added_guard_ms": 6.237,
+    "policy_consequence": "The same optional unit is rejected under D25 and eligible for empirical qualification under D35."
+  },
+  "mandatory_ran": {
+    "input": "clean valid 273-PRB PUSCH",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations_per_run": 1000,
+    "runs": 5
+  },
+  "optional_fault": {
+    "process": "separate low-priority MPS client",
+    "work_unit": "40 sequential persistent NeuralRx CUDA Graph launches",
+    "rpc_timeout_ms": 5,
+    "attempt_frequency": "every 10th release when no prior unit is outstanding",
+    "caps": [100, 20],
+    "late_response_policy": "drain and reject"
+  },
+  "primary_gate": {
+    "all_ran_releases_correct": true,
+    "all_ran_deadline_misses": 0,
+    "all_physically_overlapped_deadline_misses": 0,
+    "all_fault_requests_timeout": true,
+    "all_late_responses_drained": true,
+    "no_outstanding_unit_at_end": true,
+    "cap100_visible_sms": 108,
+    "cap20_visible_sms_max": 22
+  },
+  "interpretation_limit": "Passing D35 is empirical qualification for this declared work unit and platform. It is not a mathematical WCET or protection against arbitrary memory/DMA/non-yielding-kernel interference."
+}

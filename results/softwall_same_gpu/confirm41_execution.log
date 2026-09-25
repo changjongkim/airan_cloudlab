@@ -1,0 +1,31 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=8.382ms max=15.928ms miss=0 correct=74 nrx=0 conv=200 bg=0 duplicate=0
+07:17:06.335221 cuphy.hpp:122    CON[110957] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55cb512ddc90).
+confirm41 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58681881/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=10000 p99=16.445ms max=44.311ms miss=0 correct=9817 nrx=9787 conv=213 bg=126390 duplicate=0
+07:17:57.137084 cuphy.hpp:122    CON[111584] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f76ed54e50).
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58681881/s2_1_s2_r.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=s2_reserved n=10000 p99=55.993ms max=69.420ms miss=0 correct=9817 nrx=9787 conv=213 bg=127231 duplicate=0
+07:33:29.804073 cuphy.hpp:122    CON[114016] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x557851c8bbe0).
+S2 campaign completed: tag=confirm41_local_background_baselines rounds=1 iterations=10000 job=58681881
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58681881/bg_sr_58681881_115727.sock
+[SAME-REQUEST-NRX] ready tag=sr_58681881_115727
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9817/10000 miss=0 nrx=9787 fallback=213 bg=130254 p99=5.343ms
+07:49:02.751632 cuphy.hpp:122    CON[116317] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56034ae477a0).
+same-request IPC campaign completed: confirm41_external_background_main
+# Same-trace external S2 with bounded background AI
+
+| condition | correct | RAN misses | background units | background units/s |
+|---|---:|---:|---:|---:|
+| external_s2 | 9817 | 0 | 130254 | 144.727 |
+| s2_reserved | 9817 | 0 | 127231 | 141.368 |
+| eager_dual | 9817 | 0 | 126390 | 140.433 |
+External minus eager correct: 0.0000 pp; 95% paired CI [-0.0480, 0.0480] pp.
+External minus local S2 correct: 0.0000 pp; 95% paired CI [-0.0480, 0.0480] pp.
+
+All frozen gates pass: True.
+confirm41 background comparison completed

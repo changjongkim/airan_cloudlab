@@ -1,0 +1,17 @@
+{
+  "schema": "softwall-confirm70-profiled-conventional-nrx-protocol-v1",
+  "job": "58734412",
+  "purpose": "Check whether the strong baseline's early conventional GPU kernels actually overlap another cell's still-running NeuralRx kernels.",
+  "runner": "scripts_for_node/softwall_same_gpu/run_confirm70_conv_nrx_nodes.sh",
+  "runner_sha256": "957dc65a43f1aded27b58dcfc6b455b25c115676e8914aae243639c1dcc0a3b9",
+  "controller_sha256": "cb9c05a671c67072d9b46ec94b9f97b35b008cb4833fff663040afc4c3100e31",
+  "iterations": 40,
+  "period_ms": 150,
+  "deadline_ms": 130,
+  "early_mandatory": "on",
+  "gate_mode": "threshold",
+  "gate_threshold": 2.027073621749878,
+  "profiled_clients": ["NeuralRx worker0", "radio controller conventional GPU path"],
+  "frozen_gate": "At least one record with cell1 early conventional while worker0 NRx is host-unobserved, GPU kernel tables in both exports, and at least one intersecting kernel interval within that conventional host-call window. Report zero if absent; do not infer a bound from a positive overlap.",
+  "limits": "One profiled worker, synthetic P150/D130, profiler overhead and no production DU expiry. Kernel overlap is not a worst-case co-run service guarantee or joint-policy performance comparison."
+}

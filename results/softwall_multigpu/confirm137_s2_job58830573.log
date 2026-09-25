@@ -1,0 +1,45 @@
+[S2] policy=conventional_only n=30 p99=6.598ms max=6.615ms miss=0 correct=11 nrx=0 conv=30 bg=0 duplicate=0
+16:51:50.417929 cuphy.hpp:122    CON[933102] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55621969a360).
+[S2] policy=conventional_only n=30 p99=13.518ms max=15.773ms miss=0 correct=13 nrx=0 conv=30 bg=0 duplicate=0
+16:51:58.076453 cuphy.hpp:122    CON[933343] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55cb44a83600).
+Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
+Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
+[TRACE-QWEN] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58830573/sh1_932849.sock
+[TRACE-QWEN] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58830573/sh0_932849.sock
+[SAME-REQUEST-NRX] ready tag=sh_58830573_932849_h1_c0
+[SAME-REQUEST-NRX] ready tag=sh_58830573_932849_h1_c1
+[SAME-REQUEST-NRX] ready tag=sh_58830573_932849_h0_c0
+[SAME-REQUEST-NRX] ready tag=sh_58830573_932849_h0_c1
+[SAME-REQUEST-NRX] stopped units=150
+[SAME-REQUEST-NRX] stopped units=190
+[SAME-REQUEST-NRX] stopped units=192
+[SAME-REQUEST-NRX] stopped units=165
+[TRACE/softwall] correct=286/640 miss=0 nrx_bound=0 fallback=447 ai=9 value=1152 p99=37.042ms
+[TRACE/softwall] correct=298/640 miss=0 nrx_bound=0 fallback=436 ai=12 value=1536 p99=37.982ms
+16:52:14.672626 cuphy.hpp:122    CON[935264] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5611dad079d0).
+16:52:15.248193 cuphy.hpp:122    CON[935264] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5611db0f7e00).
+16:52:15.718220 cuphy.hpp:122    CON[935264] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5611dc4ffe50).
+16:52:16.252765 cuphy.hpp:122    CON[935264] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5611dc66f5d0).
+16:52:14.676385 cuphy.hpp:122    CON[935263] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x559e66254b90).
+16:52:15.253595 cuphy.hpp:122    CON[935263] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x559e66644f00).
+16:52:15.729199 cuphy.hpp:122    CON[935263] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x559e67abdaa0).
+16:52:16.270170 cuphy.hpp:122    CON[935263] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x559e67abdaa0).
+{
+  "two_homes": true,
+  "same_first_release": true,
+  "eight_cells": true,
+  "worker_count_match": true,
+  "system_safety": true,
+  "broker_homes": true,
+  "global_unique_requests": true,
+  "broker_drained": true,
+  "both_homes_ai": true,
+  "physical_ring_depth_conformance": true,
+  "candidate_branch_coverage": true,
+  "ai40_candidate_exchange_observed": true,
+  "candidate_horizon_margin_nonnegative": true,
+  "rpc_telemetry_present": true,
+  "rpc_prepare_commit_complete_each_home": true,
+  "rpc_wall_bound": true
+}
+service-bound telemetry arm complete: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s2_job58830573_result.json

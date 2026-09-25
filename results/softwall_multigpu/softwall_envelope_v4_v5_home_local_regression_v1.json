@@ -1,0 +1,104 @@
+{
+  "schema": "softwall-envelope-v4-v5-home-local-regression-v1",
+  "status": "PASS",
+  "scope": "Synthetic model regression only; demonstrates and fixes a cross-home false-usefulness classification without changing frozen v8 artifacts.",
+  "scenario": {
+    "id": "asymmetric_cross_home_false_qsu_regression",
+    "gpu_count": 2,
+    "cells": 8,
+    "home_cell_counts": [
+      4,
+      4
+    ],
+    "deadline_ms": 102.0,
+    "guard_ms": 2.0,
+    "recovery_bound_ms": 25.0,
+    "home_memory_feasible": true,
+    "timing_bounds_qualified": true,
+    "home_endpoint_bounds_ms": [
+      [
+        200.0
+      ],
+      [
+        60.0
+      ]
+    ],
+    "ai_bounds_ms": [
+      60.0
+    ],
+    "evidence": [
+      "synthetic model regression; not a physical qualification point"
+    ]
+  },
+  "v4_checker_sha256": "06008652a1018f58dc8e8f6889c260edbef544a9faa6ebef91e1b0bb6df56d26",
+  "v5_checker_sha256": "860afa8109a2382bf2378ee0339370cb84681ccf45766ad07b995420e34ca00f",
+  "v4": {
+    "status": "QSU",
+    "home_base_all_fail_slack_ms": [
+      0.0,
+      0.0
+    ],
+    "home_max_released_recovery_slack_ms": [
+      75.0,
+      75.0
+    ],
+    "endpoint_admitted_cells": 1,
+    "ai_classes": [
+      {
+        "bound_ms": 60.0,
+        "control_budget_ms": 0.0,
+        "effective_transaction_bound_ms": 60.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_candidate": true,
+        "exchange_only_candidate_homes": [
+          0,
+          1
+        ],
+        "too_large_even_after_exchange": false
+      }
+    ],
+    "endpoint_admitted_cells_by_home": null
+  },
+  "v5": {
+    "status": "QSN",
+    "home_base_all_fail_slack_ms": [
+      0.0,
+      0.0
+    ],
+    "home_max_released_recovery_slack_ms": [
+      0.0,
+      0.0
+    ],
+    "endpoint_admitted_cells": 1,
+    "ai_classes": [
+      {
+        "bound_ms": 60.0,
+        "control_budget_ms": 0.0,
+        "effective_transaction_bound_ms": 60.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": true
+      }
+    ],
+    "endpoint_admitted_cells_by_home": [
+      0,
+      1
+    ]
+  },
+  "expected": {
+    "admitted_by_home": [
+      0,
+      1
+    ],
+    "conditional_release_by_home_ms": [
+      0.0,
+      0.0
+    ],
+    "classification": "QSN"
+  },
+  "finding": "v4 used a global admitted flag and assigned 75 ms of nonexistent conditional release to both homes, producing QSU. v5 derives each home from its local admitted count; with only one admitted NRx at home1 and none at home0, no after-observation exchange window exists and the correct model classification is QSN.",
+  "all_pass": true
+}

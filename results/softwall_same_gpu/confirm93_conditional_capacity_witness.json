@@ -1,0 +1,208 @@
+{
+  "schema": "softwall-confirm93-conditional-capacity-witness-v1",
+  "assumptions": {
+    "radio_cells": 4,
+    "selected_nrx": [
+      "a",
+      "b"
+    ],
+    "nrx_result_event_ms": 30,
+    "conventional_bound_ms": 12,
+    "ai_bound_ms": 15,
+    "ai_early_cap": 1,
+    "single_serial_lane": true,
+    "radio_and_ai_deadline_after_guard_ms": 153,
+    "all_ai_visible_at_t0": true
+  },
+  "scenarios": {
+    "ai6_all_fail": {
+      "enumerated_early_plans": 22,
+      "feasible_early_plans": 19,
+      "best_schedule": {
+        "early_conventional": [
+          "c"
+        ],
+        "early_ai": 0,
+        "early_schedule": [
+          {
+            "job": "convc",
+            "start_ms": 0,
+            "finish_ms": 12
+          },
+          {
+            "job": "ai0",
+            "start_ms": 12,
+            "finish_ms": 27
+          }
+        ],
+        "late_schedule": [
+          {
+            "job": "conva",
+            "start_ms": 30,
+            "finish_ms": 42
+          },
+          {
+            "job": "convb",
+            "start_ms": 42,
+            "finish_ms": 54
+          },
+          {
+            "job": "convd",
+            "start_ms": 54,
+            "finish_ms": 66
+          },
+          {
+            "job": "ai1",
+            "start_ms": 66,
+            "finish_ms": 81
+          },
+          {
+            "job": "ai2",
+            "start_ms": 81,
+            "finish_ms": 96
+          },
+          {
+            "job": "ai3",
+            "start_ms": 96,
+            "finish_ms": 111
+          },
+          {
+            "job": "ai4",
+            "start_ms": 111,
+            "finish_ms": 126
+          },
+          {
+            "job": "ai5",
+            "start_ms": 126,
+            "finish_ms": 141
+          }
+        ],
+        "feasible": true,
+        "last_finish_ms": 141
+      }
+    },
+    "ai6_two_nrx_success": {
+      "enumerated_early_plans": 22,
+      "feasible_early_plans": 22,
+      "best_schedule": {
+        "early_conventional": [
+          "c"
+        ],
+        "early_ai": 0,
+        "early_schedule": [
+          {
+            "job": "convc",
+            "start_ms": 0,
+            "finish_ms": 12
+          },
+          {
+            "job": "ai0",
+            "start_ms": 12,
+            "finish_ms": 27
+          }
+        ],
+        "late_schedule": [
+          {
+            "job": "convd",
+            "start_ms": 30,
+            "finish_ms": 42
+          },
+          {
+            "job": "ai1",
+            "start_ms": 42,
+            "finish_ms": 57
+          },
+          {
+            "job": "ai2",
+            "start_ms": 57,
+            "finish_ms": 72
+          },
+          {
+            "job": "ai3",
+            "start_ms": 72,
+            "finish_ms": 87
+          },
+          {
+            "job": "ai4",
+            "start_ms": 87,
+            "finish_ms": 102
+          },
+          {
+            "job": "ai5",
+            "start_ms": 102,
+            "finish_ms": 117
+          }
+        ],
+        "feasible": true,
+        "last_finish_ms": 117
+      }
+    },
+    "ai7_all_fail": {
+      "enumerated_early_plans": 25,
+      "feasible_early_plans": 0,
+      "best_schedule": null
+    },
+    "ai7_two_nrx_success": {
+      "enumerated_early_plans": 25,
+      "feasible_early_plans": 24,
+      "best_schedule": {
+        "early_conventional": [
+          "c"
+        ],
+        "early_ai": 0,
+        "early_schedule": [
+          {
+            "job": "convc",
+            "start_ms": 0,
+            "finish_ms": 12
+          },
+          {
+            "job": "ai0",
+            "start_ms": 12,
+            "finish_ms": 27
+          }
+        ],
+        "late_schedule": [
+          {
+            "job": "convd",
+            "start_ms": 30,
+            "finish_ms": 42
+          },
+          {
+            "job": "ai1",
+            "start_ms": 42,
+            "finish_ms": 57
+          },
+          {
+            "job": "ai2",
+            "start_ms": 57,
+            "finish_ms": 72
+          },
+          {
+            "job": "ai3",
+            "start_ms": 72,
+            "finish_ms": 87
+          },
+          {
+            "job": "ai4",
+            "start_ms": 87,
+            "finish_ms": 102
+          },
+          {
+            "job": "ai5",
+            "start_ms": 102,
+            "finish_ms": 117
+          },
+          {
+            "job": "ai6",
+            "start_ms": 117,
+            "finish_ms": 132
+          }
+        ],
+        "feasible": true,
+        "last_finish_ms": 132
+      }
+    }
+  },
+  "interpretation": "Exhaustive early placement and exact serial-lane scheduling in an abstract two-stage mode. Six AI units fit the all-fail branch; seven do not, but seven fit after both selected NRx successes. This establishes conditional decision pressure under model assumptions, not physical seven-unit burst qualification, online policy advantage, or hard WCET."
+}

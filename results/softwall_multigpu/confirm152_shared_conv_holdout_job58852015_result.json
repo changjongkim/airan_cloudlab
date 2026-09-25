@@ -1,0 +1,66 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm152_shared_conv_holdout_job58852015_protocol.json": "a0ae8c109c8d76afbfdaeb22bb979c45fe6422a3a3f1924337bfd02ed3ece671",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_gpu_inventory.csv": "2d4ea3aa4306610afb18f577df379ded3819dc7424e5040bf193f4216317aab8",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_owner0.json": "210ecc76582a24e145e28459d8c77bb05753cdc98fdecf84863eafe638bad871",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_owner1.json": "95bc1419c2f63c8716ea5b0edcac9e5cdafc20c4e9a4786436d8b89b5a90ed9b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_worker.json": "5a9a6020e5ee7568b2b67f572386d0578d24f5094975d7518ed757c9a9d10270"
+  },
+  "gates": {
+    "configuration_match": true,
+    "global_order_exact": true,
+    "ipc_lifecycle": true,
+    "owner_counts": true,
+    "owner_integrity": true,
+    "peer_access": true,
+    "shared_worker_count": true,
+    "source_hash": true,
+    "three_a100_mig_off": true
+  },
+  "inventory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_gpu_inventory.csv",
+  "owners": [
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_owner0.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_owner1.json"
+  ],
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm152_shared_conv_holdout_job58852015_protocol.json",
+  "schema": "softwall-confirm149-shared-conventional-canary-v1",
+  "scope": "physical shared conventional data-path and global-order canary only; no deadline, all-fail admission, AI lease, WCET, or V17 QSU claim",
+  "status": "PHYSICAL_PATH_PASS_V17_REMAINS_UQ",
+  "summary": {
+    "backward_gpu_us": {
+      "count": 500,
+      "max": 35.0399985909462,
+      "mean": 14.827647989615798,
+      "p50": 14.4640002399683,
+      "p99": 23.072000592947006
+    },
+    "conventional_gpu_ms": {
+      "count": 500,
+      "max": 5.458240032196045,
+      "mean": 2.3849789447784424,
+      "p50": 2.360991954803467,
+      "p99": 2.5547521114349365
+    },
+    "forward_gpu_us": {
+      "count": 500,
+      "max": 74.0479975938797,
+      "mean": 32.85324804857373,
+      "p50": 41.79200157523155,
+      "p99": 52.57600173354149
+    },
+    "home_units": [
+      250,
+      250
+    ],
+    "worker_path_ms": {
+      "count": 500,
+      "max": 10.908668,
+      "mean": 2.7234798519999965,
+      "p50": 2.690128,
+      "p99": 2.918389
+    },
+    "worker_units": 500
+  },
+  "worker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/confirm152_shared_conv_holdout_job58852015_worker.json"
+}

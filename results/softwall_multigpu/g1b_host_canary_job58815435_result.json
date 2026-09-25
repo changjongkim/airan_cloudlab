@@ -1,0 +1,65 @@
+{
+  "schema": "softwall-multigpu-host-staging-gate-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1b_host_canary_job58815435_protocol.json",
+  "protocol_sha256": "9375a5436c4a0e98cf98f1ff478705b5902ef37f5eee60f2e452a54dd5f40cd8",
+  "owner": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1b_host_canary_job58815435_owner.json",
+  "owner_sha256": "959cea28de21075193840f373d5630d4f0884ae863828c975d12c47dc5f35ffc",
+  "worker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g1b_host_canary_job58815435_worker.json",
+  "worker_sha256": "cf10c32a495d836ebac0bb470164835cea1d43abc8132f5bb6fed7d5f256298b",
+  "iterations": 100,
+  "timing_warmup_units": 20,
+  "cold_first_unit_us": {
+    "round_trip": 158236.524,
+    "forward_gpu": 129.12000343203545,
+    "backward_gpu": 63.00800293684006
+  },
+  "steady_timing_us": {
+    "round_trip": {
+      "count": 80,
+      "mean": 358.12210000000005,
+      "p50": 353.754,
+      "p99": 385.986,
+      "max": 387.69
+    },
+    "forward_gpu": {
+      "count": 80,
+      "mean": 115.43879923410714,
+      "p50": 115.29599875211716,
+      "p99": 117.44000017642975,
+      "max": 118.07999759912491
+    },
+    "forward_host": {
+      "count": 80,
+      "mean": 141.9995625,
+      "p50": 141.504,
+      "p99": 146.713,
+      "max": 147.405
+    },
+    "backward_gpu": {
+      "count": 80,
+      "mean": 34.18999994173646,
+      "p50": 34.08000059425831,
+      "p99": 37.21600025892258,
+      "max": 37.34399937093258
+    },
+    "backward_host": {
+      "count": 80,
+      "mean": 64.12921249999997,
+      "p50": 63.322,
+      "p99": 72.29,
+      "max": 75.375
+    }
+  },
+  "gates": {
+    "source_hashes": true,
+    "iteration_count": true,
+    "integrity": true,
+    "sequence": true,
+    "termination_lifecycle": true,
+    "payload": true,
+    "no_error": true
+  },
+  "all_pass": true,
+  "analyzer_sha256": "2892aa235d22b2ab4d4eebae9492a47b0dc79c3eb7b36681b433d9a21c1bffea",
+  "scope": "cross-process CUDA IPC plus pinned-host staging transport integrity; no NeuralRx, MPS, or deadline claim"
+}

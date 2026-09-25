@@ -1,0 +1,41 @@
+{
+  "all_pass": true,
+  "claim_scope": "Finite pure-state audit of epoch/generation/idempotency and AI physical-fence lifecycle. It is not a GPU fault-injection result, distributed durability proof, or GPU/driver-hang model.",
+  "file_count": 6,
+  "files": {
+    "docs/current/SOFTWALL_C160_FAULT_MODEL_RESULT_KO.md": {
+      "bytes": 1926,
+      "sha256": "e855431b31883b10c5c1ccb65debe0ace65c461740acd6b7d9e235bc154c4feb"
+    },
+    "results/softwall_multigpu/c160_fault_state_model_v1.json": {
+      "bytes": 1186,
+      "sha256": "b1269b9f917e1fe21dbe0780bdc559edaa2a58f446f2847f6fa389f0f7eef963"
+    },
+    "results/softwall_multigpu/c160_fault_state_model_v1_attempt1_audit_failure.json": {
+      "bytes": 1294,
+      "sha256": "f21ffa3c9bbc54ce2bcd7726427f89c5e24cb4923984c558abf27db37b85ac72"
+    },
+    "scripts_for_node/softwall_same_gpu/c160_fault_state_model_v1.py": {
+      "bytes": 9766,
+      "sha256": "cd76326bcec02d390cba486df36e83a482bb7af708e88553832ada3383f531de"
+    },
+    "scripts_for_node/softwall_same_gpu/run_c160_fault_model_v1.py": {
+      "bytes": 7070,
+      "sha256": "57b3a0641e09c13818ba05a3c6947a1c5c6126a8d13c55ce22ab6ad719205b77"
+    },
+    "scripts_for_node/softwall_same_gpu/test_c160_fault_state_model_v1.py": {
+      "bytes": 6081,
+      "sha256": "eaae0380dcca13ee2bcf9e04cf532cabe63d58418141c8e9f5d2d51081c27b6b"
+    }
+  },
+  "gates": {
+    "all_files_present": true,
+    "attempt1_preserved": true,
+    "model_pass": true,
+    "result_sources_current": true,
+    "state_product_51": true,
+    "zero_violation": true
+  },
+  "schema": "softwall-c160-fault-model-manifest-v1",
+  "status": "C160_MODEL_PASS"
+}

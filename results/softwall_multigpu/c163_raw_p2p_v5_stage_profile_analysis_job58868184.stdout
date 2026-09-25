@@ -1,0 +1,223 @@
+{
+  "schema": "softwall-c163-stage-profile-analysis-v1",
+  "analysis_role": "Mechanism diagnosis only; profiling events alter timing and do not qualify the fast path.",
+  "inputs": {
+    "controller": "results/softwall_multigpu/raw/c163_raw_p2p_v5_stage_profile_job58868184_controller.json",
+    "worker": "results/softwall_multigpu/raw/c163_raw_p2p_v5_stage_profile_job58868184_worker.json"
+  },
+  "warmup_excluded": 100,
+  "timed_units": 300,
+  "correct_units": 300,
+  "deadline_ms": 4.5,
+  "timely_units": 265,
+  "late_units": 35,
+  "pair_wall_ms": {
+    "n": 300,
+    "mean": 4.131826503333336,
+    "p50": 3.8098989999999997,
+    "p95": 6.060088600000001,
+    "p99": 7.105168869999987,
+    "max": 11.67352
+  },
+  "worker_total_gpu_ms": {
+    "n": 300,
+    "mean": 2.79354634364446,
+    "p50": 2.356927990913391,
+    "p95": 5.388493013381959,
+    "p99": 6.431209754943834,
+    "max": 11.081791877746582
+  },
+  "stages": {
+    "channel_estimation": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 1.2845400547981263,
+        "p50": 0.8664640188217163,
+        "p95": 3.895593583583832,
+        "p99": 4.873409118652329,
+        "max": 9.592415809631348
+      },
+      "pearson_with_worker_total": 0.993403615679862,
+      "pearson_with_pair_wall": 0.9602820841334867,
+      "late_mean_gpu_ms": 3.9719634430749076,
+      "timely_mean_gpu_ms": 0.9295973431389287
+    },
+    "tensor_preparation": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.030018560023357472,
+        "p50": 0.02993600070476532,
+        "p95": 0.030912000685930252,
+        "p99": 0.031104640290141105,
+        "max": 0.031231999397277832
+      },
+      "pearson_with_worker_total": 0.06698249091827795,
+      "pearson_with_pair_wall": 0.023255676383718803,
+      "late_mean_gpu_ms": 0.030053485929965974,
+      "timely_mean_gpu_ms": 0.030013947167767667
+    },
+    "tensorrt_graph": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.8623288534084956,
+        "p50": 0.857375979423523,
+        "p95": 0.8849647969007493,
+        "p99": 0.8863686168193817,
+        "max": 0.8871679902076721
+      },
+      "pearson_with_worker_total": 0.1117324911781864,
+      "pearson_with_pair_wall": 0.07579145503536515,
+      "late_mean_gpu_ms": 0.8648182885987418,
+      "timely_mean_gpu_ms": 0.8620000600814819
+    },
+    "dmrs_removal": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.007202560013780991,
+        "p50": 0.0072639998979866505,
+        "p95": 0.007552000228315592,
+        "p99": 0.007712320047430694,
+        "max": 0.007807999849319458
+      },
+      "pearson_with_worker_total": 0.03712483627219277,
+      "pearson_with_pair_wall": 0.001404518716642245,
+      "late_mean_gpu_ms": 0.007244800004575933,
+      "timely_mean_gpu_ms": 0.007196981147072225
+    },
+    "derate_match": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.1605230933924516,
+        "p50": 0.1536479964852333,
+        "p95": 0.16201600432395935,
+        "p99": 0.1675606334209441,
+        "max": 2.253632068634033
+      },
+      "pearson_with_worker_total": 0.09302057739081691,
+      "pearson_with_pair_wall": 0.08055596091306656,
+      "late_mean_gpu_ms": 0.2157193158354078,
+      "timely_mean_gpu_ms": 0.15323302627734417
+    },
+    "ldpc_decode": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.197551253537337,
+        "p50": 0.19625599682331085,
+        "p95": 0.20461439341306686,
+        "p99": 0.20698079645633696,
+        "max": 0.2521600127220154
+      },
+      "pearson_with_worker_total": 0.1587107368129326,
+      "pearson_with_pair_wall": 0.13596434082486925,
+      "late_mean_gpu_ms": 0.2001014862741743,
+      "timely_mean_gpu_ms": 0.19721443034567923
+    },
+    "crc": {
+      "gpu_ms": {
+        "n": 300,
+        "mean": 0.2513819731275241,
+        "p50": 0.24592000246047974,
+        "p95": 0.2755631968379021,
+        "p99": 0.32078175783157337,
+        "max": 0.8170239925384521
+      },
+      "pearson_with_worker_total": 0.043939883331621306,
+      "pearson_with_pair_wall": 0.022468802056272878,
+      "late_mean_gpu_ms": 0.25624594220093316,
+      "timely_mean_gpu_ms": 0.2507395621178285
+    }
+  },
+  "host_enqueue_us": {
+    "channel_estimation": {
+      "n": 300,
+      "mean": 987.4645266666663,
+      "p50": 577.7715000000001,
+      "p95": 3597.48405,
+      "p99": 4594.647949999986,
+      "max": 9283.182
+    },
+    "tensor_preparation": {
+      "n": 300,
+      "mean": 214.82673999999997,
+      "p50": 212.3705,
+      "p95": 235.44905,
+      "p99": 248.17625999999993,
+      "max": 272.045
+    },
+    "tensorrt_graph": {
+      "n": 300,
+      "mean": 7.442636666666664,
+      "p50": 7.344,
+      "p95": 8.027,
+      "p99": 8.4461,
+      "max": 21.431
+    },
+    "dmrs_removal": {
+      "n": 300,
+      "mean": 51.30101999999998,
+      "p50": 49.786,
+      "p95": 55.552,
+      "p99": 59.42901999999999,
+      "max": 318.184
+    },
+    "derate_match": {
+      "n": 300,
+      "mean": 1060.1050966666674,
+      "p50": 1054.4270000000001,
+      "p95": 1090.82755,
+      "p99": 1105.38023,
+      "max": 3162.87
+    },
+    "ldpc_decode": {
+      "n": 300,
+      "mean": 145.11067666666662,
+      "p50": 142.911,
+      "p95": 159.74,
+      "p99": 170.83431000000002,
+      "max": 224.964
+    },
+    "crc": {
+      "n": 300,
+      "mean": 292.8352366666669,
+      "p50": 288.352,
+      "p95": 309.5145,
+      "p99": 328.4695399999998,
+      "max": 857.747
+    }
+  },
+  "copy": {
+    "forward_gpu_us": {
+      "n": 300,
+      "mean": 36.26122652242581,
+      "p50": 20.735999569296837,
+      "p95": 67.58400052785873,
+      "p99": 69.26303833723067,
+      "max": 85.75999736785889
+    },
+    "forward_host_us": {
+      "n": 300,
+      "mean": 47.0889766666667,
+      "p50": 31.03,
+      "p95": 78.4035,
+      "p99": 80.99461,
+      "max": 95.955
+    },
+    "backward_gpu_us": {
+      "n": 300,
+      "mean": 17.150400035704177,
+      "p50": 15.072000212967396,
+      "p95": 23.713599890470505,
+      "p99": 26.415359862148748,
+      "max": 43.2640016078949
+    },
+    "backward_host_us": {
+      "n": 300,
+      "mean": 26.297326666666663,
+      "p50": 24.186500000000002,
+      "p95": 32.87405,
+      "p99": 35.63642999999998,
+      "max": 57.17
+    }
+  },
+  "interpretation": "The stage with the strongest tail and pair-wall correlation localizes the remaining fast-path violation. TensorRT and P2P distributions separate model/copy service from cuPHY channel-estimation service."
+}

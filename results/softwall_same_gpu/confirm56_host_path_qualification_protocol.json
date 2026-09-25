@@ -1,0 +1,49 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm56_host_path_qualification",
+  "frozen_before_execution": true,
+  "research_question": "Does the already qualified two-endpoint P150/D130 MPS workload meet the 25 ms conventional bound when measured from host fallback decision through commit return, and what simultaneous NRx pair time is observed?",
+  "comparison_role": "Physical service-path qualification only. Neither a joint-policy comparison nor a WCET proof.",
+  "execution_command": "srun --jobid=58729926 --overlap --ntasks=1 bash scripts_for_node/softwall_same_gpu/run_confirm56_host_path_qualification.sh",
+  "radio": {
+    "cells": 2,
+    "simultaneous_release": true,
+    "period_ms": 150,
+    "deadline_ms": 130,
+    "iterations": 1000,
+    "snr_db": -8.5,
+    "payload_seed": 20321055,
+    "channel_seed_base": 20355000
+  },
+  "contract": {
+    "nrx_bound_ms": 50,
+    "conventional_host_to_commit_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "two_endpoint_caps": [40, 40],
+    "ai_cap": 20,
+    "fallback_rule": "wait for both physical NRx completions, then conventional if needed",
+    "ai_rule": "run bounded AI only after radio completion"
+  },
+  "frozen_gates": {
+    "completed_cell_records": 2000,
+    "correct_cells_at_least": 1950,
+    "deadline_misses_by_commit_return": 0,
+    "conventional_host_path_bound_violations": 0,
+    "nrx_bound_violations": 0,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0,
+    "background_faults": 0,
+    "endpoint_faults": 0,
+    "fallback_calendar_outstanding": 0,
+    "both_endpoint_outstanding": 0,
+    "background_units_greater_than_zero": true
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_confirm56_host_path_qualification.sh": "95ec46925c4dafa8787d1be90c22f09a4e1312e7adad8239fa68bea51ec0088f",
+    "scripts_for_node/softwall_same_gpu/two_endpoint_bringup_controller_v2.py": "0ebc1f0598a18353eaa636d08ea09880c390a372afc07d1a383dfac691e3ceac",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "638a9b0e2010b24b8a0ebc6e7b7d6cabb03411525a7376bb848b3e6a798620b5",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "4573034b0f3b09c27f756d661a77eb4e7660c7981a711c7f9e5665e8a0716279",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0"
+  },
+  "interpretation_limits": "P150/D130 is synthetic and permissive; sample maxima are not WCET. This wait-both execution does not qualify NRx-conventional co-run, AI-before-radio admission, a joint policy, a strong baseline, or production MAC expiry."
+}

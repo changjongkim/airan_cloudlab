@@ -1,0 +1,84 @@
+{
+  "schema": "softwall-channel-feature-integrity-audit-v1",
+  "job": "58693851",
+  "status": "INVALID_HELDOUT; within-seed noise-mode comparisons descriptive only",
+  "train_test_channel_seed_overlap": 499,
+  "train_test_total_each": 500,
+  "train_channel_seed_range": [
+    20356001,
+    20356500
+  ],
+  "test_channel_seed_range": [
+    20356002,
+    20356501
+  ],
+  "source_snapshot_hashes_match_frozen_protocol": {
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": true,
+    "scripts_for_node/softwall_same_gpu/sweep_dual_receiver_snr.py": true,
+    "scripts_for_node/softwall_same_gpu/analyze_channel_feature_gate.py": true,
+    "scripts_for_node/softwall_same_gpu/run_channel_feature_calibration.sh": true
+  },
+  "raw_sha256": {
+    "channel_feature_job58693851_seed20356001_pre_fading.json": "7b453dff5a4d951423bf117740572898e8717d13e85f54350335c90ef790a6a8",
+    "channel_feature_job58693851_seed20356001_post_fading.json": "5f461f0d38eddd4173262037215a506cc39a28971a340ee70bd8935f7c0b60d7",
+    "channel_feature_job58693851_seed20356002_pre_fading.json": "97adc3acd0ee2d44e00611d2015aa30e5acf3bd1d3db71a69eeec45a0283a2cc",
+    "channel_feature_job58693851_seed20356002_post_fading.json": "37293d2763db909267d02b7964817fceea916e2fb2c2c5dc494c5dee655f122a"
+  },
+  "arm_summaries": {
+    "20356001_pre_fading": {
+      "conventional_correct": 184,
+      "neural_correct": 216,
+      "union_correct": 216,
+      "neural_only_correct": 32,
+      "feature_gpu_ms_median": 0.7254559993743896,
+      "feature_gpu_ms_p99_observed": 0.7717120051383972,
+      "feature_gpu_ms_max": 303.9315490722656,
+      "first_feature_gpu_ms": 303.9315490722656
+    },
+    "20356001_post_fading": {
+      "conventional_correct": 184,
+      "neural_correct": 487,
+      "union_correct": 491,
+      "neural_only_correct": 307,
+      "feature_gpu_ms_median": 0.7281280159950256,
+      "feature_gpu_ms_p99_observed": 0.7681919932365417,
+      "feature_gpu_ms_max": 5.48419189453125,
+      "first_feature_gpu_ms": 5.48419189453125
+    },
+    "20356002_pre_fading": {
+      "conventional_correct": 186,
+      "neural_correct": 213,
+      "union_correct": 214,
+      "neural_only_correct": 28,
+      "feature_gpu_ms_median": 0.7232799828052521,
+      "feature_gpu_ms_p99_observed": 0.7709119915962219,
+      "feature_gpu_ms_max": 8.022239685058594,
+      "first_feature_gpu_ms": 8.022239685058594
+    },
+    "20356002_post_fading": {
+      "conventional_correct": 187,
+      "neural_correct": 488,
+      "union_correct": 490,
+      "neural_only_correct": 303,
+      "feature_gpu_ms_median": 0.7248960137367249,
+      "feature_gpu_ms_p99_observed": 0.782912015914917,
+      "feature_gpu_ms_max": 5.611328125,
+      "first_feature_gpu_ms": 5.611328125
+    }
+  },
+  "within_seed_paired_differences": {
+    "20356001": {
+      "neural_post_only_correct": 275,
+      "neural_pre_only_correct": 4,
+      "conventional_post_only_correct": 118,
+      "conventional_pre_only_correct": 118
+    },
+    "20356002": {
+      "neural_post_only_correct": 277,
+      "neural_pre_only_correct": 2,
+      "conventional_post_only_correct": 115,
+      "conventional_pre_only_correct": 114
+    }
+  },
+  "interpretation": "The threshold test is not independent. A pre/post fading noise-reference change materially alters this synthetic workload; neither mode alone proves field-channel behavior. The observed first feature call includes cold compilation cost and must not be excluded from the frozen gate."
+}

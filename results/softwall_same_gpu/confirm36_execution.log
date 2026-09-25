@@ -1,0 +1,35 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=9.620ms max=20.291ms miss=0 correct=80 nrx=0 conv=200 bg=0 duplicate=0
+05:32:12.741287 cuphy.hpp:122    CON[701516] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x559f38a86ce0).
+confirm36 operational requalification passed
+[SAME-REQUEST-NRX] ready tag=sr_58676333_701765
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9840/10000 miss=0 nrx=9797 fallback=203 bg=0 p99=5.923ms
+05:33:01.003315 cuphy.hpp:122    CON[701777] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55ee6acc0e20).
+same-request IPC campaign completed: confirm36_same_request_natural_s2
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=10000 p99=11.987ms max=57.897ms miss=0 correct=3688 nrx=0 conv=10000 bg=0 duplicate=0
+05:48:29.034545 cuphy.hpp:122    CON[705154] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56026ee74f10).
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=10000 p99=17.113ms max=32.930ms miss=0 correct=9835 nrx=9797 conv=203 bg=0 duplicate=0
+06:03:58.490865 cuphy.hpp:122    CON[707294] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5613c8092fb0).
+external endpoint baselines completed: confirm36_same_node_baselines
+# Persistent same-request CUDA-IPC NeuralRx
+
+| policy | cap | SNR (dB) | releases | correct | NRx commit | conventional runs | fallback | recovered | miss | timeout | response p99/max (ms) | worker GPU mean (ms) | visible SMs |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| s2 | 80 | -8.5 | 10000 | 9840 | 9797 | 203 | 203 | 43 | 0 | 0 | 5.923/22.390 | 1.228 | 86 |
+
+All frozen gates pass: True.
+# External same-request endpoint vs local baselines
+
+| condition | releases | correct | deadline miss | conventional executions |
+|---|---:|---:|---:|---:|
+| conventional | 10000 | 3688 | 0 | 10000 |
+| eager dual | 10000 | 9835 | 0 | 10000 |
+| external S2 | 10000 | 9840 | 0 | 203 |
+
+External−eager: 0.0500 pp; 95% CI [-0.0088, 0.1088]; margin −0.250 pp.
+Natural recoveries: 43; external/eager wins: 7/2.
+All frozen gates pass: True.
+confirm36 same-node full comparison completed

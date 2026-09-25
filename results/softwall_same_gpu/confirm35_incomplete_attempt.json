@@ -1,0 +1,21 @@
+{
+  "schema": "softwall-incomplete-attempt-v1",
+  "campaign": "confirm35_same_node_baselines",
+  "slurm_job_id": "58674868",
+  "node": "nid001128",
+  "status": "INVALID_FOR_PAIRED_BASELINE_COMPARISON",
+  "reason": "Interactive allocation FAILED with exit code 4 at 2026-09-20T22:30:31 while its conventional-only 10000-release baseline step was active; the baseline result was never written.",
+  "slurm_step": {
+    "job_id": "58674868.11",
+    "state": "CANCELLED",
+    "elapsed": "00:30:41",
+    "exit_code": "0:15"
+  },
+  "valid_partial_result": "The separate-process same-request external S2 run finished and wrote 10000 release records: 9831 correct, 0 deadline misses, 0 endpoint timeouts. This is a standalone feasibility result only.",
+  "missing": [
+    "same-job conventional-only 10000-release result",
+    "same-job eager-dual 10000-release result",
+    "paired external-versus-baseline analysis"
+  ],
+  "resolution": "Do not cite Confirm35 as a paired comparison. Re-run all conditions together in a fresh allocation."
+}

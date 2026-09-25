@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm85_fourcell_pre_dispatch_tail_direct_instrumentation",
+  "frozen_before_execution": true,
+  "job": "58738952",
+  "node": "nid001229",
+  "prefix": "confirm85_tailprobe_job58738952",
+  "iterations": 700,
+  "cells": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 50,
+  "conv_bound_ms": 25,
+  "ai_budget_ms": 15,
+  "payload_seed": 20850055,
+  "channel_seed_base": 20861000,
+  "min_admitted": 500,
+  "frozen_gates": "Same prewarmed four-cell MPS mode and B_NRx50/B_conv25/AI15 as Confirm82, new independent seed, 700 timed releases to include the prior around-release-620 transient. Source/provenance/contract, >=500 admitted NRx with direct admission and prepare_neural_ipc host/GPU timing, zero observed current-contract safety violations, and at least one NRx response >30 ms to reproduce tail. If late tail absent, mark diagnostic inconclusive rather than attribute cause.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_confirm85_tail_probe.sh": "0a5d1dd5c6f9a5f79097c357f0cedb0bb7cec382357f1b0457bfe99d343cd580",
+    "scripts_for_node/softwall_same_gpu/four_cell_tail_probe_controller.py": "223144a0acb9184e2169e63f0bc2fd6ec5c69bd6215df42b05f892312a8b5301",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm85_tail_probe.py": "01dda3d13dd3d1adca71cc29267fc4bb72fd5ec4b898da70de80f2054bca25bc",
+    "scripts_for_node/softwall_same_gpu/s2_runner.py": "8bb2f65e2c7c1cac655b7c2d82e7ae8d3500b377b8ecde44ef491333a855be7c",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "4573034b0f3b09c27f756d661a77eb4e7660c7981a711c7f9e5665e8a0716279",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm51_n1_single_cell_diagnostic",
+  "frozen_before_execution": true,
+  "research_question": "At what one-cell period does eager-dual miss the D80 deadline, and does the transactional external path preserve deadline, radio correctness, and positive completed AI work there?",
+  "decision_at_stake": {
+    "diagnostic_pass": "If at least one preregistered period meets all crossover, radio, AI, and safety conditions in both opposite-order rounds, prioritize N2 and the full combined-baseline implementation at that period; still do not claim novelty from eager alone.",
+    "diagnostic_fail": "If no period meets all conditions, do not add seeds or relax the contract; implement a comparable multicell transactional path before judging the complete N1 grid. If that full grid also fails, pursue the N3 state-transition measurement claim."
+  },
+  "if_both_outcomes_lead_to_same_action": "Cancel this diagnostic if both outcomes would leave the next implementation priority unchanged.",
+  "comparison_role": "N1 operating-point diagnostic; eager-dual and conventional-only are ablations, not the strongest realistic opponent.",
+  "strongest_realistic_opponent": "Online channel gate plus queue-aware endpoint choice plus fixed recovery reservation plus bounded AI, with the same safety contract and GPU budget; specified in docs/current/SOFTWALL_STRONG_BASELINE_SPEC_KO.md but not implemented in Confirm51.",
+  "radio": {
+    "cells": 1,
+    "periods_ms": [90, 45, 25, 12],
+    "deadline_ms": 80,
+    "iterations_per_condition": 1000,
+    "snr_db": -8.5,
+    "rounds": [
+      {"round": 1, "payload_seed": 20321051, "channel_seed_base": 20351000, "order": ["conventional_only", "eager_dual", "external_transaction"]},
+      {"round": 2, "payload_seed": 20321052, "channel_seed_base": 20352000, "order": ["external_transaction", "eager_dual", "conventional_only"]}
+    ]
+  },
+  "execution": {
+    "same_node_and_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_condition": 20,
+    "operational_requalification": "200 conventional-only P90/D80 releases, zero misses",
+    "no_posthoc_seeds_or_threshold_changes": true
+  },
+  "transaction": {
+    "endpoint_mps_cap": 80,
+    "endpoint_timeout_ms": 30,
+    "nrx_bound_ms": 50,
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "recovery_gap_ai": true,
+    "gap_lease_must_end_before_next_release_and_fallback_start": true
+  },
+  "background_all_conditions": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "host_budget_ms": 40,
+    "socket_timeout_ms": 35,
+    "guard_ms": 2
+  },
+  "measurement_sources": {
+    "baseline": "results/softwall_same_gpu/raw/confirm51_r{round}_p{period}_{policy}_job{job}_r1_{policy}_job{job}_ran.json",
+    "external": "results/softwall_same_gpu/raw/confirm51_r{round}_p{period}_external_job{job}_cap80_job{job}_controller.json",
+    "deadline_miss": "*.json:deadline_misses and records[*].deadline_miss",
+    "correct_tb": "*.json:correct_releases and records[*].correct",
+    "ran_p99_and_baseline_slack": "*.json:response_ms.p99; eager slack = 80 - eager response_ms.p99",
+    "completed_ai_units": "*.json:background_units and background_records[*].returned_ns",
+    "ai_contract": "*.json:background_budget_violations, background_release_crossings, background_faults",
+    "external_safety": "external controller JSON:endpoint_timeouts, nrx_bound_violations, conv_bound_violations, duplicate_commits, fallback_not_started, fallback_start_late_gt_1ms, runtime_metrics, records[*].fallback_actual_start_ns",
+    "gap_lease_boundary": "external controller JSON:records[*].recovery_gap_ai_deadline_ns and background_records[*].returned_ns"
+  },
+  "diagnostic_pass_criteria": {
+    "eager_deadline_misses_each_round": "greater than zero",
+    "external_deadline_misses_each_round": 0,
+    "external_completed_ai_units_each_round": "greater than zero",
+    "external_radio_correctness_each_round": "paired correct fraction difference versus eager no less than -0.25 percentage points; report exact pair counts",
+    "external_endpoint_and_timing_contract_violations_each_round": 0,
+    "all_policies_ai_contract_violations_each_round": 0,
+    "external_gap_ai_crosses_next_release": 0
+  },
+  "evidence_grade": "C for a single period; B only if the same preregistered crossover repeats in both opposite-order rounds. Neither grade proves superiority over the combined baseline or hard worst-case isolation.",
+  "interpretation_limits": "The transactional controller supports one cell and one endpoint. P<42 ms cannot fit a 40 ms AI host budget plus 2 ms guard between releases; a zero-AI crossover is a failed user-objective gate. This diagnostic cannot decide the full 1/2/4/8-cell N1 grid. All three policies must be interpreted under the same synthetic SNR trace, not as a production slot guarantee."
+}

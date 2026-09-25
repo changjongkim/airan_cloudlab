@@ -1,0 +1,44 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm46_retirement_cpu_control",
+  "purpose": "Separate initialized GPU/MPS-client lifecycle effects from socket/process retirement and clean-PUSCH input effects after Confirm39 sham deadline misses. The MPS worker runs ten pre-ready GPU warmup units but zero units during the timed RAN epoch; the CPU worker never creates a CUDA context.",
+  "execution": {
+    "one_fresh_node_allocation": true,
+    "one_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 conventional-only P60/D35 releases with zero misses",
+    "rounds": [
+      {"round": 1, "seed": 20320001, "order": ["cpu_sham", "mps_sham"]},
+      {"round": 2, "seed": 20320002, "order": ["mps_sham", "cpu_sham"]},
+      {"round": 3, "seed": 20320003, "order": ["cpu_sham", "mps_sham"]},
+      {"round": 4, "seed": 20320004, "order": ["mps_sham", "cpu_sham"]},
+      {"round": 5, "seed": 20320005, "order": ["cpu_sham", "mps_sham"]},
+      {"round": 6, "seed": 20320006, "order": ["mps_sham", "cpu_sham"]},
+      {"round": 7, "seed": 20320007, "order": ["cpu_sham", "mps_sham"]},
+      {"round": 8, "seed": 20320008, "order": ["mps_sham", "cpu_sham"]},
+      {"round": 9, "seed": 20320009, "order": ["cpu_sham", "mps_sham"]},
+      {"round": 10, "seed": 20320010, "order": ["mps_sham", "cpu_sham"]}
+    ]
+  },
+  "radio": {
+    "iterations_per_condition": 1000,
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "warmup": 20
+  },
+  "worker": {
+    "mps_cap": 20,
+    "gpu_work_units": 0,
+    "both_retire_before_first_release": true,
+    "cpu_sham_cuda_context_created": false
+  },
+  "primary_gate": {
+    "same_node_job_trace_and_serial_conditions": true,
+    "all_radio_results_correct": true,
+    "zero_optional_gpu_work_and_no_live_worker_overlap": true,
+    "mps_retirement_excess_misses_one_sided_round_sign_p_below": 0.05
+  },
+  "interpretation_limit": "Use each seed/order pair as one unit for an exact one-sided sign test; releases within a round may share a timing disturbance. The contrast bundles GPU warmup, CUDA context creation, MPS registration and retirement; it cannot isolate which substep causes a tail. A significant MPS excess under this clean-PUSCH D35 harness supports a GPU-client-lifecycle-linked timing mechanism, not universal causality. A nonsignificant result is inconclusive, not evidence of safety. No frozen threshold is revised after seeing data."
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "aerial_tdl_compatibility_canary_retry3",
+  "retry_of": "aerial_tdl_compatibility_protocol_retry2.json",
+  "frozen_before_execution": true,
+  "prior_attempts": "58694049: 5-D host buffer rejected before channel construction. 58694074: flat buffer still rejected. 58694115: Slurm step failed before script start. 58694130: flat buffer and integer stream still rejected before channel construction. Source inspection then identified pycuphy.TdlChan rand_seed as uint16_t; prior value 20357001 exceeded its range.",
+  "operational_change_only": "Set TDL seed to 57001, within uint16, and reject out-of-range seed before GPU setup. No channel sample was produced in the previous attempts. The original TDL-A no-AWGN ten-TTI receiver-compatibility question and all-pass gate are unchanged.",
+  "radio": {
+    "profile": "Aerial TDL-A",
+    "delay_spread_ns": 30,
+    "maximum_doppler_hz": 10,
+    "antennas": "4x4 uplink",
+    "awgn_disabled": true,
+    "iterations": 10,
+    "payload_seed": 20357000,
+    "tdl_seed": 57001
+  },
+  "gate": {
+    "conventional_correct": 10,
+    "neural_correct": 10,
+    "payload_and_crc_checked": true,
+    "shape_checked": true
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/probe_aerial_tdl_compatibility.py": "196eb19d8e999b934644d3a392e41c113dd73f0f92fa8e7cabbdbb4ea9c43458",
+    "scripts_for_node/softwall_same_gpu/run_aerial_tdl_compatibility.sh": "8fb6bc378877005a210815586c83aed94ab7d9cbae9bacb294f5253d26fbbf3f",
+    "third_party/aerial-cuda-accelerated-ran/pyaerial/src/aerial/phy5g/chan_models/fading_chan.py": "1a7a018579f8c0ca526b1d7260d7d1b0113b98271e2c8605c7118b23116b63d0"
+  },
+  "interpretation_limit": "Compatibility only. On a completed decoder failure, stop this TDL-A branch and attribute the PHY interface before further workload or policy experiments."
+}

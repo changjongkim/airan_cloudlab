@@ -1,0 +1,175 @@
+{
+  "schema": "softwall-confirm137-service-bound-telemetry-v1",
+  "campaign_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_service_bound_telemetry_protocol.json",
+  "campaign_protocol_sha256": "2b400d2cc23015b41e4c3a58dbc7ff0125e95571f2f02ee9f5ee5c2d62383131",
+  "nodes": [
+    "nid001177"
+  ],
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049"
+  ],
+  "arms": [
+    {
+      "name": "s1",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s1_job58830573_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s1_job58830573_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid001177"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 8,
+      "candidate_branches": 148,
+      "ai40_candidate_exchanges": 3,
+      "minimum_reserved_horizon_margin_ms": 50.187155,
+      "counterfactual_events": 3
+    },
+    {
+      "name": "s2",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s2_job58830573_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s2_job58830573_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid001177"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 8,
+      "candidate_branches": 149,
+      "ai40_candidate_exchanges": 5,
+      "minimum_reserved_horizon_margin_ms": 49.380156,
+      "counterfactual_events": 5
+    },
+    {
+      "name": "s3",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s3_job58830573_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s3_job58830573_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid001177"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 9,
+      "candidate_branches": 150,
+      "ai40_candidate_exchanges": 4,
+      "minimum_reserved_horizon_margin_ms": 51.702519,
+      "counterfactual_events": 4
+    },
+    {
+      "name": "s4",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s4_job58830573_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s4_job58830573_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid001177"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 9,
+      "candidate_branches": 152,
+      "ai40_candidate_exchanges": 6,
+      "minimum_reserved_horizon_margin_ms": 46.851164,
+      "counterfactual_events": 6
+    },
+    {
+      "name": "s5",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s5_job58830573_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s5_job58830573_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid001177"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 8,
+      "candidate_branches": 158,
+      "ai40_candidate_exchanges": 6,
+      "minimum_reserved_horizon_margin_ms": 46.052573,
+      "counterfactual_events": 6
+    },
+    {
+      "name": "s6",
+      "result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s6_job58830573_result.json",
+      "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm137_s6_job58830573_protocol.json",
+      "seed_match": true,
+      "nodes": [
+        "nid001177"
+      ],
+      "all_pass": true,
+      "radio_records": 1280,
+      "atomic_exchanges": 10,
+      "candidate_branches": 147,
+      "ai40_candidate_exchanges": 4,
+      "minimum_reserved_horizon_margin_ms": 52.067179,
+      "counterfactual_events": 4
+    }
+  ],
+  "totals": {
+    "arms": 6,
+    "radio_records": 7680,
+    "home_releases": 1920,
+    "atomic_exchanges": 52,
+    "candidate_branches": 904,
+    "ai40_candidate_exchanges": 28,
+    "counterfactual_events": 28,
+    "minimum_physical_guarded_horizon_margin_ms": 46.052573
+  },
+  "zero_failure_sensitivity": {
+    "confidence": 0.95,
+    "tb_level_iid_upper": 0.0003899932393112149,
+    "home_release_level_iid_upper": 0.0015590606261252082,
+    "arm_level_iid_upper": 0.39303776899708265,
+    "scope": "Exact binomial zero-failure sensitivity under the stated IID unit; persistent-process and within-arm dependence mean the arm-level value is the conservative reported qualification summary. None of these values is a WCET proof."
+  },
+  "artifact_hash_mismatches": [],
+  "source_hash_mismatches": [],
+  "gates": {
+    "all_declared_arms_present": true,
+    "all_seed_pairs_match": true,
+    "all_seed_pairs_unique": true,
+    "all_arm_gates_pass": true,
+    "candidate_branch_each_arm": true,
+    "ai40_exchange_each_arm": true,
+    "nonnegative_physical_margin_each_arm": true,
+    "static_counterfactual_rejects_every_exchange": true,
+    "conditional_contract_accepts_every_exchange": true,
+    "all_event_execution_checks_pass": true,
+    "single_new_physical_node": true,
+    "artifact_hashes_match": true,
+    "source_hashes_match": true,
+    "control_rpc_telemetry": true
+  },
+  "all_pass": true,
+  "claim_boundary": "On-path wall-clock telemetry for prepare/commit/complete under the frozen 5 ms per-RPC budget in the synthetic two-home A100/MPS mode. This is finite-sample control-path qualification, not WCET, production d_MAC, cross-family, or scheduler-latency isolation evidence.",
+  "control_evidence": {
+    "declared_per_rpc_bound_ms": 5.0,
+    "records": 5993,
+    "by_operation": {
+      "commit": 124,
+      "complete": 124,
+      "prepare": 5745
+    },
+    "max_elapsed_ms_by_operation": {
+      "commit": 0.388313,
+      "complete": 1.046257,
+      "prepare": 2.593595
+    },
+    "maximum_elapsed_ms": 2.593595,
+    "faulted": 0,
+    "wall_timeout_exceeded": 0,
+    "gates": {
+      "every_arm_prepare_commit_complete_coverage": true,
+      "rpc_record_counts_reconcile": true,
+      "no_rpc_fault": true,
+      "no_wall_timeout_exceedance": true,
+      "maximum_within_declared_timeout": true
+    },
+    "all_pass": true
+  }
+}

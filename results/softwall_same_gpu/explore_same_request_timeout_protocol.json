@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "explore_same_request_timeout (raw prefix confirm32_same_request_ipc)",
+  "purpose": "Validate a real same-request optional NeuralRx endpoint in a separate cap80 MPS process using CUDA IPC input/output buffers, local LDPC/CRC, conventional fallback, and fail-closed timeout handling.",
+  "selection_source": {
+    "smoke": "cap80 CUDA IPC smoke completed 100/100 correct with 0 misses, response p99 3.767 ms and max 4.881 ms.",
+    "channel": "confirm18 identified -8.5 dB as a natural transition with conventional 180/500, NeuralRx 489/500, and union 491/500.",
+    "failed_fault_preflight": "A 20 ms endpoint timeout plus a 19.597 ms noisy conventional decode produced a 40.881 ms D35 miss. The final protocol therefore reserves recovery by fixing the endpoint timeout at 5 ms before execution."
+  },
+  "hardware": "one A100-SXM4-40GB, MIG disabled, one MPS server, controller priority 0 and endpoint cap80/priority 1",
+  "runs": 3,
+  "iterations_per_condition": 1000,
+  "radio": {
+    "input": "valid 273-PRB PUSCH with per-release block-Rayleigh channel and AWGN",
+    "snr_db": -8.5,
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "same_payload_and_channel_seed_per_round": true
+  },
+  "conditions": {
+    "conventional": "local full conventional receiver baseline",
+    "ipc_s2": "CUDA IPC NeuralRx endpoint; invalid NeuralRx result falls back to conventional",
+    "ipc_timeout": "first evaluated endpoint request delayed by 30 ms beyond a 5 ms timeout; stale result is never committed and all later requests use conventional"
+  },
+  "primary_gate": {
+    "endpoint_visible_sms": 86,
+    "ipc_s2_endpoint_timeouts": 0,
+    "ipc_s2_fallbacks_positive": true,
+    "ipc_s2_deadline_misses": 0,
+    "ipc_s2_radio_correct_not_below_conventional": true,
+    "ipc_timeout_exactly_one_per_run": true,
+    "ipc_timeout_deadline_misses": 0,
+    "ipc_timeout_no_nrx_commit_after_timeout": true,
+    "all_worker_sequence_counts_match": true
+  },
+  "interpretation_limit": "This tests one endpoint, one outstanding IPC slot, one MCS/channel point, cap80, and a bounded 30 ms response-delay fault. It is not a proof for arbitrary kernels, multi-endpoint queues, DMA faults, or mathematical WCET."
+}

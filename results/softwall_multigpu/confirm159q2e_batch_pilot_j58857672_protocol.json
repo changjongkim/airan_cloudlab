@@ -1,0 +1,192 @@
+{
+  "accepted_physical_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "actual_nrx_requests": 96,
+  "ai_offer": {
+    "admission": "launch-time global certificate with the class-specific bound; certificate rejection is an envelope observation, not a failure",
+    "minimum_executed_per_class": 1,
+    "offered_per_class": 4,
+    "order": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "rule": "deterministic round-robin by one-based radio epoch"
+  },
+  "campaign": "development",
+  "excluded_nodes": [
+    "nid001052",
+    "nid001064",
+    "nid001085",
+    "nid001088",
+    "nid001109",
+    "nid001124",
+    "nid001177",
+    "nid001285",
+    "nid001308",
+    "nid002100",
+    "nid002288"
+  ],
+  "expected_global_reject": [
+    "home1",
+    "h1-r1"
+  ],
+  "gates": {
+    "atomic_outcome_batch": "all successes observed at the common cutoff are removed in one transaction before the current-time recovery/AI certificate; no sequential partial-outcome state is exposed",
+    "crc_wire_contract": "shared recovery serializes the verified CRC decision as 0=pass and 1=fail; raw cuPHY CRC bytes remain telemetry",
+    "launch_revalidation": "a certificate build above 5 ms is discarded and rebuilt from the current clock, for at most three attempts",
+    "lifecycle": "all CUDA IPC handles close before termination ack",
+    "nrx_bound": "zero release-to-complete values above 45 ms",
+    "physical_start_guard": "the Qwen worker starts no kernel after the committed lease's absolute latest-start time; a guarded non-launch safely retires the empty lease and is reported separately",
+    "prestage": "all input/oracle generation completes before readiness; each bank copy starts after prior D155 and completes before release",
+    "recovery": "zero same-input conventional semantic mismatches",
+    "response_fence": "NRx and recovery responses are copied back to the worker and byte-compared before the completion doorbell",
+    "safety": "single commit and zero D155/path/lease/control violations",
+    "sample": "all 96 actual NeuralRx requests complete",
+    "transition": "physical commit agrees with each observed outcome",
+    "variable_context": "each class follows the frozen round-robin offer, every physical Qwen completion stays within its class bound, and each class reaches the frozen minimum executed sample",
+    "warm_recovery_lifecycle": "every shared recovery context completes the full P2P input, window install, cuPHY decode, and P2P response path before readiness; preflight latency is reported but excluded from the warm service bound"
+  },
+  "high_snr_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "iterations": 24,
+  "label": "confirm159q2e_batch_pilot_j58857672",
+  "low_snr_keys": [
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ]
+  ],
+  "mode": {
+    "ai_class_bounds_ms": {
+      "16": 35,
+      "32": 35,
+      "64": 35,
+      "128": 40,
+      "256": 65,
+      "512": 75
+    },
+    "capacity": 1,
+    "conventional_bound_ms": 25,
+    "expiry_ms": 155,
+    "guard_ms": 2,
+    "launch_control_bound_ms": 5,
+    "lifecycle": "persistent endpoints with full P2P/window/cuPHY/response-path startup preflight; all synthetic channels and validation-only local oracles are built before readiness; only GPU-bank to stable IPC-buffer copy occurs in the post-expiry interval before the next P180 release",
+    "nrx_bound_ms": 45,
+    "period_ms": 180.0,
+    "post_expiry_copy_budget_ms": 25.0,
+    "qwen_context_lengths": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "qwen_model": "Qwen/Qwen2.5-1.5B",
+    "release_lead_ms": 3000.0,
+    "warmup": 10
+  },
+  "offered_keys_per_round": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ],
+    [
+      "home1",
+      "h1-r1"
+    ]
+  ],
+  "outcome_rule": "Every CRC-correct result completed by 45 ms resolves its mandatory debt; every other accepted request executes shared recovery. Outcome counts are measurements, not pass criteria.",
+  "placement": {
+    "home0": "GPU0",
+    "home1": "GPU1",
+    "persistent_actual_nrx": "GPU3 under MPS 80",
+    "shared_cuphy_and_qwen": "GPU2 under MPS 80/20"
+  },
+  "prespec": {
+    "holdout_materialized": false,
+    "path": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm159_experiment_prespec_v1.json",
+    "sha256": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "status": "DESIGN_PRESPEC_HOLDOUT_NOT_MATERIALIZED"
+  },
+  "recovery_oracle": "worker echoes the received input to the owner for exact comparison; shared CRC pass requires exact transmitted-TB payload while CRC fail is a valid radio failure result; local/shared decoder-class disagreement is reported separately and is not a transport error",
+  "schema": "softwall-confirm159-q2-protocol-v1",
+  "scope": "C159-Q2 variable-context P180 qualification, excluded from performance confidence intervals. Passing two nodes qualifies only the six frozen class bounds in this warm synthetic placement; online BurstGPT performance, WCET, cold/long-idle, production d_MAC and integrated faults remain UQ.",
+  "seed_base": 34400000,
+  "snr_assignment_rule": "two +20 dB stable-success keys and two -8.75 dB transition keys; the transition point was fixed from the earlier independent Confirm18 500-sample sweep (conventional 0/500, NeuralRx 271/500)",
+  "source_sha256": {
+    "scripts/actual_nrx_batch_recovery_plan_v1.py": "8729b20cb6f6a817f6171f0071211f864832c0f68cca2f19793c3ef7f9a4cf26",
+    "scripts/actual_nrx_integrated_coordinator.py": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d",
+    "scripts/actual_nrx_integrated_owner.py": "0b3ad90dd898bd9abeea832c83ac2b07bb571304eae6476f52ecb0611ed2e210",
+    "scripts/actual_nrx_multi_peer_worker.py": "062e82a652535de86ccd024a38dbae1e3907b2ba7ffa607f9a4b6f50335bc298",
+    "scripts/actual_nrx_repeated_control.py": "c3a5b5c29a6f0eb8beb686e119acf466ebc5e8f2da32d756f81c922dd9c77323",
+    "scripts/actual_nrx_shared_recovery_plan_v1.py": "c9e036f23f2bf913d1b5c4b27ba9a6bb82acfdcb166400b3a9abb4c0fc6b1041",
+    "scripts/analyze_confirm159_q2.py": "c04480839fba8e68d8433b6e129ccaf0b3ae748e667ddd47e3d79d80ed1ca879",
+    "scripts/bounded_launch_revalidation.py": "725da11d755d6bba1ad1a23552bff28da09f5bb35a59a065384160d67e678819",
+    "scripts/build_confirm159_q2_protocol.py": "95191e3dccc3962686230b2a90c45543c9f875b3eebda2c390597d17df3fe037",
+    "scripts/c159_persistent_nrx_worker.py": "d43a1310a27f98c8cc5247e8d84ab0f8784c561a308be65e611f74b4aa238943",
+    "scripts/c159_prestaged_owner.py": "bd0bf68a6cc8a5e41190ea1073df7cd46936fbd49733f3b1544fc50d8a344d75",
+    "scripts/c159_q2_classes.py": "34c5b0d8353bf3ece6e603b381eddd306ce5bcc1c4830a5ee73da51b516f483b",
+    "scripts/c159_q2_coordinator.py": "1d9bb65d033c52a25d9305989840b4f823cd183c1347bbab2bccb5341da83d23",
+    "scripts/c159_q2_qwen_worker.py": "1b5e9c207354fa897b6586d6cf1ccc894edf49a095c293f8f022a0f679d524dd",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_launch_plan_v1.py": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts/run_confirm159_q2.sh": "03f8ccab3f2f4f4f6965cb9d9a5df74c53b4366b835ed77cd629a40942e83bd2",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/test_actual_nrx_batch_recovery_plan_v1.py": "3c04b5f952a38608a534920721d78e836c9f1504810f71692e45fe2ba0ccaf1f",
+    "scripts/test_bounded_launch_revalidation.py": "2170d0a1b3bddbaa2c4d35d3c83562e74a1b16e750614db9dd1a71e54dbd1589",
+    "scripts/test_c159_q2_variable_plan.py": "08e6b066d1845cf9f5ba2f05bbd78ecb4eb5770e921c6350122a2183b8660521",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run"
+}

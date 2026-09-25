@@ -1,0 +1,26 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm18_dual_receiver_transition",
+  "purpose": "Resolve the narrow correct-TB transition found between -10 dB and -8 dB and quantify natural receiver complementarity.",
+  "selection_source": {
+    "confirm17": "both paths 200/200 correct at -8 dB through +4 dB",
+    "wide_smoke": "both paths 0/10 correct at -10 dB and below"
+  },
+  "radio": {
+    "prbs": 273,
+    "mcs_index": 2,
+    "channel": "independent block-Rayleigh coefficient per RX antenna and complex AWGN",
+    "snr_db": [-10, -9.75, -9.5, -9.25, -9, -8.75, -8.5, -8.25, -8],
+    "trials_per_snr": 500,
+    "seed": 20270700
+  },
+  "metrics": [
+    "conventional correct-TB",
+    "NeuralRx correct-TB",
+    "conventional-only correct",
+    "NeuralRx-only correct",
+    "oracle union correct"
+  ],
+  "interpretation_limit": "Fine-grid selection is based on the separately retained broad sweep and smoke results; it is a follow-up protocol rather than a replacement of those outcomes."
+}

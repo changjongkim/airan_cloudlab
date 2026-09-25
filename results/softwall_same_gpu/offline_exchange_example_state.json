@@ -1,0 +1,23 @@
+{
+  "schema": "softwall-offline-decision-state-v1",
+  "purpose": "Show that the basic A-to-B credit move is reproducible by an AI-aware greedy baseline; illustrative timing, not a measured workload.",
+  "now_ms": 78,
+  "recovery": [
+    {
+      "name": "cell_A_conventional",
+      "release_ms": 60,
+      "duration_ms": 25,
+      "deadline_ms": 128,
+      "fixed_start_ms": 78
+    }
+  ],
+  "ai": [
+    {
+      "name": "ai_unit",
+      "release_ms": 78,
+      "duration_ms": 20,
+      "deadline_ms": 100,
+      "value": 1
+    }
+  ]
+}

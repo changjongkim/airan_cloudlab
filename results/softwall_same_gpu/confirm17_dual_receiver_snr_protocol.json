@@ -1,0 +1,31 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm17_dual_receiver_snr",
+  "purpose": "Measure natural radio-utility complementarity between conventional cuPHY and NeuralRx on the exact same valid PUSCH channel realization.",
+  "radio": {
+    "prbs": 273,
+    "mcs_index": 2,
+    "channel": "independent block-Rayleigh coefficient per RX antenna and complex AWGN",
+    "snr_definition": "mean post-fading resource-grid power / mean complex noise power",
+    "snr_db": [-8, -6, -4, -2, 0, 2, 4],
+    "trials_per_snr": 200,
+    "seed": 20270600
+  },
+  "receiver_order": "conventional then NeuralRx on the identical immutable noisy slot",
+  "metrics": [
+    "conventional correct-TB",
+    "NeuralRx correct-TB",
+    "both correct",
+    "conventional-only correct",
+    "NeuralRx-only correct",
+    "oracle union correct",
+    "per-path GPU latency"
+  ],
+  "gate": {
+    "all_payload decisions are byte-compared with the transmitted TB": true,
+    "same channel seed is used by both receiver paths": true,
+    "no admission decision uses future CRC or payload truth": true
+  },
+  "interpretation_limit": "The channel is a reproducible block-Rayleigh plus AWGN model implemented on the Aerial-generated grid, not a live RF or full 3GPP CDL trace."
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm26_physical_overrun",
+  "purpose": "Test mandatory conventional PHY while a separate timed-out MPS NeuralRx client continues physical GPU execution across the current and possibly later releases.",
+  "selection_source": {
+    "remaining_gap": "The earlier S2 controller called NeuralRx and conventional sequentially in one process, so cutoff did not leave a physically running optional client.",
+    "smoke26": "At cap100, a 40-graph unit averaged 44.96 ms; at cap20 it averaged 126.96 ms and remained active across later releases. Both 100-release smoke runs had zero D25 misses."
+  },
+  "mandatory_ran": {
+    "input": "clean valid 273-PRB PUSCH",
+    "path": "conventional CE+NI+EQ+de-rate-match+LDPC+CRC",
+    "period_ms": 60,
+    "deadline_ms": 25,
+    "iterations_per_run": 500,
+    "runs": 3
+  },
+  "optional_fault": {
+    "process": "separate low-priority MPS client",
+    "work_unit": "40 sequential persistent NeuralRx CUDA Graph launches",
+    "rpc_timeout_ms": 5,
+    "attempt_frequency": "every 10th release when no previous unit is outstanding",
+    "late_response_policy": "drain and record; never commit",
+    "caps": [100, 20]
+  },
+  "primary_gate": {
+    "all_ran_releases_correct": true,
+    "all_ran_deadline_misses": 0,
+    "all_fault_requests_timeout": true,
+    "all_late_responses_drained": true,
+    "no_outstanding_unit_at_end": true,
+    "no_late_result_commit": true,
+    "cap100_visible_sms": 108,
+    "cap20_visible_sms_max": 22
+  },
+  "interpretation_limit": "This validates the declared persistent NeuralRx overrun. It does not prove protection against arbitrary HBM/DMA pressure or a non-yielding single kernel, and repeated fault injection represents endpoint recovery for characterization rather than continued admission of a known-bad client."
+}

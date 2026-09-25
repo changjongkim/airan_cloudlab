@@ -1,0 +1,16 @@
+{
+  "artifact_sha256": {
+    "results/softwall_multigpu/c164e_qwenreload_dev_j58862152_protocol.json": "edc72ce3b3290bf4c4f1fe639baa6856cad599fb27ac95b95e054cef3566f4e0",
+    "results/softwall_multigpu/raw/c164e_qwenreload_dev_j58862152_gpu_inventory.csv": "9b65b94e99fbda44d7874cc96deb72a64f18e3e13110b76e80c8e06342448baa",
+    "results/softwall_multigpu/raw/c164e_qwenreload_dev_j58862152_mandatory.log": "19bac13c698bab5ed80cf5e8dbe4036e56f3b76d021ac44a48facf239cef1466"
+  },
+  "campaign": "development",
+  "correction": "start MPS with visible GPUs 0,1,2,3 and retain client CUDA_VISIBLE_DEVICES=2; change source hash and new labels before rerun",
+  "failure": "mandatory client saw cudaErrorNoDevice before readiness because MPS daemon CUDA_VISIBLE_DEVICES=2 remapped physical GPU2 to logical0 while the client again requested device2",
+  "job": "58862152",
+  "label": "c164e_qwenreload_dev_j58862152",
+  "node": "nid001288",
+  "qualification_sample": false,
+  "schema": "softwall-c164-qwen-reload-prelaunch-failure-v1",
+  "timed_release_count": 0
+}

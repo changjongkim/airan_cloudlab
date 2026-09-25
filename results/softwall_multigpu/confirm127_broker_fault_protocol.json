@@ -1,0 +1,68 @@
+{
+  "schema": "softwall-confirm127-broker-fault-protocol-v1",
+  "status": "frozen-before-formal-arms",
+  "developmental_canary": "c127_broker_fault_canary_job58819952 (excluded from formal count)",
+  "hypothesis": "A post-apply lost global-commit reply can be contained by quarantining the ambiguous request and disabling new global AI at only the affected home, while both RAN homes and the other home AI continue.",
+  "fault": {
+    "home": 0,
+    "commit_number": 30,
+    "injection": "after broker state commit, before response write",
+    "retry": "forbidden"
+  },
+  "arms": [
+    {
+      "label": "confirm127_s1_job58819952",
+      "payload_seed0": 24000051,
+      "payload_seed1": 24010051,
+      "channel_seed0": 24001000,
+      "channel_seed1": 24011000
+    },
+    {
+      "label": "confirm127_s2_job58819952",
+      "payload_seed0": 24000052,
+      "payload_seed1": 24010052,
+      "channel_seed0": 24002000,
+      "channel_seed1": 24012000
+    }
+  ],
+  "mode": {
+    "gpus": 2,
+    "homes": 2,
+    "cells_per_home": 4,
+    "nrx_endpoints_per_home": 2,
+    "iterations": 340,
+    "warmup": 20,
+    "period_ms": 180,
+    "deadline_ms": 155,
+    "nrx_bound_ms": 45,
+    "conv_bound_ms": 25,
+    "ai_guard_ms": 2,
+    "mps_caps": {
+      "nrx_each": 40,
+      "qwen_each": 20
+    }
+  },
+  "primary_gates": [
+    "all RAN releases complete after the fault",
+    "zero deadline/NRx/conventional/AI-bound/horizon violations",
+    "affected home records exactly one commit ambiguity and disables only new global AI",
+    "ambiguous request executes zero times and remains the only outstanding broker token",
+    "zero duplicate commits/executions",
+    "unaffected home completes AI after fault",
+    "all local recovery/endpoint/AI execution credits drain"
+  ],
+  "trace": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/data/public/burstgpt/softwall_burst60_prefill_trace.json",
+  "trace_sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+  "source_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/global_trace_fault_contained_controller.py": "ce06cd4b2accca46dc3011203c73ff4bf224dcca3037ec18223123da3a57dab0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/fault_contained_global_trace_client.py": "03c51c8f21a68c96eabf81b759c50e45759a5788edcbb721ed779185a19ceb3f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/fault_inject_global_trace_lease_broker.py": "ca61d5575290774083b70b6ceb5916bb956a8a5017fa2094bacdf24420f5dc19",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/run_global_ai_broker_fault_arm.sh": "d96be6f56332c2a19589fe18bb5d8276584e6dca22127afbca32021b636521e2",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/analyze_confirm127_broker_fault_campaign.py": "5b4f49c99a5a1121aa23fdca08c289fa32e539b09ac87cf3e73606dbf347a4e2",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "scope": "finite-sample two-GPU process/broker fault containment; excludes broker crash, network partition, Byzantine behavior, GPU/driver hang, and hard-WCET claims"
+}

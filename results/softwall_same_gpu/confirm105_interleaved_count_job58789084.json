@@ -1,0 +1,160 @@
+{
+  "schema": "softwall-confirm105-interleaved-count-v1",
+  "source_hashes": true,
+  "runs": [
+    {
+      "name": "run1",
+      "host": "nid001109",
+      "job": "58789084",
+      "matched_phy": true,
+      "exact_count": true,
+      "pre_ai_count": 2000,
+      "safety": true,
+      "strata": {
+        "one_two": {
+          "two_minus_one_pre_ai_ms": {
+            "n": 500,
+            "mean": 0.11224362800000003,
+            "median": 0.14029050000000076,
+            "positive_fraction": 0.546,
+            "paired_bootstrap_mean_95": [
+              0.02669731199999999,
+              0.19773190999999998
+            ]
+          },
+          "two_minus_one_timely_ai": {
+            "n": 500,
+            "mean": -0.004,
+            "median": 0.0,
+            "positive_fraction": 0.09,
+            "paired_bootstrap_mean_95": [
+              -0.04,
+              0.034
+            ]
+          },
+          "two_minus_one_correct": {
+            "n": 500,
+            "mean": 0.036,
+            "median": 0.0,
+            "positive_fraction": 0.08,
+            "paired_bootstrap_mean_95": [
+              0.004,
+              0.068
+            ]
+          }
+        },
+        "two_one": {
+          "two_minus_one_pre_ai_ms": {
+            "n": 500,
+            "mean": 0.07111115600000009,
+            "median": 0.07205500000000065,
+            "positive_fraction": 0.538,
+            "paired_bootstrap_mean_95": [
+              -0.006686061999999943,
+              0.15079839400000017
+            ]
+          },
+          "two_minus_one_timely_ai": {
+            "n": 500,
+            "mean": 0,
+            "median": 0.0,
+            "positive_fraction": 0.082,
+            "paired_bootstrap_mean_95": [
+              -0.038,
+              0.04
+            ]
+          },
+          "two_minus_one_correct": {
+            "n": 500,
+            "mean": 0.044,
+            "median": 0.0,
+            "positive_fraction": 0.094,
+            "paired_bootstrap_mean_95": [
+              0.01,
+              0.076
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "run2",
+      "host": "nid001109",
+      "job": "58789084",
+      "matched_phy": true,
+      "exact_count": true,
+      "pre_ai_count": 2000,
+      "safety": true,
+      "strata": {
+        "one_two": {
+          "two_minus_one_pre_ai_ms": {
+            "n": 500,
+            "mean": -0.0012705060000000117,
+            "median": -0.04482199999999992,
+            "positive_fraction": 0.472,
+            "paired_bootstrap_mean_95": [
+              -0.0936029059999999,
+              0.09087984600000003
+            ]
+          },
+          "two_minus_one_timely_ai": {
+            "n": 500,
+            "mean": -0.022,
+            "median": 0.0,
+            "positive_fraction": 0.036,
+            "paired_bootstrap_mean_95": [
+              -0.05,
+              0.004
+            ]
+          },
+          "two_minus_one_correct": {
+            "n": 500,
+            "mean": 0.052,
+            "median": 0.0,
+            "positive_fraction": 0.102,
+            "paired_bootstrap_mean_95": [
+              0.018,
+              0.086
+            ]
+          }
+        },
+        "two_one": {
+          "two_minus_one_pre_ai_ms": {
+            "n": 500,
+            "mean": -0.113738454,
+            "median": -0.08838100000000182,
+            "positive_fraction": 0.444,
+            "paired_bootstrap_mean_95": [
+              -0.20391313,
+              -0.023103758000000012
+            ]
+          },
+          "two_minus_one_timely_ai": {
+            "n": 500,
+            "mean": 0.022,
+            "median": 0.0,
+            "positive_fraction": 0.06,
+            "paired_bootstrap_mean_95": [
+              -0.01,
+              0.058
+            ]
+          },
+          "two_minus_one_correct": {
+            "n": 500,
+            "mean": 0.038,
+            "median": 0.0,
+            "positive_fraction": 0.076,
+            "paired_bootstrap_mean_95": [
+              0.006,
+              0.07
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "all_safety_and_pairing": true,
+  "all_four_latency_ci_lower_positive": false,
+  "all_pass": false,
+  "interpretation": "Within one persistent MPS/Qwen process, each adjacent release pair replays identical PHY with 1/2 or 2/1 NeuralRx counts. This controls between-run state drift but remains a Qwen canary, not a policy or AI-RAN application result."
+}

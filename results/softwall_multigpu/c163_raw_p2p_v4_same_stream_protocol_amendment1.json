@@ -1,0 +1,23 @@
+{
+  "schema": "softwall-protocol-amendment-v1",
+  "campaign": "c163_raw_p2p_same_stream_development",
+  "amendment": 1,
+  "frozen_before_retry": true,
+  "prior_outcome": "INFRASTRUCTURE_FAILURE_BEFORE_READY_ZERO_TIMED_SAMPLES",
+  "failure": "DirectNrx stream parameter was shadowed by the engine-file context variable, so worker initialization failed before mark_ready.",
+  "preserved_logs": {
+    "controller": {
+      "path": "results/softwall_multigpu/raw/c163_raw_p2p_v4_same_stream_job58868184_attempt1_controller.log",
+      "sha256": "fc7eddd03fdf1bd07786aa073c95f3bb9514a7978a704579e58e22d43fef2282"
+    },
+    "worker": {
+      "path": "results/softwall_multigpu/raw/c163_raw_p2p_v4_same_stream_job58868184_attempt1_worker.log",
+      "sha256": "6a4a4ac9ba2c61afb25f29b6c3448a8819319ac2fbfdcdcaed83398f64abfc5e"
+    }
+  },
+  "fix": "Rename only the engine-file local variable; no timing mechanism, seed, count, deadline, or decision rule changed.",
+  "corrected_source_sha256": {
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  },
+  "retry_rule": "Run the unchanged development protocol once. Any timed sample opens the outcome; do not overwrite either attempt."
+}

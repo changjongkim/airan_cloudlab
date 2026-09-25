@@ -38,17 +38,22 @@ def stats(values):
 
 
 class DirectNrx:
-    def __init__(self, engine_path):
+    def __init__(self, engine_path, *, stream=None):
         self.logger = trt.Logger(trt.Logger.ERROR)
         self.runtime = trt.Runtime(self.logger)
-        with open(engine_path, "rb") as stream:
-            self.engine = self.runtime.deserialize_cuda_engine(stream.read())
+        with open(engine_path, "rb") as engine_file:
+            self.engine = self.runtime.deserialize_cuda_engine(engine_file.read())
         if self.engine is None:
             raise RuntimeError("failed to deserialize TensorRT engine")
         self.context = self.engine.create_execution_context()
         if self.context is None:
             raise RuntimeError("failed to create TensorRT execution context")
-        self.stream = cp.cuda.Stream(non_blocking=True)
+        # A caller may place TensorRT on the same stream as its cuPHY stages.
+        # This removes host-side producer/consumer synchronizations while CUDA
+        # stream ordering preserves the data dependency.  Existing users keep
+        # the historical private non-blocking stream by default.
+        self.stream = stream if stream is not None else cp.cuda.Stream(non_blocking=True)
+        self.caller_owned_stream = stream is not None
         self.graph = None
         self.inputs = {}
         self.outputs = {}

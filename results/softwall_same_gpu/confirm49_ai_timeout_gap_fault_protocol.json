@@ -1,0 +1,42 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm49_ai_timeout_gap_fault",
+  "purpose": "Exercise the actual transactional recovery-gap path under a deliberately stalled AI RPC. A forced NeuralRx failure on the first timed request opens a 43 ms fallback interval; the first AI work unit responds only after 60 ms. Compare a 45 ms socket timeout that exceeds its 30 ms host lease with a 25 ms timeout inside the lease, using the same input and MPS epoch.",
+  "radio": {
+    "iterations_per_condition": 500,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "payload_seed": 20321149,
+    "order": ["timeout45", "timeout25", "timeout25", "timeout45"]
+  },
+  "execution": {
+    "same_node_allocation_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 clean conventional-only releases with zero deadline misses"
+  },
+  "fault": {
+    "forced_neural_failure_release_index": 0,
+    "ai_response_delay_unit": 1,
+    "ai_response_delay_ms": 60
+  },
+  "controller": {
+    "endpoint_mps_cap": 80,
+    "background_mps_cap": 20,
+    "nrx_bound_ms": 30,
+    "conventional_bound_ms": 35,
+    "commit_guard_ms": 2,
+    "fallback_latest_start_ms_after_release": 43,
+    "ai_budget_ms": 30,
+    "ai_guard_ms": 2,
+    "socket_timeouts_ms": {"timeout45": 45, "timeout25": 25}
+  },
+  "primary_gate": {
+    "all_runs_reach_forced_first_request_fallback_and_detect_ai_timeout": true,
+    "both_timeout45_runs_fallback_late_by_more_than_3_ms": true,
+    "both_timeout25_runs_fallback_late_by_at_most_1_ms": true,
+    "all_runs_zero_ran_deadline_misses_and_no_duplicate_commits_or_credit_leaks": true
+  },
+  "interpretation_limit": "This is an injected boundary violation diagnostic, not an expected pass of the old 45 ms contract. The first-run delay may also depend on OS scheduling. A timely fallback with a 25 ms socket timeout does not by itself prove arbitrary GPU-work cancellation or WCET; the stalled AI worker can remain active until its own response is attempted. Keep previous unperturbed results unchanged."
+}

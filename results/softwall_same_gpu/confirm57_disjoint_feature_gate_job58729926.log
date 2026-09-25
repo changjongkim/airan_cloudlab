@@ -1,0 +1,33 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[SNR] -8.5dB conv=225/500 nrx=256/500 union=258/500 conv_only=2 nrx_only=33
+03:34:22.073797 cuphy.hpp:122    CON[868606] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x561954d121f0).
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[SNR] -8.5dB conv=180/500 nrx=486/500 union=486/500 conv_only=0 nrx_only=306
+03:34:33.964652 cuphy.hpp:122    CON[868840] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5594cd391a40).
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[SNR] -8.5dB conv=195/500 nrx=491/500 union=494/500 conv_only=3 nrx_only=299
+03:34:45.850789 cuphy.hpp:122    CON[869073] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55a2f06118c0).
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[SNR] -8.5dB conv=218/500 nrx=248/500 union=248/500 conv_only=0 nrx_only=30
+03:34:57.916758 cuphy.hpp:122    CON[869306] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56185fced970).
+{
+  "all_pass": true,
+  "failed": [],
+  "train_gate": {
+    "skipped_nrx": 219,
+    "skipped_fraction": 0.438,
+    "neural_only_lost": 2,
+    "radio_loss_fraction": 0.004
+  },
+  "test_gate": {
+    "skipped_nrx": 215,
+    "skipped_fraction": 0.43,
+    "neural_only_lost": 2,
+    "radio_loss_fraction": 0.004
+  },
+  "heldout_neural_only_correct": 30,
+  "feature_gpu_ms": {
+    "max": 3.452672004699707,
+    "median": 0.7237439751625061
+  }
+}

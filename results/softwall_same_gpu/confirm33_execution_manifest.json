@@ -1,0 +1,69 @@
+{
+  "schema": "softwall-live-execution-manifest-v1",
+  "campaign": "confirm33_same_request_natural_s2",
+  "observed_utc": "2026-09-21T04:36:30.235477+00:00",
+  "observed_while_running": true,
+  "host": "nid001068",
+  "slurm_job_id": "58673249",
+  "processes": {
+    "launcher": {
+      "pid": 842175,
+      "cmdline": [
+        "bash",
+        "scripts_for_node/softwall_same_gpu/run_same_request_ipc.sh",
+        "confirm33_same_request_natural_s2",
+        "10000"
+      ],
+      "proc_start_ticks": 36905732
+    },
+    "worker": {
+      "pid": 842186,
+      "cmdline": [
+        "python3",
+        "/softwall/same_request_ipc_worker.py",
+        "--tag",
+        "sr_58673249_842175",
+        "--ipc-dir",
+        "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58673249",
+        "--engine",
+        "/softwall_runtime/engines/neural_rx_fp16_full.trt",
+        "--output",
+        "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_same_gpu/raw/confirm33_same_request_natural_s2_cap80_job58673249_worker.json"
+      ],
+      "proc_start_ticks": 36905735
+    },
+    "controller": {
+      "pid": 842187,
+      "cmdline": [
+        "python3",
+        "/softwall/same_request_ipc_controller.py",
+        "--tag",
+        "sr_58673249_842175",
+        "--ipc-dir",
+        "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58673249",
+        "--engine",
+        "/softwall_runtime/engines/neural_rx_fp16_full.trt",
+        "--output",
+        "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_same_gpu/raw/confirm33_same_request_natural_s2_cap80_job58673249_controller.json",
+        "--iterations",
+        "10000",
+        "--warmup",
+        "20",
+        "--period-ms",
+        "90",
+        "--deadline-ms",
+        "80",
+        "--endpoint-timeout-ms",
+        "30",
+        "--seed",
+        "20321033",
+        "--snr-db",
+        "-8.5",
+        "--channel-seed-base",
+        "20323000"
+      ],
+      "proc_start_ticks": 36905735
+    }
+  },
+  "note": "Contemporaneous capture of exact process command lines; the frozen protocol omitted payload_seed."
+}

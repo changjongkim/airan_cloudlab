@@ -1,0 +1,47 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm64_unresolved_ai_reverse",
+  "frozen_before_execution": true,
+  "motivation": "Confirm63 off-then-one had negative AI completion difference. Fresh channel seeds and reversed one-then-off execution order test whether the sign is robust to order; no threshold retuning.",
+  "research_question": "Does submitting one bounded AI RPC while NeuralRx remains unobserved retain the same radio/safety outcome and how does total AI throughput change under fresh seeds and reverse order?",
+  "execution_order": [
+    "one",
+    "off"
+  ],
+  "execution_command_template": "srun --jobid=58729926 --overlap --ntasks=1 bash scripts_for_node/softwall_same_gpu/run_confirm64_reverse_arm.sh {mode}",
+  "allocation_job": "58729926",
+  "iterations": 200,
+  "cells": 2,
+  "period_ms": 150,
+  "deadline_ms": 130,
+  "payload_seed": 20620002,
+  "channel_seed_base": 20621000,
+  "snr_db": -8.5,
+  "noise_reference": "pre_fading",
+  "gate_threshold": 1.9490545988082886,
+  "gpu_contract": {
+    "nrx_cap_each": 40,
+    "ai_cap": 20,
+    "nrx_bound_ms": 50,
+    "conv_path_bound_ms": 25,
+    "ai_host_budget_ms": 40,
+    "ai_rpc_timeout_ms": 35,
+    "ai_guard_ms": 2,
+    "commit_guard_ms": 2
+  },
+  "conv_path_bound_ms": 25,
+  "ai_guard_ns": 2000000,
+  "min_pre_radio_ai_units": 100,
+  "min_correct_cell_difference": -2,
+  "frozen_gates": "Same trace, zero deadline/path/AI/credit violation; one-mode >=100 pre-radio AI RPCs completed before first fallback guard; radio loss <=2/400. Total AI throughput sign and latency difference are reported without a pass threshold to avoid redefining the earlier negative result.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/two_endpoint_unresolved_ai_controller.py": "148abbf219f0f03f90726f713e517bcb5a6c41aaf1fb97c26496f331da76de00",
+    "scripts_for_node/softwall_same_gpu/run_confirm64_reverse_arm.sh": "baf3f35150db22ce4165d980feebaad6210d8e78e0bf012fca15f68e6a0b2c27",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm64_reverse.py": "236bc154bf1c9a65d046eba99be6e4a471b23ce283208faa55a95f4448dbf84a",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "f3517db693aa8754512bcc3a358a7b264a6d595b2fb61a108cf2d215670869ba",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "4573034b0f3b09c27f756d661a77eb4e7660c7981a711c7f9e5665e8a0716279",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0"
+  },
+  "interpretation_limits": "Two 200-release orders are a diagnostic for order confounding, not a strong statistical proof of causal throughput difference or production guarantee. Host outstanding overlap, no GPU kernel overlap proof or WCET."
+}

@@ -1,0 +1,81 @@
+{
+  "artifacts": [
+    {
+      "bytes": 3918,
+      "path": "results/softwall_multigpu/confirm156_timeline_job58853926_protocol.json",
+      "sha256": "f4a4b280543a402a612012c746028da1e273ca5055731dae3bc96471d9fd7568"
+    },
+    {
+      "bytes": 1197,
+      "path": "results/softwall_multigpu/confirm156_timeline_job58853926_peer_spec.json",
+      "sha256": "f9b8eae602a3b1413e95c4a942ec947db19e123fdcf4cb8bad8286e042a4eea7"
+    },
+    {
+      "bytes": 344,
+      "path": "results/softwall_multigpu/raw/confirm156_timeline_job58853926_gpu_inventory.csv",
+      "sha256": "d457e402902d40a8e515808bc4a5beff7da2b79adff692f9d0aba3e80f93c7ce"
+    },
+    {
+      "bytes": 7041,
+      "path": "results/softwall_multigpu/raw/confirm156_timeline_job58853926_worker.json",
+      "sha256": "e5625a844abc74a11bccada639c9a31c5ccb51f0d63b4d4491d1026d2ba08e4e"
+    },
+    {
+      "bytes": 1761,
+      "path": "results/softwall_multigpu/raw/confirm156_timeline_job58853926_qwen.json",
+      "sha256": "ef39c33eba925cc023e88c4b00934dd2dcb9c914e06f1c023d26966b2c2ce6e6"
+    },
+    {
+      "bytes": 612761,
+      "path": "results/softwall_multigpu/raw/confirm156_timeline_job58853926_worker_profile.nsys-rep",
+      "sha256": "4b48611b8d6f0414bbf25f039b184e88cc07bc3294d9d039b8b26fd17043b6f0"
+    },
+    {
+      "bytes": 1355776,
+      "path": "results/softwall_multigpu/raw/confirm156_timeline_job58853926_worker_profile.sqlite",
+      "sha256": "8d89025bb9e4456391e69a86315874cf92ece9e7c99c319981827d3bcdb9b318"
+    },
+    {
+      "bytes": 640600,
+      "path": "results/softwall_multigpu/raw/confirm156_timeline_job58853926_qwen_profile.nsys-rep",
+      "sha256": "cdfd718a37f2d8f09445e307bf0fb2a6e69df7a85d1eba54f6ff0918fbad00bb"
+    },
+    {
+      "bytes": 1462272,
+      "path": "results/softwall_multigpu/raw/confirm156_timeline_job58853926_qwen_profile.sqlite",
+      "sha256": "248b5cf04648fe1ae20d3e67e312263e122bf15cc6eda1225c23e04e8ffef5ba"
+    }
+  ],
+  "diagnosis": "Nsight Systems 13.2 exports TARGET_INFO_SESSION_START_TIME.utcEpochNs; the first analyzer accepted only the older systemClockNs schema. Physical Qwen/cuPHY execution and both .nsys-rep/.sqlite traces completed before the error.",
+  "failure": "sqlite3.OperationalError: no such column: systemClockNs",
+  "failure_stage": "post-run analysis",
+  "job_id": "58853926",
+  "label": "confirm156_timeline_job58853926",
+  "node": "nid001085",
+  "physical_summary": {
+    "physical_recoveries": 2,
+    "qwen_fence_confirmed": true,
+    "worker_error": null
+  },
+  "protocol_source_sha256": {
+    "scripts/analyze_confirm156_timeline.py": "93e844b800bff440c0891e39abc6648a502f5f9b4b2ba1bbb0b7d1c9e4222954",
+    "scripts/build_confirm154_peer_spec.py": "8681dc95d75c9bcc4f04bbf7870b741c92037093d67d439ce2f1e7bad74c6b0b",
+    "scripts/build_confirm156_timeline_protocol.py": "f43081f934735b72427229776af44245d029edea15c31248ce717dc744b2956f",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_holdout_plan_v1.py": "792cfce1235761f6156f9197b4b652dca95610cb5f647d0fc26cac9e7a202876",
+    "scripts/integrated_shared_recovery_owner.py": "b703a5decddcd0322bf146aade5d4848494b5860bc3c49eca506c7b735789699",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_timeline_worker.py": "96624923b0df92e2d08e773fa7372aa700549a241e3b0ac843719ef4903fd676",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/run_confirm156_timeline.sh": "4fa3aa61412e0f4fe7afc46980b5b0034483ea37a6fcdab51d6ae0b9a5ae24b4",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "schema": "softwall-confirm156-attempt-failure-v1",
+  "scientific_use": "Excluded from C156 PASS/FAIL; rerun requires a newly frozen source hash and ID.",
+  "status": "ANALYZER_COMPATIBILITY_FAIL_PHYSICAL_TRACE_PRESERVED"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "softwall-offline-decision-screen-v1",
+  "state": "results/softwall_same_gpu/offline_exchange_example_state.json",
+  "scope": "visible jobs after physical NRx completion; one serial lane; no future AI",
+  "fixed": {
+    "value": 0,
+    "admitted": [],
+    "schedule": [
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 78,
+        "finish_ms": 103
+      }
+    ]
+  },
+  "greedy_density": {
+    "value": 1,
+    "admitted": [
+      "ai_unit"
+    ],
+    "schedule": [
+      {
+        "job": "ai_unit",
+        "start_ms": 78,
+        "finish_ms": 98
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 98,
+        "finish_ms": 123
+      }
+    ]
+  },
+  "greedy_deadline": {
+    "value": 1,
+    "admitted": [
+      "ai_unit"
+    ],
+    "schedule": [
+      {
+        "job": "ai_unit",
+        "start_ms": 78,
+        "finish_ms": 98
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 98,
+        "finish_ms": 123
+      }
+    ]
+  },
+  "greedy_value": {
+    "value": 1,
+    "admitted": [
+      "ai_unit"
+    ],
+    "schedule": [
+      {
+        "job": "ai_unit",
+        "start_ms": 78,
+        "finish_ms": 98
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 98,
+        "finish_ms": 123
+      }
+    ]
+  },
+  "joint_exact": {
+    "value": 1,
+    "admitted": [
+      "ai_unit"
+    ],
+    "schedule": [
+      {
+        "job": "ai_unit",
+        "start_ms": 78,
+        "finish_ms": 98
+      },
+      {
+        "job": "cell_A_conventional",
+        "start_ms": 98,
+        "finish_ms": 123
+      }
+    ]
+  }
+}

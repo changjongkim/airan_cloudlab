@@ -1,0 +1,78 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "c161_full_fault_qualification.json": "d039bb3e5f3a7af4d51e1bf5c2c3a035a93846c8cef177453427edcdcb4a003b",
+    "c162_boundary_two_node.json": "2daa077c46ffadc55d45e5149ac6eb51d2a753589713ea37d24a5875a18c207f",
+    "c162_feasibility_grid_v1.json": "f5da8016215c2896ef4d9f19be4e8ea386529a46c590407602fb116daddc60c7",
+    "c162_q2_retrospective_validation.json": "597331b014490a62d997df81f00ff5e3d0bc501e7a5f687d6c69d2fe2c37d12e",
+    "c162_scheduler_scalability_v1.json": "cce6f3eb3184b7007d1074f7212c37234c81ef0a0bee5ec8c774fc8015191fed",
+    "c164_lifecycle_qualification_summary_v1.json": "e56cab58cbb0db923aaacef3bea5d8dcdfd466b7376fe476368073b644cd24a6",
+    "c164i3_processreplace_dev_j58862843_result.json": "a43b4c2ccb6acbad1573c286c5166a053fc5b972f5b4c13c2b242c337d4dc3a7",
+    "confirm159_q2_variable_two_node.json": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692",
+    "confirm159_q3_oracle_screen_v1.json": "37298e64d351635f7973a25eac06a44cb85260f1eb06b65a909ba77173772ef8",
+    "docs/current/SOFTWALL_MANUSCRIPT_DRAFT_EN.md": "b725721774c93a46949a7129320a397b9844fcd30c149263cf367bff359594f9",
+    "docs/current/SOFTWALL_NOVELTY_DEFENSE_MATRIX_KO.md": "6b7ff8b99e11cd254055eb8d3f6862fd519b336aa819bdc84ad58455319e47e0",
+    "docs/current/figures/softwall_c162_envelope_scalability.svg": "8119f4de46c44c7081d42b3f4bf5885d92d5efc92367aaffebf8af612f5c6195",
+    "docs/current/figures/softwall_system_contract.svg": "be596e777308b03609c35d2a671bcf2bd35e236ea037e667cc88e336e0f86404",
+    "scripts_for_node/softwall_same_gpu/audit_softwall_manuscript_claims.py": "fd48012e510d14180d8b2ba712a2014bfad099be5e9041baabb3f78e9e01ec52",
+    "softwall_necessity_witness_v2.json": "3f881db8250c01d5fe86eb247ba1523286c134d5bf83f7b477985c28fe1b8fea",
+    "softwall_production_exit_gate_v2.json": "b00759035ec1870b982eeae457f867f1ef42b62461fb171cf88b10e0ede8ace1"
+  },
+  "checks": {
+    "certified_scheduler": true,
+    "claim_scoped_lifecycle": true,
+    "closest_work_covered": true,
+    "fault_authoritative_counts": true,
+    "forbidden_overclaim_absent": true,
+    "manuscript_numbers_present": true,
+    "manuscript_scope_present": true,
+    "model_exact_and_retrospective": true,
+    "necessity_witness": true,
+    "negative_performance_result": true,
+    "paper_figures_present": true,
+    "physical_boundary": true,
+    "production_exit_scope_preserved": true,
+    "q2_authoritative_counts": true
+  },
+  "evidence": {
+    "boundary_rounds": 180,
+    "debt64_decision_p99_ms": 1.4943320000000002,
+    "fault": {
+      "actual_nrx_requests": 2800,
+      "deadline_misses": 0,
+      "physical_recoveries": 942,
+      "post_terminal_radio_rounds": 260,
+      "radio_commits": 2800
+    },
+    "lifecycle_counts": {
+      "qualified_or_partial_modes": 5,
+      "total_modes": 10,
+      "unqualified_modes": 5
+    },
+    "model_states": 16023,
+    "necessity": {
+      "maximum_contract_excess_ms": 12,
+      "minimum_contract_excess_ms": 1,
+      "physical_softwall_reject_rounds": 60,
+      "prespecified_false_safe_cases": 2,
+      "recovery_first_timely_tokens": 385262,
+      "softwall_timely_tokens": 385262
+    },
+    "oracle_timely_tokens": 385262,
+    "production_exit": {
+      "channel_gate_pass": true,
+      "raw_iq_timely": 885,
+      "status": "FAIL_CURRENT_DESIGN_NOT_PRODUCTION_QUALIFIED",
+      "timing_gate_pass": false
+    },
+    "q2": {
+      "actual_nrx_requests": 4800,
+      "deadline_misses": 0,
+      "physical_recoveries": 1312,
+      "qwen_units": 1077,
+      "radio_commits": 4800
+    }
+  },
+  "schema": "softwall-manuscript-claim-audit-v1",
+  "status": "SOFTWALL_MANUSCRIPT_CLAIMS_AUDITED_PASS"
+}

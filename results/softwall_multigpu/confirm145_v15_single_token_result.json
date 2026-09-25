@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-v15-single-token-node-requalification-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm145_v15_single_token_protocol.json",
+  "protocol_sha256": "30f1a261ffc8d5f77af947ebe2d0906c99b4a17a83ab281ac97501a4a55ac6ea",
+  "nodes": [
+    "nid001244"
+  ],
+  "ai45_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm145_ai45_job58834709_result.json",
+  "fault_results": [
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm145_prepare_job58834709_result.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm145_commit_job58834709_result.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm145_complete_job58834709_result.json"
+  ],
+  "totals": {
+    "radio_records": 6080,
+    "ai45_exchanges": 7,
+    "radio_after_fault": 3731,
+    "fault_arms": 3,
+    "suppressed_prepare_due_owned_token": 273,
+    "maximum_unlaunched_tokens": 1
+  },
+  "source_hash_mismatches": [],
+  "gates": {
+    "one_expected_node": true,
+    "excluded_nodes_avoided": true,
+    "ai45_arm_pass": true,
+    "ai45_exchange_observed": true,
+    "three_fault_points": true,
+    "all_fault_arms_pass": true,
+    "all_radio_continues_after_fault": true,
+    "ownership_evidence_present": true,
+    "single_unlaunched_token": true,
+    "retained_token_branch_exercised": true,
+    "no_source_mismatch": true
+  },
+  "all_pass": true,
+  "claim_boundary": "One A100-node finite-sample V15 requalification of AI45, one post-apply fault arm per control point, and the retained-token ownership branch. Not WCET, production d_MAC, or cross-family evidence."
+}

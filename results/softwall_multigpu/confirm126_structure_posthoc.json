@@ -1,0 +1,405 @@
+{
+  "schema": "softwall-confirm126-structure-posthoc-v1",
+  "status": "posthoc",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm126_certificate_global_vs_static_protocol.json",
+  "frozen_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm126_certificate_global_vs_static_result.json",
+  "frozen_structural_pass": false,
+  "safety_mechanism": {
+    "all_arm_wrappers_pass": true,
+    "totals": {
+      "deadline_misses": 0,
+      "nrx_bound_violations": 0,
+      "conv_bound_violations": 0,
+      "conv_path_bound_violations": 0,
+      "background_budget_violations": 0,
+      "background_horizon_violations": 0,
+      "tb": 21760,
+      "atomic_exchanges": 2496
+    },
+    "maxima": {
+      "nrx_response_ms": 38.394435,
+      "conv_host_ms": 13.685371,
+      "radio_commit_response_ms": 79.502143
+    },
+    "broker_all_drained_unique": true
+  },
+  "comparison_validity": {
+    "strict_radio_decision_parity": false,
+    "within_policy_repeat_differences": [
+      {
+        "seed": 1,
+        "policy": "global",
+        "left": "c126_s1_g1_job58819952",
+        "right": "c126_s1_g2_job58819952",
+        "decision_difference_count": 4,
+        "differences": [
+          {
+            "home": 0,
+            "index": 0,
+            "cell": 0,
+            "left": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ]
+          },
+          {
+            "home": 0,
+            "index": 0,
+            "cell": 1,
+            "left": [
+              false,
+              true,
+              "nrx1",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ]
+          },
+          {
+            "home": 0,
+            "index": 0,
+            "cell": 3,
+            "left": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ],
+            "right": [
+              false,
+              true,
+              "nrx1",
+              true,
+              "conventional"
+            ]
+          },
+          {
+            "home": 0,
+            "index": 33,
+            "cell": 0,
+            "left": [
+              false,
+              true,
+              "nrx1",
+              false,
+              "nrx"
+            ],
+            "right": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ]
+          }
+        ]
+      },
+      {
+        "seed": 1,
+        "policy": "static_partition",
+        "left": "c126_s1_p1_job58819952",
+        "right": "c126_s1_p2_job58819952",
+        "decision_difference_count": 0,
+        "differences": []
+      },
+      {
+        "seed": 2,
+        "policy": "global",
+        "left": "c126_s2_g1_job58819952",
+        "right": "c126_s2_g2_job58819952",
+        "decision_difference_count": 4,
+        "differences": [
+          {
+            "home": 0,
+            "index": 0,
+            "cell": 0,
+            "left": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ]
+          },
+          {
+            "home": 1,
+            "index": 0,
+            "cell": 0,
+            "left": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ]
+          },
+          {
+            "home": 1,
+            "index": 0,
+            "cell": 1,
+            "left": [
+              false,
+              true,
+              "nrx1",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ]
+          },
+          {
+            "home": 1,
+            "index": 0,
+            "cell": 3,
+            "left": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ],
+            "right": [
+              false,
+              true,
+              "nrx1",
+              true,
+              "conventional"
+            ]
+          }
+        ]
+      },
+      {
+        "seed": 2,
+        "policy": "static_partition",
+        "left": "c126_s2_p1_job58819952",
+        "right": "c126_s2_p2_job58819952",
+        "decision_difference_count": 4,
+        "differences": [
+          {
+            "home": 0,
+            "index": 0,
+            "cell": 0,
+            "left": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ]
+          },
+          {
+            "home": 1,
+            "index": 0,
+            "cell": 0,
+            "left": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ]
+          },
+          {
+            "home": 1,
+            "index": 0,
+            "cell": 1,
+            "left": [
+              false,
+              true,
+              "nrx1",
+              true,
+              "conventional"
+            ],
+            "right": [
+              false,
+              true,
+              "nrx0",
+              true,
+              "conventional"
+            ]
+          },
+          {
+            "home": 1,
+            "index": 0,
+            "cell": 3,
+            "left": [
+              false,
+              false,
+              null,
+              false,
+              "conventional"
+            ],
+            "right": [
+              false,
+              true,
+              "nrx1",
+              true,
+              "conventional"
+            ]
+          }
+        ]
+      }
+    ],
+    "interpretation": "All arms validate fail-closed substrate safety for the exact mode. Timing-dependent radio admission differences invalidate a strict same-radio throughput comparison, independently of the already-failed >=2% outcome gate."
+  },
+  "arms": [
+    {
+      "label": "c126_s1_g1_job58819952",
+      "seed": 1,
+      "policy": "global",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1263,
+      "nrx_commits": 861,
+      "conv_commits": 1859,
+      "atomic_exchanges": 319,
+      "ai_tokens": 288209
+    },
+    {
+      "label": "c126_s1_p1_job58819952",
+      "seed": 1,
+      "policy": "static_partition",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1264,
+      "nrx_commits": 861,
+      "conv_commits": 1859,
+      "atomic_exchanges": 313,
+      "ai_tokens": 288195
+    },
+    {
+      "label": "c126_s1_p2_job58819952",
+      "seed": 1,
+      "policy": "static_partition",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1262,
+      "nrx_commits": 861,
+      "conv_commits": 1859,
+      "atomic_exchanges": 313,
+      "ai_tokens": 288195
+    },
+    {
+      "label": "c126_s1_g2_job58819952",
+      "seed": 1,
+      "policy": "global",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1262,
+      "nrx_commits": 860,
+      "conv_commits": 1860,
+      "atomic_exchanges": 319,
+      "ai_tokens": 288209
+    },
+    {
+      "label": "c126_s2_p1_job58819952",
+      "seed": 2,
+      "policy": "static_partition",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1209,
+      "nrx_commits": 853,
+      "conv_commits": 1867,
+      "atomic_exchanges": 305,
+      "ai_tokens": 288195
+    },
+    {
+      "label": "c126_s2_g1_job58819952",
+      "seed": 2,
+      "policy": "global",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1211,
+      "nrx_commits": 853,
+      "conv_commits": 1867,
+      "atomic_exchanges": 312,
+      "ai_tokens": 288209
+    },
+    {
+      "label": "c126_s2_g2_job58819952",
+      "seed": 2,
+      "policy": "global",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1209,
+      "nrx_commits": 853,
+      "conv_commits": 1867,
+      "atomic_exchanges": 310,
+      "ai_tokens": 288317
+    },
+    {
+      "label": "c126_s2_p2_job58819952",
+      "seed": 2,
+      "policy": "static_partition",
+      "wrapper_pass": true,
+      "tb": 2720,
+      "radio_correct": 1209,
+      "nrx_commits": 853,
+      "conv_commits": 1867,
+      "atomic_exchanges": 305,
+      "ai_tokens": 288195
+    }
+  ],
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm126_certificate_global_vs_static_protocol.json": "93e03121936e329bb50d81b22e57aa4ee27b720530f771c301eba5eb8aa62862",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm126_certificate_global_vs_static_result.json": "c2efee51504c8ee043ab49470aba5faf66b4a883873fdb03b80bb1862bb873f0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s1_g1_job58819952_result.json": "e479a51936a480de2701c40a354375753840069f148aec3e411c57e6b8c3aa0d",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s1_p1_job58819952_result.json": "4298afb2fd4b8295533f1768e658554ed56e48be45bf27ad5162f06607a3487b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s1_p2_job58819952_result.json": "55c0e5674bcd9ac4a67751f20ea90f024ab42f9c82ea622df025d7c5795d2b61",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s1_g2_job58819952_result.json": "6a537a30031df5720c3d67317f5ded51c00f71acc8581437c76306f68f9ac0f4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s2_p1_job58819952_result.json": "88565c485632da1c064dcc4310c159d5238c13677e84d6ea1e0857959eeb2a42",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s2_g1_job58819952_result.json": "dc7a7c06b7f5b4b281c9c9d25c7db2c42e19cce5e7af380c98a74b4800f7e123",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s2_g2_job58819952_result.json": "0a6dd8dd273fa65fdc798e2c459f69fb884ffb29c190f8b04183fc01bf67abd5",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c126_s2_p2_job58819952_result.json": "ac8b36b2bebfd7408f6c9e76872f325bbfd8136e687af896638e3d63a37760a5"
+  }
+}

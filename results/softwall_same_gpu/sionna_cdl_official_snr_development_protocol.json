@@ -1,0 +1,30 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "sionna_cdl_official_snr_screen",
+  "frozen_before_execution": true,
+  "role": "Development screen for model operation in its declared SNR domain; not a BLER holdout.",
+  "prior_result": "Exact Sionna CDL-A at 30 dB produced conventional 20/20 and NeuralRx 0/20.",
+  "hypothesis": "The public model is evaluated only at -4.0 to -3.0 dB; 30 dB may be out of distribution.",
+  "esno_grid_db": [
+    -4.0,
+    -3.8,
+    -3.6,
+    -3.4,
+    -3.2,
+    -3.0
+  ],
+  "iterations_per_snr": 100,
+  "fixed_payload": true,
+  "varying_cdl_realization": true,
+  "payload_seed": 20358800,
+  "channel_seed": 58801,
+  "decision_rule": "NeuralRx must decode at least one TB and its aggregate correct count must exceed conventional to justify a variable-payload frozen holdout. Otherwise stop and diagnose engine/tensor semantics.",
+  "claim_boundary": "Fixed-payload development data cannot support a BLER or generalization claim.",
+  "source_sha256_before_execution": {
+    "probe_sionna_cdl_official_snr_development.py": "aba641990b54890a205bf334e4ecb6268ae7571ea86a82f5325b66ec6f7e5971",
+    "probe_sionna_cdl_reference_development.py": "cd619362474010d62c00929272ea7eb3450af3adc40a07dc061aeb9c48525f08",
+    "run_sionna_cdl_official_snr_development.sh": "49eb7c8fdc46726abc89fde0d344f6797a86f69b6f500abff86da6b3a24b19fb",
+    "dual_receiver_phy.py": "40b4561636a5037f398b534ca0739b4bd35cdd590bf3386c70bbf97fa46e78d5",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

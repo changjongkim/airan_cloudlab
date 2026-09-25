@@ -1,0 +1,55 @@
+{
+  "schema": "softwall-confirm95-actual-ai8-fourcell-v1",
+  "job": "58746343",
+  "node": "nid001093",
+  "source_hashes": true,
+  "prior_mode_pass": true,
+  "arms": [
+    {
+      "name": "a",
+      "prefix": "confirm95_a_ai8_job58746343",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true,
+        "coverage": true
+      },
+      "all_pass": true,
+      "nrx_paths": 1688,
+      "nrx_max_ms": 18.950207,
+      "conv_paths": 2827,
+      "conv_max_ms": 4.28959,
+      "ai_units": 45578,
+      "ai_host_max_ms": 6.789638,
+      "two_admitted_releases": 725,
+      "injected_all_fail_releases": 153,
+      "min_ai_completed_by_d153_in_all_fail": 38,
+      "joint_ai_units": 356,
+      "deadline_misses": 0
+    },
+    {
+      "name": "b",
+      "prefix": "confirm95_b_ai8_job58746343",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true,
+        "coverage": true
+      },
+      "all_pass": true,
+      "nrx_paths": 1716,
+      "nrx_max_ms": 19.649341,
+      "conv_paths": 2781,
+      "conv_max_ms": 4.508304,
+      "ai_units": 45594,
+      "ai_host_max_ms": 4.998703,
+      "two_admitted_releases": 747,
+      "injected_all_fail_releases": 143,
+      "min_ai_completed_by_d153_in_all_fail": 38,
+      "joint_ai_units": 345,
+      "deadline_misses": 0
+    }
+  ],
+  "all_pass": true,
+  "interpretation": "Finite prewarmed four-cell GC-OFF sample with actual AI8 host budget, NRx30/conv12 calendar and 153-ms AI observation deadline. Seven AI returns by D153 in injected all-fail releases are observational after-radio completions; the controller does not issue seven atomic pre-recovery leases. Passing is not WCET or a production DU guarantee. If AI8 qualifies, 30+4*12+7*8+2=136<155 eliminates the seven-unit all-fail capacity pressure of the prior 15-ms abstract model under serial worst-case arithmetic, conditional on seven-unit lease implementation and mode preservation."
+}

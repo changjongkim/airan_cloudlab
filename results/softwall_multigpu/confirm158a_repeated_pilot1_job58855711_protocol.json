@@ -1,0 +1,134 @@
+{
+  "accepted_physical_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "actual_nrx_requests": 40,
+  "campaign": "development",
+  "excluded_nodes": [
+    "nid001064",
+    "nid001085",
+    "nid001109"
+  ],
+  "expected_global_reject": [
+    "home1",
+    "h1-r1"
+  ],
+  "gates": {
+    "lifecycle": "all CUDA IPC handles close before termination ack",
+    "nrx_bound": "zero release-to-complete values above 45 ms",
+    "recovery": "zero same-input conventional semantic mismatches",
+    "safety": "single commit and zero D155/path/lease/control violations",
+    "sample": "all 40 actual NeuralRx requests complete",
+    "transition": "physical commit agrees with each observed outcome"
+  },
+  "high_snr_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "iterations": 10,
+  "label": "confirm158a_repeated_pilot1_job58855711",
+  "low_snr_keys": [
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ]
+  ],
+  "mode": {
+    "ai_bound_ms": 35,
+    "capacity": 1,
+    "conventional_bound_ms": 25,
+    "expiry_ms": 155,
+    "guard_ms": 2,
+    "launch_control_bound_ms": 5,
+    "lifecycle": "persistent endpoints; one declared activation per epoch 100 ms before release; next validation input is staged only after the preceding 155 ms expiry",
+    "nrx_bound_ms": 45,
+    "period_ms": 600.0,
+    "qwen_context_length": 64,
+    "qwen_model": "Qwen/Qwen2.5-1.5B",
+    "release_lead_ms": 3000.0,
+    "release_prewarm_lead_ms": 100.0,
+    "warmup": 10
+  },
+  "offered_keys_per_round": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ],
+    [
+      "home1",
+      "h1-r1"
+    ]
+  ],
+  "outcome_rule": "Every CRC-correct result completed by 45 ms resolves its mandatory debt; every other accepted request executes shared recovery. Outcome counts are measurements, not pass criteria.",
+  "placement": {
+    "home0": "GPU0",
+    "home1": "GPU1",
+    "persistent_actual_nrx": "GPU3 under MPS 80",
+    "shared_cuphy_and_qwen": "GPU2 under MPS 80/20"
+  },
+  "recovery_oracle": "same-input local conventional semantics: successful CRC requires payload equality; failed CRC requires shared recovery to fail CRC",
+  "schema": "softwall-confirm158-repeated-protocol-v1",
+  "scope": "C158 qualification pilot, excluded from performance confidence intervals. Passing two nodes with at least 1,000 combined requests supports only the frozen warm synthetic mode; it is not WCET, cold/long-idle, production d_MAC, fault, or throughput evidence.",
+  "seed_base": 26000000,
+  "source_sha256": {
+    "scripts/actual_nrx_integrated_coordinator.py": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d",
+    "scripts/actual_nrx_integrated_owner.py": "0b3ad90dd898bd9abeea832c83ac2b07bb571304eae6476f52ecb0611ed2e210",
+    "scripts/actual_nrx_multi_peer_worker.py": "062e82a652535de86ccd024a38dbae1e3907b2ba7ffa607f9a4b6f50335bc298",
+    "scripts/actual_nrx_repeated_coordinator.py": "8a8ab1f6f1a68fae81192615f27714b9c4751d3dd118024d499010aea7c33905",
+    "scripts/actual_nrx_repeated_owner.py": "1d091203001cc2eceea037c3fd7c0737afc7f09e7fc7dd17de84b53291861ec8",
+    "scripts/actual_nrx_repeated_worker.py": "dec60c9919d14c8079c16f25d0402f4a6cef0b0fca2c91e27ae5780f09059008",
+    "scripts/actual_nrx_shared_recovery_plan_v1.py": "c9e036f23f2bf913d1b5c4b27ba9a6bb82acfdcb166400b3a9abb4c0fc6b1041",
+    "scripts/analyze_confirm158_repeated.py": "fddf9ac7ff86beb1bf92b3c2bacdbe4b1f209dff82d6c3659203d6410c6ee837",
+    "scripts/build_confirm158_repeated_protocol.py": "e4e821cde8913b894e9769540e113bf53d3a86808280e5e828d5399ccb62547d",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_launch_plan_v1.py": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts/run_confirm158_repeated.sh": "c5652740a901b2f30948450c87e26484a32f793f42d8b671dce3812690f6794c",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run"
+}

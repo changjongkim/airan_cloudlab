@@ -1,0 +1,91 @@
+{
+  "arms": [
+    {
+      "arm_index": 0,
+      "branch": "conditional_open",
+      "seeds": {
+        "channel": {
+          "home0/h0-r0": 25600051,
+          "home0/h0-r1": 25600151,
+          "home0/h0-r2": 25600251,
+          "home1/h1-r0": 25600351,
+          "home1/h1-r1": 25600451
+        },
+        "receiver": {
+          "home0/h0-r0": 25600011,
+          "home0/h0-r1": 25600111,
+          "home0/h0-r2": 25600211,
+          "home1/h1-r0": 25600311,
+          "home1/h1-r1": 25600411
+        }
+      }
+    }
+  ],
+  "branch_order": [
+    "conditional_open"
+  ],
+  "excluded_nodes": [
+    "nid001025",
+    "nid001032",
+    "nid001176",
+    "nid001253",
+    "nid001280",
+    "nid001348"
+  ],
+  "label": "confirm156_timeline_job58853926",
+  "mode": {
+    "ai_bound_ms": 35,
+    "capacity": 1,
+    "conventional_bound_ms": 25,
+    "expiry_ms": 155,
+    "guard_ms": 2,
+    "nrx_bound_ms": 45,
+    "period_ms": 180,
+    "qwen_context_length": 64,
+    "qwen_model": "Qwen/Qwen2.5-1.5B",
+    "release_lead_ms": 3000.0,
+    "release_semantics": "t_IQ_ready_after_synthetic_channel_preparation",
+    "snr_db": 20.0,
+    "warmup": 10
+  },
+  "outcome_source": "prospectively controlled conditional-open injection",
+  "placement": {
+    "GPU3": "unused in controlled-outcome timeline arm",
+    "home0_owners": "GPU0",
+    "home1_owners": "GPU1",
+    "shared_cuphy_and_qwen": "GPU2 under MPS 80/20"
+  },
+  "profiler": {
+    "cuda_graph_trace": "node",
+    "export": "sqlite",
+    "semantic_gates": [
+      "qwen_kernels_within_committed_lease",
+      "qwen_recovery_kernel_overlap_zero",
+      "certificate_recovery_order",
+      "forward_install_cuphy_backward_gpu_causality"
+    ],
+    "tool": "NVIDIA Nsight Systems",
+    "trace": "cuda,nvtx"
+  },
+  "schema": "softwall-confirm156-timeline-protocol-v1",
+  "scope": "Profiler-perturbed one-node controlled conditional-open arm. Passing validates GPU timeline semantics only; it is not a service bound, WCET, actual NeuralRx, throughput or production d_MAC result.",
+  "source_sha256": {
+    "scripts/analyze_confirm156_timeline.py": "93e844b800bff440c0891e39abc6648a502f5f9b4b2ba1bbb0b7d1c9e4222954",
+    "scripts/build_confirm154_peer_spec.py": "8681dc95d75c9bcc4f04bbf7870b741c92037093d67d439ce2f1e7bad74c6b0b",
+    "scripts/build_confirm156_timeline_protocol.py": "f43081f934735b72427229776af44245d029edea15c31248ce717dc744b2956f",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_holdout_plan_v1.py": "792cfce1235761f6156f9197b4b652dca95610cb5f647d0fc26cac9e7a202876",
+    "scripts/integrated_shared_recovery_owner.py": "b703a5decddcd0322bf146aade5d4848494b5860bc3c49eca506c7b735789699",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_timeline_worker.py": "96624923b0df92e2d08e773fa7372aa700549a241e3b0ac843719ef4903fd676",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/run_confirm156_timeline.sh": "4fa3aa61412e0f4fe7afc46980b5b0034483ea37a6fcdab51d6ae0b9a5ae24b4",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run"
+}

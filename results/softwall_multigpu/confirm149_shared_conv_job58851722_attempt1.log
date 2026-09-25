@@ -1,0 +1,57 @@
+/softwall/shared_conventional_worker.py:61: PerformanceWarning: The device where the array resides (2) is different from the current device (1). Peer access has been activated automatically.
+  window = real + 1j * imag
+/softwall/shared_conventional_worker.py:65: PerformanceWarning: The device where the array resides (1) is different from the current device (2). Peer access has been activated automatically.
+  receiver.rx_slot[
+03:50:59.033052 cuphy.hpp:122    CON[1093920] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x561f206a5530).
+03:50:59.032918 cuphy.hpp:122    CON[1093921] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563317788910).
+03:51:03.022545 cuphy.hpp:122    CON[1094608] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563e2da94310).
+03:51:03.815714 cuphy.hpp:122    CON[1094608] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563e30164d80).
+{
+  "gates": {
+    "global_order_exact": true,
+    "ipc_lifecycle": true,
+    "owner_counts": true,
+    "owner_integrity": true,
+    "peer_access": true,
+    "shared_worker_count": true,
+    "source_hash": true,
+    "three_a100_mig_off": true
+  },
+  "status": "PHYSICAL_PATH_PASS_V17_REMAINS_UQ",
+  "summary": {
+    "backward_gpu_us": {
+      "count": 200,
+      "max": 44.415999203920364,
+      "mean": 15.46368001960218,
+      "p50": 15.00799972563982,
+      "p99": 27.103999629616737
+    },
+    "conventional_gpu_ms": {
+      "count": 200,
+      "max": 271.8752136230469,
+      "mean": 4.0844263064861295,
+      "p50": 2.5189759731292725,
+      "p99": 9.75046443939209
+    },
+    "forward_gpu_us": {
+      "count": 200,
+      "max": 71.42399996519089,
+      "mean": 30.65567998215556,
+      "p50": 19.61600035429001,
+      "p99": 54.30399999022484
+    },
+    "home_units": [
+      100,
+      100
+    ],
+    "worker_path_ms": {
+      "count": 200,
+      "max": 279.035682,
+      "mean": 4.497616549999997,
+      "p50": 2.910677,
+      "p99": 10.106462
+    },
+    "worker_units": 200
+  }
+}
+shared conventional canary complete: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm149_shared_conv_job58851722_attempt1_result.json

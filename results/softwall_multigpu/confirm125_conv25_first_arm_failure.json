@@ -1,0 +1,52 @@
+{
+  "schema": "softwall-confirm125-first-arm-failure-v1",
+  "status": "prospective-campaign-stopped-on-first-failure",
+  "campaign_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm125_conv25_global_vs_static_protocol.json",
+  "arm_protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c125_s1_g1_job58819952_protocol.json",
+  "failed_arm": "c125_s1_g1_job58819952",
+  "failed_home": 1,
+  "failure": {
+    "type": "RuntimeError",
+    "message": "early mandatory calendar conflict index=150 cell=2",
+    "phase": "release-setup",
+    "release_index": 150,
+    "detected_ns": 138701261046708
+  },
+  "diagnosis": {
+    "attempted_cell": 2,
+    "attempt_after_release_ms": 33.106078,
+    "attempted_certified_interval_ms": [
+      33.106078,
+      58.106078
+    ],
+    "earlier_live_credit_cell": 0,
+    "earlier_live_credit_interval_ms": [
+      53.0,
+      78.0
+    ],
+    "overlap": true,
+    "cause": "executor processed the no-NRx class before already-observed failed-NRx recoveries instead of dispatching all ready recovery work in live-certificate order",
+    "safety_behavior": "fail-closed before launching the conflicting conventional recovery"
+  },
+  "completed_peer_home": {
+    "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c125_s1_g1_job58819952_h0_controller.json",
+    "records": 1360,
+    "deadline_misses": 0
+  },
+  "unrun_arms": [
+    "c125_s1_p1_job58819952",
+    "c125_s1_p2_job58819952",
+    "c125_s1_g2_job58819952",
+    "c125_s2_p1_job58819952",
+    "c125_s2_g1_job58819952",
+    "c125_s2_g2_job58819952",
+    "c125_s2_p2_job58819952"
+  ],
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm125_conv25_global_vs_static_protocol.json": "94442cbdecbe00b269d61708e3d9782dc07debf444c47168a95bfa6824b5f0e1",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c125_s1_g1_job58819952_protocol.json": "37895174e6b97a3ea6a52424309a292a3d0da4c972e28be0b88ee7b550cabc98",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c125_s1_g1_job58819952_h1_controller.json": "8d103652e2859fa141ff8a2f120a440f19af61a1fa39413ed9c0014c995ef34c",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c125_s1_g1_job58819952_h0_controller.json": "552ac58e904099e0c9003b4d3d904b8eb219e0654c125cec7794d860e6e09826"
+  },
+  "decision": "C125 exact controller/mode is rejected. Preserve the failure and evaluate a new certificate-ordered executor only under a new prospective protocol."
+}

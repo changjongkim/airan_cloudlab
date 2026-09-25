@@ -1,0 +1,48 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm103_controlled_nrx_count_qwen_slowdown_abba",
+  "frozen_before_execution": true,
+  "job": "58788499",
+  "node": "nid001740",
+  "iterations": 300,
+  "arms": [
+    {
+      "name": "a_one",
+      "nrx_count": 1,
+      "payload_seed": 21003001,
+      "channel_seed_base": 21004000
+    },
+    {
+      "name": "b_two",
+      "nrx_count": 2,
+      "payload_seed": 21003001,
+      "channel_seed_base": 21004000
+    },
+    {
+      "name": "c_two",
+      "nrx_count": 2,
+      "payload_seed": 21003002,
+      "channel_seed_base": 21005000
+    },
+    {
+      "name": "d_one",
+      "nrx_count": 1,
+      "payload_seed": 21003002,
+      "channel_seed_base": 21005000
+    }
+  ],
+  "physical_predecessor": "confirm100_observe_first_qwen_job58747620.json",
+  "configuration": "One A100, MIG off, MPS 40% per NeuralRx endpoint and 20% Qwen, four cells, always gate capped to exactly one or two NeuralRx admissions, P180/D155, NRx45/conv12/AI50, Qwen prefill context16 batch1, GC off, no injected failure.",
+  "frozen_gates": "All four arms must have exactly 300 pre-observation Qwen units, exact requested NRx count on every release, matching PHY seeds within both ABBA pairs, and zero deadline/NRx45/conv12/AI50/guard/credit/fault violations. Report paired two-minus-one Qwen execution latency; both mean directions must be positive only to establish a count-dependent physical cost. No minimum magnitude is required. Zero or sign reversal is negative. This probe is not a policy throughput result, actual AI-RAN workload, or WCET.",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/four_cell_nrx_count_probe_controller.py": "e13970d42696357fd5a52f853f040d9e43aa6be084608577acb148ca9576f58e",
+    "scripts_for_node/softwall_same_gpu/run_confirm103_nrx_count_probe.sh": "202214a006be2ee7a2aa2a6b59bb738f51866a1eb52fc88cec1c18f74fcbabeb",
+    "scripts_for_node/softwall_same_gpu/run_confirm103_nrx_count_abba.sh": "7754651b92faf9e77dd4765a34fbaf0adfc721e58d5c4d6805751df008d45c7e",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm103_nrx_count_abba.py": "f45f2b70bd2f339aab21bba10ac3cdf643a4053dbc3ad766c7b08394dba03cdd",
+    "scripts_for_node/softwall_same_gpu/qwen_worker.py": "92835cf0ce9e789edab9109d85cc8764eb620c213ab87120fb18e01a8094622b",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "results/softwall_same_gpu/confirm100_observe_first_qwen_job58747620.json": "16419915933946c1dca92e19ae84b88aefea5672a45b5c0c4c17f42792c9bbf5"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm60_low_gate_abba",
+  "frozen_before_full_execution": true,
+  "preflight": "20-release low_threshold smoke on allocation 58729926 completed before full freeze; preserved separately and not used as a comparison arm.",
+  "research_question": "Does a train-only low-feature hopeless-channel gate preserve paired radio quality and complete more AI units online than always-NeuralRx, with the same observed feature cost?",
+  "comparison_role": "A stronger channel-aware baseline ingredient: skips only feature values below the smallest train sample decoded by either receiver. Pinned endpoints, fixed recovery, AI after radio; not the proposed joint policy.",
+  "execution_order": [
+    "pair1_always",
+    "pair1_low_threshold",
+    "pair2_low_threshold",
+    "pair2_always"
+  ],
+  "execution_command_template": "srun --jobid=58729926 --overlap --ntasks=1 bash scripts_for_node/softwall_same_gpu/run_confirm60_low_gate_arm.sh {pair} {mode}",
+  "allocation_job": "58729926",
+  "one_node_one_gpu": true,
+  "separate_clean_mps_epoch_per_arm": true,
+  "same_trace_within_pair": true,
+  "iterations_per_arm": 1000,
+  "cells": 2,
+  "period_ms": 150,
+  "deadline_ms": 130,
+  "snr_db": -8.5,
+  "noise_reference": "pre_fading",
+  "threshold_from_confirm57_train": 1.9490545988082886,
+  "feature": "channel_estimate_power measured after release in both arms; prewarmed at worker startup",
+  "pairs": {
+    "1": {
+      "payload_seed": 20530001,
+      "channel_seed_base": 20531000
+    },
+    "2": {
+      "payload_seed": 20540002,
+      "channel_seed_base": 20541000
+    }
+  },
+  "gpu_contract": {
+    "nrx_cap_each": 40,
+    "ai_cap": 20,
+    "nrx_end_to_end_bound_ms": 50,
+    "conventional_host_to_commit_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "ai_host_budget_ms": 40,
+    "ai_rpc_timeout_ms": 35,
+    "ai_guard_ms": 2
+  },
+  "frozen_gates": {
+    "per_arm_ran_deadline_misses": 0,
+    "per_arm_nrx_bound_violations": 0,
+    "per_arm_conventional_host_path_bound_violations": 0,
+    "per_arm_ai_budget_or_crossing_violations": 0,
+    "per_arm_credit_outstanding": 0,
+    "paired_radio_ci_lower_at_least_pp": -0.5,
+    "ai_gain_at_least_percent": 0.5
+  },
+  "analysis": "Pair by cell/index/channel seed. Cluster-bootstrap 4,000 resamples of release-level radio difference with fixed seeds 20600001 and 20600002; require lower 95% limit >= -0.5 pp and AI gain >= 0.5% in each pair. Any failure remains a failure. No additional seeds or deadline changes.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/two_endpoint_low_gate_controller.py": "af09cfcae741297ad78a71483583833d642459e0eadcfe06e2c6ab620e98fb46",
+    "scripts_for_node/softwall_same_gpu/run_confirm60_low_gate_arm.sh": "1704ffe36c38af02ee2f17d2740341443cbe6f92a0878f5fb0f0a9b18d9844f0",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm60_low_gate_abba.py": "1ee080190b39a6b43ed9772d991411205c7e94d1e59aa0c02696f07525fe3c66",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "f3517db693aa8754512bcc3a358a7b264a6d595b2fb61a108cf2d215670869ba",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "4573034b0f3b09c27f756d661a77eb4e7660c7981a711c7f9e5665e8a0716279",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0"
+  },
+  "interpretation_limits": "Synthetic fixed-noise P150/D130, pinned endpoints and AI after radio. This is a baseline ingredient only. Low-feature hopelessness could be a synthetic fixed-MCS artifact. No production MAC expiry, WCET, loaded queue gain or full joint-policy result.",
+  "threshold_selection": "minimum train observed feature decoded by either receiver; see confirm60_low_gate_train_selection.json; test was not used to set it"
+}

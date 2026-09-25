@@ -1,0 +1,41 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm11_paired2_qwen_b8c512_s1_p25",
+  "purpose": "Stress S1 with a compute- and HBM-intensive real LLM prefill and determine whether an MPS SM cap can protect the paired full-PHY RAN.",
+  "ran": {
+    "input": "Aerial PdschTx-generated valid 273-PRB PUSCH slot",
+    "cells_per_release": 2,
+    "period_ms": 25,
+    "deadline_ms": 21,
+    "iterations_per_run": 500,
+    "runs": 2,
+    "seed_base": 20270100
+  },
+  "ai": {
+    "model": "Qwen/Qwen2.5-1.5B",
+    "phase": "prefill",
+    "context_tokens": 512,
+    "batch": 8,
+    "dtype": "float16",
+    "probe": {
+      "samples": 59,
+      "rate_per_s": 11.769,
+      "max_gpu_ms": 86.690,
+      "source": "qwen_probe_prefill_b8c512_job58625542.json"
+    }
+  },
+  "configurations": [
+    {"active_thread_percentage": 100, "priority": 0},
+    {"active_thread_percentage": 80, "priority": 0},
+    {"active_thread_percentage": 60, "priority": 0},
+    {"active_thread_percentage": 40, "priority": 0},
+    {"active_thread_percentage": 20, "priority": 0}
+  ],
+  "qualification_gate": {
+    "ran_deadline_misses": 0,
+    "incorrect_transport_blocks": 0,
+    "selection_rule": "Among configurations passing both RAN gates in both runs, choose the highest mean Qwen throughput. If none passes, S1 rejects this workload and S0 requires smaller preemptible chunks or a longer period."
+  },
+  "interpretation_limit": "The test is statistical and MPS caps still do not provide a memory-bandwidth bound."
+}

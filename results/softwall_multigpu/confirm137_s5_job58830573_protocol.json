@@ -1,0 +1,48 @@
+{
+  "schema": "softwall-service-bound-telemetry-arm-protocol-v1",
+  "status": "frozen-before-run",
+  "label": "confirm137_s5_job58830573",
+  "iterations": 160,
+  "warmup": 20,
+  "global_policy": "global",
+  "payload_seeds": [
+    28080051,
+    28090051
+  ],
+  "channel_seeds": [
+    28081000,
+    28091000
+  ],
+  "trace": "/softwall_data/softwall_context128_mechanism_trace_v1.json",
+  "trace_sha256": "9c3ebdb3d7db3fec05048653529837c083115b0ec554280a79fea2dfbe565bf2",
+  "placement": {
+    "gpu0": "four-cell home + two local NRx + Qwen",
+    "gpu1": "four-cell home + two local NRx + Qwen"
+  },
+  "shared_resources": "one serializable synthetic context128 request queue; recovery, NRx endpoint/IPC, Qwen execution and physical credits remain per-home",
+  "transaction_order": "observe NRx -> merge all ready recoveries in live-certificate order -> global hold -> local atomic recovery replan+AI lease -> global commit -> physical completion -> local retire+global complete",
+  "cuda_module_loading": "LAZY",
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 25.0,
+  "guard_ms": 2,
+  "global_broker_rpc_timeout_ms": 5,
+  "global_broker_transaction_budget_ms": 15,
+  "admission_ai_guard_ms": 17,
+  "target_ai_bound_ms": 40,
+  "endpoint_ring_depth": 1,
+  "rejected_recovery_before_exchange": false,
+  "fault_every": 5,
+  "rpc_telemetry_required": true,
+  "source_sha256": {
+    "/softwall/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "/softwall/global_trace_service_bound_controller.py": "52bbd28b0229ffc852273b90c7c14a525e8d6b00604b597a6465daa100b4fd3f",
+    "/softwall/instrumented_deadline_global_trace_client.py": "89267830cc141470ea73b93087af60a310bad4ab8480335570d720b0c595a799",
+    "/softwall/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "/softwall/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/softwall/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/softwall_task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

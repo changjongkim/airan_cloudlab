@@ -101,6 +101,195 @@ class DartRuntimeTests(unittest.TestCase):
         self.assertIsNotNone(second_transaction.reservation)
         self.assertEqual(second_transaction.reservation.endpoint_id, "e1")
 
+    def test_all_policies_reject_nrx_that_cannot_finish_before_recovery_cutoff(self):
+        for policy in ("static", "round_robin", "shortest_queue", "predicted_finish"):
+            with self.subTest(policy=policy):
+                runtime = make_runtime(ring_depth=2, fallback_capacity=1)
+                request = DartRequest(
+                    slot_id=0,
+                    epoch=1,
+                    graph_id=1,
+                    tensor_class=1,
+                    release_ns=0,
+                    deadline_ns=10 * NS_PER_MS,
+                    fallback_latest_start_ns=NS_PER_MS,
+                )
+                transaction = runtime.submit(request, 0, policy=policy)
+                self.assertIsNone(transaction.reservation)
+                self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
+                self.assertEqual(runtime.metrics["rejected_to_conventional"], 1)
+
+    def test_mandatory_first_keeps_credit_when_optional_nrx_is_rejected(self):
+        runtime = make_runtime(ring_depth=2, fallback_capacity=1)
+        request = DartRequest(
+            slot_id=0,
+            epoch=1,
+            graph_id=1,
+            tensor_class=1,
+            release_ns=0,
+            deadline_ns=10 * NS_PER_MS,
+            fallback_latest_start_ns=NS_PER_MS,
+        )
+        transaction = runtime.reserve_mandatory(request, 0)
+        self.assertIsNotNone(transaction)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 1)
+        self.assertFalse(runtime.admit_nrx(transaction, 0))
+        self.assertIsNone(transaction.reservation)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 1)
+        self.assertTrue(runtime.start_fallback(transaction, NS_PER_MS))
+        self.assertTrue(runtime.complete_conventional(transaction, 2 * NS_PER_MS))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
+
+    def test_two_mandatory_credits_can_attach_distinct_optional_endpoints(self):
+        runtime = make_runtime(ring_depth=2, fallback_capacity=1)
+        first = DartRequest(0, 1, 1, 1, 0, 130 * NS_PER_MS, 78 * NS_PER_MS)
+        second = DartRequest(1, 1, 1, 1, 0, 130 * NS_PER_MS, 103 * NS_PER_MS)
+        first_tx = runtime.reserve_mandatory(first, 0)
+        second_tx = runtime.reserve_mandatory(second, 0)
+        self.assertIsNotNone(first_tx)
+        self.assertIsNotNone(second_tx)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 2)
+        self.assertTrue(runtime.admit_nrx(first_tx, 0))
+        self.assertTrue(runtime.admit_nrx(second_tx, 0))
+        self.assertNotEqual(first_tx.reservation.endpoint_id, second_tx.reservation.endpoint_id)
+        self.assertLessEqual(first_tx.reservation.predicted_finish_ns, first.fallback_latest_start_ns)
+        self.assertLessEqual(second_tx.reservation.predicted_finish_ns, second.fallback_latest_start_ns)
+        self.assertTrue(runtime.complete_nrx(first_tx, first.slot_id, first.epoch, 3 * NS_PER_MS))
+        self.assertTrue(runtime.complete_nrx(second_tx, second.slot_id, second.epoch, 3 * NS_PER_MS))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
+
+    def test_recovery_credit_moves_later_after_other_cell_success(self):
+        profiles = ProfileTable({
+            (name, 1, 1, "isolated"): ServiceProfile(0, NS_PER_MS, 0)
+            for name in ("e0", "e1")
+        })
+        runtime = DartRuntime(
+            [EndpointState("e0", 1), EndpointState("e1", 1)], profiles,
+            commit_guard_ns=2 * NS_PER_MS,
+            fallback_calendar=FallbackCalendar(1, 25 * NS_PER_MS, 2 * NS_PER_MS),
+        )
+        a = DartRequest(0, 1, 1, 1, 0, 130 * NS_PER_MS, 78 * NS_PER_MS)
+        b = DartRequest(1, 1, 1, 1, 0, 130 * NS_PER_MS, 103 * NS_PER_MS)
+        a_tx = runtime.reserve_mandatory(a, 0)
+        b_tx = runtime.reserve_mandatory(b, 0)
+        self.assertTrue(runtime.admit_nrx(a_tx, 0))
+        self.assertTrue(runtime.admit_nrx(b_tx, 0))
+        # Moving a live optional request without physical completion is unsafe.
+        self.assertIsNone(runtime.replan_fallbacks([(a_tx, 103 * NS_PER_MS, 0)], 10 * NS_PER_MS))
+        self.assertTrue(runtime.complete_nrx(b_tx, 1, 1, 20 * NS_PER_MS))
+        self.assertFalse(runtime.complete_nrx(a_tx, 0, 1, 60 * NS_PER_MS, payload_visible=False))
+        moved = runtime.replan_fallbacks([(a_tx, 103 * NS_PER_MS, 0)], 60 * NS_PER_MS)
+        self.assertEqual(moved[(0, 1)].start_ns, 103 * NS_PER_MS)
+        self.assertFalse(runtime.start_fallback(a_tx, 78 * NS_PER_MS))
+        self.assertTrue(runtime.start_fallback(a_tx, 103 * NS_PER_MS))
+        self.assertTrue(runtime.complete_conventional(a_tx, 128 * NS_PER_MS))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
+
+    def test_multi_credit_exchange_is_atomic_and_rolls_back_on_conflict(self):
+        runtime = DartRuntime(
+            [EndpointState("e0", 1)], ProfileTable({}), commit_guard_ns=2 * NS_PER_MS,
+            fallback_calendar=FallbackCalendar(1, 25 * NS_PER_MS, 2 * NS_PER_MS),
+        )
+        a = DartRequest(0, 1, 1, 1, 0, 130 * NS_PER_MS, 78 * NS_PER_MS)
+        b = DartRequest(1, 1, 1, 1, 0, 130 * NS_PER_MS, 103 * NS_PER_MS)
+        a_tx = runtime.reserve_mandatory(a, 0)
+        b_tx = runtime.reserve_mandatory(b, 0)
+        original_a, original_b = a_tx.fallback_reservation, b_tx.fallback_reservation
+        self.assertIsNone(runtime.replan_fallbacks([
+            (a_tx, 103 * NS_PER_MS, 0),
+            (b_tx, 90 * NS_PER_MS, 0),
+        ], 60 * NS_PER_MS))
+        self.assertEqual(a_tx.fallback_reservation, original_a)
+        self.assertEqual(b_tx.fallback_reservation, original_b)
+        exchanged = runtime.replan_fallbacks([
+            (a_tx, 103 * NS_PER_MS, 0),
+            (b_tx, 78 * NS_PER_MS, 0),
+        ], 60 * NS_PER_MS)
+        self.assertEqual(exchanged[(0, 1)].start_ns, 103 * NS_PER_MS)
+        self.assertEqual(exchanged[(1, 1)].start_ns, 78 * NS_PER_MS)
+        self.assertFalse(runtime.fallback_calendar.release(original_a))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 2)
+        self.assertTrue(runtime.start_fallback(b_tx, 78 * NS_PER_MS))
+        self.assertTrue(runtime.complete_conventional(b_tx, 103 * NS_PER_MS))
+        self.assertTrue(runtime.start_fallback(a_tx, 103 * NS_PER_MS))
+        self.assertTrue(runtime.complete_conventional(a_tx, 128 * NS_PER_MS))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
+
+    def test_joint_replan_and_ai_lease_commit_or_rollback_together(self):
+        profiles = ProfileTable({
+            (name, 1, 1, "isolated"): ServiceProfile(0, NS_PER_MS, 0)
+            for name in ("e0", "e1")
+        })
+        runtime = DartRuntime(
+            [EndpointState("e0", 1), EndpointState("e1", 1), EndpointState("ai", 1)],
+            profiles, commit_guard_ns=2 * NS_PER_MS,
+            fallback_calendar=FallbackCalendar(1, 25 * NS_PER_MS, 2 * NS_PER_MS),
+        )
+        a = DartRequest(0, 1, 1, 1, 0, 130 * NS_PER_MS, 78 * NS_PER_MS)
+        b = DartRequest(1, 1, 1, 1, 0, 130 * NS_PER_MS, 103 * NS_PER_MS)
+        a_tx = runtime.reserve_mandatory(a, 0)
+        b_tx = runtime.reserve_mandatory(b, 0)
+        self.assertTrue(runtime.admit_nrx(a_tx, 0))
+        self.assertTrue(runtime.admit_nrx(b_tx, 0))
+        original_a = a_tx.fallback_reservation
+        move = [(a_tx, 103 * NS_PER_MS, 0)]
+        unit = [BackgroundUnit("ai0", 30 * NS_PER_MS, 1.0)]
+        # The same all-fail plan cannot be published before physical NRx completion.
+        self.assertIsNone(runtime.replan_and_lease(
+            move, "ai", 10 * NS_PER_MS, 40 * NS_PER_MS, 2 * NS_PER_MS, unit
+        ))
+        self.assertEqual(a_tx.fallback_reservation, original_a)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["joint_leases_outstanding"], 0)
+        self.assertTrue(runtime.complete_nrx(b_tx, 1, 1, 20 * NS_PER_MS))
+        self.assertFalse(runtime.complete_nrx(
+            a_tx, 0, 1, 60 * NS_PER_MS, payload_visible=False
+        ))
+        # A lease too long for the AI deadline must leave both resources untouched.
+        self.assertIsNone(runtime.replan_and_lease(
+            move, "ai", 60 * NS_PER_MS, 35 * NS_PER_MS, 2 * NS_PER_MS,
+            [BackgroundUnit("too_long", 40 * NS_PER_MS, 1.0)],
+        ))
+        self.assertEqual(a_tx.fallback_reservation, original_a)
+        self.assertEqual(runtime.endpoints["ai"].snapshot()["tail_ns"], 0)
+        accepted = runtime.replan_and_lease(
+            move, "ai", 60 * NS_PER_MS, 40 * NS_PER_MS, 2 * NS_PER_MS, unit
+        )
+        self.assertIsNotNone(accepted)
+        replacements, lease = accepted
+        self.assertEqual(replacements[(0, 1)].start_ns, 103 * NS_PER_MS)
+        self.assertEqual(a_tx.fallback_reservation, replacements[(0, 1)])
+        self.assertEqual(lease.predicted_finish_ns, 90 * NS_PER_MS)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["joint_leases_outstanding"], 1)
+        # An unconfirmed AI unit keeps blocking a conflicting early fallback.
+        self.assertFalse(runtime.start_fallback_early(a_tx, 80 * NS_PER_MS))
+        self.assertFalse(runtime.retire_joint_lease(lease, gpu_fence_confirmed=False))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["joint_leases_outstanding"], 1)
+        self.assertTrue(runtime.retire_joint_lease(lease, gpu_fence_confirmed=True))
+        self.assertFalse(runtime.retire_joint_lease(lease, gpu_fence_confirmed=True))
+        self.assertTrue(runtime.start_fallback(a_tx, 103 * NS_PER_MS))
+        self.assertTrue(runtime.complete_conventional(a_tx, 128 * NS_PER_MS))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
+
+    def test_joint_admission_rejects_correlated_recovery_conflict(self):
+        runtime = DartRuntime(
+            [EndpointState("ai", 1)], ProfileTable({}),
+            commit_guard_ns=2 * NS_PER_MS,
+            fallback_calendar=FallbackCalendar(1, 25 * NS_PER_MS, 2 * NS_PER_MS),
+        )
+        a = DartRequest(0, 1, 1, 1, 0, 130 * NS_PER_MS, 78 * NS_PER_MS)
+        b = DartRequest(1, 1, 1, 1, 0, 130 * NS_PER_MS, 103 * NS_PER_MS)
+        a_tx = runtime.reserve_mandatory(a, 0)
+        b_tx = runtime.reserve_mandatory(b, 0)
+        original_a, original_b = a_tx.fallback_reservation, b_tx.fallback_reservation
+        self.assertIsNone(runtime.replan_and_lease(
+            [(a_tx, 103 * NS_PER_MS, 0)], "ai", 60 * NS_PER_MS,
+            40 * NS_PER_MS, 2 * NS_PER_MS,
+            [BackgroundUnit("ai0", 20 * NS_PER_MS, 1.0)],
+        ))
+        self.assertEqual(a_tx.fallback_reservation, original_a)
+        self.assertEqual(b_tx.fallback_reservation, original_b)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["joint_leases_outstanding"], 0)
+
     def test_atomic_reservation_never_overdraws_credit(self):
         endpoints = [EndpointState("e0", ring_depth=2)]
         profiles = ProfileTable({
@@ -194,6 +383,55 @@ class DartRuntimeTests(unittest.TestCase):
         self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
         admitted = runtime.submit(make_request(2, release_ns=0), 0)
         self.assertIsNotNone(admitted.reservation)
+
+    def test_early_fallback_retime_rejects_physical_lane_overlap(self):
+        runtime = make_runtime(ring_depth=4, fallback_capacity=1)
+        first = runtime.submit(make_request(0, deadline_ms=10, release_ns=0), 0)
+        second = runtime.submit(make_request(1, deadline_ms=12, release_ns=0), 0)
+        self.assertIsNotNone(first.reservation)
+        self.assertIsNotNone(second.reservation)
+        original_second = second.fallback_reservation
+        # Second's original latest slot does not overlap first's, but an
+        # earlier start at 9 ms would collide with first's 8.95–9.95 ms slot.
+        self.assertFalse(runtime.start_fallback_early(second, 9 * NS_PER_MS))
+        self.assertEqual(second.fallback_reservation, original_second)
+        self.assertIsNone(second.fallback_started_ns)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 2)
+        self.assertTrue(runtime.start_fallback_early(first, NS_PER_MS))
+        self.assertEqual(first.fallback_reservation.start_ns, NS_PER_MS)
+        self.assertTrue(runtime.start_fallback_early(second, 3 * NS_PER_MS))
+        self.assertEqual(second.fallback_reservation.start_ns, 3 * NS_PER_MS)
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 2)
+        self.assertTrue(runtime.complete_conventional(first, 2 * NS_PER_MS))
+        self.assertTrue(runtime.complete_conventional(second, 4 * NS_PER_MS))
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 0)
+
+    def test_concurrent_early_retimes_admit_only_one_same_lane(self):
+        runtime = make_runtime(ring_depth=4, fallback_capacity=1)
+        first = runtime.submit(make_request(0, deadline_ms=10, release_ns=0), 0)
+        second = runtime.submit(make_request(1, deadline_ms=12, release_ns=0), 0)
+        barrier = threading.Barrier(3)
+        outcomes = []
+        lock = threading.Lock()
+
+        def move(transaction):
+            barrier.wait()
+            started = runtime.start_fallback_early(transaction, NS_PER_MS)
+            with lock:
+                outcomes.append(started)
+
+        threads = [threading.Thread(target=move, args=(transaction,)) for transaction in (first, second)]
+        for thread in threads:
+            thread.start()
+        barrier.wait()
+        for thread in threads:
+            thread.join()
+        self.assertEqual(sorted(outcomes), [False, True])
+        self.assertEqual(runtime.fallback_calendar.snapshot()["outstanding"], 2)
+        self.assertEqual(
+            sum(transaction.fallback_started_ns == NS_PER_MS for transaction in (first, second)),
+            1,
+        )
 
     def test_invisible_payload_cannot_commit(self):
         runtime = make_runtime()

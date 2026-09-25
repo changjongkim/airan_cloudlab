@@ -1,0 +1,98 @@
+{
+  "schema": "softwall-confirm134-validation-summary-v1",
+  "status": "PASS",
+  "allocation": {
+    "job_id": 58823497,
+    "node": "nid002688",
+    "independent_from": {
+      "job_id": 58819952,
+      "node": "nid001049"
+    },
+    "gpu_family": "NVIDIA A100-SXM4-40GB"
+  },
+  "campaign": {
+    "all_pass": true,
+    "arms": {
+      "prepare": 2,
+      "commit": 2,
+      "complete": 2
+    },
+    "totals": {
+      "radio_records": 16320,
+      "radio_records_after_crash": 14926,
+      "ai_units_before_containment": 354,
+      "deadline_misses": 0,
+      "nrx_bound_violations": 0,
+      "conv_bound_violations": 0,
+      "ai_bound_violations": 0,
+      "ai_horizon_violations": 0,
+      "duplicate_executions": 0
+    },
+    "all_clients_fail_closed": true,
+    "all_credits_drained": true,
+    "all_arm_artifacts_match": true,
+    "all_arm_sources_match": true
+  },
+  "combined_two_node_evidence": {
+    "first_node": "nid001049",
+    "second_node": "nid002688",
+    "arms": 12,
+    "radio_records": 32640,
+    "declared_safety_violations": 0,
+    "scope": "two independent allocations/nodes in the same A100 hardware family"
+  },
+  "unit_validation": {
+    "aerial_container_tests_passed": 86,
+    "qwen_runtime_tests_passed": 3,
+    "dart_runtime_tests_passed": 21,
+    "total_tests_passed": 110,
+    "c134_fault_point_tests_added": 2,
+    "post_c134_g7_validator_tests_added": 9,
+    "note": "C134 did not change core DART runtime; G7 adds a trace validator only"
+  },
+  "fault_regression": {
+    "artifact": "results/softwall_multigpu/confirm132_runtime_fault_regression.json",
+    "iterations": 10000,
+    "seed": 20260924,
+    "pass": true,
+    "note": "core DART runtime remained unchanged"
+  },
+  "envelope_v8": {
+    "counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "independent_node_qsu_status": "PASS",
+    "manifest_items": 8,
+    "manifest_hash_mismatches": 0
+  },
+  "artifact_integrity": {
+    "formal_artifact_count": 76,
+    "source_check_count": 11,
+    "all_source_checks_match": true,
+    "artifact_hash_mismatches": 0
+  },
+  "analysis_environment": {
+    "initial_compute_host_failure": "Python 3.6.15 did not support future annotations syntax",
+    "physical_arms_completed_before_failure": 6,
+    "successful_reanalysis": "same frozen analyzer in Aerial 25.3 container Python 3.10",
+    "analyzer_source_modified": false,
+    "failure_record": "results/softwall_multigpu/confirm134_analyzer_environment_failure.json"
+  },
+  "documentation_audit": {
+    "documents": 12,
+    "local_links_checked": 483,
+    "missing_links": 0,
+    "outside_workspace_links": 0,
+    "git_diff_check": "PASS"
+  },
+  "claim_boundary": "independent allocation and node requalification within the same A100 hardware family for the finite-sample bounded volatile three-control-point broker fail-stop mode; no cross-family or production-WCET generalization, restart, durable reconciliation, exactly-once, partition, GPU hang, or throughput-superiority claim",
+  "g7_production_timing_readiness": {
+    "status": "UQ_NO_PRODUCTION_TRACE",
+    "validator_tests_passed": 9,
+    "readiness_artifact": "results/softwall_multigpu/softwall_du_timing_readiness_v1.json",
+    "production_trace_available": false
+  }
+}

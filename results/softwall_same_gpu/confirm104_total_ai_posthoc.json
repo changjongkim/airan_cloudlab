@@ -1,0 +1,45 @@
+{
+  "schema": "softwall-confirm104-total-ai-posthoc-v1",
+  "posthoc": true,
+  "raw_sha256": {
+    "results/softwall_same_gpu/raw/confirm104_a_one_job58788756_controller.json": "aa41fc454e1c4497471501162d6eaafd8a231165ca37b779c02256fca166ecdc",
+    "results/softwall_same_gpu/raw/confirm104_b_two_job58788756_controller.json": "e7b53ebb35f5b8b02e6c6fbdf1e4cb5c990863b05fd54c7a2dfae47dc379a601",
+    "results/softwall_same_gpu/raw/confirm104_d_one_job58788756_controller.json": "fb8ebe73602225c40620f9211ba03f85534322e557f6a7f8499483883c6a889a",
+    "results/softwall_same_gpu/raw/confirm104_c_two_job58788756_controller.json": "98ce99477dd8337b1211808feaa90720b88909fb38c612d75be1147c80d8e86d"
+  },
+  "pairs": [
+    {
+      "one": "a_one",
+      "two": "b_two",
+      "paired_releases": 1000,
+      "one_timely_ai": 5988,
+      "two_timely_ai": 5837,
+      "two_minus_one_ai": -151,
+      "mean_per_release": -0.151,
+      "paired_bootstrap_mean_95": [
+        -0.174,
+        -0.128
+      ],
+      "one_correct": 1773,
+      "two_correct": 1819,
+      "two_minus_one_correct": 46
+    },
+    {
+      "one": "d_one",
+      "two": "c_two",
+      "paired_releases": 1000,
+      "one_timely_ai": 5980,
+      "two_timely_ai": 5988,
+      "two_minus_one_ai": 8,
+      "mean_per_release": 0.008,
+      "paired_bootstrap_mean_95": [
+        -0.001,
+        0.017
+      ],
+      "one_correct": 1856,
+      "two_correct": 1891,
+      "two_minus_one_correct": 35
+    }
+  ],
+  "interpretation": "Posthoc total D153-timely Qwen decomposition. The two-minus-one AI direction reverses across ABBA pairs, matching the frozen pre-observation latency failure; do not use a stable NRx-count cost from C103/C104."
+}

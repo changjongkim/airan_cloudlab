@@ -1,0 +1,150 @@
+{
+  "schema": "softwall-confirm136-v12-cross-node-requalification-protocol-v1",
+  "status": "frozen-before-all-physical-arms",
+  "hypothesis": "The complete V12 57 ms AI40 plus broker-control plus completion-guard class remains exchange-only and safe across six new process/seed arms on an A100 node outside the frozen prior-node set.",
+  "model_witness": {
+    "all_fail_base_slack_ms": 53,
+    "admitted_nrx": 2,
+    "successful_nrx": 2,
+    "rejected_live_recoveries": 2,
+    "observation_bound_ms": 45,
+    "earliest_recovery_start_ms": 103,
+    "transaction_window_ms": 58,
+    "raw_ai_bound_ms": 40,
+    "control_budget_ms": 15,
+    "ai_completion_guard_ms": 2,
+    "effective_transaction_ms": 57,
+    "static_margin_ms": -4,
+    "conditional_margin_ms": 1
+  },
+  "mode": {
+    "gpu_homes": 2,
+    "cells_per_home": 4,
+    "period_ms": 180,
+    "deadline_ms": 155,
+    "conv_bound_ms": 25,
+    "nrx_bound_ms": 45,
+    "endpoint_count_per_home": 2,
+    "endpoint_ring_depth": 1,
+    "mps_nrx_cap_each": 40,
+    "mps_ai_cap": 20,
+    "global_rpc_bound_ms": 5,
+    "global_rpc_count": 3,
+    "admission_guard_ms": 17,
+    "gc": "off",
+    "trace": "synthetic context128 only"
+  },
+  "excluded_nodes": [
+    "nid001245",
+    "nid002688",
+    "nid001781"
+  ],
+  "arms": [
+    {
+      "name": "s1",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        26000051,
+        26010051
+      ],
+      "channel_seeds": [
+        26001000,
+        26011000
+      ]
+    },
+    {
+      "name": "s2",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        26020051,
+        26030051
+      ],
+      "channel_seeds": [
+        26021000,
+        26031000
+      ]
+    },
+    {
+      "name": "s3",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        26040051,
+        26050051
+      ],
+      "channel_seeds": [
+        26041000,
+        26051000
+      ]
+    },
+    {
+      "name": "s4",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        26060051,
+        26070051
+      ],
+      "channel_seeds": [
+        26061000,
+        26071000
+      ]
+    },
+    {
+      "name": "s5",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        26080051,
+        26090051
+      ],
+      "channel_seeds": [
+        26081000,
+        26091000
+      ]
+    },
+    {
+      "name": "s6",
+      "iterations": 160,
+      "warmup": 20,
+      "payload_seeds": [
+        26100051,
+        26110051
+      ],
+      "channel_seeds": [
+        26101000,
+        26111000
+      ]
+    }
+  ],
+  "gates": [
+    "all six arms pass every frozen physical gate",
+    "every arm observes the exact two-admitted/two-success/two-rejected-live branch",
+    "every arm completes at least one AI40 exchange in that branch",
+    "every audited exchange is rejected by the 53 ms static contract and accepted by the 58 ms conditional contract after the complete 57 ms charge",
+    "all arms execute on one node outside the frozen exclusion set",
+    "all artifact and source hashes match"
+  ],
+  "stop_rule": "Stop on the first physical safety, bound, credit, source, or artifact failure; preserve the failure and do not widen a bound post hoc.",
+  "statistical_reporting": "Report exact zero-failure upper bounds separately at TB, home-release, and arm units. Use the arm-level value as the conservative summary and do not interpret any value as WCET.",
+  "claim_boundary": "same-family cross-node finite-sample requalification only; no cross-family, production d_MAC, WCET, BurstGPT throughput, restart, durable reconciliation, or exactly-once claim",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/run_confirm136_v12_requalification.sh": "56538e2735d455c3a99fa80a7cc38060c4ed386acb248f0d56e72f0bf7000ac5",
+    "scripts_for_node/softwall_same_gpu/run_v11_ai40_candidate_arm.sh": "cecd9c556a4702cbc7d8f38b06e656311e0984e45ad80be836407cd52b9bb972",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm136_v12_requalification.py": "16bca8e71c73c86170da6730a53e6ea6428a3e51e609743ad08bdd33620372a7",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm135_static_counterfactual.py": "400473f604b8e28b6ca5d36984086f1cbc1d6e675cd8d3d43922e93f3b0d9032",
+    "scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+    "scripts_for_node/softwall_same_gpu/softwall_envelope_checker_v8.py": "60a28dd3e4d8d1436c0058fb6be96e2bd899a08602967d2166cd89d3a93148d2",
+    "data/current/softwall_context128_mechanism_trace_v1.json": "9c3ebdb3d7db3fec05048653529837c083115b0ec554280a79fea2dfbe565bf2",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_grid_v12.json": "df519722e1ec6013beaa46acbd7b0c4af663e246250a357d39ac86dd422ddf66",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v12.json": "29a16dfe94e1cf4cf6a94e53366160dc50ed11c6203c17be6df29bafacc5328b",
+    "results/softwall_multigpu/softwall_envelope_v11_v12_ai_guard_regression_v1.json": "02907c4d74e2ca4900695b45a548ed3d4317aa18881f68d32c96b382092b1828"
+  }
+}

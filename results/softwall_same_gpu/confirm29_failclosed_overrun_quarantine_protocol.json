@@ -1,0 +1,35 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm29_failclosed_overrun_quarantine",
+  "purpose": "Validate the actual fail-closed response to a physical optional-client bound violation: stop all later admissions after the first timeout while preserving mandatory RAN service.",
+  "selection_source": {
+    "confirm26_27": "Repeatedly recovering and readmitting a known-overrun client produced D25 failures and one D35 residual campaign tail.",
+    "policy_change": "A bound-violating endpoint must be quarantined rather than periodically readmitted without requalification."
+  },
+  "mandatory_ran": {
+    "input": "clean valid 273-PRB PUSCH",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations_per_run": 1000,
+    "runs": 5
+  },
+  "fault": {
+    "work_unit": "40 sequential NeuralRx CUDA Graph launches in a separate low-priority MPS client",
+    "timeout_ms": 5,
+    "admitted_indices": [0],
+    "post_timeout_policy": "drain the late response, never commit it, and issue no later work to the endpoint",
+    "worker_lifecycle": "process and CUDA context remain alive but idle to distinguish admission quarantine from process teardown",
+    "caps": [100, 20]
+  },
+  "primary_gate": {
+    "exactly_one_fault_request_per_run": true,
+    "all_fault_requests_timeout": true,
+    "all_late_responses_drained": true,
+    "all_ran_releases_correct": true,
+    "all_ran_deadline_misses": 0,
+    "all_physically_overlapped_deadline_misses": 0,
+    "no_outstanding_unit_at_end": true
+  },
+  "interpretation_limit": "The endpoint is left idle, not forcibly destroyed. Passing validates admission quarantine for this client and D35 contract, not arbitrary kernel preemption or universal MPS isolation."
+}

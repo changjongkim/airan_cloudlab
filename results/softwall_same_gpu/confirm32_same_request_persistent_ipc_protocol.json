@@ -1,0 +1,33 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm32_same_request_persistent_ipc",
+  "purpose": "Validate a real same-request vertical slice with NeuralRx in a separate persistent MPS process, CUDA-IPC payloads, local LDPC/CRC, and no client lifecycle churn during the RAN epoch.",
+  "mandatory_ran": {
+    "input": "clean valid 273-PRB PUSCH",
+    "period_ms": 60,
+    "deadline_ms": 35,
+    "iterations": 10000,
+    "warmup_requests": 20
+  },
+  "endpoint": {
+    "mps_active_thread_percentage": 80,
+    "expected_visible_sms": 86,
+    "mps_client_priority": 1,
+    "transport": "same-device CUDA IPC payload; project-root mmap doorbells",
+    "payload": "request-specific rx_slot and channel estimate; request-specific output LLR",
+    "timeout_ms": 30,
+    "lifecycle": "create before warmup, keep persistent for all 10000 releases, terminate only after the final release"
+  },
+  "primary_gate": {
+    "warmup_correct": 20,
+    "correct_releases": 10000,
+    "deadline_misses": 0,
+    "endpoint_timeouts": 0,
+    "fallbacks": 0,
+    "nrx_commits": 10000,
+    "worker_completed_units": 10020,
+    "worker_visible_sms": 86
+  },
+  "interpretation_limit": "Passing validates the clean-channel separate-process vertical slice under this A100/MPS/D35 contract. It does not yet validate natural NeuralRx failures, physical overrun recovery, or a mathematical hard deadline."
+}

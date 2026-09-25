@@ -1,0 +1,34 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm72_separate_credit_retime_from_pre_recovery_ai",
+  "frozen_before_full_execution": true,
+  "smoke": "20-release lease_only smoke on job58734412: miss/bound 0, retime 0; excluded from pairs. No post-NRx pre-recovery AI occurred in the short smoke.",
+  "job": "58734412",
+  "iterations": 200,
+  "period_ms": 150,
+  "deadline_ms": 130,
+  "gate_threshold": 1.9490545988082886,
+  "ai_deadline_ms": 50,
+  "ai_guard_ns": 2000000,
+  "min_retime_on": 1,
+  "min_before_recovery_ai": 1,
+  "min_correct_cell_difference": -1,
+  "arms": [
+    {"prefix": "confirm72_pair1_lease_job58734412", "mode": "lease_only", "payload_seed": 20720001, "channel_seed_base": 20721000},
+    {"prefix": "confirm72_pair1_on_job58734412", "mode": "on", "payload_seed": 20720001, "channel_seed_base": 20721000},
+    {"prefix": "confirm72_pair2_on_job58734412", "mode": "on", "payload_seed": 20720002, "channel_seed_base": 20722000},
+    {"prefix": "confirm72_pair2_lease_job58734412", "mode": "lease_only", "payload_seed": 20720002, "channel_seed_base": 20722000}
+  ],
+  "pairs": [
+    {"name": "pair1", "lease_only_prefix": "confirm72_pair1_lease_job58734412", "on_prefix": "confirm72_pair1_on_job58734412"},
+    {"name": "pair2", "lease_only_prefix": "confirm72_pair2_lease_job58734412", "on_prefix": "confirm72_pair2_on_job58734412"}
+  ],
+  "frozen_gates": "Same paired trace, both arms' normal-mode/provenance/safety; each has >=1 physically completed AI unit after NRx observation before fallback; ON has >=1 safe credit retime, lease_only has zero; radio loss <=1/400 cells. AI count and 50-ms timely count have no gain gate.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/two_endpoint_retime_ablation_controller.py": "6916c924468880f354797aef2a32563f507115e907d52479357e829c40e948ca",
+    "scripts_for_node/softwall_same_gpu/run_confirm72_retime_ablation_arm.sh": "0b02ff23554f5b47b76835cceaa34647da1d2c46686607d40359ed282367e238",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm72_retime_ablation.py": "8bc3212373250e3d58e529550bbeaa82c50e005f934ace03b854941f825e669f",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "f3517db693aa8754512bcc3a358a7b264a6d595b2fb61a108cf2d215670869ba"
+  },
+  "interpretation_limits": "Ablation of simple credit retiming under synthetic P150/D130 with early homogeneous AI and asynchronous pre-NRx AI in both arms. Neither arm atomically commits an AI lease with a recovery replan; no joint PHY choice, co-run worst-case bound, fault continuation or production expiry claim."
+}

@@ -2,7 +2,10 @@
 
 **작성:** 2026-09-20 KST
 **상태:** 계획 초안. 스킴은 확정 전이며, P0/P1 게이트 결과에 따라 수정한다.
-**목표 수준:** SIGMETRICS / NSDI
+**후속 결정:** 사용자가 보장 범위를 “허용한 AI 작업 안에서 RAN deadline 보장, 남는 자원으로 AI 처리량 확보”로 확정했다. **같은 GPU / MIG OFF / MPS 검증을 첫 필수 게이트로 한다.** [현재 실행안](SOFTWALL_MPS_ISOLATION_FEASIBILITY_KO.md)을 이 초안의 L1 전용 GPU·다중 GPU 우선순위보다 우선한다. 아래 기존 수치와 주장 중 정정 사항은 [검토 문서](RESEARCH_PLAN_SOFTWALL_REVIEW_KO.md)를 따른다.
+**2026-09-23 논문축 갱신:** [substrate + feasibility envelope 전환안](SOFTWALL_SUBSTRATE_ENVELOPE_PAPER_PLAN_KO.md)을 이 초기 계획보다 우선한다. C78/79, C96에 이어 사전 고정 C102에서도 guarded joint와 `max-radio + exact recourse`가 39/39 같고 outcome gate가 실패했으므로 추가 optimizer 우위 추적을 종료한다. 이후 max-radio를 공통 controller로 고정하고 `(셀 수, P/D, mode별 bound, MPS cap, fault correlation, lifecycle, resident memory)`의 feasibility envelope와 all-fail certificate, 복수 recovery-credit/AI-lease 원자 transaction, GPU/IPC fence lifetime을 논문 중심으로 검증한다. 후보 상한은 관측 최대만으로 확정하지 않고 실제 그 상한을 적용한 복구 달력의 독립 반복·간섭·고장 시험을 통과해야 한다.
+**최신 실험 판정:** [C97 실패·C98 통과·C99 실패·C100 새 mode 통과·C101 고장 ABBA 통과](SOFTWALL_POST_C96_NOVELTY_GATE_KO.md)를 함께 반영한다. 실제 Qwen co-run에서는 NRx30 계약이 깨졌고, C99의 NRx45 위반 1건은 worker kernel이 아니라 controller의 AI/필수 conventional 선처리 뒤 관측 지연이었다. 이를 바꾼 C100 관측 우선 mode는 새 두 seed×1,000 release에서 같은 NRx45/복구12/AI50 달력의 유한 표본 gate를 통과했다. C101은 그 mode의 동일 PHY 고장 OFF/ON/ON/OFF 각 300 release에서 네 arm 안전 gate를 모두 통과했고, 일치한 두 NRx 수락 release 49+49개에서 강제 실패 ON−OFF 적시 Qwen 반환이 −7/−14개였다. [C102 독립 다중 사건 CPU 판정](../../results/softwall_same_gpu/confirm102_independent_multi_event_policy.json)은 calibration·구조 gate를 통과했지만 guarded joint와 max-radio+exact recourse가 39/39 같아 성능 gate에 실패했다. C103의 NRx-count 비용 후보는 [C104](../../results/softwall_same_gpu/confirm104_nrx_count_long_abba_job58788756.json)에서 순서별 부호가 반전됐고, 같은 process의 [C105 interleave](../../results/softwall_same_gpu/confirm105_interleaved_count_job58789084.json)도 네 strata가 일치하지 않아 **안정적 scalar cost 가설을 기각**한다. 따라서 현재 논문 중심은 새 optimizer 우월성이 아니라 all-fail certificate, 복수 recovery-credit/AI lease 원자 transaction, 물리 fault/lifecycle 경계의 시스템 substrate다. 다음 필수 gate는 [실제 AI-and-RAN 요청 자격](SOFTWALL_AI_RAN_WORKLOAD_GATE_KO.md)과 동일 안전장치를 가진 강한 시스템 baseline의 GPU paired 비교다.
+**목표 수준:** SIGMETRICS 우선 검토. NSDI는 [2027 CFP](https://www.usenix.org/conference/nsdi27/call-for-papers)가 GPU resource scheduling을 명시적 제외 범위에 넣어 현 중심 주장으로는 scope 위험이 크다. 네트워크 시스템 자체에 대한 독립 기여가 성립할 때만 재검토한다.
 **작업 코드네임:** SoftWall (MIG의 하드웨어 벽을 소프트웨어 계약으로 대체) — 잠정
 **선행 문서:** [`RESEARCH_DIRECTION_MPS_KO.md`](RESEARCH_DIRECTION_MPS_KO.md), [`MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md`](MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md),
 [`../../results/20260803/MIG_MPS_COMBINED_REPORT.md`](../../results/20260803/MIG_MPS_COMBINED_REPORT.md),
@@ -29,8 +32,8 @@
 | 기본값 공유는 파국이다 | pct=100, N=6에서 411.3ms (10.7×) | chain19 Exp 11 |
 | MIG CP+MPS는 N=16까지 평탄하다 | 41.8–43.8ms | chain19 Exp 5 |
 | 독립 client 증가가 L1을 무너뜨린다 | N=1→8에서 L1 p99 42.3→189.3ms, kernel gap 1.15→379μs, duty 31.6→13.8% | five-way 원인 분석 |
-| 간섭 경로는 두 개다 | compute 경합=gap만 팽창 / memory 경합=gap+per-op bimodal | Perlmutter §10.5, §10.7 |
-| 메커니즘은 4레벨로 닫혀 있다 | GPU gap ↔ cudaFree 블로킹(겹침 85%) ↔ convert 경계 ↔ ioctl | Perlmutter §10.5–10.9 |
+| 기존 harness에서 주요 간섭 패턴 두 가지를 관측했다 | compute 경합=gap 팽창 / memory 경합=gap+per-op bimodal. 보편적인 완전 분류는 아님 | Perlmutter §10.5, §10.7 |
+| 기존 harness의 4레벨 신호가 시간적으로 맞물린다 | GPU gap ↔ cudaFree 블로킹(겹침 약 85%) ↔ convert 경계 ↔ ioctl. allocator 제거 개입 전에는 인과 확정 아님 | Perlmutter §10.5–10.9 |
 | 메모리 대역폭 경합에서 MPS는 더 위험하다 | sat_hbm: default 426ms → MPS 6985ms (16.4×), bistable | Perlmutter §8 |
 | NRx 처리율 | full A100 1164.1 req/s (direct TRT + CUDA Graph, 서비스 1.34ms) | NRX_CAPACITY.csv |
 | 독립 endpoint는 용량이 합쳐진다 | 3 replica round-robin 97.2% timely (1/2 replica는 붕괴) | GDR pool replica sweep |
@@ -241,8 +244,13 @@ GPU3 ── 〃
 | **C4** | expiry·epoch·single-commit 정확성 계약과 fault injection 검증 | 시스템 | NSDI |
 | **C5** | 실제 AI-RAN 스택 위 평가: 파티션 없이 MIG CP 수준 격리에 근접 + 회수 용량 정량화 | 평가 | 양쪽 |
 
-**C1은 단독으로도 측정 논문이 된다.** 이미 273조건 + 4레벨 메커니즘 체인이 확보돼 있으므로,
-P0/P1이 실패해도 C1만으로 fallback 투고가 가능하다. 이게 이 계획의 안전망이다.
+**C1은 별도의 측정 논문 후보일 뿐 아직 확정된 안전망이 아니다.** 기존 273조건은
+malloc/free가 많은 harness에서 얻은 현상·상관관계 자료다. P0의 allocator 개입 뒤에도
+현상이 유지되고, 동일 valid PHY의 matched compute/HBM 대조에서 원인과 예측력이
+재현되며, 관련 GPU 간섭 선행 연구와 구별되는 기여를 보여야 독립 논문으로 판정한다.
+[Confirm8](../../results/softwall_same_gpu/INITIAL_FEASIBILITY_REPORT_KO.md)는 valid paired
+PUSCH P25/D21에서 무제어 GEMM 17/3,000 miss, HBM 2,963/3,000 miss라는 별도 반례를
+제공하지만, 그 자체로 기존 4레벨 인과 체인이나 production-slot 보장을 입증하지 않는다.
 
 ---
 
@@ -283,17 +291,19 @@ P0/P1이 실패해도 C1만으로 fallback 투고가 가능하다. 이게 이 �
 
 각 단계는 **게이트(다음으로 넘어가는 조건)**와 **실패 시 분기**를 갖는다.
 
-### P0 — 측정 타당성 확보 (2주) · 선행 필수
+### P0 — 측정 타당성 확보 (기존 2주 추정은 현재 유효하지 않음) · 선행 필수
 
 | 항목 | 내용 |
 |---|---|
-| 작업 | (1) slot-paced L1 harness: 0.5/1ms 주기 도착 + absolute deadline + miss율. (2) 프레임당 4,263회 malloc/free 제거 (NRx에서 성공한 caller-owned + CUDA Graph 방식). (3) §1.3의 문서·수치 정정. |
+| 작업 | (1) 0.5/1 ms **도착 주기 P**와 실제 PUSCH 처리·HARQ 소비 시점에서 유도한 **요청별 expiry D**를 분리하고, slot-paced harness에서 release/완료·miss를 기록. (2) 같은 GPU에서 AI 없이 필수 PHY 경로의 단독 부하와 큐 증가를 검증. (3) 프레임당 4,263회 malloc/free 제거 전후를 같은 입력으로 비교. (4) §1.3의 문서·수치 정정. |
 | 산출 | 실시간 신뢰 가능한 L1 baseline, 정정된 authoritative 문서 |
-| **게이트** | **malloc/free를 제거해도 MPS 실패 결론이 유지되는가?** |
-| 실패 분기 | 유지되지 않으면 → C1의 메커니즘 서술을 전면 수정. "harness 아티팩트였다"는 리뷰어 지적을 선제적으로 처리하는 것이 이 게이트의 목적이다. |
+| **게이트** | (a) 도착 주기와 실제 expiry가 명시되고, AI 없는 필수 경로가 그 offered load에서 expiry·큐 안정성 조건을 먼저 충족하는가? (b) malloc/free 제거 뒤에도 MPS 간섭의 실측 결론이 유지되는가? 두 조건 모두 필요. |
+| 실패 분기 | (a)가 실패하면 동일 GPU AI 회수나 공동 제어 비교를 운영 RAN deadline 주장으로 진행하지 않고 PHY 경로·용량을 먼저 수정한다. (b)가 실패하면 C1의 메커니즘 서술을 전면 수정한다. |
 
 > 근거: 현재 `miss_1ms`가 항상 100%이므로 "deadline을 지켰다"는 주장이 구조적으로 불가능하다.
 > 또한 20셀 38.5ms = 셀당 1.92ms는 0.5ms TTI 대비 실시간이 아니다. 이 간극의 정체를 P0에서 밝힌다.
+> 0.5 ms TTI는 도착 주기이며 요청별 absolute expiry와 자동으로 같지 않다. [Confirm55 원자료](../../results/softwall_same_gpu/raw/confirm55_two_endpoint_job58693395_controller.json)의 48개 conventional fallback GPU event는 모두 2.224–2.772 ms, NRx 응답 최솟값은 3.841 ms였다. 그러므로 **현재 구현이 1 ms 이하의 요청별 expiry를 충족했다고 주장할 수는 없다.** 이 표본으로 최적화된 PHY의 WCET나 처리율 한계를 단정하지 않는다.
+> 더 근본적으로, 현 **단일 conventional lane·복구 예약 상한 25 ms**에서 `C`개 셀이 매 `P` ms 동시에 도착하고 모든 NRx가 실패할 수 있으면 지속 부하의 필요조건은 `C×25/P ≤ 1`이다. 1셀조차 P=1/0.5 ms에서 필요한 lane 점유는 각각 25배/50배다. expiry를 늦춰도 장기 큐 증가를 해결하지 못한다. 이는 현재 계약에 대한 불가능 판정이며, 더 짧은 실측·검증된 PHY 서비스 상한, 병렬 필수 lane, 또는 명시적인 실패 burst 제한 없이는 P0의 0.5/1 ms 모든-실패 보장을 실험 대상으로 삼지 않는다.
 
 ### P1 — 특성화 완성 (3–4주) → C1
 
@@ -476,11 +486,11 @@ B6를 빼면 "기존 GPU 공유 스케줄러와 뭐가 다른가"에 답할 수 
 
 **말할 수 있다**
 - GPU 전용 배치는 AI 부하와 무관하게 L1을 baseline에 유지한다 (Exp 12).
-- 공유 배치는 정적 튜닝의 최선으로도 baseline의 1.9–3.8배다 (Exp 11 실측).
-- 간섭 경로는 compute와 memory 두 가지로 분리되며 시그니처가 다르다.
+- 기존 Exp 11 harness·부하 범위의 공유 배치는 측정한 정적 튜닝 중 최선에서도 baseline의 1.9–3.8배다.
+- 기존 harness에서 compute형과 memory형 간섭에 서로 다른 gap/per-op 시그니처를 관측했다.
 - GPU idle gap의 약 85%가 host의 cudaFree/memcpy 블로킹과 시간적으로 겹친다.
-- 독립 client 증가는 launch queue 중재를 포화시킨다.
-- MPS는 메모리 대역폭 경합에서 time-slicing보다 위험하다.
+- 독립 client 수와 L1 tail·kernel gap이 함께 증가했다. 제출률·총 부하를 고정한 인과 분리는 아직 없다.
+- 측정한 sat_hbm 조건에서 MPS가 time-slicing보다 더 큰 tail을 보였다.
 
 **아직 말하면 안 된다**
 - SoftWall이 MIG CP 수준에 도달한다 (P4 전).

@@ -1,0 +1,314 @@
+{
+  "schema": "softwall-confirm130-deadline-broker-crash-campaign-v1",
+  "protocol": "/workspace/results/softwall_multigpu/confirm130_deadline_broker_crash_protocol.json",
+  "source_checks": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/global_trace_deadline_fault_contained_controller.py": {
+      "expected": "6f184bb1570e7d562fd764319e0fdac81b32183649548b38fa6745133a1351ce",
+      "observed": "6f184bb1570e7d562fd764319e0fdac81b32183649548b38fa6745133a1351ce",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": {
+      "expected": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+      "observed": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/low_perturbation_crash_global_trace_lease_broker.py": {
+      "expected": "d0f66f5a514dfa75ec370405c6623da8fa5a8e9a9ed61818a4603d4358ff7791",
+      "observed": "d0f66f5a514dfa75ec370405c6623da8fa5a8e9a9ed61818a4603d4358ff7791",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/run_global_ai_deadline_broker_crash_arm.sh": {
+      "expected": "12744c4b46a6197bf551e0c10efad36569e712d414861a1ea154b34e0fda7106",
+      "observed": "12744c4b46a6197bf551e0c10efad36569e712d414861a1ea154b34e0fda7106",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/analyze_confirm130_deadline_broker_crash_campaign.py": {
+      "expected": "780b434ea9b31bc9fccbbf87a2a7cdc1136bcfdb308e4b669efab04eddbd7678",
+      "observed": "780b434ea9b31bc9fccbbf87a2a7cdc1136bcfdb308e4b669efab04eddbd7678",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_deadline_global_trace_client.py": {
+      "expected": "0fd95aa31f205be98254ad88ba7af00c6513ab59e45d9c1ef24c6c5de5f6b816",
+      "observed": "0fd95aa31f205be98254ad88ba7af00c6513ab59e45d9c1ef24c6c5de5f6b816",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": {
+      "expected": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "observed": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": {
+      "expected": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "observed": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/dart_runtime.py": {
+      "expected": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+      "observed": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+      "match": true
+    },
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": {
+      "expected": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "observed": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "match": true
+    }
+  },
+  "arms": [
+    {
+      "path": "/workspace/results/softwall_multigpu/confirm130_s1_job58819952_result.json",
+      "all_pass": true,
+      "gates": {
+        "two_homes": true,
+        "same_first_release": true,
+        "full_radio_continuity": true,
+        "worker_count_match": true,
+        "system_safety": true,
+        "expected_broker_exit": true,
+        "home0_commit_ambiguity": true,
+        "both_homes_fail_closed": true,
+        "both_homes_radio_after_detection": true,
+        "ambiguous_request_not_executed": true,
+        "no_duplicate_execution": true,
+        "both_homes_executed_ai": true
+      },
+      "broker_exit_status": 86,
+      "fault_detected_ns": 143154427893224,
+      "ambiguous_request_id": "burstgpt-839414",
+      "actual_request_ids_unique": true,
+      "controllers": [
+        {
+          "home": 0,
+          "radio_records": 1360,
+          "ai_units": 29,
+          "global_queue_status": {
+            "enabled": false,
+            "faults": [
+              {
+                "operation": "commit",
+                "type": "TimeoutError",
+                "message": "timed out",
+                "detected_ns": 143154427893224,
+                "home": 0,
+                "request_id": "burstgpt-839414",
+                "broker_token": "g61:h0:rburstgpt-839414",
+                "rpc_timeout_ms": 5.0,
+                "action": "disable-new-global-ai; never retry ambiguous operation"
+              },
+              {
+                "operation": "metadata_finalize",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143210340490685,
+                "home": 0,
+                "action": "retain fail-closed quarantine"
+              },
+              {
+                "operation": "metadata_summary",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143210542912507,
+                "home": 0,
+                "action": "return last confirmed summary"
+              }
+            ]
+          },
+          "fallback_calendar_final": {
+            "capacity": 1,
+            "service_ns": 25000000,
+            "outstanding": 0,
+            "joint_leases_outstanding": 0,
+            "by_lane": [
+              0
+            ]
+          }
+        },
+        {
+          "home": 1,
+          "radio_records": 1360,
+          "ai_units": 31,
+          "global_queue_status": {
+            "enabled": false,
+            "faults": [
+              {
+                "operation": "complete",
+                "type": "TimeoutError",
+                "message": "timed out",
+                "detected_ns": 143154448082871,
+                "home": 1,
+                "request_id": "burstgpt-839412",
+                "broker_token": "g59:h1:rburstgpt-839412",
+                "rpc_timeout_ms": 5.0,
+                "action": "disable-new-global-ai; never retry ambiguous operation"
+              },
+              {
+                "operation": "metadata_finalize",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143210340466418,
+                "home": 1,
+                "action": "retain fail-closed quarantine"
+              },
+              {
+                "operation": "metadata_summary",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143210543035886,
+                "home": 1,
+                "action": "return last confirmed summary"
+              }
+            ]
+          },
+          "fallback_calendar_final": {
+            "capacity": 1,
+            "service_ns": 25000000,
+            "outstanding": 0,
+            "joint_leases_outstanding": 0,
+            "by_lane": [
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "path": "/workspace/results/softwall_multigpu/confirm130_s2_job58819952_result.json",
+      "all_pass": true,
+      "gates": {
+        "two_homes": true,
+        "same_first_release": true,
+        "full_radio_continuity": true,
+        "worker_count_match": true,
+        "system_safety": true,
+        "expected_broker_exit": true,
+        "home0_commit_ambiguity": true,
+        "both_homes_fail_closed": true,
+        "both_homes_radio_after_detection": true,
+        "ambiguous_request_not_executed": true,
+        "no_duplicate_execution": true,
+        "both_homes_executed_ai": true
+      },
+      "broker_exit_status": 86,
+      "fault_detected_ns": 143268752813278,
+      "ambiguous_request_id": "burstgpt-839409",
+      "actual_request_ids_unique": true,
+      "controllers": [
+        {
+          "home": 0,
+          "radio_records": 1360,
+          "ai_units": 29,
+          "global_queue_status": {
+            "enabled": false,
+            "faults": [
+              {
+                "operation": "commit",
+                "type": "TimeoutError",
+                "message": "timed out",
+                "detected_ns": 143268752813278,
+                "home": 0,
+                "request_id": "burstgpt-839409",
+                "broker_token": "g56:h0:rburstgpt-839409",
+                "rpc_timeout_ms": 5.0,
+                "action": "disable-new-global-ai; never retry ambiguous operation"
+              },
+              {
+                "operation": "metadata_finalize",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143325053228736,
+                "home": 0,
+                "action": "retain fail-closed quarantine"
+              },
+              {
+                "operation": "metadata_summary",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143325255954927,
+                "home": 0,
+                "action": "return last confirmed summary"
+              }
+            ]
+          },
+          "fallback_calendar_final": {
+            "capacity": 1,
+            "service_ns": 25000000,
+            "outstanding": 0,
+            "joint_leases_outstanding": 0,
+            "by_lane": [
+              0
+            ]
+          }
+        },
+        {
+          "home": 1,
+          "radio_records": 1360,
+          "ai_units": 26,
+          "global_queue_status": {
+            "enabled": false,
+            "faults": [
+              {
+                "operation": "complete",
+                "type": "TimeoutError",
+                "message": "timed out",
+                "detected_ns": 143268777569220,
+                "home": 1,
+                "request_id": "burstgpt-839406",
+                "broker_token": "g55:h1:rburstgpt-839406",
+                "rpc_timeout_ms": 5.0,
+                "action": "disable-new-global-ai; never retry ambiguous operation"
+              },
+              {
+                "operation": "metadata_finalize",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143325053278513,
+                "home": 1,
+                "action": "retain fail-closed quarantine"
+              },
+              {
+                "operation": "metadata_summary",
+                "type": "ConnectionRefusedError",
+                "message": "[Errno 111] Connection refused",
+                "detected_ns": 143325255915851,
+                "home": 1,
+                "action": "return last confirmed summary"
+              }
+            ]
+          },
+          "fallback_calendar_final": {
+            "capacity": 1,
+            "service_ns": 25000000,
+            "outstanding": 0,
+            "joint_leases_outstanding": 0,
+            "by_lane": [
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "radio_records": 5440,
+    "radio_records_after_crash": 4992,
+    "ai_units_before_containment": 115,
+    "deadline_misses": 0,
+    "nrx_bound_violations": 0,
+    "conv_bound_violations": 0,
+    "ai_bound_violations": 0,
+    "ai_horizon_violations": 0
+  },
+  "gates": {
+    "prospective_sources_match": true,
+    "two_independent_arms": true,
+    "all_arm_gates_pass": true,
+    "expected_fail_stop": true,
+    "both_homes_continue_radio": true,
+    "all_global_ai_clients_fail_closed": true,
+    "no_duplicate_execution": true,
+    "faults_record_rpc_budget": true,
+    "all_safety_gates_zero": true
+  },
+  "all_pass": true,
+  "claim": "With a 5 ms broker-RPC budget and no synchronous fault-path logging, after a broker fail-stop immediately following one applied commit, all global-AI clients stop admission while both disjoint local RAN certificates continue without duplicate AI execution.",
+  "scope": "Volatile broker fail-stop containment only; no broker restart, durable recovery, or exactly-once completion claim."
+}

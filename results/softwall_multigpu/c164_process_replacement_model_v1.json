@@ -1,0 +1,4383 @@
+{
+  "all_pass": true,
+  "checks": {
+    "all_other_states_fail_closed": true,
+    "complete_state_product": true,
+    "only_two_complete_evidence_states_accept": true,
+    "zero_invariant_violations": true
+  },
+  "claim_boundary": "Pure evidence-composition model. Physical MPS termination, mandatory RAN continuity, process replacement, production d_MAC and WCET remain unqualified until separate gates pass.",
+  "counts": {
+    "accepted": 2,
+    "fail_closed": 254,
+    "invariant_violations": 0,
+    "state_product": 256
+  },
+  "mps_quiescence_primitive": {
+    "command": "terminate_client <server PID> <client PID>",
+    "official_reference": "https://docs.nvidia.com/deploy/mps/when-to-use-mps.html#client-early-termination",
+    "success_code": "0"
+  },
+  "schema": "softwall-c164-process-replacement-model-audit-v1",
+  "source_sha256": {
+    "build_c164_process_replacement_model.py": "8b8229c69710bd969334067ab4f64f75e19580474640211cc363ec69c4203ddb",
+    "c164_process_replacement_model_v1.py": "7efbc9cf38d956724b7671452658dc5a85309904faa43920e26fadb7b445ed47",
+    "test_c164_process_replacement_model_v1.py": "90ad0460455c33a96ff724406ec210a6bebd0db142506a670290faefb49ee09d"
+  },
+  "states": [
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_server_epoch_changed",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_server_epoch_changed",
+      "same_mps_server_survived": false,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mandatory_client_not_preserved",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": true,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_context_quiescence_certificate_accepted",
+      "same_mps_server_survived": true,
+      "stage": "prepared",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": "nonlaunch_fenced",
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": false,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "identity_mismatch",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "target_not_observed_before",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": false,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_terminate_client_not_successful",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": false
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": false,
+      "reason": "old_process_exit_unconfirmed",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "old_client_still_registered",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": false,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mps_server_epoch_changed",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_server_epoch_changed",
+      "same_mps_server_survived": false,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": false,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": false,
+      "process_exit_confirmed": true,
+      "reason": "mandatory_client_not_preserved",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": null,
+      "terminate_client_success": true
+    },
+    {
+      "accepted": true,
+      "checks": {
+        "decision_matches_complete_evidence_rule": true,
+        "safety_invariants": true
+      },
+      "identity_match": true,
+      "mandatory_client_preserved": true,
+      "process_exit_confirmed": true,
+      "reason": "mps_context_quiescence_certificate_accepted",
+      "same_mps_server_survived": true,
+      "stage": "launched",
+      "target_absent_after": true,
+      "target_present_before": true,
+      "terminal_stage": "quiescence_fenced",
+      "terminate_client_success": true
+    }
+  ],
+  "status": "C164_PROCESS_REPLACEMENT_MODEL_PASS",
+  "violations": []
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm34_external_endpoint_policy_baselines",
+  "purpose": "Compare persistent external-endpoint S2 against conventional-only and eager-dual policies on identical natural channel traces and the same GPU/process budget.",
+  "shared_contract": {
+    "channel": "block-Rayleigh plus AWGN",
+    "snr_db": -8.5,
+    "channel_seed_base": 20323000,
+    "iterations_per_policy": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "endpoint_cap": 80,
+    "endpoint_visible_sms": 86,
+    "endpoint_lifecycle": "persistent during each timed epoch; MPS restart and requalification between policies"
+  },
+  "policies": {
+    "conventional": "run conventional full path; keep the initialized external endpoint idle during the timed epoch",
+    "eager": "run external NeuralRx and conventional full path for every request; select NeuralRx when valid, otherwise conventional",
+    "s2": "reuse frozen confirm33: run external NeuralRx first and conventional only on NeuralRx verification failure"
+  },
+  "primary_gate": {
+    "all_policy_deadline_misses": 0,
+    "all_policy_endpoint_timeouts": 0,
+    "s2_vs_eager_noninferiority_margin_percentage_points": -0.25,
+    "s2_conventional_runs_less_than_eager": true,
+    "s2_natural_recoveries_positive": true,
+    "identical_channel_seed_set": true
+  },
+  "interpretation_limit": "Saved conventional executions are a direct compute-efficiency measure. Translating all saved time into background throughput is evaluated separately with an external background lease."
+}

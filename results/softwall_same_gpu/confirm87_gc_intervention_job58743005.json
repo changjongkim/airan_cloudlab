@@ -1,0 +1,120 @@
+{
+  "schema": "softwall-confirm87-gc-intervention-abba-v1",
+  "job": "58743005",
+  "source_hashes": true,
+  "arms": [
+    {
+      "name": "a_on",
+      "gc_mode": "on",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true
+      },
+      "all_contract_gates_pass": true,
+      "gc_events": 66,
+      "gen2_gc_events": 1,
+      "gen2_gc_max_ms": 28.844866,
+      "max_channel_prep_ms": 3.993813,
+      "max_channel_prep_release": 35,
+      "max_wait_lateness_ms": 0.148006,
+      "max_wait_lateness_release": 0,
+      "max_predispatch_gap_ms": 1.85676,
+      "max_host_stage_ms": 3.993813,
+      "max_nrx_response_ms": 45.567111,
+      "nrx_over_30_ms": 2,
+      "background_units": 34573,
+      "deadline_misses": 0
+    },
+    {
+      "name": "b_off",
+      "gc_mode": "off",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true
+      },
+      "all_contract_gates_pass": true,
+      "gc_events": 0,
+      "gen2_gc_events": 0,
+      "gen2_gc_max_ms": 0,
+      "max_channel_prep_ms": 6.856744,
+      "max_channel_prep_release": 43,
+      "max_wait_lateness_ms": 0.136675,
+      "max_wait_lateness_release": 0,
+      "max_predispatch_gap_ms": 2.183914,
+      "max_host_stage_ms": 6.856744,
+      "max_nrx_response_ms": 23.813241,
+      "nrx_over_30_ms": 0,
+      "background_units": 34790,
+      "deadline_misses": 0
+    },
+    {
+      "name": "c_off",
+      "gc_mode": "off",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true
+      },
+      "all_contract_gates_pass": true,
+      "gc_events": 0,
+      "gen2_gc_events": 0,
+      "gen2_gc_max_ms": 0,
+      "max_channel_prep_ms": 5.062546,
+      "max_channel_prep_release": 24,
+      "max_wait_lateness_ms": 0.407152,
+      "max_wait_lateness_release": 36,
+      "max_predispatch_gap_ms": 1.608679,
+      "max_host_stage_ms": 5.062546,
+      "max_nrx_response_ms": 22.060555,
+      "nrx_over_30_ms": 0,
+      "background_units": 34556,
+      "deadline_misses": 0
+    },
+    {
+      "name": "d_on",
+      "gc_mode": "on",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true
+      },
+      "all_contract_gates_pass": true,
+      "gc_events": 67,
+      "gen2_gc_events": 1,
+      "gen2_gc_max_ms": 27.672344,
+      "max_channel_prep_ms": 4.404059,
+      "max_channel_prep_release": 18,
+      "max_wait_lateness_ms": 0.141707,
+      "max_wait_lateness_release": 0,
+      "max_predispatch_gap_ms": 1.135261,
+      "max_host_stage_ms": 4.404059,
+      "max_nrx_response_ms": 44.03286,
+      "nrx_over_30_ms": 2,
+      "background_units": 34901,
+      "deadline_misses": 0
+    }
+  ],
+  "pairs": [
+    {
+      "seed_pair": 1,
+      "on_gen2_max_ms": 28.844866,
+      "off_gen2_events": 0,
+      "on_minus_off_max_host_stage_ms": -2.862931,
+      "on_minus_off_max_nrx_ms": 21.753869999999996,
+      "frozen_tail_attribution_gate": false
+    },
+    {
+      "seed_pair": 2,
+      "on_gen2_max_ms": 27.672344,
+      "off_gen2_events": 0,
+      "on_minus_off_max_host_stage_ms": -0.658487,
+      "on_minus_off_max_nrx_ms": 21.972305,
+      "frozen_tail_attribution_gate": false
+    }
+  ],
+  "all_contract_gates_pass": true,
+  "tail_attribution_gate_pass": false,
+  "interpretation": "Two same-trace seed pairs in ON/OFF/OFF/ON order, each separate MPS epoch. Passing the tail attribution gate supports cyclic GC as a cause of the measured host stall in this synthetic mode, not a hard service-time guarantee. Failure leaves the causal hypothesis unconfirmed; source and safety gates are separate."
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "softwall-g7-du-timing-readiness-v1",
+  "status": "UQ_NO_PRODUCTION_TRACE",
+  "ready_components": {
+    "same_clock_trace_schema": true,
+    "provenance_gate": true,
+    "explicit_gnb_expiry_gate": true,
+    "ue_k2_n2_rejection": true,
+    "single_commit_and_timestamp_validation": true,
+    "observed_deadline_gate": true,
+    "conservative_all_fail_capacity_gate": true
+  },
+  "missing_evidence": [
+    "target DU/FAPI trace",
+    "explicit gNB MAC expiry source",
+    "defensible mandatory service bound for that production mode"
+  ],
+  "files_sha256": {
+    "scripts_for_node/softwall_same_gpu/du_timing_contract_validator.py": "d1774ee48f7432f15fa069b63d1e78cb504de2a277b92ad4d1f2ea2a0c988bd6",
+    "scripts_for_node/softwall_same_gpu/test_du_timing_contract_validator.py": "11247a40a553056955e7ba011b40e565aeee264ef1a0cf2acef15f4df4daa967",
+    "results/softwall_multigpu/softwall_du_timing_contract_template_v1.json": "c81b2628df299086fed8907dfcd78e529784e2e556f06c3b32ab8fdfecf6a651"
+  },
+  "claim_boundary": "readiness artifact only; the unit-test fixture is not a production trace and does not qualify any DU mode"
+}

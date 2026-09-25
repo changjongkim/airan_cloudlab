@@ -1,0 +1,30 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm40_cold_start_ablation",
+  "purpose": "Test whether the first external same-request conventional fallback tail is caused by not priming that branch in the controller process.",
+  "order": ["off", "on", "on", "off"],
+  "same_node_allocation_mps_epoch": true,
+  "new_controller_and_worker_process_each_condition": true,
+  "radio": {
+    "iterations_per_condition": 500,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "payload_seed": 20321035,
+    "channel_seed_base": 20325000
+  },
+  "intervention": {
+    "off": "20 clean NeuralRx IPC warmups and one noisy NeuralRx IPC warmup; no conventional execution before timed releases",
+    "on": "same NeuralRx warmups plus 20 clean conventional warmups and one noisy conventional warmup",
+    "all_other_parameters_identical": true
+  },
+  "primary_gate": {
+    "all_releases_complete": true,
+    "same_trace_and_first_fallback_release": true,
+    "all_deadline_misses_zero": true,
+    "all_endpoint_timeouts_zero": true,
+    "each_off_first_fallback_gpu_ms_exceeds_each_on_by_at_least": 10
+  },
+  "interpretation_limit": "A passing ABBA result supports branch-specific cold-start causality on this hardware; it does not establish a worst-case service-time bound for subsequent fallbacks."
+}

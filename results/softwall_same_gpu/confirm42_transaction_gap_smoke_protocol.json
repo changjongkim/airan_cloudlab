@@ -1,0 +1,55 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm42_transaction_gap_smoke",
+  "purpose": "Bind the separate CUDA-IPC NRx endpoint to the actual DART admission, fallback-calendar and single-commit runtime, then test bounded AI leases before a reserved recovery interval.",
+  "radio": {
+    "iterations": 500,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "payload_seed": 20321042,
+    "channel_seed_base": 20332000
+  },
+  "execution": {
+    "one_fresh_node_allocation": true,
+    "one_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "operational_requalification": "200 conventional-only releases with zero deadline misses before the smoke run"
+  },
+  "endpoint": {
+    "mps_cap": 80,
+    "rpc_timeout_ms": 30,
+    "nrx_end_to_end_bound_ms": 30,
+    "persistent_through_timed_epoch": true
+  },
+  "recovery": {
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "fallback_latest_start_ms_after_release": 53,
+    "fallback_calendar_capacity": 1,
+    "single_commit_epoch_fence": true
+  },
+  "background": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "repeats_per_unit": 1,
+    "rpc_budget_ms": 40,
+    "rpc_timeout_ms": 45,
+    "guard_ms": 2,
+    "recovery_gap_lease_enabled": true
+  },
+  "primary_gate": {
+    "requalification_deadline_misses_zero": true,
+    "all_500_releases_complete": true,
+    "ran_deadline_misses_zero": true,
+    "endpoint_timeouts_zero": true,
+    "nrx_and_conventional_bound_violations_zero": true,
+    "background_budget_violations_crossings_faults_zero": true,
+    "duplicate_commits_zero": true,
+    "fallback_calendar_and_endpoint_outstanding_zero_at_end": true,
+    "natural_fallbacks_positive": true,
+    "completed_recovery_gap_ai_units_positive": true
+  },
+  "interpretation_limit": "A smoke pass establishes concrete integration for this allowed workload and seed. It is not a throughput advantage, hard WCET proof or multi-cell scheduling result; same-node paired ablation follows."
+}

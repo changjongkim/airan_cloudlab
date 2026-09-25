@@ -1,0 +1,72 @@
+{
+  "all_pass": false,
+  "artifact_sha256": {
+    "client": "3c337f84cfee3e3fdb1bd7efb15ca0f1c949fb758c87fe8c727f772821386ea8",
+    "inventory": "c22edf96b547d2a108a68be4bec8dc6e2a30b4f3f345ad30f9ad004d94f022c0",
+    "mandatory": "50bf36ab41c5e3bc027a9b7b3ec312fe0d2d511c526d0010d0ba02334d03a059",
+    "protocol": "52f6202ee926b2c760cb2d033f4bb786cc7d2c04f7e5c3a39f392bdde336f536",
+    "worker": "96a3349139fdb19f127672846db85622aaec5bc89719adc18ef69bd4795bb92c"
+  },
+  "campaign": "development",
+  "claim_boundary": "Finite-sample same-process Qwen worker channel reconnect with fsync-backed prepared/fenced journal reconciliation and concurrent mandatory four-cell cuPHY. Worker-process replacement, arbitrary crash windows, production d_MAC and WCET remain unqualified.",
+  "counts": {
+    "cell_decodes": 284,
+    "component_bound_violations": 0,
+    "deadline_misses": 0,
+    "mandatory_releases": 71,
+    "overlap_releases": 0,
+    "physical_qwen_launches": 30,
+    "post_fence_loss": 30,
+    "prepare_loss": 30,
+    "terminal_fences": 60,
+    "tokens": 60
+  },
+  "gates": {
+    "a100_mig_off_inventory": true,
+    "aligned_launch_interval_spans_mandatory_release": false,
+    "client_worker_journal_exact_match": true,
+    "complete_balanced_token_product": true,
+    "duplicate_reconcile_is_idempotent": true,
+    "every_fault_loses_channel_then_reconnects": true,
+    "frozen_source_hash_match": true,
+    "mandatory_correct_deadline_and_component_bound": true,
+    "mandatory_sample_complete": true,
+    "node_not_excluded": true,
+    "physical_qwen_and_mandatory_overlap_observed": false,
+    "post_fence_loss_has_one_launch_and_fence": true,
+    "prepare_loss_never_launches_and_nonlaunch_fences": true,
+    "same_host_job_worker_epoch": true
+  },
+  "host": "nid001057",
+  "label": "c164g2_reconnect_dev_j58862429",
+  "mandatory_component_gpu_ms": {
+    "count": 284,
+    "max": 13.003040313720703,
+    "mean": 4.5336995989504,
+    "p50": 4.225855827331543,
+    "p99": 12.66051197052002
+  },
+  "mandatory_response_ms": {
+    "count": 71,
+    "max": 51.841978,
+    "mean": 18.365958690140847,
+    "p50": 17.312871,
+    "p99": 23.387081
+  },
+  "pair_counts": {
+    "drop_after_fence:128": 15,
+    "drop_after_fence:512": 15,
+    "drop_after_prepare:128": 15,
+    "drop_after_prepare:512": 15
+  },
+  "qwen_gpu_ms": {
+    "count": 30,
+    "max": 67.23993682861328,
+    "mean": 45.40701675415039,
+    "p50": 34.398494720458984,
+    "p99": 67.23993682861328
+  },
+  "schema": "softwall-c164-reconnect-physical-result-v1",
+  "slurm_job_id": "58862429",
+  "status": "C164_RECONNECT_PHYSICAL_FAIL"
+}

@@ -1,0 +1,185 @@
+{
+  "schema": "softwall-s2-noninferiority-v1",
+  "campaign": "confirm21_s2_noninferiority_p90d80",
+  "paired_releases": 10000,
+  "margin_percentage_points": 0.25,
+  "s2_minus_eager_percentage_points": -0.03,
+  "confidence_interval_95_percentage_points": [
+    -0.0818559848071178,
+    0.0218559848071178
+  ],
+  "s2_wins": 2,
+  "eager_wins": 5,
+  "s2_win_indices": [
+    [
+      1,
+      1401
+    ],
+    [
+      4,
+      12
+    ]
+  ],
+  "eager_win_indices": [
+    [
+      3,
+      1186
+    ],
+    [
+      3,
+      1688
+    ],
+    [
+      4,
+      281
+    ],
+    [
+      5,
+      1466
+    ],
+    [
+      5,
+      1576
+    ]
+  ],
+  "mean_background_per_s": {
+    "s2": 701.1733333333333,
+    "eager": 679.6111111111111,
+    "relative_gain_percent": 3.1727295021662716
+  },
+  "valid_background_pairs": 5,
+  "valid_pair_background_per_s": {
+    "pairs": 5,
+    "s2": 701.1733333333333,
+    "eager": 679.6111111111111,
+    "relative_gain_percent": 3.1727295021662716
+  },
+  "gates": {
+    "utility_noninferior": true,
+    "deadline_misses_zero": true,
+    "duplicate_commits_zero": true,
+    "admission_rejections_zero": false,
+    "bound_violations_zero": true,
+    "ai_violations_zero": true,
+    "channel_seeds_match": true,
+    "background_throughput_gain": true,
+    "all_pass": false
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "iterations": 2000,
+      "eager_correct": 1972,
+      "s2_correct": 1973,
+      "difference_pp": 0.05,
+      "s2_wins": 1,
+      "eager_wins": 0,
+      "channel_seed_mismatches": 0,
+      "nrx_decision_mismatches": 0,
+      "s2_deadline_misses": 0,
+      "s2_duplicate_commits": 0,
+      "s2_admission_rejections": 0,
+      "s2_bound_violations": 0,
+      "s2_ai_violations": 0,
+      "eager_ai_violations": 0,
+      "eager_background_per_s": 680.55,
+      "s2_background_per_s": 705.4555555555555,
+      "sources": {
+        "eager_dual": "confirm21_s2_noninferiority_p90d80_r1_eager_dual_job58660634_ran.json",
+        "s2_reserved": "confirm21_s2_noninferiority_p90d80_r1_s2_reserved_job58660634_ran.json"
+      }
+    },
+    {
+      "round": 2,
+      "iterations": 2000,
+      "eager_correct": 1948,
+      "s2_correct": 1948,
+      "difference_pp": 0.0,
+      "s2_wins": 0,
+      "eager_wins": 0,
+      "channel_seed_mismatches": 0,
+      "nrx_decision_mismatches": 0,
+      "s2_deadline_misses": 0,
+      "s2_duplicate_commits": 0,
+      "s2_admission_rejections": 0,
+      "s2_bound_violations": 0,
+      "s2_ai_violations": 0,
+      "eager_ai_violations": 0,
+      "eager_background_per_s": 674.7388888888889,
+      "s2_background_per_s": 694.9888888888889,
+      "sources": {
+        "eager_dual": "confirm21_s2_noninferiority_p90d80_r2_eager_dual_job58660634_ran.json",
+        "s2_reserved": "confirm21_s2_noninferiority_p90d80_r2_s2_reserved_job58660634_ran.json"
+      }
+    },
+    {
+      "round": 3,
+      "iterations": 2000,
+      "eager_correct": 1962,
+      "s2_correct": 1960,
+      "difference_pp": -0.1,
+      "s2_wins": 0,
+      "eager_wins": 2,
+      "channel_seed_mismatches": 0,
+      "nrx_decision_mismatches": 0,
+      "s2_deadline_misses": 0,
+      "s2_duplicate_commits": 0,
+      "s2_admission_rejections": 0,
+      "s2_bound_violations": 0,
+      "s2_ai_violations": 0,
+      "eager_ai_violations": 0,
+      "eager_background_per_s": 676.1944444444445,
+      "s2_background_per_s": 704.2333333333333,
+      "sources": {
+        "eager_dual": "confirm21_s2_noninferiority_p90d80_r3_eager_dual_job58660634_ran.json",
+        "s2_reserved": "confirm21_s2_noninferiority_p90d80_r3_s2_reserved_job58660634_ran.json"
+      }
+    },
+    {
+      "round": 4,
+      "iterations": 2000,
+      "eager_correct": 1964,
+      "s2_correct": 1964,
+      "difference_pp": 0.0,
+      "s2_wins": 1,
+      "eager_wins": 1,
+      "channel_seed_mismatches": 0,
+      "nrx_decision_mismatches": 1,
+      "s2_deadline_misses": 0,
+      "s2_duplicate_commits": 0,
+      "s2_admission_rejections": 1,
+      "s2_bound_violations": 0,
+      "s2_ai_violations": 0,
+      "eager_ai_violations": 0,
+      "eager_background_per_s": 681.1666666666666,
+      "s2_background_per_s": 703.2166666666667,
+      "sources": {
+        "eager_dual": "confirm21_s2_noninferiority_p90d80_r4_eager_dual_job58660634_ran.json",
+        "s2_reserved": "confirm21_s2_noninferiority_p90d80_r4_s2_reserved_job58660634_ran.json"
+      }
+    },
+    {
+      "round": 5,
+      "iterations": 2000,
+      "eager_correct": 1967,
+      "s2_correct": 1965,
+      "difference_pp": -0.1,
+      "s2_wins": 0,
+      "eager_wins": 2,
+      "channel_seed_mismatches": 0,
+      "nrx_decision_mismatches": 0,
+      "s2_deadline_misses": 0,
+      "s2_duplicate_commits": 0,
+      "s2_admission_rejections": 0,
+      "s2_bound_violations": 0,
+      "s2_ai_violations": 0,
+      "eager_ai_violations": 0,
+      "eager_background_per_s": 685.4055555555556,
+      "s2_background_per_s": 697.9722222222222,
+      "sources": {
+        "eager_dual": "confirm21_s2_noninferiority_p90d80_r5_eager_dual_job58660634_ran.json",
+        "s2_reserved": "confirm21_s2_noninferiority_p90d80_r5_s2_reserved_job58660634_ran.json"
+      }
+    }
+  ]
+}

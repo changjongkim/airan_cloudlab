@@ -1,0 +1,51 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm16_s2_hardware_p50d40",
+  "purpose": "Compare actual same-request S2 optional NeuralRx and reserved conventional recovery against conventional-only, NRx-only, and eager dual execution while reclaiming slack for a separate MPS AI client.",
+  "radio": {
+    "input": "Aerial PdschTx-generated valid 273-PRB PUSCH",
+    "cells_per_release": 1,
+    "period_ms": 50,
+    "deadline_ms": 40,
+    "iterations_per_run": 500,
+    "runs": 3,
+    "seed_base": 20270500
+  },
+  "measured_branches": {
+    "conventional": "CE+NI+EQ+de-rate-match+LDPC+CRC",
+    "neural": "LS CE+direct persistent TensorRT NeuralRx+de-rate-match+LDPC+CRC",
+    "nrx_bound_ms": 14,
+    "conventional_bound_ms": 24,
+    "commit_guard_ms": 2
+  },
+  "fault_model": {
+    "kind": "post-compute NRx result invalidation",
+    "frequency": "every 10th release",
+    "reason": "exercise recovery and late-result fencing without substituting synthetic receiver compute"
+  },
+  "background": {
+    "kind": "separate MPS NeuralRx CUDA Graph client",
+    "end_to_end_budget_ms": 6,
+    "guard_ms": 1,
+    "maximum_outstanding": 1
+  },
+  "policies": {
+    "conventional_only": "mandatory conventional path only",
+    "nrx_only": "optional NeuralRx without recovery",
+    "eager_dual": "execute both actual receiver branches on every release",
+    "s2_reserved": "reserve NRx endpoint and a conventional recovery interval atomically; commit one result and reclaim the rest for background"
+  },
+  "primary_gate": {
+    "s2_deadline_misses": 0,
+    "s2_incorrect_releases": 0,
+    "s2_duplicate_commits": 0,
+    "s2_admission_rejections": 0,
+    "s2_bound_violations": 0,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0,
+    "nrx_only_must_expose_injected_utility_loss": true,
+    "s2_background_throughput_must_exceed_eager_dual": true
+  },
+  "interpretation_limit": "Injected NRx invalidation validates recovery semantics and resource tradeoffs; channel-induced NRx/conventional utility differences require a separate SNR/channel trace experiment."
+}

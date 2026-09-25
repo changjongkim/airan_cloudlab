@@ -1,0 +1,63 @@
+{
+  "all_pass": true,
+  "analysis_role": "Posthoc contract interpretation of prespecified C162 points; no new outcome was opened.",
+  "artifact_sha256": {
+    "results/softwall_multigpu/c162_boundary_two_node.json": "2daa077c46ffadc55d45e5149ac6eb51d2a753589713ea37d24a5875a18c207f",
+    "results/softwall_multigpu/c162_feasibility_grid_v1.json": "f5da8016215c2896ef4d9f19be4e8ea386529a46c590407602fb116daddc60c7",
+    "results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json": "37298e64d351635f7973a25eac06a44cb85260f1eb06b65a909ba77173772ef8"
+  },
+  "baseline_semantics": {
+    "c159_recovery_first": "certificate-preserving conservative policy that drains unresolved recovery before AI",
+    "debt_blind_diagnostic": "unsafe policy that treats current GPU idleness as sufficient and ignores unresolved recovery",
+    "softwall": "certificate-preserving policy that may place AI before recovery when a witness schedule remains",
+    "tie_interpretation": "The 385262-token tie rejects material AI-first throughput benefit for the trace; it does not reject the all-fail certificate."
+  },
+  "claim": "Current GPU idleness is insufficient for early external-AI admission when unresolved same-TB recovery debt exists. For each witness, mandatory-only recovery is feasible, but a debt-blind AI admission has a duration realization within the qualified bounds that crosses the radio guard. SoftWall physically reached and rejected these frozen states before GPU launch.",
+  "non_claims": [
+    "No observed debt-blind deadline miss is claimed from C162 because the rejected AI kernel was not launched.",
+    "The witness does not claim a throughput benefit over certificate-preserving recovery-first.",
+    "Failure-correlation probabilities are not estimated; all-fail safety is distribution-free within the fault model."
+  ],
+  "schema": "softwall-necessity-witness-v1",
+  "status": "SOFTWALL_CONTRACT_NECESSITY_WITNESS_PASS",
+  "summary": {
+    "maximum_contract_excess_ms": 12,
+    "minimum_contract_excess_ms": 1,
+    "physical_softwall_reject_rounds": 60,
+    "prespecified_false_safe_cases": 2,
+    "recovery_first_timely_tokens": 385262,
+    "softwall_timely_tokens": 385262
+  },
+  "witnesses": [
+    {
+      "bound_respecting_finish_ms": 165,
+      "case": "E4_two_unresolved_context256",
+      "context_length": 256,
+      "contract_excess_ms": 12,
+      "debt_blind_idle_only_decision": "ACCEPT",
+      "decision_time_ms": 45,
+      "mandatory_all_fail_safe": true,
+      "observed_deadline_miss_claimed": false,
+      "physical_softwall_reject_rounds": 30,
+      "radio_guard_boundary_ms": 153,
+      "softwall_ai_safe": false,
+      "softwall_state": "QSN",
+      "unresolved_debts": 2
+    },
+    {
+      "bound_respecting_finish_ms": 154,
+      "case": "E6b_first_unsafe_context64",
+      "context_length": 64,
+      "contract_excess_ms": 1,
+      "debt_blind_idle_only_decision": "ACCEPT",
+      "decision_time_ms": 89,
+      "mandatory_all_fail_safe": true,
+      "observed_deadline_miss_claimed": false,
+      "physical_softwall_reject_rounds": 30,
+      "radio_guard_boundary_ms": 153,
+      "softwall_ai_safe": false,
+      "softwall_state": "QSN",
+      "unresolved_debts": 1
+    }
+  ]
+}

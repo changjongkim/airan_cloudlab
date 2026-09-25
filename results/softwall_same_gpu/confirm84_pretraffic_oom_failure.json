@@ -1,0 +1,19 @@
+{
+  "schema": "softwall-confirm84-pretraffic-oom-failure-v1",
+  "job": "58738952",
+  "node": "nid001229",
+  "prefix": "confirm84_eightcell_conv12_job58738952",
+  "frozen_protocol": "confirm84_eightcell_conv12_protocol.json",
+  "source_hashes_match": true,
+  "log": "confirm84_eightcell_conv12_job58738952.log",
+  "log_sha256": "489c870025dc325b57971ff85f92f85fa287e169621c176389af0ab84570d071",
+  "srun_exit_code": 1,
+  "requalification_complete": true,
+  "requalification_max_response_ms": 11.751,
+  "timed_radio_started": false,
+  "timed_releases": 0,
+  "failure_class": "GPU out of memory while creating an independent PairedDualReceiver context; ChannelEqualizer initialization",
+  "log_contains_oom": true,
+  "post_failure_cleanup": "Three experiment worker PIDs remained after controller crash and were terminated explicitly; the MPS control/server PIDs were then terminated after quit hung. The job-local GPU lock was removed. No timed radio JSON exists.",
+  "interpretation": "Eight-cell time arithmetic was insufficient: the current one-receiver-per-cell implementation could not initialize eight physical cell contexts on this GPU. This is a pretraffic feasibility failure, not a deadline or bound sample and not a fundamental impossibility after memory redesign."
+}

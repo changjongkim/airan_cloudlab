@@ -1,0 +1,106 @@
+[1/96] Building CXX object cuPHY-CP/aerial-fh-driver/CMakeFiles/aerial-fh.dir/lib/fh_mutex.cpp.o
+[2/96] Building CXX object cuPHY-CP/aerial-fh-driver/CMakeFiles/aerial-fh.dir/lib/flow.cpp.o
+FAILED: cuPHY-CP/aerial-fh-driver/CMakeFiles/aerial-fh.dir/lib/flow.cpp.o 
+ccache /usr/local/gnu/bin/g++ -DAERIAL_METRICS -DAERIAL_SDK_VERSION=\"25-3-cubb\" -DALLOW_EXPERIMENTAL_API -DDOCA_ALLOW_EXPERIMENTAL_API -DENABLE_CELL_GROUP -DENABLE_DOCA_GPU_COMM -DENABLE_L2_SLT_RSP -DENABLE_SCHED_FIFO_ALL_RT -DFMT_SHARED -DUSE_PUSCH_PER_UE_PREQ_NOISE_VAR=1 -Daerial_fh_EXPORTS -I/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/include -I/opt/nvidia/cuBB/cuPHY/examples/common -I/opt/mellanox/dpdk/include/dpdk -I/opt/mellanox/dpdk/include/dpdk/../x86_64-linux-gnu/dpdk -I/usr/include/libnl3 -I/opt/mellanox/doca/include -I/opt/nvidia/cuBB/cuPHY/nvlog/include -I/opt/nvidia/cuBB/cuPHY-CP/cuphyoam/inc -I/opt/nvidia/cuBB/build/cuPHY-CP/cuphyoam -I/opt/nvidia/cuBB/cuPHY-CP/gt_common_libs/nvIPC/include -I/opt/nvidia/cuBB/cuPHY-CP/gt_common_libs/nvIPC/common -I/opt/nvidia/cuBB/cuPHY-CP/gt_common_libs/nvIPC/cuda -I/opt/nvidia/cuBB/cuPHY-CP/gt_common_libs/nvIPC/gpudata -I/opt/nvidia/cuBB/cuPHY-CP/app_config -I/opt/nvidia/cuBB/cuPHY-CP/gt_common_libs/slot_command/include -I/opt/nvidia/cuBB/cuPHY/src/cuphy -I/opt/nvidia/cuBB/cuPHY-CP/gt_common_libs/aerial_metrics/src -isystem /usr/local/cuda/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Werror -Wno-volatile -Wno-stringop-overread -Wno-attributes -Wno-deprecated-enum-enum-conversion -include rte_config.h -march=corei7 -I/opt/mellanox/dpdk/include/dpdk -I/opt/mellanox/dpdk/include/dpdk/../x86_64-linux-gnu/dpdk -I/usr/local/include -I/usr/include/libnl3 -march=native -DALLOW_EXPERIMENTAL_API -I/opt/mellanox/doca/include -MD -MT cuPHY-CP/aerial-fh-driver/CMakeFiles/aerial-fh.dir/lib/flow.cpp.o -MF cuPHY-CP/aerial-fh-driver/CMakeFiles/aerial-fh.dir/lib/flow.cpp.o.d -o cuPHY-CP/aerial-fh-driver/CMakeFiles/aerial-fh.dir/lib/flow.cpp.o -c /opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp
+In file included from /opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:25:
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp: In constructor ‘aerial_fh::Flow::Flow(aerial_fh::Peer*, aerial_fh::FlowInfo*)’:
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:66: error: ‘fmtlog’ has not been declared
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                                                  ^~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:63:11: note: in definition of macro ‘TI_GENERIC_PERCENTAGE_NVLOG’
+   63 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI PERCENTAGE}} <{}> {}\n", ti_task_name, ti_subtask_results1);
+      |           ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:98:5: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+   98 |     TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:63:1: error: ‘NVLOG_FMT’ was not declared in this scope; did you mean ‘NVLOGI_FMT’?
+   63 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI PERCENTAGE}} <{}> {}\n", ti_task_name, ti_subtask_results1);
+      | ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:63:1: note: in definition of macro ‘TI_GENERIC_PERCENTAGE_NVLOG’
+   63 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI PERCENTAGE}} <{}> {}\n", ti_task_name, ti_subtask_results1);
+      | ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:98:5: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+   98 |     TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:66: error: ‘fmtlog’ has not been declared
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                                                  ^~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:79:11: note: in definition of macro ‘TI_GENERIC_DURATION_NVLOG’
+   79 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI DURATION}} <{}> {}\n", ti_task_name, ti_subtask_results2);
+      |           ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:98:5: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+   98 |     TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:66: error: ‘fmtlog’ has not been declared
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                                                  ^~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:95:11: note: in definition of macro ‘TI_GENERIC_TIMESTAMP_NVLOG’
+   95 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI TIMESTAMPS}} <{}> {}\n", ti_task_name, ti_subtask_results3);
+      |           ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:98:5: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+   98 |     TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp: In member function ‘void aerial_fh::Flow::setup_packet_header_gpu()’:
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:66: error: ‘fmtlog’ has not been declared
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                                                  ^~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:63:11: note: in definition of macro ‘TI_GENERIC_PERCENTAGE_NVLOG’
+   63 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI PERCENTAGE}} <{}> {}\n", ti_task_name, ti_subtask_results1);
+      |           ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:425:6: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+  425 |      TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |      ^~~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:63:1: error: ‘NVLOG_FMT’ was not declared in this scope; did you mean ‘NVLOGI_FMT’?
+   63 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI PERCENTAGE}} <{}> {}\n", ti_task_name, ti_subtask_results1);
+      | ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:63:1: note: in definition of macro ‘TI_GENERIC_PERCENTAGE_NVLOG’
+   63 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI PERCENTAGE}} <{}> {}\n", ti_task_name, ti_subtask_results1);
+      | ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:425:6: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+  425 |      TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |      ^~~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:66: error: ‘fmtlog’ has not been declared
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                                                  ^~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:79:11: note: in definition of macro ‘TI_GENERIC_DURATION_NVLOG’
+   79 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI DURATION}} <{}> {}\n", ti_task_name, ti_subtask_results2);
+      |           ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:425:6: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+  425 |      TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |      ^~~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:66: error: ‘fmtlog’ has not been declared
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                                                  ^~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:95:11: note: in definition of macro ‘TI_GENERIC_TIMESTAMP_NVLOG’
+   95 | NVLOG_FMT(LOG_LEVEL,TAG,"{{TI TIMESTAMPS}} <{}> {}\n", ti_task_name, ti_subtask_results3);
+      |           ^~~~~~~~~
+/opt/nvidia/cuBB/cuPHY/nvlog/include/ti_generic.hpp:109:45: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOG’
+  109 | #define TI_GENERIC_ALL_NVLOGI(component_id) TI_GENERIC_ALL_NVLOG(fmtlog::INF,component_id)
+      |                                             ^~~~~~~~~~~~~~~~~~~~
+/opt/nvidia/cuBB/cuPHY-CP/aerial-fh-driver/lib/flow.cpp:425:6: note: in expansion of macro ‘TI_GENERIC_ALL_NVLOGI’
+  425 |      TI_GENERIC_ALL_NVLOGI(TAG_STARTUP_TIMES);
+      |      ^~~~~~~~~~~~~~~~~~~~~
+[3/96] Building CXX object cuPHY-CP/aerial-fh-driver/CMakeFiles/aerial-fh.dir/lib/gpu_mempool.cpp.o
+ninja: build stopped: subcommand failed.
+exit_code=1

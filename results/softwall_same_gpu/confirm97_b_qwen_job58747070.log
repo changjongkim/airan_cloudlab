@@ -1,0 +1,32 @@
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=13.214ms max=17.580ms miss=0 correct=76 nrx=0 conv=200 bg=0 duplicate=0
+11:40:50.887938 cuphy.hpp:122    CON[671936] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x560f4b099570).
+confirm80 operational requalification passed
+Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
+[QWEN-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58747070/a.sock
+[SAME-REQUEST-NRX] ready tag=f4a15_58747070_671891_c0
+[SAME-REQUEST-NRX] ready tag=f4a15_58747070_671891_c1
+Traceback (most recent call last):
+  File "/softwall/qwen_worker.py", line 218, in <module>
+    main()
+  File "/softwall/qwen_worker.py", line 214, in main
+    run_rpc(args, unit)
+  File "/softwall/qwen_worker.py", line 168, in run_rpc
+    channel.write(
+  File "/usr/lib/python3.10/socket.py", line 723, in write
+    return self._sock.send(b)
+BrokenPipeError: [Errno 32] Broken pipe
+[SAME-REQUEST-NRX] stopped units=43
+[SAME-REQUEST-NRX] stopped units=43
+Traceback (most recent call last):
+  File "/softwall/four_cell_gc_intervention_controller.py", line 652, in <module>
+    main()
+  File "/softwall/four_cell_gc_intervention_controller.py", line 474, in main
+    raise RuntimeError("joint AI physical completion unconfirmed; lease retained")
+RuntimeError: joint AI physical completion unconfirmed; lease retained
+11:41:46.153974 cuphy.hpp:122    CON[673161] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563d5a70a0c0).
+11:41:47.472707 cuphy.hpp:122    CON[673161] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563d61d3ecb0).
+11:41:47.947868 cuphy.hpp:122    CON[673161] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563d61d3ecb0).
+11:41:48.424490 cuphy.hpp:122    CON[673161] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x563d62b42080).
+srun: error: nid001053: task 0: Exited with exit code 1
+srun: Terminating StepId=58747070.2

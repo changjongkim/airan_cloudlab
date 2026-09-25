@@ -1,0 +1,31 @@
+{
+  "schema": "softwall-development-protocol-amendment-v1",
+  "campaign": "c163_raw_p2p_v5_stage_profile",
+  "amends": "c163_raw_p2p_v5_stage_profile_protocol_amendment1.json",
+  "frozen_before_retry": true,
+  "preserved_attempt1": {
+    "result_valid": false,
+    "worker_error": "cudaErrorInvalidResourceHandle before the first profiled request completed",
+    "cause": "profiling CUDA events were constructed while GPU 0 was current and then recorded on the GPU 1 receiver stream",
+    "serialized_worker_records": 0,
+    "artifacts": [
+      "raw/c163_raw_p2p_v5_stage_profile_job58868184_attempt1_controller.log",
+      "raw/c163_raw_p2p_v5_stage_profile_job58868184_attempt1_worker.log",
+      "raw/c163_raw_p2p_v5_stage_profile_job58868184_attempt1_worker.json"
+    ]
+  },
+  "correction": "Construct profiling CUDA events inside the receiver's cp.cuda.Device context.",
+  "unchanged": [
+    "workload",
+    "warmup",
+    "iterations",
+    "seed",
+    "deadline",
+    "same-stream and busy-poll mechanisms",
+    "diagnostic-only decision rule"
+  ],
+  "source_sha256_before_retry": {
+    "dual_receiver_phy.py": "fe71fc08a62ffe1d96c76241fc62b895c92d2e36ed1d4b16d6918e55e79b4a9c",
+    "run_c163_raw_p2p_v5_stage_profile.sh": "676e1a343f28017f5f7a05ccebe1da6b15418cd1a81c5d837500826fa08c430e"
+  }
+}

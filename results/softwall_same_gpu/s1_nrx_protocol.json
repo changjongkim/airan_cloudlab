@@ -1,0 +1,23 @@
+{
+  "status": "frozen before s1_nrx execution",
+  "frozen_utc": "2026-09-20",
+  "campaign": "s1_nrx",
+  "purpose": "Test whether MPS SM caps and client priority recover NeuralRx throughput through bounded overlap",
+  "hardware": "one A100-SXM4-40GB, MIG disabled, one MPS server, same physical GPU",
+  "ran_mps": {"active_thread_percentage": 100, "client_priority": 0},
+  "ai_configurations": [
+    {"active_thread_percentage": 100, "client_priority": 0},
+    {"active_thread_percentage": 100, "client_priority": 1},
+    {"active_thread_percentage": 40, "client_priority": 1},
+    {"active_thread_percentage": 30, "client_priority": 1},
+    {"active_thread_percentage": 20, "client_priority": 1},
+    {"active_thread_percentage": 10, "client_priority": 1}
+  ],
+  "period_ms": 50,
+  "deadline_ms": 35,
+  "iterations_per_run": 500,
+  "runs_per_condition": 3,
+  "seed_base": 20263000,
+  "ai_workload": "Aerial NeuralRx TensorRT FP16 CUDA Graph, continuous overlap",
+  "selection_rule": "Among configurations with zero observed RAN deadline misses, select the highest mean NeuralRx throughput; report all conditions and no hard guarantee from zero samples."
+}

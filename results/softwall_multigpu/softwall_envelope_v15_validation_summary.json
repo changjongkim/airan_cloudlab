@@ -1,0 +1,335 @@
+{
+  "schema": "softwall-envelope-v15-validation-summary-v1",
+  "status": "PASS",
+  "inputs": {
+    "results/softwall_multigpu/softwall_sharded_home_envelope_grid_v15.json": "fd60d7941ea2308fdb8016b28b75879ca8cba682c113ac5caad2742a7b919276",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v15.json": "65c7e1bf52c033ede2a03c5ee1333d02fff8b1a2b7150d8d78bed98ea57396a1",
+    "results/softwall_multigpu/confirm145_v15_single_token_result.json": "f30806eac2dc87b82bc4655bce325197d327b096889c672b071558e983ca0a88",
+    "results/softwall_multigpu/confirm146_v15_single_token_result.json": "a304c29b17d00f45e910b26e9373bfb2cb2d00ea4955b00116de42161b4eb605",
+    "results/softwall_multigpu/softwall_pipelined_control_model_v2.json": "d3f7600eff87cdcb6f2f1ffc98283a95a1a3ebe9dc802d96cd886683225d66d0",
+    "results/softwall_multigpu/softwall_v14_v15_staged_ownership_regression_v1.json": "056760d8e0748eb9a4709fdef507f683f9d203c5422d199e8a6c8a5fa6c38c01",
+    "results/softwall_multigpu/softwall_pipelined_control_model_v2_reproducibility_v1.json": "ba1d4f720d7b5f4635327961b3d521832ce27cc172a5bbd27d0b712f085c0680"
+  },
+  "model_counts": {
+    "QSU": 6,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 12
+  },
+  "v14_status": "UQ",
+  "v15_mode": {
+    "id": "sharded_home_g2_c8_single_token_pipelined_control_c145_c146",
+    "gpu_count": 2,
+    "cells": 8,
+    "status": "QSU",
+    "reason": "safe mode admits at least one bounded AI class",
+    "mandatory_capacity_ms": 153.0,
+    "mandatory_demand_ms": 200.0,
+    "home_cell_counts": [
+      4,
+      4
+    ],
+    "home_mandatory_demand_ms": [
+      100.0,
+      100.0
+    ],
+    "home_base_all_fail_slack_ms": [
+      53.0,
+      53.0
+    ],
+    "base_all_fail_slack_ms": 53.0,
+    "home_max_released_recovery_slack_ms": [
+      50.0,
+      50.0
+    ],
+    "max_released_recovery_slack_ms": 50.0,
+    "home_decision_time_exchange_windows": [
+      {
+        "home": 0,
+        "admitted_nrx": 2,
+        "rejected_nrx": 2,
+        "rejected_recovery_before_exchange": false,
+        "max_observed_successes_used": 2,
+        "remaining_recovery_obligations": 2,
+        "exchange_phase_possible": true,
+        "latest_nrx_observation_bound_ms": 45.0,
+        "rejected_conventional_charge_ms": 0.0,
+        "decision_time_bound_ms": 45.0,
+        "one_pending_recovery_start_ms": 103.0,
+        "max_safe_exchange_transaction_ms": 58.0
+      },
+      {
+        "home": 1,
+        "admitted_nrx": 2,
+        "rejected_nrx": 2,
+        "rejected_recovery_before_exchange": false,
+        "max_observed_successes_used": 2,
+        "remaining_recovery_obligations": 2,
+        "exchange_phase_possible": true,
+        "latest_nrx_observation_bound_ms": 45.0,
+        "rejected_conventional_charge_ms": 0.0,
+        "decision_time_bound_ms": 45.0,
+        "one_pending_recovery_start_ms": 103.0,
+        "max_safe_exchange_transaction_ms": 58.0
+      }
+    ],
+    "home_max_safe_exchange_transaction_ms": [
+      58.0,
+      58.0
+    ],
+    "endpoint_admitted_cells": 4,
+    "endpoint_rejected_cells": 4,
+    "endpoint_admitted_cells_by_home": [
+      2,
+      2
+    ],
+    "endpoint_rejected_cells_by_home": [
+      2,
+      2
+    ],
+    "endpoint_scope": "disjoint-per-home",
+    "endpoint_ring_depths": null,
+    "home_endpoint_ring_depths": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "rejected_recovery_before_exchange": [
+      false,
+      false
+    ],
+    "control_fault_model": "broker_fail_stop_single_token_async_prepare_complete_sync_commit7",
+    "control_fault_qualified": true,
+    "control_rpc_budget_required": true,
+    "control_rpc_bound_ms": 7,
+    "control_rpc_count": 1,
+    "control_critical_operations": [
+      "commit"
+    ],
+    "control_deferred_operations": [
+      "prepare",
+      "abort",
+      "complete"
+    ],
+    "required_control_transaction_budget_ms": 7,
+    "declared_control_transaction_budget_ms": 7,
+    "control_budget_accounted_in_admission": true,
+    "control_budget_qualified": true,
+    "single_token_ownership_required": true,
+    "single_token_ownership_qualified": true,
+    "ownership_contract": "at-most-one-staged-or-offered-token-per-home",
+    "ai_completion_guard_ms": 2.0,
+    "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+    "endpoint_schedule_is_timing_only_counterfactual": false,
+    "endpoint_schedule": [
+      {
+        "cell": 0,
+        "home": 0,
+        "home_local_cell": 0,
+        "cutoff_ms": 53.0,
+        "endpoint": "h0:e0",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 1,
+        "home": 0,
+        "home_local_cell": 1,
+        "cutoff_ms": 78.0,
+        "endpoint": "h0:e1",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 2,
+        "home": 0,
+        "home_local_cell": 2,
+        "cutoff_ms": 103.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      },
+      {
+        "cell": 3,
+        "home": 0,
+        "home_local_cell": 3,
+        "cutoff_ms": 128.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      },
+      {
+        "cell": 4,
+        "home": 1,
+        "home_local_cell": 0,
+        "cutoff_ms": 53.0,
+        "endpoint": "h1:e0",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 5,
+        "home": 1,
+        "home_local_cell": 1,
+        "cutoff_ms": 78.0,
+        "endpoint": "h1:e1",
+        "predicted_finish_ms": 45.0,
+        "admitted": true
+      },
+      {
+        "cell": 6,
+        "home": 1,
+        "home_local_cell": 2,
+        "cutoff_ms": 103.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      },
+      {
+        "cell": 7,
+        "home": 1,
+        "home_local_cell": 3,
+        "cutoff_ms": 128.0,
+        "endpoint": null,
+        "predicted_finish_ms": null,
+        "admitted": false
+      }
+    ],
+    "ai_classes": [
+      {
+        "bound_ms": 35.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 44.0,
+        "static_admissible": true,
+        "static_admissible_homes": [
+          0,
+          1
+        ],
+        "exchange_only_geometry_candidate": false,
+        "exchange_only_geometry_candidate_homes": [],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": false
+      },
+      {
+        "bound_ms": 40.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 49.0,
+        "static_admissible": true,
+        "static_admissible_homes": [
+          0,
+          1
+        ],
+        "exchange_only_geometry_candidate": false,
+        "exchange_only_geometry_candidate_homes": [],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": false
+      },
+      {
+        "bound_ms": 45.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 54.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_geometry_candidate": true,
+        "exchange_only_geometry_candidate_homes": [
+          0,
+          1
+        ],
+        "exchange_only_candidate": true,
+        "exchange_only_candidate_homes": [
+          0,
+          1
+        ],
+        "too_large_even_after_exchange": false
+      },
+      {
+        "bound_ms": 65.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 74.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_geometry_candidate": true,
+        "exchange_only_geometry_candidate_homes": [
+          0,
+          1
+        ],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": true
+      },
+      {
+        "bound_ms": 75.0,
+        "control_budget_ms": 7,
+        "ai_completion_guard_ms": 2.0,
+        "effective_transaction_bound_ms": 84.0,
+        "static_admissible": false,
+        "static_admissible_homes": [],
+        "exchange_only_geometry_candidate": true,
+        "exchange_only_geometry_candidate_homes": [
+          0,
+          1
+        ],
+        "exchange_only_candidate": false,
+        "exchange_only_candidate_homes": [],
+        "too_large_even_after_exchange": true
+      }
+    ],
+    "evidence": [
+      "V14/V15 deterministic two-request regression: V14 untracked held token 1, V15 0",
+      "V15 finite audit composes the 16-state/20-edge fault protocol with a 4-state/8-edge single-token ownership model; violations 0",
+      "nid001244: AI45 exchange 7, fault arms 3, radio 6080, post-fault 3731, suppressed prepares 273, maximum unlaunched token 1",
+      "nid003417: AI45 exchange 5, fault arms 3, radio 6080, post-fault 3732, suppressed prepares 264, maximum unlaunched token 1"
+    ]
+  },
+  "c145": {
+    "radio_records": 6080,
+    "ai45_exchanges": 7,
+    "radio_after_fault": 3731,
+    "fault_arms": 3,
+    "suppressed_prepare_due_owned_token": 273,
+    "maximum_unlaunched_tokens": 1
+  },
+  "c146": {
+    "radio_records": 6080,
+    "ai45_exchanges": 5,
+    "radio_after_fault": 3732,
+    "fault_arms": 3,
+    "suppressed_prepare_due_owned_token": 264,
+    "maximum_unlaunched_tokens": 1
+  },
+  "finite_model": {
+    "fault_states": 16,
+    "fault_edges": 20,
+    "ownership_states": 4,
+    "ownership_edges": 8,
+    "violations": 0
+  },
+  "gates": {
+    "v14_uncovered_mode_is_uq": true,
+    "v15_mode_is_qsu": true,
+    "single_token_ownership_qualified": true,
+    "only_commit_is_critical": true,
+    "ai45_predicted_exchange_only": true,
+    "two_new_nodes": true,
+    "both_node_campaigns_pass": true,
+    "six_fault_arms": true,
+    "physical_ownership_branch_covered": true,
+    "regression_reproduces_and_fixes_v14": true,
+    "composed_finite_model_pass": true,
+    "model_semantically_reproducible": true,
+    "v15_expected_counts": true
+  },
+  "all_pass": true,
+  "claim_boundary": "V15 closes the finite-sample model/implementation loop for one-token ownership, pipelined global control, and exchange-only AI45 on two additional A100 nodes. It does not qualify production d_MAC, WCET, durable broker restart, or another GPU family."
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm105_within_process_matched_nrx_count",
+  "frozen_before_execution": true,
+  "job": "58789084",
+  "node": "nid001109",
+  "iterations": 2000,
+  "pattern": "1221",
+  "bootstrap_seed": 21005105,
+  "bootstrap_resamples": 10000,
+  "runs": [
+    {
+      "name": "run1",
+      "payload_seed": 21005001,
+      "channel_seed_base": 21030000
+    },
+    {
+      "name": "run2",
+      "payload_seed": 21005002,
+      "channel_seed_base": 21040000
+    }
+  ],
+  "pairing": "Adjacent releases share the same four channel seeds. Pattern 1,2,2,1 creates 500 one->two and 500 two->one matched pairs per run inside one persistent MPS/Qwen process.",
+  "configuration": "One A100, MIG off, MPS 40% per NeuralRx endpoint and 20% Qwen, four cells, P180/D155, NRx45/conv12/AI50, Qwen prefill context16 batch1, GC off, no injected failure.",
+  "frozen_gates": "Both runs require exact per-release count pattern, identical four PHY seeds inside every adjacent pair, 2,000 pre-observation Qwen units, and zero deadline/bound/guard/credit/fault violations. Separately for each run and each order stratum, the 10,000-resample paired-bootstrap 95% lower bound of two-minus-one pre-observation Qwen execution time must exceed zero. Any stratum failure remains negative. Timely-AI and correct-TB paired effects are reported but are not part of this mechanism gate. This is not a policy, actual AI-RAN application, or WCET result.",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/four_cell_nrx_count_interleaved_controller.py": "f8f48de7192d151db3dbac4186354e6b487bd6bd7a2e978568f6b406514c149b",
+    "scripts_for_node/softwall_same_gpu/run_confirm105_nrx_count_interleaved.sh": "cf4b7f56aa9890b3965345e300a7c3771bd7a2c628b5dcc91500003d429aa9c9",
+    "scripts_for_node/softwall_same_gpu/run_confirm105_interleaved_two_runs.sh": "730e2261553241fdb0c4872bfe4972acf2b983d1f722ac125f030951b7fb3e16",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm105_interleaved_count.py": "8ecdfebc6f551881156396da6df74de4e16566927cffc0c58c0639157f694df6",
+    "scripts_for_node/softwall_same_gpu/qwen_worker.py": "92835cf0ce9e789edab9109d85cc8764eb620c213ab87120fb18e01a8094622b",
+    "scripts_for_node/softwall_same_gpu/common.sh": "1cfca46a43a308924e2945575d300eaf62ac103604631094758eeaf3e272b1e1",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "results/softwall_same_gpu/confirm104_nrx_count_long_abba_job58788756.json": "08c74629e78af75c51a02a5e72a04bfcd5552dfb1c7c57acba13adcc87171240"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "accepted_physical_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "actual_nrx_requests": 1000,
+  "campaign": "holdout",
+  "excluded_nodes": [
+    "nid001064",
+    "nid001085",
+    "nid001109",
+    "nid002288"
+  ],
+  "expected_global_reject": [
+    "home1",
+    "h1-r1"
+  ],
+  "gates": {
+    "crc_wire_contract": "shared recovery serializes the verified CRC decision as 0=pass and 1=fail; raw cuPHY CRC bytes remain telemetry",
+    "lifecycle": "all CUDA IPC handles close before termination ack",
+    "nrx_bound": "zero release-to-complete values above 45 ms",
+    "recovery": "zero same-input conventional semantic mismatches",
+    "response_fence": "NRx and recovery responses are copied back to the worker and byte-compared before the completion doorbell",
+    "safety": "single commit and zero D155/path/lease/control violations",
+    "sample": "all 1000 actual NeuralRx requests complete",
+    "transition": "physical commit agrees with each observed outcome"
+  },
+  "high_snr_keys": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ]
+  ],
+  "iterations": 250,
+  "label": "confirm158b_repeated_holdout_job58856474",
+  "low_snr_keys": [
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ]
+  ],
+  "mode": {
+    "ai_bound_ms": 35,
+    "capacity": 1,
+    "conventional_bound_ms": 25,
+    "expiry_ms": 155,
+    "guard_ms": 2,
+    "launch_control_bound_ms": 5,
+    "lifecycle": "persistent endpoints; one declared activation per epoch 100 ms before release; next validation input is staged only after the preceding 155 ms expiry",
+    "nrx_bound_ms": 45,
+    "period_ms": 600.0,
+    "qwen_context_length": 64,
+    "qwen_model": "Qwen/Qwen2.5-1.5B",
+    "release_lead_ms": 3000.0,
+    "release_prewarm_lead_ms": 100.0,
+    "warmup": 10
+  },
+  "offered_keys_per_round": [
+    [
+      "home0",
+      "h0-r0"
+    ],
+    [
+      "home0",
+      "h0-r1"
+    ],
+    [
+      "home0",
+      "h0-r2"
+    ],
+    [
+      "home1",
+      "h1-r0"
+    ],
+    [
+      "home1",
+      "h1-r1"
+    ]
+  ],
+  "outcome_rule": "Every CRC-correct result completed by 45 ms resolves its mandatory debt; every other accepted request executes shared recovery. Outcome counts are measurements, not pass criteria.",
+  "placement": {
+    "home0": "GPU0",
+    "home1": "GPU1",
+    "persistent_actual_nrx": "GPU3 under MPS 80",
+    "shared_cuphy_and_qwen": "GPU2 under MPS 80/20"
+  },
+  "recovery_oracle": "worker echoes the received input to the owner for exact comparison; shared CRC pass requires exact transmitted-TB payload while CRC fail is a valid radio failure result; local/shared decoder-class disagreement is reported separately and is not a transport error",
+  "schema": "softwall-confirm158-repeated-protocol-v1",
+  "scope": "C158 qualification pilot, excluded from performance confidence intervals. Passing two nodes with at least 1,000 combined requests supports only the frozen warm synthetic mode; it is not WCET, cold/long-idle, production d_MAC, fault, or throughput evidence.",
+  "seed_base": 31000000,
+  "snr_assignment_rule": "two +20 dB stable-success keys and two -8.75 dB transition keys; the transition point was fixed from the earlier independent Confirm18 500-sample sweep (conventional 0/500, NeuralRx 271/500)",
+  "source_sha256": {
+    "scripts/actual_nrx_integrated_coordinator.py": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d",
+    "scripts/actual_nrx_integrated_owner.py": "0b3ad90dd898bd9abeea832c83ac2b07bb571304eae6476f52ecb0611ed2e210",
+    "scripts/actual_nrx_multi_peer_worker.py": "062e82a652535de86ccd024a38dbae1e3907b2ba7ffa607f9a4b6f50335bc298",
+    "scripts/actual_nrx_repeated_control.py": "c3a5b5c29a6f0eb8beb686e119acf466ebc5e8f2da32d756f81c922dd9c77323",
+    "scripts/actual_nrx_repeated_coordinator.py": "0ed6cb17763bb48b9d7090c9f46ede2a82bc6a04b58c200394e5bcc8695b1d2e",
+    "scripts/actual_nrx_repeated_owner.py": "804dfd737ea9e60fb38fbf503bb897b90fbb7692cd11198c024082406216803a",
+    "scripts/actual_nrx_repeated_worker.py": "c2cda442b68e8ab55f51e24eaf657713245dbbd1df11b4ca8b34dde58ee490b2",
+    "scripts/actual_nrx_shared_recovery_plan_v1.py": "c9e036f23f2bf913d1b5c4b27ba9a6bb82acfdcb166400b3a9abb4c0fc6b1041",
+    "scripts/analyze_confirm158_repeated.py": "aed8ab34ecd3d5bd0702588e478b7d5002608773ab8fb75137ee8084f47427d7",
+    "scripts/build_confirm158_repeated_protocol.py": "a15ba0ea3ff45060c1e03b974b14fcffb8f3ee13874d2dcc807e2f6eede52876",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_launch_plan_v1.py": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts/run_confirm158_repeated.sh": "d5414b2b7918decb61ad41fd6bb0d7dc7e3e6b9eca17827c21ac0107735b2a67",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "frozen-before-run"
+}

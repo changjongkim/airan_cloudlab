@@ -1,0 +1,72 @@
+{
+  "schema": "softwall-confirm55-novelty-gap-v1",
+  "experiment_job": "58693395",
+  "host": "nid001153",
+  "releases": 1000,
+  "period_ms": 150.0,
+  "deadline_ms": 130.0,
+  "admission_rejections": 0,
+  "fallbacks_per_release": {
+    "0": 953,
+    "1": 46,
+    "2": 1
+  },
+  "fallback_host_decisions_after_cutoff": 0,
+  "fallback_precommit_path_over_configured_25ms": 0,
+  "fallback_host_decision_to_precommit_ms": {
+    "n": 48,
+    "min": 2.333882,
+    "median": 2.4476934999999997,
+    "max": 2.906715
+  },
+  "fallback_non_gpu_residual_ms": {
+    "n": 48,
+    "min": 0.1102019806213379,
+    "median": 0.11651156224823,
+    "max": 0.20100690205383298
+  },
+  "fallback_timestamp_semantics": "fallback_actual_start_ns is a pre-run host decision timestamp; completed_ns is sampled before the commit call returns; neither gives GPU kernel start or actual commit completion",
+  "radio_tail_ms": {
+    "n": 1000,
+    "min": 4.710193,
+    "median": 5.1842369999999995,
+    "max": 13.502767
+  },
+  "pair_nrx_tail_ms": {
+    "n": 1000,
+    "min": 4.710193,
+    "median": 5.170977000000001,
+    "max": 13.502767
+  },
+  "pair_nrx_tail_semantics": "last host-observed NRx PHY finish before complete_nrx returns; not an after-commit bound",
+  "nrx_cutoff_slack_ms": {
+    "n": 2000,
+    "min": 66.272661,
+    "median": 81.8279115,
+    "max": 98.289807
+  },
+  "releases_all_nrx_before_first_cutoff": 1000,
+  "post_radio_to_next_release_ms": {
+    "n": 999,
+    "min": 136.497233,
+    "median": 144.815271,
+    "max": 145.289807
+  },
+  "ai_units_per_interval": {
+    "n": 999,
+    "min": 27,
+    "median": 30,
+    "max": 30
+  },
+  "intervals_without_ai": 0,
+  "total_ai_units": 29910,
+  "ai_admissions_before_radio_complete": 0,
+  "ai_admission_after_radio_ms": {
+    "n": 29910,
+    "min": 0.015651,
+    "median": 49.6859125,
+    "max": 102.919217
+  },
+  "evidence_scope": "post-hoc descriptive saturation audit; no policy comparison or GPU overlap proof",
+  "controller_sha256": "addaea3984316ef439bce39f1ab0ba75844383adf3889b2e6ff1d6d5aec92b89"
+}

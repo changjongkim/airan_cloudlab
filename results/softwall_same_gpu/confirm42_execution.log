@@ -1,0 +1,22 @@
+salloc: Granted job allocation 58682735
+salloc: Waiting for resource configuration
+salloc: Nodes nid001145 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=10.934ms max=12.545ms miss=0 correct=78 nrx=0 conv=200 bg=0 duplicate=0
+07:31:26.233950 cuphy.hpp:122    CON[2344659] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x561402d02170).
+confirm42 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58682735/bg_sr_58682735_2345221.sock
+[SAME-REQUEST-NRX] ready tag=sr_58682735_2345221
+[SAME-REQUEST-NRX] stopped units=521
+[SAME-REQUEST] correct=486/500 miss=0 nrx=482 fallback=18 bg=6304 p99=55.733ms
+07:32:17.360051 cuphy.hpp:122    CON[2345809] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x561436b9b3c0).
+same-request IPC campaign completed: confirm42_transaction_gap_smoke
+Traceback (most recent call last):
+  File "/softwall/analyze_transaction_smoke.py", line 110, in <module>
+    main()
+  File "/softwall/analyze_transaction_smoke.py", line 52, in main
+    int(worker["mps_active_thread_percentage"]) == cap
+KeyError: 'mps_active_thread_percentage'
+srun: error: nid001145: task 0: Exited with exit code 1
+srun: Terminating StepId=58682735.0
+salloc: Relinquishing job allocation 58682735

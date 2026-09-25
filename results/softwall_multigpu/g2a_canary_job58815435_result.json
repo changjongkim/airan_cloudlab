@@ -1,0 +1,76 @@
+{
+  "schema": "softwall-multigpu-p2p-nrx-path-gate-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g2a_canary_job58815435_protocol.json",
+  "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g2a_canary_job58815435_controller.json",
+  "worker": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/g2a_canary_job58815435_worker.json",
+  "controller_response_ms": {
+    "n": 50,
+    "mean": 3.38547824,
+    "p50": 3.410952,
+    "p95": 3.5331462,
+    "p99": 3.5688435899999997,
+    "p99_9": 3.578196759,
+    "min": 3.161306,
+    "max": 3.579236
+  },
+  "front_gpu_ms": {
+    "n": 50,
+    "mean": 1.365880959033966,
+    "p50": 1.3817920088768005,
+    "p95": 1.5079583942890167,
+    "p99": 1.553132197856903,
+    "p99_9": 1.5607244393825532,
+    "min": 1.1646720170974731,
+    "max": 1.561568021774292
+  },
+  "post_gpu_ms": {
+    "n": 50,
+    "mean": 0.7312428796291351,
+    "p50": 0.7296800017356873,
+    "p95": 0.741296011209488,
+    "p99": 0.7445776253938675,
+    "p99_9": 0.7467649856209755,
+    "min": 0.7225919961929321,
+    "max": 0.7470080256462097
+  },
+  "forward_gpu_us": {
+    "count": 55,
+    "mean": 64.14487280628897,
+    "p50": 65.63200056552887,
+    "p99": 69.18399780988693,
+    "max": 69.50400024652481
+  },
+  "nrx_gpu_ms": {
+    "count": 55,
+    "mean": 0.8447144714268771,
+    "p50": 0.8444799780845642,
+    "p99": 0.8468800187110901,
+    "max": 0.8494719862937927
+  },
+  "backward_gpu_us": {
+    "count": 55,
+    "mean": 21.54007272964174,
+    "p50": 20.864000543951988,
+    "p99": 24.4159996509552,
+    "max": 43.168000876903534
+  },
+  "worker_path_ms": {
+    "count": 55,
+    "mean": 1.9368210727272726,
+    "p50": 1.089274,
+    "p99": 1.146124,
+    "max": 47.596151
+  },
+  "gates": {
+    "warmup_correct": true,
+    "timed_correct": true,
+    "deadline": true,
+    "timeout": true,
+    "worker_count": true,
+    "worker_sequence": true,
+    "finite": true,
+    "worker_error": true
+  },
+  "all_pass": true,
+  "scope": "isolated clean-PUSCH remote P2P NeuralRx path; no MPS co-run or all-fail transaction claim"
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm36_same_node_baselines",
+  "purpose": "Run the separate-process CUDA-IPC S2 endpoint and both strong local baselines on one node, one allocation, one MPS epoch, and the exact same deterministic radio trace.",
+  "source_endpoint": "confirm36_same_request_natural_s2",
+  "radio": {
+    "payload_seed": 20321036,
+    "channel_seed_base": 20326000,
+    "snr_db": -8.5,
+    "iterations": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80
+  },
+  "endpoint": {
+    "mps_active_thread_percentage": 80,
+    "expected_visible_sms": 86,
+    "transport": "same-device CUDA IPC with request-specific PUSCH/channel estimate and output LLR",
+    "timeout_ms": 30,
+    "lifecycle": "persistent for the external timed epoch; teardown only after its final release"
+  },
+  "execution": {
+    "same_host_required": true,
+    "same_slurm_allocation_required": true,
+    "one_mps_epoch": true,
+    "global_gpu0_lock_held_across_all_conditions": true,
+    "order": ["external_s2", "conventional_only", "eager_dual"],
+    "ran_free_quiet_seconds_between_conditions": 20,
+    "future_crc_or_ground_truth_used_for_admission": false,
+    "operational_requalification": "200-release independent-seed conventional smoke; excluded from comparison statistics"
+  },
+  "primary_gate": {
+    "all_channel_seeds_match": true,
+    "all_deadline_misses_zero": true,
+    "external_endpoint_timeouts_zero": true,
+    "external_natural_recoveries_positive": true,
+    "external_worker_completed_units": 10021,
+    "external_worker_visible_sms": 86,
+    "external_vs_eager_noninferiority_margin_percentage_points": -0.25,
+    "confidence_interval": "paired release-level normal approximation, two-sided 95%",
+    "external_executes_conventional_on_fewer_releases_than_eager": true
+  },
+  "interpretation_limit": "This gate compares radio utility and executed conventional work. It does not yet measure background throughput concurrent with the external endpoint, and a measured zero-miss run is not a mathematical WCET proof."
+}

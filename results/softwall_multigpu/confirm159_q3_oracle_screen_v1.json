@@ -1,0 +1,266 @@
+{
+  "gates": {
+    "all_four_calibration_windows_complete": true,
+    "calibration_only_and_holdout_unmaterialized": true,
+    "empirical_direction_positive_all_windows": false,
+    "empirical_upper_bound_reaches_mde": false,
+    "frozen_source_hash_match": true,
+    "q2_variable_context_qualification_passed": true,
+    "radio_admission_set_equal_by_construction": true,
+    "same_exact_offline_selector_both_policies": true
+  },
+  "interpretation": "Calibration-only structural upper-bound screen. Both policies use the same exact offline weighted request selector and the same radio admission inequality. The measured difference can only come from SoftWall placing AI before unresolved recovery versus the strong event-driven baseline physically draining recovery first. This is not an online performance result or confirmatory confidence interval.",
+  "model": {
+    "capacity": "at most one Qwen unit per P180 radio epoch",
+    "class_bounds_ms": {
+      "128": 40.0,
+      "16": 35.0,
+      "256": 65.0,
+      "32": 35.0,
+      "512": 75.0,
+      "64": 35.0
+    },
+    "cutoff_ms": 45.0,
+    "event_contract_sensitivity": "25 ms per unresolved recovery; intentionally conservative",
+    "event_empirical_delay": "sum of Q2 observed full recovery path durations in that epoch",
+    "event_order": "physically drain unresolved recoveries, then admit AI",
+    "launch_control_ms": 5.0,
+    "period_ms": 180.0,
+    "recovery_bound_ms": 25.0,
+    "recovery_deadline_ms": 153.0,
+    "softwall_order": "AI first, then atomically retimed unresolved recoveries"
+  },
+  "open_confirmatory_holdout": false,
+  "prespec_sha256": "8a2ef9d1b1163dceb671ffb0201ad4bb6179e4ec820b9ade6ff73706ac0ce87f",
+  "schema": "softwall-confirm159-q3-oracle-screen-v1",
+  "source_sha256": {
+    "q2_combined": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692",
+    "q2_development_coordinator": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "q2_holdout_coordinator": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881",
+    "screen_source": "a24bd8d058370c7e13e7654f757d57706dad37328b3e8dd515f41ccba1380d5b",
+    "trace": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f"
+  },
+  "status": "C159_Q3_ORACLE_SCREEN_STOP_PERFORMANCE",
+  "summary": {
+    "minimum_effect_pct": 5.0,
+    "offered_requests": 4290,
+    "offered_value_tokens": 1129504,
+    "per_window_empirical_gain_pct": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "slots": 1336,
+    "softwall_gain_over_event_contract_pct": 0.06623256200536613,
+    "softwall_gain_over_event_empirical_pct": 0.0,
+    "totals": {
+      "event_contract": {
+        "timely_requests": 930,
+        "timely_value_tokens": 385007
+      },
+      "event_empirical": {
+        "timely_requests": 931,
+        "timely_value_tokens": 385262
+      },
+      "softwall": {
+        "timely_requests": 931,
+        "timely_value_tokens": 385262
+      }
+    }
+  },
+  "windows": [
+    {
+      "offered_requests": 1136,
+      "offered_value_tokens": 288591,
+      "policies": {
+        "event_contract": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 1,
+            "256": 4,
+            "32": 0,
+            "512": 239,
+            "64": 0
+          },
+          "timely_requests": 245,
+          "timely_value_tokens": 94386
+        },
+        "event_empirical": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 1,
+            "256": 4,
+            "32": 0,
+            "512": 239,
+            "64": 0
+          },
+          "timely_requests": 245,
+          "timely_value_tokens": 94386
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 1,
+            "256": 4,
+            "32": 0,
+            "512": 239,
+            "64": 0
+          },
+          "timely_requests": 245,
+          "timely_value_tokens": 94386
+        }
+      },
+      "q2_state_offset": 0,
+      "q2_state_stream": "development",
+      "slots": 334,
+      "softwall_gain_over_event_contract_pct": 0.0,
+      "softwall_gain_over_event_empirical_pct": 0.0,
+      "window_id": "w00-3063931"
+    },
+    {
+      "offered_requests": 1084,
+      "offered_value_tokens": 295201,
+      "policies": {
+        "event_contract": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 0,
+            "32": 1,
+            "512": 227,
+            "64": 0
+          },
+          "timely_requests": 229,
+          "timely_value_tokens": 101292
+        },
+        "event_empirical": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 0,
+            "32": 1,
+            "512": 227,
+            "64": 0
+          },
+          "timely_requests": 229,
+          "timely_value_tokens": 101292
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 0,
+            "32": 1,
+            "512": 227,
+            "64": 0
+          },
+          "timely_requests": 229,
+          "timely_value_tokens": 101292
+        }
+      },
+      "q2_state_offset": 266,
+      "q2_state_stream": "development",
+      "slots": 334,
+      "softwall_gain_over_event_contract_pct": 0.0,
+      "softwall_gain_over_event_empirical_pct": 0.0,
+      "window_id": "w01-3064181"
+    },
+    {
+      "offered_requests": 1081,
+      "offered_value_tokens": 284398,
+      "policies": {
+        "event_contract": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 232,
+            "64": 2
+          },
+          "timely_requests": 235,
+          "timely_value_tokens": 97454
+        },
+        "event_empirical": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 232,
+            "64": 2
+          },
+          "timely_requests": 235,
+          "timely_value_tokens": 97454
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 232,
+            "64": 2
+          },
+          "timely_requests": 235,
+          "timely_value_tokens": 97454
+        }
+      },
+      "q2_state_offset": 0,
+      "q2_state_stream": "holdout",
+      "slots": 334,
+      "softwall_gain_over_event_contract_pct": 0.0,
+      "softwall_gain_over_event_empirical_pct": 0.0,
+      "window_id": "w02-3063999"
+    },
+    {
+      "offered_requests": 989,
+      "offered_value_tokens": 261314,
+      "policies": {
+        "event_contract": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 2,
+            "32": 0,
+            "512": 219,
+            "64": 0
+          },
+          "timely_requests": 221,
+          "timely_value_tokens": 91875
+        },
+        "event_empirical": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 3,
+            "32": 0,
+            "512": 219,
+            "64": 0
+          },
+          "timely_requests": 222,
+          "timely_value_tokens": 92130
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 3,
+            "32": 0,
+            "512": 219,
+            "64": 0
+          },
+          "timely_requests": 222,
+          "timely_value_tokens": 92130
+        }
+      },
+      "q2_state_offset": 266,
+      "q2_state_stream": "holdout",
+      "slots": 334,
+      "softwall_gain_over_event_contract_pct": 0.27755102040816326,
+      "softwall_gain_over_event_empirical_pct": 0.0,
+      "window_id": "w03-3064082"
+    }
+  ]
+}

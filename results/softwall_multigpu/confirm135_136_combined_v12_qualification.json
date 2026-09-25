@@ -1,0 +1,38 @@
+{
+  "schema": "softwall-confirm135-136-combined-v12-qualification-v1",
+  "inputs": {
+    "c135": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm135_v11_ai40_campaign_result.json",
+    "c136": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm136_v12_ai40_requalification_result.json"
+  },
+  "nodes": [
+    "nid001245",
+    "nid002817"
+  ],
+  "totals": {
+    "nodes": 2,
+    "arms": 8,
+    "radio_records": 10240,
+    "home_releases": 2560,
+    "atomic_exchanges": 72,
+    "candidate_branches": 1196,
+    "ai40_candidate_exchanges": 38,
+    "declared_safety_violations": 0
+  },
+  "zero_failure_sensitivity": {
+    "confidence": 0.95,
+    "tb_level_iid_upper": 0.000292509190681578,
+    "home_release_level_iid_upper": 0.0011695234930695353,
+    "arm_level_iid_upper": 0.3123439780663678,
+    "node_level_iid_upper": 0.776393202250021,
+    "interpretation": "The four units are alternative IID assumptions, not four simultaneous guarantees. Node-level evidence is only two A100 nodes and remains statistically weak; no result is WCET or cross-family evidence."
+  },
+  "gates": {
+    "both_campaigns_pass": true,
+    "two_distinct_nodes": true,
+    "eight_arms": true,
+    "every_arm_has_candidate_exchange": true,
+    "all_38_events_static_reject_conditional_accept": true
+  },
+  "all_pass": true,
+  "claim_boundary": "Two-node, eight-arm, same-A100-family finite-sample mechanism qualification under one synthetic mode."
+}

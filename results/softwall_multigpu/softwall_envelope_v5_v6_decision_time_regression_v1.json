@@ -1,0 +1,56 @@
+{
+  "schema": "softwall-envelope-v5-v6-decision-time-regression-v1",
+  "status": "PASS",
+  "scenario": {
+    "id": "decision-time-counterexample",
+    "gpu_count": 1,
+    "cells": 4,
+    "home_cell_counts": [
+      4
+    ],
+    "deadline_ms": 80,
+    "guard_ms": 2,
+    "recovery_bound_ms": 12,
+    "home_memory_feasible": true,
+    "timing_bounds_qualified": true,
+    "endpoint_path_bounds_ms": [
+      45,
+      45
+    ],
+    "ai_bounds_ms": [
+      35
+    ]
+  },
+  "v5": {
+    "status": "QSU",
+    "base_slack_ms": 30,
+    "released_slack_ms": [
+      12
+    ],
+    "exchange_only_candidate": true
+  },
+  "v6": {
+    "status": "QSN",
+    "base_slack_ms": 30,
+    "released_slack_ms": [
+      12
+    ],
+    "geometry_candidate": true,
+    "decision_time_candidate": false,
+    "decision_windows": [
+      {
+        "home": 0,
+        "admitted_nrx": 2,
+        "rejected_nrx": 2,
+        "exchange_phase_possible": true,
+        "latest_nrx_observation_bound_ms": 45.0,
+        "rejected_conventional_charge_ms": 24,
+        "decision_time_bound_ms": 69.0,
+        "one_pending_recovery_start_ms": 66,
+        "max_safe_exchange_transaction_ms": 0.0
+      }
+    ]
+  },
+  "cause": "v5 treated W+Delta capacity geometry as sufficient. v6 charges the observe-all decision time before testing the AI transaction.",
+  "claim_boundary": "This is a deterministic counterexample for the declared-bound model, not a physical timing result."
+}

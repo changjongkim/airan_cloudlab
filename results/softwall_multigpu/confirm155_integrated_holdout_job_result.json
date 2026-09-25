@@ -1,0 +1,49 @@
+{
+  "all_pass": true,
+  "arm_results": [
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a0_overload_result.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a1_all_success_result.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a2_conditional_open_result.json",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a3_all_fail_result.json"
+  ],
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a0_overload_result.json": "227c79e4e94c85a0ca15ba30e803cd0332a883cfcfa2bc660b2c71d8bfac73e2",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a1_all_success_result.json": "1135f689652be34d9e9fd2d6600aebe62c0a78a796e5412ca38b324cf45c7fa5",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a2_conditional_open_result.json": "b5139cf70a118bc131385bf36d97ddc84869c8f01a5c8dd3b03d0d4c6045c48e",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_a3_all_fail_result.json": "91e2173a5aafc5aae6dcfbf1654f65c188b91cecdb8671eb3a93c69df6a8f159",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_protocol.json": "34aabaac4c0f624d40cdb7400ab28a57e71075e5143b2be55d4323d7d8e7fc88"
+  },
+  "branches": [
+    "overload",
+    "all_success",
+    "conditional_open",
+    "all_fail"
+  ],
+  "claim_scope": "Prospective same-source four-branch integrated holdout. Passing qualifies controlled outcome semantics on one additional A100 node; actual NeuralRx output, fault matrix, WCET, production d_MAC and throughput remain outside this campaign.",
+  "gates": {
+    "all_arm_gates_pass": true,
+    "branch_totals": true,
+    "four_frozen_branches": true,
+    "node_exclusion": true,
+    "single_allocation_node": true
+  },
+  "job_ids": [
+    "58853542"
+  ],
+  "nodes": [
+    "nid001025"
+  ],
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm155_integrated_holdout_job_protocol.json",
+  "schema": "softwall-confirm154-integrated-holdout-campaign-v1",
+  "status": "ONE_NODE_CONTROLLED_HOLDOUT_PASS_SECOND_NODE_REQUIRED",
+  "totals": {
+    "accepted_debts": 16,
+    "correct_home_commits": 10,
+    "deadline_misses": 0,
+    "physical_recoveries": 10,
+    "qwen_units": 2,
+    "rejected_debts": 2,
+    "submitted_debts": 18,
+    "success_outcomes": 6
+  }
+}

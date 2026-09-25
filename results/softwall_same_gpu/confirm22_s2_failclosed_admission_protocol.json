@@ -1,0 +1,44 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm22_s2_failclosed_admission",
+  "purpose": "Validate that a request arriving too late for the optional NeuralRx reservation is rejected before execution and safely routed to the mandatory conventional path.",
+  "selection_source": "confirm21 r4:index617 incurred 28.759 ms start lateness; S2 rejected NeuralRx admission, completed conventional correctly at 31.737 ms, and met D80.",
+  "radio": {
+    "input": "clean valid 273-PRB PUSCH so the fault experiment isolates scheduling semantics",
+    "cells_per_release": 1,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "iterations": 1000,
+    "payload_seed": 20290101
+  },
+  "timing_contract": {
+    "nrx_bound_ms": 50,
+    "conventional_bound_ms": 24,
+    "commit_guard_ms": 2,
+    "fallback_latest_start_ms": 54
+  },
+  "fault": {
+    "kind": "controller start lateness",
+    "delay_ms": 30,
+    "frequency": "every 10th release including index 0",
+    "expected_injected_releases": 100,
+    "expected_decision": "reject optional NeuralRx admission and immediately execute conventional"
+  },
+  "background": {
+    "kind": "separate MPS NeuralRx CUDA Graph client",
+    "end_to_end_budget_ms": 10,
+    "guard_ms": 1,
+    "rpc_timeout_ms": 12
+  },
+  "primary_gate": {
+    "all_injected_releases_rejected_to_conventional": true,
+    "all_admission_rejections_correct": true,
+    "all_admission_rejections_meet_deadline": true,
+    "nrx_not_executed_on_rejected_releases": true,
+    "duplicate_commits": 0,
+    "bound_violations": 0,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0
+  }
+}

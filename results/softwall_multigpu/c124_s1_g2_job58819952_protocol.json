@@ -1,0 +1,29 @@
+{
+  "schema": "softwall-global-ai-two-home-arm-protocol-v1",
+  "status": "frozen-before-run",
+  "label": "c124_s1_g2_job58819952",
+  "iterations": 340,
+  "warmup": 20,
+  "global_policy": "global",
+  "placement": {
+    "gpu0": "four-cell home + two local NRx + Qwen",
+    "gpu1": "four-cell home + two local NRx + Qwen"
+  },
+  "shared_resources": "one serializable BurstGPT request queue; recovery, NRx endpoint/IPC, Qwen execution and physical credits remain per-home",
+  "transaction_order": "global hold -> local atomic recovery replan+AI lease -> global commit -> physical completion -> local retire+global complete",
+  "cuda_module_loading": "LAZY",
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 12,
+  "guard_ms": 2,
+  "fault_every": 5,
+  "source_sha256": {
+    "/softwall/global_trace_baseline_controller.py": "1520dc7556370758a8f1f50e55c0ce42df5c8c7834361c2380c72b24c91d1ff1",
+    "/softwall/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "/softwall/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/softwall/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/softwall_task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

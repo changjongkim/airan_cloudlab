@@ -1,0 +1,55 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm21_s2_noninferiority_p90d80",
+  "purpose": "Test natural-channel S2 receiver-utility noninferiority to eager dual execution after covering the confirm19 MPS timing tail, while retaining background-AI throughput gain.",
+  "selection_source": {
+    "confirm19": "Across 5,000 releases, S2 had 0 deadline misses, recovered 28 NRx-only failures, achieved 6.96% more background throughput than eager, but had five branch-bound violations and a -0.08 percentage-point aggregate correctness difference.",
+    "confirm20": "All selected NeuralRx decisions were stable across 30 repeats, input mutation was absent, and conventional decisions at mismatch traces were intrinsically variable."
+  },
+  "radio": {
+    "input": "identical valid 273-PRB PUSCH construction and per-release channel seed in both policies",
+    "channel": "independent block-Rayleigh coefficient per RX antenna plus complex AWGN",
+    "snr_db": -8.5,
+    "cells_per_release": 1,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "iterations_per_run": 2000,
+    "runs": 5,
+    "payload_seed_base": 20280000,
+    "channel_seed_base": 303100000,
+    "paired_trace_rule": "Within each round, eager and S2 store and use the same payload seed and per-release channel seed."
+  },
+  "timing_contract": {
+    "nrx_bound_ms": 50,
+    "conventional_bound_ms": 24,
+    "commit_guard_ms": 2,
+    "fallback_latest_start_ms": 54,
+    "basis": "The NRx bound exceeds the 47.075 ms worst S2 aggregate GPU time observed in confirm19; the fallback interval remains fully reserved before deadline."
+  },
+  "background": {
+    "kind": "separate MPS NeuralRx CUDA Graph client",
+    "end_to_end_budget_ms": 10,
+    "guard_ms": 1,
+    "rpc_timeout_ms": 12,
+    "maximum_outstanding": 1
+  },
+  "policies": ["eager_dual", "s2_reserved"],
+  "statistics": {
+    "utility_difference": "S2 correct fraction minus eager correct fraction on paired trace indices",
+    "confidence_interval": "two-sided 95% paired normal interval over per-trace values in {-1,0,1}",
+    "noninferiority_margin_percentage_points": 0.25,
+    "noninferiority_gate": "lower 95% confidence limit must exceed -0.25 percentage points"
+  },
+  "primary_gate": {
+    "s2_utility_noninferior": true,
+    "s2_deadline_misses": 0,
+    "s2_duplicate_commits": 0,
+    "s2_admission_rejections": 0,
+    "s2_bound_violations": 0,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0,
+    "s2_mean_background_throughput_must_exceed_eager": true
+  },
+  "interpretation_limit": "This is a predeclared follow-up to confirm19. The guarantee remains conditional on admission of workloads whose measured bounds satisfy the declared timing contract."
+}

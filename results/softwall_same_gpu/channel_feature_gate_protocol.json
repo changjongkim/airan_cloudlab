@@ -1,0 +1,47 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "channel_feature_gate_calibration",
+  "frozen_before_execution": true,
+  "purpose": "Qualify one pre-CRC observable feature as a fair channel-gate ingredient for the strong combined baseline; compare the historical block-normalized AWGN workload with a fixed pre-fading noise power workload.",
+  "scope": "Offline same-request paired conventional and NeuralRx correctness. This is neither a joint-policy superiority test nor a same-GPU MPS deadline test.",
+  "radio": {
+    "valid_pusch_prbs": 273,
+    "mcs_index": 2,
+    "block_rayleigh_per_receive_antenna": true,
+    "snr_db": -8.5,
+    "noise_references": ["post_fading", "pre_fading"],
+    "train_seed": 20356001,
+    "test_seed": 20356002,
+    "trials_per_seed_mode": 500,
+    "same_channel_seed_paired_across_noise_modes": true,
+    "receiver_order": "conventional followed by NeuralRx on the identical immutable noisy slot",
+    "mode_order": "train pre/post, test post/pre"
+  },
+  "feature": {
+    "online_candidate": "mean squared magnitude of current-slot noisy PHY channel estimate",
+    "secondary_descriptive": "mean received resource-grid power",
+    "extraction_before_either_crc": true,
+    "feature_gpu_cost_included_in_future_online_deadline": true,
+    "forbidden_as_policy_input": ["generator SNR", "channel seed", "future CRC", "transmitted payload truth"]
+  },
+  "analysis": {
+    "target": "conventional branch correct TB, on the same request",
+    "gate_rule": "skip NeuralRx and execute conventional only when observed channel-estimate power >= threshold",
+    "threshold_selection": "On pre-fading train seed only, maximize skipped NeuralRx requests while losing at most 2/500 neural-only successes; break ties toward the higher threshold.",
+    "heldout_test": "Apply the frozen threshold to the independent pre-fading test seed without retuning.",
+    "diagnostic_gates": [
+      "At least 50/500 NeuralRx requests skipped on test",
+      "At most 5/500 neural-only successes lost on test",
+      "At least 50 neural-only successes available on test",
+      "Maximum measured feature GPU duration below 5 ms across all four arms"
+    ],
+    "failure_disposition": "If any diagnostic gate fails, do not represent this single-feature threshold as a qualified channel gate. Do not add seeds or change SNR to turn this protocol into PASS. A different observable feature requires a new calibration hypothesis and independent test trace."
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/sweep_dual_receiver_snr.py": "9021a91e5c015d658d279138c01f8061dce7eb35132a27ac382f5679b497d938",
+    "scripts_for_node/softwall_same_gpu/analyze_channel_feature_gate.py": "8e53b11e4a06513c6067e22d97146e5f36fbd249831760984cd187a82abcc42a",
+    "scripts_for_node/softwall_same_gpu/run_channel_feature_calibration.sh": "510f35f3ca729ac6ea9eba94abad801deba5c6fd1ab1c94f53fc2ec036d5cf38"
+  },
+  "limits": "No training on held-out outcomes; no online admission is implemented here. Even PASS would establish only a baseline feature candidate in this synthetic channel model. It would not prove AI throughput gain, MPS isolation, production HARQ timing, or joint-policy novelty."
+}

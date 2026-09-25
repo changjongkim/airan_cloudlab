@@ -1,0 +1,84 @@
+{
+  "schema": "softwall-confirm53-early-fallback-abba-v1",
+  "job": "58692459",
+  "completed_arms": 4,
+  "planned_arms": 4,
+  "summaries": [
+    {
+      "arm": 1,
+      "pair": 1,
+      "timing": "early_if_clear",
+      "correct": 983,
+      "miss": 0,
+      "ai_units": 343,
+      "admission_rejections": 0,
+      "fallbacks": 21,
+      "early_fallbacks": 21,
+      "ran_p99_ms": 5.5609711200000005,
+      "no_fallback_response_le_3ms": 369
+    },
+    {
+      "arm": 2,
+      "pair": 1,
+      "timing": "latest",
+      "correct": 968,
+      "miss": 0,
+      "ai_units": 197,
+      "admission_rejections": 19,
+      "fallbacks": 19,
+      "early_fallbacks": 0,
+      "ran_p99_ms": 55.74572961,
+      "no_fallback_response_le_3ms": 219
+    },
+    {
+      "arm": 3,
+      "pair": 2,
+      "timing": "latest",
+      "correct": 972,
+      "miss": 0,
+      "ai_units": 384,
+      "admission_rejections": 19,
+      "fallbacks": 19,
+      "early_fallbacks": 0,
+      "ran_p99_ms": 55.66746006,
+      "no_fallback_response_le_3ms": 404
+    },
+    {
+      "arm": 4,
+      "pair": 2,
+      "timing": "early_if_clear",
+      "correct": 983,
+      "miss": 0,
+      "ai_units": 221,
+      "admission_rejections": 0,
+      "fallbacks": 19,
+      "early_fallbacks": 19,
+      "ran_p99_ms": 5.57915108,
+      "no_fallback_response_le_3ms": 237
+    }
+  ],
+  "pairs": [
+    {
+      "pair": 1,
+      "correct_gain": 15,
+      "reject_reduction": 19,
+      "early_only_correct": 16,
+      "latest_only_correct": 1,
+      "pass": true
+    },
+    {
+      "pair": 2,
+      "correct_gain": 11,
+      "reject_reduction": 19,
+      "early_only_correct": 12,
+      "latest_only_correct": 1,
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "pair_gates": {
+    "pair1": true,
+    "pair2": true
+  },
+  "all_pass": true
+}

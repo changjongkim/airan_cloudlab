@@ -1,0 +1,37 @@
+{
+  "schema": "softwall-nrx-public-contract-v1",
+  "source_sha256": {
+    "third_party/aerial-cuda-accelerated-ran/pyaerial/notebooks/example_neural_receiver.ipynb": "2dcc11780845b02d6fc041430357f56da53784e4f42f94e7634f9e88fef96c16",
+    "third_party/aerial-cuda-accelerated-ran/pyaerial/models/neural_rx.onnx": "773b92a35a8a86903915bc0bbba2ce0b0ffe35d8c5839b64af8a8391dbac633c"
+  },
+  "declared_channel_support": {
+    "rayleigh": true,
+    "cdl_a_to_e": true,
+    "tdl": false
+  },
+  "reference_profile": {
+    "mcs_index": 7,
+    "start_symbol": 0,
+    "num_symbols": 12,
+    "dmrs_symbols": [
+      0,
+      5,
+      10
+    ],
+    "tx_antennas": 1,
+    "rx_antennas": 4,
+    "engine_precision": "fp32"
+  },
+  "checks": {
+    "rayleigh_declared": true,
+    "rayleigh_branch": true,
+    "cdl_branch": true,
+    "tdl_branch": false,
+    "mcs7": true,
+    "start_symbol_zero": true,
+    "one_tx_four_rx": true,
+    "fp32_build": true,
+    "input_shape": true
+  },
+  "interpretation": "The supplied public example explicitly constructs Rayleigh and CDL channels. It contains no TDL branch, so the prior TDL-A failure cannot by itself be treated as a failed advertised model contract. A CDL holdout is the first external-channel compatibility gate; TDL requires separate support evidence or retraining."
+}

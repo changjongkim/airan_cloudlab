@@ -1,0 +1,44 @@
+{
+  "claim_boundary": "The C163 ingestion and decision-audit path is executable and unit tested. It does not qualify a production DU mode until the listed external artifacts are captured and pass the frozen validator.",
+  "files_sha256": {
+    "results/softwall_multigpu/c163_clock_calibration_template_v1.json": "a9ac4cee763570d43f542fbd5e8499b2ed697873d75b394e3b89e4f28a2eecfb",
+    "results/softwall_multigpu/c163_expiry_contract_template_v1.json": "9f950c5b8f09ab19f23062d3e6cf34fc96241b4fc404107057d629a233441e4a",
+    "results/softwall_multigpu/c163_mode_qualification_template_v1.json": "d94e52bc4a66ecb69155207ed56d824947e7cbb00cf5c704dc65c6e1035687a7",
+    "results/softwall_multigpu/c163_raw_du_trace_template_v1.json": "ae6789ccb70f39d8ff7af020de9cc021c0cdea1d848f2ad8d2476995b10abbc4",
+    "results/softwall_multigpu/softwall_du_timing_contract_template_v2.json": "3acf0d9be259917e88aa6b27c94c8fe955eda6816d415a1cc5aecbdffdab13b9",
+    "scripts_for_node/softwall_same_gpu/build_c163_timing_readiness_v2.py": "7d8ac9299162130e4174fcb1e6985d6ca2bcb7b14a4e5819dcf9a101ca3c5c9f",
+    "scripts_for_node/softwall_same_gpu/c162_certified_scheduler_v1.py": "af6fd5d1812cfbcaed826cecc03937945146e6f3f125491f200e73eda5d4c49e",
+    "scripts_for_node/softwall_same_gpu/c163_build_du_contract_v2.py": "020f3888767f264fb9a48925a990871eae2e1662f6074a02b250ae15632d8484",
+    "scripts_for_node/softwall_same_gpu/c163_production_envelope_bridge.py": "3bb20d0978616530c82b496a242c4fa039c20a41c8d3b63236a44d3083f9c2be",
+    "scripts_for_node/softwall_same_gpu/du_timing_contract_v2.py": "a129ae52f5adb6a8a7925cc1b5f4733e47f433964dccd22165c0f463717f54b1",
+    "scripts_for_node/softwall_same_gpu/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts_for_node/softwall_same_gpu/test_c163_build_du_contract_v2.py": "429d20fa385f442165ec286410d8550f3366c4abee9d8e7bc1949b8fb55e3426",
+    "scripts_for_node/softwall_same_gpu/test_c163_production_envelope_bridge.py": "72bf7fd44a2cd0a476617ed9779aa30fa920a5e67a4f2714d7d0f0af8737b963",
+    "scripts_for_node/softwall_same_gpu/test_du_timing_contract_v2.py": "acdc41d7e9c4f6539f58c2000b6a6623b041766ec52d61c0ff8c3bee535e6c3c"
+  },
+  "missing_evidence": [
+    "target DU/FAPI or DU/MAC raw event trace",
+    "explicit target gNB MAC expiry artifact",
+    "clock calibration artifact for every timestamp producer",
+    "same-topology whole-path NRx/recovery/control/AI mode qualification",
+    "independent-node production holdout"
+  ],
+  "ready_components": {
+    "artifact_to_contract_reconstruction_gate": true,
+    "calibrated_clock_uncertainty_gate": true,
+    "content_hash_provenance_for_trace_clock_expiry_and_mode": true,
+    "mac_consumption_deadline_gate_with_clock_error": true,
+    "nrx_outcome_visible_before_decision_gate": true,
+    "physical_ai_lease_decision_parity_gate": true,
+    "qsu_qsn_mi_uq_production_bridge": true,
+    "raw_event_to_contract_joiner": true,
+    "request_specific_verified_all_fail_certificate": true,
+    "single_commit_and_nrx_outcome_consistency": true
+  },
+  "schema": "softwall-c163-du-timing-readiness-v2",
+  "status": "UQ_NO_PRODUCTION_TRACE",
+  "verification": {
+    "unit_tests": 24,
+    "unit_tests_passed": 24
+  }
+}

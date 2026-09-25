@@ -1,0 +1,54 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm48_gc_tail_abba",
+  "purpose": "Test the prospective hypothesis that periodic Python cyclic garbage collection contributes to the same-request NRx >30 ms host/GPU-event tail clustered near release 2740–2762 in Confirm43/44. Instrument collection duration and disable automatic GC only in the intervention, with an explicit collection before every timed epoch in both arms.",
+  "decision_at_stake": {
+    "pass": "If both GC-on runs have a >30 ms NRx violation overlapping a measured collection, both GC-off runs have no NRx violations or collections, and safety gates pass, qualify a new separate experiment testing whether the GC-off path can satisfy an 8 ms NRx service contract. Do not infer that 8 ms is already safe.",
+    "fail": "If any required GC-on or GC-off arm contradicts the hypothesis, stop this route without extra seeds; a shorter NRx bound requires another concrete mechanism before GPU qualification."
+  },
+  "if_both_outcomes_lead_to_same_action": "Cancel if the result would not change whether the GC-off short-bound route is developed.",
+  "early_stop_rule": "Analyze after every completed arm. If that arm fails its frozen hypothesis, input, contract, or safety gate, stop before the remaining arms because full PASS is then impossible; preserve the partial report and data.",
+  "single_question_rule": "Only automatic Python cyclic-GC behavior is varied; the 8 ms admission contract is a separate later decision.",
+  "strongest_realistic_opponent": "Same initialized cap80 MPS NeuralRx and cap20 background worker, same trace and bounded contract, with automatic GC enabled versus disabled in ABBA order.",
+  "radio": {
+    "iterations_per_condition": 4000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "payload_seed": 20321148,
+    "snr_db": -8.5,
+    "channel_seed_base": 20339000,
+    "order": ["gc_on", "gc_off", "gc_off", "gc_on"]
+  },
+  "execution": {
+    "same_node_allocation_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 conventional-only releases with zero deadline misses"
+  },
+  "controller": {
+    "endpoint_mps_cap": 80,
+    "background_mps_cap": 20,
+    "recovery_gap_ai": true,
+    "nrx_end_to_end_bound_ms": 30,
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "ai_budget_ms": 40,
+    "ai_guard_ms": 2,
+    "ai_rpc_timeout_ms": 35,
+    "gc_long_event_threshold_ms": 1
+  },
+  "primary_hypothesis_gate": {
+    "both_gc_on_runs_have_nrx_bound_violation_temporally_overlapping_recorded_gc_collection": true,
+    "both_gc_off_runs_have_zero_nrx_bound_violations_and_zero_gc_collections": true,
+    "all_runs_zero_ran_deadline_misses_and_ai_contract_faults": true
+  },
+  "measurement_sources": {
+    "radio": "results/softwall_same_gpu/raw/confirm48_gc_r{round}_{condition}_cap80_job{job}_controller.json:records[*].release_ns/response_ms/deadline_miss/correct/nrx_bound_violation, deadline_misses, correct_releases",
+    "gc": "same controller JSON:gc_counts_by_generation, gc_long_events[*].started_ns/finished_ns/duration_ms/release_index_at_callback",
+    "worker": "matching _worker.json and _background.json:host, slurm_job_id, visible_sm_count, mps_active_thread_percentage, completed_units",
+    "safety": "controller JSON:endpoint_timeouts, conv_bound_violations, background_budget_violations, background_release_crossings, background_faults, duplicate_commits, fallback_calendar_final, endpoint_final"
+  },
+  "evidence_grade": "A local GC contribution only if the ABBA frozen hypothesis and all control gates pass; otherwise C diagnostic. Neither grade qualifies an 8 ms bound or top-conference novelty.",
+  "interpretation_limit": "The two GC-on/GC-off pairs are a mechanistic diagnostic, not a proof of a WCET bound or proof that GC is the only tail source. Preserve all run data and report failure of any gate without reclassifying prior Confirm43/44 failures. A GC-off success still requires maintenance/lifecycle and fault-injection checks before claiming a conditional deadline guarantee."
+}

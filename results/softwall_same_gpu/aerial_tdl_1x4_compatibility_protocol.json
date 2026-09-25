@@ -1,0 +1,36 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "aerial_tdl_1x4_no_awgn_compatibility_canary",
+  "frozen_before_execution": true,
+  "relationship_to_previous_failure": "The previous 4x4 TDL-A canary used four physical transmit branches, whereas the NVIDIA pyAerial NeuralRx example uses one UE transmit antenna and four gNB receive antennas. This is a new interface-contract canary, not a reinterpretation or replacement of the previous FAIL.",
+  "geometry": {
+    "one_spatial_layer": true,
+    "precoder": ["0.5+0j", "0+0.5j", "0+0.5j", "-0.5+0j"],
+    "verify_reconstruction_before_channel": true,
+    "physical_tx_antennas": 1,
+    "physical_rx_antennas": 4,
+    "input_logical_shape": [1, 1, 1, 14, 3276]
+  },
+  "radio": {
+    "profile": "Aerial TDL-A",
+    "delay_spread_ns": 30,
+    "maximum_doppler_hz": 10,
+    "awgn_disabled": true,
+    "iterations": 10,
+    "payload_seed": 20357000,
+    "tdl_seed": 57001
+  },
+  "gate": {
+    "conventional_correct": 10,
+    "neural_correct": 10,
+    "payload_and_crc_checked": true,
+    "stop_on_failure": true
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/probe_aerial_tdl_1x4_compatibility.py": "ff7a62385635bc9f03bfeb724bb745237b0ad39fc88f8200575318bb23cbb801",
+    "scripts_for_node/softwall_same_gpu/run_aerial_tdl_1x4_compatibility.sh": "585d0d8e1accb96a0c7343bd89b9eeb1c3d1fd5af214e816e6470ef1dc6d8b14",
+    "third_party/aerial-cuda-accelerated-ran/pyaerial/notebooks/example_neural_receiver.ipynb": "2dcc11780845b02d6fc041430357f56da53784e4f42f94e7634f9e88fef96c16",
+    "third_party/aerial-cuda-accelerated-ran/pyaerial/src/aerial/phy5g/chan_models/fading_chan.py": "1a7a018579f8c0ca526b1d7260d7d1b0113b98271e2c8605c7118b23116b63d0"
+  },
+  "interpretation_limit": "Only receiver interface compatibility. It cannot establish BLER, deadline, AI throughput, isolation, policy superiority, or novelty. Failure requires interface attribution before any noisy or MPS campaign."
+}

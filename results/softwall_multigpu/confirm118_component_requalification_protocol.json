@@ -1,0 +1,42 @@
+{
+  "schema": "softwall-confirm118-component-requalification-protocol-v1",
+  "status": "frozen-before-run",
+  "job": "58815435",
+  "mode": "local1+remote2, four cells, MPS, Qwen trace, mixed fault, P180/D155",
+  "predecessor": "confirm117_component_bounds_job58815435.json",
+  "predecessor_outcome": "C117 rejected 2 ms home front/back bounds with one front and one back violation; all remote and end-to-end component gates passed.",
+  "arms": [
+    {
+      "label": "c118_components_s3_job58815435",
+      "payload_seed": 23100213,
+      "channel_seed": 24339000
+    },
+    {
+      "label": "c118_components_s4_job58815435",
+      "payload_seed": 23200324,
+      "channel_seed": 25058000
+    }
+  ],
+  "warmup": 20,
+  "iterations": 340,
+  "candidate_bounds": {
+    "front_gpu_ms": 3.0,
+    "remote_forward_gpu_us": 250.0,
+    "remote_nrx_gpu_ms": 2.5,
+    "remote_backward_gpu_us": 100.0,
+    "remote_worker_path_ms": 6.0,
+    "back_gpu_ms": 3.0,
+    "end_to_end_nrx_ms": 25.0
+  },
+  "selection_rule": "The 3 ms home front/back candidates were fixed after C117 diagnosed co-run tails of 2.393/2.741 ms; all other C117 bounds remain unchanged. Both new independent arms must have zero component and system-safety violations.",
+  "interpretation_rule": "A pass is finite-sample qualification for this exact warm co-run mode, not WCET. A failure rejects the candidate without overwriting C117 or C118.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_multigpu_three_endpoint_arm.sh": "f48cee4a6d58e331882c6c5b4524320a0fb44110acbb4eaf32c46ff49e27fb72",
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": "8db5fe06f81b2ece2a0aa6d982095e0638b36962c7f95c69c5962738a4f821cb",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

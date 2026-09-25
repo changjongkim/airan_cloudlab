@@ -1,0 +1,34 @@
+{
+  "schema": "softwall-confirm62-combined-baseline-v1",
+  "job": "58729926",
+  "gates": {
+    "source_hashes": true,
+    "always_contract": true,
+    "always_provenance": true,
+    "always_safety": true,
+    "always_online_feature": true,
+    "always_timing": true,
+    "low_threshold_contract": true,
+    "low_threshold_provenance": true,
+    "low_threshold_safety": true,
+    "low_threshold_online_feature": true,
+    "low_threshold_timing": true,
+    "paired_trace": true,
+    "cross_routing": true,
+    "early_host_overlap": true,
+    "radio_noninferiority": true,
+    "ai_gain": true
+  },
+  "all_pass": true,
+  "comparison": {
+    "always_correct": 214,
+    "low_gate_correct": 214,
+    "always_ai_units": 5746,
+    "low_gate_ai_units": 5865,
+    "ai_gain_percent": 2.0710059171597632,
+    "low_gate_skips": 163,
+    "cross_routed_cells": 117,
+    "low_gate_host_overlapped_early_mandatory": 101
+  },
+  "interpretation": "Combined component integration on synthetic P150/D130 with idle endpoint queues and AI only after radio. This is not the AI-aware greedy-replan strong baseline, the joint policy, GPU-kernel overlap proof, WCET or production MAC expiry."
+}

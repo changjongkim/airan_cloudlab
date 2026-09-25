@@ -1,0 +1,27 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm20_receiver_stability",
+  "purpose": "Determine whether confirm19 S2/eager mismatch traces reflect receiver-output instability, input mutation, or only deadline cutoff behavior.",
+  "selection_source": {
+    "confirm19_mismatch_indices": ["1:985", "1:990", "2:190", "2:605", "2:805", "2:984", "3:463", "5:225"],
+    "selection_rule": "All eight S2/eager correctness mismatch indices from the frozen confirm19 campaign; no mismatch is omitted."
+  },
+  "radio": {
+    "snr_db": -8.5,
+    "payload_seed_base": 20270500,
+    "channel_seed_base": 202609200,
+    "repetitions_per_trace": 30,
+    "frozen_input": "Recreate the declared trace once, copy its GPU tensor, and restore an exact copy before each tested order."
+  },
+  "orders": [
+    "conventional only",
+    "NeuralRx only",
+    "NeuralRx followed immediately by conventional"
+  ],
+  "checks": [
+    "correct-TB result stability across repetitions",
+    "whether either receiver mutates the input tensor",
+    "whether receiver order changes conventional output"
+  ]
+}

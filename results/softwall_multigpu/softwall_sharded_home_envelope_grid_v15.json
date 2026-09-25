@@ -1,0 +1,1210 @@
+{
+  "schema": "softwall-sharded-home-envelope-grid-v15",
+  "status": "post-C146-single-token-pipelined-two-node-qualified",
+  "scope": "Synchronous P180/D155 cells on disjoint RAN home GPUs. Qualification is mode-specific over home cell count, recovery bound, executor ordering, lifecycle, shared-AI broker, declared control-plane fault class, and the full synchronous prepare/commit/complete budget and post-apply fault-point coverage; later falsification demotes earlier finite-sample points. C134 adds an independent allocation and node requalification for the full-budget three-control-point QSU mode within the same A100 hardware family. Version 9 derives conditional recovery release per home from that home's admitted NeuralRx jobs and is audited against an independent exact endpoint-admission oracle. Version 10 further distinguishes W+Delta capacity geometry from the sufficient exchange window at the current observe-all decision boundary; the latter charges the latest admitted NeuralRx path bound and sequential recovery for rejected NeuralRx jobs before testing an AI transaction. Version 11 caps synchronous NeuralRx admission by the physical CUDA-IPC ring depth and makes rejected-recovery-before-exchange an executor-mode property. Version 12 separately charges the physical AI completion guard in addition to the radio commit guard and any synchronous broker transaction budget. Version 13 rejects the former equality between the 5 ms socket timeout and an RPC wall-time bound after C138, separates a prospective 7 ms admission charge, and replaces the invalidated AI40 exchange-only class with the corrected AI35+control21+completion2 class validated by C140. Version 14 moves prepare, abort, and complete to a separate control connection, revalidates prepared work against the current local certificate, and keeps only the launch-authorizing commit on the RAN critical path. C142-C144 qualify AI45+commit7+completion2=54 ms and the three post-apply fault points on two A100 nodes. Version 15 preserves V14 timing but adds an explicit one-unlaunched-token-per-home ownership contract. A deterministic two-request audit found that V14 could issue prepare behind a retained staged token; V15 suppresses that transition and exposes physical branch counters.",
+  "classification": {
+    "QSU": "qualified-safe-useful",
+    "QSN": "qualified-safe-no-slack",
+    "MI": "mandatory timing or per-home memory infeasible",
+    "UQ": "memory/timing arithmetic is feasible but a timing, lifecycle, executor-conformance, control-fault, complete control-budget, or comparison gate is not physically qualified"
+  },
+  "scenarios": [
+    {
+      "id": "sharded_home_g1_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 4,
+      "home_cell_counts": [
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C113 qualifies the single-home four-cell reference",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g1_c8",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 8,
+      "home_cell_counts": [
+        8
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g1_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 12,
+      "home_cell_counts": [
+        12
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 4,
+      "home_cell_counts": [
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_conv12_legacy_executor",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C121 passed two arms and remains historical finite-sample evidence",
+        "C124 later observed conventional host-to-commit 12.535096 ms > 12 ms; exact conv12 mode is demoted to UQ",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_class_order_executor",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C125 prospective first arm failed closed at release150 cell2",
+        "executor attempted [+33.106,+58.106] ms across earlier live credit [+53,+78] ms",
+        "arithmetic feasibility alone is insufficient without certificate-conformant dispatch",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C126 canary crossed release150 after merging all ready recovery classes in live-certificate order",
+        "C126 eight formal arms: 21,760 TB, 2,496 atomic exchanges, zero deadline/NRx/conv/AI-bound violations, all brokers drained",
+        "C126 strict same-radio comparison failed and throughput superiority is not qualified; this QSU label is safety/usefulness only",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 12,
+      "home_cell_counts": [
+        6,
+        6
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g4_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 4,
+      "home_cell_counts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g4_c8",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 8,
+      "home_cell_counts": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g4_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 12,
+      "home_cell_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C122: two independent 4-home x 3-cell arms, 8,160 total TB, synchronized release delta 0 ns, safety violations 0",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the legacy/sharded executor completes rejected mandatory recoveries before exchange",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": true,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor_commit_fault_unhandled",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C123/C126 nominal broker paths do not qualify a post-apply lost commit reply",
+        "Retry can duplicate execution; terminating the controller can propagate an AI control fault into RAN availability",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "post_apply_commit_reply_loss",
+      "control_fault_qualified": false,
+      "ambiguous_token_policy": "unspecified retry/reassignment or whole-controller failure",
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor_commit_fault_quarantine",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C127 two prospective arms: 5,440 TB, zero deadline/NRx/conv/AI-bound violations",
+        "After the fault, affected home completed 2,490 RAN TB and the other home completed 1,668 AI units",
+        "Exactly one quarantined inflight token per arm; duplicate commit/execution zero; all local credits drained",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "post_apply_commit_reply_loss",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; disable new global AI only at affected home; continue local RAN",
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_sync_marker_c128",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C128 first formal arm: synchronous /pscratch fault-marker serialization caused one D155 miss at each home",
+        "Fault-path instrumentation is part of the exact mode and therefore cannot be excluded from timing qualification",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_with_synchronous_fault_logging",
+      "control_fault_qualified": false,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_unbounded_rpc_c129",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C129 direct os._exit removed marker perturbation but home1 blocked in global complete RPC",
+        "The failure surfaced 97.259 ms after Qwen physical return and mandatory fallback failed at +160.844 ms for D155",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_unbounded_rpc",
+      "control_fault_qualified": false,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 0,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 0,
+      "control_budget_accounted_in_admission": false,
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_timeout_unaccounted_c130",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C130 two arms and 5,440 TB physically passed with a 5 ms socket timeout",
+        "Post-run proof audit found prepare, commit, and complete control cost absent from the AI admission inequality",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_bounded_rpc",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 5,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 0,
+      "control_budget_accounted_in_admission": false,
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_partial_budget_c131",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C131 two arms and 5,440 TB physically passed after charging commit+complete as 10 ms",
+        "Proof audit found the synchronous prepare RPC was still omitted; required full budget is 15 ms",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_bounded_rpc",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 5,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 10,
+      "control_budget_accounted_in_admission": true,
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C132 two prospective arms: 5,440 TB, including 4,976 TB after crash detection, with every safety violation zero",
+        "All three 5 ms prepare/commit/complete bounds were charged as 15 ms plus a 2 ms physical guard before admission",
+        "Both clients failed closed global AI, 114 AI units completed before containment, ambiguous execution and duplicates were zero, and all local credits drained",
+        "C133 four prospective arms: prepare2 and complete2, 10,880 TB and 9,962 TB after crash detection, every safety violation zero",
+        "Combined with frozen C132 commit2: prepare/commit/complete each two arms, 16,320 TB and 14,938 TB after crash detection; prepare launched no ambiguous AI and complete executed its target exactly once",
+        "C134 independent job 58823497 on nid002688: prepare/commit/complete each two new arms, 16,320 TB and 14,926 TB after crash detection, 354 AI units before containment, every safety and duplicate-execution violation zero",
+        "v11 models the implemented one-buffer CUDA-IPC endpoint as ring_depth=1",
+        "the global certificate executor attempts exchange before rejected mandatory recovery dispatch",
+        "v12 charges the 2 ms physical AI completion guard separately from the radio commit guard and broker control budget",
+        "C138 prospectively rejected the 5 ms socket timeout as a wall-time bound: faulting prepare 5.205092 ms and concurrent complete 5.830741 ms",
+        "The C132-C134 safety executions remain historical, but their 15 ms admission charge is superseded and this exact mode is UQ"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_bounded_rpc",
+      "control_fault_qualified": false,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 5,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 15,
+      "control_budget_accounted_in_admission": true,
+      "qualification_nodes": [
+        "nid001049",
+        "nid002688"
+      ],
+      "hardware_generalization": "two independent A100 allocations/nodes; cross-family unqualified",
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_qualified_wall_bound_c139_c140",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C138 prospective first arm rejected equality between a 5 ms socket timeout and wall-time bound while all non-control safety gates passed",
+        "C139 six prospective arms on nid001252: prepare/commit/complete each two, 16,320 TB, 14,919 TB after fault detection, all safety and duplicate gates zero",
+        "C139 measured 2,020 attempted RPCs; 12 faulting returns exceeded the 5 ms socket timeout, maximum 5.653235 ms, and none exceeded the prospective 7 ms admission wall bound",
+        "The corrected transaction charges AI35 + control21 + completion2 = 58 ms; static all-fail slack is 53 ms and the decision-time conditional window is 58 ms",
+        "C140 two prospective arms on the same node: 2,560 TB, 309 target branches, 8 AI35 conditional exchanges, zero safety/bound/credit violations",
+        "C140 static counterfactual rejected all 8 exchanges at margin -5 ms while the conditional contract accepted them at model margin 0 ms",
+        "v13 preserves one-buffer CUDA-IPC ring depth and certificate-ordered recovery execution"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_socket_timeout5_wall_bound7",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 7,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 21,
+      "control_budget_accounted_in_admission": true,
+      "qualification_nodes": [
+        "nid001252"
+      ],
+      "hardware_generalization": "one A100 node for corrected wall-bound and conditional-class qualification; independent-node and cross-family requalification pending",
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_pipelined_control_c142_c144",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        45.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "The finite V14 protocol model exhausts 16 states and 20 transitions including every before/after-apply control failure branch with zero invariant violations",
+        "C142 two AI45 arms on nid001361: 2,560 TB, 305 target branches, 9 exchange-only executions, zero safety/bound/credit violations",
+        "The V14 transaction charges AI45 + synchronous launch commit7 + completion guard2 = 54 ms; static all-fail slack is 53 ms and conditional window is 58 ms",
+        "C143 six fault arms on nid001361: 16,320 TB, 14,184 after fault, commit max 5.148988 ms, zero safety or duplicate violations",
+        "C143 deferred prepare/abort/complete reached 9.614963 ms and exceeded 7 ms 50 times without blocking RAN recovery",
+        "C144 independently requalified AI45 and all three fault points on nid002049: 6,080 TB and 3,730 after fault, all gates pass",
+        "Prepared work is never launched without commit ACK and is revalidated against the current local horizon",
+        "Deterministic V14/V15 two-request audit reproduces one V14 untracked broker-held token; C142-C144 ended drained but did not gate this transition"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_async_prepare_complete_sync_commit7",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 7,
+      "control_rpc_count": 1,
+      "control_transaction_budget_ms": 7,
+      "control_budget_accounted_in_admission": true,
+      "qualification_nodes": [
+        "nid001361",
+        "nid002049"
+      ],
+      "hardware_generalization": "same V14 contract qualified on two A100 nodes; cross-family and production d_MAC remain unqualified",
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0,
+      "control_critical_operations": [
+        "commit"
+      ],
+      "control_deferred_operations": [
+        "prepare",
+        "abort",
+        "complete"
+      ],
+      "prepared_token_policy": "revalidate at poll; retain across a short local horizon; abort only when the request SLO cannot be met",
+      "completion_policy": "retire local GPU lease at physical fence; keep global token inflight until asynchronous complete ACK",
+      "single_token_ownership_required": true,
+      "single_token_ownership_qualified": false,
+      "ownership_contract": "at-most-one-staged-or-offered-token-per-home"
+    },
+    {
+      "id": "sharded_home_g2_c8_single_token_pipelined_control_c145_c146",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        45.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "V14/V15 deterministic two-request regression: V14 untracked held token 1, V15 0",
+        "V15 finite audit composes the 16-state/20-edge fault protocol with a 4-state/8-edge single-token ownership model; violations 0",
+        "nid001244: AI45 exchange 7, fault arms 3, radio 6080, post-fault 3731, suppressed prepares 273, maximum unlaunched token 1",
+        "nid003417: AI45 exchange 5, fault arms 3, radio 6080, post-fault 3732, suppressed prepares 264, maximum unlaunched token 1"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_single_token_async_prepare_complete_sync_commit7",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 7,
+      "control_rpc_count": 1,
+      "control_transaction_budget_ms": 7,
+      "control_budget_accounted_in_admission": true,
+      "qualification_nodes": [
+        "nid001244",
+        "nid003417"
+      ],
+      "hardware_generalization": "same V15 contract qualified on two A100 nodes; cross-family and production d_MAC remain unqualified",
+      "home_endpoint_ring_depths": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "rejected_recovery_before_exchange": false,
+      "ai_completion_guard_ms": 2.0,
+      "control_critical_operations": [
+        "commit"
+      ],
+      "control_deferred_operations": [
+        "prepare",
+        "abort",
+        "complete"
+      ],
+      "prepared_token_policy": "retain across short horizon; never issue prepare while staged or offered token exists; abort only when request SLO cannot be met",
+      "completion_policy": "retire local GPU lease at physical fence; keep global token inflight until asynchronous complete ACK",
+      "single_token_ownership_required": true,
+      "single_token_ownership_qualified": true,
+      "ownership_contract": "at-most-one-staged-or-offered-token-per-home"
+    }
+  ]
+}

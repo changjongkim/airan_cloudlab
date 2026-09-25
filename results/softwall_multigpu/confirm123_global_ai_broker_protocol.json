@@ -1,0 +1,53 @@
+{
+  "schema": "softwall-confirm123-global-ai-broker-protocol-v1",
+  "status": "frozen-before-run",
+  "job": "58819952",
+  "question": "Can one externally offered AI trace be serialized across two GPU/RAN homes while every committed request is backed by the selected home local all-fail certificate and physical AI lease?",
+  "canary": "c123_global_ai_canary_job58819952_result.json",
+  "canary_outcome": "PASS: 101 unique timely requests split 50/51, prepare/commit/complete exactly once, broker outstanding/duplicates 0, all RAN safety gates pass.",
+  "mode": "two synchronized A100 homes, four cells/two local NRx/Qwen each, one global BurstGPT queue, global broker policy, local atomic recovery replan+AI lease, P180/D155, mixed faults",
+  "arms": [
+    {
+      "label": "c123_global_ai_s1_job58819952",
+      "payload_seed0": 26200051,
+      "payload_seed1": 26210051,
+      "channel_seed0": 26201000,
+      "channel_seed1": 26211000
+    },
+    {
+      "label": "c123_global_ai_s2_job58819952",
+      "payload_seed0": 26300061,
+      "payload_seed1": 26310061,
+      "channel_seed0": 26301000,
+      "channel_seed1": 26311000
+    }
+  ],
+  "iterations": 340,
+  "warmup": 20,
+  "homes": 2,
+  "cells_per_home": 4,
+  "physical_gpus": 2,
+  "global_policy": "global",
+  "protocol_order": [
+    "broker prepare/hold",
+    "local replan_and_lease atomic commit",
+    "broker commit",
+    "Qwen physical completion",
+    "local lease retire",
+    "broker complete"
+  ],
+  "failure_rule": "Before global commit, a local rejection aborts the hold. After global commit, timeout/crash leaves request and physical credit unavailable; no reassignment without recovery protocol.",
+  "gate_rule": "Both arms must pass RAN safety and worker counts; share one release epoch; execute every AI request at most once; conserve timely value between broker and homes; serve both homes; show legal broker event sequences; end with zero broker tokens, duplicate commits, local leases, endpoint credits, and recovery credits; preserve source/artifact hashes.",
+  "claim_rule": "A pass establishes finite-sample serializable global AI admission composed with local recovery certificates. It does not establish throughput superiority, distributed hardware atomicity, WCET, shared NRx endpoints, or production DU timing.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_global_ai_two_home_arm.sh": "c8a3feb5fab1adeff328b757e0f4de5315804609cffaeef378e908de853bea82",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm123_global_ai.py": "c7ab7463a7ae1b1e9c1dbd6f9b56054e342ce02532c838923b1de02d8a3fb9f6",
+    "scripts_for_node/softwall_same_gpu/global_trace_baseline_controller.py": "1520dc7556370758a8f1f50e55c0ce42df5c8c7834361c2380c72b24c91d1ff1",
+    "scripts_for_node/softwall_same_gpu/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "scripts_for_node/softwall_same_gpu/test_global_trace_lease_broker.py": "f75bd9354d969b8528a3039ab9dd5f92acdc90d0f05b4d41ddabc14392e69c75",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

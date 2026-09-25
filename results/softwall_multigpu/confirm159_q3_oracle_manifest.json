@@ -1,0 +1,53 @@
+{
+  "all_pass": true,
+  "claim_scope": "Calibration-only exact offline opportunity screen; not an online performance result or confidence interval. The confirmatory BurstGPT holdout remains unmaterialized.",
+  "file_count": 9,
+  "files": {
+    "data/current/softwall_c159_calibration_burst_windows_v1.json": {
+      "bytes": 1893471,
+      "sha256": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f"
+    },
+    "docs/current/SOFTWALL_CONFIRM159_Q3_ORACLE_RESULT_KO.md": {
+      "bytes": 5076,
+      "sha256": "876a9ab9bcffeb16796a38910a22fa20976fd14abdf29f6e573958e3c6544500"
+    },
+    "results/softwall_multigpu/confirm159_q2_variable_two_node.json": {
+      "bytes": 18413,
+      "sha256": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692"
+    },
+    "results/softwall_multigpu/confirm159_q3_oracle_prespec_v1.json": {
+      "bytes": 2339,
+      "sha256": "8a2ef9d1b1163dceb671ffb0201ad4bb6179e4ec820b9ade6ff73706ac0ce87f"
+    },
+    "results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json": {
+      "bytes": 7774,
+      "sha256": "37298e64d351635f7973a25eac06a44cb85260f1eb06b65a909ba77173772ef8"
+    },
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json": {
+      "bytes": 3348576,
+      "sha256": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773"
+    },
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json": {
+      "bytes": 3345851,
+      "sha256": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881"
+    },
+    "scripts_for_node/softwall_same_gpu/c159_q3_oracle_screen.py": {
+      "bytes": 14621,
+      "sha256": "a24bd8d058370c7e13e7654f757d57706dad37328b3e8dd515f41ccba1380d5b"
+    },
+    "scripts_for_node/softwall_same_gpu/test_c159_q3_oracle_screen.py": {
+      "bytes": 1843,
+      "sha256": "7d79c106303b884a12f0b7f46506b581717d6489895b2730dd49e4d1f152a106"
+    }
+  },
+  "gates": {
+    "all_files_present": true,
+    "empirical_gain_below_mde": true,
+    "four_windows_zero_empirical_gain": true,
+    "holdout_unmaterialized": true,
+    "screen_stopped_performance": true,
+    "source_hash_still_matches": true
+  },
+  "schema": "softwall-confirm159-q3-artifact-manifest-v1",
+  "status": "C159_Q3_ORACLE_SCREEN_STOP_PERFORMANCE"
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm74_incremental_phy_value_train_test_calibration",
+  "frozen_before_full_execution": true,
+  "job": "58734412",
+  "node": "nid001409",
+  "prefix": "confirm74_value_job58734412",
+  "trials": 5000,
+  "train_seed": 20800001,
+  "test_seed": 20810001,
+  "bins": 5,
+  "min_bin_n": 500,
+  "min_rescue_events": 100,
+  "max_weighted_mace": 0.05,
+  "smoke": "Independent 20+20 trial synthetic smoke completed; no calibration claims, excluded from full gate.",
+  "frozen_gates": "Disjoint 5,000/5,000 seeds and recorded prewarmed observable features; >=500 test and train samples in every train-defined quintile; >=100 rescue events in each split; held-out weighted mean absolute calibration error <=0.05; held-out Brier score lower than a train-prevalence constant. Report all gates even on failure.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/run_confirm74_phy_value_calibration.sh": "073e547feab91ee13a3bd2c86a9567e2f26243eeda4c0ba9a251f4f58dc60cd3",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm74_phy_value.py": "9addfbf9930a9777274e3783900c7cd537d5424d9c565fc9f7a7ddf00dee6d8f",
+    "scripts_for_node/softwall_same_gpu/sweep_dual_receiver_snr.py": "25cba74ea9a7f2c6de78182fa08d15d022fe801dbccf44cd5b27ea1f5c75fbf6",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/softwall_same_gpu/softwall_phy.py": "200e46fce5837ccb3d08f1291b9a0394c956285bc7e7f8a5a12a1fad51d69355"
+  },
+  "limits": "Synthetic fixed SNR -8.5 dB pre-fading noise only; online q_use timing and confidence-aware admission, multi-SNR/TDL/DU transfer, and GPU joint-policy gain are not established."
+}

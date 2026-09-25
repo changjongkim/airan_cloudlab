@@ -1,0 +1,81 @@
+{
+  "schema": "softwall-confirm132-validation-summary-v1",
+  "status": "PASS",
+  "campaign": {
+    "all_pass": true,
+    "totals": {
+      "radio_records": 5440,
+      "radio_records_after_crash": 4976,
+      "ai_units_before_containment": 114,
+      "deadline_misses": 0,
+      "nrx_bound_violations": 0,
+      "conv_bound_violations": 0,
+      "ai_bound_violations": 0,
+      "ai_horizon_violations": 0
+    },
+    "gates": {
+      "prospective_sources_match": true,
+      "two_independent_arms": true,
+      "all_arm_gates_pass": true,
+      "expected_fail_stop": true,
+      "both_homes_continue_radio": true,
+      "all_global_ai_clients_fail_closed": true,
+      "no_duplicate_execution": true,
+      "control_budget_accounted_in_admission": true,
+      "faults_record_rpc_budget": true,
+      "all_safety_gates_zero": true
+    }
+  },
+  "unit_validation": {
+    "aerial_container_tests_passed": 75,
+    "qwen_runtime_tests_passed": 3,
+    "dart_runtime_tests_passed": 21,
+    "total_tests_passed": 99,
+    "environment_split": "trace_qwen_worker tests require the Qwen PyTorch runtime; all other repository tests ran in the Aerial runtime"
+  },
+  "fault_regression": {
+    "iterations": 10000,
+    "seed": 20260924,
+    "wrong_commit": 0,
+    "stale_accepted": 0,
+    "duplicate_accepted": 0,
+    "deadline_accepted": 0,
+    "invisible_accepted": 0,
+    "restarted_accepted": 0,
+    "committed": {
+      "nrx": 2525,
+      "conventional": 5798,
+      "deadline_miss": 1677
+    },
+    "pass": true,
+    "fallback_storm": {
+      "groups": 100,
+      "fanout": 8,
+      "capacity": 2,
+      "over_admitted": 0,
+      "reservation_leaks": 0,
+      "pass": true
+    }
+  },
+  "envelope_v6": {
+    "counts": {
+      "QSU": 5,
+      "QSN": 0,
+      "MI": 3,
+      "UQ": 10
+    },
+    "c132_status": "QSU"
+  },
+  "artifact_integrity": {
+    "formal_artifact_count": 86,
+    "all_source_checks_match": true,
+    "artifact_hash_mismatches": 0
+  },
+  "documentation_audit": {
+    "documents": 8,
+    "local_links_checked": 189,
+    "missing_links": 0,
+    "git_diff_check": "PASS"
+  },
+  "claim_boundary": "finite-sample bounded volatile broker fail-stop containment with all prepare/commit/complete budgets admission-charged; no restart, durable reconciliation, exactly-once, GPU hang, production WCET, or throughput superiority claim"
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm53_early_fallback_abba",
+  "frozen_before_execution": true,
+  "research_question": "At one-cell P45/D80, does moving a known-CRC-failure conventional recovery to the earliest safe time remove the next-release NRx rejection chain while preserving deadline and positive AI work?",
+  "decision_at_stake": {
+    "pass": "If both opposite-order seed pairs gain at least 5 correct TB per 1000 releases, have no deadline or safety-contract failures, reduce admission rejections, and finish positive AI units, develop the joint timing/admission scheme and then compare against the full strong combined baseline. This is a mechanism qualification, not a novelty claim.",
+    "fail": "If either pair fails, stop this early-recovery route without adding seeds or weakening timing bounds; rethink the mechanism before any strong-baseline campaign."
+  },
+  "if_both_outcomes_lead_to_same_action": "Cancel the comparison if neither result would alter the next implementation decision.",
+  "comparison_role": "ABBA mechanism ablation against the existing latest-start controller. Neither arm is the strong combined baseline.",
+  "strongest_realistic_opponent": "The channel-gated, queue-aware, fixed-recovery, bounded-AI combined baseline in docs/current/SOFTWALL_STRONG_BASELINE_SPEC_KO.md; implementation and comparison are a separate required gate.",
+  "radio": {
+    "cells": 1,
+    "period_ms": 45,
+    "deadline_ms": 80,
+    "iterations_per_arm": 1000,
+    "snr_db": -8.5,
+    "arms": [
+      {"arm": 1, "pair": 1, "timing": "early_if_clear", "payload_seed": 20321053, "channel_seed_base": 20353000},
+      {"arm": 2, "pair": 1, "timing": "latest", "payload_seed": 20321053, "channel_seed_base": 20353000},
+      {"arm": 3, "pair": 2, "timing": "latest", "payload_seed": 20321054, "channel_seed_base": 20354000},
+      {"arm": 4, "pair": 2, "timing": "early_if_clear", "payload_seed": 20321054, "channel_seed_base": 20354000}
+    ]
+  },
+  "execution": {
+    "same_node_job_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_arm": 20,
+    "operational_requalification": "200 conventional-only P90/D80 releases with zero deadline misses",
+    "early_stop": "Analyze after arm 2 and stop if pair 1 fails any frozen gate; otherwise finish arms 3 and 4. Preserve failed data and do not add seeds."
+  },
+  "transaction": {
+    "endpoint_mps_cap": 80,
+    "endpoint_timeout_ms": 30,
+    "nrx_bound_ms": 50,
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "recovery_gap_ai": true,
+    "early_policy_rule": "Only a completed invalid NeuralRx result can trigger early recovery, and only if start+25 ms+2 ms is no later than the next release. Otherwise use reserved latest start."
+  },
+  "background_both_arms": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "host_budget_ms": 40,
+    "socket_timeout_ms": 35,
+    "guard_ms": 2
+  },
+  "pair_gate": {
+    "minimum_early_minus_latest_correct_tb_per_1000": 5,
+    "early_admission_rejections_less_than_latest": true,
+    "early_completed_ai_units_greater_than_zero": true,
+    "both_zero_deadline_misses": true,
+    "both_zero_timing_safety_ai_contract_faults": true
+  },
+  "measurement_sources": {
+    "arm": "results/softwall_same_gpu/raw/confirm53_arm{arm}_{timing}_job{job}_cap80_job{job}_controller.json",
+    "workers": "matching *_worker.json and *_background.json",
+    "radio": "controller JSON:records[*].correct/deadline_miss/channel_seed, correct_releases, deadline_misses, response_ms",
+    "timing": "controller JSON:records[*].release_ns/fallback_actual_start_ns/fallback_early, early_fallbacks, admission_rejections, nrx_bound_violations, conv_bound_violations, fallback_not_started, fallback_calendar_final, endpoint_final",
+    "ai": "controller JSON:background_units/background_records[*].returned_ns, background_budget_violations, background_release_crossings, background_faults"
+  },
+  "evidence_grade": "B mechanism ablation only if both paired opposite-order rounds and controls pass; otherwise C diagnostic.",
+  "interpretation_limits": "One cell and one endpoint at a synthetic P45/D80 radio contract. The fixed 50/25/2 ms bounds are empirical qualification, not WCET. Known early CRC failure cannot generalize to timeout, long-tail NeuralRx, or correlated multi-cell failure. A pass cannot establish full-system novelty or production HARQ deadline safety."
+}

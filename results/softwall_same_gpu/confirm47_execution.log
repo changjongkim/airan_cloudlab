@@ -1,0 +1,42 @@
+salloc: Granted job allocation 58688541
+salloc: Waiting for resource configuration
+salloc: Nodes nid001084 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=9.007ms max=24.517ms miss=0 correct=81 nrx=0 conv=200 bg=0 duplicate=0
+09:39:56.936638 cuphy.hpp:122    CON[152964] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55ad2a413b50).
+confirm47 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58688541/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=10000 p99=16.036ms max=41.238ms miss=0 correct=9837 nrx=9799 conv=201 bg=126400 duplicate=0
+09:40:47.914400 cuphy.hpp:122    CON[153589] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56205bebc8d0).
+S2 campaign completed: tag=confirm47_r1_eager_job58688541 rounds=1 iterations=10000 job=58688541
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58688541/bg_sr_58688541_156632.sock
+[SAME-REQUEST-NRX] ready tag=sr_58688541_156632
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9838/10000 miss=0 nrx=9799 fallback=201 bg=128140 p99=55.803ms
+09:56:20.189892 cuphy.hpp:122    CON[157216] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f872bef540).
+same-request IPC campaign completed: confirm47_r1_external
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58688541/bg_sr_58688541_159506.sock
+[SAME-REQUEST-NRX] ready tag=sr_58688541_159506
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9823/10000 miss=0 nrx=9776 fallback=224 bg=127916 p99=55.828ms
+10:11:52.318951 cuphy.hpp:122    CON[160090] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56283b87cd10).
+same-request IPC campaign completed: confirm47_r2_external
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/mps/58688541/s2_1_eage.sock
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=eager_dual n=10000 p99=16.332ms max=40.719ms miss=0 correct=9818 nrx=9776 conv=224 bg=126506 duplicate=0
+10:27:25.356575 cuphy.hpp:122    CON[163500] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56386c42b150).
+S2 campaign completed: tag=confirm47_r2_eager_job58688541 rounds=1 iterations=10000 job=58688541
+# Confirm47 fully transactional external S2 vs eager-dual
+
+| round | order | eager correct | external correct | eager AI | external AI | recovery-gap AI | admission rejections | external−eager AI |
+|---:|---|---:|---:|---:|---:|---:|---:|---:|
+| 1 | eager_dual → external_transaction | 9837 | 9838 | 126400 | 128140 | 602 | 0 | +1740 |
+Round 1 external−eager radio: +0.0100 pp, paired 95% CI [-0.0419, +0.0619] pp; eager NRx 20 ms branch-bound diagnostic 2.
+| 2 | external_transaction → eager_dual | 9818 | 9823 | 126506 | 127916 | 670 | 0 | +1410 |
+Round 2 external−eager radio: +0.0500 pp, paired 95% CI [-0.0088, +0.1088] pp; eager NRx 20 ms branch-bound diagnostic 3.
+
+All frozen gates pass: True.
+confirm47 conservative-bound transactional external vs eager completed
+salloc: Relinquishing job allocation 58688541
+salloc: Job allocation 58688541 has been revoked.

@@ -1,0 +1,48 @@
+{
+  "schema": "softwall-sharded-home-envelope-manifest-v10",
+  "status": "decision-time-envelope-audited",
+  "files": {
+    "scripts_for_node/softwall_same_gpu/softwall_envelope_checker_v6.py": "eacccb797d78593b639321b04e7af2587b9500afaceacce82e58920b66733af0",
+    "scripts_for_node/softwall_same_gpu/test_softwall_envelope_checker_v6.py": "7906019a8b0899ba8666eb8c8478adda8b709ac384b481bc2209ad0aebf6ed29",
+    "scripts_for_node/softwall_same_gpu/analyze_softwall_decision_time_envelope.py": "fba4bea6b44c1c489c0f43b966a919d0f67a941c2187cd3e00eacd9c7681235d",
+    "scripts_for_node/softwall_same_gpu/test_analyze_softwall_decision_time_envelope.py": "b46580d28e499ee6518676d873a1c36e23a912d4e68b223087cf55675d302d1f",
+    "scripts_for_node/softwall_same_gpu/softwall_endpoint_admission_exact_oracle.py": "bf43639646a8bcba1735cce66a12e1094c6339311228fc7fa5617b67c0ee6b49",
+    "scripts_for_node/softwall_same_gpu/test_softwall_endpoint_admission_exact_oracle.py": "0f71eab412c4ce9201f25a44a0f4b8c462569ebeff716f3d8ff6b93c6928bb42",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_grid_v10.json": "2ed87482d555169d8175f759e0de56983231c88f028c82ed8abea06fd82d26fa",
+    "results/softwall_multigpu/softwall_sharded_home_envelope_prediction_v10.json": "ef71054c8339b9e62d9bd31dc3f0819d91f73f35f227e0efa70fea26c5ba2435",
+    "results/softwall_multigpu/softwall_endpoint_admission_exact_oracle_audit_v2.json": "afa7b044d595b831681dd2d721b4faaf017106a2ab563f4fc6e5107980323f8c",
+    "results/softwall_multigpu/softwall_decision_time_envelope_audit_v1.json": "3e10d9273197c0408744b1aad9b38959e9d6cae2dd419b92479e58117c5793d1",
+    "results/softwall_multigpu/softwall_envelope_v5_v6_decision_time_regression_v1.json": "4eb35c9f434cdd0c763f533facd1d297e1907447bb6645f74800ac00dede9348",
+    "results/softwall_multigpu/softwall_envelope_v10_validation_summary.json": "9fa70e166c5b4e71683471dc51bb754722401f28231c2c8b41c04a77d9ef7d28",
+    "results/softwall_multigpu/raw/envelope_v10_aerial_tests_job58824789_compute.log": "536d53ed57edc05c919b98aea9a8f254bfa589e747fc3deb93629d7363b1e187",
+    "results/softwall_multigpu/raw/envelope_v10_qwen_tests_job58824789_compute.log": "59115251ee893f076ec21b39137b9655619a846dfb0680f6ef1221d65ca024d7",
+    "results/softwall_multigpu/raw/envelope_v10_dart_tests_job58824789_compute.log": "2b7d2dfc10e8894fab10b912c08560b7526c0c8b6aaedc20e83e4cfcf59a09c1",
+    "results/softwall_multigpu/confirm134_independent_node_control_matrix_result.json": "60d3d17e039c32b888b0f14900f6203afb01dc2ae9974d36ff253a1cca6459c4",
+    "results/softwall_multigpu/confirm134_artifact_manifest.json": "bd0be442bfa06811fd4bd85ea60f527532f2e32043329b84a6a01865701c29d0"
+  },
+  "classification_counts": {
+    "QSU": 5,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 10
+  },
+  "decision_time_audit": {
+    "geometry_exchange_home_class_pairs": 42,
+    "decision_time_exchange_home_class_pairs": 0,
+    "classification_changes_from_v9": 0,
+    "regression": "v5 QSU -> v6 QSN"
+  },
+  "oracle_audit": {
+    "grid_scenarios": 18,
+    "endpoint_pools": 39,
+    "bounded_exhaustive_cases": 3640,
+    "cardinality_gaps": 0,
+    "schedule_failures": 0
+  },
+  "unit_validation": {
+    "allocation_job_id": 58824789,
+    "node": "nid001513",
+    "tests_passed": 155
+  },
+  "claim": "V10 retains physical-mode status counts but separates conditional-capacity geometry from the sufficient transaction window at the current observe-all decision boundary; all 42 geometric exchange-only pairs are unavailable under declared worst-case bounds."
+}

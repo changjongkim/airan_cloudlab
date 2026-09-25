@@ -1,0 +1,10 @@
+{
+  "schema": "softwall-c122-four-home-canary-failure-v1",
+  "status": "failed-before-timed-traffic",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c122_sharded_four_home_canary_job58819952_protocol.json",
+  "protocol_sha256": "a830e51255399a49f4b319e47659ec3647946ba3a3dc6a9da1d6e20f69472fc0",
+  "failure": "four_cell_trace_baseline_controller rejected --cells 3 because its CLI was intentionally restricted to choices=(4,)",
+  "secondary_finding": "runner waited on persistent workers after all controllers exited before publishing IPC termination; allocation processes required targeted cleanup",
+  "remediation": "preserve the C121 controller; use a C122-specific sharded controller supporting 1--4 cells and wait for controller PIDs before worker PIDs",
+  "claim": "This is an implementation/preflight failure, not a physical safety or performance result."
+}

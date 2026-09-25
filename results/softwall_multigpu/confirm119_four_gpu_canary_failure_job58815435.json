@@ -1,0 +1,22 @@
+{
+  "schema": "softwall-confirm119-four-gpu-canary-failure-v1",
+  "job": "58815435",
+  "node": "nid001016",
+  "status": "development-canary-failed-before-timed-traffic",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c119_four_gpu_canary_job58815435_protocol.json",
+  "protocol_sha256": "2119c87542183ec9fe29f1a5105e226ce2e1b775baa39f48f0b03d2ecb7451e7",
+  "runner_sha256_at_failure": "647fe89055497906a4489993d70fb63b70be88ccf33472bd0bfc9990a6db6a5d",
+  "placement": "GPU0 four-cell Aerial + local NRx + Qwen; GPU1/GPU2/GPU3 one remote NRx each",
+  "failure": {
+    "exception": "RuntimeError: out of memory",
+    "location": "four_cell_trace_baseline_controller.py PairedDualReceiver construction -> aerial.phy5g.ldpc.LdpcDecoder",
+    "timed_releases_completed": 0,
+    "interpretation": "The failure is consistent with the third remote worker/source-side GPU0 context consuming the remaining home-GPU residency margin before the fourth receiver completed construction."
+  },
+  "cleanup": {
+    "initial": "MPS quit timeout left workers alive",
+    "action": "cancelled Slurm step 58815435.77 only",
+    "postcheck": "no worker, MPS, or compute application remained"
+  },
+  "claim_boundary": "development boundary only; no safety or throughput result"
+}

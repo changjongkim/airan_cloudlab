@@ -1,0 +1,69 @@
+{
+  "schema": "softwall-confirm56-host-path-audit-v1",
+  "job": "58729926",
+  "host": "nid001217",
+  "gates": {
+    "source_hashes": true,
+    "same_host_job": true,
+    "requalification": true,
+    "input_contract": true,
+    "record_integrity": true,
+    "path_measurement_integrity": true,
+    "completed_cell_records": true,
+    "correct_cells_at_least": true,
+    "deadline_misses_by_commit_return": true,
+    "conventional_host_path_bound_violations": true,
+    "nrx_bound_violations": true,
+    "background_budget_violations": true,
+    "background_release_crossings": true,
+    "background_faults": true,
+    "endpoint_faults": true,
+    "fallback_calendar_outstanding": true,
+    "both_endpoint_outstanding": true,
+    "background_units_greater_than_zero": true
+  },
+  "source_evidence": {
+    "scripts_for_node/softwall_same_gpu/run_confirm56_host_path_qualification.sh": "scripts_for_node/softwall_same_gpu/run_confirm56_host_path_qualification.sh",
+    "scripts_for_node/softwall_same_gpu/two_endpoint_bringup_controller_v2.py": "scripts_for_node/softwall_same_gpu/two_endpoint_bringup_controller_v2.py",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "results/softwall_same_gpu/frozen_source/confirm56/dart_runtime.py",
+    "scripts_for_node/softwall_same_gpu/ai_worker.py": "scripts_for_node/softwall_same_gpu/ai_worker.py",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py"
+  },
+  "all_pass": true,
+  "observed": {
+    "completed_cell_records": 2000,
+    "correct_cells_at_least": 1958,
+    "deadline_misses_by_commit_return": 0,
+    "conventional_host_path_bound_violations": 0,
+    "nrx_bound_violations": 0,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0,
+    "background_faults": 0,
+    "endpoint_faults": 0,
+    "fallback_calendar_outstanding": 0,
+    "both_endpoint_outstanding": 0,
+    "background_units_greater_than_zero": true
+  },
+  "fallback_host_to_commit_ms": {
+    "count": 48,
+    "min": 2.390436,
+    "median": 2.5247025,
+    "p99_nearest_rank": 3.11443,
+    "max": 3.11443
+  },
+  "nrx_pair_observed_ms": {
+    "count": 1000,
+    "min": 4.727752,
+    "median": 5.128789,
+    "p99_nearest_rank": 6.319384,
+    "max": 9.029913
+  },
+  "radio_commit_response_ms": {
+    "count": 2000,
+    "min": 3.882483,
+    "median": 4.830538,
+    "p99_nearest_rank": 7.827871,
+    "max": 10.438196
+  },
+  "interpretation": "Sampled host-path evidence only; no WCET, production MAC expiry, joint policy, or AI-before-radio claim."
+}

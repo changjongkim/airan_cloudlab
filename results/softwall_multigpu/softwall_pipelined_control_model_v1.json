@@ -1,0 +1,485 @@
+{
+  "schema": "softwall-pipelined-control-finite-model-v1",
+  "scope": "one global request; all before/after-apply prepare, abort, commit, and complete reply-loss branches; timing bounds and GPU behavior excluded",
+  "states": 16,
+  "edges": 20,
+  "terminal_states": 8,
+  "quarantined_terminal_states": 6,
+  "invariants": [
+    "at-most-once physical launch",
+    "physical launch requires commit ACK",
+    "executed or ambiguous token is never reusable",
+    "only commit wait is on the RAN critical path and it is charged",
+    "broker transitions do not mutate the local RAN certificate"
+  ],
+  "violations": [],
+  "all_pass": true,
+  "terminal_state_values": [
+    {
+      "global_state": "ready",
+      "local_state": "quarantined",
+      "commit_ack": false,
+      "launch_count": 0,
+      "certificate_version": 0,
+      "commit_budget_reserved": false
+    },
+    {
+      "global_state": "completed",
+      "local_state": "quarantined",
+      "commit_ack": true,
+      "launch_count": 1,
+      "certificate_version": 0,
+      "commit_budget_reserved": true
+    },
+    {
+      "global_state": "held",
+      "local_state": "quarantined",
+      "commit_ack": false,
+      "launch_count": 0,
+      "certificate_version": 0,
+      "commit_budget_reserved": true
+    },
+    {
+      "global_state": "inflight",
+      "local_state": "quarantined",
+      "commit_ack": true,
+      "launch_count": 1,
+      "certificate_version": 0,
+      "commit_budget_reserved": true
+    },
+    {
+      "global_state": "inflight",
+      "local_state": "quarantined",
+      "commit_ack": false,
+      "launch_count": 0,
+      "certificate_version": 0,
+      "commit_budget_reserved": true
+    },
+    {
+      "global_state": "ready",
+      "local_state": "done_no_work",
+      "commit_ack": false,
+      "launch_count": 0,
+      "certificate_version": 0,
+      "commit_budget_reserved": false
+    },
+    {
+      "global_state": "completed",
+      "local_state": "done",
+      "commit_ack": true,
+      "launch_count": 1,
+      "certificate_version": 0,
+      "commit_budget_reserved": true
+    },
+    {
+      "global_state": "held",
+      "local_state": "quarantined",
+      "commit_ack": false,
+      "launch_count": 0,
+      "certificate_version": 0,
+      "commit_budget_reserved": false
+    }
+  ],
+  "transition_values": [
+    {
+      "transition": "submit_prepare",
+      "source": {
+        "global_state": "ready",
+        "local_state": "idle",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "ready",
+        "local_state": "prepare_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "prepare_ack_none",
+      "source": {
+        "global_state": "ready",
+        "local_state": "prepare_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "ready",
+        "local_state": "done_no_work",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "prepare_ack_held",
+      "source": {
+        "global_state": "ready",
+        "local_state": "prepare_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "staged",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "prepare_fail_before_apply",
+      "source": {
+        "global_state": "ready",
+        "local_state": "prepare_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "ready",
+        "local_state": "quarantined",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "prepare_fail_after_apply",
+      "source": {
+        "global_state": "ready",
+        "local_state": "prepare_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "quarantined",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "poll_current_horizon_fits",
+      "source": {
+        "global_state": "held",
+        "local_state": "staged",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "offered",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "poll_current_horizon_short",
+      "source": {
+        "global_state": "held",
+        "local_state": "staged",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "staged",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "request_slo_expired",
+      "source": {
+        "global_state": "held",
+        "local_state": "staged",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "abort_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "local_replan_reject",
+      "source": {
+        "global_state": "held",
+        "local_state": "offered",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "abort_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "local_replan_accept_charge_commit",
+      "source": {
+        "global_state": "held",
+        "local_state": "offered",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "commit_wait",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "abort_ack",
+      "source": {
+        "global_state": "held",
+        "local_state": "abort_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "ready",
+        "local_state": "done_no_work",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "abort_fail_before_apply",
+      "source": {
+        "global_state": "held",
+        "local_state": "abort_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "quarantined",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "abort_fail_after_apply",
+      "source": {
+        "global_state": "held",
+        "local_state": "abort_pending",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "target": {
+        "global_state": "ready",
+        "local_state": "quarantined",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": false
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "commit_ack",
+      "source": {
+        "global_state": "held",
+        "local_state": "commit_wait",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "target": {
+        "global_state": "inflight",
+        "local_state": "running",
+        "commit_ack": true,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": true
+    },
+    {
+      "transition": "commit_fail_before_apply",
+      "source": {
+        "global_state": "held",
+        "local_state": "commit_wait",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "target": {
+        "global_state": "held",
+        "local_state": "quarantined",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": true
+    },
+    {
+      "transition": "commit_fail_after_apply",
+      "source": {
+        "global_state": "held",
+        "local_state": "commit_wait",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "target": {
+        "global_state": "inflight",
+        "local_state": "quarantined",
+        "commit_ack": false,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": true
+    },
+    {
+      "transition": "physical_fence",
+      "source": {
+        "global_state": "inflight",
+        "local_state": "running",
+        "commit_ack": true,
+        "launch_count": 0,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "target": {
+        "global_state": "inflight",
+        "local_state": "complete_pending",
+        "commit_ack": true,
+        "launch_count": 1,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "complete_ack",
+      "source": {
+        "global_state": "inflight",
+        "local_state": "complete_pending",
+        "commit_ack": true,
+        "launch_count": 1,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "target": {
+        "global_state": "completed",
+        "local_state": "done",
+        "commit_ack": true,
+        "launch_count": 1,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "complete_fail_before_apply",
+      "source": {
+        "global_state": "inflight",
+        "local_state": "complete_pending",
+        "commit_ack": true,
+        "launch_count": 1,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "target": {
+        "global_state": "inflight",
+        "local_state": "quarantined",
+        "commit_ack": true,
+        "launch_count": 1,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": false
+    },
+    {
+      "transition": "complete_fail_after_apply",
+      "source": {
+        "global_state": "inflight",
+        "local_state": "complete_pending",
+        "commit_ack": true,
+        "launch_count": 1,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "target": {
+        "global_state": "completed",
+        "local_state": "quarantined",
+        "commit_ack": true,
+        "launch_count": 1,
+        "certificate_version": 0,
+        "commit_budget_reserved": true
+      },
+      "ran_critical_path": false
+    }
+  ]
+}

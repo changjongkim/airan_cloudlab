@@ -1,0 +1,33 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm12_paired2_qwen_b8c512_final_p25",
+  "purpose": "Independent final gate for the cap80 heavy-Qwen S1 candidate selected by confirm11.",
+  "selection_source": "confirm11_paired2_qwen_heavy_s1_job58625542_d21.json",
+  "ran": {
+    "input": "Aerial PdschTx-generated valid 273-PRB PUSCH slot",
+    "cells_per_release": 2,
+    "period_ms": 25,
+    "deadline_ms": 21,
+    "iterations_per_run": 1000,
+    "runs": 5,
+    "seed_base": 20270200
+  },
+  "ai": {
+    "model": "Qwen/Qwen2.5-1.5B",
+    "phase": "prefill",
+    "context_tokens": 512,
+    "batch": 8,
+    "dtype": "float16"
+  },
+  "configurations": [
+    {"active_thread_percentage": 100, "priority": 0, "role": "uncontrolled_reference"},
+    {"active_thread_percentage": 80, "priority": 0, "role": "selected_s1_candidate"}
+  ],
+  "primary_gate": {
+    "cap80_ran_deadline_misses": 0,
+    "cap80_incorrect_transport_blocks": 0,
+    "minimum_cap80_qwen_rate_fraction_of_cap100": 0.75
+  },
+  "interpretation_limit": "Passing establishes a workload-qualified statistical SLO for this exact model phase, batch, context, RAN load, and platform; it is not a hard MPS isolation proof."
+}

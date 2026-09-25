@@ -1,0 +1,25 @@
+{
+  "status": "frozen before s1b_nrx execution",
+  "frozen_utc": "2026-09-20",
+  "campaign": "s1b_nrx",
+  "purpose": "Close the throughput/safety boundary between the initial 40% and 100% MPS cap results",
+  "hardware": "one A100-SXM4-40GB, MIG disabled, one MPS server, same physical GPU",
+  "ran_mps": {"active_thread_percentage": 100, "client_priority": 0},
+  "ai_configurations": [
+    {"active_thread_percentage": 50, "client_priority": 0},
+    {"active_thread_percentage": 50, "client_priority": 1},
+    {"active_thread_percentage": 60, "client_priority": 0},
+    {"active_thread_percentage": 60, "client_priority": 1},
+    {"active_thread_percentage": 70, "client_priority": 0},
+    {"active_thread_percentage": 70, "client_priority": 1},
+    {"active_thread_percentage": 80, "client_priority": 0},
+    {"active_thread_percentage": 80, "client_priority": 1}
+  ],
+  "period_ms": 50,
+  "deadline_ms": 35,
+  "iterations_per_run": 500,
+  "runs_per_condition": 3,
+  "seed_base": 20264000,
+  "ai_workload": "Aerial NeuralRx TensorRT FP16 CUDA Graph, continuous overlap",
+  "selection_rule": "A candidate must have zero observed deadline misses and mean NeuralRx throughput above the previously measured S0 mean of 631.2/s; all configurations remain statistical evidence only."
+}

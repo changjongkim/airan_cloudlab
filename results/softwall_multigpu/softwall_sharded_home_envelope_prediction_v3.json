@@ -1,0 +1,1434 @@
+{
+  "schema": "softwall-deterministic-envelope-v2",
+  "checker_sha256": "2558b02db8d11145f37d9f3b1e2e37f7dcaf7bdb82999826c8e1bc382ad3c7a7",
+  "input": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_sharded_home_envelope_grid_v3.json",
+  "input_sha256": "2e96327dc84b3098462c3a7bccda8674abe2c41810607cafd6a9f2446df992e5",
+  "scope": "Synchronous P180/D155 cells distributed across disjoint RAN home GPUs; each home has two local NRx endpoints and one bounded Qwen worker. Only exact physically tested multi-home modes are qualified.",
+  "classification": {
+    "QSU": "qualified-safe-useful",
+    "QSN": "qualified-safe-no-slack",
+    "MI": "mandatory timing or per-home memory infeasible",
+    "UQ": "memory/timing arithmetic is feasible but multi-home timing/lifecycle bounds are not physically qualified"
+  },
+  "results": [
+    {
+      "id": "sharded_home_g1_c4",
+      "gpu_count": 1,
+      "cells": 4,
+      "status": "QSU",
+      "reason": "safe mode admits at least one bounded AI class",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 48.0,
+      "home_cell_counts": [
+        4
+      ],
+      "home_mandatory_demand_ms": [
+        48.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        105.0
+      ],
+      "base_all_fail_slack_ms": 105.0,
+      "home_max_released_recovery_slack_ms": [
+        36.0
+      ],
+      "max_released_recovery_slack_ms": 36.0,
+      "endpoint_admitted_cells": 4,
+      "endpoint_rejected_cells": 0,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": false,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 105.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 117.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 129.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C113 qualifies the single-home four-cell reference"
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c8",
+      "gpu_count": 1,
+      "cells": 8,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 96.0,
+      "home_cell_counts": [
+        8
+      ],
+      "home_mandatory_demand_ms": [
+        96.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        57.0
+      ],
+      "base_all_fail_slack_ms": 57.0,
+      "home_max_released_recovery_slack_ms": [
+        84.0
+      ],
+      "max_released_recovery_slack_ms": 84.0,
+      "endpoint_admitted_cells": 5,
+      "endpoint_rejected_cells": 3,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 57.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 69.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 81.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 93.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 105.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 117.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c12",
+      "gpu_count": 1,
+      "cells": 12,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 144.0,
+      "home_cell_counts": [
+        12
+      ],
+      "home_mandatory_demand_ms": [
+        144.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        9.0
+      ],
+      "base_all_fail_slack_ms": 9.0,
+      "home_max_released_recovery_slack_ms": [
+        132.0
+      ],
+      "max_released_recovery_slack_ms": 132.0,
+      "endpoint_admitted_cells": 5,
+      "endpoint_rejected_cells": 7,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 9.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 21.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 33.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 45.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 57.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 69.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 81.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 93.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 8,
+          "home": 0,
+          "home_local_cell": 8,
+          "cutoff_ms": 105.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 9,
+          "home": 0,
+          "home_local_cell": 9,
+          "cutoff_ms": 117.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 10,
+          "home": 0,
+          "home_local_cell": 10,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 11,
+          "home": 0,
+          "home_local_cell": 11,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c4",
+      "gpu_count": 2,
+      "cells": 4,
+      "status": "UQ",
+      "reason": "required timing/lifecycle bounds are not qualified",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 48.0,
+      "home_cell_counts": [
+        2,
+        2
+      ],
+      "home_mandatory_demand_ms": [
+        24.0,
+        24.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        129.0,
+        129.0
+      ],
+      "base_all_fail_slack_ms": 129.0,
+      "home_max_released_recovery_slack_ms": [
+        12.0,
+        12.0
+      ],
+      "max_released_recovery_slack_ms": 12.0,
+      "endpoint_admitted_cells": 4,
+      "endpoint_rejected_cells": 0,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 129.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 1,
+          "home_local_cell": 0,
+          "cutoff_ms": 129.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 1,
+          "home_local_cell": 1,
+          "cutoff_ms": 141.0,
+          "endpoint": "h1:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c8",
+      "gpu_count": 2,
+      "cells": 8,
+      "status": "QSU",
+      "reason": "safe mode admits at least one bounded AI class",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 96.0,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "home_mandatory_demand_ms": [
+        48.0,
+        48.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        105.0,
+        105.0
+      ],
+      "base_all_fail_slack_ms": 105.0,
+      "home_max_released_recovery_slack_ms": [
+        36.0,
+        36.0
+      ],
+      "max_released_recovery_slack_ms": 36.0,
+      "endpoint_admitted_cells": 8,
+      "endpoint_rejected_cells": 0,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": false,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 105.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 117.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 129.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 1,
+          "home_local_cell": 0,
+          "cutoff_ms": 105.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 1,
+          "home_local_cell": 1,
+          "cutoff_ms": 117.0,
+          "endpoint": "h1:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 6,
+          "home": 1,
+          "home_local_cell": 2,
+          "cutoff_ms": 129.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 7,
+          "home": 1,
+          "home_local_cell": 3,
+          "cutoff_ms": 141.0,
+          "endpoint": "h1:e1",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C121: two independent 2-home x 4-cell arms, 5,440 total TB, synchronized release delta 0 ns, safety violations 0"
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c12",
+      "gpu_count": 2,
+      "cells": 12,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 144.0,
+      "home_cell_counts": [
+        6,
+        6
+      ],
+      "home_mandatory_demand_ms": [
+        72.0,
+        72.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        81.0,
+        81.0
+      ],
+      "base_all_fail_slack_ms": 81.0,
+      "home_max_released_recovery_slack_ms": [
+        60.0,
+        60.0
+      ],
+      "max_released_recovery_slack_ms": 60.0,
+      "endpoint_admitted_cells": 10,
+      "endpoint_rejected_cells": 2,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 81.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 93.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 105.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 117.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        },
+        {
+          "cell": 6,
+          "home": 1,
+          "home_local_cell": 0,
+          "cutoff_ms": 81.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 7,
+          "home": 1,
+          "home_local_cell": 1,
+          "cutoff_ms": 93.0,
+          "endpoint": "h1:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 8,
+          "home": 1,
+          "home_local_cell": 2,
+          "cutoff_ms": 105.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 9,
+          "home": 1,
+          "home_local_cell": 3,
+          "cutoff_ms": 117.0,
+          "endpoint": "h1:e1",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 10,
+          "home": 1,
+          "home_local_cell": 4,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 11,
+          "home": 1,
+          "home_local_cell": 5,
+          "cutoff_ms": 141.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c4",
+      "gpu_count": 4,
+      "cells": 4,
+      "status": "UQ",
+      "reason": "required timing/lifecycle bounds are not qualified",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 48.0,
+      "home_cell_counts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "home_mandatory_demand_ms": [
+        12.0,
+        12.0,
+        12.0,
+        12.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        141.0,
+        141.0,
+        141.0,
+        141.0
+      ],
+      "base_all_fail_slack_ms": 141.0,
+      "home_max_released_recovery_slack_ms": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_released_recovery_slack_ms": 0.0,
+      "endpoint_admitted_cells": 4,
+      "endpoint_rejected_cells": 0,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 1,
+          "home_local_cell": 0,
+          "cutoff_ms": 141.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 2,
+          "home_local_cell": 0,
+          "cutoff_ms": 141.0,
+          "endpoint": "h2:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 3,
+          "home_local_cell": 0,
+          "cutoff_ms": 141.0,
+          "endpoint": "h3:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c8",
+      "gpu_count": 4,
+      "cells": 8,
+      "status": "UQ",
+      "reason": "required timing/lifecycle bounds are not qualified",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 96.0,
+      "home_cell_counts": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "home_mandatory_demand_ms": [
+        24.0,
+        24.0,
+        24.0,
+        24.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        129.0,
+        129.0,
+        129.0,
+        129.0
+      ],
+      "base_all_fail_slack_ms": 129.0,
+      "home_max_released_recovery_slack_ms": [
+        12.0,
+        12.0,
+        12.0,
+        12.0
+      ],
+      "max_released_recovery_slack_ms": 12.0,
+      "endpoint_admitted_cells": 8,
+      "endpoint_rejected_cells": 0,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 129.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 1,
+          "home_local_cell": 0,
+          "cutoff_ms": 129.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 1,
+          "home_local_cell": 1,
+          "cutoff_ms": 141.0,
+          "endpoint": "h1:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 2,
+          "home_local_cell": 0,
+          "cutoff_ms": 129.0,
+          "endpoint": "h2:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 2,
+          "home_local_cell": 1,
+          "cutoff_ms": 141.0,
+          "endpoint": "h2:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 6,
+          "home": 3,
+          "home_local_cell": 0,
+          "cutoff_ms": 129.0,
+          "endpoint": "h3:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 7,
+          "home": 3,
+          "home_local_cell": 1,
+          "cutoff_ms": 141.0,
+          "endpoint": "h3:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c12",
+      "gpu_count": 4,
+      "cells": 12,
+      "status": "QSU",
+      "reason": "safe mode admits at least one bounded AI class",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 144.0,
+      "home_cell_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "home_mandatory_demand_ms": [
+        36.0,
+        36.0,
+        36.0,
+        36.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        117.0,
+        117.0,
+        117.0,
+        117.0
+      ],
+      "base_all_fail_slack_ms": 117.0,
+      "home_max_released_recovery_slack_ms": [
+        24.0,
+        24.0,
+        24.0,
+        24.0
+      ],
+      "max_released_recovery_slack_ms": 24.0,
+      "endpoint_admitted_cells": 12,
+      "endpoint_rejected_cells": 0,
+      "endpoint_scope": "disjoint-per-home",
+      "endpoint_schedule_is_timing_only_counterfactual": false,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 117.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 129.0,
+          "endpoint": "h0:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 141.0,
+          "endpoint": "h0:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 1,
+          "home_local_cell": 0,
+          "cutoff_ms": 117.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 1,
+          "home_local_cell": 1,
+          "cutoff_ms": 129.0,
+          "endpoint": "h1:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 1,
+          "home_local_cell": 2,
+          "cutoff_ms": 141.0,
+          "endpoint": "h1:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 6,
+          "home": 2,
+          "home_local_cell": 0,
+          "cutoff_ms": 117.0,
+          "endpoint": "h2:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 7,
+          "home": 2,
+          "home_local_cell": 1,
+          "cutoff_ms": 129.0,
+          "endpoint": "h2:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 8,
+          "home": 2,
+          "home_local_cell": 2,
+          "cutoff_ms": 141.0,
+          "endpoint": "h2:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 9,
+          "home": 3,
+          "home_local_cell": 0,
+          "cutoff_ms": 117.0,
+          "endpoint": "h3:e0",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 10,
+          "home": 3,
+          "home_local_cell": 1,
+          "cutoff_ms": 129.0,
+          "endpoint": "h3:e1",
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 11,
+          "home": 3,
+          "home_local_cell": 2,
+          "cutoff_ms": 141.0,
+          "endpoint": "h3:e0",
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C122: two independent 4-home x 3-cell arms, 8,160 total TB, synchronized release delta 0 ns, safety violations 0"
+      ]
+    }
+  ],
+  "counts": {
+    "QSU": 3,
+    "QSN": 0,
+    "MI": 3,
+    "UQ": 3
+  }
+}

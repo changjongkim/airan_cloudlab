@@ -1,0 +1,11 @@
+{
+  "schema": "softwall-protocol-amendment-v1",
+  "campaign": "sionna_cdl_public_notebook_reproduction",
+  "amendment": 1,
+  "frozen_before_execution": true,
+  "prior_outcome": "ENVIRONMENT_PROBE_ONLY_ZERO_CHANNEL_SAMPLES",
+  "finding": "Project-local TensorFlow 2.19.0 and Sionna 1.0.2 import, but TensorFlow cannot register a GPU against the Aerial container CUDA library set.",
+  "change": "Run only Sionna channel generation on CPU and copy its complex64 output to the existing GPU cuPHY/NeuralRx pipeline. Channel parameters, tensor transformations, seeds, count, engine, and decision rule are unchanged.",
+  "claim_boundary": "This is a compatibility diagnosis, not a timing result; CPU transport time is not measured or reported as service time.",
+  "corrected_source_sha256": "cd619362474010d62c00929272ea7eb3450af3adc40a07dc061aeb9c48525f08"
+}

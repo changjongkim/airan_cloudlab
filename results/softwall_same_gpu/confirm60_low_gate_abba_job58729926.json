@@ -1,0 +1,107 @@
+{
+  "schema": "softwall-confirm60-low-gate-abba-v1",
+  "job": "58729926",
+  "execution_order": [
+    "pair1_always",
+    "pair1_low_threshold",
+    "pair2_low_threshold",
+    "pair2_always"
+  ],
+  "comparisons": [
+    {
+      "pair": 1,
+      "always_correct": 978,
+      "gate_correct": 978,
+      "radio_difference_pp": 0.0,
+      "paired_release_bootstrap_95_ci_pp": [
+        0.0,
+        0.0
+      ],
+      "always_ai_units": 29059,
+      "gate_ai_units": 29333,
+      "ai_gain_percent": 0.9429092535875289,
+      "gate_skips": 887,
+      "feature_host_ms": {
+        "n": 2000,
+        "mean": 1.0281454405,
+        "p50": 0.9079155,
+        "p95": 1.4389410999999999,
+        "p99": 1.58830899,
+        "p99_9": 2.23309448700015,
+        "min": 0.790433,
+        "max": 3.270633
+      },
+      "feature_gpu_ms": {
+        "n": 2000,
+        "mean": 0.9343297119736671,
+        "p50": 0.8175040185451508,
+        "p95": 1.3066143751144408,
+        "p99": 1.47054949760437,
+        "p99_9": 2.0912225394250377,
+        "min": 0.7169920206069946,
+        "max": 3.117216110229492
+      }
+    },
+    {
+      "pair": 2,
+      "always_correct": 942,
+      "gate_correct": 942,
+      "radio_difference_pp": 0.0,
+      "paired_release_bootstrap_95_ci_pp": [
+        0.0,
+        0.0
+      ],
+      "always_ai_units": 28823,
+      "gate_ai_units": 29364,
+      "ai_gain_percent": 1.8769732505290913,
+      "gate_skips": 919,
+      "feature_host_ms": {
+        "n": 2000,
+        "mean": 1.0397460595,
+        "p50": 0.9207555000000001,
+        "p95": 1.454179,
+        "p99": 1.68278246,
+        "p99_9": 2.476119524000071,
+        "min": 0.790914,
+        "max": 2.990129
+      },
+      "feature_gpu_ms": {
+        "n": 2000,
+        "mean": 0.9442531845569611,
+        "p50": 0.819920003414154,
+        "p95": 1.3277856051921844,
+        "p99": 1.5493888103961944,
+        "p99_9": 2.3299910638333032,
+        "min": 0.7161279916763306,
+        "max": 2.8326399326324463
+      }
+    }
+  ],
+  "gates": {
+    "source_hashes": true,
+    "pair1_always_contract": true,
+    "pair1_always_same_node_job": true,
+    "pair1_always_features_online": true,
+    "pair1_always_safe_terminal": true,
+    "pair1_low_threshold_contract": true,
+    "pair1_low_threshold_same_node_job": true,
+    "pair1_low_threshold_features_online": true,
+    "pair1_low_threshold_safe_terminal": true,
+    "pair2_always_contract": true,
+    "pair2_always_same_node_job": true,
+    "pair2_always_features_online": true,
+    "pair2_always_safe_terminal": true,
+    "pair2_low_threshold_contract": true,
+    "pair2_low_threshold_same_node_job": true,
+    "pair2_low_threshold_features_online": true,
+    "pair2_low_threshold_safe_terminal": true,
+    "pair1_same_trace": true,
+    "pair1_radio_noninferiority": true,
+    "pair1_ai_gain": true,
+    "pair2_same_trace": true,
+    "pair2_radio_noninferiority": true,
+    "pair2_ai_gain": true
+  },
+  "all_pass": true,
+  "interpretation": "Low-feature failure-aware gate with pinned endpoints and AI after radio; not the full strong combined baseline or joint policy. P150/D130 is synthetic."
+}

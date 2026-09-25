@@ -1,0 +1,35 @@
+{
+  "artifacts": {
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt3_job58854900_peer_spec.json": "6c3fe034576a6e517f1ba6a45ae0f0f49981688d8a99defdb21ceecc8db51440",
+    "results/softwall_multigpu/confirm157a_actual_nrx_attempt3_job58854900_protocol.json": "9ccba0c1a51c4d8975062e188a1434e6ff03a8c15dcc3fa1fed4ea5384264fb9",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt3_job58854900_coordinator.json": "d5a1ceb4021f4a486394b31d80b752476d4bb99ccd576b8ab285b7b005a12936",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt3_job58854900_home0_h0-r0_owner.json": "d463143fc5d232888bde1dd2edd66a6c7d2b8231a38b0e2459d3085de39c1556",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt3_job58854900_home0_h0-r1_owner.json": "ac3e51c1d29dbf7d4ac1f7de19a53452f433e097be9b972a5280527dfd14abf7",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt3_job58854900_home0_h0-r2_owner.json": "762f723a559724219be177f2164ea365d2c90ba5a5ffdafb17346d3a24492869",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt3_job58854900_home1_h1-r0_owner.json": "f828000a0d4c18ae0e7263a4f407a235e2b2ac9f08dd137ce68d63432c7cd7ff",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt3_job58854900_nrx_worker.json": "e5ece145c51c8eb331d35682250448076e2022b22eeb9d5a3528c91f2b895fdf",
+    "results/softwall_multigpu/raw/confirm157a_actual_nrx_attempt3_job58854900_qwen.json": "fe7a4f532f1eea968dfd1be3da0a825eab82eed0f3a79efcf3d5b33ac01d6567"
+  },
+  "attempt": 3,
+  "correction": "Qualify an explicitly warm periodic lifecycle by exercising every peer forward/P2P/TensorRT/backward path 100 ms before the common release. Cold or long-idle lifecycle remains outside this mode.",
+  "job": "58854900",
+  "node": "nid001109",
+  "observations": {
+    "deadline_misses": 0,
+    "gpu_inference_ms_max": 1.297536015510559,
+    "lease_accepted": false,
+    "missing_outcomes_at_cutoff": 4,
+    "nrx_worker_paths_ms": [
+      52.057372,
+      1.52337,
+      1.499143,
+      1.565411
+    ],
+    "recoveries": 4,
+    "recovery_semantic_equivalence": 4
+  },
+  "reason": "An IPC/P2P prewarm performed before readiness did not survive the 3 s experimental release lead. The first actual peer path had a 52.057 ms host tail while the next three were 1.499--1.565 ms, so all outcomes arrived after the frozen 45 ms cutoff.",
+  "schema": "softwall-confirm157a-attempt-failure-v1",
+  "scientific_outcome_opened": false,
+  "status": "WARM_LIFECYCLE_GATE_FAIL"
+}

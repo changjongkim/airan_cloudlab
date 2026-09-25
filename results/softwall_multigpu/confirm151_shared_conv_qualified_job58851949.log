@@ -1,0 +1,54 @@
+03:55:02.702836 cuphy.hpp:122    CON[1415829] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x557a46a8b780).
+03:55:02.702918 cuphy.hpp:122    CON[1415828] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55e1a0e0e6e0).
+03:55:06.670105 cuphy.hpp:122    CON[1416513] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55e0077236a0).
+03:55:07.378404 cuphy.hpp:122    CON[1416513] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55e009df2fb0).
+{
+  "gates": {
+    "configuration_match": true,
+    "global_order_exact": true,
+    "ipc_lifecycle": true,
+    "owner_counts": true,
+    "owner_integrity": true,
+    "peer_access": true,
+    "shared_worker_count": true,
+    "source_hash": true,
+    "three_a100_mig_off": true
+  },
+  "status": "PHYSICAL_PATH_PASS_V17_REMAINS_UQ",
+  "summary": {
+    "backward_gpu_us": {
+      "count": 500,
+      "max": 33.215999603271484,
+      "mean": 14.723455984145403,
+      "p50": 14.14399966597557,
+      "p99": 23.264000192284584
+    },
+    "conventional_gpu_ms": {
+      "count": 500,
+      "max": 6.612671852111816,
+      "mean": 2.385647678375244,
+      "p50": 2.3535358905792236,
+      "p99": 2.5611519813537598
+    },
+    "forward_gpu_us": {
+      "count": 500,
+      "max": 65.05600363016129,
+      "mean": 32.51193605363369,
+      "p50": 42.01599955558777,
+      "p99": 53.69599908590317
+    },
+    "home_units": [
+      250,
+      250
+    ],
+    "worker_path_ms": {
+      "count": 500,
+      "max": 11.870798,
+      "mean": 2.7271500459999998,
+      "p50": 2.68062,
+      "p99": 3.14624
+    },
+    "worker_units": 500
+  }
+}
+shared conventional canary complete: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm151_shared_conv_qualified_job58851949_result.json

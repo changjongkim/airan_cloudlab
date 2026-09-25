@@ -1,0 +1,151 @@
+{
+  "schema": "softwall-confirm113-feasibility-envelope-posthoc-v1",
+  "status": "posthoc explanation; not a new confirmatory performance result",
+  "certificate_geometry": {
+    "cells": 4,
+    "recovery_credit_ms": 12,
+    "maximum_incremental_slack_from_tail_compaction_ms": 36,
+    "derivation": "(cells - 1) * recovery_credit_ms",
+    "exclusive_admission_condition": "For decision-time base slack W, a unit is enabled only by compaction when W < B_AI <= W + Delta_recovery. B_AI <= Delta_recovery is a necessary zero-base-slack special case, not a sufficient dynamic condition."
+  },
+  "primary_trace": {
+    "requests": 1136,
+    "bucket_counts": {
+      "16": 1,
+      "128": 1,
+      "256": 710,
+      "512": 424
+    },
+    "bound_ms": {
+      "16": 35,
+      "32": 35,
+      "64": 35,
+      "128": 40,
+      "256": 65,
+      "512": 75
+    },
+    "units_no_larger_than_max_incremental_slack": 1,
+    "eligible_fraction": 0.0008802816901408451,
+    "coarse_256_or_512_units": 1134,
+    "coarse_fraction": 0.9982394366197183,
+    "synthetic_slo_ms": 1000,
+    "radio_period_ms": 180
+  },
+  "confirm113_observation": {
+    "gates": {
+      "provenance": true,
+      "safety": true,
+      "radio_structural_parity": true,
+      "outcome": false,
+      "all_pass": false
+    },
+    "paired_comparisons": [
+      {
+        "name": "seed1_ABBA",
+        "softwall_arms": [
+          "sw_s1_a",
+          "sw_s1_b"
+        ],
+        "work_conserving_arms": [
+          "wc_s1_a",
+          "wc_s1_b"
+        ],
+        "softwall_mean_timely_value": 225146.5,
+        "work_conserving_mean_timely_value": 224891.5,
+        "delta_tokens": 255.0,
+        "effect_pct": 0.1133880115522374,
+        "paired_source_second_bootstrap_95_ci": [
+          -121.5,
+          710.0
+        ],
+        "effect_at_least_2pct": false,
+        "bootstrap_lower_positive": false
+      },
+      {
+        "name": "seed2_BAAB",
+        "softwall_arms": [
+          "sw_s2_a",
+          "sw_s2_b"
+        ],
+        "work_conserving_arms": [
+          "wc_s2_a",
+          "wc_s2_b"
+        ],
+        "softwall_mean_timely_value": 224830.0,
+        "work_conserving_mean_timely_value": 224608.0,
+        "delta_tokens": 222.0,
+        "effect_pct": 0.09883886593531842,
+        "paired_source_second_bootstrap_95_ci": [
+          -457.5,
+          948.5
+        ],
+        "effect_at_least_2pct": false,
+        "bootstrap_lower_positive": false
+      }
+    ],
+    "softwall_exchange_counts": {
+      "sw_s1_a": 81,
+      "sw_s1_b": 81,
+      "sw_s2_a": 88,
+      "sw_s2_b": 88
+    }
+  },
+  "small_unit_sensitivity": {
+    "mode": "Qwen2.5-0.5B, uniform within-second arrivals, 200 ms SLO, 35 ms bound",
+    "softwall": {
+      "offered_requests": 218,
+      "offered_value_tokens": 56703,
+      "timely_requests": 216,
+      "timely_value_tokens": 56214,
+      "late_requests": 0,
+      "expired_requests": 0,
+      "unfinished_requests": 2,
+      "not_arrived_requests": 918,
+      "ready_requests": 2
+    },
+    "work_conserving": {
+      "offered_requests": 218,
+      "offered_value_tokens": 56703,
+      "timely_requests": 216,
+      "timely_value_tokens": 56214,
+      "late_requests": 0,
+      "expired_requests": 0,
+      "unfinished_requests": 2,
+      "not_arrived_requests": 918,
+      "ready_requests": 2
+    },
+    "same_timely_value": true,
+    "interpretation": "The smaller qualified unit fits the recovery increment, but both systems completed 216 of 218 offered requests; demand pressure was absent."
+  },
+  "pressure_sensitivity": {
+    "mode": "Qwen2.5-0.5B, uniform 3x arrivals, 200 ms SLO, candidate 30 ms bound",
+    "qualified": false,
+    "failure": {
+      "type": "RuntimeError",
+      "message": "trace AI exceeded its certified execution window",
+      "phase": "release-setup",
+      "release_index": 0,
+      "detected_ns": 127437027848095
+    },
+    "violating_record": {
+      "request_id": "burstgpt-839354",
+      "source_order": 0,
+      "context_length": 512,
+      "value_tokens": 512,
+      "arrival_ns": 127436977402117,
+      "deadline_ns": 127437177402117,
+      "admitted_ns": 127436984173834,
+      "returned_ns": 127437027801835,
+      "gpu_ms": 42.4139518737793,
+      "execution_ms": 43.628001,
+      "bound_ms": 30.0,
+      "bound_violation": true,
+      "timely": true,
+      "phase": "after_nrx_before_recovery",
+      "horizon_ns": 127437065735450,
+      "horizon_guard_violation": false
+    },
+    "interpretation": "Demand pressure existed, but a 43.628 ms host execution violated the candidate 30 ms contract. This point is unqualified and cannot support a throughput claim."
+  },
+  "conclusion": "The measured no-benefit region follows from the conjunction of coarse qualified AI units, loose AI deadlines, and insufficient demand in the smaller-unit mode. SoftWall's atomic exchange is exercised and safe, but a useful performance region requires a qualified unit that fits reclaimed recovery slack while demand and SLO make earlier completion valuable."
+}

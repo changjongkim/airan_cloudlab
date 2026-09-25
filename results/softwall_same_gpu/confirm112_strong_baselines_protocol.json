@@ -1,0 +1,90 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm112_trace_driven_strong_baselines",
+  "frozen_before_execution": true,
+  "date_utc": "2026-09-24",
+  "job": "58815435",
+  "node": "nid001016",
+  "claim_axis": "certified conditional-recovery substrate and feasibility envelope",
+  "iterations": 340,
+  "cells": 4,
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 12,
+  "commit_guard_ms": 2,
+  "fault_pattern": "mixed every five releases",
+  "mps": {
+    "mig": "off",
+    "nrx_endpoint_caps_pct": [40, 40],
+    "ai_cap_pct": 20
+  },
+  "ai": {
+    "model": "Qwen/Qwen2.5-1.5B",
+    "phase": "full-transformer prefill with final-token LM head",
+    "context_buckets": [16, 32, 64, 128, 256, 512],
+    "bound_ms": {
+      "16": 35,
+      "32": 35,
+      "64": 35,
+      "128": 40,
+      "256": 65,
+      "512": 75
+    }
+  },
+  "trace": {
+    "path": "data/public/burstgpt/softwall_burst60_prefill_trace.json",
+    "sha256": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d",
+    "arrival_mode": "preserved integer-second BurstGPT timestamps",
+    "synthetic_slo_ms": 1000,
+    "requests": 1136,
+    "offered_value_tokens": 288591
+  },
+  "systems": {
+    "static": "fixed all-fail recovery block; AI only outside the fixed block",
+    "work_conserving": "same certificate and early recovery; AI may use an existing gap but recovery credits are not jointly retimed",
+    "softwall": "remaining credits are tail-compacted and committed atomically with the AI lease"
+  },
+  "arms": [
+    {"name": "static_s1", "system": "static", "payload_seed": 20800051, "channel_seed_base": 20801000, "prefix": "c112_static_s1_j58815435"},
+    {"name": "wc_s1_a", "system": "work_conserving", "payload_seed": 20800051, "channel_seed_base": 20801000, "prefix": "c112_wc_s1a_j58815435"},
+    {"name": "sw_s1_a", "system": "softwall", "payload_seed": 20800051, "channel_seed_base": 20801000, "prefix": "c112_sw_s1a_j58815435"},
+    {"name": "sw_s1_b", "system": "softwall", "payload_seed": 20800051, "channel_seed_base": 20801000, "prefix": "c112_sw_s1b_j58815435"},
+    {"name": "wc_s1_b", "system": "work_conserving", "payload_seed": 20800051, "channel_seed_base": 20801000, "prefix": "c112_wc_s1b_j58815435"},
+    {"name": "static_s2", "system": "static", "payload_seed": 20900132, "channel_seed_base": 21520000, "prefix": "c112_static_s2_j58815435"},
+    {"name": "sw_s2_a", "system": "softwall", "payload_seed": 20900132, "channel_seed_base": 21520000, "prefix": "c112_sw_s2a_j58815435"},
+    {"name": "wc_s2_a", "system": "work_conserving", "payload_seed": 20900132, "channel_seed_base": 21520000, "prefix": "c112_wc_s2a_j58815435"},
+    {"name": "wc_s2_b", "system": "work_conserving", "payload_seed": 20900132, "channel_seed_base": 21520000, "prefix": "c112_wc_s2b_j58815435"},
+    {"name": "sw_s2_b", "system": "softwall", "payload_seed": 20900132, "channel_seed_base": 21520000, "prefix": "c112_sw_s2b_j58815435"}
+  ],
+  "radio_parity_groups": {
+    "seed1": ["static_s1", "wc_s1_a", "sw_s1_a", "sw_s1_b", "wc_s1_b"],
+    "seed2": ["static_s2", "sw_s2_a", "wc_s2_a", "wc_s2_b", "sw_s2_b"]
+  },
+  "paired_comparisons": [
+    {"name": "seed1_ABBA", "softwall": ["sw_s1_a", "sw_s1_b"], "work_conserving": ["wc_s1_a", "wc_s1_b"]},
+    {"name": "seed2_BAAB", "softwall": ["sw_s2_a", "sw_s2_b"], "work_conserving": ["wc_s2_a", "wc_s2_b"]}
+  ],
+  "gates": {
+    "per_arm": "exact source/trace mode, 340 releases, zero deadline/bound/guard/credit/fault violations, no final outstanding credit or lease",
+    "radio": "gate/admission/forced-failure/commit-kind signature identical across systems for each PHY seed",
+    "performance": "in both independent seed groups, SoftWall timely token value is at least 2% above safe work-conserving and the paired source-second bootstrap 95% CI lower bound is positive",
+    "decision": "If the performance gate fails, stop the throughput-superiority claim and retain the passing substrate plus measured safe/useful/no-benefit envelope."
+  },
+  "development_disclosure": "C107--C111 were unsealed canaries. They exposed a resident-memory artifact, a missing multi-credit tail compaction path, co-run AI bound failures, and no robust SoftWall advantage over safe work-conserving across 125/200/1000 ms and unit-size/load sensitivities. None is promoted to confirmatory evidence.",
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": "65f89869b53c0c188e77e367051ba665517a8514b5e888e6f11619f877f224f0",
+    "scripts_for_node/softwall_same_gpu/run_trace_baseline_arm.sh": "6f1f94e328ebee18faf62f2c45237ae143268dc0dfe7e5577494bea06635c644",
+    "scripts_for_node/softwall_same_gpu/run_confirm112_strong_baselines.sh": "96b1fbe281cde8c89ecfef936ae7e63712a683a560eeadc5a7114d82d54b2734",
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "scripts_for_node/softwall_same_gpu/trace_background_client.py": "f6fc4de63df7b31cb907b63b6971048ee3706ef18595df0b3ecd5834a91e1d8c",
+    "scripts_for_node/softwall_same_gpu/analyze_confirm112_strong_baselines.py": "0fe4b914882d962ee77b346c836513a18476699790bb0fedfb753d559ad3aa68",
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "scripts_for_node/softwall_same_gpu/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+    "scripts_for_node/softwall_same_gpu/common.sh": "cad7418e26cc3afbf97fad16dd498da054e94bfce0c27daa9e81e50d11ab9adc",
+    "scripts_for_node/softwall_same_gpu/mps_runtime.sh": "81a2818c8b6af35e65738b46f8f13ae14745068db3a158826b655c166eeb4980",
+    "data/public/burstgpt/softwall_burst60_prefill_trace.json": "da760e696d78ec4d71c3d595770b74fa1fab54eb18ba0d9ab50d56388f7bb18d"
+  }
+}

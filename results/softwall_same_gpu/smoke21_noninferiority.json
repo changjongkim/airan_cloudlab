@@ -1,0 +1,55 @@
+{
+  "schema": "softwall-s2-noninferiority-v1",
+  "campaign": "smoke21_noninferiority",
+  "paired_releases": 100,
+  "margin_percentage_points": 0.25,
+  "s2_minus_eager_percentage_points": 0.0,
+  "confidence_interval_95_percentage_points": [
+    0.0,
+    0.0
+  ],
+  "s2_wins": 0,
+  "eager_wins": 0,
+  "s2_win_indices": [],
+  "eager_win_indices": [],
+  "mean_background_per_s": {
+    "s2": 699.4444444444445,
+    "eager": 667.5555555555555,
+    "relative_gain_percent": 4.776964047936083
+  },
+  "gates": {
+    "utility_noninferior": true,
+    "deadline_misses_zero": true,
+    "duplicate_commits_zero": true,
+    "admission_rejections_zero": true,
+    "bound_violations_zero": true,
+    "ai_violations_zero": true,
+    "channel_seeds_match": true,
+    "background_throughput_gain": true,
+    "all_pass": true
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "iterations": 100,
+      "eager_correct": 100,
+      "s2_correct": 100,
+      "difference_pp": 0.0,
+      "s2_wins": 0,
+      "eager_wins": 0,
+      "channel_seed_mismatches": 0,
+      "nrx_decision_mismatches": 0,
+      "s2_deadline_misses": 0,
+      "s2_duplicate_commits": 0,
+      "s2_admission_rejections": 0,
+      "s2_bound_violations": 0,
+      "s2_ai_violations": 0,
+      "eager_background_per_s": 667.5555555555555,
+      "s2_background_per_s": 699.4444444444445,
+      "sources": {
+        "eager_dual": "smoke21_noninferiority_r1_eager_dual_job58660634_ran.json",
+        "s2_reserved": "smoke21_noninferiority_r1_s2_reserved_job58660634_ran.json"
+      }
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "schema": "softwall-conditional-phy-value-exploratory-v1",
+  "train": "results/softwall_same_gpu/raw/confirm57_feature_job58729926_seed20456001_pre_fading.json",
+  "test": "results/softwall_same_gpu/raw/confirm57_feature_job58729926_seed20457001_pre_fading.json",
+  "feature": "channel_estimate_power",
+  "target": "NeuralRx correct AND conventional incorrect",
+  "bin_edges_train_only": [
+    1.816192626953125,
+    1.9430251121520996,
+    2.0467076301574707,
+    2.2021255493164062
+  ],
+  "train_bins": [
+    {
+      "bin": 0,
+      "feature_lower_inclusive": null,
+      "feature_upper_exclusive": 1.816192626953125,
+      "n": 100,
+      "neural_only": 0,
+      "conventional_only": 0,
+      "both": 0,
+      "neither": 100,
+      "incremental_neural_success_rate": 0.0,
+      "incremental_neural_success_wilson_95": [
+        3.469446951953614e-18,
+        0.03699349820698568
+      ]
+    },
+    {
+      "bin": 1,
+      "feature_lower_inclusive": 1.816192626953125,
+      "feature_upper_exclusive": 1.9430251121520996,
+      "n": 100,
+      "neural_only": 0,
+      "conventional_only": 0,
+      "both": 0,
+      "neither": 100,
+      "incremental_neural_success_rate": 0.0,
+      "incremental_neural_success_wilson_95": [
+        3.469446951953614e-18,
+        0.03699349820698568
+      ]
+    },
+    {
+      "bin": 2,
+      "feature_lower_inclusive": 1.9430251121520996,
+      "feature_upper_exclusive": 2.0467076301574707,
+      "n": 100,
+      "neural_only": 33,
+      "conventional_only": 2,
+      "both": 23,
+      "neither": 42,
+      "incremental_neural_success_rate": 0.33,
+      "incremental_neural_success_wilson_95": [
+        0.24563122734128034,
+        0.4269465620490947
+      ]
+    },
+    {
+      "bin": 3,
+      "feature_lower_inclusive": 2.0467076301574707,
+      "feature_upper_exclusive": 2.2021255493164062,
+      "n": 100,
+      "neural_only": 0,
+      "conventional_only": 0,
+      "both": 100,
+      "neither": 0,
+      "incremental_neural_success_rate": 0.0,
+      "incremental_neural_success_wilson_95": [
+        3.469446951953614e-18,
+        0.03699349820698568
+      ]
+    },
+    {
+      "bin": 4,
+      "feature_lower_inclusive": 2.2021255493164062,
+      "feature_upper_exclusive": null,
+      "n": 100,
+      "neural_only": 0,
+      "conventional_only": 0,
+      "both": 100,
+      "neither": 0,
+      "incremental_neural_success_rate": 0.0,
+      "incremental_neural_success_wilson_95": [
+        3.469446951953614e-18,
+        0.03699349820698568
+      ]
+    }
+  ],
+  "test_bins": [
+    {
+      "bin": 0,
+      "feature_lower_inclusive": null,
+      "feature_upper_exclusive": 1.816192626953125,
+      "n": 112,
+      "neural_only": 0,
+      "conventional_only": 0,
+      "both": 0,
+      "neither": 112,
+      "incremental_neural_success_rate": 0.0,
+      "incremental_neural_success_wilson_95": [
+        3.469446951953614e-18,
+        0.033161347066943875
+      ]
+    },
+    {
+      "bin": 1,
+      "feature_lower_inclusive": 1.816192626953125,
+      "feature_upper_exclusive": 1.9430251121520996,
+      "n": 105,
+      "neural_only": 0,
+      "conventional_only": 0,
+      "both": 0,
+      "neither": 105,
+      "incremental_neural_success_rate": 0.0,
+      "incremental_neural_success_wilson_95": [
+        -3.469446951953614e-18,
+        0.035294076929109894
+      ]
+    },
+    {
+      "bin": 2,
+      "feature_lower_inclusive": 1.9430251121520996,
+      "feature_upper_exclusive": 2.0467076301574707,
+      "n": 82,
+      "neural_only": 29,
+      "conventional_only": 0,
+      "both": 18,
+      "neither": 35,
+      "incremental_neural_success_rate": 0.35365853658536583,
+      "incremental_neural_success_wilson_95": [
+        0.25885568331347614,
+        0.4615591333763093
+      ]
+    },
+    {
+      "bin": 3,
+      "feature_lower_inclusive": 2.0467076301574707,
+      "feature_upper_exclusive": 2.2021255493164062,
+      "n": 90,
+      "neural_only": 1,
+      "conventional_only": 0,
+      "both": 89,
+      "neither": 0,
+      "incremental_neural_success_rate": 0.011111111111111112,
+      "incremental_neural_success_wilson_95": [
+        0.0019640841009183445,
+        0.06028408311753451
+      ]
+    },
+    {
+      "bin": 4,
+      "feature_lower_inclusive": 2.2021255493164062,
+      "feature_upper_exclusive": null,
+      "n": 111,
+      "neural_only": 0,
+      "conventional_only": 0,
+      "both": 111,
+      "neither": 0,
+      "incremental_neural_success_rate": 0.0,
+      "incremental_neural_success_wilson_95": [
+        3.469446951953614e-18,
+        0.03345010469339235
+      ]
+    }
+  ],
+  "limits": "Exploratory synthetic fixed-noise Rayleigh analysis; bin edges fixed from train. Sparse incremental successes and no online calibration, production-channel or deadline claim."
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "softwall-c163-diagnostic-protocol-v3",
+  "frozen_before_execution": true,
+  "purpose": "Remove the GPU1 host-mediated channel-estimator-to-TensorRT stream transition after GC OFF did not reduce the raw-P2P tail.",
+  "prior_results": [
+    "Raw-P2P v1 completed 852/1000 within 4.5 ms; GPU1 NeuralRx p99 was 9.61 ms.",
+    "GC-OFF v2 completed 838/1000 within 4.5 ms; GPU1 NeuralRx p99 remained 9.42 ms."
+  ],
+  "intervention": "Retain raw-P2P and GC OFF, but run channel estimation, TensorRT, LDPC, and CRC through the same pyAerial CUDA stream rather than the DirectNrx cross-stream host-synchronized path.",
+  "claim_boundary": "This two-GPU clean isolated test is neither a production d_MAC qualification nor a WCET bound. It omits MPS, external AI, a real DU clock, and real channels.",
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "iterations": 1000,
+  "seed": 20358300,
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "decision_rule": "Report pair-completion counts at 4.5 ms; do not promote sample statistics to a bound. End the production diagnostic after this intervention.",
+  "source_sha256_before_execution": {
+    "c163_raw_p2p_nrx_worker_v3.py": "fed8dcaca555a90d99a20cc33d81346174cd7f978978be67cc8686f7cbd88f88",
+    "c163_raw_p2p_controller_v3.py": "5b9d5ddb77931ad8fb99d639c0f77256ab00ce30dc563b3a9b4aa9cb31d26c56",
+    "run_c163_raw_p2p_v3.sh": "91a429347fe19a2e1159c1ae3d3ff5068307642615569c09db7e4f75f1d54f58",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

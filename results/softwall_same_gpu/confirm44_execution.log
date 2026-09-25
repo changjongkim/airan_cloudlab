@@ -1,0 +1,48 @@
+salloc: Granted job allocation 58685929
+salloc: Waiting for resource configuration
+salloc: Nodes nid001001 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=12.173ms max=15.173ms miss=0 correct=67 nrx=0 conv=200 bg=0 duplicate=0
+08:42:11.223984 cuphy.hpp:122    CON[1777477] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56415830b050).
+confirm44 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58685929/bg_sr_58685929_1777725.sock
+[SAME-REQUEST-NRX] ready tag=sr_58685929_1777725
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9827/10000 miss=0 nrx=9775 fallback=225 bg=128887 p99=55.707ms
+08:43:01.926071 cuphy.hpp:122    CON[1778306] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x55f5b66b5fc0).
+same-request IPC campaign completed: confirm44_gap_r1_on
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58685929/bg_sr_58685929_1781373.sock
+[SAME-REQUEST-NRX] ready tag=sr_58685929_1781373
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9827/10000 miss=0 nrx=9775 fallback=225 bg=127205 p99=55.775ms
+08:58:34.201843 cuphy.hpp:122    CON[1781959] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5641ee3b8580).
+same-request IPC campaign completed: confirm44_gap_r2_off
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58685929/bg_sr_58685929_1784009.sock
+[SAME-REQUEST-NRX] ready tag=sr_58685929_1784009
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9823/10000 miss=0 nrx=9775 fallback=225 bg=127237 p99=55.790ms
+09:14:06.717624 cuphy.hpp:122    CON[1784594] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x555f393de240).
+same-request IPC campaign completed: confirm44_gap_r3_off
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58685929/bg_sr_58685929_1787862.sock
+[SAME-REQUEST-NRX] ready tag=sr_58685929_1787862
+[SAME-REQUEST-NRX] stopped units=10021
+[SAME-REQUEST] correct=9827/10000 miss=0 nrx=9775 fallback=225 bg=128872 p99=55.768ms
+09:29:38.953185 cuphy.hpp:122    CON[1788451] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x555d1defb700).
+same-request IPC campaign completed: confirm44_gap_r4_on
+# Confirm44 transactional recovery-gap AI BAAB ablation
+
+| round | gap lease | correct | RAN misses | natural fallbacks | completed AI | in recovery gap |
+|---:|---|---:|---:|---:|---:|---:|
+| 1 | on | 9827 | 0 | 225 | 128887 | 675 |
+| 2 | off | 9827 | 0 | 225 | 127205 | 0 |
+| 3 | off | 9823 | 0 | 225 | 127237 | 0 |
+| 4 | on | 9827 | 0 | 225 | 128872 | 675 |
+
+Gap ON minus OFF: 3317 completed AI units (+1.304%).
+Matched ON-minus-OFF radio paired 95% CI: [-0.0620, +0.0620] pp; [-0.0279, +0.1079] pp.
+All frozen gates pass: False.
+
+Failed checks: r1_on_radio_and_bounds, r3_off_radio_and_bounds, r4_on_radio_and_bounds, all_pass.
+srun: error: nid001001: task 0: Exited with exit code 1
+srun: Terminating StepId=58685929.0
+salloc: Relinquishing job allocation 58685929

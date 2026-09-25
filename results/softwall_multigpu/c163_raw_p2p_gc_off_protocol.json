@@ -1,0 +1,20 @@
+{
+  "schema": "softwall-c163-diagnostic-protocol-v2",
+  "frozen_before_execution": true,
+  "purpose": "Test whether the raw-P2P 4.5 ms tail is the previously observed Python-GC lifecycle effect.",
+  "prior_result": "Raw-P2P moved 4.5 ms completion from 0/1000 to 852/1000, but its GPU1 full-NeuralRx p99 was 9.61 ms.",
+  "intervention": "Disable cyclic Python GC in both persistent controller and worker before all warmup and timed work; otherwise retain the v1 raw-P2P mechanism.",
+  "claim_boundary": "This two-GPU clean isolated test is neither a production d_MAC qualification nor a WCET bound. It omits MPS, external AI, a real DU clock, and real channels.",
+  "deadline_ms": 4.5,
+  "warmup": 100,
+  "iterations": 1000,
+  "seed": 20358200,
+  "engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "decision_rule": "Report pair-completion counts at 4.5 ms; do not promote sample statistics to a bound.",
+  "source_sha256_before_execution": {
+    "c163_raw_p2p_nrx_worker_v2.py": "f1b2ec7c217343193edbe494b45e86cac8787dea289d8fc729f674915496d09e",
+    "c163_raw_p2p_controller_v2.py": "276430dc9e79c1b7398bc7cccd3814adec8372d0f15754b1f1acdfc74f391c51",
+    "run_c163_raw_p2p_v2.sh": "f7ac41f0815aa98cb935273c5683c12a154a1d4753e2878060866740f0f2c32b",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

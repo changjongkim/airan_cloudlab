@@ -1,0 +1,108 @@
+{
+  "schema": "softwall-sharded-two-home-arm-result-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c121_sharded_two_home_canary_job58819952_protocol.json",
+  "homes": [
+    {
+      "home": 0,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h0_controller.json",
+      "first_release_ns": 134748659156948,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c121_sharded_two_home_canary_job58819952/barrier",
+        "member": 0,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 57,
+          "expected_units": 57,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 49,
+          "expected_units": 49,
+          "count_match": true
+        }
+      ],
+      "summary": {
+        "records": 160,
+        "correct_cells": 70,
+        "nrx_commits": 43,
+        "conv_commits": 117,
+        "atomic_exchange": 10,
+        "ai_timely_value_tokens": 22272
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    },
+    {
+      "home": 1,
+      "controller": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h1_controller.json",
+      "first_release_ns": 134748659156948,
+      "start_barrier": {
+        "directory": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_multigpu/c121_sharded_two_home_canary_job58819952/barrier",
+        "member": 1,
+        "participants": 2
+      },
+      "workers": [
+        {
+          "endpoint": 0,
+          "completed_units": 59,
+          "expected_units": 59,
+          "count_match": true
+        },
+        {
+          "endpoint": 1,
+          "completed_units": 52,
+          "expected_units": 52,
+          "count_match": true
+        }
+      ],
+      "summary": {
+        "records": 160,
+        "correct_cells": 77,
+        "nrx_commits": 47,
+        "conv_commits": 113,
+        "atomic_exchange": 10,
+        "ai_timely_value_tokens": 22009
+      },
+      "safety": {
+        "deadline": true,
+        "nrx_bound": true,
+        "conv_bound": true,
+        "ai_bound": true,
+        "faults": true,
+        "credits": true
+      }
+    }
+  ],
+  "gates": {
+    "two_homes": true,
+    "same_first_release": true,
+    "eight_cells": true,
+    "worker_count_match": true,
+    "system_safety": true
+  },
+  "all_pass": true,
+  "artifact_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c121_sharded_two_home_canary_job58819952_protocol.json": "9421e9700cd25ca06c45d7f38aa8924d21960d46df8636d071933729ff2ae723",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h0_controller.json": "e5d5b4f7e7dc296a02f93cdbd0926a1b1480c9a971c70955290bd91e07e92b07",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h0_worker0.json": "1fa86f57144de2978d239b59420a75ce888d89defa26eeace31b429c1dd0acea",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h0_worker1.json": "ba57f2e91bfbdf71c1ec6558eb7909982cf835fc2793cbcd9de914d99e42e563",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h0_background.json": "9d3897c61f8d5f43bfa7d552a9b691942e16e0cde0bbb2b18e44c8fd560ff1f4",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h0_requalification.json": "d2ccbaf7d391633cb18683a1d341e0cadcd5121e3fd3b0196e6044047dddb885",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h1_controller.json": "c1fe730bf27237fbcdb4dd01eeb95494f0d690528f2041e61175a8e8cb927baf",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h1_worker0.json": "ce973c0a89c5cb1da87b916d42d3cf37c60589389a2cdcbb69d217a474e260b1",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h1_worker1.json": "b3bee0dbecabafc10728d50b9f0efd946c2658bd50aaacff99a552e79f49d527",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h1_background.json": "c1f0e7b5cc49a9d534e0d97ced49f6d1c25d6d8fbcae4fcb8bb03618191dcfd8",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/raw/c121_sharded_two_home_canary_job58819952_h1_requalification.json": "b3c43f53732b1e4acced50fce9331b766827675b802de2219c4b5de6664d9aaf"
+  },
+  "scope": "disjoint-product two-home certificate gate; no shared endpoint or global AI lease"
+}

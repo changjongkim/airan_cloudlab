@@ -1,0 +1,18 @@
+{
+  "schema": "softwall-c163-stage-diagnostic-protocol-v1",
+  "frozen_before_execution": true,
+  "role": "Post-failure mechanism diagnosis only; event insertion changes timing and cannot qualify the fast path.",
+  "input_failure": "C163 raw-P2P v4 had 115/1000 late pairs at 4.5 ms with correctness 1000/1000.",
+  "warmup": 100,
+  "iterations": 300,
+  "seed": 20358600,
+  "question": "Which same-stream stage carries the long tail, and is it CUDA service time or Python enqueue time?",
+  "decision_rule": "Report every stage distribution and preserve all records; do not compare the profiled run as a performance improvement.",
+  "source_sha256_before_execution": {
+    "c163_raw_p2p_nrx_worker.py": "93efe4107e4cec00cca40fd38d34cee21d567c497d5457d1570864bc2c6f34ca",
+    "c163_raw_p2p_controller.py": "c55af86e5e37ed143e3592ca006853635402eff3942ee5ac8990733e093ad38f",
+    "run_c163_raw_p2p_v5_stage_profile.sh": "676e1a343f28017f5f7a05ccebe1da6b15418cd1a81c5d837500826fa08c430e",
+    "dual_receiver_phy.py": "40b4561636a5037f398b534ca0739b4bd35cdd590bf3386c70bbf97fa46e78d5",
+    "nrx_trt_direct.py": "866795b7f5dd7e6a29f93ccdd7fe318c9f5136c80a1df98a07389124d1cb36d9"
+  }
+}

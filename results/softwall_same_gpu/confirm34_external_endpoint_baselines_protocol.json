@@ -1,0 +1,40 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm34_external_endpoint_baselines",
+  "purpose": "Compare the Confirm33 separate-process CUDA-IPC S2 endpoint with conventional-only and local eager-dual baselines on the exact same deterministic channel trace.",
+  "source_endpoint": "confirm33_same_request_natural_s2",
+  "source_evidence": {
+    "frozen_protocol": "confirm33_same_request_natural_s2_protocol.json",
+    "live_execution_manifest": "confirm33_execution_manifest.json",
+    "controller_output": "raw/confirm33_same_request_natural_s2_cap80_job58673249_controller.json",
+    "note": "The source run preceded this comparison protocol. Its exact controller command, including payload seed and output path, was captured while the process was running."
+  },
+  "radio": {
+    "payload_seed": 20321033,
+    "channel_seed_base": 20323000,
+    "snr_db": -8.5,
+    "iterations": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80
+  },
+  "conditions": {
+    "conventional_only": "local full conventional receiver",
+    "eager_dual": "local NeuralRx and conventional full paths on every release, select NeuralRx when valid",
+    "external_s2": "Confirm33 cap80 MPS/CUDA-IPC NeuralRx; conventional executes only on natural NeuralRx failure"
+  },
+  "execution": {
+    "baseline_order": ["conventional_only", "eager_dual"],
+    "ran_free_quiet_seconds_between_processes": 20,
+    "future_crc_or_ground_truth_used_for_admission": false
+  },
+  "primary_gate": {
+    "all_channel_seeds_match": true,
+    "payload_seed_matches_captured_external_command": true,
+    "all_deadline_misses_zero": true,
+    "external_natural_recoveries_positive": true,
+    "external_vs_eager_noninferiority_margin_percentage_points": -0.25,
+    "external_executes_conventional_on_fewer_releases_than_eager": true
+  },
+  "interpretation_limit": "The inputs are trace-matched but policies run sequentially, so decoder nondeterminism and temporal system drift remain. This compares radio utility and executed work, not background throughput under concurrent third-party AI."
+}

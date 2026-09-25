@@ -1,0 +1,350 @@
+{
+  "schema": "softwall-offline-contingent-phy-ai-screen-result-v1",
+  "protocol": "results/softwall_same_gpu/offline_contingent_phy_ai_screen_protocol.json",
+  "screened": 250,
+  "feasible": 240,
+  "positive_gap_cases": 5,
+  "maximum_gap": 0.5999999999999996,
+  "positive_cases": [
+    {
+      "case_index": 67,
+      "problem": {
+        "cells": [
+          {
+            "name": "A",
+            "deadline_ms": 51,
+            "conventional_ms": 8,
+            "nrx_ready_ms": 20,
+            "neural_success_probability": 0.8,
+            "incremental_rescue_probability": 0.4
+          },
+          {
+            "name": "B",
+            "deadline_ms": 65,
+            "conventional_ms": 7,
+            "nrx_ready_ms": 15,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.488
+          },
+          {
+            "name": "C",
+            "deadline_ms": 45,
+            "conventional_ms": 11,
+            "nrx_ready_ms": 14,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.163
+          },
+          {
+            "name": "D",
+            "deadline_ms": 42,
+            "conventional_ms": 10,
+            "nrx_ready_ms": 19,
+            "neural_success_probability": 0.35,
+            "incremental_rescue_probability": 0.087
+          }
+        ],
+        "ai": [
+          {
+            "name": "ai0",
+            "deadline_ms": 33,
+            "isolated_ms": 8,
+            "nrx_overlap_ms": 18,
+            "value": 2
+          },
+          {
+            "name": "ai1",
+            "deadline_ms": 27,
+            "isolated_ms": 11,
+            "nrx_overlap_ms": 18,
+            "value": 3
+          }
+        ],
+        "min_expected_radio_rescues": 0.3,
+        "nrx_endpoint_capacity": 2
+      },
+      "exact_selected_nrx": [
+        "A",
+        "C"
+      ],
+      "greedy_selected_nrx": [
+        "B",
+        "D"
+      ],
+      "exact_expected_ai_value": 4.3,
+      "greedy_expected_ai_value": 3.7,
+      "gap": 0.5999999999999996
+    },
+    {
+      "case_index": 63,
+      "problem": {
+        "cells": [
+          {
+            "name": "A",
+            "deadline_ms": 51,
+            "conventional_ms": 10,
+            "nrx_ready_ms": 15,
+            "neural_success_probability": 0.8,
+            "incremental_rescue_probability": 0.6
+          },
+          {
+            "name": "B",
+            "deadline_ms": 44,
+            "conventional_ms": 12,
+            "nrx_ready_ms": 16,
+            "neural_success_probability": 0.8,
+            "incremental_rescue_probability": 0.6
+          },
+          {
+            "name": "C",
+            "deadline_ms": 45,
+            "conventional_ms": 11,
+            "nrx_ready_ms": 18,
+            "neural_success_probability": 0.5,
+            "incremental_rescue_probability": 0.375
+          },
+          {
+            "name": "D",
+            "deadline_ms": 60,
+            "conventional_ms": 10,
+            "nrx_ready_ms": 13,
+            "neural_success_probability": 0.8,
+            "incremental_rescue_probability": 0.2
+          }
+        ],
+        "ai": [
+          {
+            "name": "ai0",
+            "deadline_ms": 39,
+            "isolated_ms": 11,
+            "nrx_overlap_ms": 16,
+            "value": 2
+          },
+          {
+            "name": "ai1",
+            "deadline_ms": 33,
+            "isolated_ms": 7,
+            "nrx_overlap_ms": 8,
+            "value": 2
+          }
+        ],
+        "min_expected_radio_rescues": 0.4,
+        "nrx_endpoint_capacity": 2
+      },
+      "exact_selected_nrx": [
+        "B",
+        "C"
+      ],
+      "greedy_selected_nrx": [
+        "A"
+      ],
+      "exact_expected_ai_value": 3.8,
+      "greedy_expected_ai_value": 3.6,
+      "gap": 0.19999999999999973
+    },
+    {
+      "case_index": 100,
+      "problem": {
+        "cells": [
+          {
+            "name": "A",
+            "deadline_ms": 50,
+            "conventional_ms": 8,
+            "nrx_ready_ms": 13,
+            "neural_success_probability": 0.5,
+            "incremental_rescue_probability": 0.375
+          },
+          {
+            "name": "B",
+            "deadline_ms": 56,
+            "conventional_ms": 11,
+            "nrx_ready_ms": 16,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.163
+          },
+          {
+            "name": "C",
+            "deadline_ms": 62,
+            "conventional_ms": 10,
+            "nrx_ready_ms": 15,
+            "neural_success_probability": 0.35,
+            "incremental_rescue_probability": 0.262
+          },
+          {
+            "name": "D",
+            "deadline_ms": 63,
+            "conventional_ms": 11,
+            "nrx_ready_ms": 20,
+            "neural_success_probability": 0.35,
+            "incremental_rescue_probability": 0.087
+          }
+        ],
+        "ai": [
+          {
+            "name": "ai0",
+            "deadline_ms": 58,
+            "isolated_ms": 13,
+            "nrx_overlap_ms": 14,
+            "value": 2
+          },
+          {
+            "name": "ai1",
+            "deadline_ms": 38,
+            "isolated_ms": 9,
+            "nrx_overlap_ms": 12,
+            "value": 1
+          }
+        ],
+        "min_expected_radio_rescues": 0.2,
+        "nrx_endpoint_capacity": 2
+      },
+      "exact_selected_nrx": [
+        "C",
+        "D"
+      ],
+      "greedy_selected_nrx": [
+        "A",
+        "B"
+      ],
+      "exact_expected_ai_value": 3.0,
+      "greedy_expected_ai_value": 2.825,
+      "gap": 0.17499999999999982
+    },
+    {
+      "case_index": 133,
+      "problem": {
+        "cells": [
+          {
+            "name": "A",
+            "deadline_ms": 60,
+            "conventional_ms": 11,
+            "nrx_ready_ms": 12,
+            "neural_success_probability": 0.35,
+            "incremental_rescue_probability": 0.262
+          },
+          {
+            "name": "B",
+            "deadline_ms": 59,
+            "conventional_ms": 8,
+            "nrx_ready_ms": 26,
+            "neural_success_probability": 0.8,
+            "incremental_rescue_probability": 0.4
+          },
+          {
+            "name": "C",
+            "deadline_ms": 44,
+            "conventional_ms": 9,
+            "nrx_ready_ms": 17,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.163
+          },
+          {
+            "name": "D",
+            "deadline_ms": 48,
+            "conventional_ms": 9,
+            "nrx_ready_ms": 21,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.325
+          }
+        ],
+        "ai": [
+          {
+            "name": "ai0",
+            "deadline_ms": 47,
+            "isolated_ms": 8,
+            "nrx_overlap_ms": 11,
+            "value": 2
+          },
+          {
+            "name": "ai1",
+            "deadline_ms": 45,
+            "isolated_ms": 13,
+            "nrx_overlap_ms": 17,
+            "value": 3
+          }
+        ],
+        "min_expected_radio_rescues": 0.3,
+        "nrx_endpoint_capacity": 2
+      },
+      "exact_selected_nrx": [
+        "A",
+        "C"
+      ],
+      "greedy_selected_nrx": [
+        "B",
+        "D"
+      ],
+      "exact_expected_ai_value": 5.0,
+      "greedy_expected_ai_value": 4.859999999999999,
+      "gap": 0.14000000000000057
+    },
+    {
+      "case_index": 186,
+      "problem": {
+        "cells": [
+          {
+            "name": "A",
+            "deadline_ms": 51,
+            "conventional_ms": 10,
+            "nrx_ready_ms": 25,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.488
+          },
+          {
+            "name": "B",
+            "deadline_ms": 49,
+            "conventional_ms": 9,
+            "nrx_ready_ms": 17,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.163
+          },
+          {
+            "name": "C",
+            "deadline_ms": 38,
+            "conventional_ms": 9,
+            "nrx_ready_ms": 25,
+            "neural_success_probability": 0.65,
+            "incremental_rescue_probability": 0.488
+          },
+          {
+            "name": "D",
+            "deadline_ms": 40,
+            "conventional_ms": 11,
+            "nrx_ready_ms": 22,
+            "neural_success_probability": 0.8,
+            "incremental_rescue_probability": 0.2
+          }
+        ],
+        "ai": [
+          {
+            "name": "ai0",
+            "deadline_ms": 44,
+            "isolated_ms": 9,
+            "nrx_overlap_ms": 9,
+            "value": 1
+          },
+          {
+            "name": "ai1",
+            "deadline_ms": 26,
+            "isolated_ms": 13,
+            "nrx_overlap_ms": 16,
+            "value": 1
+          }
+        ],
+        "min_expected_radio_rescues": 0.2,
+        "nrx_endpoint_capacity": 2
+      },
+      "exact_selected_nrx": [
+        "B",
+        "D"
+      ],
+      "greedy_selected_nrx": [
+        "A",
+        "C"
+      ],
+      "exact_expected_ai_value": 0.9299999999999999,
+      "greedy_expected_ai_value": 0.8775,
+      "gap": 0.05249999999999999
+    }
+  ],
+  "interpretation": "Exploratory two-stage synthetic screen only. Positive gaps against a one-exchange local greedy can be generic local-search gaps; they do not establish an AI-RAN novelty or a physical throughput gain."
+}

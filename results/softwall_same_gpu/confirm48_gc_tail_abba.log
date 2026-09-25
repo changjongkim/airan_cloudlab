@@ -1,0 +1,32 @@
+salloc: Granted job allocation 58692107
+salloc: Waiting for resource configuration
+salloc: Nodes nid001128 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=14.279ms max=14.816ms miss=0 correct=81 nrx=0 conv=200 bg=0 duplicate=0
+13:55:19.124426 cuphy.hpp:122    CON[853128] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56036d6584f0).
+confirm48 operational requalification passed
+[AI-WORKER] rpc ready /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58692107/bg_sr_58692107_853391.sock
+[SAME-REQUEST-NRX] ready tag=sr_58692107_853391
+[SAME-REQUEST-NRX] stopped units=4021
+[SAME-REQUEST] correct=3944/4000 miss=0 nrx=3932 fallback=68 bg=51338 p99=55.757ms
+13:56:10.352235 cuphy.hpp:122    CON[853978] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x5557bdaba080).
+same-request IPC campaign completed: confirm48_gc_r1_on
+Traceback (most recent call last):
+  File "/softwall/analyze_confirm48_gc_tail_abba.py", line 170, in <module>
+    main()
+  File "/softwall/analyze_confirm48_gc_tail_abba.py", line 60, in main
+    ran = read(Path(str(prefix) + "_controller.json"))
+  File "/softwall/analyze_confirm48_gc_tail_abba.py", line 12, in read
+    return json.loads(path.read_text(encoding="utf-8"))
+  File "/usr/lib/python3.10/pathlib.py", line 1134, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+  File "/usr/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_same_gpu/raw/confirm48_gc_r1_gc_on_cap80_job58692107_controller.json'
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: '/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_same_gpu/confirm48_gc_tail_abba.json'
+srun: error: nid001128: task 0: Exited with exit code 1
+srun: Terminating StepId=58692107.0
+salloc: Relinquishing job allocation 58692107
+salloc: Job allocation 58692107 has been revoked.

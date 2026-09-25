@@ -1,0 +1,47 @@
+{
+  "schema": "softwall-confirm90-tail-posthoc-v1",
+  "frozen_gate_result_unchanged": true,
+  "cases": [
+    {
+      "arm": "a",
+      "release_index": 0,
+      "cell": 1,
+      "nrx_response_ms": 26.874811,
+      "feature_begin_after_release_ms": 3.653706,
+      "feature_return_after_release_ms": 6.998051,
+      "nrx_dispatch_after_release_ms": 14.424641,
+      "worker_published_after_release_ms": 16.117463,
+      "worker_gpu_ms": 1.6713279485702515,
+      "controller_observed_after_release_ms": 26.874811,
+      "post_publish_observation_gap_ms": 10.757348,
+      "mandatory_other_cells": [
+        {
+          "cell": 0,
+          "start_after_release_ms": 18.682838,
+          "commit_after_release_ms": 21.203155,
+          "path_ms": 2.520317
+        },
+        {
+          "cell": 2,
+          "start_after_release_ms": 21.205789,
+          "commit_after_release_ms": 23.616674,
+          "path_ms": 2.410885
+        },
+        {
+          "cell": 3,
+          "start_after_release_ms": 23.619149,
+          "commit_after_release_ms": 26.005766,
+          "path_ms": 2.386617
+        }
+      ],
+      "ai_before_observation": [
+        {
+          "admitted_after_release_ms": 14.751585,
+          "returned_after_release_ms": 18.641868,
+          "execution_ms": 3.890283
+        }
+      ]
+    }
+  ],
+  "interpretation": "Timestamp overlap only. A delayed controller observation can include AI-thread join, serial early-mandatory conventional commits, OS scheduling, and completion copy. This posthoc report does not revise the frozen bound failure or prove a sole cause."
+}

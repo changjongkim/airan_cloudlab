@@ -1,0 +1,706 @@
+{
+  "schema": "softwall-sharded-home-envelope-grid-v10",
+  "status": "post-C134-decision-time-envelope-audited",
+  "scope": "Synchronous P180/D155 cells on disjoint RAN home GPUs. Qualification is mode-specific over home cell count, recovery bound, executor ordering, lifecycle, shared-AI broker, declared control-plane fault class, and the full synchronous prepare/commit/complete budget and post-apply fault-point coverage; later falsification demotes earlier finite-sample points. C134 adds an independent allocation and node requalification for the full-budget three-control-point QSU mode within the same A100 hardware family. Version 9 derives conditional recovery release per home from that home's admitted NeuralRx jobs and is audited against an independent exact endpoint-admission oracle. Version 10 further distinguishes W+Delta capacity geometry from the sufficient exchange window at the current observe-all decision boundary; the latter charges the latest admitted NeuralRx path bound and sequential recovery for rejected NeuralRx jobs before testing an AI transaction.",
+  "classification": {
+    "QSU": "qualified-safe-useful",
+    "QSN": "qualified-safe-no-slack",
+    "MI": "mandatory timing or per-home memory infeasible",
+    "UQ": "memory/timing arithmetic is feasible but a timing, lifecycle, executor-conformance, control-fault, complete control-budget, or comparison gate is not physically qualified"
+  },
+  "scenarios": [
+    {
+      "id": "sharded_home_g1_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 4,
+      "home_cell_counts": [
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C113 qualifies the single-home four-cell reference"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c8",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 8,
+      "home_cell_counts": [
+        8
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g1_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 1,
+      "cells": 12,
+      "home_cell_counts": [
+        12
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 4,
+      "home_cell_counts": [
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c8_conv12_legacy_executor",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C121 passed two arms and remains historical finite-sample evidence",
+        "C124 later observed conventional host-to-commit 12.535096 ms > 12 ms; exact conv12 mode is demoted to UQ"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_class_order_executor",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C125 prospective first arm failed closed at release150 cell2",
+        "executor attempted [+33.106,+58.106] ms across earlier live credit [+53,+78] ms",
+        "arithmetic feasibility alone is insufficient without certificate-conformant dispatch"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C126 canary crossed release150 after merging all ready recovery classes in live-certificate order",
+        "C126 eight formal arms: 21,760 TB, 2,496 atomic exchanges, zero deadline/NRx/conv/AI-bound violations, all brokers drained",
+        "C126 strict same-radio comparison failed and throughput superiority is not qualified; this QSU label is safety/usefulness only"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 12,
+      "home_cell_counts": [
+        6,
+        6
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": false,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified",
+        "C84 rejects more than four receiver instances on one A100 home in the current implementation"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c4",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 4,
+      "home_cell_counts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c8",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 8,
+      "home_cell_counts": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": false,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "exact multi-home cell-per-home mode has not been physically qualified"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g4_c12",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 4,
+      "cells": 12,
+      "home_cell_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 12.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C122: two independent 4-home x 3-cell arms, 8,160 total TB, synchronized release delta 0 ns, safety violations 0"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ]
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor_commit_fault_unhandled",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C123/C126 nominal broker paths do not qualify a post-apply lost commit reply",
+        "Retry can duplicate execution; terminating the controller can propagate an AI control fault into RAN availability"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "post_apply_commit_reply_loss",
+      "control_fault_qualified": false,
+      "ambiguous_token_policy": "unspecified retry/reassignment or whole-controller failure"
+    },
+    {
+      "id": "sharded_home_g2_c8_conv25_certificate_executor_commit_fault_quarantine",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C127 two prospective arms: 5,440 TB, zero deadline/NRx/conv/AI-bound violations",
+        "After the fault, affected home completed 2,490 RAN TB and the other home completed 1,668 AI units",
+        "Exactly one quarantined inflight token per arm; duplicate commit/execution zero; all local credits drained"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "post_apply_commit_reply_loss",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; disable new global AI only at affected home; continue local RAN"
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_sync_marker_c128",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C128 first formal arm: synchronous /pscratch fault-marker serialization caused one D155 miss at each home",
+        "Fault-path instrumentation is part of the exact mode and therefore cannot be excluded from timing qualification"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_with_synchronous_fault_logging",
+      "control_fault_qualified": false,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate"
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_unbounded_rpc_c129",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C129 direct os._exit removed marker perturbation but home1 blocked in global complete RPC",
+        "The failure surfaced 97.259 ms after Qwen physical return and mandatory fallback failed at +160.844 ms for D155"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_unbounded_rpc",
+      "control_fault_qualified": false,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 0,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 0,
+      "control_budget_accounted_in_admission": false
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_timeout_unaccounted_c130",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C130 two arms and 5,440 TB physically passed with a 5 ms socket timeout",
+        "Post-run proof audit found prepare, commit, and complete control cost absent from the AI admission inequality"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_bounded_rpc",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 5,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 0,
+      "control_budget_accounted_in_admission": false
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_partial_budget_c131",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C131 two arms and 5,440 TB physically passed after charging commit+complete as 10 ms",
+        "Proof audit found the synchronous prepare RPC was still omitted; required full budget is 15 ms"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_bounded_rpc",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 5,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 10,
+      "control_budget_accounted_in_admission": true
+    },
+    {
+      "id": "sharded_home_g2_c8_broker_crash_full_budget_control_matrix_c132_c134",
+      "architecture": "one recovery certificate, two local NRx endpoints, and one Qwen worker per disjoint RAN home GPU",
+      "gpu_count": 2,
+      "cells": 8,
+      "home_cell_counts": [
+        4,
+        4
+      ],
+      "deadline_ms": 155.0,
+      "guard_ms": 2.0,
+      "recovery_bound_ms": 25.0,
+      "home_memory_feasible": true,
+      "timing_bounds_qualified": true,
+      "ai_bounds_ms": [
+        35.0,
+        40.0,
+        65.0,
+        75.0
+      ],
+      "evidence": [
+        "C132 two prospective arms: 5,440 TB, including 4,976 TB after crash detection, with every safety violation zero",
+        "All three 5 ms prepare/commit/complete bounds were charged as 15 ms plus a 2 ms physical guard before admission",
+        "Both clients failed closed global AI, 114 AI units completed before containment, ambiguous execution and duplicates were zero, and all local credits drained",
+        "C133 four prospective arms: prepare2 and complete2, 10,880 TB and 9,962 TB after crash detection, every safety violation zero",
+        "Combined with frozen C132 commit2: prepare/commit/complete each two arms, 16,320 TB and 14,938 TB after crash detection; prepare launched no ambiguous AI and complete executed its target exactly once",
+        "C134 independent job 58823497 on nid002688: prepare/commit/complete each two new arms, 16,320 TB and 14,926 TB after crash detection, 354 AI units before containment, every safety and duplicate-execution violation zero"
+      ],
+      "home_endpoint_bounds_ms": [
+        [
+          45.0,
+          45.0
+        ],
+        [
+          45.0,
+          45.0
+        ]
+      ],
+      "control_fault_model": "broker_fail_stop_bounded_rpc",
+      "control_fault_qualified": true,
+      "ambiguous_token_policy": "no retry or reassignment; fail closed global AI at every client; continue each local RAN certificate",
+      "control_rpc_budget_required": true,
+      "control_rpc_bound_ms": 5,
+      "control_rpc_count": 3,
+      "control_transaction_budget_ms": 15,
+      "control_budget_accounted_in_admission": true,
+      "qualification_nodes": [
+        "nid001049",
+        "nid002688"
+      ],
+      "hardware_generalization": "two independent A100 allocations/nodes; cross-family unqualified"
+    }
+  ]
+}

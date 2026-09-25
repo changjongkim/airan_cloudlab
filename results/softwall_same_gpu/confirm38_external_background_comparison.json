@@ -1,0 +1,84 @@
+{
+  "schema": "softwall-external-background-comparison-v1",
+  "campaign": "confirm38_external_background_comparison",
+  "host": "nid001084",
+  "job": "58678990",
+  "releases": 10000,
+  "correct": {
+    "external_s2": 9845,
+    "s2_reserved": 9841,
+    "eager_dual": 9843
+  },
+  "deadline_misses": {
+    "external_s2": 0,
+    "s2_reserved": 0,
+    "eager_dual": 0
+  },
+  "background_units": {
+    "external_s2": 130177,
+    "s2_reserved": 127180,
+    "eager_dual": 126477
+  },
+  "background_units_per_s": {
+    "external_s2": 144.64111111111112,
+    "s2_reserved": 141.3111111111111,
+    "eager_dual": 140.53
+  },
+  "external_vs_eager": {
+    "difference_pp": 0.02,
+    "confidence_interval_95_pp": [
+      -0.03543855769559609,
+      0.07543855769559608
+    ],
+    "left_only_correct": 5,
+    "right_only_correct": 3
+  },
+  "external_vs_local_s2": {
+    "difference_pp": 0.04,
+    "confidence_interval_95_pp": [
+      -0.00800599755843177,
+      0.08800599755843178
+    ],
+    "left_only_correct": 5,
+    "right_only_correct": 1
+  },
+  "gates": {
+    "external_s2_radio_matches": true,
+    "external_s2_records_complete": true,
+    "external_s2_deadline_misses_zero": true,
+    "external_s2_background_faults_zero": true,
+    "external_s2_background_budget_violations_zero": true,
+    "external_s2_background_crossings_zero": true,
+    "s2_reserved_radio_matches": true,
+    "s2_reserved_records_complete": true,
+    "s2_reserved_deadline_misses_zero": true,
+    "s2_reserved_background_faults_zero": true,
+    "s2_reserved_background_budget_violations_zero": true,
+    "s2_reserved_background_crossings_zero": true,
+    "eager_dual_radio_matches": true,
+    "eager_dual_records_complete": true,
+    "eager_dual_deadline_misses_zero": true,
+    "eager_dual_background_faults_zero": true,
+    "eager_dual_background_budget_violations_zero": true,
+    "eager_dual_background_crossings_zero": true,
+    "same_host_and_job": true,
+    "trace_matches_release_by_release": true,
+    "external_endpoint_no_timeout": true,
+    "external_endpoint_units_match": true,
+    "external_s2_background_worker_units_match": true,
+    "external_s2_background_cap_effective": true,
+    "external_s2_worker_provenance_matches": true,
+    "s2_reserved_background_worker_units_match": true,
+    "s2_reserved_background_cap_effective": true,
+    "s2_reserved_worker_provenance_matches": true,
+    "eager_dual_background_worker_units_match": true,
+    "eager_dual_background_cap_effective": true,
+    "eager_dual_worker_provenance_matches": true,
+    "external_background_positive": true,
+    "external_natural_recoveries_positive": true,
+    "external_utility_noninferior_to_eager": true,
+    "external_background_exceeds_eager": true,
+    "all_pass": true
+  },
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_same_gpu/confirm38_background_comparison_protocol.json"
+}

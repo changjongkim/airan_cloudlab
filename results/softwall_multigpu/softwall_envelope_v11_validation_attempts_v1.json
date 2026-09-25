@@ -1,0 +1,42 @@
+{
+  "schema": "softwall-envelope-v11-validation-attempts-v1",
+  "attempts": [
+    {
+      "job_id": 58828125,
+      "node": "nid001256",
+      "status": "ENVIRONMENT_FAIL",
+      "reason": "Aerial import could not resolve libcuda.so.1 before any tests ran; login-shell invocation reset the injected dynamic-link path.",
+      "authoritative": false
+    },
+    {
+      "job_id": 58828138,
+      "node": "nid001256",
+      "status": "ENVIRONMENT_FAIL",
+      "reason": "Same pre-test libcuda.so.1 resolution failure; confirmed as invocation-environment error.",
+      "authoritative": false
+    },
+    {
+      "job_id": 58828204,
+      "node": "nid001256",
+      "status": "TEST_PORTABILITY_FAIL",
+      "reason": "154/155 Aerial tests passed; new regression test assumed two parent directories under the /softwall mount and raised IndexError. Model assertions did not fail.",
+      "authoritative": false
+    },
+    {
+      "job_id": 58828216,
+      "node": "nid001037",
+      "status": "INCOMPLETE_DISCOVERY",
+      "reason": "Aerial155 and Qwen3 passed, but DART discovery started above a non-package directory and ran zero tests.",
+      "authoritative": false
+    },
+    {
+      "job_id": 58828266,
+      "node": "nid001781",
+      "status": "PASS",
+      "reason": "Aerial155, Qwen3, and DART30 all passed in one allocation.",
+      "authoritative": true
+    }
+  ],
+  "authoritative_job_id": 58828266,
+  "policy": "Environment and test-harness failures are preserved and excluded from scientific gate counts; only a nonzero complete suite can be authoritative."
+}

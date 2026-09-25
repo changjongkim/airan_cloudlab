@@ -1,0 +1,462 @@
+{
+  "schema": "softwall-confirm118-component-requalification-v1",
+  "protocol": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm118_component_requalification_protocol.json",
+  "protocol_sha256": "7aff7816afd9c525d05b4c503baad372aec52a4a7ae5f047cffebd45ad4b4c87",
+  "source_audit": {
+    "scripts_for_node/softwall_same_gpu/run_multigpu_three_endpoint_arm.sh": {
+      "expected": "f48cee4a6d58e331882c6c5b4524320a0fb44110acbb4eaf32c46ff49e27fb72",
+      "observed": "f48cee4a6d58e331882c6c5b4524320a0fb44110acbb4eaf32c46ff49e27fb72",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/four_cell_trace_baseline_controller.py": {
+      "expected": "8db5fe06f81b2ece2a0aa6d982095e0638b36962c7f95c69c5962738a4f821cb",
+      "observed": "8db5fe06f81b2ece2a0aa6d982095e0638b36962c7f95c69c5962738a4f821cb",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": {
+      "expected": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "observed": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_nrx_worker.py": {
+      "expected": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+      "observed": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": {
+      "expected": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "observed": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+      "match": true
+    },
+    "scripts_for_node/softwall_same_gpu/multigpu_p2p_ipc_gate.py": {
+      "expected": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+      "observed": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+      "match": true
+    },
+    "scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": {
+      "expected": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "observed": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45",
+      "match": true
+    }
+  },
+  "arms": [
+    {
+      "label": "c118_components_s3_job58815435",
+      "wrapper": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c118_components_s3_job58815435_result.json",
+      "wrapper_sha256": "7b0861cfae4a858a95aad9a9dae84eb4eff97d06c5a54c7ddb3301a597e8ecb0",
+      "all_arm_gates_pass": true,
+      "arm_protocol_source_checks": {
+        "/softwall/four_cell_trace_baseline_controller.py": true,
+        "/softwall/same_request_ipc_worker.py": true,
+        "/softwall/multigpu_p2p_nrx_worker.py": true,
+        "/softwall/trace_qwen_worker.py": true,
+        "/softwall/multigpu_p2p_ipc_gate.py": true,
+        "/softwall_task1/isca_v2/cuda_ipc_channel.py": true
+      },
+      "artifacts_unchanged": true,
+      "endpoint_admissions": {
+        "nrx0": 326,
+        "nrx1": 258,
+        "nrx2": 127
+      },
+      "component": {
+        "front_gpu_ms": {
+          "bound": 3.0,
+          "summary": {
+            "count": 711,
+            "mean": 0.7434031166943149,
+            "p50": 0.71561598777771,
+            "p99": 0.8469759821891785,
+            "max": 1.8309119939804077
+          },
+          "violations": 0,
+          "pass": true
+        },
+        "back_gpu_ms": {
+          "bound": 3.0,
+          "summary": {
+            "count": 711,
+            "mean": 0.8090862898383966,
+            "p50": 0.8143360018730164,
+            "p99": 0.9506239891052246,
+            "max": 1.8863999843597412
+          },
+          "violations": 0,
+          "pass": true
+        },
+        "end_to_end_nrx_ms": {
+          "bound": 25.0,
+          "summary": {
+            "count": 711,
+            "mean": 8.254425362869199,
+            "p50": 8.231303,
+            "p99": 10.247552,
+            "max": 12.578597
+          },
+          "violations": 0,
+          "pass": true
+        }
+      },
+      "remote": {
+        "nrx1": {
+          "expected_timed": 258,
+          "observed_timed": 258,
+          "count_match": true,
+          "forward_gpu_us": {
+            "bound": 250.0,
+            "summary": {
+              "count": 258,
+              "mean": 67.97110071304695,
+              "p50": 67.23199784755707,
+              "p99": 84.09599959850311,
+              "max": 88.73599767684937
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "nrx_gpu_ms": {
+            "bound": 2.5,
+            "summary": {
+              "count": 258,
+              "mean": 1.603290294954019,
+              "p50": 1.6024320125579834,
+              "p99": 1.6197439432144165,
+              "max": 1.6278400421142578
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "backward_gpu_us": {
+            "bound": 100.0,
+            "summary": {
+              "count": 258,
+              "mean": 22.445023276431616,
+              "p50": 21.695999428629875,
+              "p99": 38.047999143600464,
+              "max": 40.70400074124336
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "worker_path_ms": {
+            "bound": 6.0,
+            "summary": {
+              "count": 258,
+              "mean": 1.8837843720930232,
+              "p50": 1.871997,
+              "p99": 2.1214,
+              "max": 2.354961
+            },
+            "violations": 0,
+            "pass": true
+          }
+        },
+        "nrx2": {
+          "expected_timed": 127,
+          "observed_timed": 127,
+          "count_match": true,
+          "forward_gpu_us": {
+            "bound": 250.0,
+            "summary": {
+              "count": 127,
+              "mean": 55.68881872601396,
+              "p50": 52.70399898290634,
+              "p99": 111.84000223875046,
+              "max": 157.4079990386963
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "nrx_gpu_ms": {
+            "bound": 2.5,
+            "summary": {
+              "count": 127,
+              "mean": 1.6079654843788447,
+              "p50": 1.604383945465088,
+              "p99": 1.694111943244934,
+              "max": 1.7018879652023315
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "backward_gpu_us": {
+            "bound": 100.0,
+            "summary": {
+              "count": 127,
+              "mean": 23.504881818932812,
+              "p50": 22.431999444961548,
+              "p99": 35.51999852061272,
+              "max": 37.66399994492531
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "worker_path_ms": {
+            "bound": 6.0,
+            "summary": {
+              "count": 127,
+              "mean": 1.9724391023622048,
+              "p50": 1.886485,
+              "p99": 3.64327,
+              "max": 4.208963
+            },
+            "violations": 0,
+            "pass": true
+          }
+        }
+      },
+      "component_pass": true,
+      "summary": {
+        "system": "softwall",
+        "iterations": 340,
+        "radio_records": 1360,
+        "correct_cells": 634,
+        "nrx_commits": 535,
+        "conv_commits": 825,
+        "fallbacks": 825,
+        "recovery_retime_count": 91,
+        "joint_lease_retired_count": 91,
+        "ai_timely_units": 888,
+        "ai_timely_value_tokens": 225131,
+        "nrx_response_ms": {
+          "n": 711,
+          "mean": 8.254425362869199,
+          "p50": 8.231303,
+          "p95": 9.7914225,
+          "p99": 10.2421145,
+          "p99_9": 12.108233360000051,
+          "min": 6.784847,
+          "max": 12.578597
+        },
+        "remote1_worker_path_ms": {
+          "count": 279,
+          "mean": 2.0354362580645167,
+          "p50": 1.871577,
+          "p99": 2.158531,
+          "max": 44.61569
+        },
+        "remote2_worker_path_ms": {
+          "count": 148,
+          "mean": 2.267774432432432,
+          "p50": 1.884181,
+          "p99": 4.208963,
+          "max": 46.926635
+        }
+      }
+    },
+    {
+      "label": "c118_components_s4_job58815435",
+      "wrapper": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c118_components_s4_job58815435_result.json",
+      "wrapper_sha256": "dc98c63838e9775a1c018d97a97d8f91ccfdec044341a319c22f22329a095e6e",
+      "all_arm_gates_pass": true,
+      "arm_protocol_source_checks": {
+        "/softwall/four_cell_trace_baseline_controller.py": true,
+        "/softwall/same_request_ipc_worker.py": true,
+        "/softwall/multigpu_p2p_nrx_worker.py": true,
+        "/softwall/trace_qwen_worker.py": true,
+        "/softwall/multigpu_p2p_ipc_gate.py": true,
+        "/softwall_task1/isca_v2/cuda_ipc_channel.py": true
+      },
+      "artifacts_unchanged": true,
+      "endpoint_admissions": {
+        "nrx0": 328,
+        "nrx1": 249,
+        "nrx2": 123
+      },
+      "component": {
+        "front_gpu_ms": {
+          "bound": 3.0,
+          "summary": {
+            "count": 700,
+            "mean": 0.7415904455525535,
+            "p50": 0.7126079797744751,
+            "p99": 0.8421440124511719,
+            "max": 2.732192039489746
+          },
+          "violations": 0,
+          "pass": true
+        },
+        "back_gpu_ms": {
+          "bound": 3.0,
+          "summary": {
+            "count": 700,
+            "mean": 0.788092891233308,
+            "p50": 0.7943999767303467,
+            "p99": 0.893343985080719,
+            "max": 1.3713279962539673
+          },
+          "violations": 0,
+          "pass": true
+        },
+        "end_to_end_nrx_ms": {
+          "bound": 25.0,
+          "summary": {
+            "count": 700,
+            "mean": 8.262443534285715,
+            "p50": 8.202003,
+            "p99": 10.128204,
+            "max": 11.564552
+          },
+          "violations": 0,
+          "pass": true
+        }
+      },
+      "remote": {
+        "nrx1": {
+          "expected_timed": 249,
+          "observed_timed": 249,
+          "count_match": true,
+          "forward_gpu_us": {
+            "bound": 250.0,
+            "summary": {
+              "count": 249,
+              "mean": 68.31485941168295,
+              "p50": 67.64800101518631,
+              "p99": 96.8639999628067,
+              "max": 122.43200093507767
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "nrx_gpu_ms": {
+            "bound": 2.5,
+            "summary": {
+              "count": 249,
+              "mean": 1.6032587323322833,
+              "p50": 1.6024320125579834,
+              "p99": 1.6221439838409424,
+              "max": 1.6404160261154175
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "backward_gpu_us": {
+            "bound": 100.0,
+            "summary": {
+              "count": 249,
+              "mean": 22.172144550575787,
+              "p50": 21.824000403285027,
+              "p99": 28.863999992609024,
+              "max": 34.52799841761589
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "worker_path_ms": {
+            "bound": 6.0,
+            "summary": {
+              "count": 249,
+              "mean": 1.8884588554216866,
+              "p50": 1.873801,
+              "p99": 2.262452,
+              "max": 2.424846
+            },
+            "violations": 0,
+            "pass": true
+          }
+        },
+        "nrx2": {
+          "expected_timed": 123,
+          "observed_timed": 123,
+          "count_match": true,
+          "forward_gpu_us": {
+            "bound": 250.0,
+            "summary": {
+              "count": 123,
+              "mean": 54.031609640858036,
+              "p50": 52.73599922657013,
+              "p99": 77.2479996085167,
+              "max": 97.37599641084671
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "nrx_gpu_ms": {
+            "bound": 2.5,
+            "summary": {
+              "count": 123,
+              "mean": 1.6059124576367014,
+              "p50": 1.6036479473114014,
+              "p99": 1.6395200490951538,
+              "max": 1.6479359865188599
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "backward_gpu_us": {
+            "bound": 100.0,
+            "summary": {
+              "count": 123,
+              "mean": 22.856065125121333,
+              "p50": 21.983999758958817,
+              "p99": 34.432001411914825,
+              "max": 34.591998904943466
+            },
+            "violations": 0,
+            "pass": true
+          },
+          "worker_path_ms": {
+            "bound": 6.0,
+            "summary": {
+              "count": 123,
+              "mean": 1.9305491056910569,
+              "p50": 1.877237,
+              "p99": 2.434855,
+              "max": 2.482607
+            },
+            "violations": 0,
+            "pass": true
+          }
+        }
+      },
+      "component_pass": true,
+      "summary": {
+        "system": "softwall",
+        "iterations": 340,
+        "radio_records": 1360,
+        "correct_cells": 628,
+        "nrx_commits": 515,
+        "conv_commits": 845,
+        "fallbacks": 845,
+        "recovery_retime_count": 96,
+        "joint_lease_retired_count": 96,
+        "ai_timely_units": 889,
+        "ai_timely_value_tokens": 225402,
+        "nrx_response_ms": {
+          "n": 700,
+          "mean": 8.262443534285714,
+          "p50": 8.1978025,
+          "p95": 9.8054696,
+          "p99": 10.12896357,
+          "p99_9": 11.482771796000005,
+          "min": 6.752915,
+          "max": 11.564552
+        },
+        "remote1_worker_path_ms": {
+          "count": 270,
+          "mean": 2.0487695740740746,
+          "p50": 1.87302,
+          "p99": 2.262452,
+          "max": 45.753387
+        },
+        "remote2_worker_path_ms": {
+          "count": 144,
+          "mean": 2.249835916666666,
+          "p50": 1.869733,
+          "p99": 3.772791,
+          "max": 47.788499
+        }
+      }
+    }
+  ],
+  "gates": {
+    "protocol_sources": true,
+    "two_independent_arms": true,
+    "arm_sources": true,
+    "artifacts_unchanged": true,
+    "system_safety": true,
+    "revised_component_bounds": true
+  },
+  "all_pass": true,
+  "scope": "prospective finite-sample requalification after C117 rejected the 2 ms home-component bounds; not WCET or production timing"
+}

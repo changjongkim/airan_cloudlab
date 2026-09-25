@@ -1,0 +1,61 @@
+{
+  "schema": "softwall-confirm98-qwen-nrx45-ai50-fourcell-v1",
+  "job": "58747070",
+  "node": "nid001053",
+  "source_hashes": true,
+  "prior_mode_pass": true,
+  "arms": [
+    {
+      "name": "a",
+      "prefix": "confirm98_a_qwen45_job58747070",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true,
+        "coverage": true
+      },
+      "all_pass": true,
+      "nrx_paths": 683,
+      "nrx_max_ms": 43.411857,
+      "conv_paths": 1124,
+      "conv_max_ms": 9.160818,
+      "ai_units": 2373,
+      "ai_host_max_ms": 28.480626,
+      "two_admitted_releases": 299,
+      "injected_all_fail_releases": 55,
+      "all_fail_releases_with_fewer_than_seven_ai_by_d153": 55,
+      "min_ai_completed_by_d153_in_all_fail": 5,
+      "median_ai_completed_by_d153_in_all_fail": 6,
+      "max_ai_completed_by_d153_in_all_fail": 6,
+      "joint_ai_units": 146,
+      "deadline_misses": 0
+    },
+    {
+      "name": "b",
+      "prefix": "confirm98_b_qwen45_job58747070",
+      "gates": {
+        "contract": true,
+        "provenance": true,
+        "sample_safety": true,
+        "coverage": true
+      },
+      "all_pass": true,
+      "nrx_paths": 692,
+      "nrx_max_ms": 42.818103,
+      "conv_paths": 1109,
+      "conv_max_ms": 4.86803,
+      "ai_units": 2362,
+      "ai_host_max_ms": 28.040975,
+      "two_admitted_releases": 303,
+      "injected_all_fail_releases": 64,
+      "all_fail_releases_with_fewer_than_seven_ai_by_d153": 64,
+      "min_ai_completed_by_d153_in_all_fail": 5,
+      "median_ai_completed_by_d153_in_all_fail": 6.0,
+      "max_ai_completed_by_d153_in_all_fail": 6,
+      "joint_ai_units": 136,
+      "deadline_misses": 0
+    }
+  ],
+  "all_pass": true,
+  "interpretation": "Actual NRx45/conv12/AI50 four-cell calendar with Qwen2.5-1.5B b1c16 prefill cap20 and continuous backlog. This candidate was selected after Confirm97 NRx30 failure and RPC timeout35/AI40 failure, using new seeds. Fewer-than-seven Qwen returns by D153 under this controller show observed demand pressure, not optimal schedule infeasibility. Passing is finite prewarmed GC-OFF sample, not WCET, online seven-job lease, production DU, or policy superiority."
+}

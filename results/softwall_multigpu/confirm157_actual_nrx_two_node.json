@@ -1,0 +1,72 @@
+{
+  "all_pass": true,
+  "campaigns": [
+    {
+      "job_id": "58854900",
+      "node": "nid001109",
+      "protocol": "results/softwall_multigpu/confirm157a_actual_nrx_attempt7_job58854900_protocol.json",
+      "result": "results/softwall_multigpu/confirm157a_actual_nrx_attempt7_job58854900_result.json",
+      "seed_base": 25800000,
+      "summary": {
+        "accepted_debts": 4,
+        "actual_nrx_successes": 2,
+        "deadline_misses": 0,
+        "max_nrx_release_to_complete_ms": 15.50475,
+        "max_radio_release_to_commit_ms": 107.674136,
+        "oracle_equivalent_recoveries": 2,
+        "physical_recoveries": 2,
+        "qwen_execution_ms": 27.779797,
+        "qwen_units": 1,
+        "radio_commits": 4,
+        "rejected_debts": 1,
+        "submitted_debts": 5
+      }
+    },
+    {
+      "job_id": "58855194",
+      "node": "nid001085",
+      "protocol": "results/softwall_multigpu/confirm157b_actual_nrx_holdout_job58855194_protocol.json",
+      "result": "results/softwall_multigpu/confirm157b_actual_nrx_holdout_job58855194_result.json",
+      "seed_base": 25900000,
+      "summary": {
+        "accepted_debts": 4,
+        "actual_nrx_successes": 2,
+        "deadline_misses": 0,
+        "max_nrx_release_to_complete_ms": 37.659848,
+        "max_radio_release_to_commit_ms": 107.054256,
+        "oracle_equivalent_recoveries": 2,
+        "physical_recoveries": 2,
+        "qwen_execution_ms": 26.385846,
+        "qwen_units": 1,
+        "radio_commits": 4,
+        "rejected_debts": 1,
+        "submitted_debts": 5
+      }
+    }
+  ],
+  "claim_scope": "Two A100 nodes, disjoint seeds, identical frozen source/mode, and actual TensorRT NeuralRx CRC-driven transitions in a warm synthetic timing contract. This does not establish WCET, cold/long-idle qualification, production d_MAC, fault coverage, throughput superiority, or cross-family generality.",
+  "gates": {
+    "both_campaigns_pass": true,
+    "development_then_holdout": true,
+    "distinct_job_node_seed": true,
+    "exact_two_node_totals": true,
+    "holdout_excludes_development_node": true,
+    "same_frozen_source_and_mode": true,
+    "same_prospective_outcome_rule": true
+  },
+  "schema": "softwall-confirm157-two-node-actual-nrx-v1",
+  "status": "TWO_NODE_ACTUAL_NRX_TRANSITION_PASS_WARM_SYNTHETIC",
+  "totals": {
+    "accepted_debts": 8,
+    "actual_nrx_successes": 4,
+    "deadline_misses": 0,
+    "max_nrx_release_to_complete_ms": 37.659848,
+    "max_radio_release_to_commit_ms": 107.674136,
+    "oracle_equivalent_recoveries": 4,
+    "physical_recoveries": 4,
+    "qwen_units": 2,
+    "radio_commits": 8,
+    "rejected_debts": 2,
+    "submitted_debts": 10
+  }
+}

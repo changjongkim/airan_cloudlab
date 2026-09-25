@@ -1,0 +1,248 @@
+{
+  "all_pass": true,
+  "artifact_sha256": {
+    "results/softwall_multigpu/confirm159q1a6_dev_j58857317_peer_spec.json": "e9b891e381dc06dbd6b7d507a37b94003fe41acf0128f32860c7d1a98a5dd46f",
+    "results/softwall_multigpu/confirm159q1a6_dev_j58857317_protocol.json": "67027ef600bed5de8c83aa696829d44974c75ee145ee383e818d6f390d64cb86",
+    "results/softwall_multigpu/confirm159q1a6_dev_j58857317_result.json": "8814a0a66101ec794e6108898245984d4010006d99fb28f4ad3712a107b47bd0",
+    "results/softwall_multigpu/confirm159q1b_holdout_j58857402_peer_spec.json": "d65cb88606665e7d309ad444b9765691fcaa3a30f343d8058b9936bca22f49d6",
+    "results/softwall_multigpu/confirm159q1b_holdout_j58857402_protocol.json": "074716a47c1af8491a32339df8a2750fd3053064f458472364e06e823ad66841",
+    "results/softwall_multigpu/confirm159q1b_holdout_j58857402_result.json": "c0f3b1b6c128c496d580ad9839e5fe480aef8be0cd94f821aec62b0707b0dd48",
+    "results/softwall_multigpu/raw/confirm159q1a6_dev_j58857317_coordinator.json": "0c6a1e84b5af72eb29622b56c236caf308558ddd8014d304bb831e3659ae23dd",
+    "results/softwall_multigpu/raw/confirm159q1a6_dev_j58857317_home0_h0-r0_owner.json": "6764b0d7a46c25776067ae90d03a7db8e20d47490f5a68cd7352806c8ca9f664",
+    "results/softwall_multigpu/raw/confirm159q1a6_dev_j58857317_home0_h0-r1_owner.json": "7b0386c2ba6bf492d86c72b463121847d7dce6a04a44439e3d3910eaaa76e311",
+    "results/softwall_multigpu/raw/confirm159q1a6_dev_j58857317_home0_h0-r2_owner.json": "b6a1ca556ed226f943885408b8f2d78adf6dfdadb112581971e87649088cfad9",
+    "results/softwall_multigpu/raw/confirm159q1a6_dev_j58857317_home1_h1-r0_owner.json": "5538654293a49d653add94024958bb1ea7f37458f750e606773199e041501666",
+    "results/softwall_multigpu/raw/confirm159q1a6_dev_j58857317_nrx_worker.json": "b557d903ca70334fe7c6d57d46b9670de32c199d167ba1664d2193dc9d31e319",
+    "results/softwall_multigpu/raw/confirm159q1b_holdout_j58857402_coordinator.json": "234595222eed72c1362a3358e01300c62e1112393c6613d61e2cf0f2002806b1",
+    "results/softwall_multigpu/raw/confirm159q1b_holdout_j58857402_home0_h0-r0_owner.json": "001cd685195cd282ac483d9d23aff7c1609062b3de4195c07c53082781497af9",
+    "results/softwall_multigpu/raw/confirm159q1b_holdout_j58857402_home0_h0-r1_owner.json": "d01767b33379d7de76be501ea5106b4b32e6e1c5541e51e760e21e4e0ab2f634",
+    "results/softwall_multigpu/raw/confirm159q1b_holdout_j58857402_home0_h0-r2_owner.json": "4c7df6a13018bc4967877dbc53d3a7608a4be05728ac1c7921b869d3b79cf199",
+    "results/softwall_multigpu/raw/confirm159q1b_holdout_j58857402_home1_h1-r0_owner.json": "0f921cd3d7b728c29ddf94588672aa96f6a481a49ee5d7047eb1dd9308c48473",
+    "results/softwall_multigpu/raw/confirm159q1b_holdout_j58857402_nrx_worker.json": "4a96b6b4244f1a3adb39363880284acbc6306447c7a399ca5905a3a88a52d7eb"
+  },
+  "campaigns": [
+    {
+      "campaign": "development",
+      "job_id": "58857317",
+      "label": "confirm159q1a6_dev_j58857317",
+      "node": "nid001177",
+      "seed_base": 32200000,
+      "summary": {
+        "actual_nrx_requests": 1000,
+        "actual_nrx_successes": 702,
+        "bank_copy_gpu_ms": {
+          "count": 1000,
+          "max": 0.9953920245170593,
+          "mean": 0.11841804809868335,
+          "p50": 0.10825599730014801,
+          "p99": 0.22630399465560913
+        },
+        "deadline_misses": 0,
+        "local_shared_class_disagreements": 0,
+        "nrx_release_to_complete_ms": {
+          "count": 1000,
+          "max": 23.881511,
+          "mean": 5.20597944,
+          "p50": 5.845259,
+          "p99": 8.063215
+        },
+        "oracle_equivalent_recoveries": 298,
+        "physical_recoveries": 298,
+        "prestage_ms": {
+          "count": 4,
+          "max": 2660.919983,
+          "mean": 2611.2962355,
+          "p50": 2653.688427,
+          "p99": 2660.919983
+        },
+        "qwen_execution_ms": {
+          "count": 250,
+          "max": 26.770941,
+          "mean": 22.523783436000002,
+          "p50": 22.417289,
+          "p99": 25.182234
+        },
+        "qwen_units": 250,
+        "radio_commits": 1000,
+        "radio_release_to_commit_ms": {
+          "count": 1000,
+          "max": 99.509379,
+          "mean": 56.288467040999954,
+          "p50": 46.249909,
+          "p99": 98.472821
+        },
+        "raw_zero_normalized_failures": 1,
+        "recovery_path_ms": {
+          "count": 298,
+          "max": 5.600166,
+          "mean": 3.6116340503355677,
+          "p50": 3.506141,
+          "p99": 4.326069
+        },
+        "recovery_preflight_path_ms": {
+          "count": 4,
+          "max": 59.081902,
+          "mean": 17.825881000000003,
+          "p50": 4.187791,
+          "p99": 59.081902
+        },
+        "rounds": 250
+      }
+    },
+    {
+      "campaign": "holdout",
+      "job_id": "58857402",
+      "label": "confirm159q1b_holdout_j58857402",
+      "node": "nid001308",
+      "seed_base": 33000000,
+      "summary": {
+        "actual_nrx_requests": 1000,
+        "actual_nrx_successes": 716,
+        "bank_copy_gpu_ms": {
+          "count": 1000,
+          "max": 0.7188799977302551,
+          "mean": 0.13056569607555865,
+          "p50": 0.11606399714946747,
+          "p99": 0.2784000039100647
+        },
+        "deadline_misses": 0,
+        "local_shared_class_disagreements": 0,
+        "nrx_release_to_complete_ms": {
+          "count": 1000,
+          "max": 23.091002,
+          "mean": 5.258360421999994,
+          "p50": 5.873581,
+          "p99": 8.084742
+        },
+        "oracle_equivalent_recoveries": 284,
+        "physical_recoveries": 284,
+        "prestage_ms": {
+          "count": 4,
+          "max": 2652.989042,
+          "mean": 2590.62947575,
+          "p50": 2645.422523,
+          "p99": 2652.989042
+        },
+        "qwen_execution_ms": {
+          "count": 250,
+          "max": 25.703981,
+          "mean": 22.447932671999997,
+          "p50": 22.177527,
+          "p99": 25.272377
+        },
+        "qwen_units": 250,
+        "radio_commits": 1000,
+        "radio_release_to_commit_ms": {
+          "count": 1000,
+          "max": 103.401584,
+          "mean": 55.66827177400003,
+          "p50": 46.208878,
+          "p99": 98.56681
+        },
+        "raw_zero_normalized_failures": 0,
+        "recovery_path_ms": {
+          "count": 284,
+          "max": 11.555466,
+          "mean": 3.5818385211267594,
+          "p50": 3.515582,
+          "p99": 4.268046
+        },
+        "recovery_preflight_path_ms": {
+          "count": 4,
+          "max": 64.750189,
+          "mean": 19.216166249999997,
+          "p50": 4.109209,
+          "p99": 64.750189
+        },
+        "rounds": 250
+      }
+    }
+  ],
+  "claim_scope": "Two-node finite-sample qualification of the warm synthetic P180/D155 actual-NeuralRx transition mode. The 180 ms period leaves a 25 ms post-expiry bank-copy interval; all expensive input/oracle construction and the full P2P/window/cuPHY/response cold preflight complete before readiness. The radio contract remains D155 with NRx45, conventional25, AI35. This is not WCET, cold/long-idle, production d_MAC, integrated fault, variable-context trace throughput, or cross-family evidence. Pilot and failed development samples are excluded.",
+  "gates": {
+    "both_campaigns_pass": true,
+    "combined_sample_exactly_2000": true,
+    "development_node_excluded_from_holdout": true,
+    "development_then_holdout": true,
+    "distinct_job_node_seed": true,
+    "frozen_source_equal_and_current": true,
+    "full_recovery_preflight_both_nodes": true,
+    "same_p180_mode_and_workload": true,
+    "zero_bound_deadline_contract_lifecycle_violation": true
+  },
+  "schema": "softwall-confirm159-q1-two-node-result-v1",
+  "source_sha256": {
+    "scripts/actual_nrx_integrated_coordinator.py": "bcff4884a1097e74058820868327d447e1cd84f297665f6ddc245374813bf04d",
+    "scripts/actual_nrx_integrated_owner.py": "0b3ad90dd898bd9abeea832c83ac2b07bb571304eae6476f52ecb0611ed2e210",
+    "scripts/actual_nrx_multi_peer_worker.py": "062e82a652535de86ccd024a38dbae1e3907b2ba7ffa607f9a4b6f50335bc298",
+    "scripts/actual_nrx_repeated_control.py": "c3a5b5c29a6f0eb8beb686e119acf466ebc5e8f2da32d756f81c922dd9c77323",
+    "scripts/actual_nrx_shared_recovery_plan_v1.py": "c9e036f23f2bf913d1b5c4b27ba9a6bb82acfdcb166400b3a9abb4c0fc6b1041",
+    "scripts/analyze_confirm159_q1.py": "45d369ff7956e083f92dbf8465d10a077a6a6d8eb098f6e5c80b103cccf0dfd4",
+    "scripts/build_confirm159_q1_protocol.py": "cd736f240694e6eec7a4dc9794a459acad455b0530bee36fa58d57a368bb2018",
+    "scripts/c159_persistent_nrx_worker.py": "d43a1310a27f98c8cc5247e8d84ab0f8784c561a308be65e611f74b4aa238943",
+    "scripts/c159_prestaged_owner.py": "bd0bf68a6cc8a5e41190ea1073df7cd46936fbd49733f3b1544fc50d8a344d75",
+    "scripts/c159_q1_coordinator.py": "679454672ca60850033b573463d9aa53cd7469320c67776e02927da60159c397",
+    "scripts/dual_receiver_phy.py": "be2fac930f76cfac456a77cd0f15c92c1e159db2edd0137848c91ac664206f06",
+    "scripts/integrated_shared_recovery_launch_plan_v1.py": "52160f53c5b100a5d3b3d479e491f6b8a6abe19af015ba31a5a2c9c280cbfab9",
+    "scripts/integrated_shared_recovery_plan_v1.py": "c0673d823dd77c61b8c7426090db5c15f4f01aa8ed745dd00ea36991c8a1ba04",
+    "scripts/integrated_shared_recovery_worker.py": "ab75ff2c8f75428a84d6ec2f252390a8b2ce7e3233e9674719fc83da659cfe4a",
+    "scripts/multigpu_p2p_ipc_gate.py": "6249176023d7469af64245e1aa3e6ed972f47669e47da32aca40795ad481e58a",
+    "scripts/multigpu_p2p_nrx_worker.py": "fb0c64be55ca5f4e0ec88c14e91b76443ff34abc514db782c35684c8bab4d759",
+    "scripts/run_confirm159_q1.sh": "9a8744374c60418e6fda8c981cd7a6db52b5997d91f6b14f85fc9e2de04a5938",
+    "scripts/shared_conventional_owner.py": "cc079530ac8547edb2f82a54263268ac868229c9b077ac536a1b12837eac93c0",
+    "scripts/shared_conventional_worker.py": "0ea326d416289b1acb771648e231e4c8a55bce639ee88ca9383cec4312daaa33",
+    "scripts/shared_recovery_certificate_v1.py": "2ac779a434d18f0c545e27e3bdf74a0eb5ca4413d9e66cbf378d5bbe7509b441",
+    "scripts/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "status": "C159_Q1_TWO_NODE_P180_PASS",
+  "summary": {
+    "actual_nrx_requests": 2000,
+    "actual_nrx_successes": 1418,
+    "deadline_misses": 0,
+    "input_roundtrip_violations": 0,
+    "local_shared_class_disagreements": 0,
+    "nrx_release_to_complete_ms": {
+      "count": 2000,
+      "max": 23.881511,
+      "mean": 5.232169931000011,
+      "p50": 5.854047,
+      "p99": 8.084742
+    },
+    "physical_recoveries": 582,
+    "qwen_execution_ms": {
+      "count": 500,
+      "max": 26.770941,
+      "mean": 22.485858054000015,
+      "p50": 22.290723,
+      "p99": 25.182234
+    },
+    "qwen_units": 500,
+    "radio_commits": 2000,
+    "radio_release_to_commit_ms": {
+      "count": 2000,
+      "max": 103.401584,
+      "mean": 55.978369407500075,
+      "p50": 46.222992,
+      "p99": 98.562943
+    },
+    "raw_zero_normalized_failures": 1,
+    "recovery_contract_violations": 0,
+    "recovery_path_ms": {
+      "count": 582,
+      "max": 11.555466,
+      "mean": 3.5970946512027515,
+      "p50": 3.50968,
+      "p99": 4.317472
+    },
+    "recovery_preflight_path_ms": {
+      "count": 8,
+      "max": 64.750189,
+      "mean": 18.521023625,
+      "p50": 4.109209,
+      "p99": 64.750189
+    },
+    "response_echo_violations": 0,
+    "rounds": 500
+  }
+}

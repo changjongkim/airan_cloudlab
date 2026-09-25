@@ -1,0 +1,39 @@
+salloc: Granted job allocation 58693257
+salloc: Waiting for resource configuration
+salloc: Nodes nid001153 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+[S2] policy=conventional_only n=200 p99=7.928ms max=14.821ms miss=0 correct=77 nrx=0 conv=200 bg=0 duplicate=0
+14:39:59.321953 cuphy.hpp:122    CON[2234315] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x56055c07bde0).
+confirm55 operational requalification passed
+Traceback (most recent call last):
+  File "/softwall/ai_worker.py", line 232, in <module>
+    main()
+  File "/softwall/ai_worker.py", line 228, in main
+    run_rpc(args, unit)
+  File "/softwall/ai_worker.py", line 137, in run_rpc
+    server.bind(str(socket_path))
+OSError: AF_UNIX path too long
+background worker exited before ready
+MPS quit command did not return within 5 seconds
+salloc: Job allocation 58693257 has been revoked.
+[2026-09-21T14:42:44.842] error: *** STEP 58693257.0 ON nid001153 CANCELLED AT 2026-09-21T14:42:44 DUE to SIGNAL Terminated ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+Traceback (most recent call last):
+  File "/softwall/same_request_ipc_worker.py", line 139, in <module>
+    main()
+  File "/softwall/same_request_ipc_worker.py", line 54, in main
+    peer = CudaIpcPeer(args.tag, 120.0, directory=args.ipc_dir)
+  File "/softwall_task1/isca_v2/cuda_ipc_channel.py", line 123, in __init__
+    raise TimeoutError(f"CUDA IPC owner info timeout: {self.info_path}")
+TimeoutError: CUDA IPC owner info timeout: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58693257/cuda_ipc_two_58693257_2234268_c1.info
+Traceback (most recent call last):
+  File "/softwall/same_request_ipc_worker.py", line 139, in <module>
+    main()
+  File "/softwall/same_request_ipc_worker.py", line 54, in main
+    peer = CudaIpcPeer(args.tag, 120.0, directory=args.ipc_dir)
+  File "/softwall_task1/isca_v2/cuda_ipc_channel.py", line 123, in __init__
+    raise TimeoutError(f"CUDA IPC owner info timeout: {self.info_path}")
+TimeoutError: CUDA IPC owner info timeout: /pscratch/sd/s/sgkim/kcj/airan_cloudlab/run_state/softwall_same_gpu/job58693257/cuda_ipc_two_58693257_2234268_c0.info
+srun: error: nid001153: task 0: Killed
+srun: Terminating StepId=58693257.0
+srun: error: Timed out waiting for job step to complete

@@ -1,0 +1,48 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm45_transaction_vs_eager",
+  "purpose": "Compare the fully transactional separate-process NRx plus recovery-gap AI policy against a strong eager-dual baseline on identical noisy PHY requests, background work and node resources. This closes the reservation gap in the earlier external comparison.",
+  "radio": {
+    "iterations_per_condition": 10000,
+    "period_ms": 90,
+    "deadline_ms": 80,
+    "snr_db": -8.5,
+    "rounds": [
+      {"round": 1, "payload_seed": 20321045, "channel_seed_base": 20335000, "order": ["eager_dual", "external_transaction"]},
+      {"round": 2, "payload_seed": 20321046, "channel_seed_base": 20336000, "order": ["external_transaction", "eager_dual"]}
+    ]
+  },
+  "execution": {
+    "same_node_allocation_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_each_condition": 20,
+    "operational_requalification": "200 conventional-only releases with zero deadline misses"
+  },
+  "external_transaction": {
+    "endpoint_mps_cap": 80,
+    "endpoint_timeout_ms": 30,
+    "nrx_end_to_end_bound_ms": 30,
+    "conventional_gpu_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "fallback_calendar_capacity": 1,
+    "recovery_gap_ai": true
+  },
+  "background_both_conditions": {
+    "kind": "NeuralRx",
+    "mps_cap": 20,
+    "repeats_per_unit": 1,
+    "rpc_budget_ms": 40,
+    "rpc_timeout_ms": 45,
+    "guard_ms": 2
+  },
+  "primary_gate": {
+    "all_runs_complete_same_node_job_trace": true,
+    "both_policies_zero_ran_deadline_misses": true,
+    "both_policies_zero_ai_budget_violations_crossings_faults": true,
+    "external_zero_endpoint_timeout_bounds_duplicate_commits_outstanding_credits": true,
+    "external_radio_utility_noninferior_to_eager_each_round_margin_pp": -0.25,
+    "external_completed_ai_units_exceed_eager_each_round": true
+  },
+  "interpretation_limit": "Compare both seed/order pairs including a failure. A pass demonstrates conditional benefit for this AI unit and P90/D80 trace, not arbitrary MPS isolation, mathematical WCET or production slot timing."
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "softwall-frozen-protocol-amendment-v1",
+  "campaign": "confirm102_independent_multi_event_conditional_recovery_policy",
+  "original_protocol_sha256": "f10649a4972c64d91693e651dc600e4180969d9228244fc144796702a21b5e85",
+  "created_after_first_individual_trace_open": true,
+  "first_attempt_outcome_observed": false,
+  "first_attempt_failure": "KeyError low_gate_model after trace/model calibration was computed in process memory but before case sampling, report write, or stdout result. No numerical calibration or policy result was observed.",
+  "correction_scope": "Supply the omitted low_gate_model path already uniquely identified by the original source_sha256 and low_gate baseline description. No workload, policy, comparator, threshold value, sampling seed, metric, or gate changes.",
+  "low_gate_model": "confirm60_low_gate_train_selection.json",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/analyze_confirm102_independent_multi_event.py": "744a5dcaf8337a01a601bcbe1d1d1302c6b766b1e129f66bc0ec9977779c0db8",
+    "scripts_for_node/softwall_same_gpu/offline_online_recovery_v4.py": "fc2fdc73c009a50d311c961fa91ed0fdef8058ed176f0991522b914d5ba8e1fe",
+    "scripts_for_node/softwall_same_gpu/cv_grid_phy_value_model.py": "90597e4356178574c5cce0861cc36f6f2685fd1e24df5ec5d52bfb6e821b3dff",
+    "scripts_for_node/softwall_same_gpu/test_offline_online_recovery_v4.py": "51437e66b528decbd862ea21a0c31976d40e4ac7281b8e565ecedd7ba40d779f",
+    "results/softwall_same_gpu/confirm102_train_only_cv_grid_model.json": "43199b93cd736204688c952e75dd548d4422bcc59b2ba2e5558cc1d0299c9268",
+    "results/softwall_same_gpu/confirm60_low_gate_train_selection.json": "2f71b392f10ca7e12b2c722238160458d52a79987c6007bf45e67dfd43d4b9be",
+    "results/softwall_same_gpu/confirm102_blinded_phy_protocol.json": "a611f49c6ce1098b1db25b2114449cd2a3c828d1fd4f460d51810236ee6869c9",
+    "results/softwall_same_gpu/confirm102_blinded_phy_capture.json": "f263b2e737ba781eff26f96fbc3004ce498ab67cc20aaa7878f774e2530d4fcd"
+  }
+}

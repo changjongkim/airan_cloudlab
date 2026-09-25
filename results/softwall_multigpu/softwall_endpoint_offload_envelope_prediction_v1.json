@@ -1,0 +1,1332 @@
+{
+  "schema": "softwall-deterministic-envelope-v1",
+  "checker_sha256": "9e5a4aaf4bcaf12d75d79c775a686424caedf44fb780d4bc16560592a6935108",
+  "input": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/softwall_endpoint_offload_envelope_grid_v1.json",
+  "input_sha256": "34a1c8f08ce696ca19bf76055ce3e4bb7573cbb94d963ae33725c4a48c87dce0",
+  "scope": "Synchronous P180/D155 batch, one GPU0 RAN home/recovery lane, endpoint-only 1/2/4-GPU scale-out, warm qualified bounds; no sharded-home prediction.",
+  "classification": {
+    "QSU": "qualified-safe-useful: mandatory path feasible and at least one listed bounded AI class fits static or conditional slack",
+    "QSN": "qualified-safe-no-slack: mandatory path feasible but no listed AI class fits",
+    "MI": "mandatory-infeasible: recovery timing or home receiver memory is infeasible",
+    "UQ": "unqualified: required timing/lifecycle bounds are absent"
+  },
+  "results": [
+    {
+      "id": "endpoint_offload_g1_c4",
+      "gpu_count": 1,
+      "cells": 4,
+      "status": "QSU",
+      "reason": "safe mode admits at least one bounded AI class",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 48.0,
+      "home_cell_counts": [
+        4
+      ],
+      "home_mandatory_demand_ms": [
+        48.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        105.0
+      ],
+      "base_all_fail_slack_ms": 105.0,
+      "home_max_released_recovery_slack_ms": [
+        36.0
+      ],
+      "max_released_recovery_slack_ms": 36.0,
+      "endpoint_admitted_cells": 4,
+      "endpoint_rejected_cells": 0,
+      "endpoint_schedule_is_timing_only_counterfactual": false,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 105.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 117.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 129.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 141.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C113 single-GPU 4-cell qualified mode"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g1_c8",
+      "gpu_count": 1,
+      "cells": 8,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 96.0,
+      "home_cell_counts": [
+        8
+      ],
+      "home_mandatory_demand_ms": [
+        96.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        57.0
+      ],
+      "base_all_fail_slack_ms": 57.0,
+      "home_max_released_recovery_slack_ms": [
+        84.0
+      ],
+      "max_released_recovery_slack_ms": 84.0,
+      "endpoint_admitted_cells": 5,
+      "endpoint_rejected_cells": 3,
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 57.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 69.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 81.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 93.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 105.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 117.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 141.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C113 single-GPU 4-cell qualified mode",
+        "C84 eight home receiver instances OOM before timed traffic; endpoint-offload v1 leaves all receiver residency on GPU0"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g1_c12",
+      "gpu_count": 1,
+      "cells": 12,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 144.0,
+      "home_cell_counts": [
+        12
+      ],
+      "home_mandatory_demand_ms": [
+        144.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        9.0
+      ],
+      "base_all_fail_slack_ms": 9.0,
+      "home_max_released_recovery_slack_ms": [
+        132.0
+      ],
+      "max_released_recovery_slack_ms": 132.0,
+      "endpoint_admitted_cells": 5,
+      "endpoint_rejected_cells": 7,
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 9.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 21.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 33.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 45.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 57.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 69.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 81.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 93.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 8,
+          "home": 0,
+          "home_local_cell": 8,
+          "cutoff_ms": 105.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 9,
+          "home": 0,
+          "home_local_cell": 9,
+          "cutoff_ms": 117.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 10,
+          "home": 0,
+          "home_local_cell": 10,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 11,
+          "home": 0,
+          "home_local_cell": 11,
+          "cutoff_ms": 141.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C113 single-GPU 4-cell qualified mode",
+        "C84 eight home receiver instances OOM before timed traffic; endpoint-offload v1 leaves all receiver residency on GPU0"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g2_c4",
+      "gpu_count": 2,
+      "cells": 4,
+      "status": "QSU",
+      "reason": "safe mode admits at least one bounded AI class",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 48.0,
+      "home_cell_counts": [
+        4
+      ],
+      "home_mandatory_demand_ms": [
+        48.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        105.0
+      ],
+      "base_all_fail_slack_ms": 105.0,
+      "home_max_released_recovery_slack_ms": [
+        36.0
+      ],
+      "max_released_recovery_slack_ms": 36.0,
+      "endpoint_admitted_cells": 4,
+      "endpoint_rejected_cells": 0,
+      "endpoint_schedule_is_timing_only_counterfactual": false,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 105.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 117.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 129.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 141.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C114/C115 local1+remote1 4-cell mode"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g2_c8",
+      "gpu_count": 2,
+      "cells": 8,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 96.0,
+      "home_cell_counts": [
+        8
+      ],
+      "home_mandatory_demand_ms": [
+        96.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        57.0
+      ],
+      "base_all_fail_slack_ms": 57.0,
+      "home_max_released_recovery_slack_ms": [
+        84.0
+      ],
+      "max_released_recovery_slack_ms": 84.0,
+      "endpoint_admitted_cells": 5,
+      "endpoint_rejected_cells": 3,
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 57.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 69.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 81.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 93.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 105.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 117.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 141.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C114/C115 local1+remote1 4-cell mode",
+        "C84 eight home receiver instances OOM before timed traffic; endpoint-offload v1 leaves all receiver residency on GPU0"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g2_c12",
+      "gpu_count": 2,
+      "cells": 12,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 144.0,
+      "home_cell_counts": [
+        12
+      ],
+      "home_mandatory_demand_ms": [
+        144.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        9.0
+      ],
+      "base_all_fail_slack_ms": 9.0,
+      "home_max_released_recovery_slack_ms": [
+        132.0
+      ],
+      "max_released_recovery_slack_ms": 132.0,
+      "endpoint_admitted_cells": 5,
+      "endpoint_rejected_cells": 7,
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 9.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 21.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 33.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 45.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 57.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 69.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 81.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 93.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 8,
+          "home": 0,
+          "home_local_cell": 8,
+          "cutoff_ms": 105.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 9,
+          "home": 0,
+          "home_local_cell": 9,
+          "cutoff_ms": 117.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 10,
+          "home": 0,
+          "home_local_cell": 10,
+          "cutoff_ms": 129.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 11,
+          "home": 0,
+          "home_local_cell": 11,
+          "cutoff_ms": 141.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C114/C115 local1+remote1 4-cell mode",
+        "C84 eight home receiver instances OOM before timed traffic; endpoint-offload v1 leaves all receiver residency on GPU0"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g4_c4",
+      "gpu_count": 4,
+      "cells": 4,
+      "status": "QSU",
+      "reason": "safe mode admits at least one bounded AI class",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 48.0,
+      "home_cell_counts": [
+        4
+      ],
+      "home_mandatory_demand_ms": [
+        48.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        105.0
+      ],
+      "base_all_fail_slack_ms": 105.0,
+      "home_max_released_recovery_slack_ms": [
+        36.0
+      ],
+      "max_released_recovery_slack_ms": 36.0,
+      "endpoint_admitted_cells": 4,
+      "endpoint_rejected_cells": 0,
+      "endpoint_schedule_is_timing_only_counterfactual": false,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 105.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 117.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 129.0,
+          "endpoint": 2,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 141.0,
+          "endpoint": 3,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C119/C120 local1+remote3 four-GPU system-safety arms"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g4_c8",
+      "gpu_count": 4,
+      "cells": 8,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 96.0,
+      "home_cell_counts": [
+        8
+      ],
+      "home_mandatory_demand_ms": [
+        96.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        57.0
+      ],
+      "base_all_fail_slack_ms": 57.0,
+      "home_max_released_recovery_slack_ms": [
+        84.0
+      ],
+      "max_released_recovery_slack_ms": 84.0,
+      "endpoint_admitted_cells": 8,
+      "endpoint_rejected_cells": 0,
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 57.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 69.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 81.0,
+          "endpoint": 2,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 93.0,
+          "endpoint": 3,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 105.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 117.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 129.0,
+          "endpoint": 2,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 141.0,
+          "endpoint": 3,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": true,
+          "static_admissible_homes": [
+            0
+          ],
+          "exchange_only_candidate": false,
+          "exchange_only_candidate_homes": [],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C119/C120 local1+remote3 four-GPU system-safety arms",
+        "C84 eight home receiver instances OOM before timed traffic; endpoint-offload v1 leaves all receiver residency on GPU0"
+      ]
+    },
+    {
+      "id": "endpoint_offload_g4_c12",
+      "gpu_count": 4,
+      "cells": 12,
+      "status": "MI",
+      "reason": "home receiver residency is infeasible",
+      "mandatory_capacity_ms": 153.0,
+      "mandatory_demand_ms": 144.0,
+      "home_cell_counts": [
+        12
+      ],
+      "home_mandatory_demand_ms": [
+        144.0
+      ],
+      "home_base_all_fail_slack_ms": [
+        9.0
+      ],
+      "base_all_fail_slack_ms": 9.0,
+      "home_max_released_recovery_slack_ms": [
+        132.0
+      ],
+      "max_released_recovery_slack_ms": 132.0,
+      "endpoint_admitted_cells": 9,
+      "endpoint_rejected_cells": 3,
+      "endpoint_schedule_is_timing_only_counterfactual": true,
+      "endpoint_schedule": [
+        {
+          "cell": 0,
+          "home": 0,
+          "home_local_cell": 0,
+          "cutoff_ms": 9.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 1,
+          "home": 0,
+          "home_local_cell": 1,
+          "cutoff_ms": 21.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 2,
+          "home": 0,
+          "home_local_cell": 2,
+          "cutoff_ms": 33.0,
+          "endpoint": null,
+          "predicted_finish_ms": null,
+          "admitted": false
+        },
+        {
+          "cell": 3,
+          "home": 0,
+          "home_local_cell": 3,
+          "cutoff_ms": 45.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 4,
+          "home": 0,
+          "home_local_cell": 4,
+          "cutoff_ms": 57.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 5,
+          "home": 0,
+          "home_local_cell": 5,
+          "cutoff_ms": 69.0,
+          "endpoint": 2,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 6,
+          "home": 0,
+          "home_local_cell": 6,
+          "cutoff_ms": 81.0,
+          "endpoint": 3,
+          "predicted_finish_ms": 45.0,
+          "admitted": true
+        },
+        {
+          "cell": 7,
+          "home": 0,
+          "home_local_cell": 7,
+          "cutoff_ms": 93.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 8,
+          "home": 0,
+          "home_local_cell": 8,
+          "cutoff_ms": 105.0,
+          "endpoint": 1,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 9,
+          "home": 0,
+          "home_local_cell": 9,
+          "cutoff_ms": 117.0,
+          "endpoint": 2,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 10,
+          "home": 0,
+          "home_local_cell": 10,
+          "cutoff_ms": 129.0,
+          "endpoint": 3,
+          "predicted_finish_ms": 90.0,
+          "admitted": true
+        },
+        {
+          "cell": 11,
+          "home": 0,
+          "home_local_cell": 11,
+          "cutoff_ms": 141.0,
+          "endpoint": 0,
+          "predicted_finish_ms": 135.0,
+          "admitted": true
+        }
+      ],
+      "ai_classes": [
+        {
+          "bound_ms": 35.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 40.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 65.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        },
+        {
+          "bound_ms": 75.0,
+          "static_admissible": false,
+          "static_admissible_homes": [],
+          "exchange_only_candidate": true,
+          "exchange_only_candidate_homes": [
+            0
+          ],
+          "too_large_even_after_exchange": false
+        }
+      ],
+      "evidence": [
+        "C119/C120 local1+remote3 four-GPU system-safety arms",
+        "C84 eight home receiver instances OOM before timed traffic; endpoint-offload v1 leaves all receiver residency on GPU0"
+      ]
+    }
+  ],
+  "counts": {
+    "QSU": 3,
+    "QSN": 0,
+    "MI": 6,
+    "UQ": 0
+  }
+}

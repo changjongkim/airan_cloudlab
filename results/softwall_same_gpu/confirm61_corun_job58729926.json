@@ -1,0 +1,32 @@
+{
+  "schema": "softwall-confirm61-corun-v1",
+  "job": "58729926",
+  "gates": {
+    "source_hashes": true,
+    "off_contract": true,
+    "off_provenance": true,
+    "off_safety": true,
+    "off_observed_timing": true,
+    "on_contract": true,
+    "on_provenance": true,
+    "on_safety": true,
+    "on_observed_timing": true,
+    "paired_trace": true,
+    "early_host_overlap_observed": true,
+    "radio_noninferiority": true
+  },
+  "all_pass": true,
+  "comparison": {
+    "off_correct": 196,
+    "on_correct": 196,
+    "off_ai_units": 5707,
+    "on_ai_units": 5753,
+    "ai_difference_percent": 0.8060276852987559,
+    "off_fallbacks": 375,
+    "on_fallbacks": 375,
+    "on_host_overlapped_early_mandatory": 99,
+    "off_response_p99_ms": 12.463117159999998,
+    "on_response_p99_ms": 12.13789854
+  },
+  "interpretation": "Physical same-GPU MPS full-path sample and host outstanding overlap only. Host overlap is not GPU kernel overlap, and observed maximum below 25 ms is not WCET. Synthetic P150/D130, fixed routing, and AI after radio do not validate the joint scheme."
+}

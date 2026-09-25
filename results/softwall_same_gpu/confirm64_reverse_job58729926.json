@@ -1,0 +1,34 @@
+{
+  "schema": "softwall-confirm64-reverse-v1",
+  "job": "58729926",
+  "gates": {
+    "source_hashes": true,
+    "off_contract": true,
+    "off_provenance": true,
+    "off_safety": true,
+    "off_timing": true,
+    "off_pre_record_integrity": true,
+    "one_contract": true,
+    "one_provenance": true,
+    "one_safety": true,
+    "one_timing": true,
+    "one_pre_record_integrity": true,
+    "paired_trace": true,
+    "pre_radio_exposure": true,
+    "radio_noninferiority": true
+  },
+  "all_pass": true,
+  "comparison": {
+    "off_correct": 197,
+    "one_correct": 197,
+    "off_ai_units": 5814,
+    "one_ai_units": 5890,
+    "ai_difference_percent": 1.3071895424836601,
+    "one_pre_radio_ai_units": 159,
+    "off_nrx_response_p99_ms": 8.193448720000001,
+    "one_nrx_response_p99_ms": 11.43443386,
+    "off_commit_response_p99_ms": 10.162852529999995,
+    "one_commit_response_p99_ms": 12.997477339999998
+  },
+  "interpretation": "One physically completed AI RPC before host NRx observation and first fallback guard in a P150/D130 synthetic sample. Host outstanding overlap does not prove GPU kernel overlap; sample maximum is not WCET. AI timeout/fault continuation is not qualified. This is not an atomic joint AI/recovery policy or production guarantee."
+}

@@ -1,0 +1,288 @@
+{
+  "schema": "softwall-production-exit-gate-v1",
+  "all_pass": false,
+  "status": "FAIL_CURRENT_DESIGN_NOT_PRODUCTION_QUALIFIED",
+  "timing_contract": {
+    "status": "VENDOR_TESTMAC_THRESHOLD_IDENTIFIED_NOT_PRODUCTION_D_MAC",
+    "source_role": "NVIDIA describes testMAC as a developer tool acting as L2 in a controlled environment; it is a stronger integration target than the synthetic P180/D155 contract but not a field DU trace.",
+    "early_harq_deadline_ns": 2000000,
+    "ul_ind_deadline_ns": 4500000,
+    "prach_ind_deadline_ns": 4500000,
+    "uci_ind_deadline_ns": 4500000,
+    "validator_semantics": "testMAC reconstructs slot T0 with sfn_to_tai and marks the indication late when handler-entry time minus T0 exceeds the configured threshold.",
+    "source_sha256": {
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/README.md": "fa0779f6a3f2e7a6951be9a60539164cc5b939c4667a0b8f41cd09d443521379",
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/testMAC/test_mac_config.yaml": "3c9fa6cfa152c860b30bfb7cc6f5502c5b46ebeda604b390f5ced242b434a78f",
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/testMAC/test_mac_configs.cpp": "14ec700e67bc96e52bcf58c382a9259e1a038e9b3c977a867594bdee7534ce60",
+      "third_party/aerial-cuda-accelerated-ran/cuPHY-CP/testMAC/testMAC/scf_fapi_handler.cpp": "4aa84c7ed18a645b551a85ab862fa0cd669402a8ad6c6c3d28fad8a3ed3bbd46"
+    }
+  },
+  "current_timing_diagnosis": {
+    "gate_pass": false,
+    "live_du_trace_available": false,
+    "wait_then_recover_diagnostic_pass": false,
+    "raw_iq_full_remote_diagnostic_pass": false,
+    "qualification_rule": "Production timing requires both a target-DU trace-derived d_MAC and a physically requalified implementation under that contract. Passing the testMAC microbenchmark alone is insufficient.",
+    "local_isolated_clean": {
+      "neural_wall_ms": {
+        "count": 1000,
+        "mean": 3.024594017,
+        "p50": 3.0073505000000003,
+        "p95": 3.1487620499999998,
+        "p99": 3.18159802,
+        "min": 2.964938,
+        "max": 3.666388
+      },
+      "conventional_wall_ms": {
+        "count": 1000,
+        "mean": 3.627196293,
+        "p50": 3.599879,
+        "p95": 3.75226505,
+        "p99": 3.80916563,
+        "min": 3.541156,
+        "max": 7.106327
+      },
+      "wait_then_recover_wall_ms": {
+        "count": 1000,
+        "mean": 6.65179031,
+        "p50": 6.608893,
+        "p95": 6.8659471,
+        "p99": 6.984433309999999,
+        "min": 6.538606,
+        "max": 10.114819
+      },
+      "deadline_counts": {
+        "neural_wall_le_deadline": 1000,
+        "conventional_wall_le_deadline": 997,
+        "wait_then_recover_wall_le_deadline": 0
+      }
+    },
+    "speculative_same_gpu_parallel": {
+      "parallel_pair_wall_ms": {
+        "count": 1000,
+        "mean": 7.5836441709999995,
+        "p50": 6.828067,
+        "p95": 13.559387899999994,
+        "p99": 17.552368639999994,
+        "min": 6.056101,
+        "max": 29.424393
+      },
+      "deadline_counts": {
+        "parallel_pair_wall_le_deadline": 0,
+        "parallel_pair_wall_gt_deadline": 1000
+      }
+    },
+    "cross_gpu_candidates": {
+      "precomputed_ls_split": {
+        "parallel_pair_wall_ms": {
+          "n": 1000,
+          "mean": 6.492539013,
+          "p50": 5.9424305,
+          "p95": 10.321105449999997,
+          "p99": 11.896979589999987,
+          "p99_9": 20.12331251500006,
+          "min": 5.78287,
+          "max": 20.785165
+        },
+        "deadline_counts": {
+          "parallel_pair_wall_le_deadline": 0,
+          "parallel_pair_wall_gt_deadline": 1000
+        }
+      },
+      "raw_iq_full_remote": {
+        "parallel_pair_wall_ms": {
+          "n": 1000,
+          "mean": 4.226587075,
+          "p50": 3.8313275,
+          "p95": 6.671513199999998,
+          "p99": 9.506097289999998,
+          "p99_9": 14.500585940000088,
+          "min": 3.782834,
+          "max": 15.48554
+        },
+        "deadline_counts": {
+          "parallel_pair_wall_le_deadline": 852,
+          "parallel_pair_wall_gt_deadline": 148
+        }
+      },
+      "raw_iq_full_remote_gc_off": {
+        "parallel_pair_wall_ms": {
+          "n": 1000,
+          "mean": 4.399739771,
+          "p50": 3.987641,
+          "p95": 6.704602999999999,
+          "p99": 10.040892099999999,
+          "p99_9": 17.301237882000052,
+          "min": 3.93597,
+          "max": 17.889531
+        },
+        "deadline_counts": {
+          "parallel_pair_wall_le_deadline": 838,
+          "parallel_pair_wall_gt_deadline": 162
+        }
+      },
+      "raw_iq_single_stream_wrapper": {
+        "controller_outcome": "endpoint timeout on first timed request",
+        "completed_worker_units": 101,
+        "neural_gpu_ms": {
+          "count": 101,
+          "mean": 106.92192991653292,
+          "p50": 106.88809967041016,
+          "p99": 107.57743835449219,
+          "max": 107.59107208251953
+        }
+      }
+    },
+    "qualified_q2_context": {
+      "nrx_release_to_complete_ms": {
+        "count": 4800,
+        "max": 18.123007,
+        "mean": 5.192831625833324,
+        "p50": 5.862303,
+        "p99": 8.098506
+      },
+      "recovery_path_ms": {
+        "count": 1312,
+        "max": 13.465105,
+        "mean": 3.4790348414634127,
+        "p50": 3.40418,
+        "p99": 4.239559
+      }
+    },
+    "interpretation": "The current wait-then-recover path missed the 4.5 ms diagnostic in 1000/1000 clean isolated trials. Same-GPU speculative dual execution and the precomputed-LS cross-GPU split also missed 1000/1000. Moving the full NeuralRx path behind raw-IQ P2P improved completion to 852/1000, while GC OFF produced 838/1000; both retain disqualifying tails. A single-stream wrapper took about 107 ms and timed out. These are sample diagnostics, but they refute qualifying every tested implementation at 4.5 ms."
+  },
+  "external_channel_diagnosis": {
+    "gate_pass": false,
+    "supported_channel_holdout_available": false,
+    "development_screen_has_any_neural_success": false,
+    "qualification_rule": "External-channel support requires a model with an explicit supported-channel contract and a frozen disjoint-seed holdout; development-screen success alone would not qualify the mode.",
+    "channel": "Aerial TDL-A, 30 ns, 10 Hz, 1x4 UL, no AWGN",
+    "campaigns": [
+      {
+        "campaign": "prior_corrected_1x4",
+        "arms": [
+          {
+            "name": "raw",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          }
+        ]
+      },
+      {
+        "campaign": "normalization",
+        "arms": [
+          {
+            "name": "raw",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "cfr_rms",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "match_ue_power",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "match_component_power",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          }
+        ]
+      },
+      {
+        "campaign": "radio_profile",
+        "arms": [
+          {
+            "name": "historical",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "reference_dmrs_spacing",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "reference_dmrs_and_mcs",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "nvidia_reference",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          }
+        ]
+      },
+      {
+        "campaign": "tx_and_channel_mode",
+        "arms": [
+          {
+            "name": "frequency_delay0",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "frequency_delay1us",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "time_delay1us",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          }
+        ]
+      },
+      {
+        "campaign": "official_fp32",
+        "arms": [
+          {
+            "name": "frequency_delay0",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "frequency_delay1us",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          },
+          {
+            "name": "time_delay1us",
+            "conventional_correct": 10,
+            "neural_correct": 0
+          }
+        ]
+      }
+    ],
+    "interpretation": "Conventional decoding succeeded in every reported arm, while NeuralRx succeeded in none. Channel-power normalization, public-reference DMRS/MCS/start-symbol/TDI settings, exact one-antenna transmission, Aerial frequency/time channel execution, and the notebook's FP32 engine precision did not repair compatibility. The supplied pretrained model is therefore not qualified for this external TDL-A workload."
+  },
+  "claim_decision": {
+    "production_harq_guarantee": "REJECT",
+    "external_tdl_neuralrx_support": "REJECT",
+    "synthetic_qualified_substrate": "RETAIN",
+    "reason": "The method remains valid as a qualification procedure and as a synthetic qualified substrate, but its current implementation cannot be presented as production PUSCH/HARQ capable."
+  },
+  "required_exit_gates": [
+    {
+      "id": "P1_LIVE_DU_CLOCK",
+      "requirement": "Capture IQ-ready, PHY submit, CRC/FAPI publish, and MAC consume/expiry on one clock from the target DU; derive d_MAC from that trace."
+    },
+    {
+      "id": "P2_FAST_PATH",
+      "requirement": "Implement a path whose qualified all-fail completion fits the derived deadline. Every tested path is ruled out at the 4.5 ms testMAC threshold; raw-IQ full-remote P2P is the best measured candidate but still exceeded the threshold in 148/1000 trials."
+    },
+    {
+      "id": "P3_CHANNEL_COMPATIBILITY",
+      "requirement": "Obtain or train a NeuralRx model with an explicit supported-channel contract, then pass a frozen disjoint-seed external-channel holdout with both conventional and NeuralRx correctness."
+    },
+    {
+      "id": "P4_INTEGRATED_REQUALIFICATION",
+      "requirement": "Re-run MPS plus bounded Qwen plus correlated all-fail recovery under the P1 timing contract and P3 channel workload on independent nodes."
+    }
+  ]
+}

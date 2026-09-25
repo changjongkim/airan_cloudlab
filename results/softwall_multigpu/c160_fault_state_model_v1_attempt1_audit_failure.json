@@ -1,0 +1,30 @@
+{
+  "all_pass": false,
+  "gates": {
+    "bounded_state_product_nonempty": true,
+    "zero_invariant_violation": false,
+    "zero_rejected_transition_mutation": true
+  },
+  "mutation_on_reject": [],
+  "schema": "softwall-c160-fault-state-model-v1",
+  "scope": "Finite pure-state audit of epoch/generation/idempotency and AI physical-fence lifecycle. It is not a GPU fault-injection result, distributed durability proof, or GPU/driver-hang model.",
+  "source_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/c160_fault_state_model_v1.py": "9876aaed2d1fe0e1d67c6f54431795cee84a1bad954bec2a252622b542788e6b",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/run_c160_fault_model_v1.py": "57b3a0641e09c13818ba05a3c6947a1c5c6126a8d13c55ce22ab6ad719205b77",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_c160_fault_state_model_v1.py": "e17ab43ddc3f912c8c38472015ce1a4ec81c5bf80681a4d1ab27b5abe61e1c7d"
+  },
+  "status": "C160_MODEL_FAIL",
+  "summary": {
+    "invariant_violations": 1,
+    "rejected_transition_mutations": 0,
+    "state_transition_cases": 51
+  },
+  "violations": [
+    {
+      "failed": [
+        "unfenced_lease_not_released"
+      ],
+      "kind": "invariant"
+    }
+  ]
+}

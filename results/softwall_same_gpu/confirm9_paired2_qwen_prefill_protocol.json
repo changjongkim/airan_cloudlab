@@ -1,0 +1,49 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "frozen_before_execution": true,
+  "campaign": "confirm9_paired2_qwen_prefill_p50",
+  "purpose": "Test whether S0 protects a valid paired 2-cell full-PHY RAN from a real Qwen2.5-1.5B prefill workload while retaining positive AI throughput.",
+  "ran": {
+    "input": "Aerial PdschTx-generated valid 273-PRB PUSCH slot",
+    "path": "CE+NI+EQ+de-rate-match+LDPC+CRC+payload comparison",
+    "cells_per_release": 2,
+    "period_ms": 50,
+    "deadline_ms": 21,
+    "iterations_per_run": 500,
+    "runs": 3,
+    "seed_base": 20269900
+  },
+  "ai": {
+    "model": "Qwen/Qwen2.5-1.5B",
+    "phase": "prefill",
+    "context_tokens": 16,
+    "dtype": "float16",
+    "batch": 1,
+    "warmup_units": 3,
+    "probe": {
+      "samples": 246,
+      "max_gpu_ms": 24.012,
+      "source": "qwen_probe_prefill16_job58625542.json"
+    }
+  },
+  "conditions": [
+    "mps_alone",
+    "uncontrolled_qwen",
+    "protected_qwen_s0"
+  ],
+  "s0": {
+    "ai_end_to_end_budget_ms": 28,
+    "guard_ms": 2,
+    "maximum_outstanding_units": 1,
+    "admission_rule": "now + B_ai + G <= next_RAN_release",
+    "completion_ack_required": true
+  },
+  "primary_gate": {
+    "protected_ran_deadline_misses": 0,
+    "protected_incorrect_transport_blocks": 0,
+    "ai_budget_violations": 0,
+    "ai_release_crossings": 0,
+    "minimum_protected_ai_units": 1
+  },
+  "interpretation_limit": "This is a cooperative bounded-work-unit contract at a 50 ms harness period, not a production 0.5 ms TTI guarantee."
+}

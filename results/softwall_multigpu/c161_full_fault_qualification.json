@@ -1,0 +1,53 @@
+{
+  "all_pass": true,
+  "claim_scope": "A0-A6 finite-sample containment on qualified warm P180 nodes. One same-source A100 node/lifecycle violated the NRx45 whole-path bound and remains UQ. No GPU/driver-hang, durable restart, production d_MAC, WCET, cross-family, or throughput-superiority claim.",
+  "coverage": {
+    "A0": "no_fault_control",
+    "A1": "correlated_all_fail",
+    "A2": "stale_duplicate_nrx_outcome",
+    "A3": "post_fence_qwen_reply_delay",
+    "A4": "latest_start_physical_nonlaunch",
+    "A5": "pre_fence_qwen_channel_loss",
+    "A6": "stale_duplicate_recovery_response"
+  },
+  "gates": {
+    "all_a0_through_a6_covered": true,
+    "c160_state_semantics_pass": true,
+    "combined_radio_commit_exact": true,
+    "failure_history_preserved": true,
+    "node_lifecycle_failure_not_promoted": true,
+    "phase1_a0_a1_a4_two_node_pass": true,
+    "phase2_a2_a3_a5_a6_two_node_pass": true,
+    "zero_deadline_miss": true
+  },
+  "inputs": {
+    "c160": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c160_fault_state_model_v1.json",
+    "failure_history": [
+      "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161p2a_quarantine_sentinel_failure.json",
+      "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161p2b_marker_deadline_audit_failure.json",
+      "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161p2c_first_round_nrx_bound_failure.json"
+    ],
+    "phase1": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161_phase1_two_node.json",
+    "phase2": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c161_phase2_two_node.json"
+  },
+  "qualified_phase2_nodes": [
+    "nid001145",
+    "nid001069"
+  ],
+  "schema": "softwall-c161-full-fault-qualification-v1",
+  "status": "C161_FULL_QUALIFIED_NODE_PASS",
+  "summary": {
+    "actual_nrx_requests": 2800,
+    "correlated_all_fail_recoveries": 240,
+    "deadline_misses": 0,
+    "latest_start_nonlaunches": 52,
+    "physical_recoveries": 942,
+    "physical_rounds": 700,
+    "post_terminal_radio_rounds": 260,
+    "radio_commits": 2800,
+    "stale_duplicate_nrx_pairs": 20,
+    "stale_duplicate_recovery_pairs": 20,
+    "terminal_channel_faults": 4
+  },
+  "unqualified_observed_node_lifecycle": "nid001044 sequence-1 owner-observed NRx 47.470144 ms > 45 ms"
+}

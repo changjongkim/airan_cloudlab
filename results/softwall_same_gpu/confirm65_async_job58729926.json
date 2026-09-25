@@ -1,0 +1,33 @@
+{
+  "schema": "softwall-confirm65-async-ai-v1",
+  "job": "58729926",
+  "gates": {
+    "source_hashes": true,
+    "sync_one_contract": true,
+    "sync_one_provenance": true,
+    "sync_one_safety": true,
+    "sync_one_pre_ai": true,
+    "async_one_contract": true,
+    "async_one_provenance": true,
+    "async_one_safety": true,
+    "async_one_pre_ai": true,
+    "paired_trace": true,
+    "async_host_observation": true,
+    "radio_noninferiority": true
+  },
+  "all_pass": true,
+  "comparison": {
+    "sync_correct": 97,
+    "async_correct": 97,
+    "sync_ai_units": 2911,
+    "async_ai_units": 2937,
+    "ai_gain_percent": 0.8931638612160769,
+    "sync_pre_ai_units": 86,
+    "async_pre_ai_units": 86,
+    "sync_observed_before_ai_return": 0,
+    "async_observed_before_ai_return": 31,
+    "sync_commit_p99_ms": 15.993964489999929,
+    "async_commit_p99_ms": 14.359384279999983
+  },
+  "interpretation": "Success-path diagnostic: asynchronous RPC lets host observe some NRx results before AI completion, but joins before conventional or the earliest fallback guard. Host observation is not GPU kernel overlap. One 100-release pair cannot qualify WCET, fault continuation, production MAC expiry, or joint-policy advantage over the strong baseline."
+}

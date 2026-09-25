@@ -1,0 +1,27 @@
+{
+  "schema": "softwall-development-protocol-v3",
+  "campaign": "aerial_tdl_official_fp32_engine_screen_python_builder_v3",
+  "frozen_before_execution": true,
+  "role": "Post-failure development diagnosis only; no channel qualification or performance claim.",
+  "prior_infrastructure_failures": [
+    "v1 trtexec stopped before engine build with a CUDA driver/runtime error",
+    "v2 Python builder stopped before engine build because TensorRT 10.12 set_shape returns None rather than a success boolean"
+  ],
+  "hypothesis": "The historical SoftWall engine added --fp16, while NVIDIA's public NeuralRx notebook builds the same ONNX without an FP16 builder flag.",
+  "official_onnx_sha256": "773b92a35a8a86903915bc0bbba2ce0b0ffe35d8c5839b64af8a8391dbac633c",
+  "historical_fp16_engine_sha256": "6d5818430fc4c00cb09320ff6a807adf61eb7829fe8abd372498e3b0689f5e97",
+  "engine_build_contract": "TensorRT Python builder with fixed official input shapes, 4 GiB workspace, and no FP16 flag.",
+  "radio_profile": "NVIDIA public example: MCS7, start0, DMRS 0/5/10, TDI1, one UE TX",
+  "channel": "Aerial TDL-A, 30 ns, 10 Hz, 1x4 UL, no AWGN",
+  "arms": ["frequency_delay0", "frequency_delay1us", "time_delay1us"],
+  "iterations_per_arm": 10,
+  "payload_seed": 20357700,
+  "tdl_seed": 57701,
+  "next_gate": "A successful FP32 arm must be frozen and repeated on disjoint seeds before any compatibility claim.",
+  "source_sha256_before_execution": {
+    "build_nrx_fp32_reference_engine.py": "684a255198db0ffcf1431e7191f164cfb5ef64fbb9b8a4879970835d94ac6a60",
+    "run_aerial_tdl_fp32_reference_development_v3.sh": "71429f63938acfdc82f7132f426a9faccf9e926d2f6fbeed7f04c8530e1a6152",
+    "probe_aerial_tdl_tx_contract_development.py": "77f131240fe339f79a853fd4332f95b5c23366a30887b58a71d72f6be95e4623",
+    "dual_receiver_phy.py": "74757d874ed097571e4b16bad731392f3e7177c0bfee66f28b46d96cdaf76c8f"
+  }
+}

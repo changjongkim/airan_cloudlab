@@ -1,0 +1,51 @@
+{
+  "schema": "softwall-v13-ai35-candidate-arm-protocol-v1",
+  "status": "frozen-before-run",
+  "label": "confirm141_ai35_s1_job58832462",
+  "iterations": 160,
+  "warmup": 20,
+  "global_policy": "global",
+  "payload_seeds": [
+    33000051,
+    33010051
+  ],
+  "channel_seeds": [
+    33001000,
+    33011000
+  ],
+  "trace": "/softwall_data/softwall_context64_mechanism_trace_v1.json",
+  "trace_sha256": "b14388c7356878458031d4e881a0510f42f1b4414493f876cd13d2b881979277",
+  "placement": {
+    "gpu0": "four-cell home + two local NRx + Qwen",
+    "gpu1": "four-cell home + two local NRx + Qwen"
+  },
+  "shared_resources": "one serializable synthetic context64 request queue; recovery, NRx endpoint/IPC, Qwen execution and physical credits remain per-home",
+  "transaction_order": "observe NRx -> merge all ready recoveries in live-certificate order -> global hold -> local atomic recovery replan+AI lease -> global commit -> physical completion -> local retire+global complete",
+  "cuda_module_loading": "LAZY",
+  "period_ms": 180,
+  "deadline_ms": 155,
+  "nrx_bound_ms": 45,
+  "conv_bound_ms": 25.0,
+  "guard_ms": 2,
+  "global_broker_rpc_timeout_ms": 5,
+  "global_broker_rpc_admission_bound_ms": 7,
+  "global_broker_transaction_budget_ms": 21,
+  "admission_ai_guard_ms": 23,
+  "target_ai_bound_ms": 35,
+  "effective_transaction_bound_ms": 58,
+  "endpoint_ring_depth": 1,
+  "rejected_recovery_before_exchange": false,
+  "fault_every": 5,
+  "rpc_telemetry_required": true,
+  "source_sha256": {
+    "/softwall/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "/softwall/global_trace_qualified_control_bound_controller.py": "c57b426b400425e47700102216797a68671c3b2a5982cda34929c63d4d45b5b0",
+    "/softwall/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "/softwall/instrumented_deadline_global_trace_client_v2.py": "de3b0e95e0f62851cb4181791d27b61094c2d0754feb88554a2c4bf6437230a8",
+    "/softwall/global_trace_lease_broker.py": "db36e0db21f0debc4487e4e008e9dc3dff3e50fa3cd6be3b235cc48ec1507930",
+    "/softwall/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/softwall/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/softwall_task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/softwall_task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  }
+}

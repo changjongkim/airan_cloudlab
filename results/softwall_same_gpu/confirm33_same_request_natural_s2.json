@@ -1,0 +1,49 @@
+{
+  "schema": "softwall-same-request-ipc-analysis-v1",
+  "campaign": "confirm33_same_request_natural_s2",
+  "gates": {
+    "clean_runs_all_correct": true,
+    "natural_runs_have_recoveries": true,
+    "correct_at_least_nrx_commits": true,
+    "deadline_misses_zero": true,
+    "endpoint_timeouts_zero": true,
+    "worker_units_match": true,
+    "persistent_lifecycle": true,
+    "cap80_visible_sms": true,
+    "all_pass": true
+  },
+  "totals": {
+    "releases": 10000,
+    "correct": 9826,
+    "misses": 0,
+    "nrx_commits": 9779,
+    "fallbacks": 221,
+    "recoveries": 47,
+    "unrecovered": 174,
+    "timeouts": 0
+  },
+  "rows": [
+    {
+      "cap": 80,
+      "job": 58673249,
+      "iterations": 10000,
+      "snr_db": -8.5,
+      "correct": 9826,
+      "misses": 0,
+      "nrx_commits": 9779,
+      "fallbacks": 221,
+      "recoveries": 47,
+      "unrecovered": 174,
+      "timeouts": 0,
+      "response_p99_ms": 6.00354804,
+      "response_max_ms": 30.669448,
+      "front_mean_ms": 1.0150457791805267,
+      "post_mean_ms": 0.7943262050271034,
+      "worker_units": 10021,
+      "expected_worker_units": 10021,
+      "worker_gpu_mean_ms": 1.2259646199465917,
+      "visible_sms": 86,
+      "lifecycle": "persistent during RAN epoch; teardown after final release"
+    }
+  ]
+}

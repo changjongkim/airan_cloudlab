@@ -1,0 +1,18 @@
+{
+  "schema": "softwall-development-protocol-v1",
+  "campaign": "sionna_rayleigh_reference_development",
+  "frozen_before_execution": true,
+  "role": "Public-default channel compatibility control after clean-reference success and CDL failure; not a BLER holdout.",
+  "channel": "Sionna normalized 1x4 Rayleigh block fading, matching the public notebook's default channel branch",
+  "radio_profile": "MCS7/start0/DMRS0,5,10/TDI1/one TX/four RX/FP32 engine",
+  "esno_db": 30.0,
+  "iterations": 20,
+  "payload_seed": 20358940,
+  "channel_seed": 58941,
+  "decision_rule": "If NeuralRx passes at high Es/No, localize the open compatibility gap to frequency/time-selective CDL behavior. If it fails while clean input passes, treat the Sionna channel integration as unqualified and stop any external-channel holdout claim.",
+  "source_sha256_before_execution": {
+    "probe_sionna_rayleigh_reference_development.py": "5e4eea89868aca0927f1b9e93f9340af63860b07230ed3f596ce83991774e5fc",
+    "run_sionna_rayleigh_reference_development.sh": "b009f6565612e621d1dc67c48fade23f0432cac09e1a3db46f2c9bd7e4c0f34e",
+    "dual_receiver_phy.py": "fe71fc08a62ffe1d96c76241fc62b895c92d2e36ed1d4b16d6918e55e79b4a9c"
+  }
+}

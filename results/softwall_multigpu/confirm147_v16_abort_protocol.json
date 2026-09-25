@@ -1,0 +1,57 @@
+{
+  "schema": "softwall-v16-abort-node-protocol-v1",
+  "status": "frozen-before-arm",
+  "campaign": "confirm147",
+  "allocation_node": "nid003197",
+  "job_id": 58835729,
+  "excluded_nodes": [
+    "nid001245",
+    "nid002817",
+    "nid002688",
+    "nid001781",
+    "nid001049",
+    "nid001177",
+    "nid001144",
+    "nid001252",
+    "nid001372",
+    "nid001361",
+    "nid002049",
+    "nid001244",
+    "nid003417"
+  ],
+  "ownership_contract": "at-most-one-staged-or-offered-token-per-home",
+  "fault_arm": {
+    "operation": "abort",
+    "operation_number": 3,
+    "label": "confirm147_abort_job58835729",
+    "iterations": 200,
+    "warmup": 20,
+    "payload_seeds": [
+      40000051,
+      40010051
+    ],
+    "channel_seeds": [
+      40001000,
+      40011000
+    ]
+  },
+  "required_physical_gates": [
+    "abort_arm_pass",
+    "target_not_executed",
+    "both_homes_radio_continue",
+    "all_four_operations_observed",
+    "single_unlaunched_token",
+    "retained_token_branch_exercised"
+  ],
+  "failure_rule": "stop on failure; preserve failure; no post-hoc bound widening",
+  "source_sha256": {
+    "scripts_for_node/softwall_same_gpu/control_point_crash_global_trace_lease_broker.py": "ae2ca3d39df3f92b8200d7fc4ef52be395b06dc4362e054aa0f1de71d9a01c4e",
+    "scripts_for_node/softwall_same_gpu/four_point_crash_global_trace_lease_broker.py": "353087075e6c5d6abc043d880936ed845b6d06b14f682fca254694a5dcca761d",
+    "scripts_for_node/softwall_same_gpu/global_trace_single_token_pipelined_controller.py": "d8b44dce96d347032608faab0afd6f551715ddcb2512cc43a21cfed25b7ba4e3",
+    "scripts_for_node/softwall_same_gpu/single_token_pipelined_global_trace_client.py": "3a1dc830967758df16ab76e1053d8e016adde8cf582bc2cfd8b0f32d7d132277",
+    "scripts_for_node/softwall_same_gpu/run_v16_abort_fault_arm.sh": "866548f2cbc75d523ea5f80a4f0a904f8f5bfb22459ae887f9f716243418b1eb",
+    "scripts_for_node/softwall_same_gpu/analyze_v16_abort_node.py": "ab83b7584b8204525c15db461f83e2796098e01a87b4e6ebc422fd0a71426a1e",
+    "scripts_for_node/softwall_same_gpu/test_four_point_crash_broker.py": "dd074af75134b7b5687d12b18732a3ce15b1836bfe510772463272571b343be8",
+    "scripts_for_node/softwall_same_gpu/run_v16_abort_node_requalification.sh": "6e93f867e803b46c724e503dc7e12286ba812454f8a61b21df9df88b92c3aad2"
+  }
+}

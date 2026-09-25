@@ -1,0 +1,70 @@
+{
+  "schema": "softwall-frozen-protocol-v1",
+  "campaign": "confirm54_retimed_recovery_canary",
+  "frozen_before_execution": true,
+  "research_question": "Does the calendar-retimed early fallback preserve the Confirm53 one-cell P45/D80 safety and radio behavior on the same preregistered trace?",
+  "decision_at_stake": {
+    "pass": "If the retimed calendar has no rejected early moves, no credit leak, no deadline or timing-contract fault, positive AI work, and at least 980 correct TB, use the primitive for the multi-request design; no new novelty claim.",
+    "fail": "If any gate fails, stop before multi-request GPU work and fix the retiming integration without adding seeds."
+  },
+  "if_both_outcomes_lead_to_same_action": "Cancel if failure would not stop multi-request implementation.",
+  "comparison_role": "Operational integration canary, not a policy comparison or independent Confirm53 replication.",
+  "radio": {
+    "cells": 1,
+    "period_ms": 45,
+    "deadline_ms": 80,
+    "iterations": 1000,
+    "snr_db": -8.5,
+    "payload_seed": 20321053,
+    "channel_seed_base": 20353000,
+    "same_trace_as_confirm53_pair1": true
+  },
+  "contract": {
+    "endpoint_mps_cap": 80,
+    "background_mps_cap": 20,
+    "nrx_bound_ms": 50,
+    "conv_bound_ms": 25,
+    "commit_guard_ms": 2,
+    "endpoint_timeout_ms": 30,
+    "ai_budget_ms": 40,
+    "ai_guard_ms": 2,
+    "ai_rpc_timeout_ms": 35,
+    "fallback_timing": "early_if_clear",
+    "recovery_gap_ai": true
+  },
+  "execution": {
+    "one_node_one_mps_epoch": true,
+    "exclusive_gpu0_lock": true,
+    "quiet_seconds_before_arm": 20,
+    "operational_requalification": "200 conventional-only P90/D80 releases, zero misses",
+    "no_new_seed_or_contract_relaxation": true
+  },
+  "source_sha256_before_run": {
+    "scripts_for_node/softwall_same_gpu/same_request_transaction_controller.py": "25d981c46afd82fd8025da195c30aa5fd994b0dfeca49ffac270f7dee5b68f85",
+    "scripts_for_node/task1/isca_v2/dart_runtime.py": "4c4ced454ed48ff5ed37b441c5dbcb4083161549afa6382bbb00a5844d61367c",
+    "scripts_for_node/softwall_same_gpu/run_same_request_transaction.sh": "a76dfc2d1743cfd1aed495dd1de2e563d3f6424ca51fa775deffe934392e35cf"
+  },
+  "pass_gates": {
+    "deadline_misses": 0,
+    "admission_rejections": 0,
+    "early_retime_rejections": 0,
+    "early_fallbacks_greater_than_zero": true,
+    "correct_releases_at_least": 980,
+    "background_units_greater_than_zero": true,
+    "endpoint_timeouts": 0,
+    "nrx_bound_violations": 0,
+    "conv_bound_violations": 0,
+    "background_budget_violations": 0,
+    "background_release_crossings": 0,
+    "duplicate_commits": 0,
+    "fallback_not_started": 0,
+    "fallback_calendar_outstanding": 0,
+    "endpoint_outstanding": 0
+  },
+  "measurement_sources": {
+    "radio_and_contract": "results/softwall_same_gpu/raw/confirm54_retimed_job{job}_cap80_job{job}_controller.json",
+    "endpoint_and_ai": "matching *_worker.json and *_background.json",
+    "requalification": "results/softwall_same_gpu/raw/confirm54_requalification_job{job}.json"
+  },
+  "interpretation_limit": "This checks integration on one known trace only. It does not prove physical service bounds, multi-cell recovery safety, AI throughput superiority, or top-conference novelty."
+}

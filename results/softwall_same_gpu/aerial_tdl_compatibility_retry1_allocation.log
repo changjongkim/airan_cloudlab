@@ -1,0 +1,23 @@
+salloc: Granted job allocation 58694074
+salloc: Waiting for resource configuration
+salloc: Nodes nid002117 are ready for job
+CUDA lazy loading is not enabled. Enabling it can significantly reduce device memory usage and speed up TensorRT initialization. See "Lazy Loading" section of CUDA documentation https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#lazy-loading
+Traceback (most recent call last):
+  File "/softwall/probe_aerial_tdl_compatibility.py", line 129, in <module>
+    main()
+  File "/softwall/probe_aerial_tdl_compatibility.py", line 67, in main
+    channel = FadingChan(
+  File "/opt/nvidia/cuBB/pyaerial/src/aerial/phy5g/chan_models/fading_chan.py", line 145, in __init__
+    self.fast_fading = pycuphy.TdlChan(
+TypeError: __init__(): incompatible constructor arguments. The following argument types are supported:
+    1. aerial.pycuphy._pycuphy.TdlChan(tdl_cfg: aerial.pycuphy._pycuphy.TdlConfig, tx_signal_in_gpu: int, rand_seed: int, stream_handle: int)
+    2. aerial.pycuphy._pycuphy.TdlChan(tdl_cfg: aerial.pycuphy._pycuphy.TdlConfig, tx_signal_in_cpu: numpy.ndarray[numpy.complex64], rand_seed: int, stream_handle: int)
+
+Invoked with: kwargs: tdl_cfg=<aerial.pycuphy._pycuphy.TdlConfig object at 0x7feff93ea570>, tx_signal_in_cpu=array([ 0.        +0.j        ,  0.        +0.j        ,
+        0.        +0.j        , ...,  0.35351562+0.35351562j,
+       -0.35351562-0.35351562j,  0.35351562+0.35351562j],
+      shape=(183456,), dtype=complex64), rand_seed=20357001, stream_handle=<CUstream 0x558be5d1c2d0>
+15:16:21.340985 cuphy.hpp:122    CON[1618393] [CUPHY.MEMFOOT] cuphyMemoryFootprint - GPU allocation: 98.130 MiB for cuPHY PDSCH channel object (0x558bbe829d70).
+srun: error: nid002117: task 0: Exited with exit code 1
+srun: Terminating StepId=58694074.0
+salloc: Relinquishing job allocation 58694074

@@ -1,0 +1,93 @@
+{
+  "schema": "softwall-confirm141-v13-independent-requalification-v1",
+  "status": "PASS",
+  "nodes": [
+    "nid001372"
+  ],
+  "prior_corrected_mode_nodes": [
+    "nid001252"
+  ],
+  "inputs": {
+    "control": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm141_control_requalification_result.json",
+    "control_sha256": "089e5c4e2041f0127b23a9bb38f32475906c4042d86f7b94eb2ad64fcbd9b09d",
+    "ai35": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm141_ai35_requalification_result.json",
+    "ai35_sha256": "d5ea4c0656c31c840a90479d6f14216195415b40726c4050d6afd3381ef6c011"
+  },
+  "totals": {
+    "arms": 8,
+    "radio_records": 18880,
+    "radio_records_after_fault_detection": 14914,
+    "attempted_fault_campaign_rpcs": 2010,
+    "ai35_candidate_exchanges": 7
+  },
+  "control_evidence": {
+    "socket_timeout_ms": 5.0,
+    "declared_per_rpc_admission_bound_ms": 7.0,
+    "records": 2010,
+    "by_operation": {
+      "commit": 354,
+      "complete": 352,
+      "prepare": 1304
+    },
+    "faulted_by_operation": {
+      "commit": 2,
+      "complete": 6,
+      "prepare": 4
+    },
+    "max_elapsed_ms_by_operation": {
+      "commit": 5.77566,
+      "complete": 5.434791,
+      "prepare": 5.343565
+    },
+    "max_faulted_elapsed_ms_by_operation": {
+      "commit": 5.77566,
+      "complete": 5.434791,
+      "prepare": 5.343565
+    },
+    "maximum_elapsed_ms": 5.77566,
+    "maximum_faulted_elapsed_ms": 5.77566,
+    "socket_timeout_elapsed_exceeded": 12,
+    "admission_bound_exceeded": 0,
+    "gates": {
+      "telemetry_on_every_home": true,
+      "prepare_commit_complete_coverage": true,
+      "faulted_call_each_arm": true,
+      "faulted_call_present_at_each_control_point": true,
+      "socket_timeout_and_admission_bound_distinct": true,
+      "no_admission_bound_exceedance": true,
+      "maximum_within_admission_bound": true
+    },
+    "all_pass": true
+  },
+  "control_campaign": {
+    "arms": 6,
+    "radio_records": 16320,
+    "radio_records_after_fault_detection": 14914
+  },
+  "ai35_campaign": {
+    "arms": 2,
+    "radio_records": 2560,
+    "candidate_branches": 293,
+    "ai35_candidate_exchanges": 7,
+    "minimum_physical_guarded_horizon_margin_ms": 44.160249
+  },
+  "ai35_counterfactual": {
+    "static_all_fail_slack_ms": 53.0,
+    "effective_transaction_bound_ms": 58.0,
+    "conditional_decision_window_ms": 58.0,
+    "static_margin_ms": -5.0,
+    "conditional_margin_ms": 0.0
+  },
+  "gates": {
+    "control_campaign_passes": true,
+    "ai35_campaign_passes": true,
+    "same_single_physical_node": true,
+    "node_is_independent": true,
+    "six_control_arms": true,
+    "two_ai35_arms": true,
+    "seven_ms_control_bound": true,
+    "corrected_ai35_class": true
+  },
+  "all_pass": true,
+  "claim_boundary": "Independent-node finite-sample requalification of the corrected V13 7 ms control admission bound and AI35 conditional class within the A100 family. This is not WCET, production d_MAC, cross-family, or throughput superiority evidence."
+}

@@ -1,0 +1,11 @@
+{
+  "campaign": "confirm51_n1_single_cell_diagnostic",
+  "job_id": "58689828",
+  "node": "nid001232",
+  "stopped_at_utc": "2026-09-21T12:28:02Z",
+  "completed_conditions": "round 1, periods 90/45/25/12 ms, all three policies, 1000 releases each",
+  "unfinished_condition": "round 2, period 90 ms, external_transaction; worker had started but no completed controller result was used",
+  "reason": "The frozen diagnostic pass required eager deadline misses at the same period in both opposite-order rounds. All four eager runs in completed round 1 had zero misses, making pass mathematically impossible before round 2.",
+  "action": "Cancelled the exact Slurm allocation with scancel 58689828; preserved completed raw results and the cancelled job log. The analyzer's early-stop mode reads only the 12 completed first-round conditions.",
+  "interpretation": "Confirm51 is a one-round grade-C failed operating-point diagnostic, not a completed two-round comparison and not the full multicell N1 verdict."
+}

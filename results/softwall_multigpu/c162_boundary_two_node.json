@@ -1,0 +1,66 @@
+{
+  "all_pass": true,
+  "case_counts": {
+    "E1_four_unresolved_no_ai": 30,
+    "E3_two_unresolved_context128": 30,
+    "E4_two_unresolved_context256": 30,
+    "E5_one_unresolved_context512": 30,
+    "E6a_latest_safe_context64": 30,
+    "E6b_first_unsafe_context64": 30
+  },
+  "counts": {
+    "actual_nrx": 720,
+    "deadline_misses": 0,
+    "injected_recoveries": 330,
+    "qwen_units": 90,
+    "radio_commits": 720
+  },
+  "gates": {
+    "campaign_roles_fixed": true,
+    "development_and_holdout_pass": true,
+    "every_case_30_samples": true,
+    "expected_180_rounds": true,
+    "holdout_reverses_case_order": true,
+    "identical_frozen_sources": true,
+    "independent_seeds": true,
+    "same_frozen_grid": true,
+    "two_independent_nodes": true,
+    "zero_deadline_miss": true
+  },
+  "inputs": {
+    "development": {
+      "path": "results/softwall_multigpu/c162a_boundary_dev_j58860486_result.json",
+      "sha256": "398e15d4e59dfa25f0fa12c57829513a031b6c3e320f4e404c5eb6b85c7b7acb"
+    },
+    "development_protocol": {
+      "path": "results/softwall_multigpu/c162a_boundary_dev_j58860486_protocol.json",
+      "sha256": "c192d1a5c013ddccb00b95420fc4ad76085106201884caea82a71fabb0fadef2"
+    },
+    "holdout": {
+      "path": "results/softwall_multigpu/c162b_boundary_holdout_j58860535_result.json",
+      "sha256": "33da84e2b501073f41000e6d7641b21d565a2186137276b0e77fb9f68201c88a"
+    },
+    "holdout_protocol": {
+      "path": "results/softwall_multigpu/c162b_boundary_holdout_j58860535_protocol.json",
+      "sha256": "8aa3d8be9151799dca8e2e030213d02d95ddf497cc4d76b15594cd16497a96d5"
+    }
+  },
+  "jobs": [
+    "58860486",
+    "58860535"
+  ],
+  "maxima_ms": {
+    "nrx_release_to_complete": 28.406632,
+    "qwen_execution": 67.975822,
+    "radio_commit": 126.169375,
+    "recovery_path": 8.950475
+  },
+  "nodes": [
+    "nid001265",
+    "nid001353"
+  ],
+  "schema": "softwall-c162-boundary-two-node-v1",
+  "scope": "Finite-sample validation of the frozen warm P180/D155 qualified-node envelope. It is not WCET, cold/long-idle, arbitrary-node, or production d_MAC qualification.",
+  "status": "C162_TWO_NODE_BOUNDARY_PASS",
+  "total_rounds": 180
+}

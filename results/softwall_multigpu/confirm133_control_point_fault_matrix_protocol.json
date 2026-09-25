@@ -1,0 +1,95 @@
+{
+  "schema": "softwall-confirm133-control-point-fault-matrix-protocol-v1",
+  "status": "frozen-before-formal-arms",
+  "predecessor": "C132 qualifies post-commit broker fail-stop with the full three-RPC budget; C133 tests the two remaining post-apply control points.",
+  "developmental_canaries": [
+    "c133_prepare_canary_job58819952 (excluded)",
+    "c133_complete_canary_job58819952 (excluded)"
+  ],
+  "hypothesis": "The same 15 ms prepare+commit+complete control budget preserves local RAN certificates when the broker fail-stops after applying prepare or complete, not only after commit.",
+  "contract": "B_prepare_rpc + B_commit_rpc + B_AI + B_complete_rpc + G_physical <= min(AI deadline, recovery horizon)",
+  "faults": {
+    "operations": [
+      "prepare",
+      "complete"
+    ],
+    "home": 0,
+    "operation_number": 30,
+    "injection": "direct os._exit(86) after state transition and before reply",
+    "rpc_bound_ms": 5,
+    "rpc_count_per_transaction": 3,
+    "control_budget_ms": 15,
+    "physical_guard_ms": 2,
+    "admission_guard_ms": 17
+  },
+  "arms": [
+    {
+      "label": "confirm133_prepare_s1_job58819952",
+      "operation": "prepare",
+      "payload_seed0": 24100011,
+      "payload_seed1": 24110011,
+      "channel_seed0": 24111000,
+      "channel_seed1": 24121000
+    },
+    {
+      "label": "confirm133_prepare_s2_job58819952",
+      "operation": "prepare",
+      "payload_seed0": 24100012,
+      "payload_seed1": 24110012,
+      "channel_seed0": 24112000,
+      "channel_seed1": 24122000
+    },
+    {
+      "label": "confirm133_complete_s1_job58819952",
+      "operation": "complete",
+      "payload_seed0": 24100021,
+      "payload_seed1": 24110021,
+      "channel_seed0": 24113000,
+      "channel_seed1": 24123000
+    },
+    {
+      "label": "confirm133_complete_s2_job58819952",
+      "operation": "complete",
+      "payload_seed0": 24100022,
+      "payload_seed1": 24110022,
+      "channel_seed0": 24114000,
+      "channel_seed1": 24124000
+    }
+  ],
+  "mode": {
+    "gpus": 2,
+    "homes": 2,
+    "cells_per_home": 4,
+    "iterations": 340,
+    "warmup": 20,
+    "period_ms": 180,
+    "deadline_ms": 155,
+    "nrx_bound_ms": 45,
+    "conv_bound_ms": 25
+  },
+  "primary_gates": [
+    "all four new arms pass every arm gate",
+    "two arms at each prepare and complete post-apply fault point",
+    "both homes complete all releases after detection",
+    "15 ms control budget and 17 ms total guard recorded",
+    "zero deadline/service-bound/horizon/credit violations",
+    "prepare ambiguity launches no AI; complete ambiguity executes the request exactly once",
+    "all actual request IDs unique"
+  ],
+  "c132_commit_result": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/confirm132_fully_budgeted_broker_crash_result.json",
+  "c132_commit_result_sha256": "ee805866e04fd00c8e5155e566ce816cfa2f47ee966161552becf5d0e574e968",
+  "source_sha256": {
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/global_trace_fully_budgeted_fault_contained_controller.py": "4952c3004cb705b576a343e6208a06e2cb4348c36bb244c5e3b43acaf11acbea",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/deadline_fault_contained_global_trace_client.py": "c0b39f127241911b9164ae73ed0f11f245b0152a0b89c5929d98c2548ac5765f",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/control_point_crash_global_trace_lease_broker.py": "ae2ca3d39df3f92b8200d7fc4ef52be395b06dc4362e054aa0f1de71d9a01c4e",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/run_global_ai_control_point_broker_crash_arm.sh": "c9640aeccb53dde1e3484bbe5618520ca545d8d10f30e15fdde05783499bb2f3",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/analyze_confirm133_control_point_fault_matrix.py": "db241efec4127c1f47a321c582b3e81e58d57ad6b8a8e5c3fc3834fc1e0460f7",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_control_point_crash_broker.py": "177cbc1e89b6e7d012f2ebd1b2254a7851385b92f5c3bc61aeff4a7831ccf6f1",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/test_global_control_budget_v2.py": "70b8f76fe6c4a5bf6f10b528aab681974002472cfcbf2e02009871c3ef1ff883",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/same_request_ipc_worker.py": "3dd9ff0c0bada106915cc70cb1725482143784df57965e763f7b8f3ac441cfd0",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/trace_qwen_worker.py": "f25af35016dbdd926c3da76297d3614431e99b0a5a284383b95ebe7eaeabb190",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/dart_runtime.py": "36102ba16b5db2384ad164b78939c9d37ccbc90e4a141967f5fe4b45aa174abc",
+    "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/task1/isca_v2/cuda_ipc_channel.py": "d118d397317892c22406f05236c5847825e7d9cc2e46bec18fdd4235ec151c45"
+  },
+  "scope": "finite-sample prepare/commit/complete post-apply volatile fail-stop coverage; excludes restart, durable reconciliation, exactly-once, partition, GPU hang, production WCET, and throughput superiority"
+}

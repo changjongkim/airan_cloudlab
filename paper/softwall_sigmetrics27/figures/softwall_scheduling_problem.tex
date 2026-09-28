@@ -1,6 +1,6 @@
 % Three scheduling failures on the shared recovery lane of the evaluated
 % P180/D155 mode. Requests, bounds, and lease classes are the evaluated ones:
-% two retained debts (h0-r2, h1-r0) after two timely successes (h0-r0, h0-r1).
+% two retained debts (TB3, TB4) after two timely successes (TB1, TB2).
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
   \def\swT#1{3.85+(#1-40)*0.0555}
@@ -21,9 +21,10 @@
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.38cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},3.7) {};
   \swJob{3.7}{50}{115}{aic}{AI ctx256 admitted}
-  \swJob{3.7}{115}{140}{recc}{h0-r2}
+  \swJob{3.7}{115}{140}{recc}{TB3}
   \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
-        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{140}},3.7) {h1-r0};
+        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{140}},3.7) {};
+  \node[font=\bfseries\scriptsize] at ({\swT{146.5}},3.7) {TB4};
   \node[comp, draw=dred, minimum width=2.1cm, minimum height=0.38cm] at (12.75,3.7)
     {\xmark\ recovery misses guard};
 
@@ -34,28 +35,31 @@
   \node[job, fill=black!8, pattern=north east lines, pattern color=black!35,
         minimum height=0.38cm, minimum width={25*0.0555 cm}, anchor=west]
     at ({\swT{45}},2.65) {};
-  \node[font=\bfseries\scriptsize, text=black!60] at ({\swT{57.5}},2.65) {h0-r0 \cmark};
+  \node[font=\bfseries\scriptsize, text=black!60, fill=white, inner sep=1pt] at ({\swT{57.5}},2.65) {TB1 \cmark};
   \node[job, fill=black!8, pattern=north east lines, pattern color=black!35,
         minimum height=0.38cm, minimum width={25*0.0555 cm}, anchor=west]
     at ({\swT{70}},2.65) {};
-  \node[font=\bfseries\scriptsize, text=black!60] at ({\swT{82.5}},2.65) {h0-r1 \cmark};
-  \swJob{2.65}{95}{120}{recc}{h0-r2}
-  \swJob{2.65}{120}{145}{recc}{h1-r0}
+  \node[font=\bfseries\scriptsize, text=black!60, fill=white, inner sep=1pt] at ({\swT{82.5}},2.65) {TB2 \cmark};
+  \swJob{2.65}{95}{120}{recc}{TB3}
+  \swJob{2.65}{120}{145}{recc}{TB4}
   \node[comp, draw=dred, minimum width=2.1cm, minimum height=0.38cm] at (12.75,2.65)
     {\xmark\ AI ctx128 rejected};
 
-  % (c) Per-home certificates: each home is feasible alone, not on one lane.
+  % (c) Per-instance certificates: each cuPHY instance is feasible alone, not on one lane.
   \node[font=\bfseries\scriptsize] at (0.18,1.85) {(c)};
   \node[font=\scriptsize, align=left, anchor=west] at (0.45,1.35)
-    {\textbf{Per-home certificates}\\\textit{each home valid alone}};
-  \draw[dred, dashed, line width=0.9pt] ({\swT{44}},0.84) rectangle ({\swT{96}},1.86);
-  \node[font=\itshape\tiny, anchor=west] at ({\swT{121}},1.6) {home 0};
-  \node[font=\itshape\tiny, anchor=west] at ({\swT{97.5}},1.1) {home 1};
-  \swJob{1.6}{45}{70}{recc}{h0-r0}
-  \swJob{1.6}{70}{95}{recc}{h0-r1}
-  \swJob{1.6}{95}{120}{recc}{h0-r2}
-  \swJob{1.1}{45}{70}{recc}{h1-r0}
-  \swJob{1.1}{70}{95}{recc}{h1-r1}
+    {\textbf{Per-instance certificates}\\\textit{each instance valid alone}};
+  \node[font=\itshape\tiny, anchor=west] at ({\swT{121}},1.6) {cuPHY 0};
+  \node[font=\itshape\tiny, anchor=west] at ({\swT{97.5}},1.1) {cuPHY 1};
+  \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
+        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{45}},1.6) {TB1};
+  \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
+        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{70}},1.6) {TB2};
+  \swJob{1.6}{95}{120}{recc}{TB3}
+  \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
+        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{45}},1.1) {TB4};
+  \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
+        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{70}},1.1) {TB5};
   \node[comp, draw=dred, minimum width=2.1cm, minimum height=0.38cm] at (12.75,1.35)
     {\xmark\ overlap on one lane};
 

@@ -3,10 +3,10 @@
 % until the common cutoff shows a timely NeuralRx success.
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \def\swT#1{2.85+(#1)*0.0578}
+  \def\swT#1{3.3+(#1)*0.0556}
 
   % Row labels.
-  \node[pttl, anchor=west] at (0.1,2.45) {RAN owner (TB)};
+  \node[pttl, anchor=west] at (0.1,2.45) {cuPHY L1 (TB owner)};
   \node[pttl, anchor=west] at (0.1,1.7) {NeuralRx endpoint};
   \node[pttl, anchor=west] at (0.1,0.95) {Recovery lane};
   \foreach \y in {2.45,1.7,0.95} {
@@ -22,33 +22,33 @@
   \node[font=\itshape\tiny, anchor=south west] at ({\swT{155}},2.95) {expiry};
 
   % Owner row: release, debt until the outcome, one commit, next release.
-  \node[font=\scriptsize, text=navyf] at ({\swT{0}},2.45) {$\blacktriangledown$};
-  \node[font=\itshape\tiny, anchor=south] at ({\swT{0}},2.6) {release};
+  \node[font=\scriptsize, text=navyf] at ({\swT{0}},2.76) {$\blacktriangledown$};
+  \node[font=\itshape\tiny, anchor=south] at ({\swT{0}},2.84) {release};
   \node[job, pattern=north east lines, pattern color=gold!90!black, draw=gold!80!black,
-        minimum height=0.36cm, minimum width={45*0.0578 cm}, anchor=west]
+        minimum height=0.36cm, minimum width={45*0.0556 cm}, anchor=west]
     at ({\swT{0}},2.45) {};
   \node[font=\bfseries\scriptsize, fill=white, inner sep=1pt] at ({\swT{22.5}},2.45)
     {recovery debt};
   \node[comp, fill=okc, draw=green!45!black, minimum height=0.36cm, inner sep=1pt,
         anchor=west] at ({\swT{47}},2.45) {\cmark\ commit NRx result};
-  \node[font=\itshape\scriptsize] at ({\swT{95.5}},2.45) {or};
+  \node[font=\itshape\scriptsize, fill=white, inner sep=1pt] at ({\swT{95.5}},2.45) {or};
   \node[comp, fill=badc, draw=dred, minimum height=0.36cm, inner sep=1pt, anchor=west]
     at ({\swT{99}},2.45) {\xmark\ commit cuPHY result};
-  \node[font=\scriptsize, text=navyf] at ({\swT{180}},2.45) {$\blacktriangledown$};
-  \node[font=\itshape\tiny, anchor=south] at ({\swT{180}},2.6) {next release};
+  \node[font=\scriptsize, text=navyf] at ({\swT{180}},2.76) {$\blacktriangledown$};
+  \node[font=\itshape\tiny, anchor=south] at ({\swT{180}},2.84) {next release};
 
   % NeuralRx row: TensorRT execution and the outcome at the owner.
-  \node[job, fill=peach, minimum height=0.36cm, minimum width={14*0.0578 cm}, anchor=west]
+  \node[job, fill=peach, minimum height=0.36cm, minimum width={14*0.0556 cm}, anchor=west]
     at ({\swT{3}},1.7) {};
-  \node[font=\itshape\scriptsize, anchor=west] at ({\swT{19}},1.7) {TensorRT};
+  \node[font=\itshape\scriptsize, anchor=west, fill=white, inner sep=1pt] at ({\swT{19}},1.7) {TensorRT};
   \draw[arr] ({\swT{17}},1.88) -- ({\swT{17}},2.27);
 
   % Recovery row: executed only after a failed, late, or missing outcome.
   \node[job, dashed, draw=dred, fill=white, minimum height=0.36cm,
-        minimum width={(153-45)*0.0578 cm}, anchor=west] at ({\swT{45}},0.95) {};
-  \node[job, fill=recc, minimum height=0.36cm, minimum width={25*0.0578 cm}, anchor=west]
+        minimum width={(153-45)*0.0556 cm}, anchor=west] at ({\swT{45}},0.95) {};
+  \node[job, fill=recc, minimum height=0.36cm, minimum width={25*0.0556 cm}, anchor=west]
     at ({\swT{70}},0.95) {cuPHY};
-  \node[font=\itshape\scriptsize, anchor=west] at ({\swT{101}},0.95)
+  \node[font=\itshape\scriptsize, anchor=west, fill=white, inner sep=1pt] at ({\swT{101}},0.95)
     {window ends at the guard};
   \draw[arr, draw=dred] ({\swT{95}},1.13) -- ({\swT{100}},2.27);
 

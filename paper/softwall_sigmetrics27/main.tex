@@ -106,7 +106,7 @@ state that none of these visible-work abstractions captures: future mandatory re
 Consider one uplink transport block (TB). A timely \NRx result may improve its decoding outcome, while
 failure, lateness, or lost evidence leaves conventional decoding mandatory. Before that outcome is
 known, the conventional path is absent from the execution queue but remains part of the radio
-contract. Several cells can hold this obligation at once, and several RAN homes can send recovery to
+contract. Several cells can hold this obligation at once, and several cuPHY instances can send recovery to
 the same cuPHY lane. A scheduler that sees an idle GPU can therefore admit external AI into time that
 must remain available for correlated recovery.
 
@@ -114,7 +114,7 @@ Static reservation keeps every possible recovery slot until every neural outcome
 but it strands the capacity released by timely neural success. A useful scheduler must decide three
 coupled questions: which speculative receivers to admit, where and when all unresolved
 conventional jobs could still execute, and which external-AI units can complete without invalidating
-that plan. Queue occupancy, MPS percentage, and independent per-home schedules omit at least one of
+that plan. Queue occupancy, MPS percentage, and independent per-instance schedules omit at least one of
 these decisions.
 
 \sys is a certified event-driven scheduler built around \emph{recovery debt}. Every unresolved optional
@@ -135,7 +135,7 @@ The paper makes four contributions:
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
   \item \textbf{Conditional-recovery scheduling model.} We formalize unresolved same-TB recovery as
   debt and quantify safe AI capacity across cells, outcome correlation, deadlines, recovery cost,
-  RAN homes, and one to four GPUs. Closed-form homogeneous capacity matches exhaustive checking.
+  cuPHY instances, and one to four GPUs. Closed-form homogeneous capacity matches exhaustive checking.
   \item \textbf{Certified multi-GPU scheduler.} An event-driven candidate scheduler jointly retimes
   recovery and leases external AI; an independent verifier accepts only schedules that preserve the
   all-fail radio branch. Seven measured counterexamples refine that decision through transport,
@@ -205,7 +205,7 @@ central scheduling problem.
 \noindent\textbf{Shared Recovery.}
 Several cells can select \NRx together, and their failures can be correlated. When their conventional
 paths share one cuPHY lane, feasibility belongs to the union of their unresolved jobs. A schedule that
-is valid at each home can therefore be invalid after the homes' jobs are composed.
+is valid at each cuPHY instance can therefore be invalid after the instances' jobs are composed.
 
 \noindent\textbf{External-AI Admission.}
 Qwen is a representative external workload that creates physical GPU contention; it is not an
@@ -245,13 +245,13 @@ locally valid calendars on one shared lane. These failures define the state and 
 \begin{figure}[t]
   \centering
   \input{figures/softwall_scheduling_problem.tex}
-  \caption{Scheduling failures after two timely successes (h0-r0, h0-r1). (a) Current-idle admission
+  \caption{Scheduling failures after two timely successes (TB1, TB2). (a) Current-idle admission
   pushes a retained recovery past the guard. (b) Static reservation rejects a context-128 unit that fits
-  once the successful reservations are released. (c) Per-home certificates claim one lane interval.}
+  once the successful reservations are released. (c) Per-instance certificates claim one lane interval.}
   \Description{Three lane timelines between 45 and 170 milliseconds with the guard and expiry marked.
   The first shows an AI unit followed by two recoveries whose second crosses the guard. The second
   shows four reservations, two of them for successful requests, and a rejected AI unit. The third shows
-  two per-home calendars that occupy the same lane interval.}
+  two per-instance calendars that occupy the same lane interval.}
   \label{fig:scheduling-problem}
 \end{figure}
 
@@ -318,7 +318,7 @@ Figure~\ref{fig:overall} shows the scheduling loop on its runtime objects. Persi
 GPU work, while one host coordinator owns the per-TB decision pages, the recovery-debt table, the
 recovery-lane certificate, and the verifier. The numbered steps follow one epoch from \NRx input to the
 recovery that runs at its certificate start. The same control layer serves a single GPU, where CUDA
-IPC connects the workers, and several GPUs, where retained debts from different RAN homes share one
+IPC connects the workers, and several GPUs, where retained debts from different cuPHY instances share one
 recovery lane over NVLink P2P.
 
 \begin{figure}[H]
@@ -326,12 +326,13 @@ recovery lane over NVLink P2P.
   \input{figures/softwall_overall_architecture.tex}
   \caption{\sys architecture. The control layer is identical for every placement: steps (2)--(7)
   record outcomes, apply one cutoff batch, retime debts around a candidate lease, verify it, dispatch
-  actions and the lease, and retire the lease on a marker. The data layer shows (a) one GPU over CUDA
-  IPC and (b) the evaluated four-GPU placement over NVLink P2P, with \NRx input (1) and
-  certificate-ordered recovery (8).}
+  actions and the lease, and retire the lease on a marker. The data layer shows (a) one GPU whose
+  processes exchange IQ, LLR, and TB buffers through CUDA IPC rings and (b) the evaluated four-GPU
+  placement over NVLink P2P, where cuPHY instance 0 owns TB1--TB3 and instance 1 owns TB4 and TB5.
+  Steps (1) and (8) are the \NRx input and the certificate-ordered recovery.}
   \Description{A control layer contains a decision-page table, a recovery-debt table, a recovery-lane
   calendar with a candidate AI lease, and an independent verifier. The data layer shows one GPU hosting
-  all job classes and a four-GPU node with two RAN-home GPUs, a NeuralRx GPU, and a shared recovery and
+  all job classes and a four-GPU node with two cuPHY GPUs, a NeuralRx GPU, and a shared recovery and
   AI GPU connected by NVLink P2P. Numbered arrows follow input, outcome, batch, retiming, verification,
   dispatch, fence, and recovery.}
   \label{fig:overall}
@@ -344,7 +345,7 @@ job are
  J_i=(r_i,d_i,h_i,c_i,K_i,q_i), \qquad
  A_a=(u_a,v_a,\ell_a,b_a,g_a),
 \end{equation}
-where $r_i,d_i$ are release and expiry, $h_i$ is the recovery home, $c_i$ is the conventional
+where $r_i,d_i$ are release and expiry, $h_i$ is the owning cuPHY instance, $c_i$ is the conventional
 host-to-commit bound, $K_i$ contains eligible \NRx endpoints, and $q_i$ is optional radio value;
 $u_a,v_a,\ell_a,b_a,g_a$ are AI arrival, timely value, deadline, physical-completion bound, and
 recovery guard. Decisions cannot use future CRC, arrivals, realized service, or hidden channel labels.
@@ -393,7 +394,7 @@ success creates new mandatory work or changes another service bound; that case n
   \centering
   \input{figures/softwall_atomic_replan.tex}
   \caption{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB
-  and rejects h1-r1; the 45~ms batch deletes two debts in one generation. (b) The verifier commits the
+  and rejects TB5; the 45~ms batch deletes two debts in one generation. (b) The verifier commits the
   context-128 lease and keeps $X_t$ for the context-256 lease, whose last recovery would end after the
   guard.}
   \Description{Four lane timelines between 45 and 170 milliseconds. The first shows four reserved
@@ -411,13 +412,13 @@ success deletes debt, while failure, lateness, and missing evidence retain it. S
 invalid because it can manufacture intermediate states that did not coexist.
 
 \paragraph{Global atomic state.}
-Certificate scope follows the contended lane: disjoint lanes compose by union, while homes sharing
-cuPHY require one global obligation set. The complete runtime state is
+Certificate scope follows the contended lane: disjoint lanes compose by union, while cuPHY instances
+sharing a recovery lane require one global obligation set. The complete runtime state is
 \begin{equation}
  X_t=(S_t,Q_t,T_t,L_t,E_t,C_t,G_t),
 \end{equation}
 where $S$ is the recovery schedule, $Q,T$ endpoint and transport credits, $L$ AI leases, $E$ fences
-and worker epochs, $C$ radio commit state, and $G$ multi-home AI ownership. Figure~\ref{fig:atomic-replan}b
+and worker epochs, $C$ radio commit state, and $G$ multi-instance AI ownership. Figure~\ref{fig:atomic-replan}b
 commits a private $X'$ only when
 \begin{align}
 \mathrm{VALID}(X') \equiv {}& \mathrm{ExecutableRecovery}(S') \land
@@ -468,7 +469,7 @@ duplicate, and reply-lost messages cannot retire newer ownership, and a transpor
 stand in for receiver or recovery completion.
 
 \paragraph{Distributed ownership.}
-One global AI queue may serve several RAN homes, but each home may hold at most one unlaunched token in
+One global AI queue may serve several cuPHY instances, but each instance may hold at most one unlaunched token in
 an ownership epoch. Commit transfers launch authority only after local and global certificates remain
 current. Same-worker reconnect carries the generation through bounded markers; full process
 replacement without durable reconciliation remains \UQ.
@@ -584,14 +585,14 @@ to make certificate state observable and enforceable across process and GPU boun
 
 \subsection{Runtime topology}
 
-The implementation runs with MIG disabled and MPS enabled. RAN homes, neural endpoints,
+The implementation runs with MIG disabled and MPS enabled. cuPHY instances, neural endpoints,
 conventional recovery, and external AI execute in separate persistent workers.
 
 \noindent\textbf{Radio and AI Workers.}
 Local and remote TensorRT \NRx workers hold preallocated bindings and CUDA graphs. Persistent
 Aerial/cuPHY workers execute conventional recovery, while a Qwen2.5-1.5B worker executes bounded
-prefill classes. Multi-home modes direct conventional work to one shared recovery GPU. In the
-evaluated placement (Figure~\ref{fig:overall}b), GPU0 and GPU1 host the RAN-home request owners with a
+prefill classes. Multi-instance modes direct conventional work to one shared recovery GPU. In the
+evaluated placement (Figure~\ref{fig:overall}b), GPU0 and GPU1 host the cuPHY instances that own the TBs with a
 50\% MPS thread limit, GPU3 hosts the \NRx endpoint, and GPU2 hosts the shared cuPHY lane and the
 Qwen worker, which runs as a low-priority MPS client with a 20\% thread limit.
 
@@ -750,7 +751,7 @@ valid when mapped to CUDA workers, transport ownership, and failure handling.
   \centering
   \includegraphics[width=\linewidth]{figures/softwall_capacity_headroom.pdf}
   \caption{Scheduling capacity and decision quality. (a) Expected timely requests at a representative
-  four-cell, two-home, one-GPU point with correlated outcomes. (b) Fraction of 513 mandatory-feasible
+  four-cell, two-instance, one-GPU point with correlated outcomes. (b) Fraction of 513 mandatory-feasible
   trace points per SLO that pass the frozen 5\% headroom screen. (c) Of 362 advanced points, a safe
   AI-first greedy is within 5\% of the fixed-placement oracle at 361; flexible recovery placement has
   a positive upper-bound gain at 203.}
@@ -770,7 +771,7 @@ strand capacity, debt-blind admission uses that capacity without protecting radi
 
 % provenance: C167_CAPACITY
 \noindent\textbf{Model Grid.}
-The closed-form and exact multi-class capacity model covers 21,384 points over cells, homes, GPUs,
+The closed-form and exact multi-class capacity model covers 21,384 points over cells, cuPHY instances, GPUs,
 outcome probability and correlation, expiry, recovery bound, AI class, deadline, and offered load.
 Mandatory recovery is infeasible at 7,668 points. Among the 13,716 feasible points, \sys exceeds
 static reservation at 3,600 (26.2\%), recovery-first trails its oracle by at least 5\% at 2,604
@@ -1050,7 +1051,7 @@ System & Primary protected/allocated object & State not exposed to its scheduler
 \midrule
 YinYangRAN, CloudRIC, Concordia & Fraction, queue/deadline, or reserved capacity & Unqueued same-TB recovery debt \\
 DARIS, REEF, XSched, nvtaskset & GPU stage, kernel, context, or partition & Radio recovery, transport ownership, and single commit as one certificate \\
-ARCHES, OCUDU, SMEC & PHY choice, timing class, or edge SLO & Cross-home all-fail debt plus atomic external-AI lease \\
+ARCHES, OCUDU, SMEC & PHY choice, timing class, or edge SLO & Cross-instance all-fail debt plus atomic external-AI lease \\
 \sys & Same-TB recovery obligation & Explicitly modeled, certified, and carried through physical completion \\
 \bottomrule
 \end{tabularx}
@@ -1065,7 +1066,7 @@ while recovery debt is future conventional work tied to one unresolved radio res
 
 ARCHES selects PHY experts, OCUDU exposes in-DU timing classes, and SMEC coordinates RAN/edge SLOs
 ~\cite{arches,ocudu,smec}. They rule out novelty claims for coexistence, fallback, or deadline
-scheduling. Their public designs do not expose a cross-home all-fail recovery calendar atomically
+scheduling. Their public designs do not expose a cross-instance all-fail recovery calendar atomically
 joined to an external-AI lease through physical completion.
 
 \noindent\textbf{Scoped Difference.}

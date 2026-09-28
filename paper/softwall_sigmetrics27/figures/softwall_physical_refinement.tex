@@ -18,16 +18,16 @@
 
   % (2) Run request.
   \draw[arr] (1.5,3.98) -- (6.9,3.98);
-  \node[note, anchor=south] at (4.9,3.98) {run($L$, latest-start)};
+  \node[note, anchor=south, fill=white, inner sep=1pt] at (4.9,4.0) {run($L$, latest-start)};
   \node[num] at (2.8,4.1) {2};
 
   % (3) Launch-time gate on the worker.
   \node[comp, minimum width=2.1cm, minimum height=0.34cm] at (6.9,3.6) {now $\le$ latest-start?};
   \node[num] at (5.6,3.6) {3};
   \draw[arr, dashed] (5.85,3.33) -- (1.5,3.33);
-  \node[inote, anchor=south] at (3.3,3.33) {no: non-launch reply, no kernel};
+  \node[inote, anchor=south, fill=white, inner sep=1pt] at (3.3,3.35) {no: non-launch reply, no kernel};
   \draw[arr] (7.4,3.43) |- (9.4,3.2);
-  \node[inote, anchor=south] at (8.7,3.2) {yes: submit};
+  \node[inote, anchor=south] at (8.68,3.2) {yes: submit};
   \node[job, fill=aic, minimum width=0.42cm, minimum height=0.95cm] at (9.4,2.725) {};
   \node[inote, anchor=west, align=left] at (9.68,2.8) {prefill\\kernels};
   \draw[arr] (6.9,2.95) -- (4.93,2.95);
@@ -71,14 +71,14 @@
   \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,3.9)
     {replay of nrx-17 or an\\epoch-16 batch: no change};
   \node[hcell, minimum width=2.8cm] at (10.85,3.4) {commit set (epoch, TB)};
-  \foreach \y/\k/\src in {3.1/{(17, h0-r0)}/NRx, 2.8/{(17, h0-r1)}/NRx,
-                           2.5/{(17, h0-r2)}/cuPHY, 2.2/{(17, h1-r0)}/cuPHY} {
+  \foreach \y/\k/\src in {3.1/{(17, TB1)}/NRx, 2.8/{(17, TB2)}/NRx,
+                           2.5/{(17, TB3)}/cuPHY, 2.2/{(17, TB4)}/cuPHY} {
     \node[cell, minimum width=1.75cm] at (10.85,\y) {\k};
     \node[cell, minimum width=1.05cm] at (12.6,\y) {\src};
   }
   \node[rnum] at (11.02,1.5) {4};
   \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,1.5)
-    {second response for\\(17, h1-r0): no commit};
+    {second response for\\(17, TB4): no commit};
   \node[inote, align=center] at (12.25,0.7) {one commit per TB};
 \end{tikzpicture}%
 }

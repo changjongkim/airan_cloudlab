@@ -30,22 +30,22 @@
   \node[num] at (0.55,4.35) {1};
   \node[font=\scriptsize, align=left, anchor=west] at (0.75,4.35)
     {\textbf{Admission at release}\\\textit{one all-fail debt per TB}};
-  \swJob{4.35}{45}{70}{recc}{h0-r0}
-  \swJob{4.35}{70}{95}{recc}{h0-r1}
-  \swJob{4.35}{95}{120}{recc}{h0-r2}
-  \swJob{4.35}{120}{145}{recc}{h1-r0}
+  \swJob{4.35}{45}{70}{recc}{TB1}
+  \swJob{4.35}{70}{95}{recc}{TB2}
+  \swJob{4.35}{95}{120}{recc}{TB3}
+  \swJob{4.35}{120}{145}{recc}{TB4}
   \node[job, draw=dred, dashed, pattern=north east lines, pattern color=dred!45,
         minimum height=0.4cm, minimum width={25*0.0555 cm}, anchor=west] at ({\swT{145}},4.35) {};
-  \node[font=\bfseries\scriptsize, text=dred] at ({\swT{163}},4.35) {h1-r1};
+  \node[font=\bfseries\scriptsize, text=dred, fill=white, inner sep=1pt] at ({\swT{163}},4.35) {TB5};
   \node[comp, draw=dred, minimum width=2.0cm, minimum height=0.4cm] at (12.9,4.35)
-    {\xmark\ h1-r1 rejected};
+    {\xmark\ TB5 rejected};
 
   % Row 2: one outcome batch deletes the debts of timely successes.
   \node[num] at (0.55,3.45) {2};
   \node[font=\scriptsize, align=left, anchor=west] at (0.75,3.45)
-    {\textbf{Outcome batch at 45 ms}\\\textit{\cmark\ h0-r0, h0-r1;\ \xmark\ h0-r2, h1-r0}};
-  \swJob{3.45}{45}{70}{recc}{h0-r2}
-  \swJob{3.45}{70}{95}{recc}{h1-r0}
+    {\textbf{Outcome batch at 45 ms}\\\textit{\cmark\ TB1, TB2;\ \xmark\ TB3, TB4}};
+  \swJob{3.45}{45}{70}{recc}{TB3}
+  \swJob{3.45}{70}{95}{recc}{TB4}
   \node[job, draw=green!45!black, dashed, fill=okc, minimum height=0.4cm,
         minimum width={(153-95)*0.0555 cm}, anchor=west, font=\itshape\scriptsize]
     at ({\swT{95}},3.45) {released until the guard};
@@ -63,8 +63,8 @@
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.4cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},2.4) {};
   \swJob{2.4}{50}{90}{aic}{AI ctx128}
-  \swJob{2.4}{90}{115}{recc}{h0-r2}
-  \swJob{2.4}{115}{140}{recc}{h1-r0}
+  \swJob{2.4}{90}{115}{recc}{TB3}
+  \swJob{2.4}{115}{140}{recc}{TB4}
   \node[comp, fill=okc, draw=green!45!black, minimum width=2.0cm, minimum height=0.4cm]
     at (12.9,2.4) {\cmark\ commit, gen $g{+}1$};
 
@@ -75,9 +75,10 @@
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.4cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},1.5) {};
   \swJob{1.5}{50}{115}{aic}{AI ctx256}
-  \swJob{1.5}{115}{140}{recc}{h0-r2}
+  \swJob{1.5}{115}{140}{recc}{TB3}
   \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.4cm,
-        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{140}},1.5) {h1-r0};
+        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{140}},1.5) {};
+  \node[font=\bfseries\scriptsize] at ({\swT{146.5}},1.5) {TB4};
   \node[comp, draw=dred, minimum width=2.0cm, minimum height=0.4cm] at (12.9,1.5)
     {\xmark\ reject, keep $X_t$};
   \node[num] at (11.5,2.4) {4};

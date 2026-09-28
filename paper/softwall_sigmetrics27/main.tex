@@ -246,7 +246,7 @@ locally valid calendars on one shared lane. These failures define the state and 
   \centering
   \input{figures/softwall_scheduling_problem.tex}
   \caption{Scheduling failures after two timely successes (TB1, TB2). (a) Current-idle admission
-  pushes a retained recovery past the guard. (b) Static reservation rejects a context-128 unit that fits
+  pushes a retained recovery past the guard. (b) Static reservation rejects a 128-token AI unit that fits
   once the successful reservations are released. (c) Per-instance certificates claim one lane interval.}
   \Description{Three lane timelines between 45 and 170 milliseconds with the guard and expiry marked.
   The first shows an AI unit followed by two recoveries whose second crosses the guard. The second
@@ -397,12 +397,12 @@ success creates new mandatory work or changes another service bound; that case n
   \input{figures/softwall_atomic_replan.tex}
   \caption{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB
   and rejects TB5; the 45~ms batch deletes two debts in one generation. (b) The verifier commits the
-  context-128 lease and keeps $X_t$ for the context-256 lease, whose last recovery would end after the
-  guard.}
+  128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the
+  guard. AI units are Qwen prefill requests; hatching marks the 5~ms launch-control charge.}
   \Description{Four lane timelines between 45 and 170 milliseconds. The first shows four reserved
   recoveries and a rejected fifth request that crosses the guard. The second shows two retained
-  recoveries and released capacity until the guard. The third and fourth show a context-128 and a
-  context-256 AI lease followed by the retained recoveries; the first is committed and the second,
+  recoveries and released capacity until the guard. The third and fourth show a 128-token and a
+  256-token AI lease followed by the retained recoveries; the first is committed and the second,
   which crosses the guard, is rejected.}
   \label{fig:atomic-replan}
 \end{figure}

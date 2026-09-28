@@ -20,7 +20,7 @@
     {\textbf{Current-idle admission}\\\textit{queue empty at 45 ms}};
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.38cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},3.7) {};
-  \swJob{3.7}{50}{115}{aic}{AI ctx256 admitted}
+  \swJob{3.7}{50}{115}{aic}{AI, 256 tokens, admitted}
   \swJob{3.7}{115}{140}{recc}{TB3}
   \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
         minimum width={25*0.0555 cm}, anchor=west] at ({\swT{140}},3.7) {};
@@ -43,7 +43,7 @@
   \swJob{2.65}{95}{120}{recc}{TB3}
   \swJob{2.65}{120}{145}{recc}{TB4}
   \node[comp, draw=dred, minimum width=2.1cm, minimum height=0.38cm] at (12.75,2.65)
-    {\xmark\ AI ctx128 rejected};
+    {\xmark\ 128-token AI rejected};
 
   % (c) Per-instance certificates: each cuPHY instance is feasible alone, not on one lane.
   \node[font=\bfseries\scriptsize] at (0.18,1.85) {(c)};

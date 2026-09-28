@@ -13,8 +13,8 @@
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{fig:airan-background}{{1}{3}{One uplink TB in one 180~ms release period. Until the 45~ms common cutoff, the TB owes a conventional recovery that no GPU queue contains. A failed, late, or missing \NRx outcome requires one cuPHY recovery that ends before the guard}{figure.caption.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Optional NeuralRx\xspace  creates future mandatory work}{3}{subsection.2.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Scheduling failures after two timely successes (TB1, TB2). (a) Current-idle admission pushes a retained recovery past the guard. (b) Static reservation rejects a context-128 unit that fits once the successful reservations are released. (c) Per-instance certificates claim one lane interval.}}{4}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:scheduling-problem}{{2}{4}{Scheduling failures after two timely successes (TB1, TB2). (a) Current-idle admission pushes a retained recovery past the guard. (b) Static reservation rejects a context-128 unit that fits once the successful reservations are released. (c) Per-instance certificates claim one lane interval}{figure.caption.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Scheduling failures after two timely successes (TB1, TB2). (a) Current-idle admission pushes a retained recovery past the guard. (b) Static reservation rejects a 128-token AI unit that fits once the successful reservations are released. (c) Per-instance certificates claim one lane interval.}}{4}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:scheduling-problem}{{2}{4}{Scheduling failures after two timely successes (TB1, TB2). (a) Current-idle admission pushes a retained recovery past the guard. (b) Static reservation rejects a 128-token AI unit that fits once the successful reservations are released. (c) Per-instance certificates claim one lane interval}{figure.caption.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Threat model and qualification}{4}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Missing scheduling state}{4}{subsection.2.4}\protected@file@percent }
 \newlabel{sec:requirements}{{2.4}{4}{Missing scheduling state}{subsection.2.4}{}}
@@ -31,19 +31,19 @@
 \newlabel{fig:overall}{{3}{6}{\sys architecture. The control layer is identical for both placements. (1) Each owner publishes its \NRx outcome to a decision page. One common-cutoff batch then updates the debt table, the scheduler retimes retained debts around a candidate lease, and the independent verifier commits $X'$ or keeps $X_t$. (2) The coordinator publishes each action with its generation and (3) sends the lease with an absolute latest-start. (4) A completion or non-launch marker retires the lease. The shared lane runs retained recoveries in certificate order. In (a), the processes on one GPU exchange IQ, LLR, and TB buffers through CUDA IPC rings. In (b), the evaluated multi-GPU placement uses NVLink P2P; cuPHY instance 0 owns TB1--TB3 and instance 1 owns TB4 and TB5}{figure.caption.9}{}}
 \@writefile{toc}{\contentsline {paragraph}{Scheduling objects.}{6}{section*.10}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Qualified modes.}{6}{section*.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Separation of proposal and authority.}{7}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Separation of proposal and authority.}{6}{section*.12}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Scheduling conditional recovery}{7}{subsection.3.2}\protected@file@percent }
 \newlabel{sec:design-recovery}{{3.2}{7}{Scheduling conditional recovery}{subsection.3.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45\nonbreakingspace ms batch deletes two debts in one generation. (b) The verifier commits the context-128 lease and keeps $X_t$ for the context-256 lease, whose last recovery would end after the guard.}}{7}{figure.caption.13}\protected@file@percent }
-\newlabel{fig:atomic-replan}{{4}{7}{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45~ms batch deletes two debts in one generation. (b) The verifier commits the context-128 lease and keeps $X_t$ for the context-256 lease, whose last recovery would end after the guard}{figure.caption.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45\nonbreakingspace ms batch deletes two debts in one generation. (b) The verifier commits the 128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the guard. AI units are Qwen prefill requests; hatching marks the 5\nonbreakingspace ms launch-control charge.}}{7}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:atomic-replan}{{4}{7}{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45~ms batch deletes two debts in one generation. (b) The verifier commits the 128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the guard. AI units are Qwen prefill requests; hatching marks the 5~ms launch-control charge}{figure.caption.13}{}}
 \@writefile{toc}{\contentsline {paragraph}{Mandatory-first transition.}{7}{section*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Global atomic state.}{8}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Global atomic state.}{7}{section*.15}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Refining schedules to physical completion}{8}{subsection.3.3}\protected@file@percent }
 \newlabel{sec:design-refinement}{{3.3}{8}{Refining schedules to physical completion}{subsection.3.3}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Refinement of one AI lease. Black steps: commit with a latest-start (1), run request (2), launch gate and launch marker (3), CUDA event and completion marker (4), and retirement on a matching marker (5). Red faults: marker reconciliation after a late reply (1), AI quarantine after channel loss (2), and no-op outcome and response replays (3, 4).}}{8}{figure.caption.16}\protected@file@percent }
 \newlabel{fig:refinement}{{5}{8}{Refinement of one AI lease. Black steps: commit with a latest-start (1), run request (2), launch gate and launch marker (3), CUDA event and completion marker (4), and retirement on a matching marker (5). Red faults: marker reconciliation after a late reply (1), AI quarantine after channel loss (2), and no-op outcome and response replays (3, 4)}{figure.caption.16}{}}
 \@writefile{toc}{\contentsline {paragraph}{Bounded launch.}{8}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Physical retirement.}{9}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Physical retirement.}{8}{section*.18}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Distributed ownership.}{9}{section*.19}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Why IPC/P2P is part of scheduling.}{9}{section*.20}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Certified event-scheduling algorithm}{9}{subsection.3.4}\protected@file@percent }
@@ -52,9 +52,9 @@
 \newlabel{alg:certify-event}{{6}{9}{SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a false-safe state}{figure.caption.21}{}}
 \@writefile{toc}{\contentsline {paragraph}{Decision window.}{9}{section*.22}\protected@file@percent }
 \newlabel{eq:window}{{6}{9}{Decision window}{equation.6}{}}
+\newlabel{eq:debtblind}{{7}{9}{Current idleness is insufficient}{equation.7}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces The scheduler's predictive outcomes.}}{10}{table.caption.24}\protected@file@percent }
 \newlabel{tab:classes}{{2}{10}{The scheduler's predictive outcomes}{table.caption.24}{}}
-\newlabel{eq:debtblind}{{7}{10}{Current idleness is insufficient}{equation.7}{}}
 \@writefile{toc}{\contentsline {paragraph}{Safe reclaimable capacity.}{10}{section*.23}\protected@file@percent }
 \newlabel{eq:capacity}{{10}{10}{Safe reclaimable capacity}{equation.10}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Implementation}{10}{section.4}\protected@file@percent }

@@ -8,7 +8,8 @@ This directory contains the anonymous `acmart` review manuscript.
 - `figures/softwall_overall_architecture.tex`: Section 3.1 scheduling loop
 - `figures/softwall_atomic_replan.tex`: Section 3.2 recovery/AI transaction
 - `figures/softwall_physical_refinement.tex`: Section 3.3 launch-to-fence refinement
-- `main.pdf`: compiled 20-page review PDF, including references
+- `figures/generate_paper_figures.py`: Section 2 and Section 4 data figures from hashed result artifacts
+- `main.pdf`: compiled 22-page review draft, including references (above the 20-page limit)
 
 Build from this directory on the project environment:
 

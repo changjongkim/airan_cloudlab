@@ -54,6 +54,8 @@ SOURCES = {
     "envelope_protocol": ROOT / "results/softwall_multigpu/c162a_boundary_dev_j58860486_protocol.json",
     "necessity_dev": ROOT / "results/softwall_multigpu/c172_debt_blind_job58957717_result.json",
     "necessity_holdout": ROOT / "results/softwall_multigpu/c172_debt_blind_job58957719_result.json",
+    "fault_phase1": ROOT / "results/softwall_multigpu/c161_phase1_two_node.json",
+    "fault_phase2": ROOT / "results/softwall_multigpu/c161_phase2_two_node.json",
 }
 
 # Raw per-request records behind the two background figures. The Q2
@@ -75,6 +77,7 @@ EVAL_RAW = {
     "c172_holdout": ROOT / "results/softwall_multigpu/raw/c172_debt_blind_job58957719_coordinator.json",
 }
 EVAL_DATA = HERE / "softwall_eval_data.json"
+RUNTIME_DATA = HERE / "softwall_runtime_data.json"
 
 
 def load(name: str):
@@ -823,6 +826,300 @@ def make_eval_safety() -> dict:
             "qwen_rejected": dict(zip(map(str, contexts), rejected))}
 
 
+FAULT_RUNS = ("c161p1a_dev_j58859044", "c161p1b_holdout_j58859145",
+              "c161p2d_dev_j58859872_a0_stale_duplicate_nrx", "c161p2d_dev_j58859872_a1_post_fence_reply_delay",
+              "c161p2d_dev_j58859872_a2_pre_fence_channel_loss", "c161p2d_dev_j58859872_a3_stale_duplicate_recovery",
+              "c161p2e_holdout_j58859986_a0_stale_duplicate_recovery",
+              "c161p2e_holdout_j58859986_a1_pre_fence_channel_loss",
+              "c161p2e_holdout_j58859986_a2_post_fence_reply_delay",
+              "c161p2e_holdout_j58859986_a3_stale_duplicate_nrx")
+FAULT_ORDER = (("no_fault", "A0 none"), ("correlated_all_fail", "A1 all-fail"),
+               ("stale_duplicate_nrx", "A2 stale NRx"), ("post_fence_reply_delay", "A3 late reply"),
+               ("latest_start_nonlaunch", "A4 held lease"), ("pre_fence_channel_loss", "A5 lost channel"),
+               ("stale_duplicate_recovery", "A6 stale recovery"))
+
+
+def pinned_digests(*names: str) -> dict:
+    """Every 64-hex digest recorded under a results path in the given summaries."""
+    digests = {}
+
+    def walk(node):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if isinstance(value, str) and key.startswith("results/") and len(value) == 64:
+                    digests[key] = value
+                walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    for name in names:
+        walk(load(name))
+    return digests
+
+
+def derive_runtime() -> None:
+    """Per-period admission records (Q2) and fault-campaign commits and leases (C161)."""
+    raw = ROOT / "results/softwall_multigpu/raw"
+    coordinators = [raw / f"{run}_coordinator.json" for run in FAULT_RUNS]
+    if not all(path.exists() for path in coordinators):
+        return
+    pinned = pinned_digests("fault_phase1", "fault_phase2")
+    q2_pinned = load("q2")["artifact_sha256"]
+    mode = load("q2_protocol")["mode"]
+
+    # Q2: one record per release period of both runs. The certified end is the
+    # end of the last lane action in the certificate committed at the outcome
+    # batch: the lease runs to its latest-start plus its class bound, and each
+    # required recovery then takes its full bound. A recovery-only certificate
+    # ends at the last certified recovery finish. The measured end is the later
+    # of the CUDA completion of the prefill and the completion of the last
+    # recovery. Both are relative to the NeuralRx deadline.
+    periods = []
+    for key in ("q2_dev", "q2_holdout"):
+        path = BACKGROUND_RAW[key]
+        assert q2_pinned[str(path.relative_to(ROOT))] == sha256(path)
+        raw_run = json.loads(path.read_text())
+        recoveries = {}
+        for record in raw_run["physical_recoveries"]:
+            recoveries.setdefault(record["sequence"], []).append(record)
+        for row in sorted(raw_run["rounds"], key=lambda r: r["sequence"]):
+            qwen = row["qwen"] if row["lease_accepted"] else None
+            required = len(row["outcome_transition"]["unresolved_obligations"])
+            lane = recoveries.get(row["sequence"], [])
+            assert len(lane) == required
+            assert all(r["release_to_complete_ms"] * 1e6 <= r["model_finish_ns"] for r in lane)
+            ends = [r["release_to_complete_ms"] for r in lane]
+            if qwen:
+                latest_start = (qwen["latest_start_ns"] - row["release_wall_ns"]) / 1e6
+                certified = latest_start + mode["ai_class_bounds_ms"][str(row["context_length"])] \
+                    + required * mode["conventional_bound_ms"]
+                ends.append((qwen["worker_completed_ns"] - row["release_wall_ns"]) / 1e6)
+            else:
+                certified = max(r["model_finish_ns"] for r in lane) / 1e6
+            periods.append({
+                "run": key, "sequence": row["sequence"], "pending": required,
+                "context": row["context_length"], "admitted": row["lease_accepted"],
+                "execution_ms": round(qwen["execution_ms"], 3) if qwen else None,
+                "arrival_minus_latest_start_ms": (round((qwen["worker_accepted_ns"] - qwen["latest_start_ns"]) / 1e6, 4)
+                                                  if qwen else None),
+                "decision_ms": round(row["outcome_transition"]["applied_at_ns"] / 1e6, 4),
+                "certified_end_ms": round(certified - mode["nrx_bound_ms"], 4),
+                "measured_end_ms": round(max(ends) - mode["nrx_bound_ms"], 4),
+            })
+
+    # C161: commits of every TB per fault class and every lease held past its latest-start.
+    commits = {name: [] for name, _ in FAULT_ORDER}
+    commit_counts = {name: 0 for name, _ in FAULT_ORDER}
+    misses = {name: 0 for name, _ in FAULT_ORDER}
+    held = []
+    for run in FAULT_RUNS:
+        coordinator = raw / f"{run}_coordinator.json"
+        assert pinned[str(coordinator.relative_to(ROOT))] == sha256(coordinator), run
+        rounds = json.loads(coordinator.read_text())["rounds"]
+        arm_by_sequence = {row["sequence"]: row["fault_arm"] for row in rounds}
+        for row in rounds:
+            attempt = row.get("qwen_attempt")
+            if row["fault_arm"] == "latest_start_nonlaunch" and attempt:
+                held.append({"arrival_minus_latest_start_ms":
+                             round((attempt["worker_accepted_ns"] - attempt["latest_start_ns"]) / 1e6, 4),
+                             "launched": attempt["launched"], "reason": attempt.get("reason")})
+        owners = sorted(raw.glob(f"{run}_home*_owner.json"))
+        assert len(owners) == 4, run
+        for owner in owners:
+            assert pinned[str(owner.relative_to(ROOT))] == sha256(owner), owner.name
+            for record in json.loads(owner.read_text())["records"]:
+                arm = arm_by_sequence[record["sequence"]]
+                commits[arm].append(round(record["release_to_commit_ms"], 3))
+                commit_counts[arm] += record["commit_count"]
+                misses[arm] += bool(record["deadline_miss"])
+
+    data = {
+        "schema": "softwall-runtime-data-v1",
+        "scope": ("Every release period of the Q2 development and holdout runs, and every TB commit and held "
+                  "lease of the qualified C161 phase-1 and phase-2 runs on two nodes. Arrival is the time at "
+                  "which the Qwen worker accepts a lease; a lease that arrives after its latest-start does not "
+                  "launch."),
+        "mode": {"expiry_ms": mode["expiry_ms"], "guard_ms": mode["guard_ms"], "nrx_bound_ms": mode["nrx_bound_ms"],
+                 "conventional_bound_ms": mode["conventional_bound_ms"],
+                 "launch_control_bound_ms": mode["launch_control_bound_ms"],
+                 "ai_class_bounds_ms": mode["ai_class_bounds_ms"]},
+        "q2_periods": periods,
+        "fault_commits_ms": commits,
+        "fault_commit_counts": commit_counts,
+        "fault_deadline_misses": misses,
+        "held_leases": held,
+    }
+    RUNTIME_DATA.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
+
+
+def make_eval_online() -> dict:
+    """Certified schedules and their physical execution in the two-node campaign (Q2)."""
+    data = json.loads(RUNTIME_DATA.read_text())
+    mode = data["mode"]
+    periods = data["q2_periods"]
+    assert len(periods) == 1200 and sum(p["admitted"] for p in periods) == 1077
+    window = mode["expiry_ms"] - mode["guard_ms"] - mode["nrx_bound_ms"]
+    recovery = mode["conventional_bound_ms"]
+    charge = mode["launch_control_bound_ms"]
+    bounds = {int(k): v for k, v in mode["ai_class_bounds_ms"].items()}
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.45, 1.1]})
+    fig.subplots_adjust(wspace=0.36)
+
+    # (a) The certified schedule of 36 consecutive periods: an admitted AI lease
+    # first, then the required recoveries, all before the guard. A rejected AI
+    # lease is drawn above the recoveries where it would cross the guard.
+    ax = axes[0]
+    shown = [p for p in periods if p["run"] == "q2_dev"][:36]
+    for x, p in enumerate(shown):
+        lease = bounds[p["context"]] + charge
+        base = 0.0
+        if p["admitted"]:
+            ax.bar(x, lease, bottom=0, width=0.78, color=COLORS["light_blue"], edgecolor=COLORS["blue"],
+                   linewidth=0.5, zorder=3)
+            ax.bar(x, p["execution_ms"], bottom=charge, width=0.36, color=COLORS["blue"], zorder=4)
+            base = lease
+        ax.bar(x, p["pending"] * recovery, bottom=base, width=0.78, color=COLORS["light_orange"],
+               edgecolor=COLORS["orange"], linewidth=0.5, zorder=3)
+        if not p["admitted"]:
+            ax.bar(x, lease, bottom=p["pending"] * recovery, width=0.78, color="none", edgecolor=COLORS["red"],
+                   hatch="/////", linewidth=0.7, zorder=3)
+    ax.axhline(window, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=5)
+    ax.text(21.0, window + 3, "guard", ha="center", va="bottom", fontsize=6.5, color=COLORS["red"])
+    ax.set_xlim(-0.8, 35.8)
+    ax.set_ylim(0, 150)
+    ax.set_yticks([0, 50, 100])
+    ax.set_xticks([0, 11, 23, 35], ["1", "12", "24", "36"])
+    ax.set_xlabel("release period")
+    ax.set_ylabel("after NeuralRx\ndeadline (ms)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    lane_handles = [Rectangle((0, 0), 1, 1, facecolor=COLORS["light_blue"], edgecolor=COLORS["blue"]),
+                    Rectangle((0, 0), 1, 1, facecolor=COLORS["blue"]),
+                    Rectangle((0, 0), 1, 1, facecolor=COLORS["light_orange"], edgecolor=COLORS["orange"]),
+                    Rectangle((0, 0), 1, 1, facecolor=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////")]
+    lane_labels = ["admitted AI lease", "measured prefill", "required recovery", "rejected AI lease"]
+
+    # (b) Measured against certified end of the last lane action, all 1,200
+    # periods. Points below the diagonal finish inside their certificate.
+    ax = axes[1]
+    kinds = (("AI only", lambda p: p["admitted"] and p["pending"] == 0, "o", COLORS["blue"], "none"),
+             ("AI + 1 recovery", lambda p: p["admitted"] and p["pending"] == 1, "^", COLORS["blue"], COLORS["blue"]),
+             ("AI + 2 recoveries", lambda p: p["admitted"] and p["pending"] == 2, "s", COLORS["blue"],
+              COLORS["light_blue"]),
+             ("recoveries only", lambda p: not p["admitted"], "s", COLORS["orange"], COLORS["light_orange"]))
+    assert sum(sum(1 for p in periods if test(p)) for _, test, *_ in kinds) == len(periods)
+    handles = []
+    for label, test, marker, edge, face in kinds:
+        chosen = [p for p in periods if test(p)]
+        ax.scatter([p["certified_end_ms"] for p in chosen], [p["measured_end_ms"] for p in chosen], s=11,
+                   marker=marker, facecolor=face, edgecolor=edge, linewidths=0.6, zorder=3)
+        handles.append(Line2D([], [], marker=marker, linestyle="none", markerfacecolor=face, markeredgecolor=edge,
+                              markersize=4.2))
+    assert all(p["measured_end_ms"] < p["certified_end_ms"] <= window for p in periods)
+    ax.plot([0, 120], [0, 120], color=COLORS["gray"], linestyle=":", linewidth=1.0, zorder=2)
+    ax.text(40, 44, "measured = certified", ha="center", va="bottom", fontsize=6.0, color=COLORS["gray"],
+            rotation=45, rotation_mode="anchor", transform_rotates_text=True)
+    ax.axvline(window, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=2)
+    ax.text(window - 2, 6, "guard", ha="right", va="bottom", fontsize=6.5, color=COLORS["red"])
+    ax.set_xlim(0, 120)
+    ax.set_ylim(0, 120)
+    ax.set_xticks([0, 50, 100])
+    ax.set_yticks([0, 50, 100])
+    ax.set_xlabel("certified end (ms)")
+    ax.set_ylabel("measured end (ms)")
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    # One legend above both panels: the first row names the lane intervals of
+    # (a), the second row the schedule kinds of (b).
+    order = [h for pair in zip(lane_handles, handles) for h in pair]
+    names = [n for pair in zip(lane_labels, [k[0] for k in kinds]) for n in pair]
+    figure_legend(fig, order, names, ncol=4)
+    save(fig, "softwall_eval_online")
+    late = [p for p in periods if p["decision_ms"] > mode["nrx_bound_ms"] + 1.0]
+    return {"window_ms": window,
+            "measured_end_max_ms": max(p["measured_end_ms"] for p in periods),
+            "certified_end_max_ms": max(p["certified_end_ms"] for p in periods),
+            "min_slack_to_certificate_ms": min(p["certified_end_ms"] - p["measured_end_ms"] for p in periods),
+            "late_decisions": [[p["run"], p["sequence"], p["decision_ms"], p["certified_end_ms"],
+                                p["measured_end_ms"]] for p in late]}
+
+
+def make_eval_refinement() -> dict:
+    """Latest-start enforcement and radio commits under injected faults (Q2, C161)."""
+    data = json.loads(RUNTIME_DATA.read_text())
+    mode = data["mode"]
+    launched = [p["arrival_minus_latest_start_ms"] for p in data["q2_periods"] if p["admitted"]]
+    held = data["held_leases"]
+    assert len(launched) == 1077 and len(held) == 52 and not any(h["launched"] for h in held)
+    assert all(v < 0 for v in launched) and all(h["arrival_minus_latest_start_ms"] > 0 for h in held)
+    assert all(v == 0 for v in data["fault_deadline_misses"].values())
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.0, 1.35]})
+    fig.subplots_adjust(wspace=0.45)
+
+    # (a) Lease arrival at the Qwen worker relative to its latest-start.
+    ax = axes[0]
+    rows = ((1, launched, COLORS["blue"], "o"), (0, [h["arrival_minus_latest_start_ms"] for h in held],
+                                                  COLORS["red"], "x"))
+    for y, values, color, marker in rows:
+        offsets = [((i % 11) - 5) * 0.035 for i in range(len(values))]
+        if marker == "x":
+            ax.scatter(values, [y + o for o in offsets], s=9, marker="x", color=color, linewidths=0.8, zorder=3)
+        else:
+            ax.scatter(values, [y + o for o in offsets], s=9, marker="o", facecolor="none", edgecolor=color,
+                       linewidths=0.7, zorder=3)
+    ax.axvline(0.0, color=COLORS["dark"], linestyle="--", linewidth=1.1, zorder=2)
+    ax.set_yticks([0, 1], ["held\nlease", "two-node\ncampaign"])
+    ax.set_ylim(-0.6, 1.6)
+    ax.set_xlim(-6, 10)
+    ax.set_xticks([-5, 0, 5, 10])
+    ax.set_xlabel("arrival - latest-start (ms)")
+    ax.grid(axis="x", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    # (b) Release-to-commit time of every TB in each fault class.
+    ax = axes[1]
+    commits = data["fault_commits_ms"]
+    xs = list(range(len(FAULT_ORDER)))
+    ax.boxplot([commits[name] for name, _ in FAULT_ORDER], positions=xs, widths=0.55, whis=(0, 100),
+               patch_artist=True, medianprops={"color": COLORS["dark"], "linewidth": 1.0},
+               boxprops={"facecolor": COLORS["light_blue"], "edgecolor": COLORS["blue"], "linewidth": 0.8},
+               whiskerprops={"color": COLORS["blue"], "linewidth": 0.8},
+               capprops={"color": COLORS["blue"], "linewidth": 0.8})
+    ax.axhline(mode["expiry_ms"], color=COLORS["red"], linestyle="--", linewidth=1.1)
+    ax.text(len(FAULT_ORDER) - 0.5, mode["expiry_ms"] + 3, "expiry", ha="right", va="bottom", fontsize=6.5,
+            color=COLORS["red"])
+    ax.set_xticks(xs, [label.split(" ", 1)[0] for _, label in FAULT_ORDER])
+    ax.set_xlim(-0.6, len(FAULT_ORDER) - 0.4)
+    ax.set_ylim(0, 180)
+    ax.set_yticks([0, 50, 100, 150])
+    ax.set_xlabel("fault class")
+    ax.set_ylabel("release to\ncommit (ms)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    handles = [Line2D([], [], marker="o", linestyle="none", markerfacecolor="none", markeredgecolor=COLORS["blue"],
+                      markersize=4.5),
+               Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
+               Line2D([], [], color=COLORS["dark"], linestyle="--", linewidth=1.1)]
+    figure_legend(fig, handles, ["launched", "refused (non-launch)", "latest-start"], ncol=3)
+    save(fig, "softwall_eval_refinement")
+    return {"launched_arrival_ms": [min(launched), max(launched)],
+            "held_arrival_ms": [min(h["arrival_minus_latest_start_ms"] for h in held),
+                                max(h["arrival_minus_latest_start_ms"] for h in held)],
+            "fault_commit_max_ms": {name: max(commits[name]) for name, _ in FAULT_ORDER},
+            "fault_commit_counts": data["fault_commit_counts"],
+            "fault_tbs": {name: len(commits[name]) for name, _ in FAULT_ORDER}}
+
+
 def make_capacity_headroom() -> dict:
     """Capacity model, trace headroom screen, and prespecified lever decomposition."""
     capacity = load("capacity")
@@ -934,17 +1231,21 @@ def make_capacity_headroom() -> dict:
 def main() -> None:
     derive_background()
     derive_eval()
+    derive_runtime()
     outputs = {
         "execution": make_execution(),
         "debt": make_debt(),
         "eval_capacity": make_eval_capacity(),
         "eval_trace": make_eval_trace(),
         "eval_safety": make_eval_safety(),
+        "eval_online": make_eval_online(),
+        "eval_refinement": make_eval_refinement(),
         "envelope": make_envelope(),
         "capacity_headroom": make_capacity_headroom(),
     }
     stems = ("softwall_execution", "softwall_debt", "softwall_eval_capacity", "softwall_eval_trace",
-             "softwall_eval_safety", "softwall_envelope", "softwall_capacity_headroom")
+             "softwall_eval_safety", "softwall_eval_online", "softwall_eval_refinement", "softwall_envelope",
+             "softwall_capacity_headroom")
     manifest = {
         "schema": "softwall-paper-figure-manifest-v1",
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in SOURCES.values()},

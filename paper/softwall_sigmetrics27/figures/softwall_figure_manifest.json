@@ -254,6 +254,79 @@
       },
       "useful_points": 10314
     },
+    "eval_online": {
+      "certified_end_max_ms": 105.0396,
+      "late_decisions": [
+        [
+          "q2_dev",
+          1,
+          47.1527,
+          67.1527,
+          32.0987
+        ],
+        [
+          "q2_dev",
+          351,
+          68.7507,
+          88.7507,
+          51.6319
+        ],
+        [
+          "q2_holdout",
+          1,
+          47.2084,
+          42.2084,
+          29.3398
+        ],
+        [
+          "q2_holdout",
+          350,
+          76.0135,
+          96.0135,
+          58.3538
+        ]
+      ],
+      "measured_end_max_ms": 72.8605,
+      "min_slack_to_certificate_ms": 12.689700000000002,
+      "window_ms": 108
+    },
+    "eval_refinement": {
+      "fault_commit_counts": {
+        "correlated_all_fail": 240,
+        "latest_start_nonlaunch": 240,
+        "no_fault": 240,
+        "post_fence_reply_delay": 560,
+        "pre_fence_channel_loss": 560,
+        "stale_duplicate_nrx": 480,
+        "stale_duplicate_recovery": 480
+      },
+      "fault_commit_max_ms": {
+        "correlated_all_fail": 125.205,
+        "latest_start_nonlaunch": 86.755,
+        "no_fault": 103.153,
+        "post_fence_reply_delay": 107.532,
+        "pre_fence_channel_loss": 106.901,
+        "stale_duplicate_nrx": 110.58,
+        "stale_duplicate_recovery": 107.139
+      },
+      "fault_tbs": {
+        "correlated_all_fail": 240,
+        "latest_start_nonlaunch": 240,
+        "no_fault": 240,
+        "post_fence_reply_delay": 560,
+        "pre_fence_channel_loss": 560,
+        "stale_duplicate_nrx": 480,
+        "stale_duplicate_recovery": 480
+      },
+      "held_arrival_ms": [
+        6.3525,
+        7.217
+      ],
+      "launched_arrival_ms": [
+        -3.7606,
+        -2.9183
+      ]
+    },
     "eval_safety": {
       "boundary": {
         "E4_debt_blind_launch": {
@@ -406,6 +479,8 @@
     "softwall_eval_capacity.pdf",
     "softwall_eval_trace.pdf",
     "softwall_eval_safety.pdf",
+    "softwall_eval_online.pdf",
+    "softwall_eval_refinement.pdf",
     "softwall_envelope.pdf",
     "softwall_capacity_headroom.pdf"
   ],
@@ -418,6 +493,10 @@
     "softwall_envelope.svg": "e8cdb858da9ff9968c34c1363fdfebe6b583f38cd53bca81ed6cdcf872a0f095",
     "softwall_eval_capacity.pdf": "5f562da67f2613b2a6932b31e4aa1069877e403b965587f246481afffb17297a",
     "softwall_eval_capacity.svg": "cb8f32336258374581d2a1d24006683e095a1a3699fbb2ad393d5cdc4961b498",
+    "softwall_eval_online.pdf": "0f51600a750e48a3a4d60b388ac691808ece21b741d636e07b8e9cb57a9f6e8c",
+    "softwall_eval_online.svg": "a6475eaf4c6f856264be2a197ce758b88cdc28dd993a48c74c156ff61ff2311c",
+    "softwall_eval_refinement.pdf": "cabb5bc7ca67890c587fb46a12718e95156c70ba41303baad88587d456a06ce4",
+    "softwall_eval_refinement.svg": "7a32dde2293adae2b08b15147b6c4a346c7ca1431254df64ca60a7db33d067fd",
     "softwall_eval_safety.pdf": "6d06ae24eeda19f1f5a6bbb58f96f3697c86efebb1478848d21a855f36d26c77",
     "softwall_eval_safety.svg": "f70f8e017ad0cedb59fc77117717710e01ae3f545dc7e680c520cbe837420245",
     "softwall_eval_trace.pdf": "ffcf1a7c81a5b7ac4f7e973003c71383d87e329d350754e32b4879f09292ded5",
@@ -428,6 +507,8 @@
   "schema": "softwall-paper-figure-manifest-v1",
   "source_sha256": {
     "results/softwall_multigpu/c161_full_fault_qualification.json": "d039bb3e5f3a7af4d51e1bf5c2c3a035a93846c8cef177453427edcdcb4a003b",
+    "results/softwall_multigpu/c161_phase1_two_node.json": "fcbaab2ac98e0c46ca391655741b708e15668f15ff9f85ccfaee65b1b9346dc1",
+    "results/softwall_multigpu/c161_phase2_two_node.json": "f36e9d28a2afecb0322652d9fdbc7e51daceb70ee94ecd23227ff84ace15f427",
     "results/softwall_multigpu/c162_feasibility_grid_v1.json": "f5da8016215c2896ef4d9f19be4e8ea386529a46c590407602fb116daddc60c7",
     "results/softwall_multigpu/c162_scheduler_scalability_v1.json": "cce6f3eb3184b7007d1074f7212c37234c81ef0a0bee5ec8c774fc8015191fed",
     "results/softwall_multigpu/c162a_boundary_dev_j58860486_protocol.json": "c192d1a5c013ddccb00b95420fc4ad76085106201884caea82a71fabb0fadef2",

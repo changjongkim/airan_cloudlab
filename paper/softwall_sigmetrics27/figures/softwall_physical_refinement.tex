@@ -1,50 +1,84 @@
-% Refining an accepted schedule through launch and physical completion.
+% Certificate-to-execution refinement as the evaluated message sequence. The
+% lease stages, the launch/completion marker files, the latest-start gate, and
+% the four injected fault arms follow the evaluated coordinator, AI worker, and
+% fault-state model. Black numbers are the normal path; red numbers are faults.
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \node[layer, minimum width=3.45cm, minimum height=5.15cm, anchor=south west] (control) at (0,0) {};
-  \node[layer, minimum width=4.20cm, minimum height=5.15cm, anchor=south west] (ownership) at (3.75,0) {};
-  \node[layer, minimum width=4.35cm, minimum height=5.15cm, anchor=south west] (workers) at (8.25,0) {};
-  \node[layer, minimum width=3.10cm, minimum height=5.15cm, anchor=south west] (terminal) at (12.90,0) {};
-  \node[ttl, anchor=north] at (1.725,4.98) {Controller};
-  \node[ttl, anchor=north] at (5.85,4.98) {Ownership transfer};
-  \node[ttl, anchor=north] at (10.425,4.98) {Persistent GPU workers};
-  \node[ttl, anchor=north] at (14.45,4.98) {Terminal evidence};
+  % ------------------------------------------------------------ lifelines
+  \foreach \x/\t/\w in {1.5/{Coordinator (host)}/2.3, 4.3/{Marker files}/1.7,
+                         6.9/{Qwen worker}/1.9, 9.4/{GPU2 CUDA stream}/2.1} {
+    \node[comp, fill=panel, minimum width=\w cm, minimum height=0.42cm] at (\x,5.0) {\t};
+    \draw[black!45, dashed, line width=0.5pt] (\x,4.79) -- (\x,0.9);
+  }
 
-  \node[comp, fill=bluec!55, minimum width=2.55cm] (accepted) at (1.73,3.63) {accepted certificate\\first action only};
-  \node[comp, fill=white, minimum width=2.55cm] (calendar) at (1.73,2.23) {calendar generation\\worker epoch};
-  \node[comp, fill=hot!35, minimum width=2.55cm] (closed) at (1.73,0.75) {fail closed\\new optional work off};
+  % (1) Commit a lease with an absolute latest-start.
+  \node[comp, fill=aic, minimum width=2.3cm, minimum height=0.46cm] at (1.5,4.45)
+    {commit lease $L$\\committed, gen $g{+}1$};
+  \node[num] at (0.18,4.45) {1};
 
-  \node[comp, fill=gold!45, minimum width=2.90cm] (prepare) at (5.85,3.63) {prepare one token\\ring + transport credit};
-  \node[comp, fill=greenc!65, minimum width=2.90cm] (revalidate) at (5.85,2.23) {launch-time revalidate\\absolute latest-start};
-  \node[comp, fill=peach, minimum width=2.90cm] (quarantine) at (5.85,0.75) {quarantine ambiguous\\generation};
+  % (2) Run request.
+  \draw[arr] (1.5,3.98) -- (6.9,3.98);
+  \node[note, anchor=south] at (4.9,3.98) {run($L$, latest-start)};
+  \node[num] at (2.8,4.1) {2};
 
-  \node[comp, fill=peach, minimum width=3.05cm] (nrxw) at (10.43,3.75) {NeuralRx endpoint\\IPC / P2P input};
-  \node[comp, fill=cyanp, minimum width=3.05cm] (recw) at (10.43,2.42) {cuPHY recovery\\certificate order};
-  \node[comp, fill=bluec!55, minimum width=3.05cm] (aiw) at (10.43,1.09) {external-AI worker\\bounded CUDA unit};
+  % (3) Launch-time gate on the worker.
+  \node[comp, minimum width=2.1cm, minimum height=0.34cm] at (6.9,3.6) {now $\le$ latest-start?};
+  \node[num] at (5.6,3.6) {3};
+  \draw[arr, dashed] (5.85,3.33) -- (1.5,3.33);
+  \node[inote, anchor=south] at (3.3,3.33) {no: non-launch reply, no kernel};
+  \draw[arr] (7.4,3.43) |- (9.4,3.2);
+  \node[inote, anchor=south] at (8.7,3.2) {yes: submit};
+  \node[job, fill=aic, minimum width=0.42cm, minimum height=0.95cm] at (9.4,2.725) {};
+  \node[inote, anchor=west, align=left] at (9.68,2.8) {prefill\\kernels};
+  \draw[arr] (6.9,2.95) -- (4.93,2.95);
+  \node[cell, fill=white, minimum width=1.25cm, anchor=center] at (4.3,2.95) {L.launch};
+  \node[inote, anchor=south] at (5.9,2.95) {write};
 
-  \node[comp, fill=greenc!65, minimum width=2.25cm] (fence) at (14.45,3.62) {CUDA fence\\or non-launch};
-  \node[comp, fill=cyanp, minimum width=2.25cm] (retire) at (14.45,2.22) {retire lease\\and credits};
-  \node[comp, fill=white, minimum width=2.25cm] (commit) at (14.45,0.82) {single radio\\commit};
+  % (4) Completion fence: CUDA event, completion marker, reply.
+  \draw[arr] (9.4,2.25) -- (6.9,2.25);
+  \node[inote, anchor=south] at (8.15,2.25) {CUDA event done};
+  \node[num] at (9.83,2.25) {4};
+  \draw[arr] (6.9,2.05) -- (4.93,2.05);
+  \node[cell, fill=okc, minimum width=1.25cm, anchor=center] at (4.3,2.05) {L.complete};
+  \node[inote, anchor=south] at (5.9,2.05) {write};
+  \draw[arr] (6.9,1.65) -- (1.5,1.65);
+  \node[inote, anchor=south] at (6.2,1.65) {reply};
 
-  \draw[arr] (accepted.east) -- (prepare.west);
-  \draw[arr] (calendar.east) -- (revalidate.west);
-  \draw[arr] (prepare.south) -- (revalidate.north);
-  \draw[arr, draw=dblue] (revalidate.east) -- ++(0.38,0) |- (nrxw.west);
-  \draw[arr, draw=dblue] (revalidate.east) -- (recw.west);
-  \draw[arr, draw=dblue] (revalidate.east) -- ++(0.38,0) |- (aiw.west);
-  \draw[arr] (nrxw.east) -- (fence.west);
-  \draw[arr] (recw.east) -- (fence.west);
-  \draw[arr] (aiw.east) -- (fence.west);
-  \draw[arr] (fence.south) -- (retire.north);
-  \draw[arr] (retire.south) -- (commit.north);
-  \draw[arr, draw=dred] (revalidate.south) -- node[right,note] {stale / late} (quarantine.north);
-  \draw[arr, draw=dred] (fence.south west) -- ++(-0.18,-2.92) -- node[below,note] {reply loss without proof} (quarantine.south east);
-  \draw[arr, draw=dred] (quarantine.west) -- (closed.east);
+  % (5) Retire only with matching physical evidence.
+  \node[comp, fill=okc, draw=green!45!black, minimum width=2.3cm, minimum height=0.46cm]
+    at (1.5,1.2) {retire $L$ on match\\gen $g{+}2$};
+  \node[num] at (0.18,1.2) {5};
 
-  \node[num] at (3.72,4.10) {1};
-  \node[num] at (5.85,2.92) {2};
-  \node[num] at (8.23,2.90) {3};
-  \node[num] at (12.88,4.10) {4};
-  \node[num] at (14.45,1.52) {5};
+  % Fault 1: a late or lost reply after the fence is reconciled from the marker.
+  \draw[arr, draw=dred, dashed] (1.5,2.05) -- (3.67,2.05);
+  \node[font=\itshape\scriptsize, text=dred, anchor=south] at (2.55,2.05) {read marker};
+  \node[rnum] at (0.18,2.05) {1};
+  \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (1.6,2.62)
+    {reply delayed or lost\\after the fence};
+
+  % Fault 2: a channel lost before the fence leaves only the launch marker.
+  \node[comp, draw=dred, fill=badc, minimum width=7.0cm, minimum height=0.5cm, align=center]
+    at (4.05,0.5) {channel lost before the fence: only L.launch at lease end\\
+                   keep $L$ and quarantine AI; radio recovery continues};
+  \node[rnum] at (0.18,0.5) {2};
+
+  % ------------------------------------------------ radio state (faults 3, 4)
+  \draw[sub, fill=panel] (10.75,0.25) rectangle (13.75,5.25);
+  \node[pttl] at (12.25,5.03) {Radio state, epoch 17};
+  \node[hcell, minimum width=2.8cm] at (10.85,4.78) {applied outcome batches};
+  \node[cell, minimum width=2.8cm, fill=okc] at (10.85,4.48) {nrx-17: two debts deleted};
+  \node[rnum] at (11.02,3.9) {3};
+  \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,3.9)
+    {replay of nrx-17 or an\\epoch-16 batch: no change};
+  \node[hcell, minimum width=2.8cm] at (10.85,3.4) {commit set (epoch, TB)};
+  \foreach \y/\k/\src in {3.1/{(17, h0-r0)}/NRx, 2.8/{(17, h0-r1)}/NRx,
+                           2.5/{(17, h0-r2)}/cuPHY, 2.2/{(17, h1-r0)}/cuPHY} {
+    \node[cell, minimum width=1.75cm] at (10.85,\y) {\k};
+    \node[cell, minimum width=1.05cm] at (12.6,\y) {\src};
+  }
+  \node[rnum] at (11.02,1.5) {4};
+  \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,1.5)
+    {second response for\\(17, h1-r0): no commit};
+  \node[inote, align=center] at (12.25,0.7) {one commit per TB};
 \end{tikzpicture}%
 }

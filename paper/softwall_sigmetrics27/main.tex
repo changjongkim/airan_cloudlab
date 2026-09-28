@@ -160,21 +160,21 @@ lifecycle matrix.
 \subsection{AI-and-RAN on a shared GPU}
 
 A shared AI-RAN node executes three scheduling classes: speculative \NRx, mandatory conventional
-recovery, and external AI. Figure~\ref{fig:airan-background}a shows their same-TB dependency, while
-Figure~\ref{fig:airan-background}b shows why decisions made at one RAN home affect other homes through
-a shared GPU lane. The scheduler must therefore track both the radio branch and the physical resource
-on which that branch may execute.
+recovery, and external AI. Figure~\ref{fig:airan-background} follows one uplink TB through one release
+period of the evaluated contract. Until the common cutoff shows a timely \NRx success, the TB owes a
+conventional recovery that no GPU queue contains. The scheduler must therefore track both the radio
+branch and the physical resource on which that branch may execute.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/softwall_airan_background.pdf}
-  \caption{AI-RAN scheduling background. (a) A timely \NRx result may commit directly, but failure,
-  lateness, or missing evidence makes conventional recovery mandatory for the same TB. (b) Multiple
-  RAN homes use local \NRx endpoints while their recovery and external-AI work contend on a shared
-  GPU lane through CUDA IPC or NVLink P2P.}
-  \Description{Two panels show the same-transport-block dependency between optional neural reception,
-  conventional recovery, and one radio commit, followed by two RAN homes whose local neural endpoints
-  feed one shared conventional-recovery and external-AI GPU lane.}
+  \input{figures/softwall_airan_background.tex}
+  \caption{One uplink TB in one 180~ms release period. Until the 45~ms common cutoff, the TB owes a
+  conventional recovery that no GPU queue contains. A failed, late, or missing \NRx outcome requires
+  one cuPHY recovery that ends before the guard.}
+  \Description{Three rows show the RAN owner, the NeuralRx endpoint, and the recovery lane over one
+  release period. A hatched recovery-debt bar spans release to the common cutoff. The owner commits
+  either the neural result after the cutoff or the conventional result after one recovery placed in a
+  window that ends at the guard.}
   \label{fig:airan-background}
 \end{figure}
 
@@ -244,14 +244,14 @@ locally valid calendars on one shared lane. These failures define the state and 
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/softwall_scheduling_problem.pdf}
-  \caption{Why existing scheduling abstractions are insufficient. (a) Current-idle admission can
-  overlap a future all-fail recovery. (b) Static reservation is safe but rejects an AI opportunity
-  that timely \NRx successes could release. (c) Per-home certificates can overlap after composition on
-  the shared cuPHY lane. Dashed vertical lines mark the radio guard and expiry.}
-  \Description{Three timelines illustrate an external-AI job overlapping future recovery, four static
-  recovery reservations stranding an AI opportunity after three neural successes, and two local
-  recovery jobs colliding on a globally shared lane.}
+  \input{figures/softwall_scheduling_problem.tex}
+  \caption{Scheduling failures after two timely successes (h0-r0, h0-r1). (a) Current-idle admission
+  pushes a retained recovery past the guard. (b) Static reservation rejects a context-128 unit that fits
+  once the successful reservations are released. (c) Per-home certificates claim one lane interval.}
+  \Description{Three lane timelines between 45 and 170 milliseconds with the guard and expiry marked.
+  The first shows an AI unit followed by two recoveries whose second crosses the guard. The second
+  shows four reservations, two of them for successful requests, and a rejected AI unit. The third shows
+  two per-home calendars that occupy the same lane interval.}
   \label{fig:scheduling-problem}
 \end{figure}
 
@@ -314,23 +314,26 @@ capacity model used by the implementation.
 \subsection{Overall architecture}
 \label{sec:design-overall}
 
-Figure~\ref{fig:overall} shows the full scheduling loop. RAN homes and the external-AI queue generate
-events; the controller converts unresolved radio outcomes into recovery debt; a candidate scheduler
-places recovery and bounded AI; an independent verifier grants dispatch authority; and terminal GPU
-evidence returns the system to the next event. The six numbered arrows are the operative path, rather
-than a conceptual dataflow.
+Figure~\ref{fig:overall} shows the scheduling loop on its runtime objects. Persistent MPS workers own
+GPU work, while one host coordinator owns the per-TB decision pages, the recovery-debt table, the
+recovery-lane certificate, and the verifier. The numbered steps follow one epoch from \NRx input to the
+recovery that runs at its certificate start. The same control layer serves a single GPU, where CUDA
+IPC connects the workers, and several GPUs, where retained debts from different RAN homes share one
+recovery lane over NVLink P2P.
 
 \begin{figure}[H]
   \centering
   \input{figures/softwall_overall_architecture.tex}
-  \caption{Overall SoftWall architecture. (1) Homes and AI queues publish only currently visible
-  events. (2) Each unresolved optional receiver owns conventional-recovery debt. (3) The candidate
-  scheduler jointly retimes debt and proposes an AI lease. (4) An independent verifier checks the
-  complete state. (5) Only a verified state grants dispatch authority. (6) Receiver outcomes and
-  terminal fences trigger the next atomic transition.}
-  \Description{Three shaded layers show RAN homes, the SoftWall controller, and qualified multi-GPU
-  workers. Numbered arrows connect event collection, recovery debt, scheduling, verification,
-  dispatch, and terminal completion.}
+  \caption{\sys architecture. The control layer is identical for every placement: steps (2)--(7)
+  record outcomes, apply one cutoff batch, retime debts around a candidate lease, verify it, dispatch
+  actions and the lease, and retire the lease on a marker. The data layer shows (a) one GPU over CUDA
+  IPC and (b) the evaluated four-GPU placement over NVLink P2P, with \NRx input (1) and
+  certificate-ordered recovery (8).}
+  \Description{A control layer contains a decision-page table, a recovery-debt table, a recovery-lane
+  calendar with a candidate AI lease, and an independent verifier. The data layer shows one GPU hosting
+  all job classes and a four-GPU node with two RAN-home GPUs, a NeuralRx GPU, and a shared recovery and
+  AI GPU connected by NVLink P2P. Numbered arrows follow input, outcome, batch, retiming, verification,
+  dispatch, fence, and recovery.}
   \label{fig:overall}
 \end{figure}
 
@@ -389,14 +392,15 @@ success creates new mandatory work or changes another service bound; that case n
 \begin{figure}[H]
   \centering
   \input{figures/softwall_atomic_replan.tex}
-  \caption{Conditional-recovery transaction. (a) SoftWall reserves debt before dispatching \NRx;
-  one common-cutoff batch deletes debt only for timely successes. (b) It builds a private candidate
-  that retimes retained recoveries around one bounded AI lease. The verifier commits the calendar and
-  lease together or keeps the previous state unchanged.}
-  \Description{The left panel shows transport-block release, recovery reservation, neural-receiver
-  dispatch, and success or failure outcomes. The right panel compares the current four-recovery
-  calendar with a candidate containing one AI lease and two retained recoveries, followed by atomic
-  commit or rollback.}
+  \caption{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB
+  and rejects h1-r1; the 45~ms batch deletes two debts in one generation. (b) The verifier commits the
+  context-128 lease and keeps $X_t$ for the context-256 lease, whose last recovery would end after the
+  guard.}
+  \Description{Four lane timelines between 45 and 170 milliseconds. The first shows four reserved
+  recoveries and a rejected fifth request that crosses the guard. The second shows two retained
+  recoveries and released capacity until the guard. The third and fourth show a context-128 and a
+  context-256 AI lease followed by the retained recoveries; the first is committed and the second,
+  which crosses the guard, is rejected.}
   \label{fig:atomic-replan}
 \end{figure}
 
@@ -433,22 +437,21 @@ matching terminal physical evidence, and each request commits at most one radio 
 \label{sec:design-refinement}
 
 A feasible host calendar is insufficient unless launch and ownership obey it. Figure~\ref{fig:refinement}
-refines an accepted first action through prepare, launch-time revalidation, persistent GPU execution,
-and terminal evidence. The mechanism closes the interval between a scheduling decision and the CUDA
-effect it authorizes.
+follows one AI lease from commit through the latest-start gate, CUDA execution, and the marker that
+retires it, together with the injected faults. The mechanism closes the interval between a scheduling
+decision and the CUDA effect it authorizes.
 
 \begin{figure}[H]
   \centering
   \input{figures/softwall_physical_refinement.tex}
-  \caption{Certificate-to-execution refinement. (1) A certificate authorizes only its first
-  non-preemptive action. (2) Prepare owns one generation-tagged token. (3) The worker revalidates an
-  absolute latest-start before launch. (4) Persistent NeuralRx, cuPHY, or AI workers publish physical
-  completion. (5) Only matching CUDA fences or qualified non-launch markers retire ownership; stale
-  or ambiguous effects are quarantined.}
-  \Description{Four layers show a controller, ownership transfer, three persistent GPU workers, and
-  terminal evidence. The normal path moves from an accepted certificate to prepare, revalidation,
-  execution, a CUDA fence, credit retirement, and radio commit. Red arrows route ambiguous states to
-  quarantine and fail-closed admission.}
+  \caption{Refinement of one AI lease. Black steps: commit with a latest-start (1), run request (2),
+  launch gate and launch marker (3), CUDA event and completion marker (4), and retirement on a
+  matching marker (5). Red faults: marker reconciliation after a late reply (1), AI quarantine after
+  channel loss (2), and no-op outcome and response replays (3, 4).}
+  \Description{A message sequence among the coordinator, marker files, the AI worker, and the GPU
+  stream shows lease commit, the run request, the latest-start gate, kernel submission with a launch
+  marker, the CUDA event, the completion marker, the reply, and lease retirement. Red paths show marker
+  reconciliation, AI quarantine after channel loss, and no-op replays in a radio-state table.}
   \label{fig:refinement}
 \end{figure}
 
@@ -587,7 +590,10 @@ conventional recovery, and external AI execute in separate persistent workers.
 \noindent\textbf{Radio and AI Workers.}
 Local and remote TensorRT \NRx workers hold preallocated bindings and CUDA graphs. Persistent
 Aerial/cuPHY workers execute conventional recovery, while a Qwen2.5-1.5B worker executes bounded
-prefill classes. Multi-home modes direct conventional work to one shared recovery GPU.
+prefill classes. Multi-home modes direct conventional work to one shared recovery GPU. In the
+evaluated placement (Figure~\ref{fig:overall}b), GPU0 and GPU1 host the RAN-home request owners with a
+50\% MPS thread limit, GPU3 hosts the \NRx endpoint, and GPU2 hosts the shared cuPHY lane and the
+Qwen worker, which runs as a low-priority MPS client with a 20\% thread limit.
 
 \noindent\textbf{Transport.}
 CUDA IPC rings connect processes on one GPU, and NVLink P2P rings connect GPUs. Each slot carries a

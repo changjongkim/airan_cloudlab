@@ -1,54 +1,87 @@
-% Conditional-recovery scheduling transaction.
+% One conditional-recovery transaction on the shared recovery lane, following
+% the evaluated code path: all-fail reservation at release, one common-cutoff
+% outcome batch, and two candidate AI leases checked by the verifier. The
+% requests, service bounds, lease classes, and guard are those of the
+% evaluated P180/D155 mode (context-128 admitted, context-256 rejected).
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \node[layer, minimum width=7.35cm, minimum height=5.25cm, anchor=south west] (left) at (0,0) {};
-  \node[layer, minimum width=7.75cm, minimum height=5.25cm, anchor=south west] (right) at (7.70,0) {};
-  \node[ttl, anchor=north] at (3.675,5.08) {(a) Outcome event changes recovery debt};
-  \node[ttl, anchor=north] at (11.575,5.08) {(b) Atomic recovery retiming + AI lease};
+  \def\swT#1{3.85+(#1-40)*0.0555}
+  \def\swJob#1#2#3#4#5{% y, start, end, fill, label
+    \node[job, fill=#4, minimum height=0.4cm, anchor=west,
+          minimum width={(#3-#2)*0.0555 cm}] at ({\swT{#2}},#1) {#5};}
 
-  % Panel a: state transition.
-  \node[comp, fill=cyanp, minimum width=1.55cm] (release) at (0.98,3.40) {TB release};
-  \node[comp, fill=gold!45, minimum width=1.75cm] (reserve) at (3.05,3.40) {reserve $R_i$\\before NRx};
-  \node[comp, fill=peach, minimum width=1.65cm] (nrx) at (5.20,3.40) {dispatch\\NeuralRx};
-  \node[comp, fill=white, minimum width=1.42cm] (cutoff) at (6.50,1.80) {atomic\\outcome batch};
-  \draw[arr] (release) -- node[above,note] {mandatory first} (reserve);
-  \draw[arr] (reserve) -- (nrx);
-  \draw[arr] (nrx.south east) -- (cutoff.north);
-  \node[comp, fill=greenc!65, minimum width=1.62cm] (success) at (4.30,0.67) {timely success\\delete $R_i$};
-  \node[comp, fill=hot!35, minimum width=1.72cm] (failure) at (6.35,0.67) {fail / late / lost\\retain $R_i$};
-  \draw[arr] (cutoff.south west) -- (success.north);
-  \draw[arr] (cutoff.south east) -- (failure.north);
-  \node[num] at (1.95,3.82) {1};
-  \node[num] at (4.10,3.82) {2};
-  \node[rnum] at (5.58,1.82) {3};
-  \node[note, align=center] at (2.45,1.55) {Debt exists while the outcome is unresolved,\\even when no recovery kernel is queued.};
+  % ---------------------------------------------------- guard and expiry
+  \draw[guard] ({\swT{153}},0.95) -- ({\swT{153}},4.8);
+  \draw[expiry] ({\swT{155}},0.95) -- ({\swT{155}},4.8);
+  \node[font=\itshape\tiny, text=dred, anchor=east] at ({\swT{153}},4.92) {guard};
+  \node[font=\itshape\tiny, anchor=west] at ({\swT{155}},4.92) {expiry};
 
-  % Panel b: current and candidate calendars.
-  \node[note, anchor=east] at (9.12,3.82) {current $X_t$};
-  \draw[->, line width=0.45pt] (9.30,3.52) -- (14.90,3.52);
-  \node[blk, fill=hot!45, minimum width=0.92cm] at (11.05,3.52) {$R_1$};
-  \node[blk, fill=hot!45, minimum width=0.92cm] at (12.05,3.52) {$R_2$};
-  \node[blk, fill=hot!45, minimum width=0.92cm] at (13.05,3.52) {$R_3$};
-  \node[blk, fill=hot!45, minimum width=0.92cm] at (14.05,3.52) {$R_4$};
-  \node[note, anchor=west] at (14.30,3.84) {guard};
-  \draw[dred, dashed, line width=0.8pt] (14.55,3.10) -- (14.55,4.18);
+  % --------------------------------------------------------------- axis
+  \draw[line width=0.45pt] ({\swT{42}},0.95) -- ({\swT{175}},0.95);
+  \foreach \t in {45,70,95,120,145,170} {
+    \draw[line width=0.45pt] ({\swT{\t}},0.95) -- ({\swT{\t}},0.88);
+    \node[font=\tiny] at ({\swT{\t}},0.76) {\t};
+  }
+  \node[font=\tiny, anchor=west] at ({\swT{175}},0.76) {ms};
 
-  \node[note, anchor=east] at (9.12,2.40) {candidate $X'$};
-  \draw[->, line width=0.45pt] (9.30,2.10) -- (14.90,2.10);
-  \node[blk, fill=bluec!60, minimum width=1.55cm] at (10.55,2.10) {AI lease};
-  \node[free, minimum width=0.66cm] at (11.72,2.10) {};
-  \node[blk, fill=hot!45, minimum width=0.92cm] at (12.38,2.10) {$R_2$};
-  \node[blk, fill=hot!45, minimum width=0.92cm] at (13.38,2.10) {$R_4$};
-  \node[note, anchor=west] at (14.30,2.42) {guard};
-  \draw[dred, dashed, line width=0.8pt] (14.55,1.68) -- (14.55,2.76);
-  \node[note, align=center] at (12.10,1.35) {success deletes $R_1,R_3$; retained debt is retimed};
+  % ------------------------------------------------------------- panel (a)
+  \node[font=\bfseries\scriptsize] at (0.18,4.62) {(a)};
+  % Row 1: admission reserves one all-fail recovery per TB.
+  \node[num] at (0.55,4.35) {1};
+  \node[font=\scriptsize, align=left, anchor=west] at (0.75,4.35)
+    {\textbf{Admission at release}\\\textit{one all-fail debt per TB}};
+  \swJob{4.35}{45}{70}{recc}{h0-r0}
+  \swJob{4.35}{70}{95}{recc}{h0-r1}
+  \swJob{4.35}{95}{120}{recc}{h0-r2}
+  \swJob{4.35}{120}{145}{recc}{h1-r0}
+  \node[job, draw=dred, dashed, pattern=north east lines, pattern color=dred!45,
+        minimum height=0.4cm, minimum width={25*0.0555 cm}, anchor=west] at ({\swT{145}},4.35) {};
+  \node[font=\bfseries\scriptsize, text=dred] at ({\swT{163}},4.35) {h1-r1};
+  \node[comp, draw=dred, minimum width=2.0cm, minimum height=0.4cm] at (12.9,4.35)
+    {\xmark\ h1-r1 rejected};
 
-  \node[comp, fill=greenc!65, minimum width=2.15cm] (verify) at (9.92,0.55) {independent verifier\\checks complete $X'$};
-  \node[comp, fill=cyanp, minimum width=1.50cm] (commit) at (12.45,0.55) {commit $X'$};
-  \node[comp, fill=white, minimum width=1.42cm] (rollback) at (14.45,0.55) {keep $X_t$};
-  \draw[arr] (verify.east) -- node[above,note] {valid} (commit.west);
-  \draw[arr, draw=dred] (verify.south) -- ++(0,-0.32) -| node[pos=0.72,below,note] {invalid} (rollback.south);
-  \node[num] at (8.37,2.72) {4};
-  \node[num] at (11.35,0.97) {5};
+  % Row 2: one outcome batch deletes the debts of timely successes.
+  \node[num] at (0.55,3.45) {2};
+  \node[font=\scriptsize, align=left, anchor=west] at (0.75,3.45)
+    {\textbf{Outcome batch at 45 ms}\\\textit{\cmark\ h0-r0, h0-r1;\ \xmark\ h0-r2, h1-r0}};
+  \swJob{3.45}{45}{70}{recc}{h0-r2}
+  \swJob{3.45}{70}{95}{recc}{h1-r0}
+  \node[job, draw=green!45!black, dashed, fill=okc, minimum height=0.4cm,
+        minimum width={(153-95)*0.0555 cm}, anchor=west, font=\itshape\scriptsize]
+    at ({\swT{95}},3.45) {released until the guard};
+  \node[comp, fill=debtc, minimum width=2.0cm, minimum height=0.4cm] at (12.9,3.45)
+    {$X_t$: gen $g$, two debts};
+
+  \draw[black!40, dashed, line width=0.4pt] (0.1,2.93) -- (13.8,2.93);
+
+  % ------------------------------------------------------------- panel (b)
+  \node[font=\bfseries\scriptsize] at (0.18,2.67) {(b)};
+  % Row 3: context-128 lease first, recoveries retimed before the guard.
+  \node[num] at (0.55,2.4) {3};
+  \node[font=\scriptsize, align=left, anchor=west] at (0.75,2.4)
+    {\textbf{Candidate $X'$: ctx128}\\\textit{lease first, debts retimed}};
+  \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.4cm,
+        minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},2.4) {};
+  \swJob{2.4}{50}{90}{aic}{AI ctx128}
+  \swJob{2.4}{90}{115}{recc}{h0-r2}
+  \swJob{2.4}{115}{140}{recc}{h1-r0}
+  \node[comp, fill=okc, draw=green!45!black, minimum width=2.0cm, minimum height=0.4cm]
+    at (12.9,2.4) {\cmark\ commit, gen $g{+}1$};
+
+  % Row 4: context-256 lease pushes the last recovery past the guard.
+  \node[num] at (0.55,1.5) {3};
+  \node[font=\scriptsize, align=left, anchor=west] at (0.75,1.5)
+    {\textbf{Candidate $X'$: ctx256}\\\textit{lease first, debts retimed}};
+  \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.4cm,
+        minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},1.5) {};
+  \swJob{1.5}{50}{115}{aic}{AI ctx256}
+  \swJob{1.5}{115}{140}{recc}{h0-r2}
+  \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.4cm,
+        minimum width={25*0.0555 cm}, anchor=west] at ({\swT{140}},1.5) {h1-r0};
+  \node[comp, draw=dred, minimum width=2.0cm, minimum height=0.4cm] at (12.9,1.5)
+    {\xmark\ reject, keep $X_t$};
+  \node[num] at (11.5,2.4) {4};
+  \node[num] at (11.5,1.5) {4};
+  \node[inote, anchor=west] at ({\swT{45}},1.12) {hatched: 5 ms launch-control charge};
 \end{tikzpicture}%
 }

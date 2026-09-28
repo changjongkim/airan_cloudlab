@@ -1,58 +1,206 @@
-% Overall architecture of SoftWall, drawn in the shared CASCADE style.
+% SoftWall architecture. The control layer is placement-independent: per-TB
+% decision pages, the recovery-debt table, the recovery-lane certificate, and
+% the independent verifier. The data layer shows the same persistent MPS
+% workers in (a) a single-GPU placement connected by CUDA IPC and (b) the
+% evaluated four-GPU placement connected by CUDA IPC handles over NVLink P2P.
+% The example state is one common-cutoff epoch with two timely successes and
+% two retained debts.
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
-  % Layer backgrounds.
-  \node[layer, minimum width=3.15cm, minimum height=5.25cm, anchor=south west] (ranlayer) at (0,0) {};
-  \node[layer, minimum width=6.25cm, minimum height=5.25cm, anchor=south west] (ctrllayer) at (3.45,0) {};
-  \node[layer, minimum width=5.80cm, minimum height=5.25cm, anchor=south west] (gpulayer) at (10.00,0) {};
-  \node[ttl, anchor=north] at (1.575,5.08) {RAN homes};
-  \node[ttl, anchor=north] at (6.575,5.08) {\SOFTWALLNAME{} scheduler};
-  \node[ttl, anchor=north] at (12.90,5.08) {Qualified multi-GPU execution};
+  \def\swT#1{7.85+(#1-45)*0.03}
 
-  % RAN homes and events.
-  \node[comp, fill=cyanp, minimum width=2.35cm] (homea) at (1.58,3.72) {Home A\\release / expiry};
-  \node[comp, fill=cyanp, minimum width=2.35cm] (homeb) at (1.58,2.62) {Home B\\release / expiry};
-  \node[comp, fill=white, minimum width=2.35cm] (aioq) at (1.58,1.18) {External-AI queue\\arrival / deadline};
+  % ---------------------------------------------------------------- frame
+  \draw[frame] (0,0) rectangle (13.9,7.75);
+  \node[font=\bfseries\footnotesize] at (6.95,7.52)
+    {AI-RAN node: MIG off, MPS on every GPU};
 
-  % Scheduler pipeline.
-  \node[comp, fill=peach, minimum width=2.18cm] (events) at (4.75,3.72) {Event collector\\common cutoff};
-  \node[comp, fill=gold!45, minimum width=2.18cm] (debt) at (7.20,3.72) {Recovery-debt\\table};
-  \node[comp, fill=bluec!55, minimum width=2.18cm] (candidate) at (4.75,2.34) {Candidate scheduler\\replan + lease};
-  \node[comp, fill=greenc!65, minimum width=2.18cm] (verifier) at (7.20,2.34) {Independent verifier\\all-fail + ownership};
-  \node[comp, fill=white, minimum width=4.63cm] (state) at (5.97,0.93) {Committed state $X_t$\\calendar $S$ \; credits $Q,T$ \; leases $L$\\epochs $E$ \; commits $C$ \; ownership $G$};
+  % ---------------------------------------------------------- control layer
+  \draw[layer] (0.15,4.05) rectangle (13.75,7.28);
+  \node[font=\bfseries\footnotesize, anchor=west] at (0.3,7.1)
+    {Control layer: \SOFTWALLNAME{} coordinator (host process)};
 
-  % GPU components.
-  \node[comp, fill=peach, minimum width=2.18cm] (nrx0) at (11.50,3.72) {TensorRT NeuralRx\\local endpoint};
-  \node[comp, fill=peach, minimum width=2.18cm] (nrx1) at (14.25,3.72) {TensorRT NeuralRx\\remote endpoint};
-  \node[comp, fill=cyanp, minimum width=2.18cm] (cuphy) at (11.50,1.95) {Aerial / cuPHY\\recovery lane};
-  \node[comp, fill=bluec!55, minimum width=2.18cm] (qwen) at (14.25,1.95) {Qwen worker\\bounded AI unit};
-  \node[comp, fill=greenc!65, minimum width=4.93cm] (terminal) at (12.88,0.70) {CUDA fence / non-launch marker / single radio commit};
+  % (2) Decision pages: the owner writes the outcome, the coordinator the action.
+  \draw[sub] (0.3,4.25) rectangle (4.05,6.68);
+  \node[num] at (0.55,6.49) {2};
+  \node[pttl, anchor=west] at (0.75,6.49) {Decision pages (one per TB)};
+  \node[hcell, minimum width=0.72cm] at (0.4,6.3) {TB};
+  \node[hcell, minimum width=1.00cm] at (1.12,6.3) {outcome};
+  \node[hcell, minimum width=1.25cm] at (2.12,6.3) {action};
+  \node[hcell, minimum width=0.58cm] at (3.37,6.3) {gen};
+  \foreach \y/\tb/\oc/\ocf/\ac in {
+      6.0/h0-r0/{\cmark\ timely}/okc/SUCCESS,
+      5.7/h0-r1/{\cmark\ timely}/okc/SUCCESS,
+      5.4/h0-r2/{\xmark\ CRC}/badc/RECOVERY,
+      5.1/h1-r0/{\xmark\ late}/badc/RECOVERY} {
+    \node[cell, minimum width=0.72cm] at (0.4,\y) {\tb};
+    \node[cell, minimum width=1.00cm, fill=\ocf] at (1.12,\y) {\oc};
+    \node[cell, minimum width=1.25cm] at (2.12,\y) {\ac};
+    \node[cell, minimum width=0.58cm] at (3.37,\y) {$g{+}1$};
+  }
+  \node[inote] at (2.17,4.5) {owner: outcome; coordinator: action};
 
-  % Main control flow.
-  \draw[arr] (homea.east) -- (events.west);
-  \draw[arr] (homeb.east) -- (events.west);
-  \draw[arr] (aioq.east) -- ++(0.30,0) |- (candidate.west);
-  \draw[arr] (events.east) -- (debt.west);
-  \draw[arr] (debt.south) |- (candidate.north east);
-  \draw[arr] (candidate.east) -- (verifier.west);
-  \draw[arr] (verifier.south) -- (state.north east);
-  \draw[arr, draw=dblue] (state.east) -- ++(0.32,0) |- (cuphy.west);
-  \draw[arr, draw=dblue] (state.east) -- ++(0.52,0) |- (qwen.west);
-  \draw[arr, draw=hot] (debt.east) -- ++(0.35,0) |- (nrx0.west);
-  \draw[arr, draw=hot] (debt.east) -- ++(0.55,0) |- (nrx1.west);
-  \draw[arr] (nrx0.south) -- (terminal.north west);
-  \draw[arr] (nrx1.south) -- (terminal.north east);
-  \draw[arr] (cuphy.south) -- (terminal.north west);
-  \draw[arr] (qwen.south) -- (terminal.north east);
-  \draw[arr, draw=dred] (terminal.west) -- (9.82,0.18) -- (3.62,0.18) -- (3.62,3.72) -- (events.west);
+  % (3) Recovery-debt table after the common-cutoff batch.
+  \draw[sub] (4.35,4.25) rectangle (7.05,6.68);
+  \node[num] at (4.6,6.49) {3};
+  \node[pttl, anchor=west] at (4.8,6.49) {Recovery-debt table};
+  \node[hcell, minimum width=0.66cm] at (4.45,6.3) {TB};
+  \node[hcell, minimum width=0.66cm] at (5.11,6.3) {home};
+  \node[hcell, minimum width=0.86cm] at (5.77,6.3) {window};
+  \node[hcell, minimum width=0.34cm] at (6.63,6.3) {$c$};
+  \foreach \y/\tb/\hm/\fc/\tc in {
+      6.0/h0-r0/0/white/black!45,
+      5.7/h0-r1/0/white/black!45,
+      5.4/h0-r2/0/debtc/black,
+      5.1/h1-r0/1/debtc/black} {
+    \node[cell, minimum width=0.66cm, fill=\fc, text=\tc] at (4.45,\y) {\tb};
+    \node[cell, minimum width=0.66cm, fill=\fc, text=\tc] at (5.11,\y) {\hm};
+    \node[cell, minimum width=0.86cm, fill=\fc, text=\tc] at (5.77,\y) {45--153};
+    \node[cell, minimum width=0.34cm, fill=\fc, text=\tc] at (6.63,\y) {25};
+  }
+  \draw[black!60, line width=0.5pt] (4.45,5.85) -- (6.97,5.85);
+  \draw[black!60, line width=0.5pt] (4.45,5.55) -- (6.97,5.55);
+  \node[inote] at (5.7,4.5) {one batch at 45 ms, gen $g$};
 
-  % Transport labels and decision numbers.
-  \node[note] at (12.88,3.08) {CUDA IPC / NVLink P2P};
-  \node[num] at (3.43,4.13) {1};
-  \node[num] at (6.00,4.12) {2};
-  \node[num] at (5.97,2.78) {3};
-  \node[num] at (8.48,2.76) {4};
-  \node[num] at (9.76,1.58) {5};
-  \node[rnum] at (3.62,0.82) {6};
+  % (4) Recovery lane: current state and candidate lease.
+  \draw[sub] (7.35,4.25) rectangle (11.55,6.68);
+  \node[num] at (7.6,6.49) {4};
+  \node[pttl, anchor=west] at (7.8,6.49) {Recovery-lane certificate};
+  \node[font=\scriptsize, anchor=west] at (7.4,5.95) {$X_t$};
+  \node[font=\scriptsize, anchor=west] at (7.4,5.35) {$X'$};
+  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+    at ({\swT{45}},5.95) {h0-r2};
+  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+    at ({\swT{70}},5.95) {h1-r0};
+  \node[job, pattern=north east lines, pattern color=black!60, minimum width=0.15cm,
+        minimum height=0.34cm, anchor=west] at ({\swT{45}},5.35) {};
+  \node[job, fill=aic, minimum width=1.20cm, minimum height=0.34cm, anchor=west]
+    at ({\swT{50}},5.35) {AI ctx128};
+  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+    at ({\swT{90}},5.35) {h0-r2};
+  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+    at ({\swT{115}},5.35) {h1-r0};
+  \draw[line width=0.45pt] ({\swT{45}},4.93) -- ({\swT{160}},4.93);
+  \foreach \t in {45,90,140,153} {
+    \draw[line width=0.45pt] ({\swT{\t}},4.93) -- ({\swT{\t}},4.86);
+    \node[font=\tiny] at ({\swT{\t}},4.75) {\t};
+  }
+  \node[font=\tiny, anchor=west] at (7.4,4.75) {ms};
+  \draw[guard] ({\swT{153}},4.93) -- ({\swT{153}},6.2);
+  \node[font=\itshape\tiny, text=dred] at ({\swT{153}},6.3) {guard};
+  \node[inote] at (9.45,4.46) {hatched: launch-control charge};
+
+  % (5) Independent verifier.
+  \draw[sub] (11.85,4.25) rectangle (13.6,6.68);
+  \node[num] at (12.0,6.49) {5};
+  \node[pttl, anchor=west, align=left] at (12.14,6.38) {Independent\\verifier};
+  \node[font=\tiny, align=left, anchor=west] at (11.93,5.76)
+    {all-fail by guard\\unique credits\\current generation};
+  \node[comp, fill=okc, draw=green!45!black, minimum width=1.3cm, minimum height=0.36cm,
+        inner sep=0.5pt] at (12.6,5.03) {commit $X'$};
+  \node[comp, fill=white, draw=dred, minimum width=1.3cm, minimum height=0.36cm,
+        inner sep=0.5pt] at (12.6,4.55) {else keep $X_t$};
+
+  % Control-layer flow.
+  \draw[arr] (4.05,5.4) -- (4.35,5.4);
+  \draw[arr] (7.05,5.4) -- (7.35,5.4);
+  \draw[arr] (11.55,5.4) -- (11.85,5.4);
+
+  % ------------------------------------------------------------- data layer
+  \draw[layer] (0.15,0.15) rectangle (13.75,3.8);
+  \node[font=\bfseries\footnotesize] at (7.1,3.63) {Data layer: persistent MPS workers};
+  \draw[black!45, dashed, line width=0.5pt] (4.45,0.3) -- (4.45,3.45);
+
+  % (a) Single GPU: every class on one device, CUDA IPC between processes.
+  \node[font=\bfseries\scriptsize] at (0.4,3.5) {(a)};
+  \draw[gpu] (0.3,0.35) rectangle (4.3,3.25);
+  \node[pttl, anchor=east] at (4.2,3.08) {GPU0 $\cdot$ all classes};
+  \node[comp, minimum width=1.2cm, minimum height=0.6cm] at (1.05,2.4) {request\\owners};
+  \node[comp, fill=peach, minimum width=1.75cm, minimum height=0.6cm] at (3.3,2.4)
+    {TensorRT\\NeuralRx};
+  \node[comp, fill=recc, minimum width=1.2cm, minimum height=0.6cm] at (1.05,1.2)
+    {cuPHY\\recovery};
+  \node[comp, fill=aic, minimum width=1.75cm, minimum height=0.6cm] at (3.3,1.2)
+    {Qwen, latest-\\start gate};
+  \draw[darr] (1.65,2.4) -- (2.42,2.4);
+  \draw[darr] (1.05,2.1) -- (1.05,1.5);
+  \node[num] at (2.03,2.72) {1};
+  \node[num] at (1.37,1.8) {8};
+  \node[inote] at (2.3,0.55) {CUDA IPC; one recovery lane};
+
+  % (b) Evaluated four-GPU placement.
+  \node[font=\bfseries\scriptsize] at (4.62,3.5) {(b)};
+  % GPU0: RAN home 0 with three request owners.
+  \draw[gpu] (4.6,0.95) rectangle (6.9,3.25);
+  \node[pttl, anchor=west] at (4.68,3.08) {GPU0 $\cdot$ home 0};
+  \foreach \x/\tb in {4.68/h0-r0, 5.42/h0-r1, 6.16/h0-r2} {
+    \draw[sub] (\x,2.0) rectangle ++(0.68,0.85);
+    \node[pttl] at (\x+0.34,2.68) {\tb};
+    \node[cell, fill=aic, minimum width=0.3cm, font=\tiny] at (\x+0.04,2.43) {N};
+    \node[cell, fill=recc, minimum width=0.3cm, font=\tiny] at (\x+0.34,2.43) {R};
+  }
+  \node[comp, minimum width=2.1cm, minimum height=0.36cm] at (5.75,1.55)
+    {one commit per TB};
+  \node[inote] at (5.75,1.15) {owners, MPS 50\%};
+
+  % GPU1: RAN home 1; the fifth request was rejected at admission.
+  \draw[gpu] (7.0,0.95) rectangle (8.97,3.25);
+  \node[pttl, anchor=west] at (7.1,3.08) {GPU1 $\cdot$ home 1};
+  \draw[sub] (7.12,2.0) rectangle ++(0.68,0.85);
+  \node[pttl] at (7.46,2.68) {h1-r0};
+  \node[cell, fill=aic, minimum width=0.3cm, font=\tiny] at (7.16,2.43) {N};
+  \node[cell, fill=recc, minimum width=0.3cm, font=\tiny] at (7.46,2.43) {R};
+  \draw[draw=black!45, dashed, line width=0.5pt] (8.1,2.0) rectangle ++(0.68,0.85);
+  \node[pttl, text=black!45] at (8.44,2.68) {h1-r1};
+  \node[font=\bfseries\small, text=dred] at (8.44,2.33) {\xmark};
+  \node[font=\itshape\tiny, text=dred, align=center] at (7.95,1.45)
+    {h1-r1 rejected\\at admission};
+
+  % GPU3: persistent NeuralRx endpoint.
+  \draw[gpu] (9.1,0.95) rectangle (10.34,3.25);
+  \node[pttl] at (9.72,3.08) {GPU3 $\cdot$ NRx};
+  \node[comp, fill=peach, minimum width=1.1cm, minimum height=0.85cm] at (9.72,2.43)
+    {TensorRT\\CUDA\\graph};
+  \node[inote] at (9.72,1.45) {MPS 80\%};
+
+  % GPU2: shared recovery lane and bounded external AI.
+  \draw[gpu] (10.45,0.95) rectangle (13.6,3.25);
+  \node[pttl, anchor=west] at (10.52,3.08) {GPU2 $\cdot$ lane, AI};
+  \draw[sub, fill=peach] (10.55,1.05) rectangle (11.85,2.92);
+  \node[pttl] at (11.2,2.75) {cuPHY lane};
+  \node[job, fill=recc, minimum width=0.85cm, minimum height=0.34cm] at (11.2,2.3) {h0-r2};
+  \node[job, fill=recc, minimum width=0.85cm, minimum height=0.34cm] at (11.2,1.68) {h1-r0};
+  \draw[arr] (11.2,2.12) -- (11.2,1.86);
+  \node[inote] at (11.2,1.25) {MPS 80\%};
+  \node[comp, minimum width=1.45cm, minimum height=0.44cm] at (12.72,2.66) {latest-start\\gate};
+  \node[comp, fill=aic, minimum width=1.45cm, minimum height=0.56cm] at (12.72,1.96)
+    {Qwen prefill\\MPS 20\%};
+  \node[comp, fill=okc, minimum width=1.45cm, minimum height=0.44cm] at (12.72,1.3)
+    {completion\\marker};
+  \draw[arr] (12.72,2.44) -- (12.72,2.24);
+  \draw[arr] (12.72,1.68) -- (12.72,1.52);
+
+  % NVLink P2P: IQ/LLR to the NeuralRx endpoint, IQ/TB to the recovery lane.
+  \draw[line width=2.0pt, black!80] (5.75,0.58) -- (11.2,0.58);
+  \foreach \x in {5.75,7.95,9.72,11.2} {
+    \draw[line width=2.0pt, black!80, -{Triangle[length=1.6mm,width=2.8mm]}]
+      (\x,0.58) -- (\x,0.95);
+  }
+  \node[inote] at (7.3,0.33) {NVLink P2P through CUDA IPC handles};
+  \node[num] at (9.3,0.77) {1};
+  \node[num] at (10.72,0.77) {8};
+
+  % ------------------------------------------------------- cross-layer flow
+  % (2) outcome from each owner.
+  \draw[arr] (0.85,2.7) -- (0.85,4.25);
+  \node[inote, anchor=west] at (0.95,3.5) {outcome};
+  % (6) dispatch to every decision page and one lease to the AI worker.
+  \draw[arr, draw=dblue] (12.72,6.68) -- (12.72,6.84) -- (2.17,6.84) -- (2.17,6.68);
+  \node[num] at (7.0,6.84) {6};
+  \node[note, text=dblue, anchor=west] at (7.2,7.03) {dispatch: action and generation};
+  \draw[arr, draw=dblue] (12.5,4.25) -- (12.5,2.88);
+  \node[inote, text=dblue, anchor=east] at (12.4,3.5) {run(lease, latest-start)};
+  % (7) fence or non-launch marker retires the lease.
+  \draw[arr, draw=green!40!black] (13.45,1.3) -- (13.5,1.3) -- (13.5,4.25);
+  \node[num] at (13.2,3.5) {7};
 \end{tikzpicture}%
 }

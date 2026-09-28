@@ -19,7 +19,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
+from matplotlib.patches import Rectangle
 
 
 HERE = Path(__file__).resolve().parent
@@ -128,204 +128,6 @@ def save(fig, stem: str) -> None:
     plt.close(fig)
 
 
-ARROW_LW = 1.2
-
-
-def rounded_box(ax, xy, width, height, text, face, edge, fontsize=7.6, lw=1.1):
-    box = FancyBboxPatch(
-        xy,
-        width,
-        height,
-        boxstyle="round,pad=0.012,rounding_size=0.016",
-        linewidth=lw,
-        facecolor=face,
-        edgecolor=edge,
-    )
-    ax.add_patch(box)
-    ax.text(
-        xy[0] + width / 2,
-        xy[1] + height / 2,
-        text,
-        ha="center",
-        va="center",
-        fontsize=fontsize,
-        color=COLORS["dark"],
-        linespacing=1.18,
-    )
-    return box
-
-
-def arrow(ax, start, end, color=None, style="-|>", lw=ARROW_LW, rad=0.0):
-    patch = FancyArrowPatch(
-        start,
-        end,
-        arrowstyle=style,
-        mutation_scale=9,
-        linewidth=lw,
-        color=color or COLORS["gray"],
-        connectionstyle=f"arc3,rad={rad}",
-    )
-    ax.add_patch(patch)
-    return patch
-
-
-def make_airan_background() -> None:
-    """Problem-domain background: same-TB dependency and the contended GPU path."""
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 2.45))
-    fig.subplots_adjust(wspace=0.30)
-
-    # (a) One transport block creates an optional result and a conditional but
-    # mandatory conventional branch. This is a domain dependency, not a
-    # SoftWall component diagram.
-    ax = axes[0]
-    ax.set_xlim(-0.03, 1.03)
-    ax.set_ylim(0, 1)
-    ax.axis("off")
-    rounded_box(ax, (0.00, 0.40), 0.27, 0.20, "uplink TB\nrelease", COLORS["light_blue"], COLORS["blue"], 6.2)
-    rounded_box(ax, (0.365, 0.70), 0.27, 0.18, "optional\nNeuralRx", COLORS["light_orange"], COLORS["orange"], 6.5)
-    rounded_box(ax, (0.365, 0.12), 0.27, 0.20, "conventional\nrecovery", COLORS["light_red"], COLORS["red"], 6.2)
-    rounded_box(ax, (0.73, 0.40), 0.27, 0.20, "single radio\ncommit", COLORS["light_green"], COLORS["green"], 6.2)
-    arrow(ax, (0.20, 0.61), (0.365, 0.79), color=COLORS["orange"])
-    arrow(ax, (0.20, 0.39), (0.365, 0.22), color=COLORS["red"])
-    arrow(ax, (0.635, 0.79), (0.80, 0.61), color=COLORS["green"])
-    arrow(ax, (0.635, 0.22), (0.80, 0.39), color=COLORS["red"])
-    ax.text(0.86, 0.80, "timely\nsuccess", ha="center", va="center", fontsize=6.2, color=COLORS["dark"])
-    ax.text(0.12, 0.20, "failure, late,\nor missing", ha="center", va="center", fontsize=6.2,
-            color=COLORS["dark"])
-    panel_label(ax, "a")
-
-    # (b) The physical path exposes three scheduling classes and two scopes:
-    # local optional endpoints and a globally shared recovery/AI lane.
-    ax = axes[1]
-    ax.set_xlim(-0.03, 1.03)
-    ax.set_ylim(0, 1)
-    ax.axis("off")
-    rounded_box(ax, (0.00, 0.70), 0.22, 0.16, "RAN\nhome A", COLORS["light_blue"], COLORS["blue"], 6.5)
-    rounded_box(ax, (0.00, 0.14), 0.22, 0.16, "RAN\nhome B", COLORS["light_blue"], COLORS["blue"], 6.5)
-    rounded_box(ax, (0.30, 0.70), 0.29, 0.16, "NRx endpoint\nGPU $g_A$", COLORS["light_orange"], COLORS["orange"], 5.9)
-    rounded_box(ax, (0.30, 0.14), 0.29, 0.16, "NRx endpoint\nGPU $g_B$", COLORS["light_orange"], COLORS["orange"], 5.9)
-    rounded_box(ax, (0.68, 0.36), 0.32, 0.28, "shared lane\ncuPHY recovery\nexternal AI", COLORS["light_purple"], COLORS["purple"], 5.9)
-    arrow(ax, (0.22, 0.78), (0.30, 0.78), color=COLORS["orange"])
-    arrow(ax, (0.22, 0.22), (0.30, 0.22), color=COLORS["orange"])
-    arrow(ax, (0.11, 0.70), (0.68, 0.53), color=COLORS["red"], rad=0.18)
-    arrow(ax, (0.11, 0.30), (0.68, 0.47), color=COLORS["red"], rad=-0.18)
-    arrow(ax, (0.59, 0.78), (0.84, 0.64), color=COLORS["gray"])
-    arrow(ax, (0.59, 0.22), (0.84, 0.36), color=COLORS["gray"])
-    panel_label(ax, "b")
-
-    save(fig, "softwall_airan_background")
-
-
-def make_scheduling_problem() -> None:
-    """Three failure modes that motivate conditional-recovery scheduling."""
-    fig, axes = plt.subplots(3, 1, figsize=(FIG_WIDTH, 3.75))
-    fig.subplots_adjust(hspace=0.72)
-
-    def base_axis(ax, label, title):
-        ax.set_xlim(0, 100)
-        ax.set_ylim(0, 1)
-        ax.set_yticks([])
-        ax.set_xticks([0, 40, 75, 100], ["release", "decision", "guard", "expiry"])
-        ax.tick_params(axis="x", length=0, pad=2)
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-        ax.axvline(75, color=COLORS["red"], linestyle="--", linewidth=1.0)
-        ax.axvline(100, color=COLORS["dark"], linestyle=":", linewidth=1.0)
-        panel_label(ax, label)
-
-    # Current occupancy omits unresolved recovery, so debt-blind AI consumes
-    # the only all-fail recovery interval.
-    ax = axes[0]
-    base_axis(ax, "a", "Current-idle admission hides future mandatory work")
-    ax.add_patch(Rectangle((40, 0.57), 35, 0.25, facecolor=COLORS["light_purple"],
-                           edgecolor=COLORS["purple"], linewidth=1.0))
-    ax.text(57.5, 0.695, "external AI", ha="center", va="center", fontsize=7.0)
-    ax.add_patch(Rectangle((68, 0.17), 25, 0.25, facecolor=COLORS["light_red"],
-                           edgecolor=COLORS["red"], linewidth=1.2))
-    ax.text(80.5, 0.295, "all-fail recovery", ha="center", va="center", fontsize=7.0, zorder=5,
-            bbox=dict(facecolor=COLORS["light_red"], edgecolor="none", pad=0.6))
-    ax.annotate("overlap", xy=(71.5, 0.50), xytext=(60, 0.97), ha="center", fontsize=6.8,
-                color=COLORS["red"], arrowprops=dict(arrowstyle="->", color=COLORS["red"], lw=1.0))
-
-    # Static reservation is safe but cannot reclaim debt removed by successful
-    # optional outcomes until too late for the visible AI request.
-    ax = axes[1]
-    base_axis(ax, "b", "Static reservation protects recovery but strands conditional capacity")
-    starts = [43, 51, 59, 67]
-    for idx, start in enumerate(starts):
-        color = COLORS["light_red"] if idx == 3 else COLORS["light_gray"]
-        edge = COLORS["red"] if idx == 3 else COLORS["gray"]
-        ax.add_patch(Rectangle((start, 0.48), 8, 0.25, facecolor=color, edgecolor=edge, linewidth=1.0))
-    ax.text(55, 0.90, "four recovery reservations", ha="center", va="center", fontsize=7.0)
-    ax.add_patch(Rectangle((36, 0.08), 36, 0.24, facecolor="none", edgecolor=COLORS["purple"],
-                           linewidth=1.0, linestyle="--"))
-    ax.text(54, 0.20, "AI opportunity rejected", ha="center", va="center", fontsize=6.8, color=COLORS["purple"])
-    ax.text(84, 0.61, "3 successes\nrelease debt", ha="center", va="center", fontsize=6.6,
-            color=COLORS["gray"])
-
-    # Two independently valid local calendars can collide when they target the
-    # same cuPHY recovery lane.
-    ax = axes[2]
-    base_axis(ax, "c", "Local certificates do not compose on a shared recovery lane")
-    ax.add_patch(Rectangle((48, 0.59), 24, 0.22, facecolor=COLORS["light_blue"],
-                           edgecolor=COLORS["blue"], linewidth=1.0))
-    ax.text(60, 0.70, "home A recovery", ha="center", va="center", fontsize=7.0)
-    ax.add_patch(Rectangle((58, 0.18), 24, 0.22, facecolor=COLORS["light_orange"],
-                           edgecolor=COLORS["orange"], linewidth=1.0))
-    ax.text(70, 0.29, "home B recovery", ha="center", va="center", fontsize=7.0, zorder=5,
-            bbox=dict(facecolor=COLORS["light_orange"], edgecolor="none", pad=0.6))
-    ax.axvspan(58, 72, ymin=0.14, ymax=0.86, color=COLORS["red"], alpha=0.16)
-    ax.text(58, 0.97, "shared-lane collision", ha="center", va="center", fontsize=6.8, color=COLORS["red"])
-
-    save(fig, "softwall_scheduling_problem")
-
-
-def make_design_flow() -> None:
-    """One event transaction. The refinement layers are given by the table in Section 3."""
-    fig, ax = plt.subplots(figsize=(FIG_WIDTH, 2.75))
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.axis("off")
-
-    width, height = 0.29, 0.22
-    xs = (0.035, 0.3575, 0.68)
-    top, bottom = 0.64, 0.30
-    nodes = [
-        (xs[0], top, "Radio release\nreserve recovery debt", COLORS["light_blue"], COLORS["blue"]),
-        (xs[1], top, "Optional NeuralRx\ndispatch, hold credit", COLORS["light_orange"], COLORS["orange"]),
-        (xs[2], top, "Atomic outcome batch\nsuccess deletes debt;\nfailure retains it", COLORS["light_orange"], COLORS["orange"]),
-        (xs[2], bottom, "Recovery replan\nand candidate\nexternal-AI lease", COLORS["light_purple"], COLORS["purple"]),
-        (xs[1], bottom, "Independent verifier\nall-fail schedule\nand ownership", COLORS["light_green"], COLORS["green"]),
-        (xs[0], bottom, "Worker enforcement\nlatest-start, fence,\nsingle commit", COLORS["light_blue"], COLORS["blue"]),
-    ]
-    for x, y, text, face, edge in nodes:
-        rounded_box(ax, (x, y), width, height, text, face, edge, fontsize=7.0)
-
-    # The verifier has two outcomes: an accepted candidate continues to worker
-    # enforcement, and a rejected candidate ends in the labeled reject box.
-    top_mid, bottom_mid = top + height / 2, bottom + height / 2
-    arrow(ax, (xs[0] + width, top_mid), (xs[1], top_mid))
-    arrow(ax, (xs[1] + width, top_mid), (xs[2], top_mid))
-    arrow(ax, (xs[2] + width / 2, top), (xs[2] + width / 2, bottom + height))
-    arrow(ax, (xs[2], bottom_mid), (xs[1] + width, bottom_mid))
-    arrow(ax, (xs[1], bottom_mid), (xs[0] + width, bottom_mid))
-
-    reject_w, reject_h = 0.27, 0.1
-    reject_x = xs[1] + (width - reject_w) / 2
-    arrow(ax, (xs[1] + width / 2, bottom), (xs[1] + width / 2, 0.035 + reject_h), color=COLORS["red"])
-    rounded_box(ax, (reject_x, 0.035), reject_w, reject_h, "reject: keep prior state $X_t$",
-                COLORS["light_red"], COLORS["red"], fontsize=7.0)
-
-    # The next event re-enters outcome processing. The route runs outside all
-    # boxes, so it crosses no other arrow.
-    route_x, route_y = 0.008, 0.955
-    ax.plot([xs[0], route_x, route_x, xs[2] + width / 2], [bottom_mid, bottom_mid, route_y, route_y],
-            color=COLORS["gray"], lw=ARROW_LW, solid_capstyle="butt")
-    arrow(ax, (xs[2] + width / 2, route_y), (xs[2] + width / 2, top + height))
-    ax.text(0.40, route_y + 0.012, "completion or outcome starts the next event", ha="center", va="bottom",
-            fontsize=7.5, color=COLORS["dark"])
-
-    save(fig, "softwall_design_flow")
 
 
 def make_qualification_evidence() -> dict:
@@ -697,9 +499,6 @@ def make_capacity_headroom() -> dict:
 
 
 def main() -> None:
-    make_airan_background()
-    make_scheduling_problem()
-    make_design_flow()
     qualification = make_qualification_evidence()
     boundaries = make_outcome_boundaries()
     capacity = make_capacity_headroom()
@@ -707,9 +506,6 @@ def main() -> None:
         "schema": "softwall-paper-figure-manifest-v1",
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in SOURCES.values()},
         "figures": [
-            "softwall_airan_background.pdf",
-            "softwall_scheduling_problem.pdf",
-            "softwall_design_flow.pdf",
             "softwall_qualification_evidence.pdf",
             "softwall_outcome_boundaries.pdf",
             "softwall_capacity_headroom.pdf",
@@ -723,8 +519,7 @@ def main() -> None:
     }
     manifest["output_sha256"] = {
         name: sha256(HERE / name)
-        for stem in ("softwall_airan_background", "softwall_scheduling_problem", "softwall_design_flow",
-                     "softwall_qualification_evidence", "softwall_outcome_boundaries",
+        for stem in ("softwall_qualification_evidence", "softwall_outcome_boundaries",
                      "softwall_capacity_headroom")
         for name in (f"{stem}.pdf", f"{stem}.svg")
     }

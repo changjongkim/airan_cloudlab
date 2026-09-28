@@ -41,6 +41,16 @@ SOURCES = {
     "channel": ROOT / "results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json",
 }
 
+# Per-epoch records of the two-node warm campaign (Q2). The raw coordinator
+# logs are local artifacts; their digests are pinned in the Q2 summary JSON.
+# The motivation figure is drawn from a small derived file that records the
+# counts and the digests of these logs.
+MOTIVATION_RAW = [
+    ROOT / "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json",
+    ROOT / "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json",
+]
+MOTIVATION_DATA = HERE / "softwall_motivation_data.json"
+
 
 def load(name: str):
     return json.loads(SOURCES[name].read_text())
@@ -128,6 +138,110 @@ def save(fig, stem: str) -> None:
     plt.close(fig)
 
 
+
+
+def derive_motivation() -> None:
+    """Count retained debts and certificate lease decisions per measured epoch."""
+    if not all(path.exists() for path in MOTIVATION_RAW):
+        return
+    pinned = load("q2")["artifact_sha256"]
+    debt_counts = {str(m): 0 for m in range(5)}
+    classes = {}
+    epochs = 0
+    for path in MOTIVATION_RAW:
+        rel = str(path.relative_to(ROOT))
+        assert pinned[rel] == sha256(path), f"raw log differs from pinned digest: {rel}"
+        for row in json.loads(path.read_text())["rounds"]:
+            epochs += 1
+            retained = len(row["outcome_transition"]["unresolved_obligations"])
+            debt_counts[str(retained)] += 1
+            entry = classes.setdefault(str(row["context_length"]), {"offered": 0, "fits": 0, "breaks": 0})
+            entry["offered"] += 1
+            if row["lease_accepted"]:
+                entry["fits"] += 1
+            else:
+                assert row["lease_reason"] == "lease_breaks_global_certificate", row["lease_reason"]
+                entry["breaks"] += 1
+    data = {
+        "schema": "softwall-motivation-data-v1",
+        "scope": ("Two-node warm P180/D155 campaign (development and holdout). Retained debts are "
+                  "the unresolved NeuralRx outcomes at the 45 ms common cutoff. A lease 'fits' when "
+                  "the certificate admitted it under declared bounds and 'breaks' when it violated "
+                  "the all-fail recovery schedule. Static reservation of all four admitted debts "
+                  "leaves 8 ms of the 108 ms window, so it admits no AI unit."),
+        "raw_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in MOTIVATION_RAW},
+        "epochs": epochs,
+        "retained_debt_epochs": debt_counts,
+        "lease_by_context": classes,
+    }
+    MOTIVATION_DATA.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+
+
+def make_motivation() -> dict:
+    """Measured retained debt and the errors of the two existing admission views."""
+    data = json.loads(MOTIVATION_DATA.read_text())
+    counts = data["retained_debt_epochs"]
+    epochs = data["epochs"]
+    assert epochs == 1200 and sum(counts.values()) == epochs
+    classes = data["lease_by_context"]
+    contexts = [16, 32, 64, 128, 256, 512]
+    assert all(classes[str(c)]["offered"] == 200 for c in contexts)
+    assert classes["256"]["breaks"] == 55 and classes["512"]["breaks"] == 68
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.95),
+                             gridspec_kw={"width_ratios": [0.85, 1.15]})
+    fig.subplots_adjust(wspace=0.42)
+
+    # (a) Retained debts at the common cutoff, against the two fixed views.
+    ax = axes[0]
+    xs = list(range(5))
+    shares = [100.0 * counts[str(m)] / epochs for m in xs]
+    ax.bar(xs, shares, width=0.62, color=COLORS["orange"], zorder=3, label="measured epochs")
+    ax.axvline(0, color=COLORS["red"], linestyle=":", linewidth=1.4, zorder=2,
+               label="current-idle view")
+    ax.axvline(4, color=COLORS["gray"], linestyle="--", linewidth=1.4, zorder=2,
+               label="static reservation")
+    ax.set_xticks(xs)
+    ax.set_xlim(-0.6, 4.6)
+    ax.set_ylim(0, 60)
+    ax.set_xlabel("retained debts at cutoff")
+    ax.set_ylabel("epochs (%)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    handles, labels = ax.get_legend_handles_labels()
+    order = [labels.index(name) for name in ("measured epochs", "current-idle view", "static reservation")]
+    ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="upper center",
+              bbox_to_anchor=(0.5, -0.3), ncol=1, frameon=False, handlelength=1.6, labelspacing=0.25)
+    panel_label(ax, "a")
+
+    # (b) Per AI class: static rejects units that fit; current-idle admits units
+    # that break the all-fail recovery schedule.
+    ax = axes[1]
+    xs = list(range(len(contexts)))
+    width = 0.36
+    static_wrong = [100.0 * classes[str(c)]["fits"] / classes[str(c)]["offered"] for c in contexts]
+    idle_wrong = [100.0 * classes[str(c)]["breaks"] / classes[str(c)]["offered"] for c in contexts]
+    ax.bar([x - width / 2 for x in xs], static_wrong, width=width, color=COLORS["gray"], zorder=3,
+           label="static rejects a fitting unit")
+    ax.bar([x + width / 2 for x in xs], idle_wrong, width=width, color=COLORS["red"], zorder=3,
+           label="current-idle admits a breaking unit")
+    ax.set_xticks(xs, [str(c) for c in contexts])
+    ax.set_ylim(0, 105)
+    ax.set_xlabel("AI prompt length (tokens)")
+    ax.set_ylabel("epochs of the class (%)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.3), ncol=1, frameon=False,
+              handlelength=1.4, labelspacing=0.25)
+    panel_label(ax, "b")
+
+    save(fig, "softwall_motivation")
+    return {
+        "epochs": epochs,
+        "retained_debt_share_pct": dict(zip(["0", "1", "2", "3", "4"], shares)),
+        "static_wrong_pct": dict(zip([str(c) for c in contexts], static_wrong)),
+        "current_idle_wrong_pct": dict(zip([str(c) for c in contexts], idle_wrong)),
+    }
 
 
 def make_qualification_evidence() -> dict:
@@ -499,6 +613,8 @@ def make_capacity_headroom() -> dict:
 
 
 def main() -> None:
+    derive_motivation()
+    motivation = make_motivation()
     qualification = make_qualification_evidence()
     boundaries = make_outcome_boundaries()
     capacity = make_capacity_headroom()
@@ -506,11 +622,13 @@ def main() -> None:
         "schema": "softwall-paper-figure-manifest-v1",
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in SOURCES.values()},
         "figures": [
+            "softwall_motivation.pdf",
             "softwall_qualification_evidence.pdf",
             "softwall_outcome_boundaries.pdf",
             "softwall_capacity_headroom.pdf",
         ],
-        "derived": {"qualification": qualification, "boundaries": boundaries, "capacity": capacity},
+        "derived": {"motivation": motivation, "qualification": qualification, "boundaries": boundaries,
+                    "capacity": capacity},
         "claim_boundary": (
             "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; "
             "sample maxima are not WCET; the 4.5 ms production gate remains failed; and Sionna CDL-D/E "
@@ -519,7 +637,7 @@ def main() -> None:
     }
     manifest["output_sha256"] = {
         name: sha256(HERE / name)
-        for stem in ("softwall_qualification_evidence", "softwall_outcome_boundaries",
+        for stem in ("softwall_motivation", "softwall_qualification_evidence", "softwall_outcome_boundaries",
                      "softwall_capacity_headroom")
         for name in (f"{stem}.pdf", f"{stem}.svg")
     }

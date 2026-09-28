@@ -202,6 +202,27 @@ mandatory in an allowed future branch. It therefore need not appear in the curre
 though the scheduler must keep it executable. This gap between queued work and obligated work is the
 central scheduling problem.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/softwall_motivation.pdf}
+  \caption{Measured recovery debt in the evaluated warm mode (1,200 epochs on two nodes). (a) Retained
+  debts at the 45~ms common cutoff; the dotted line marks the zero debt that current-idle admission
+  sees, and the dashed line marks the four recoveries that static reservation holds. (b) Share of epochs,
+  per AI prompt length, in which static reservation rejects a unit that the all-fail certificate admits
+  and in which current-idle admission accepts a unit that breaks the all-fail recovery bound.}
+  \Description{The left bar chart shows the share of epochs that retain zero, one, two, three, or four
+  recovery debts at the common cutoff, with markers at zero and four debts. The right grouped bar chart
+  shows, for six AI prompt lengths, how often static reservation rejects an admissible unit and how
+  often current-idle admission accepts a unit that breaks the recovery bound.}
+  \label{fig:motivation}
+\end{figure}
+
+\noindent\textbf{Measured Debt.}
+Figure~\ref{fig:motivation}a measures this gap in the evaluated warm mode
+(Section~\ref{sec:methodology}). Across 1,200 epochs on two nodes, 21.4\%, 47.8\%, and 30.8\% of
+epochs retain zero, one, and two recovery debts at the 45~ms cutoff. A current-idle scheduler sees no
+queued recovery at that instant, while a static reservation holds all four admitted recoveries.
+
 \noindent\textbf{Shared Recovery.}
 Several cells can select \NRx together, and their failures can be correlated. When their conventional
 paths share one cuPHY lane, feasibility belongs to the union of their unresolved jobs. A schedule that
@@ -254,6 +275,12 @@ locally valid calendars on one shared lane. These failures define the state and 
   two per-instance calendars that occupy the same lane interval.}
   \label{fig:scheduling-problem}
 \end{figure}
+
+\noindent\textbf{Measured Consequence.}
+Figure~\ref{fig:motivation}b applies both views to the measured epochs. Static reservation leaves 8~ms
+of the 108~ms recovery window and rejects every AI unit that the all-fail certificate admits.
+Current-idle admission accepts every unit; for 256- and 512-token prompts, 27.5\% and 34.0\% of the
+accepted units break the all-fail recovery bound because two debts remain.
 
 \paragraph{Takeaway 1: current idleness is not schedulable slack.}
 An unresolved \NRx leaves mandatory work outside the current queue. A scheduler needs an explicit

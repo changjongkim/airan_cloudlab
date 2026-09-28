@@ -1,0 +1,48 @@
+{
+  "epochs": 1200,
+  "lease_by_context": {
+    "128": {
+      "breaks": 0,
+      "fits": 200,
+      "offered": 200
+    },
+    "16": {
+      "breaks": 0,
+      "fits": 200,
+      "offered": 200
+    },
+    "256": {
+      "breaks": 55,
+      "fits": 145,
+      "offered": 200
+    },
+    "32": {
+      "breaks": 0,
+      "fits": 200,
+      "offered": 200
+    },
+    "512": {
+      "breaks": 68,
+      "fits": 132,
+      "offered": 200
+    },
+    "64": {
+      "breaks": 0,
+      "fits": 200,
+      "offered": 200
+    }
+  },
+  "raw_sha256": {
+    "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881"
+  },
+  "retained_debt_epochs": {
+    "0": 257,
+    "1": 574,
+    "2": 369,
+    "3": 0,
+    "4": 0
+  },
+  "schema": "softwall-motivation-data-v1",
+  "scope": "Two-node warm P180/D155 campaign (development and holdout). Retained debts are the unresolved NeuralRx outcomes at the 45 ms common cutoff. A lease 'fits' when the certificate admitted it under declared bounds and 'breaks' when it violated the all-fail recovery schedule. Static reservation of all four admitted debts leaves 8 ms of the 108 ms window, so it admits no AI unit."
+}

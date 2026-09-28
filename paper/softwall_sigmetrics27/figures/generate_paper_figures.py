@@ -267,19 +267,37 @@ def make_motivation() -> dict:
     top_legend(ax, ncol=1)
     panel_label(ax, "a")
 
-    # (b) Per AI class: static rejects units that fit; current-idle admits units
-    # that break the all-fail recovery schedule.
+    # (b) Certificate decision per AI class. A unit either fits, and static
+    # reservation wrongly rejects it, or breaks the all-fail schedule, and
+    # current-idle admission wrongly accepts it. Solid bars are the measured
+    # decisions; hatched bars apply the same rule, which reproduces all measured
+    # decisions, to the joined four-TB epochs.
     ax = axes[1]
+    mode = data["mode"]
+    window = mode["expiry_ms"] - mode["guard_ms"] - mode["nrx_bound_ms"]
+    lease = {c: mode["ai_class_bounds_ms"][str(c)] + mode["launch_control_bound_ms"] for c in contexts}
+    rule_fits = {c: {m for m in range(5) if lease[c] + m * mode["conventional_bound_ms"] <= window}
+                 for c in contexts}
+    assert all(set(range(3)) <= rule_fits[c] for c in contexts[:4])
+    assert all(rule_fits[c] == {0, 1} for c in contexts[4:])
+    grouped_debts = grouped["retained_debt_epochs"]
     xs = list(range(len(contexts)))
-    width = 0.36
+    width = 0.3
     static_wrong = [100.0 * classes[str(c)]["fits"] / classes[str(c)]["offered"] for c in contexts]
     idle_wrong = [100.0 * classes[str(c)]["breaks"] / classes[str(c)]["offered"] for c in contexts]
-    ax.bar([x - width / 2 for x in xs], static_wrong, width=width, color=COLORS["gray"], zorder=3,
-           label="static rejects a fitting unit")
-    ax.bar([x + width / 2 for x in xs], idle_wrong, width=width, color=COLORS["red"], zorder=3,
-           label="current-idle admits a breaking unit")
+    four_fits = [100.0 * sum(grouped_debts[str(m)] for m in rule_fits[c]) / grouped["epochs"] for c in contexts]
+    four_breaks = [100.0 - share for share in four_fits]
+    left = [x - 0.2 for x in xs]
+    right = [x + 0.2 for x in xs]
+    ax.bar(left, static_wrong, width=width, color=COLORS["gray"], zorder=3, label="fits: static rejects it")
+    ax.bar(left, idle_wrong, bottom=static_wrong, width=width, color=COLORS["red"], zorder=3,
+           label="breaks: current-idle admits it")
+    ax.bar(right, four_fits, width=width, color=COLORS["light_gray"], edgecolor=COLORS["gray"],
+           hatch="/////", linewidth=0.8, zorder=3)
+    ax.bar(right, four_breaks, bottom=four_fits, width=width, color=COLORS["light_red"],
+           edgecolor=COLORS["red"], hatch="/////", linewidth=0.8, zorder=3)
     ax.set_xticks(xs, [str(c) for c in contexts])
-    ax.set_ylim(0, 105)
+    ax.set_ylim(0, 106)
     ax.set_yticks([0, 50, 100])
     ax.set_xlabel("AI prompt length (tokens)")
     ax.set_ylabel("epochs (%)")
@@ -295,6 +313,8 @@ def make_motivation() -> dict:
         "grouped_four_transition_share_pct": dict(zip(["0", "1", "2", "3", "4"], four)),
         "static_wrong_pct": dict(zip([str(c) for c in contexts], static_wrong)),
         "current_idle_wrong_pct": dict(zip([str(c) for c in contexts], idle_wrong)),
+        "grouped_four_transition_static_wrong_pct": dict(zip([str(c) for c in contexts], four_fits)),
+        "grouped_four_transition_current_idle_wrong_pct": dict(zip([str(c) for c in contexts], four_breaks)),
     }
 
 

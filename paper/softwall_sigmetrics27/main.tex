@@ -209,14 +209,15 @@ central scheduling problem.
   debts at the 45~ms common cutoff for epochs with two transition-SNR TBs, and for 600 four-TB epochs
   that join the transition TBs of consecutive measured epochs. The dotted line marks the zero debt that
   current-idle admission sees; the dashed line marks the four recoveries that static reservation holds.
-  (b) Share of epochs, per AI prompt length, in which static reservation rejects a unit that the
-  all-fail certificate admits and in which current-idle admission accepts a unit that breaks the
-  all-fail recovery bound.}
+  (b) All-fail certificate decision per AI prompt length. A unit either fits, and static reservation
+  rejects it, or breaks the all-fail recovery bound, and current-idle admission accepts it. Solid bars
+  are the measured decisions; hatched bars apply the same rule, which reproduces all 1,200 measured
+  decisions, to the joined four-TB epochs.}
   \Description{The left grouped bar chart shows the share of epochs that retain zero to four recovery
   debts at the common cutoff, for measured epochs with two transition-SNR TBs and for joined epochs with
-  four, with vertical lines at zero and four debts. The right grouped bar chart shows, for six AI prompt
-  lengths, how often static reservation rejects an admissible unit and how often current-idle admission
-  accepts a unit that breaks the recovery bound.}
+  four, with vertical lines at zero and four debts. The right chart shows, for six AI prompt lengths,
+  stacked bars that split epochs into units that fit, which static reservation rejects, and units that
+  break the recovery bound, which current-idle admission accepts, for two and four transition TBs.}
   \label{fig:motivation}
 \end{figure}
 
@@ -260,7 +261,7 @@ still have a feasible placement.
 \noindent\textbf{Measured Lease.}
 Figure~\ref{fig:lease-timing}a places each Qwen class in the 108~ms recovery window. A lease occupies
 its class bound plus a 5~ms launch-control charge, and it fits after $m$ retained debts only when it
-ends $25m$~ms before the guard. Measured prefill stays below every class bound. Two retained debts
+ends at least $25m$~ms before the guard. Measured prefill stays below every class bound. Two retained debts
 therefore exclude the 256- and 512-token classes, and three exclude every class.
 Figure~\ref{fig:lease-timing}b adds the host side. Building the launch-time certificate takes 1.06~ms
 at the median, but 2 of 1,200 epochs stall for 23.7 and 31.0~ms, beyond the charge. In an earlier
@@ -310,12 +311,15 @@ locally valid calendars on one shared lane. These failures define the state and 
 \end{figure}
 
 \noindent\textbf{Measured Consequence.}
-Figure~\ref{fig:motivation}b applies both views to the measured epochs. Static reservation leaves 8~ms
-of the 108~ms recovery window and rejects every AI unit that the all-fail certificate admits.
-Current-idle admission accepts every unit; for 256- and 512-token prompts, 27.5\% and 34.0\% of the
-accepted units break the all-fail recovery bound because two debts remain
-(Figure~\ref{fig:lease-timing}a). With four transition TBs, 39.0\% of epochs retain three or more
-debts, where current-idle admission breaks the bound for every class.
+Figure~\ref{fig:motivation}b applies both views to the same epochs. Static reservation leaves 8~ms
+of the 108~ms recovery window and rejects every AI unit, including every unit that the all-fail
+certificate admits. Current-idle admission accepts every unit, including every unit that breaks the
+all-fail recovery bound. Each epoch therefore exposes an error of one of the two views. With two
+transition TBs, at most two debts remain and the 16- to 128-token leases still fit
+(Figure~\ref{fig:lease-timing}a). Current-idle admission errs only on 256- and 512-token units, in
+27.5\% and 34.0\% of their epochs. With four transition TBs, three or more debts remain in 39.0\% of
+epochs, and every prompt length breaks the bound there; 256- and 512-token units break in 76.5\% of
+epochs.
 
 \paragraph{Takeaway 1: current idleness is not schedulable slack.}
 An unresolved \NRx leaves mandatory work outside the current queue. A scheduler needs an explicit

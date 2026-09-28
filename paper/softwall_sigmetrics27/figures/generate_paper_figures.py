@@ -52,6 +52,8 @@ SOURCES = {
     "envelope_grid": ROOT / "results/softwall_multigpu/c162_feasibility_grid_v1.json",
     "envelope_scale": ROOT / "results/softwall_multigpu/c162_scheduler_scalability_v1.json",
     "envelope_protocol": ROOT / "results/softwall_multigpu/c162a_boundary_dev_j58860486_protocol.json",
+    "necessity_dev": ROOT / "results/softwall_multigpu/c172_debt_blind_job58957717_result.json",
+    "necessity_holdout": ROOT / "results/softwall_multigpu/c172_debt_blind_job58957719_result.json",
 }
 
 # Raw per-request records behind the two background figures. The Q2
@@ -65,6 +67,14 @@ BACKGROUND_RAW = {
     "kernel": ROOT / "results/softwall_multigpu/raw/c163_raw_p2p_v5_stage_profile_job58868184_worker.json",
 }
 BACKGROUND_DATA = HERE / "softwall_background_data.json"
+
+# Per-attempt records of the two-node debt-blind diagnostic (C172); the result
+# files pin the digest of each coordinator log.
+EVAL_RAW = {
+    "c172_dev": ROOT / "results/softwall_multigpu/raw/c172_debt_blind_job58957717_coordinator.json",
+    "c172_holdout": ROOT / "results/softwall_multigpu/raw/c172_debt_blind_job58957719_coordinator.json",
+}
+EVAL_DATA = HERE / "softwall_eval_data.json"
 
 
 def load(name: str):
@@ -564,264 +574,253 @@ def make_envelope() -> dict:
             "decision_max_ms": decision_max, "verify_p99_ms": verify_p99}
 
 
-def make_qualification_evidence() -> dict:
-    cap = load("mps_cap")
-    life = load("mps_lifecycle")
-    life_protocol = load("mps_lifecycle_protocol")
-    q2 = load("q2")
-    q2_protocol = load("q2_protocol")
-    fault = load("fault")
+def figure_legend(fig, handles, labels, ncol: int) -> None:
+    """One legend above all panels of a figure."""
+    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=ncol, frameon=False,
+               handlelength=1.8, handletextpad=0.4, columnspacing=1.2, borderaxespad=0.0)
 
-    assert cap["by_cap"]["100"]["misses"] == 2
-    assert cap["by_cap"]["20"]["misses"] == 1
-    assert life["mps_only_misses"] == 12 and life["cpu_only_misses"] == 0
-    assert q2["summary"]["actual_nrx_requests"] == 4800
-    assert q2["summary"]["qwen_units"] == 1077
-    assert fault["summary"]["deadline_misses"] == 0
 
-    fig, axes = plt.subplots(2, 2, figsize=(FIG_WIDTH, 4.0))
-    fig.subplots_adjust(hspace=0.95, wspace=0.62)
+def derive_eval() -> None:
+    """Per-attempt boundary records of the two-node debt-blind diagnostic (C172)."""
+    if not all(path.exists() for path in EVAL_RAW.values()):
+        return
+    records = []
+    for key, result in (("c172_dev", "necessity_dev"), ("c172_holdout", "necessity_holdout")):
+        pinned = load(result)["artifact_sha256"]["coordinator"]
+        assert sha256(EVAL_RAW[key]) == pinned, f"raw log differs from pinned digest: {key}"
+        for row in json.loads(EVAL_RAW[key].read_text())["rounds"]:
+            records.append({"run": key, "scenario": row["scenario_id"], "policy": row["policy"],
+                            "lease_accepted": row["lease_accepted"],
+                            "decision_ms": round(row["observed_decision_ms"], 4),
+                            "last_recovery_complete_ms": round(row["last_recovery_complete_ms"], 4)})
+    data = {
+        "schema": "softwall-eval-data-v1",
+        "scope": ("Every physical attempt of the frozen C172 development and holdout runs. The last recovery "
+                  "completion is measured from release; the guard is 153 ms and the expiry 155 ms."),
+        "raw_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in EVAL_RAW.values()},
+        "boundary_attempts": records,
+    }
+    EVAL_DATA.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
 
-    # (a) Diagnostic miss observations from two separate campaigns. The shared
-    # per-10k axis is visual only; a gap and group labels keep them unpooled.
-    ax = axes[0, 0]
-    n_life = len(life["rows"]) * life_protocol["radio"]["iterations_per_condition"]
-    raw = [
-        ("cap 100", 2, cap["by_cap"]["100"]["releases"]),
-        ("cap 20", 1, cap["by_cap"]["20"]["releases"]),
-        ("CPU sham", 0, n_life),
-        ("MPS client", 12, n_life),
-    ]
-    xpos = [0, 1, 2.7, 3.7]
-    values = [misses / n * 10000 for _, misses, n in raw]
-    ax.bar(xpos, values, color=[COLORS["orange"], COLORS["orange"], COLORS["gray"], COLORS["red"]], width=0.7)
-    ax.axvline(1.85, color=COLORS["gray"], linestyle=":", linewidth=1.0)
-    ax.set_xticks(xpos, [r[0] for r in raw], rotation=25, ha="right")
-    for x_center, group in ((0.5, "cap sweep"), (3.2, "lifecycle")):
-        ax.text(x_center, 0.97, group, transform=ax.get_xaxis_transform(), ha="center", va="top",
-                fontsize=7.5, color=COLORS["dark"])
-    ax.set_ylabel("misses per 10k")
-    ax.set_ylim(0, 17.5)
-    ax.set_xlim(-0.6, 4.3)
+
+def make_eval_capacity() -> dict:
+    """Safe AI capacity of each policy in the exact-checked capacity model (C167)."""
+    capacity = load("capacity")
+    rows = [dict(zip(capacity["row_fields"], row)) for row in capacity["rows"]]
+    feasible = [row for row in rows if row["mandatory_feasible"] == 1]
+    assert len(feasible) == 13716 and capacity["exact_checker"]["mismatches"] == 0
+    assert all(abs(row["softwall_requests"] - row["oracle_requests"]) < 1e-9 for row in feasible)
+    useful = [row for row in feasible if row["oracle_requests"] > 0]
+    policies = (("static_requests", "static", COLORS["gray"], ":", "o"),
+                ("recovery_first_requests", "recovery-first", COLORS["gray"], "--", "s"),
+                ("softwall_requests", "SoftWall", COLORS["blue"], "-", "D"))
+
+    def share(group, key):
+        return 100.0 * statistics.mean(row[key] / row["oracle_requests"] for row in group)
+
+    fig, axes = plt.subplots(1, 3, figsize=(FIG_WIDTH, 1.35))
+    fig.subplots_adjust(wspace=0.62)
+    cells = [2, 4, 8, 16]
+    deadlines = [50, 100, 1000]
+    summary = {"by_cells": {}, "by_deadline": {}, "idle_violation_by_cells": {}}
+
+    # (a) Capacity as the number of cells grows.
+    ax = axes[0]
+    for key, label, color, style, marker in policies:
+        values = [share([row for row in useful if row["cells"] == c], key) for c in cells]
+        summary["by_cells"][label] = dict(zip(map(str, cells), values))
+        ax.plot(range(len(cells)), values, color=color, linestyle=style, marker=marker, markersize=3.6,
+                linewidth=1.5, label=label)
+    ax.set_xticks(range(len(cells)), [str(c) for c in cells])
+    ax.set_xlabel("cells")
+    ax.set_ylabel("AI capacity\n(% of oracle)")
+    ax.set_ylim(40, 105)
+    ax.set_yticks([50, 75, 100])
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "a")
 
-    # (b) Class-specific Qwen admission.
-    ax = axes[0, 1]
-    contexts = [16, 32, 64, 128, 256, 512]
-    accepted = [q2["summary"]["qwen_executed_by_class"][str(v)] for v in contexts]
-    offered = [q2["summary"]["qwen_offered_by_class"][str(v)] for v in contexts]
-    rejected = [o - a for o, a in zip(offered, accepted)]
-    ypos = list(range(len(contexts)))
-    ax.barh(ypos, accepted, color=COLORS["blue"], label="executed")
-    ax.barh(ypos, rejected, left=accepted, color=COLORS["red"], label="certificate reject")
-    ax.set_yticks(ypos, [str(v) for v in contexts])
-    ax.set_xlabel("Qwen requests per class")
-    ax.set_ylabel("context tokens")
-    ax.set_xlim(0, 200)
-    ax.grid(axis="x", **GRID)
+    # (b) Capacity as the AI deadline tightens.
+    ax = axes[1]
+    for key, label, color, style, marker in policies:
+        values = [share([row for row in useful if row["ai_deadline_ms"] == d], key) for d in deadlines]
+        summary["by_deadline"][label] = dict(zip(map(str, deadlines), values))
+        ax.plot(range(len(deadlines)), values, color=color, linestyle=style, marker=marker, markersize=3.6,
+                linewidth=1.5)
+    ax.set_xticks(range(len(deadlines)), [str(d) for d in deadlines])
+    ax.set_xlabel("AI deadline (ms)")
+    ax.set_ylim(40, 105)
+    ax.set_yticks([50, 75, 100])
+    ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.40), ncol=2, frameon=False, handlelength=1.2,
-              columnspacing=0.9)
     panel_label(ax, "b")
 
-    # (c) Whole-path quantiles versus the declared contract.
-    ax = axes[1, 0]
-    rows = [
-        ("NeuralRx", q2["summary"]["nrx_release_to_complete_ms"], q2_protocol["mode"]["nrx_bound_ms"]),
-        ("recovery", q2["summary"]["recovery_path_ms"], q2_protocol["mode"]["conventional_bound_ms"]),
-        ("radio\ncommit", q2["summary"]["radio_release_to_commit_ms"], q2_protocol["mode"]["expiry_ms"]),
-    ]
-    for y, (_, vals, bound) in enumerate(rows):
-        ax.plot([vals["p50"], vals["max"]], [y, y], color="#AAB2BD", lw=2.0, zorder=1)
-        ax.scatter(vals["p50"], y, marker="o", s=26, color=COLORS["blue"], label="p50" if y == 0 else None, zorder=3)
-        ax.scatter(vals["p99"], y, marker="s", s=26, color=COLORS["orange"], label="p99" if y == 0 else None, zorder=3)
-        ax.scatter(vals["max"], y, marker="D", s=26, color=COLORS["red"], label="max" if y == 0 else None, zorder=3)
-        ax.scatter(bound, y, marker="|", s=170, linewidths=2.4, color=COLORS["green"],
-                   label="contract" if y == 0 else None, zorder=4)
-    ax.set_yticks(range(3), [r[0] for r in rows])
-    ax.set_ylim(2.6, -0.6)
-    ax.set_xlim(0, 165)
-    ax.set_xlabel("release-to-terminal path (ms)")
-    ax.grid(axis="x", **GRID)
+    # (c) Radio violation probability of idle-time admission; the certified
+    # policies never violate the all-fail schedule.
+    ax = axes[2]
+    violation = [100.0 * statistics.mean(row["debt_blind_violation_probability"] for row in feasible
+                                         if row["cells"] == c) for c in cells]
+    summary["idle_violation_by_cells"] = dict(zip(map(str, cells), violation))
+    ax.plot(range(len(cells)), violation, color=COLORS["red"], marker="^", markersize=3.8, linewidth=1.5,
+            label="idle-time")
+    ax.plot(range(len(cells)), [0.0] * len(cells), color=COLORS["blue"], marker="D", markersize=3.6,
+            linewidth=1.5)
+    ax.set_xticks(range(len(cells)), [str(c) for c in cells])
+    ax.set_xlabel("cells")
+    ax.set_ylabel("radio violation\nprobability (%)")
+    ax.set_ylim(-2, 35)
+    ax.set_yticks([0, 15, 30])
+    ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.40), ncol=4, frameon=False, handletextpad=0.3,
-              columnspacing=0.8)
     panel_label(ax, "c")
 
-    # (d) Fault coverage. A log scale keeps rare terminal events visible.
-    ax = axes[1, 1]
-    f = fault["summary"]
-    labels = ["NeuralRx", "recoveries", "corr. all-fail", "post-fault periods", "replay pairs", "terminal faults"]
-    counts = [f["actual_nrx_requests"], f["physical_recoveries"], f["correlated_all_fail_recoveries"],
-              f["post_terminal_radio_rounds"], f["stale_duplicate_nrx_pairs"] + f["stale_duplicate_recovery_pairs"],
-              f["terminal_channel_faults"]]
-    y = list(range(len(labels)))
-    ax.barh(y, counts, color=COLORS["blue"], height=0.62)
-    ax.set_xscale("log")
-    ax.set_xlim(1, 5000)
-    ax.set_yticks(y, labels)
-    ax.tick_params(axis="y", labelsize=7.5)
-    ax.invert_yaxis()
-    ax.set_xlabel("observed events (log)")
-    ax.grid(axis="x", which="major", **GRID)
+    handles = [Line2D([], [], color=color, linestyle=style, marker=marker, markersize=3.6, linewidth=1.5)
+               for _, _, color, style, marker in policies]
+    handles.append(Line2D([], [], color=COLORS["red"], marker="^", markersize=3.8, linewidth=1.5))
+    figure_legend(fig, handles, ["static", "recovery-first", "SoftWall", "idle-time"], ncol=4)
+    save(fig, "softwall_eval_capacity")
+    summary["feasible_points"] = len(feasible)
+    summary["useful_points"] = len(useful)
+    return summary
+
+
+def make_eval_trace() -> dict:
+    """Timely AI value on the BurstGPT headroom points (C174/C175)."""
+    rows = load("levers")["rows"]
+    assert len(rows) == 362
+    gpus = [1, 2, 4]
+    rf = {g: [] for g in gpus}
+    sw = {g: [] for g in gpus}
+    ratios = []
+    for row in rows:
+        values = row["lever_values"]
+        oracle = values["fixed_placement_oracle"]
+        rf[row["gpus"]].append(100.0 * values["recovery_first"] / oracle)
+        sw[row["gpus"]].append(100.0 * values["ai_first_greedy"] / oracle)
+        ratios.append(values["ai_first_greedy"] / values["recovery_first"])
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3))
+    fig.subplots_adjust(wspace=0.4)
+
+    # (a) Mean timely value per GPU count, normalized to the fixed-placement oracle.
+    ax = axes[0]
+    xs = list(range(len(gpus)))
+    width = 0.34
+    rf_mean = [statistics.mean(rf[g]) for g in gpus]
+    sw_mean = [statistics.mean(sw[g]) for g in gpus]
+    ax.bar([x - width / 2 for x in xs], rf_mean, width=width, color=COLORS["gray"], zorder=3)
+    ax.bar([x + width / 2 for x in xs], sw_mean, width=width, color=COLORS["blue"], zorder=3)
+    ax.set_xticks(xs, [str(g) for g in gpus])
+    ax.set_xlabel("GPUs")
+    ax.set_ylabel("timely AI value\n(% of oracle)")
+    ax.set_ylim(0, 105)
+    ax.set_yticks([0, 50, 100])
+    ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
-    panel_label(ax, "d")
-
-    save(fig, "softwall_qualification_evidence")
-    return {
-        "mps_diagnostics": [{"label": label, "misses": misses, "requests": n} for label, misses, n in raw],
-        "qwen_contexts": contexts,
-        "qwen_accepted": accepted,
-        "qwen_rejected": rejected,
-        "fault_counts": dict(zip((label.replace("\n", " ") for label in labels), counts)),
-    }
-
-
-def make_outcome_boundaries() -> dict:
-    baseline = load("baseline")
-    lifecycle = load("lifecycle")
-    production = load("production")
-    channel = load("channel")
-
-    assert baseline["summary"]["totals"]["softwall"]["timely_value_tokens"] == 349387
-    assert baseline["summary"]["totals"]["recovery_first_full_bound"]["gap_to_oracle_pct"] < baseline["summary"]["minimum_effect_pct"]
-    assert lifecycle["counts"] == {"qualified_or_partial_modes": 5, "total_modes": 10, "unqualified_modes": 5}
-    assert production["current_timing_diagnosis"]["cross_gpu_candidates"]["raw_iq_full_remote_persistent_ordered"]["deadline_counts"]["parallel_pair_wall_le_deadline"] == 995
-    assert channel["aggregate_low_snr_paired"]["neural_only"] == 31
-    assert channel["aggregate_low_snr_paired"]["conventional_only"] == 12
-
-    fig, axes = plt.subplots(2, 2, figsize=(FIG_WIDTH, 4.3))
-    fig.subplots_adjust(hspace=1.0, wspace=0.62)
-
-    # (a) Negative throughput result relative to the prespecified minimum effect.
-    # A dot plot keeps the zero-gain case visible.
-    ax = axes[0, 0]
-    gains = [baseline["summary"]["totals"]["recovery_first_empirical"]["gap_to_oracle_pct"],
-             baseline["summary"]["totals"]["recovery_first_full_bound"]["gap_to_oracle_pct"]]
-    names = ["empirical\nservice", "full-bound\nsensitivity"]
-    y = [0, 1]
-    threshold = baseline["summary"]["minimum_effect_pct"]
-    ax.hlines(y, 0, gains, color=COLORS["blue"], linewidth=1.6)
-    ax.scatter(gains, y, s=36, color=COLORS["blue"], zorder=3, label="SoftWall gain")
-    ax.axvline(threshold, color=COLORS["red"], linestyle="--", linewidth=1.3, label="prespecified\nminimum effect")
-    ax.set_yticks(y, names)
-    ax.set_ylim(1.6, -0.6)
-    ax.set_xlim(-0.15, 5.5)
-    ax.set_xlabel("timely-token gain (%)")
-    ax.grid(axis="x", **GRID)
-    ax.set_axisbelow(True)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.46), ncol=2, frameon=False, handlelength=1.4,
-              columnspacing=0.8)
     panel_label(ax, "a")
 
-    # (b) Claim-scoped lifecycle matrix.
-    ax = axes[0, 1]
-    ax.set_xlim(0, 2)
-    ax.set_ylim(0, 5)
-    ax.axis("off")
-    mode_layout = [
-        ("warm\npersistent", "Q", 0, 4),
-        ("30 s idle", "Q", 1, 4),
-        ("MPS restart", "P", 0, 3),
-        ("Qwen reload", "P", 1, 3),
-        ("same-worker\nreconnect", "P", 0, 2),
-        ("process or\nmodel cold", "UQ", 1, 2),
-        ("5 min idle", "UQ", 0, 1),
-        ("30 min idle", "UQ", 1, 1),
-        ("GC on", "UQ", 0, 0),
-        ("worker\nreplacement", "UQ", 1, 0),
-    ]
-    style = {
-        "Q": (COLORS["light_green"], COLORS["green"], "qualified"),
-        "P": (COLORS["light_orange"], COLORS["orange"], "partial"),
-        "UQ": (COLORS["light_gray"], COLORS["gray"], "unqualified"),
-    }
-    for label, status, col, row in mode_layout:
-        face, edge, _ = style[status]
-        ax.add_patch(Rectangle((col + 0.02, row + 0.07), 0.96, 0.86, facecolor=face, edgecolor=edge, linewidth=1.0))
-        ax.text(col + 0.5, row + 0.5, label, ha="center", va="center", fontsize=7.0, color=COLORS["dark"],
-                linespacing=1.1)
-    handles = [Rectangle((0, 0), 1, 1, facecolor=face, edgecolor=edge) for face, edge, _ in style.values()]
-    ax.legend(handles, [name for _, _, name in style.values()], loc="upper center", bbox_to_anchor=(0.5, -0.04),
-              ncol=3, frameon=False, handlelength=1.1, columnspacing=0.8)
-    panel_label(ax, "b")
-
-    # (c) Production exit-gate progression over the prespecified 1,000-request
-    # runs. Late requests use a log axis because the gate requires zero late
-    # requests and the final candidate differs from the others by a small count.
-    # The 300-request mechanism ablation is a diagnostic and is not plotted.
-    ax = axes[1, 0]
-    candidates = production["current_timing_diagnosis"]["cross_gpu_candidates"]
-    prod_rows = [
-        ("precomputed\nsplit", "precomputed_ls_split"),
-        ("raw-IQ P2P", "raw_iq_full_remote"),
-        ("same stream", "raw_iq_full_remote_same_stream"),
-        ("frozen\ncandidate", "raw_iq_full_remote_persistent_ordered"),
-    ]
-    late, totals = [], []
-    for _, key in prod_rows:
-        counts = candidates[key]["deadline_counts"]
-        late.append(counts["parallel_pair_wall_gt_deadline"])
-        totals.append(counts["parallel_pair_wall_le_deadline"] + counts["parallel_pair_wall_gt_deadline"])
-    assert totals == [1000, 1000, 1000, 1000]
-    yy = list(range(len(prod_rows)))
-    ax.barh(yy, late, color=COLORS["blue"], height=0.62)
+    # (b) Distribution of the SoftWall-to-recovery-first value ratio.
+    ax = axes[1]
+    values = sorted(ratios)
+    n = len(values)
+    ax.step(values, [100.0 * (i + 1) / n for i in range(n)], where="post", color=COLORS["blue"], linewidth=1.6)
+    ax.axvline(1.0, color=COLORS["gray"], linestyle=":", linewidth=1.1)
     ax.set_xscale("log")
-    ax.set_xlim(1, 1500)
-    ax.set_yticks(yy, [r[0] for r in prod_rows])
-    ax.invert_yaxis()
-    ax.set_xlabel("requests over 4.5 ms (log)")
-    ax.grid(axis="x", which="major", **GRID)
-    ax.set_axisbelow(True)
-    panel_label(ax, "c")
-
-    # (d) Supported simulated channel result. The four waterfall strata use a
-    # numeric Es/No axis; the 10 dB control stratum sits after an axis break and
-    # is not joined to the waterfall curves.
-    ax = axes[1, 1]
-    strata = channel["models"]["D"]["strata"]
-    low = [row["esno_db"] for row in strata if row["esno_db"] < 0]
-    assert low == [-4.0, -3.6, -3.2, -3.0]
-    assert [row["esno_db"] for row in channel["models"]["E"]["strata"]] == [row["esno_db"] for row in strata]
-    high_x = -2.55
-    line_specs = [
-        ("D conventional", "D", "conventional_correct", COLORS["gray"], "o", "-"),
-        ("D NeuralRx", "D", "neural_correct", COLORS["blue"], "s", "-"),
-        ("E conventional", "E", "conventional_correct", COLORS["gray"], "o", "--"),
-        ("E NeuralRx", "E", "neural_correct", COLORS["blue"], "s", "--"),
-    ]
-    for label, model, field, color, marker, ls in line_specs:
-        rows_m = channel["models"][model]["strata"]
-        lo = [100 * r[field] / r["trials"] for r in rows_m if r["esno_db"] < 0]
-        hi = [100 * r[field] / r["trials"] for r in rows_m if r["esno_db"] >= 0]
-        ax.plot(low, lo, label=label, color=color, marker=marker, linestyle=ls, markersize=4.2)
-        ax.plot([high_x] * len(hi), hi, color=color, marker=marker, linestyle="none", markersize=4.2)
-    ax.set_xticks(low + [high_x], ["-4.0", "-3.6", "-3.2", "-3.0", "10"], rotation=40, ha="right",
-                  rotation_mode="anchor")
-    ax.set_xlim(-4.12, -2.43)
-    for xb in (-2.79, -2.75):
-        ax.plot([xb - 0.02, xb + 0.02], [-0.045, 0.045], transform=ax.get_xaxis_transform(),
-                color=COLORS["dark"], linewidth=1.0, clip_on=False)
-    ax.set_ylim(-4, 106)
-    ax.set_ylabel("decode success (%)")
-    ax.set_xlabel("Es/No (dB)")
+    ax.set_xlim(0.9, 20)
+    ax.set_xticks([1, 2, 5, 10, 20], ["1", "2", "5", "10", "20"])
+    ax.set_ylim(0, 102)
+    ax.set_yticks([0, 50, 100])
+    ax.set_xlabel("SoftWall / recovery-first value")
+    ax.set_ylabel("CDF (%)")
     ax.grid(**GRID)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.42), ncol=2, frameon=False, handlelength=1.8,
-              columnspacing=0.8)
-    panel_label(ax, "d")
+    panel_label(ax, "b")
 
-    save(fig, "softwall_outcome_boundaries")
-    return {
-        "throughput_gain_pct": gains,
-        "minimum_effect_pct": threshold,
-        "production_labels": [r[0].replace("\n", " ") for r in prod_rows],
-        "production_late": late,
-        "production_totals": totals,
-        "channel_aggregate": channel["aggregate_low_snr_paired"],
-    }
+    handles = [Rectangle((0, 0), 1, 1, color=COLORS["gray"]), Rectangle((0, 0), 1, 1, color=COLORS["blue"])]
+    figure_legend(fig, handles, ["recovery-first", "SoftWall"], ncol=2)
+    save(fig, "softwall_eval_trace")
+    return {"recovery_first_pct_of_oracle": dict(zip(map(str, gpus), rf_mean)),
+            "softwall_pct_of_oracle": dict(zip(map(str, gpus), sw_mean)),
+            "ratio_median": statistics.median(values), "ratio_max": values[-1], "ratio_min": values[0],
+            "points": n}
+
+
+def make_eval_safety() -> dict:
+    """Physical boundary attempts (C172) and class-wise AI admission (Q2)."""
+    data = json.loads(EVAL_DATA.read_text())
+    attempts = data["boundary_attempts"]
+    # Boundary case, horizontal position, and policy of each attempt group.
+    groups = (("E4_debt_blind_launch", -0.2, COLORS["red"], "x"),
+              ("E4_softwall_reject", 0.2, COLORS["blue"], "o"),
+              ("E6b_shadow_launch", 0.8, COLORS["red"], "x"),
+              ("E6b_softwall_reject", 1.2, COLORS["blue"], "o"),
+              ("E6a_softwall_admit", 2.0, COLORS["blue"], "o"))
+    guard, expiry = 153.0, 155.0
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.4), gridspec_kw={"width_ratios": [1.25, 1.0]})
+    fig.subplots_adjust(wspace=0.38)
+
+    # (a) Completion of the last recovery in every physical attempt. A small
+    # deterministic horizontal offset separates overlapping attempts.
+    ax = axes[0]
+    summary = {}
+    for scenario, x, color, marker in groups:
+        ends = [a["last_recovery_complete_ms"] for a in attempts if a["scenario"] == scenario]
+        assert len(ends) == 48
+        offsets = [((i % 9) - 4) * 0.03 for i in range(len(ends))]
+        if marker == "x":
+            ax.scatter([x + o for o in offsets], ends, s=10, marker="x", color=color, linewidths=0.9, zorder=3)
+        else:
+            ax.scatter([x + o for o in offsets], ends, s=10, marker="o", facecolor="none", edgecolor=color,
+                       linewidths=0.9, zorder=3)
+        summary[scenario] = {"attempts": len(ends), "min_ms": min(ends), "max_ms": max(ends),
+                             "beyond_guard": sum(e > guard for e in ends)}
+    ax.axhline(guard, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=2)
+    ax.axhline(expiry, color=COLORS["dark"], linestyle=":", linewidth=1.1, zorder=2)
+    ax.text(-0.55, guard - 1.5, "guard", ha="left", va="top", fontsize=6.5, color=COLORS["red"])
+    ax.set_xticks([0, 1, 2], ["E4", "E6b", "E6a"])
+    ax.set_xlabel("boundary case")
+    ax.set_xlim(-0.6, 2.4)
+    ax.set_ylim(85, 172)
+    ax.set_yticks([100, 125, 150])
+    ax.set_ylabel("last recovery\nend (ms)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    # (b) Qwen units per prompt length in the two-node campaign: executed by
+    # SoftWall, and admitted only by idle-time admission because they break
+    # the certified recovery bound. Static reservation admits none.
+    ax = axes[1]
+    q2 = load("q2")["summary"]
+    contexts = [16, 32, 64, 128, 256, 512]
+    executed = [q2["qwen_executed_by_class"][str(c)] for c in contexts]
+    rejected = [q2["qwen_certificate_rejected_by_class"][str(c)] for c in contexts]
+    assert sum(executed) == 1077 and [e + r for e, r in zip(executed, rejected)] == [200] * 6
+    xs = list(range(len(contexts)))
+    ax.bar(xs, executed, width=0.62, color=COLORS["blue"], zorder=3)
+    broken = [(x, e, r) for x, e, r in zip(xs, executed, rejected) if r > 0]
+    ax.bar([x for x, _, _ in broken], [r for _, _, r in broken], bottom=[e for _, e, _ in broken], width=0.62,
+           color=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////", linewidth=0.8, zorder=3)
+    ax.set_xticks(xs, [str(c) for c in contexts])
+    ax.set_xlabel("prompt length (tokens)")
+    ax.set_ylabel("Qwen units")
+    ax.set_ylim(0, 215)
+    ax.set_yticks([0, 100, 200])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    handles = [Line2D([], [], marker="o", linestyle="none", markerfacecolor="none",
+                      markeredgecolor=COLORS["blue"], markersize=4.5),
+               Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
+               Rectangle((0, 0), 1, 1, color=COLORS["blue"]),
+               Rectangle((0, 0), 1, 1, facecolor=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////")]
+    figure_legend(fig, handles, ["SoftWall attempt", "baseline attempt", "executed by SoftWall",
+                                 "breaks the bound"], ncol=4)
+    save(fig, "softwall_eval_safety")
+    return {"boundary": summary, "qwen_executed": dict(zip(map(str, contexts), executed)),
+            "qwen_rejected": dict(zip(map(str, contexts), rejected))}
 
 
 def make_capacity_headroom() -> dict:
@@ -934,38 +933,32 @@ def make_capacity_headroom() -> dict:
 
 def main() -> None:
     derive_background()
-    execution = make_execution()
-    debt = make_debt()
-    envelope = make_envelope()
-    qualification = make_qualification_evidence()
-    boundaries = make_outcome_boundaries()
-    capacity = make_capacity_headroom()
+    derive_eval()
+    outputs = {
+        "execution": make_execution(),
+        "debt": make_debt(),
+        "eval_capacity": make_eval_capacity(),
+        "eval_trace": make_eval_trace(),
+        "eval_safety": make_eval_safety(),
+        "envelope": make_envelope(),
+        "capacity_headroom": make_capacity_headroom(),
+    }
+    stems = ("softwall_execution", "softwall_debt", "softwall_eval_capacity", "softwall_eval_trace",
+             "softwall_eval_safety", "softwall_envelope", "softwall_capacity_headroom")
     manifest = {
         "schema": "softwall-paper-figure-manifest-v1",
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in SOURCES.values()},
-        "figures": [
-            "softwall_execution.pdf",
-            "softwall_debt.pdf",
-            "softwall_envelope.pdf",
-            "softwall_qualification_evidence.pdf",
-            "softwall_outcome_boundaries.pdf",
-            "softwall_capacity_headroom.pdf",
-        ],
-        "derived": {"execution": execution, "debt": debt, "envelope": envelope,
-                    "qualification": qualification, "boundaries": boundaries, "capacity": capacity},
+        "figures": [f"{stem}.pdf" for stem in stems],
+        "derived": outputs,
         "claim_boundary": (
             "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; "
             "sample maxima are not WCET; the 4.5 ms production gate remains failed; and Sionna CDL-D/E "
-            "does not qualify Aerial TDL-A or field IQ."
+            "does not qualify Aerial TDL-A or field IQ. The capacity figure is an exact-checked model and "
+            "the trace figure covers the prespecified headroom points only."
         ),
     }
-    manifest["output_sha256"] = {
-        name: sha256(HERE / name)
-        for stem in ("softwall_execution", "softwall_debt", "softwall_envelope",
-                     "softwall_qualification_evidence", "softwall_outcome_boundaries",
-                     "softwall_capacity_headroom")
-        for name in (f"{stem}.pdf", f"{stem}.svg")
-    }
+    manifest["output_sha256"] = {name: sha256(HERE / name) for stem in stems
+                                 for name in (f"{stem}.pdf", f"{stem}.svg")}
     (HERE / "softwall_figure_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"status": "PASS", "outputs": manifest["figures"]}, indent=2))
 

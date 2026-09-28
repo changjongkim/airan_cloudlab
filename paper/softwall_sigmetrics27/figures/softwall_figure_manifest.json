@@ -1,37 +1,7 @@
 {
-  "claim_boundary": "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; sample maxima are not WCET; the 4.5 ms production gate remains failed; and Sionna CDL-D/E does not qualify Aerial TDL-A or field IQ.",
+  "claim_boundary": "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; sample maxima are not WCET; the 4.5 ms production gate remains failed; and Sionna CDL-D/E does not qualify Aerial TDL-A or field IQ. The capacity figure is an exact-checked model and the trace figure covers the prespecified headroom points only.",
   "derived": {
-    "boundaries": {
-      "channel_aggregate": {
-        "conventional_only": 12,
-        "exact_pvalue": 0.005401572654591291,
-        "neural_only": 31
-      },
-      "minimum_effect_pct": 5.0,
-      "production_labels": [
-        "precomputed split",
-        "raw-IQ P2P",
-        "same stream",
-        "frozen candidate"
-      ],
-      "production_late": [
-        1000,
-        148,
-        115,
-        5
-      ],
-      "production_totals": [
-        1000,
-        1000,
-        1000,
-        1000
-      ],
-      "throughput_gain_pct": [
-        0.0,
-        1.1397104070844077
-      ]
-    },
-    "capacity": {
+    "capacity_headroom": {
       "flexible_placement_positive_points": 203,
       "greedy_within_5pct_points": 361,
       "lever_candidate_points": 362,
@@ -237,6 +207,119 @@
         0.13098400000000002
       ]
     },
+    "eval_capacity": {
+      "by_cells": {
+        "SoftWall": {
+          "16": 100.0,
+          "2": 100.0,
+          "4": 100.0,
+          "8": 100.0
+        },
+        "recovery-first": {
+          "16": 83.2532146367219,
+          "2": 92.3692626960709,
+          "4": 87.64222146252622,
+          "8": 84.9440533374714
+        },
+        "static": {
+          "16": 59.297385902874055,
+          "2": 85.27597426455938,
+          "4": 73.7270256539142,
+          "8": 65.91166520983714
+        }
+      },
+      "by_deadline": {
+        "SoftWall": {
+          "100": 100.0,
+          "1000": 100.0,
+          "50": 100.0
+        },
+        "recovery-first": {
+          "100": 89.97041186205226,
+          "1000": 100.0,
+          "50": 62.7492735852147
+        },
+        "static": {
+          "100": 73.8756675012384,
+          "1000": 72.12605659679114,
+          "50": 75.51841762123301
+        }
+      },
+      "feasible_points": 13716,
+      "idle_violation_by_cells": {
+        "16": 24.42027995133568,
+        "2": 9.861111111111112,
+        "4": 16.159878826530612,
+        "8": 21.80330661349687
+      },
+      "useful_points": 10314
+    },
+    "eval_safety": {
+      "boundary": {
+        "E4_debt_blind_launch": {
+          "attempts": 48,
+          "beyond_guard": 48,
+          "max_ms": 164.7302,
+          "min_ms": 163.5697
+        },
+        "E4_softwall_reject": {
+          "attempts": 48,
+          "beyond_guard": 0,
+          "max_ms": 98.2026,
+          "min_ms": 95.2127
+        },
+        "E6a_softwall_admit": {
+          "attempts": 48,
+          "beyond_guard": 0,
+          "max_ms": 151.9506,
+          "min_ms": 151.7661
+        },
+        "E6b_shadow_launch": {
+          "attempts": 48,
+          "beyond_guard": 48,
+          "max_ms": 155.7886,
+          "min_ms": 153.4061
+        },
+        "E6b_softwall_reject": {
+          "attempts": 48,
+          "beyond_guard": 0,
+          "max_ms": 116.5732,
+          "min_ms": 114.9724
+        }
+      },
+      "qwen_executed": {
+        "128": 200,
+        "16": 200,
+        "256": 145,
+        "32": 200,
+        "512": 132,
+        "64": 200
+      },
+      "qwen_rejected": {
+        "128": 0,
+        "16": 0,
+        "256": 55,
+        "32": 0,
+        "512": 68,
+        "64": 0
+      }
+    },
+    "eval_trace": {
+      "points": 362,
+      "ratio_max": 17.180928949867834,
+      "ratio_median": 1.444156217664467,
+      "ratio_min": 0.9859631041652084,
+      "recovery_first_pct_of_oracle": {
+        "1": 51.711113334067974,
+        "2": 67.38392002186528,
+        "4": 75.47661702829701
+      },
+      "softwall_pct_of_oracle": {
+        "1": 99.83049503321558,
+        "2": 99.85764116597255,
+        "4": 99.95797479046541
+      }
+    },
     "execution": {
       "alone_p99_range_ms": [
         8.88661495,
@@ -315,70 +398,15 @@
           "n": 1000
         }
       }
-    },
-    "qualification": {
-      "fault_counts": {
-        "NeuralRx": 2800,
-        "corr. all-fail": 240,
-        "post-fault periods": 260,
-        "recoveries": 942,
-        "replay pairs": 40,
-        "terminal faults": 4
-      },
-      "mps_diagnostics": [
-        {
-          "label": "cap 100",
-          "misses": 2,
-          "requests": 1500
-        },
-        {
-          "label": "cap 20",
-          "misses": 1,
-          "requests": 1500
-        },
-        {
-          "label": "CPU sham",
-          "misses": 0,
-          "requests": 10000
-        },
-        {
-          "label": "MPS client",
-          "misses": 12,
-          "requests": 10000
-        }
-      ],
-      "qwen_accepted": [
-        200,
-        200,
-        200,
-        200,
-        145,
-        132
-      ],
-      "qwen_contexts": [
-        16,
-        32,
-        64,
-        128,
-        256,
-        512
-      ],
-      "qwen_rejected": [
-        0,
-        0,
-        0,
-        0,
-        55,
-        68
-      ]
     }
   },
   "figures": [
     "softwall_execution.pdf",
     "softwall_debt.pdf",
+    "softwall_eval_capacity.pdf",
+    "softwall_eval_trace.pdf",
+    "softwall_eval_safety.pdf",
     "softwall_envelope.pdf",
-    "softwall_qualification_evidence.pdf",
-    "softwall_outcome_boundaries.pdf",
     "softwall_capacity_headroom.pdf"
   ],
   "output_sha256": {
@@ -388,12 +416,14 @@
     "softwall_debt.svg": "14fdd72986462d40b836e9293bcf99657ad82e3e6b1a5cdb475e09c2434ac8a6",
     "softwall_envelope.pdf": "7a539877a6b28187aab90ab38917f21d7757befbabb6f556e5e54ba2e11b42fe",
     "softwall_envelope.svg": "e8cdb858da9ff9968c34c1363fdfebe6b583f38cd53bca81ed6cdcf872a0f095",
+    "softwall_eval_capacity.pdf": "5f562da67f2613b2a6932b31e4aa1069877e403b965587f246481afffb17297a",
+    "softwall_eval_capacity.svg": "cb8f32336258374581d2a1d24006683e095a1a3699fbb2ad393d5cdc4961b498",
+    "softwall_eval_safety.pdf": "6d06ae24eeda19f1f5a6bbb58f96f3697c86efebb1478848d21a855f36d26c77",
+    "softwall_eval_safety.svg": "f70f8e017ad0cedb59fc77117717710e01ae3f545dc7e680c520cbe837420245",
+    "softwall_eval_trace.pdf": "ffcf1a7c81a5b7ac4f7e973003c71383d87e329d350754e32b4879f09292ded5",
+    "softwall_eval_trace.svg": "13c23042fd8c6d591f9b279bf233db548b6e8b00cba5af39a5cbe46956e9b4b8",
     "softwall_execution.pdf": "4888bfdd007e8ba5a5c8bc4e320e6989e5d03c74e41d2dd57b0ca0871e12449a",
-    "softwall_execution.svg": "282caab7b59c6083ec931668ab52d59b81cca646e850eb74851253ed60b3fd52",
-    "softwall_outcome_boundaries.pdf": "6b5cb3dc264aaaa03a6bc81c979dff6220d7e4f5b9239b9bb83e85b0ed7b3c81",
-    "softwall_outcome_boundaries.svg": "b30f6e5469e2a8995f330a91d78bb433a66aab23cff6fe48a237e32a7d2a64f4",
-    "softwall_qualification_evidence.pdf": "37dbc68a9d259e277bf142568050517aebb2fe08a875a1aecfc5b7380d6b574f",
-    "softwall_qualification_evidence.svg": "cc04b65927ed71ee9eb43a39c362a6c79d96434dd6718aadfbfbb986d77b40e3"
+    "softwall_execution.svg": "282caab7b59c6083ec931668ab52d59b81cca646e850eb74851253ed60b3fd52"
   },
   "schema": "softwall-paper-figure-manifest-v1",
   "source_sha256": {
@@ -405,6 +435,8 @@
     "results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json": "e56cab58cbb0db923aaacef3bea5d8dcdfd466b7376fe476368073b644cd24a6",
     "results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json": "d5870419a4326d576c640e29a63878b47f1a49f3bec761a4aa8be9c87644d717",
     "results/softwall_multigpu/c168_persistent_pair_canary_seed20359400_job58871654.json": "9f057ba014a9026576f550bd2f201b99f487b36644c26e68cfaeda1c96f1ebf3",
+    "results/softwall_multigpu/c172_debt_blind_job58957717_result.json": "f3517885d955053b21040f674c4d6e58134c8220f06ebf0ac6b05991f1c633be",
+    "results/softwall_multigpu/c172_debt_blind_job58957719_result.json": "6c31ed4b3277b0af8904368b579b802f043034aa144c982ce1de5d66f66526fe",
     "results/softwall_multigpu/c173_deadline_correction_result_v1.json": "99efc84b6231b0b12cce8df5ec48126fec107e9e38d80377852e767e587f7d16",
     "results/softwall_multigpu/c174_trace_oracle_screen_v1.json": "b37a287bb6f399380b307884b8d643ff2b99930f932adf87348de561c28ba0eb",
     "results/softwall_multigpu/c175_lever_evaluation_v1.json": "1d0e375a63b792c6963d4731e61af911dc7344dba7d1ba4df894a394655715e7",

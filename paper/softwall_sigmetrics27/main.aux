@@ -43,91 +43,72 @@
 \newlabel{tab:counterexamples}{{2}{6}{Counterexamples define the certificate-to-execution refinement chain}{table.caption.7}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}SoftWall Design}{6}{section.3}\protected@file@percent }
 \newlabel{sec:design}{{3}{6}{SoftWall Design}{section.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Guarantee scope}{6}{subsection.3.1}\protected@file@percent }
-\newlabel{sec:guarantee-scope}{{3.1}{6}{Guarantee scope}{subsection.3.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Overall architecture}{6}{subsection.3.2}\protected@file@percent }
-\newlabel{sec:design-overall}{{3.2}{6}{Overall architecture}{subsection.3.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Overall architecture}{6}{subsection.3.1}\protected@file@percent }
+\newlabel{sec:design-overall}{{3.1}{6}{Overall architecture}{subsection.3.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces SoftWall\xspace  architecture for one release period. (1) Each owner publishes its NeuralRx\xspace  outcome to a decision page. (2) One outcome batch at the NeuralRx\xspace  deadline updates the pending-recovery table. (3) The scheduler retimes the required recoveries around a candidate AI lease. (4) The independent verifier checks the all-fail schedule, credits, and generation, and commits $X'$ or keeps $X_t$. (5) The coordinator publishes each action with its generation and (6) sends the lease with an absolute latest-start. (7) A completion or non-launch marker retires the lease. The shared lane runs required recoveries in certificate order. The steps are drawn for the evaluated multi-GPU placement (b); the single-GPU placement (a) exchanges IQ, LLR, and TB buffers through CUDA IPC rings and uses the same steps. In (b), cuPHY instance 0 owns TB1--TB3, instance 1 owns TB4 and TB5, and ellipses mark further TBs.}}{7}{figure.caption.8}\protected@file@percent }
 \newlabel{fig:overall}{{5}{7}{\sys architecture for one release period. (1) Each owner publishes its \NRx outcome to a decision page. (2) One outcome batch at the \NRx deadline updates the pending-recovery table. (3) The scheduler retimes the required recoveries around a candidate AI lease. (4) The independent verifier checks the all-fail schedule, credits, and generation, and commits $X'$ or keeps $X_t$. (5) The coordinator publishes each action with its generation and (6) sends the lease with an absolute latest-start. (7) A completion or non-launch marker retires the lease. The shared lane runs required recoveries in certificate order. The steps are drawn for the evaluated multi-GPU placement (b); the single-GPU placement (a) exchanges IQ, LLR, and TB buffers through CUDA IPC rings and uses the same steps. In (b), cuPHY instance 0 owns TB1--TB3, instance 1 owns TB4 and TB5, and ellipses mark further TBs}{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {paragraph}{Scheduling objects.}{7}{section*.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Qualified modes.}{7}{section*.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Separation of proposal and authority.}{8}{section*.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Scheduling conditional recovery}{8}{subsection.3.3}\protected@file@percent }
-\newlabel{sec:design-recovery}{{3.3}{8}{Scheduling conditional recovery}{subsection.3.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45\nonbreakingspace ms batch cancels two pending recoveries in one generation. (b) The verifier commits the 128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the guard. AI units are Qwen prefill requests; hatching marks the 5\nonbreakingspace ms launch-control charge.}}{8}{figure.caption.12}\protected@file@percent }
-\newlabel{fig:atomic-replan}{{6}{8}{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45~ms batch cancels two pending recoveries in one generation. (b) The verifier commits the 128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the guard. AI units are Qwen prefill requests; hatching marks the 5~ms launch-control charge}{figure.caption.12}{}}
-\@writefile{toc}{\contentsline {paragraph}{Mandatory-first transition.}{8}{section*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Global atomic state.}{9}{section*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Refining schedules to physical completion}{9}{subsection.3.4}\protected@file@percent }
-\newlabel{sec:design-refinement}{{3.4}{9}{Refining schedules to physical completion}{subsection.3.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Refinement of one AI lease. Black steps: commit with a latest-start (1), run request (2), launch gate and launch marker (3), CUDA event and completion marker (4), and retirement on a matching marker (5). Red faults: marker reconciliation after a late reply (1), AI quarantine after channel loss (2), and no-op outcome and response replays (3, 4).}}{9}{figure.caption.15}\protected@file@percent }
-\newlabel{fig:refinement}{{7}{9}{Refinement of one AI lease. Black steps: commit with a latest-start (1), run request (2), launch gate and launch marker (3), CUDA event and completion marker (4), and retirement on a matching marker (5). Red faults: marker reconciliation after a late reply (1), AI quarantine after channel loss (2), and no-op outcome and response replays (3, 4)}{figure.caption.15}{}}
-\@writefile{toc}{\contentsline {paragraph}{Bounded launch.}{9}{section*.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Physical retirement.}{10}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Distributed ownership.}{10}{section*.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Why IPC/P2P is part of scheduling.}{10}{section*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Certified event-scheduling algorithm}{10}{subsection.3.5}\protected@file@percent }
-\newlabel{sec:design-algorithm}{{3.5}{10}{Certified event-scheduling algorithm}{subsection.3.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a false-safe state.}}{10}{figure.caption.20}\protected@file@percent }
-\newlabel{alg:certify-event}{{8}{10}{SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a false-safe state}{figure.caption.20}{}}
-\@writefile{toc}{\contentsline {paragraph}{Decision window.}{10}{section*.21}\protected@file@percent }
-\newlabel{eq:window}{{6}{10}{Decision window}{equation.6}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces The scheduler's predictive outcomes.}}{11}{table.caption.23}\protected@file@percent }
-\newlabel{tab:classes}{{3}{11}{The scheduler's predictive outcomes}{table.caption.23}{}}
-\newlabel{eq:idletime}{{7}{11}{Idle time is insufficient}{equation.7}{}}
-\@writefile{toc}{\contentsline {paragraph}{Safe reclaimable capacity.}{11}{section*.22}\protected@file@percent }
-\newlabel{eq:capacity}{{10}{11}{Safe reclaimable capacity}{equation.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Implementation}{11}{section.4}\protected@file@percent }
-\newlabel{sec:implementation}{{4}{11}{Implementation}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Runtime topology}{11}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Certificate engine}{12}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Measurement and mode separation}{12}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Evaluation Methodology}{12}{section.5}\protected@file@percent }
-\newlabel{sec:methodology}{{5}{12}{Evaluation Methodology}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Pending-recovery scheduling}{8}{subsection.3.2}\protected@file@percent }
+\newlabel{sec:design-recovery}{{3.2}{8}{Pending-recovery scheduling}{subsection.3.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45\nonbreakingspace ms batch cancels two pending recoveries in one generation. (b) The verifier commits the 128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the guard. AI units are Qwen prefill requests; hatching marks the 5\nonbreakingspace ms launch-control charge.}}{8}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:atomic-replan}{{6}{8}{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB and rejects TB5; the 45~ms batch cancels two pending recoveries in one generation. (b) The verifier commits the 128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the guard. AI units are Qwen prefill requests; hatching marks the 5~ms launch-control charge}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Refinement to physical execution}{9}{subsection.3.3}\protected@file@percent }
+\newlabel{sec:design-refinement}{{3.3}{9}{Refinement to physical execution}{subsection.3.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Refinement of one AI lease. Black steps: commit with a latest-start (1), run request (2), launch gate and launch marker (3), CUDA event and completion marker (4), and retirement on a matching marker (5). Red faults: marker reconciliation after a late reply (1), AI quarantine after channel loss (2), and no-op outcome and response replays (3, 4).}}{9}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:refinement}{{7}{9}{Refinement of one AI lease. Black steps: commit with a latest-start (1), run request (2), launch gate and launch marker (3), CUDA event and completion marker (4), and retirement on a matching marker (5). Red faults: marker reconciliation after a late reply (1), AI quarantine after channel loss (2), and no-op outcome and response replays (3, 4)}{figure.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Certified event-scheduling algorithm}{10}{subsection.3.4}\protected@file@percent }
+\newlabel{sec:design-algorithm}{{3.4}{10}{Certified event-scheduling algorithm}{subsection.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a false-safe state.}}{10}{figure.caption.11}\protected@file@percent }
+\newlabel{alg:certify-event}{{8}{10}{SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a false-safe state}{figure.caption.11}{}}
+\newlabel{eq:window}{{6}{10}{Certified event-scheduling algorithm}{equation.6}{}}
+\newlabel{eq:idletime}{{7}{10}{Idle time is insufficient}{equation.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces The scheduler's predictive outcomes.}}{11}{table.caption.12}\protected@file@percent }
+\newlabel{tab:classes}{{3}{11}{The scheduler's predictive outcomes}{table.caption.12}{}}
+\newlabel{eq:capacity}{{10}{11}{Certified event-scheduling algorithm}{equation.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Guarantee scope}{11}{subsection.3.5}\protected@file@percent }
+\newlabel{sec:guarantee-scope}{{3.5}{11}{Guarantee scope}{subsection.3.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}SoftWall implementation}{12}{subsection.3.6}\protected@file@percent }
+\newlabel{sec:implementation}{{3.6}{12}{SoftWall implementation}{subsection.3.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Evaluation}{12}{section.4}\protected@file@percent }
+\newlabel{sec:evaluation}{{4}{12}{Evaluation}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Evaluation setup}{12}{subsection.4.1}\protected@file@percent }
+\newlabel{sec:methodology}{{4.1}{12}{Evaluation setup}{subsection.4.1}{}}
+\citation{aerial}
+\citation{qwen25}
 \citation{burstgpt}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Evaluation questions and their decision criteria.}}{13}{table.caption.24}\protected@file@percent }
-\newlabel{tab:rqs}{{4}{13}{Evaluation questions and their decision criteria}{table.caption.24}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Questions and metrics}{13}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Testbed, workloads, and contract}{13}{subsection.5.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Scheduling capacity and decision quality. (a) Expected timely requests at a representative four-cell, two-instance, one-GPU point with correlated outcomes. (b) Fraction of 513 mandatory-feasible trace points per SLO that pass the frozen 5\% headroom screen. (c) Of 362 advanced points, a safe AI-first greedy is within 5\% of the fixed-placement oracle at 361; flexible recovery placement has a positive upper-bound gain at 203.}}{14}{figure.caption.27}\protected@file@percent }
-\newlabel{fig:capacity}{{9}{14}{Scheduling capacity and decision quality. (a) Expected timely requests at a representative four-cell, two-instance, one-GPU point with correlated outcomes. (b) Fraction of 513 mandatory-feasible trace points per SLO that pass the frozen 5\% headroom screen. (c) Of 362 advanced points, a safe AI-first greedy is within 5\% of the fixed-placement oracle at 361; flexible recovery placement has a positive upper-bound gain at 203}{figure.caption.27}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Protocols and baselines}{14}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Reproducibility.}{14}{section*.25}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Use of generative AI.}{14}{section*.26}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Evaluation}{14}{section.6}\protected@file@percent }
-\newlabel{sec:evaluation}{{6}{14}{Evaluation}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}RQ1: Tracking pending recovery expands safe capacity}{15}{subsection.6.1}\protected@file@percent }
-\newlabel{sec:eval-capacity}{{6.1}{15}{RQ1: Tracking pending recovery expands safe capacity}{subsection.6.1}{}}
-\@writefile{toc}{\contentsline {paragraph}{Takeaway 1.}{15}{section*.28}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}RQ2: Decision quality and scheduling levers}{15}{subsection.6.2}\protected@file@percent }
-\newlabel{sec:eval-decision}{{6.2}{15}{RQ2: Decision quality and scheduling levers}{subsection.6.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Safety authority and AI-first scheduling utility are separate comparisons.}}{16}{table.caption.29}\protected@file@percent }
-\newlabel{tab:necessity}{{5}{16}{Safety authority and AI-first scheduling utility are separate comparisons}{table.caption.29}{}}
-\@writefile{toc}{\contentsline {paragraph}{Takeaway 2.}{16}{section*.30}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}RQ3: Prediction accuracy and control cost}{16}{subsection.6.3}\protected@file@percent }
-\newlabel{sec:eval-prediction}{{6.3}{16}{RQ3: Prediction accuracy and control cost}{subsection.6.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Predictive scheduling and control cost. (a) Latest decision time at which one AI unit of each prompt length remains admissible with four admitted TBs and zero to four pending recoveries; circles and crosses mark the prespecified physical cases that the scheduler admitted and rejected. (b) Candidate construction and independent verification latency against the number of pending recoveries, with the evaluated 5\nonbreakingspace ms control budget. Latencies are finite-run measurements, not WCETs.}}{17}{figure.caption.31}\protected@file@percent }
-\newlabel{fig:envelope}{{10}{17}{Predictive scheduling and control cost. (a) Latest decision time at which one AI unit of each prompt length remains admissible with four admitted TBs and zero to four pending recoveries; circles and crosses mark the prespecified physical cases that the scheduler admitted and rejected. (b) Candidate construction and independent verification latency against the number of pending recoveries, with the evaluated 5~ms control budget. Latencies are finite-run measurements, not WCETs}{figure.caption.31}{}}
-\@writefile{toc}{\contentsline {paragraph}{Takeaway 3.}{17}{section*.32}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}RQ4: Accepted schedules survive physical execution}{17}{subsection.6.4}\protected@file@percent }
-\newlabel{sec:eval-physical}{{6.4}{17}{RQ4: Accepted schedules survive physical execution}{subsection.6.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Physical evidence for the scheduling contract. (a) MPS cap-only and lifecycle diagnostics retain deadline misses. (b) The scheduler admits every offered 16--128-token Qwen unit and rejects larger classes when required recoveries consume the window. (c) Whole-path samples remain inside their mode contracts. (d) The fault campaign spans frequent execution and rare terminal events without an observed deadline or invariant violation.}}{18}{figure.caption.33}\protected@file@percent }
-\newlabel{fig:qualification}{{11}{18}{Physical evidence for the scheduling contract. (a) MPS cap-only and lifecycle diagnostics retain deadline misses. (b) The scheduler admits every offered 16--128-token Qwen unit and rejects larger classes when required recoveries consume the window. (c) Whole-path samples remain inside their mode contracts. (d) The fault campaign spans frequent execution and rare terminal events without an observed deadline or invariant violation}{figure.caption.33}{}}
-\@writefile{toc}{\contentsline {paragraph}{Takeaway 4.}{18}{section*.34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}RQ5: Faults preserve schedule ownership}{19}{subsection.6.5}\protected@file@percent }
-\newlabel{sec:eval-fault}{{6.5}{19}{RQ5: Faults preserve schedule ownership}{subsection.6.5}{}}
-\@writefile{toc}{\contentsline {paragraph}{Takeaway 5.}{19}{section*.35}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}RQ6: MPS and lifecycle define the mode}{19}{subsection.6.6}\protected@file@percent }
-\newlabel{sec:eval-mps}{{6.6}{19}{RQ6: MPS and lifecycle define the mode}{subsection.6.6}{}}
-\@writefile{toc}{\contentsline {paragraph}{Takeaway 6.}{19}{section*.36}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}RQ7: Deployment exit gates}{19}{subsection.6.7}\protected@file@percent }
-\newlabel{sec:eval-exit}{{6.7}{19}{RQ7: Deployment exit gates}{subsection.6.7}{}}
-\citation{yinyangran,cloudric,interplay,caora,haf,distributedairan}
-\citation{concordia,daris,reef,xsched,nvtaskset}
+\@writefile{toc}{\contentsline {paragraph}{Reproducibility.}{13}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Use of generative AI.}{13}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Safe AI capacity}{13}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:eval-capacity}{{4.2}{13}{Safe AI capacity}{subsection.4.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Safe AI capacity in the exact-checked capacity model (13,716 mandatory-feasible points). (a) AI capacity relative to the offline oracle as the number of cells grows. (b) AI capacity as the AI deadline tightens. (c) Radio violation probability of idle-time admission; static reservation, recovery-first, and SoftWall\xspace  never violate the all-fail schedule. Idle-time admission is omitted from (a) and (b) because the AI that it admits exceeds the safe capacity.}}{14}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:eval-capacity}{{9}{14}{Safe AI capacity in the exact-checked capacity model (13,716 mandatory-feasible points). (a) AI capacity relative to the offline oracle as the number of cells grows. (b) AI capacity as the AI deadline tightens. (c) Radio violation probability of idle-time admission; static reservation, recovery-first, and \sys never violate the all-fail schedule. Idle-time admission is omitted from (a) and (b) because the AI that it admits exceeds the safe capacity}{figure.caption.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Timely AI value on BurstGPT traces at the 362 prespecified headroom points. (a) Mean timely value relative to the fixed-placement oracle per GPU count. (b) CDF of the ratio between the timely value of SoftWall\xspace  and that of certificate-preserving recovery-first.}}{14}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:eval-trace}{{10}{14}{Timely AI value on BurstGPT traces at the 362 prespecified headroom points. (a) Mean timely value relative to the fixed-placement oracle per GPU count. (b) CDF of the ratio between the timely value of \sys and that of certificate-preserving recovery-first}{figure.caption.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Timely AI value on real traces}{14}{subsection.4.3}\protected@file@percent }
+\newlabel{sec:eval-trace}{{4.3}{14}{Timely AI value on real traces}{subsection.4.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Radio safety and AI admission under physical execution on two nodes. (a) End of the last recovery in every attempt of the bound-padded boundary diagnostic; baseline attempts are idle-time admission in E4 and the shadow launch of the unit that SoftWall\xspace  rejects in E6b. (b) Qwen units per prompt length in the two-node campaign: units executed by SoftWall\xspace  and units that only idle-time admission would launch because they break the certified recovery bound; static reservation launches none.}}{15}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:eval-safety}{{11}{15}{Radio safety and AI admission under physical execution on two nodes. (a) End of the last recovery in every attempt of the bound-padded boundary diagnostic; baseline attempts are idle-time admission in E4 and the shadow launch of the unit that \sys rejects in E6b. (b) Qwen units per prompt length in the two-node campaign: units executed by \sys and units that only idle-time admission would launch because they break the certified recovery bound; static reservation launches none}{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Radio safety under physical execution}{15}{subsection.4.4}\protected@file@percent }
+\newlabel{sec:eval-physical}{{4.4}{15}{Radio safety under physical execution}{subsection.4.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Predictive scheduling and control cost. (a) Latest decision time at which one AI unit of each prompt length remains admissible with four admitted TBs and zero to four pending recoveries; circles and crosses mark the prespecified physical cases that the scheduler admitted and rejected. (b) Candidate construction and independent verification latency against the number of pending recoveries, with the evaluated 5\nonbreakingspace ms control budget. Latencies are finite-run measurements, not WCETs.}}{16}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:envelope}{{12}{16}{Predictive scheduling and control cost. (a) Latest decision time at which one AI unit of each prompt length remains admissible with four admitted TBs and zero to four pending recoveries; circles and crosses mark the prespecified physical cases that the scheduler admitted and rejected. (b) Candidate construction and independent verification latency against the number of pending recoveries, with the evaluated 5~ms control budget. Latencies are finite-run measurements, not WCETs}{figure.caption.18}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Prediction accuracy and decision cost}{16}{subsection.4.5}\protected@file@percent }
+\newlabel{sec:eval-prediction}{{4.5}{16}{Prediction accuracy and decision cost}{subsection.4.5}{}}
+\citation{yinyangran}
+\citation{cloudric}
+\citation{concordia}
+\citation{interplay,caora,haf,distributedairan}
 \citation{arches,ocudu,smec}
-\@writefile{toc}{\contentsline {paragraph}{Takeaway 7.}{20}{section*.37}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Related Work}{20}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Limitations}{20}{section.8}\protected@file@percent }
+\citation{reef}
+\citation{xsched}
+\citation{daris}
+\citation{nvtaskset}
+\citation{ghosh1997primarybackup}
+\citation{liu1991imprecise}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Sensitivity analysis}{17}{subsection.4.6}\protected@file@percent }
+\newlabel{sec:eval-sensitivity}{{4.6}{17}{Sensitivity analysis}{subsection.4.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Related Work}{17}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Limitations}{18}{section.6}\protected@file@percent }
+\newlabel{sec:limitations}{{6}{18}{Limitations}{section.6}{}}
 \bibstyle{ACM-Reference-Format}
 \bibdata{references}
 \bibcite{tr38901}{{1}{2020}{{3GPP}}{{}}}
@@ -137,24 +118,26 @@
 \bibcite{nvtaskset}{{5}{2025}{{Bakita and Anderson}}{{}}}
 \bibcite{nrx5g}{{6}{2023}{{Cammerer et~al\mbox  {.}}}{{}}}
 \bibcite{concordia}{{7}{2021}{{Foukas and Radunovic}}{{}}}
-\bibcite{reef}{{8}{2022}{{Han et~al\mbox  {.}}}{{}}}
-\bibcite{deeprx}{{9}{2021}{{Honkala et~al\mbox  {.}}}{{}}}
-\bibcite{sionna}{{10}{2022}{{Hoydis et~al\mbox  {.}}}{{}}}
-\bibcite{haf}{{11}{2026}{{Li et~al\mbox  {.}}}{{}}}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{21}{section.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{21}{section*.39}\protected@file@percent }
-\bibcite{aerial}{{12}{2026a}{{NVIDIA Corporation}}{{}}}
-\bibcite{nvidiampS}{{13}{2026b}{{NVIDIA Corporation}}{{}}}
-\bibcite{ocudu}{{14}{2026}{{O'Shea et~al\mbox  {.}}}{{}}}
-\bibcite{qwen25}{{15}{2024}{{Qwen Team}}{{}}}
-\bibcite{arches}{{16}{2026}{{Santhi et~al\mbox  {.}}}{{}}}
-\bibcite{yinyangran}{{17}{2024a}{{Schiavo et~al\mbox  {.}}}{{}}}
-\bibcite{cloudric}{{18}{2024b}{{Schiavo et~al\mbox  {.}}}{{}}}
-\bibcite{caora}{{19}{2025a}{{Shah et~al\mbox  {.}}}{{}}}
-\bibcite{interplay}{{20}{2025b}{{Shah et~al\mbox  {.}}}{{}}}
-\bibcite{xsched}{{21}{2025}{{Shen et~al\mbox  {.}}}{{}}}
-\bibcite{burstgpt}{{22}{2025}{{Wang et~al\mbox  {.}}}{{}}}
-\bibcite{smec}{{23}{2026}{{Zhang and Kim}}{{}}}
+\bibcite{ghosh1997primarybackup}{{8}{1997}{{Ghosh et~al\mbox  {.}}}{{}}}
+\bibcite{reef}{{9}{2022}{{Han et~al\mbox  {.}}}{{}}}
+\bibcite{deeprx}{{10}{2021}{{Honkala et~al\mbox  {.}}}{{}}}
+\bibcite{sionna}{{11}{2022}{{Hoydis et~al\mbox  {.}}}{{}}}
+\bibcite{haf}{{12}{2026}{{Li et~al\mbox  {.}}}{{}}}
+\bibcite{liu1991imprecise}{{13}{1991}{{Liu et~al\mbox  {.}}}{{}}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{19}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{19}{section*.20}\protected@file@percent }
+\bibcite{aerial}{{14}{2026a}{{NVIDIA Corporation}}{{}}}
+\bibcite{nvidiampS}{{15}{2026b}{{NVIDIA Corporation}}{{}}}
+\bibcite{ocudu}{{16}{2026}{{O'Shea et~al\mbox  {.}}}{{}}}
+\bibcite{qwen25}{{17}{2024}{{Qwen Team}}{{}}}
+\bibcite{arches}{{18}{2026}{{Santhi et~al\mbox  {.}}}{{}}}
+\bibcite{yinyangran}{{19}{2024a}{{Schiavo et~al\mbox  {.}}}{{}}}
+\bibcite{cloudric}{{20}{2024b}{{Schiavo et~al\mbox  {.}}}{{}}}
+\bibcite{caora}{{21}{2025a}{{Shah et~al\mbox  {.}}}{{}}}
+\bibcite{interplay}{{22}{2025b}{{Shah et~al\mbox  {.}}}{{}}}
+\bibcite{xsched}{{23}{2025}{{Shen et~al\mbox  {.}}}{{}}}
+\bibcite{burstgpt}{{24}{2025}{{Wang et~al\mbox  {.}}}{{}}}
+\bibcite{smec}{{25}{2026}{{Zhang and Kim}}{{}}}
 \newlabel{tocindent-1}{0pt}
 \newlabel{tocindent0}{0pt}
 \newlabel{tocindent1}{9.29999pt}
@@ -162,5 +145,5 @@
 \newlabel{tocindent3}{0pt}
 \newlabel{tocindent4}{0pt}
 \newlabel{tocindent5}{0pt}
-\newlabel{TotPages}{{22}{22}{}{page.22}{}}
-\gdef \@abspage@last{22}
+\newlabel{TotPages}{{20}{20}{}{page.20}{}}
+\gdef \@abspage@last{20}

@@ -184,6 +184,34 @@ percentage~\cite{nvidiampS}. These controls choose how visible kernels share a G
 host scheduling, queueing, context lifecycle, allocation, or arbitrary kernel blocking. We therefore
 use MPS as the execution mechanism and make scheduling admission depend on a separate timing contract.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_execution.pdf}
+  \caption{Execution variability on shared A100 GPUs. (a) Radio p99 of a two-cell 273-PRB PUSCH
+  pipeline against the MPS share of a co-running Qwen prefill class: one 16-token request (light) or
+  eight 512-token requests (heavy). Lines connect run means, and bars span the runs. (b) Complementary
+  CDF of latency normalized by its median: host construction of a scheduling certificate (1,200
+  epochs), cross-GPU receiver pairs at the 4.5~ms scale with a Python and a partly native C++/CUDA path
+  (1,000 and 300 slots), and the \NRx TensorRT graph (300 slots).}
+  \Description{The left line chart shows radio p99 latency for MPS shares of 20 to 100 percent for a
+  light and a heavy AI class, with a band for the radio pipeline alone and a dashed deadline line that
+  only the heavy class at 100 percent crosses. The right log-log plot shows complementary CDFs of latency
+  divided by its median; the GPU kernel drops at one, the receiver pairs extend to about four, and host
+  certificate construction extends to about thirty.}
+  \label{fig:execution}
+\end{figure}
+
+\noindent\textbf{Measured Execution.}
+Figure~\ref{fig:execution}a co-runs Qwen prefill with a two-cell 273-PRB PUSCH pipeline and sweeps the
+Qwen MPS share. A single 16-token request keeps the radio p99 within 11.9~ms at every share, against
+8.9--10.0~ms alone. Eight 512-token requests stay within 13.9~ms up to an 80\% share but reach
+21.2--22.9~ms at 100\%, where 93 of 1,000 slots miss the 21~ms deadline. An MPS share is therefore safe
+only together with the AI class that uses it. Figure~\ref{fig:execution}b normalizes each latency by
+its median. The \NRx TensorRT graph stays within 3.5\% of its median, while end-to-end paths do not.
+Cross-GPU receiver pairs at the 4.5~ms scale reach 4.0 and 3.7 times their median with a Python and a
+partly native C++/CUDA path, and host construction of a scheduling certificate reaches 29 times its
+median. A schedule computed from nominal kernel times can therefore become invalid before it executes.
+
 \noindent\textbf{MIG-Off Reclamation.}
 MIG provides spatial separation, while fixed partitions restrict reclaiming capacity released by a
 successful optional receiver. Our MIG-off setting keeps this capacity schedulable and uses qualified
@@ -204,33 +232,32 @@ central scheduling problem.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{figures/softwall_motivation.pdf}
-  \caption{Measured recovery debt in the evaluated warm mode (1,200 epochs on two nodes). (a) Retained
-  debts at the 45~ms common cutoff for epochs with two transition-SNR TBs, and for 600 four-TB epochs
-  that join the transition TBs of consecutive measured epochs. The dotted line marks the zero debt that
-  current-idle admission sees; the dashed line marks the four recoveries that static reservation holds.
-  (b) All-fail certificate decision per AI prompt length. A unit either fits, and static reservation
-  rejects it, or breaks the all-fail recovery bound, and current-idle admission accepts it. Solid bars
-  are the measured decisions; hatched bars apply the same rule, which reproduces all 1,200 measured
-  decisions, to the joined four-TB epochs.}
-  \Description{The left grouped bar chart shows the share of epochs that retain zero to four recovery
-  debts at the common cutoff, for measured epochs with two transition-SNR TBs and for joined epochs with
-  four, with vertical lines at zero and four debts. The right chart shows, for six AI prompt lengths,
-  stacked bars that split epochs into units that fit, which static reservation rejects, and units that
-  break the recovery bound, which current-idle admission accepts, for two and four transition TBs.}
-  \label{fig:motivation}
+  \includegraphics[width=0.9\linewidth]{figures/softwall_debt.pdf}
+  \caption{Uncertain recovery debt across channels and failure rates. (a) Share of TBs that \NRx
+  (solid) and the conventional receiver (dashed) decode in three channel models; each SNR is shifted so
+  that the conventional receiver decodes half of the TBs at 0~dB. (b) Probability that an epoch with four
+  admitted TBs retains at least $k$ debts when each TB fails with probability $p$. Lines assume
+  independent failures; the band raises the correlation of the all-four event to 0.3. Circles are
+  deployment epochs that join the transition-SNR TBs of two consecutive measured epochs; squares group
+  four consecutive receiver trials.}
+  \Description{The left line chart shows decode success against SNR offset for NeuralRx and the
+  conventional receiver in a block-Rayleigh, a CDL-D, and a CDL-E channel; every curve rises from zero to
+  one hundred percent within about one decibel. The right log-log plot shows, against the per-TB failure
+  probability, the probability that at least one, two, three, or all four of four TBs fail, a shaded
+  band for correlated all-four failures, and measured markers that lie on the independent curves.}
+  \label{fig:debt}
 \end{figure}
 
 \noindent\textbf{Measured Debt.}
-Figure~\ref{fig:motivation}a measures this gap in the evaluated warm mode
-(Section~\ref{sec:methodology}). Each epoch admits four TBs. Two use a synthetic channel at the \NRx
-transition SNR, where \NRx fails on 53--56\% of TBs, and the other two always succeed. Across 1,200
-epochs on two nodes, 21.4\%, 47.8\%, and 30.8\% of epochs retain zero, one, and two recovery debts at
-the 45~ms cutoff. The two transition TBs fail almost independently: both fail in 30.8\% of epochs,
-against 29.9\% expected under independence. Joining the transition TBs of consecutive epochs therefore
-approximates epochs with four transition TBs, and 31.7\% and 7.3\% of these 600 epochs retain three and
-four debts. A current-idle scheduler sees no queued recovery at the cutoff, while a static reservation
-holds all four admitted recoveries.
+Figure~\ref{fig:debt}a decodes the same TBs with both receivers in three channel models: a synthetic
+block-Rayleigh channel with cuPHY and our TensorRT \NRx (500 TBs per point), and the Sionna CDL-D and
+CDL-E models (50 TBs per point). In every model, the \NRx success rate rises from near zero to near one
+within 1~dB of the point at which the conventional receiver decodes half of the TBs, and in CDL-D/E the
+conventional receiver also decodes TBs that \NRx misses. Link adaptation places cells near this
+transition. Whether a TB will owe a recovery is therefore uncertain until its \NRx outcome arrives.
+Figure~\ref{fig:debt}b turns a per-TB debt probability $p$ into the debt that an epoch with four
+admitted TBs retains. Deployment epochs and grouped receiver trials follow the curves for independent
+failures.
 
 \noindent\textbf{Shared Recovery.}
 Several cells can select \NRx together, and their failures can be correlated. When their conventional
@@ -242,31 +269,6 @@ Qwen is a representative external workload that creates physical GPU contention;
 AI-RAN-domain workload. Its deadline and complete launch-to-fence service form a third job class.
 Admitting it before an unresolved radio outcome is useful only when the remaining conventional jobs
 still have a feasible placement.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.9\linewidth]{figures/softwall_lease_timing.pdf}
-  \caption{Measured AI-lease timing in the evaluated warm mode (1,200 epochs on two nodes). (a) Lease
-  length per AI prompt length: the class bound plus the hatched launch-control charge, with measured
-  Qwen prefill from median to maximum. Dashed lines mark the latest lease end that leaves room for $m$
-  retained debts before the guard. (b) Complementary CDF of the host time to build the launch-time
-  certificate; the dashed line marks the launch-control charge.}
-  \Description{The left bar chart shows, for six prompt lengths, a lease bar made of the class bound and
-  a hatched charge, a dot-and-line range of measured prefill time, and five horizontal dashed lines for
-  zero to four retained debts. The right log-log plot shows the complementary CDF of certificate build
-  time with a vertical line at the launch-control charge; two epochs lie beyond it.}
-  \label{fig:lease-timing}
-\end{figure}
-
-\noindent\textbf{Measured Lease.}
-Figure~\ref{fig:lease-timing}a places each Qwen class in the 108~ms recovery window. A lease occupies
-its class bound plus a 5~ms launch-control charge, and it fits after $m$ retained debts only when it
-ends at least $25m$~ms before the guard. Measured prefill stays below every class bound. Two retained debts
-therefore exclude the 256- and 512-token classes, and three exclude every class.
-Figure~\ref{fig:lease-timing}b adds the host side. Building the launch-time certificate takes 1.06~ms
-at the median, but 2 of 1,200 epochs stall for 23.7 and 31.0~ms, beyond the charge. In an earlier
-development run without bounded revalidation, one such stall launched a 128-token lease outside its
-certified interval.
 
 \subsection{Threat model and qualification}
 
@@ -311,15 +313,13 @@ locally valid calendars on one shared lane. These failures define the state and 
 \end{figure}
 
 \noindent\textbf{Measured Consequence.}
-Figure~\ref{fig:motivation}b applies both views to the same epochs. Static reservation leaves 8~ms
-of the 108~ms recovery window and rejects every AI unit, including every unit that the all-fail
-certificate admits. Current-idle admission accepts every unit, including every unit that breaks the
-all-fail recovery bound. Each epoch therefore exposes an error of one of the two views. With two
-transition TBs, at most two debts remain and the 16- to 128-token leases still fit
-(Figure~\ref{fig:lease-timing}a). Current-idle admission errs only on 256- and 512-token units, in
-27.5\% and 34.0\% of their epochs. With four transition TBs, three or more debts remain in 39.0\% of
-epochs, and every prompt length breaks the bound there; 256- and 512-token units break in 76.5\% of
-epochs.
+Figure~\ref{fig:debt}b quantifies both failures for an epoch with four admitted TBs. Current-idle
+admission reserves no recovery and is wrong whenever one debt remains, which happens in 34\% of epochs
+at $p=0.1$. Static reservation holds four recoveries, which an epoch uses only when all four TBs fail;
+with independent failures at $p=0.1$, this happens once in $10^4$ epochs. The all-four event is also
+the most sensitive to correlation: an intra-epoch correlation of 0.1 or 0.3 makes it 16 or 116 times
+more likely. Planning for the typical debt is therefore unsafe, and planning for every admitted debt
+strands capacity until the outcomes resolve.
 
 \paragraph{Takeaway 1: current idleness is not schedulable slack.}
 An unresolved \NRx leaves mandatory work outside the current queue. A scheduler needs an explicit
@@ -363,8 +363,9 @@ obligations before optional endpoint or external-AI admission.
 
 \noindent\textbf{From Decision to Launch.}
 A certificate must remain current through control delay, outcome observation, and CUDA launch
-(Figure~\ref{fig:lease-timing}b). A lease therefore includes launch control and carries an absolute
-latest-start enforced by the worker.
+(Figure~\ref{fig:execution}b). In a development run without bounded revalidation, a 23.5~ms host stall
+launched a 128-token AI unit outside its certified interval. A lease therefore includes launch control
+and carries an absolute latest-start enforced by the worker.
 
 \noindent\textbf{From Logical Completion to Physical Retirement.}
 RPC success is not CUDA completion, and reply loss is not proof that no effect occurred. Generations,

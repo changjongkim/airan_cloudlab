@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import statistics
 from pathlib import Path
 
@@ -20,6 +21,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 
 
@@ -40,17 +42,26 @@ SOURCES = {
     "lifecycle": ROOT / "results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json",
     "production": ROOT / "results/softwall_multigpu/softwall_production_exit_gate_v3.json",
     "channel": ROOT / "results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json",
+    "receiver": ROOT / "results/softwall_same_gpu/confirm18_dual_receiver_transition_job58637416.json",
+    "mps_light": ROOT / "results/softwall_same_gpu/confirm10_paired2_qwen_s1_job58625542_d21.json",
+    "mps_light_protocol": ROOT / "results/softwall_same_gpu/confirm10_paired2_qwen_s1_protocol.json",
+    "mps_heavy": ROOT / "results/softwall_same_gpu/confirm11_paired2_qwen_heavy_s1_job58625542_d21.json",
+    "mps_heavy_protocol": ROOT / "results/softwall_same_gpu/confirm11_paired2_qwen_heavy_s1_protocol.json",
+    "native_canary": ROOT / "results/softwall_multigpu/c168_persistent_pair_canary_seed20359400_job58871654.json",
+    "kernel_analysis": ROOT / "results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json",
 }
 
-# Per-epoch records of the two-node warm campaign (Q2). The raw coordinator
-# logs are local artifacts; their digests are pinned in the Q2 summary JSON.
-# The motivation figure is drawn from a small derived file that records the
-# counts and the digests of these logs.
-MOTIVATION_RAW = [
-    ROOT / "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json",
-    ROOT / "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json",
-]
-MOTIVATION_DATA = HERE / "softwall_motivation_data.json"
+# Raw per-request records behind the two background figures. The Q2
+# coordinator digests are pinned in the Q2 summary and the native-pair digest in
+# its canary analysis; the derived file records every digest.
+BACKGROUND_RAW = {
+    "q2_dev": ROOT / "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json",
+    "q2_holdout": ROOT / "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json",
+    "pair_python": ROOT / "results/softwall_multigpu/raw/c163_raw_p2p_job58866163_controller.json",
+    "pair_native": ROOT / "results/softwall_multigpu/raw/c168_persistent_pair_canary_seed20359400_job58871654_controller.json",
+    "kernel": ROOT / "results/softwall_multigpu/raw/c163_raw_p2p_v5_stage_profile_job58868184_worker.json",
+}
+BACKGROUND_DATA = HERE / "softwall_background_data.json"
 
 
 def load(name: str):
@@ -78,6 +89,8 @@ COLORS = {
     "light_purple": "#E7DEEF",
     "red": "#D62728",
     "light_red": "#F6D3D3",
+    "brown": "#8C564B",
+    "cyan": "#17BECF",
     "gray": "#7F7F7F",
     "light_gray": "#E5E5E5",
     "dark": "#202020",
@@ -141,79 +154,146 @@ def save(fig, stem: str) -> None:
 
 
 
-def derive_motivation() -> None:
-    """Derive per-epoch debt, lease, and launch-control records from the Q2 raw logs."""
-    if not all(path.exists() for path in MOTIVATION_RAW):
+def conventional_midpoint(points: list) -> float:
+    """SNR at which the conventional receiver decodes half of the TBs (linear interpolation)."""
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        if y0 < 50.0 <= y1:
+            return x0 + (x1 - x0) * (50.0 - y0) / (y1 - y0)
+    raise ValueError("conventional waterfall does not cross 50%")
+
+
+def debt_histogram_tail(counts: dict) -> list:
+    """Share of epochs that retain at least k debts, k = 1..4."""
+    total = sum(counts.values())
+    return [sum(n for m, n in counts.items() if int(m) >= k) / total for k in range(1, 5)]
+
+
+def debt_tail_model(p: float, k: int, rho: float, n: int = 4) -> float:
+    """P(at least k of n debts remain) with per-TB probability p and intra-epoch correlation rho."""
+    if rho == 0.0:
+        return sum(math.comb(n, m) * p ** m * (1 - p) ** (n - m) for m in range(k, n + 1))
+    a = p * (1 - rho) / rho
+    b = (1 - p) * (1 - rho) / rho
+
+    def log_beta(x: float, y: float) -> float:
+        return math.lgamma(x) + math.lgamma(y) - math.lgamma(x + y)
+
+    return sum(math.comb(n, m) * math.exp(log_beta(m + a, n - m + b) - log_beta(a, b))
+               for m in range(k, n + 1))
+
+
+def derive_background() -> None:
+    """Derive the background-figure data from receiver, MPS, and runtime records."""
+    if not all(path.exists() for path in BACKGROUND_RAW.values()):
         return
     pinned = load("q2")["artifact_sha256"]
+    for key in ("q2_dev", "q2_holdout"):
+        rel = str(BACKGROUND_RAW[key].relative_to(ROOT))
+        assert pinned[rel] == sha256(BACKGROUND_RAW[key]), f"raw log differs from pinned digest: {rel}"
+    assert load("native_canary")["source_sha256"]["controller_raw"] == sha256(BACKGROUND_RAW["pair_native"])
+
+    # Receiver outcomes. Confirm18 decodes the same TBs with cuPHY and NeuralRx
+    # under a synthetic block-Rayleigh channel; the Sionna holdout does the same
+    # for CDL-D and CDL-E. The 10 dB control stratum is not part of a waterfall.
+    receiver = load("receiver")["results"]
+    channels = {"Rayleigh": [(row["snr_db"], row["trials"], row["conventional_correct"], row["neural_correct"])
+                             for row in receiver]}
+    for model in ("D", "E"):
+        strata = load("channel")["models"][model]["strata"]
+        channels[f"CDL-{model}"] = [(row["esno_db"], row["trials"], row["conventional_correct"],
+                                     row["neural_correct"]) for row in strata if row["esno_db"] < 0]
+    waterfalls = {}
+    for name, rows in channels.items():
+        midpoint = conventional_midpoint([(snr, 100.0 * conv / n) for snr, n, conv, _ in rows])
+        waterfalls[name] = {
+            "conventional_50pct_snr_db": midpoint,
+            "rows": [{"snr_db": snr, "trials": n, "conventional_correct": conv, "neural_correct": nrx}
+                     for snr, n, conv, nrx in rows],
+        }
+
+    # Receiver trials are independent channel draws; four consecutive trials
+    # form one epoch with four TBs at that SNR.
+    grouped_trials = []
+    for row in receiver:
+        records = sorted(row["records"], key=lambda record: record["trial"])
+        failures = sum(not record["neural_correct"] for record in records)
+        assert failures == row["trials"] - row["neural_correct"]
+        if 0 < failures < len(records):
+            counts = {str(m): 0 for m in range(5)}
+            for start in range(0, len(records) - len(records) % 4, 4):
+                counts[str(sum(not record["neural_correct"] for record in records[start:start + 4]))] += 1
+            grouped_trials.append({"snr_db": row["snr_db"], "p": failures / len(records),
+                                   "epochs": sum(counts.values()), "retained_debt_epochs": counts})
+
+    # Deployment epochs (Q2). The transition-SNR TBs of consecutive epochs of
+    # one run form a four-TB epoch; the first certificate build of each epoch
+    # is the host control sample.
     transition = [tuple(key) for key in load("q2_protocol")["low_snr_keys"]]
-    assert len(transition) == 2
-    debt_counts = {str(m): 0 for m in range(5)}
-    grouped_counts = {str(m): 0 for m in range(5)}
-    classes = {}
-    execution = {}
+    joined = {str(m): 0 for m in range(5)}
+    failed = outcomes = 0
     build_ms = []
-    retried = 0
-    epochs = joint = 0
-    key_failures = {"/".join(key): 0 for key in transition}
-    for path in MOTIVATION_RAW:
-        rel = str(path.relative_to(ROOT))
-        assert pinned[rel] == sha256(path), f"raw log differs from pinned digest: {rel}"
-        rounds = sorted(json.loads(path.read_text())["rounds"], key=lambda row: row["sequence"])
+    for key in ("q2_dev", "q2_holdout"):
+        rounds = sorted(json.loads(BACKGROUND_RAW[key].read_text())["rounds"], key=lambda row: row["sequence"])
         assert len(rounds) % 2 == 0
-        failed_pairs = []
+        per_epoch = []
         for row in rounds:
-            epochs += 1
-            unresolved = {tuple(key) for key in row["outcome_transition"]["unresolved_obligations"]}
-            # Only the two transition-SNR TBs ever miss the cutoff in this campaign.
+            unresolved = {tuple(item) for item in row["outcome_transition"]["unresolved_obligations"]}
             assert unresolved <= set(transition), unresolved
-            debt_counts[str(len(unresolved))] += 1
-            for key in transition:
-                key_failures["/".join(key)] += key in unresolved
-            joint += len(unresolved) == 2
-            failed_pairs.append(len(unresolved))
-            entry = classes.setdefault(str(row["context_length"]), {"offered": 0, "fits": 0, "breaks": 0})
-            entry["offered"] += 1
-            if row["lease_accepted"]:
-                entry["fits"] += 1
-                qwen = row["qwen"]
-                assert qwen["launched"] and qwen["context_length"] == row["context_length"]
-                execution.setdefault(str(row["context_length"]), []).append(round(qwen["execution_ms"], 3))
-            else:
-                assert row["lease_reason"] == "lease_breaks_global_certificate", row["lease_reason"]
-                entry["breaks"] += 1
-            attempts = row["launch_revalidation_attempts"]
-            build_ms.append(round(attempts[0]["elapsed_ms"], 3))
-            retried += len(attempts) > 1
-        # Four-transition epochs join the transition TBs of consecutive epochs
-        # (sequence 2j-1 and 2j) of the same run.
-        for first, second in zip(failed_pairs[0::2], failed_pairs[1::2]):
-            grouped_counts[str(first + second)] += 1
-    mode = load("q2_protocol")["mode"]
-    data = {
-        "schema": "softwall-motivation-data-v2",
-        "scope": ("Two-node warm P180/D155 campaign (development and holdout). Retained debts are "
-                  "the unresolved NeuralRx outcomes at the 45 ms common cutoff; only the two "
-                  "transition-SNR TBs miss it. Four-transition epochs join the transition TBs of "
-                  "consecutive measured epochs of the same run. A lease 'fits' when the certificate "
-                  "admitted it under declared bounds and 'breaks' when it violated the all-fail "
-                  "recovery schedule. Build time is the first launch-time certificate construction "
-                  "of each epoch; a construction over the launch-control bound is discarded and rebuilt."),
-        "raw_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in MOTIVATION_RAW},
-        "epochs": epochs,
-        "retained_debt_epochs": debt_counts,
-        "transition_keys": ["/".join(key) for key in transition],
-        "transition_failures": key_failures,
-        "transition_joint_failures": joint,
-        "grouped_four_transition": {"epochs": epochs // 2, "retained_debt_epochs": grouped_counts},
-        "lease_by_context": classes,
-        "mode": {name: mode[name] for name in ("ai_class_bounds_ms", "conventional_bound_ms", "expiry_ms",
-                                               "guard_ms", "launch_control_bound_ms", "nrx_bound_ms")},
-        "qwen_execution_ms": execution,
-        "certificate_build_ms": build_ms,
-        "certificate_rebuilt_epochs": retried,
+            per_epoch.append(len(unresolved))
+            failed += len(unresolved)
+            outcomes += len(transition)
+            build_ms.append(round(row["launch_revalidation_attempts"][0]["elapsed_ms"], 4))
+        for first, second in zip(per_epoch[0::2], per_epoch[1::2]):
+            joined[str(first + second)] += 1
+    deployment = {"p": failed / outcomes, "epochs": sum(joined.values()), "retained_debt_epochs": joined}
+
+    # MPS share sweeps: one two-cell PUSCH pipeline co-running a light or a
+    # heavy Qwen prefill class at each active-thread share.
+    sweeps = {}
+    for name in ("light", "heavy"):
+        protocol = load(f"mps_{name}_protocol")
+        by_share = {}
+        for row in load(f"mps_{name}"):
+            share = 0 if row["condition"] == "alone" else int(row["condition"].split("_")[0][len("cap"):])
+            entry = by_share.setdefault(str(share), {"p99_ms": [], "max_ms": [], "misses": 0, "samples": 0,
+                                                     "ai_units_per_s": []})
+            entry["p99_ms"].append(row["ran_p99_ms"])
+            entry["max_ms"].append(row["ran_max_ms"])
+            entry["misses"] += row["deadline_misses"]
+            entry["samples"] += row["samples"]
+            entry["ai_units_per_s"].append(row["ai_units_per_s"])
+        sweeps[name] = {"ai": protocol["ai"], "deadline_ms": protocol["ran"]["deadline_ms"], "by_share": by_share}
+
+    # End-to-end paths against one GPU kernel. The receiver pairs meet a 4.5 ms
+    # indication deadline; the kernel is the NeuralRx TensorRT graph.
+    pair_python = json.loads(BACKGROUND_RAW["pair_python"].read_text())
+    pair_native = json.loads(BACKGROUND_RAW["pair_native"].read_text())
+    kernel_warmup = load("kernel_analysis")["warmup_excluded"]
+    kernel = [record["stage_profile"]["stages_gpu_ms"]["tensorrt_graph"]
+              for record in json.loads(BACKGROUND_RAW["kernel"].read_text())["records"]
+              if record["sequence"] > kernel_warmup]
+    latency = {
+        "certificate_build": build_ms,
+        "pair_python": [round(record["parallel_pair_wall_ms"], 4) for record in pair_python["records"]],
+        "pair_native": [round(record["parallel_pair_wall_ms"], 4) for record in pair_native["records"]],
+        "kernel": [round(value, 5) for value in kernel],
     }
-    MOTIVATION_DATA.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
+
+    data = {
+        "schema": "softwall-background-data-v1",
+        "scope": ("Receiver waterfalls from Confirm18 (synthetic block Rayleigh, cuPHY and NeuralRx, 500 TBs per "
+                  "SNR) and the Sionna CDL-D/E holdout (50 TBs per stratum); grouped receiver trials and Q2 "
+                  "deployment epochs joined into four-TB epochs; MPS share sweeps of Confirm10/11 (two-cell "
+                  "273-PRB PUSCH, 21 ms deadline); host certificate build times of Q2; cross-GPU receiver pairs "
+                  "of C163 and C168 at the 4.5 ms scale; and the TensorRT graph stage of C163."),
+        "raw_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in BACKGROUND_RAW.values()},
+        "waterfalls": waterfalls,
+        "grouped_receiver_trials": grouped_trials,
+        "deployment_joined": deployment,
+        "mps_sweeps": sweeps,
+        "latency_ms": latency,
+    }
+    BACKGROUND_DATA.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
 
 
 def top_legend(ax, ncol: int, handles=None, labels=None) -> None:
@@ -224,182 +304,172 @@ def top_legend(ax, ncol: int, handles=None, labels=None) -> None:
               handlelength=1.5, handletextpad=0.4, columnspacing=0.9, labelspacing=0.2, borderaxespad=0.0)
 
 
-def make_motivation() -> dict:
-    """Retained debt at the cutoff and the errors of the two existing admission views."""
-    data = json.loads(MOTIVATION_DATA.read_text())
-    counts = data["retained_debt_epochs"]
-    epochs = data["epochs"]
-    assert epochs == 1200 and sum(counts.values()) == epochs
-    grouped = data["grouped_four_transition"]
-    assert grouped["epochs"] == 600 and sum(grouped["retained_debt_epochs"].values()) == 600
-    classes = data["lease_by_context"]
-    contexts = [16, 32, 64, 128, 256, 512]
-    assert all(classes[str(c)]["offered"] == 200 for c in contexts)
-    assert classes["256"]["breaks"] == 55 and classes["512"]["breaks"] == 68
+def make_execution() -> dict:
+    """GPU sharing and end-to-end latency tails."""
+    data = json.loads(BACKGROUND_DATA.read_text())
+    sweeps = data["mps_sweeps"]
+    shares = [20, 40, 60, 80, 100]
+    deadline = sweeps["heavy"]["deadline_ms"]
+    assert deadline == sweeps["light"]["deadline_ms"] == 21
+    assert sweeps["heavy"]["by_share"]["100"]["misses"] == 93
+    assert all(sweeps[name]["by_share"][str(s)]["misses"] == 0
+               for name in ("light", "heavy") for s in [0] + shares if (name, s) != ("heavy", 100))
 
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3),
-                             gridspec_kw={"width_ratios": [1.0, 1.15]})
-    fig.subplots_adjust(wspace=0.36)
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3))
+    fig.subplots_adjust(wspace=0.45)
 
-    # (a) Retained debts at the common cutoff, against the two fixed views.
+    # (a) Radio p99 against the MPS share of a co-running Qwen prefill class.
+    # Lines connect the mean over runs; bars span the runs.
     ax = axes[0]
-    xs = list(range(5))
-    width = 0.38
-    shares = [100.0 * counts[str(m)] / epochs for m in xs]
-    four = [100.0 * grouped["retained_debt_epochs"][str(m)] / grouped["epochs"] for m in xs]
-    ax.bar([x - width / 2 for x in xs], shares, width=width, color=COLORS["orange"], zorder=3,
-           label="2 transition TBs")
-    ax.bar([x + width / 2 for x in xs], four, width=width, color=COLORS["light_orange"],
-           edgecolor=COLORS["orange"], hatch="/////", linewidth=0.8, zorder=3, label="4 transition TBs")
-    # The two fixed views are labeled on their lines; the legend keeps the data.
-    ax.axvline(0, color=COLORS["red"], linestyle=":", linewidth=1.4, zorder=4)
-    ax.axvline(4, color=COLORS["gray"], linestyle="--", linewidth=1.4, zorder=4)
-    ax.text(0.1, 56, "current-idle", ha="left", va="center", fontsize=6.8, color=COLORS["red"])
-    ax.text(3.9, 56, "static", ha="right", va="center", fontsize=6.8, color=COLORS["gray"])
-    ax.set_xticks(xs)
-    ax.set_xlim(-0.6, 4.6)
-    ax.set_ylim(0, 62)
-    ax.set_yticks([0, 20, 40, 60])
-    ax.set_xlabel("retained debts at cutoff")
-    ax.set_ylabel("epochs (%)")
-    ax.grid(axis="y", **GRID)
-    ax.set_axisbelow(True)
-    top_legend(ax, ncol=1)
-    panel_label(ax, "a")
-
-    # (b) Certificate decision per AI class. A unit either fits, and static
-    # reservation wrongly rejects it, or breaks the all-fail schedule, and
-    # current-idle admission wrongly accepts it. Solid bars are the measured
-    # decisions; hatched bars apply the same rule, which reproduces all measured
-    # decisions, to the joined four-TB epochs.
-    ax = axes[1]
-    mode = data["mode"]
-    window = mode["expiry_ms"] - mode["guard_ms"] - mode["nrx_bound_ms"]
-    lease = {c: mode["ai_class_bounds_ms"][str(c)] + mode["launch_control_bound_ms"] for c in contexts}
-    rule_fits = {c: {m for m in range(5) if lease[c] + m * mode["conventional_bound_ms"] <= window}
-                 for c in contexts}
-    assert all(set(range(3)) <= rule_fits[c] for c in contexts[:4])
-    assert all(rule_fits[c] == {0, 1} for c in contexts[4:])
-    grouped_debts = grouped["retained_debt_epochs"]
-    xs = list(range(len(contexts)))
-    width = 0.3
-    static_wrong = [100.0 * classes[str(c)]["fits"] / classes[str(c)]["offered"] for c in contexts]
-    idle_wrong = [100.0 * classes[str(c)]["breaks"] / classes[str(c)]["offered"] for c in contexts]
-    four_fits = [100.0 * sum(grouped_debts[str(m)] for m in rule_fits[c]) / grouped["epochs"] for c in contexts]
-    four_breaks = [100.0 - share for share in four_fits]
-    left = [x - 0.2 for x in xs]
-    right = [x + 0.2 for x in xs]
-    ax.bar(left, static_wrong, width=width, color=COLORS["gray"], zorder=3, label="fits: static rejects it")
-    ax.bar(left, idle_wrong, bottom=static_wrong, width=width, color=COLORS["red"], zorder=3,
-           label="breaks: current-idle admits it")
-    ax.bar(right, four_fits, width=width, color=COLORS["light_gray"], edgecolor=COLORS["gray"],
-           hatch="/////", linewidth=0.8, zorder=3)
-    ax.bar(right, four_breaks, bottom=four_fits, width=width, color=COLORS["light_red"],
-           edgecolor=COLORS["red"], hatch="/////", linewidth=0.8, zorder=3)
-    ax.set_xticks(xs, [str(c) for c in contexts])
-    ax.set_ylim(0, 106)
-    ax.set_yticks([0, 50, 100])
-    ax.set_xlabel("AI prompt length (tokens)")
-    ax.set_ylabel("epochs (%)")
-    ax.grid(axis="y", **GRID)
-    ax.set_axisbelow(True)
-    top_legend(ax, ncol=1)
-    panel_label(ax, "b")
-
-    save(fig, "softwall_motivation")
-    return {
-        "epochs": epochs,
-        "retained_debt_share_pct": dict(zip(["0", "1", "2", "3", "4"], shares)),
-        "grouped_four_transition_share_pct": dict(zip(["0", "1", "2", "3", "4"], four)),
-        "static_wrong_pct": dict(zip([str(c) for c in contexts], static_wrong)),
-        "current_idle_wrong_pct": dict(zip([str(c) for c in contexts], idle_wrong)),
-        "grouped_four_transition_static_wrong_pct": dict(zip([str(c) for c in contexts], four_fits)),
-        "grouped_four_transition_current_idle_wrong_pct": dict(zip([str(c) for c in contexts], four_breaks)),
-    }
-
-
-def make_lease_timing() -> dict:
-    """AI lease length against the debt-dependent slack, and the launch-control tail."""
-    data = json.loads(MOTIVATION_DATA.read_text())
-    mode = data["mode"]
-    contexts = [16, 32, 64, 128, 256, 512]
-    bounds = [mode["ai_class_bounds_ms"][str(c)] for c in contexts]
-    charge = mode["launch_control_bound_ms"]
-    recovery = mode["conventional_bound_ms"]
-    window = mode["expiry_ms"] - mode["guard_ms"] - mode["nrx_bound_ms"]
-    assert (window, recovery, charge) == (108, 25, 5)
-    execution = data["qwen_execution_ms"]
-    assert sum(len(execution[str(c)]) for c in contexts) == 1077
-    medians = [statistics.median(execution[str(c)]) for c in contexts]
-    maxima = [max(execution[str(c)]) for c in contexts]
-    assert all(peak <= bound for peak, bound in zip(maxima, bounds))
-    build = sorted(data["certificate_build_ms"])
-    assert len(build) == 1200 and data["certificate_rebuilt_epochs"] == 2
-    tail = [value for value in build if value > charge]
-    assert len(tail) == 2
-
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3),
-                             gridspec_kw={"width_ratios": [1.6, 1.0]})
-    fig.subplots_adjust(wspace=0.42)
-
-    # (a) A lease occupies its class bound plus the launch-control charge. It
-    # fits after m retained debts when it ends before the window minus m bounds.
-    ax = axes[0]
-    xs = list(range(len(contexts)))
-    ax.bar(xs, bounds, width=0.6, color=COLORS["light_blue"], edgecolor=COLORS["blue"], linewidth=0.8,
-           zorder=3, label="class bound")
-    ax.bar(xs, [charge] * len(xs), bottom=bounds, width=0.6, color="white", edgecolor=COLORS["blue"],
-           hatch="/////", linewidth=0.8, zorder=3, label="launch-control charge")
-    ax.vlines(xs, medians, maxima, color=COLORS["dark"], linewidth=1.6, zorder=4)
-    ax.scatter(xs, medians, s=9, color=COLORS["dark"], zorder=5, label="measured execution")
-    for m in range(5):
-        slack = window - m * recovery
-        ax.axhline(slack, color=COLORS["gray"], linestyle="--", linewidth=0.9, zorder=2,
-                   label="slack after $m$ debts" if m == 0 else None)
-        ax.text(-0.95, slack, f"$m$={m}", ha="center", va="center", fontsize=6.5, color=COLORS["dark"],
-                bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.4}, zorder=2.4)
-    ax.set_xticks(xs, [str(c) for c in contexts])
-    ax.set_xlim(-1.35, len(xs) - 0.45)
-    ax.set_ylim(0, 115)
-    ax.set_yticks([0, 50, 100])
-    ax.set_xlabel("AI prompt length (tokens)")
-    ax.set_ylabel("after cutoff (ms)")
+    alone = [value for sweep in sweeps.values() for value in sweep["by_share"]["0"]["p99_ms"]]
+    ax.axhspan(min(alone), max(alone), color=COLORS["light_gray"], zorder=1, label="RAN alone")
+    ax.axhline(deadline, color=COLORS["red"], linestyle="--", linewidth=1.2, zorder=2, label="deadline")
+    summary = {}
+    for name, color, marker, label in (("light", COLORS["green"], "o", "light AI"),
+                                       ("heavy", COLORS["purple"], "s", "heavy AI")):
+        runs = [sweeps[name]["by_share"][str(s)]["p99_ms"] for s in shares]
+        ax.vlines(shares, [min(r) for r in runs], [max(r) for r in runs], color=color, linewidth=1.3, zorder=3)
+        ax.plot(shares, [statistics.mean(r) for r in runs], color=color, marker=marker, markersize=3.8,
+                linewidth=1.5, zorder=4, label=label)
+        summary[name] = {str(s): [min(r), max(r)] for s, r in zip(shares, runs)}
+    ax.set_xticks(shares)
+    ax.set_xlim(10, 110)
+    ax.set_ylim(0, 25)
+    ax.set_yticks([0, 10, 20])
+    ax.set_xlabel("AI MPS share (%)")
+    ax.set_ylabel("radio p99 (ms)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     handles, labels = ax.get_legend_handles_labels()
-    order = [labels.index(name) for name in ("class bound", "launch-control charge", "measured execution",
-                                             "slack after $m$ debts")]
+    order = [labels.index(name) for name in ("light AI", "RAN alone", "heavy AI", "deadline")]
     top_legend(ax, ncol=2, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
     panel_label(ax, "a")
 
-    # (b) Complementary CDF of the first launch-time certificate construction.
+    # (b) Complementary CDF of latency normalized by its own median.
     ax = axes[1]
-    n = len(build)
-    ax.step(build, [(n - i) / n for i in range(n)], where="pre", color=COLORS["blue"], linewidth=1.5,
-            label="certificate build")
-    ax.scatter(tail, [(n - build.index(value)) / n for value in tail], s=12, color=COLORS["blue"], zorder=4)
-    ax.axvline(charge, color=COLORS["red"], linestyle="--", linewidth=1.2, label="launch-control charge")
+    series = (("certificate_build", "host build", COLORS["orange"]),
+              ("pair_python", "Python pair", COLORS["brown"]),
+              ("pair_native", "native pair", COLORS["cyan"]),
+              ("kernel", "GPU kernel", COLORS["gray"]))
+    tails = {}
+    for key, label, color in series:
+        values = sorted(data["latency_ms"][key])
+        median = statistics.median(values)
+        n = len(values)
+        ax.step([value / median for value in values], [(n - i) / n for i in range(n)], where="pre", color=color,
+                linewidth=1.5, label=label)
+        tails[key] = {"n": n, "median_ms": median, "max_ms": values[-1], "max_over_median": values[-1] / median}
+    assert len(data["latency_ms"]["certificate_build"]) == 1200
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlim(0.7, 50)
+    ax.set_xlim(0.8, 40)
     ax.set_ylim(5e-4, 1.5)
-    ax.set_xticks([1, 5, 10, 30], ["1", "5", "10", "30"])
-    ax.set_xlabel("build time (ms)")
+    ax.set_xticks([1, 3, 10, 30], ["1", "3", "10", "30"])
+    ax.set_xlabel("latency / median")
     ax.set_ylabel("CCDF")
     ax.grid(which="major", **GRID)
     ax.set_axisbelow(True)
-    top_legend(ax, ncol=1)
+    handles, labels = ax.get_legend_handles_labels()
+    order = [labels.index(name) for name in ("host build", "native pair", "Python pair", "GPU kernel")]
+    top_legend(ax, ncol=2, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
     panel_label(ax, "b")
 
-    save(fig, "softwall_lease_timing")
+    save(fig, "softwall_execution")
+    return {"deadline_ms": deadline, "p99_range_ms": summary,
+            "alone_p99_range_ms": [min(alone), max(alone)], "tails": tails}
+
+
+def make_debt() -> dict:
+    """Receiver outcome uncertainty and the retained debt of a four-TB epoch."""
+    data = json.loads(BACKGROUND_DATA.read_text())
+    deployment = data["deployment_joined"]
+    assert deployment["epochs"] == 600
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3))
+    fig.subplots_adjust(wspace=0.6)
+
+    # (a) Waterfalls of both receivers, shifted so that the conventional
+    # receiver decodes half of the TBs at 0 dB in every channel model.
+    ax = axes[0]
+    channel_colors = {"Rayleigh": COLORS["orange"], "CDL-D": COLORS["green"], "CDL-E": COLORS["purple"]}
+    for name, color in channel_colors.items():
+        waterfall = data["waterfalls"][name]
+        offset = [row["snr_db"] - waterfall["conventional_50pct_snr_db"] for row in waterfall["rows"]]
+        neural = [100.0 * row["neural_correct"] / row["trials"] for row in waterfall["rows"]]
+        conventional = [100.0 * row["conventional_correct"] / row["trials"] for row in waterfall["rows"]]
+        ax.plot(offset, neural, color=color, linestyle="-", marker="o", markersize=3.0, linewidth=1.5, zorder=3)
+        ax.plot(offset, conventional, color=color, linestyle="--", marker="o", markersize=3.0,
+                markerfacecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xlim(-1.7, 0.6)
+    ax.set_ylim(-4, 104)
+    ax.set_yticks([0, 50, 100])
+    ax.set_xlabel("SNR offset (dB)")
+    ax.set_ylabel("TBs decoded (%)")
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
+    handles = [Line2D([], [], color=color, linewidth=2.2) for color in channel_colors.values()]
+    handles += [Line2D([], [], color=COLORS["dark"], linestyle="-", linewidth=1.5),
+                Line2D([], [], color=COLORS["dark"], linestyle="--", linewidth=1.2)]
+    labels = list(channel_colors) + ["NeuralRx", "conventional"]
+    order = [0, 3, 1, 4, 2]
+    top_legend(ax, ncol=3, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
+    panel_label(ax, "a")
+
+    # (b) Probability that an epoch with four admitted TBs retains at least k
+    # debts. Curves are independent failures; the band raises the correlation
+    # of the all-four event to 0.3. Markers are measured epochs.
+    ax = axes[1]
+    ps = [10 ** (-2 + 2 * i / 240) for i in range(240)]
+    shades = ["#BDBDBD", "#969696", "#636363", "#252525"]
+    for k in range(1, 5):
+        ax.plot(ps, [debt_tail_model(p, k, 0.0) for p in ps], color=shades[k - 1], linewidth=1.5, zorder=3)
+    ax.fill_between(ps, [debt_tail_model(p, 4, 0.0) for p in ps], [debt_tail_model(p, 4, 0.3) for p in ps],
+                    color=COLORS["light_red"], linewidth=0, zorder=2)
+    ax.plot(ps, [debt_tail_model(p, 4, 0.3) for p in ps], color=COLORS["red"], linestyle="--", linewidth=1.0,
+            zorder=2)
+    # Curve labels sit where no other curve or the band passes.
+    for k, (p, y, va) in zip(range(1, 5), ((0.013, 0.09, "bottom"), (0.04, 0.0165, "bottom"),
+                                           (0.05, 0.0008, "bottom"), (0.36, 0.0012, "top"))):
+        ax.text(p, y, "all 4" if k == 4 else f"$\\geq${k}", ha="center", va=va, fontsize=6.8,
+                color=shades[k - 1] if k > 1 else COLORS["dark"])
+    measured = [(deployment["p"], debt_histogram_tail(deployment["retained_debt_epochs"]), "o")]
+    measured += [(group["p"], debt_histogram_tail(group["retained_debt_epochs"]), "s")
+                 for group in data["grouped_receiver_trials"]]
+    for p, tail, marker in measured:
+        for k, y in zip(range(1, 5), tail):
+            if y > 0:
+                ax.scatter(p, y, marker=marker, s=16, color=shades[k - 1], edgecolor=COLORS["dark"],
+                           linewidth=0.6, zorder=5)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(0.01, 1.0)
+    ax.set_ylim(1e-4, 1.6)
+    ax.set_xticks([0.01, 0.1, 1.0], ["0.01", "0.1", "1"])
+    ax.set_xlabel("per-TB debt probability $p$")
+    ax.set_ylabel("$P$(debts $\\geq k$)")
+    ax.grid(which="major", **GRID)
+    ax.set_axisbelow(True)
+    handles = [Line2D([], [], color=shades[3], linewidth=1.5),
+               Rectangle((0, 0), 1, 1, facecolor=COLORS["light_red"], edgecolor=COLORS["red"], linestyle="--"),
+               Line2D([], [], color=shades[1], marker="o", linestyle="none", markeredgecolor=COLORS["dark"],
+                      markersize=4.5),
+               Line2D([], [], color=shades[1], marker="s", linestyle="none", markeredgecolor=COLORS["dark"],
+                      markersize=4.2)]
+    top_legend(ax, ncol=2, handles=[handles[0], handles[2], handles[1], handles[3]],
+               labels=["independent", "deployment", "correlated", "receiver trials"])
+    panel_label(ax, "b")
+
+    save(fig, "softwall_debt")
     return {
-        "window_ms": window,
-        "lease_ms": [bound + charge for bound in bounds],
-        "slack_after_m_ms": [window - m * recovery for m in range(5)],
-        "execution_median_ms": dict(zip([str(c) for c in contexts], medians)),
-        "execution_max_ms": dict(zip([str(c) for c in contexts], maxima)),
-        "build_median_ms": statistics.median(build),
-        "build_over_charge_ms": tail,
+        "waterfall_midpoints_db": {name: data["waterfalls"][name]["conventional_50pct_snr_db"]
+                                   for name in channel_colors},
+        "deployment_p": deployment["p"],
+        "deployment_tail": debt_histogram_tail(deployment["retained_debt_epochs"]),
+        "grouped_trials": [{"snr_db": g["snr_db"], "p": g["p"], "tail": debt_histogram_tail(g["retained_debt_epochs"])}
+                           for g in data["grouped_receiver_trials"]],
+        "model_at_p_0_1": {"at_least_one": debt_tail_model(0.1, 1, 0.0), "all_four": debt_tail_model(0.1, 4, 0.0),
+                           "all_four_rho_0_1": debt_tail_model(0.1, 4, 0.1),
+                           "all_four_rho_0_3": debt_tail_model(0.1, 4, 0.3)},
     }
 
 
@@ -772,9 +842,9 @@ def make_capacity_headroom() -> dict:
 
 
 def main() -> None:
-    derive_motivation()
-    motivation = make_motivation()
-    lease_timing = make_lease_timing()
+    derive_background()
+    execution = make_execution()
+    debt = make_debt()
     qualification = make_qualification_evidence()
     boundaries = make_outcome_boundaries()
     capacity = make_capacity_headroom()
@@ -782,13 +852,13 @@ def main() -> None:
         "schema": "softwall-paper-figure-manifest-v1",
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in SOURCES.values()},
         "figures": [
-            "softwall_motivation.pdf",
-            "softwall_lease_timing.pdf",
+            "softwall_execution.pdf",
+            "softwall_debt.pdf",
             "softwall_qualification_evidence.pdf",
             "softwall_outcome_boundaries.pdf",
             "softwall_capacity_headroom.pdf",
         ],
-        "derived": {"motivation": motivation, "lease_timing": lease_timing, "qualification": qualification,
+        "derived": {"execution": execution, "debt": debt, "qualification": qualification,
                     "boundaries": boundaries, "capacity": capacity},
         "claim_boundary": (
             "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; "
@@ -798,7 +868,7 @@ def main() -> None:
     }
     manifest["output_sha256"] = {
         name: sha256(HERE / name)
-        for stem in ("softwall_motivation", "softwall_lease_timing", "softwall_qualification_evidence",
+        for stem in ("softwall_execution", "softwall_debt", "softwall_qualification_evidence",
                      "softwall_outcome_boundaries", "softwall_capacity_headroom")
         for name in (f"{stem}.pdf", f"{stem}.svg")
     }

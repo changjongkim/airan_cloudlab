@@ -3,13 +3,13 @@
 % the independent verifier. Below it are two separate placements: (a) a single
 % GPU whose processes share CUDA IPC rings and (b) the evaluated multi-GPU node
 % connected by CUDA IPC handles over NVLink P2P. The numbered cross-layer steps
-% are drawn for (b); (a) uses the same steps. TB1-TB5 are the five evaluated
+% are drawn for (b); (a) uses the same seven steps. TB1-TB5 are the five evaluated
 % requests: cuPHY instance 0 owns TB1-TB3 and instance 1 owns TB4-TB5. The
 % example state is one common-cutoff epoch with timely TB1/TB2 and retained
 % TB3/TB4; TB5 was rejected at admission.
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
-  \def\swT#1{8.0+(#1-45)*0.03}
+  \def\swT#1{8.2+(#1-45)*0.027}
 
   % ---------------------------------------------------------- control layer
   \draw[layer] (0.15,4.2) rectangle (13.75,7.1);
@@ -17,82 +17,86 @@
     {Control layer: \SOFTWALLNAME{} coordinator (host process)};
 
   % Decision pages: the owner writes the outcome, the coordinator the action.
-  \draw[sub] (0.3,4.35) rectangle (3.8,6.3);
+  \draw[sub] (0.3,4.35) rectangle (3.7,6.3);
   \node[pttl, anchor=west] at (0.45,6.12) {Decision pages};
-  \node[hcell, minimum height=0.28cm, minimum width=0.60cm] at (0.38,5.92) {TB};
-  \node[hcell, minimum height=0.28cm, minimum width=1.00cm] at (0.98,5.92) {outcome};
-  \node[hcell, minimum height=0.28cm, minimum width=1.25cm] at (1.98,5.92) {action};
-  \node[hcell, minimum height=0.28cm, minimum width=0.50cm] at (3.23,5.92) {gen};
+  \node[hcell, minimum height=0.28cm, minimum width=0.58cm] at (0.38,5.92) {TB};
+  \node[hcell, minimum height=0.28cm, minimum width=0.98cm] at (0.96,5.92) {outcome};
+  \node[hcell, minimum height=0.28cm, minimum width=1.20cm] at (1.94,5.92) {action};
+  \node[hcell, minimum height=0.28cm, minimum width=0.48cm] at (3.14,5.92) {gen};
   \foreach \y/\tb/\oc/\ocf/\ac in {
       5.64/TB1/{\cmark\ timely}/okc/success,
       5.36/TB2/{\cmark\ timely}/okc/success,
       5.08/TB3/{\xmark\ CRC}/badc/recovery,
       4.80/TB4/{\xmark\ late}/badc/recovery} {
-    \node[cell, minimum height=0.28cm, minimum width=0.60cm] at (0.38,\y) {\tb};
-    \node[cell, minimum height=0.28cm, minimum width=1.00cm, fill=\ocf] at (0.98,\y) {\oc};
-    \node[cell, minimum height=0.28cm, minimum width=1.25cm] at (1.98,\y) {\ac};
-    \node[cell, minimum height=0.28cm, minimum width=0.50cm] at (3.23,\y) {$g{+}1$};
+    \node[cell, minimum height=0.28cm, minimum width=0.58cm] at (0.38,\y) {\tb};
+    \node[cell, minimum height=0.28cm, minimum width=0.98cm, fill=\ocf] at (0.96,\y) {\oc};
+    \node[cell, minimum height=0.28cm, minimum width=1.20cm] at (1.94,\y) {\ac};
+    \node[cell, minimum height=0.28cm, minimum width=0.48cm] at (3.14,\y) {$g{+}1$};
   }
 
   % Recovery-debt table after the common-cutoff batch.
-  \draw[sub] (4.1,4.35) rectangle (7.1,6.3);
-  \node[pttl, anchor=west] at (4.25,6.12) {Recovery-debt table};
-  \node[hcell, minimum height=0.28cm, minimum width=0.55cm] at (4.22,5.92) {TB};
-  \node[hcell, minimum height=0.28cm, minimum width=0.85cm] at (4.77,5.92) {cuPHY};
-  \node[hcell, minimum height=0.28cm, minimum width=0.95cm] at (5.62,5.92) {window};
-  \node[hcell, minimum height=0.28cm, minimum width=0.40cm] at (6.57,5.92) {$c$};
+  \draw[sub] (4.25,4.35) rectangle (7.1,6.3);
+  \node[pttl, anchor=west] at (4.4,6.12) {Recovery-debt table};
+  \node[hcell, minimum height=0.28cm, minimum width=0.50cm] at (4.36,5.92) {TB};
+  \node[hcell, minimum height=0.28cm, minimum width=0.82cm] at (4.86,5.92) {cuPHY};
+  \node[hcell, minimum height=0.28cm, minimum width=0.92cm] at (5.68,5.92) {window};
+  \node[hcell, minimum height=0.28cm, minimum width=0.38cm] at (6.60,5.92) {$c$};
   \foreach \y/\tb/\ph/\fc/\tc in {
       5.64/TB1/0/white/black!45,
       5.36/TB2/0/white/black!45,
       5.08/TB3/0/debtc/black,
       4.80/TB4/1/debtc/black} {
-    \node[cell, minimum height=0.28cm, minimum width=0.55cm, fill=\fc, text=\tc] at (4.22,\y) {\tb};
-    \node[cell, minimum height=0.28cm, minimum width=0.85cm, fill=\fc, text=\tc] at (4.77,\y) {\ph};
-    \node[cell, minimum height=0.28cm, minimum width=0.95cm, fill=\fc, text=\tc] at (5.62,\y) {45--153};
-    \node[cell, minimum height=0.28cm, minimum width=0.40cm, fill=\fc, text=\tc] at (6.57,\y) {25};
+    \node[cell, minimum height=0.28cm, minimum width=0.50cm, fill=\fc, text=\tc] at (4.36,\y) {\tb};
+    \node[cell, minimum height=0.28cm, minimum width=0.82cm, fill=\fc, text=\tc] at (4.86,\y) {\ph};
+    \node[cell, minimum height=0.28cm, minimum width=0.92cm, fill=\fc, text=\tc] at (5.68,\y) {45--153};
+    \node[cell, minimum height=0.28cm, minimum width=0.38cm, fill=\fc, text=\tc] at (6.60,\y) {25};
   }
-  \draw[black!60, line width=0.5pt] (4.22,5.5) -- (6.97,5.5);
-  \draw[black!60, line width=0.5pt] (4.22,5.22) -- (6.97,5.22);
+  \draw[black!60, line width=0.5pt] (4.36,5.5) -- (6.98,5.5);
+  \draw[black!60, line width=0.5pt] (4.36,5.22) -- (6.98,5.22);
 
   % Recovery-lane certificate: current state and candidate lease.
-  \draw[sub] (7.4,4.35) rectangle (11.55,6.3);
-  \node[pttl, anchor=west] at (7.55,6.12) {Recovery-lane certificate};
-  \node[font=\scriptsize, anchor=west] at (7.48,5.62) {$X_t$};
-  \node[font=\scriptsize, anchor=west] at (7.48,5.12) {$X'$};
-  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+  \draw[sub] (7.65,4.35) rectangle (11.45,6.3);
+  \node[pttl, anchor=west] at (7.8,6.12) {Recovery-lane certificate};
+  \node[font=\scriptsize, anchor=west] at (7.73,5.62) {$X_t$};
+  \node[font=\scriptsize, anchor=west] at (7.73,5.12) {$X'$};
+  \node[job, fill=recc, minimum width=0.675cm, minimum height=0.34cm, anchor=west]
     at ({\swT{45}},5.62) {TB3};
-  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+  \node[job, fill=recc, minimum width=0.675cm, minimum height=0.34cm, anchor=west]
     at ({\swT{70}},5.62) {TB4};
-  \node[job, pattern=north east lines, pattern color=black!60, minimum width=0.15cm,
+  \node[job, pattern=north east lines, pattern color=black!60, minimum width=0.135cm,
         minimum height=0.34cm, anchor=west] at ({\swT{45}},5.12) {};
-  \node[job, fill=aic, minimum width=1.2cm, minimum height=0.34cm, anchor=west]
+  \node[job, fill=aic, minimum width=1.08cm, minimum height=0.34cm, anchor=west]
     at ({\swT{50}},5.12) {AI lease};
-  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+  \node[job, fill=recc, minimum width=0.675cm, minimum height=0.34cm, anchor=west]
     at ({\swT{90}},5.12) {TB3};
-  \node[job, fill=recc, minimum width=0.75cm, minimum height=0.34cm, anchor=west]
+  \node[job, fill=recc, minimum width=0.675cm, minimum height=0.34cm, anchor=west]
     at ({\swT{115}},5.12) {TB4};
   \draw[line width=0.45pt] ({\swT{45}},4.72) -- ({\swT{160}},4.72);
   \foreach \t in {45,90,140,153} {
     \draw[line width=0.45pt] ({\swT{\t}},4.72) -- ({\swT{\t}},4.65);
-    \node[font=\tiny] at ({\swT{\t}},4.54) {\t};
   }
-  \node[font=\tiny, anchor=west] at (7.48,4.54) {ms};
+  \node[font=\tiny] at ({\swT{45}},4.54) {45 ms};
+  \node[font=\tiny] at ({\swT{90}},4.54) {90};
+  \node[font=\tiny, anchor=east] at ({\swT{140}+0.05},4.54) {140};
+  \node[font=\tiny, anchor=west] at ({\swT{153}-0.05},4.54) {153};
   \draw[guard] ({\swT{153}},4.72) -- ({\swT{153}},5.88);
   \node[font=\itshape\tiny, text=dred] at ({\swT{153}},5.98) {guard};
 
   % Independent verifier.
-  \draw[sub] (11.85,4.35) rectangle (13.7,6.3);
-  \node[pttl, anchor=north west, align=left] at (11.95,6.26) {Independent\\verifier};
-  \node[font=\itshape\tiny, anchor=west, align=left] at (11.95,5.3) {all-fail schedule,\\credits, generation};
-  \node[comp, fill=okc, draw=green!45!black, minimum width=1.5cm, minimum height=0.3cm,
-        inner sep=0.5pt] at (12.77,4.88) {commit $X'$};
-  \node[comp, fill=white, draw=dred, minimum width=1.5cm, minimum height=0.3cm,
-        inner sep=0.5pt] at (12.77,4.52) {else keep $X_t$};
+  \draw[sub] (12.0,4.35) rectangle (13.7,6.3);
+  \node[pttl, anchor=north west, align=left] at (12.08,6.26) {Independent\\verifier};
+  \node[comp, fill=okc, draw=green!45!black, minimum width=1.45cm, minimum height=0.3cm,
+        inner sep=0.5pt] at (12.85,5.05) {commit $X'$};
+  \node[comp, fill=white, draw=dred, minimum width=1.45cm, minimum height=0.3cm,
+        inner sep=0.5pt] at (12.85,4.6) {else keep $X_t$};
 
-  % Control-layer flow: batch, retime, verify.
-  \draw[arr] (3.8,5.3) -- (4.1,5.3);
-  \draw[arr] (7.1,5.3) -- (7.4,5.3);
-  \draw[arr] (11.55,5.3) -- (11.85,5.3);
+  % Control-layer steps: (2) batch, (3) retime, (4) verify.
+  \draw[arr] (3.7,5.15) -- (4.25,5.15);
+  \draw[arr] (7.1,5.15) -- (7.65,5.15);
+  \draw[arr] (11.45,5.15) -- (12.0,5.15);
+  \node[num] at (3.975,5.6) {2};
+  \node[num] at (7.375,5.6) {3};
+  \node[num] at (11.725,5.6) {4};
 
   % ------------------------------------------------ (a) Single GPU placement
   \draw[layer] (0.15,0.18) rectangle (3.7,3.8);
@@ -119,7 +123,7 @@
   \node[inote, anchor=east] at (1.4,0.34) {steps};
   \node[num, minimum size=0.27cm, font=\bfseries\tiny] at (1.6,0.34) {1};
   \node[font=\scriptsize] at (1.83,0.34) {--};
-  \node[num, minimum size=0.27cm, font=\bfseries\tiny] at (2.06,0.34) {4};
+  \node[num, minimum size=0.27cm, font=\bfseries\tiny] at (2.06,0.34) {7};
   \node[inote, anchor=west] at (2.25,0.34) {as in (b)};
 
   % ------------------------------------------------- (b) Multi-GPU placement
@@ -198,19 +202,19 @@
   \draw[arr] (4.12,3.35) -- (4.12,4.0) -- (3.35,4.0) -- (3.35,4.35);
   \node[num] at (4.47,4.0) {1};
   \node[inote, anchor=west] at (4.66,4.0) {outcome};
-  % (2) Dispatch: one action and generation per decision page.
-  \draw[arr, draw=dblue] (12.77,6.3) -- (12.77,6.52) -- (2.05,6.52) -- (2.05,6.3);
-  \node[num] at (7.0,6.52) {2};
+  % (5) Dispatch: one action and generation per decision page.
+  \draw[arr, draw=dblue] (12.85,6.3) -- (12.85,6.52) -- (2.0,6.52) -- (2.0,6.3);
+  \node[num] at (7.0,6.52) {5};
   \node[note, text=dblue, anchor=west, fill=panel, inner sep=1pt] at (7.2,6.52)
     {dispatch: action and generation};
-  % (3) One lease with an absolute latest-start.
+  % (6) One lease with an absolute latest-start.
   \draw[arr, draw=dblue] (13.3,4.35) -- (13.3,2.9);
-  \node[num] at (13.02,4.0) {3};
+  \node[num] at (13.02,4.0) {6};
   \node[inote, text=dblue, anchor=east] at (12.82,4.0) {lease, latest-start};
-  % (4) A completion or non-launch marker retires the lease.
+  % (7) A completion or non-launch marker retires the lease.
   \draw[arr, draw=green!45!black, line width=1.1pt]
     (13.475,1.35) -- (14.45,1.35) -- (14.45,5.6) -- (13.7,5.6);
-  \node[num] at (14.1,3.5) {4};
+  \node[num] at (14.1,3.5) {7};
 
   % Legend.
   \node[font=\itshape\scriptsize] at (6.95,-0.02)

@@ -49,6 +49,9 @@ SOURCES = {
     "mps_heavy_protocol": ROOT / "results/softwall_same_gpu/confirm11_paired2_qwen_heavy_s1_protocol.json",
     "native_canary": ROOT / "results/softwall_multigpu/c168_persistent_pair_canary_seed20359400_job58871654.json",
     "kernel_analysis": ROOT / "results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json",
+    "envelope_grid": ROOT / "results/softwall_multigpu/c162_feasibility_grid_v1.json",
+    "envelope_scale": ROOT / "results/softwall_multigpu/c162_scheduler_scalability_v1.json",
+    "envelope_protocol": ROOT / "results/softwall_multigpu/c162a_boundary_dev_j58860486_protocol.json",
 }
 
 # Raw per-request records behind the two background figures. The Q2
@@ -445,8 +448,8 @@ def make_debt() -> dict:
     ax.set_xlim(0.01, 1.0)
     ax.set_ylim(1e-4, 1.6)
     ax.set_xticks([0.01, 0.1, 1.0], ["0.01", "0.1", "1"])
-    ax.set_xlabel("per-TB debt probability $p$")
-    ax.set_ylabel("$P$(debts $\\geq k$)")
+    ax.set_xlabel("per-TB failure probability $p$")
+    ax.set_ylabel("$P$(recoveries $\\geq k$)")
     ax.grid(which="major", **GRID)
     ax.set_axisbelow(True)
     handles = [Line2D([], [], color=shades[3], linewidth=1.5),
@@ -471,6 +474,94 @@ def make_debt() -> dict:
                            "all_four_rho_0_1": debt_tail_model(0.1, 4, 0.1),
                            "all_four_rho_0_3": debt_tail_model(0.1, 4, 0.3)},
     }
+
+
+def make_envelope() -> dict:
+    """Certified AI-admission frontier and scheduler cost (C162)."""
+    grid = load("envelope_grid")
+    by_count = load("envelope_scale")["large_grid"]["by_debt"]
+    cases = load("envelope_protocol")["cases"]
+    contexts = [64, 128, 256, 512]
+    shades = {64: "#9ECAE1", 128: "#6BAED6", 256: "#3182BD", 512: "#08519C"}
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3), gridspec_kw={"width_ratios": [1.2, 1.0]})
+    fig.subplots_adjust(wspace=0.5)
+
+    # (a) Latest decision time at which one AI unit of each class still admits
+    # an all-fail schedule, for four admitted TBs and 0-4 pending recoveries.
+    ax = axes[0]
+    frontier = {}
+    for context in contexts:
+        points = []
+        for pending in range(5):
+            safe = [row["decision_time_ms"] for row in grid["qualified_rows"]
+                    if row["accepted_debts"] == 4 and row["unresolved_debts"] == pending
+                    and row["context_length"] == context and row["state"] == "QSU"]
+            if safe:
+                points.append((max(safe), pending))
+        frontier[str(context)] = points
+        ax.plot([x for x, _ in points], [y for _, y in points], color=shades[context], marker="o",
+                markersize=3.2, linewidth=1.5, label=f"ctx {context}")
+    physical = []
+    for case in cases:
+        if case["context_length"] is None:
+            continue
+        pending = 4 - case["success_count"]
+        name = case["case_id"].split("_")[0]
+        x = case["conservative_prediction_time_ms"]
+        physical.append({"case": name, "decision_ms": x, "pending": pending, "admit": case["expected_lease"]})
+        if case["expected_lease"]:
+            ax.scatter(x, pending, marker="o", s=22, facecolor="white", edgecolor=COLORS["green"], linewidth=1.4,
+                       zorder=5)
+        else:
+            ax.scatter(x, pending, marker="x", s=24, color=COLORS["red"], linewidth=1.5, zorder=5)
+        # Admitted cases are labeled below their marker and rejected cases above.
+        ax.text(x + 1.5, pending + (0.2 if not case["expected_lease"] else -0.2), name, fontsize=6.3,
+                color=COLORS["dark"], ha="left", va="bottom" if not case["expected_lease"] else "top")
+    ax.set_xlim(40, 120)
+    ax.set_ylim(-0.3, 4.3)
+    ax.set_yticks(range(5))
+    ax.set_xlabel("decision time after release (ms)")
+    ax.set_ylabel("pending recoveries")
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
+    handles, labels = ax.get_legend_handles_labels()
+    handles += [Line2D([], [], marker="o", linestyle="none", markerfacecolor="white",
+                       markeredgecolor=COLORS["green"], markeredgewidth=1.4, markersize=4.5),
+                Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markeredgewidth=1.5, markersize=4.5)]
+    labels += ["admitted", "rejected"]
+    top_legend(ax, ncol=3, handles=handles, labels=labels)
+    panel_label(ax, "a")
+
+    # (b) Candidate construction and verification latency against the number
+    # of pending recoveries.
+    ax = axes[1]
+    counts = [1, 2, 4, 8, 16, 32, 64]
+    decision_p99 = [by_count[str(n)]["decision_us"]["p99"] / 1000 for n in counts]
+    decision_max = [by_count[str(n)]["decision_us"]["max"] / 1000 for n in counts]
+    verify_p99 = [by_count[str(n)]["verify_us"]["p99"] / 1000 for n in counts]
+    assert round(decision_p99[-1], 3) == 1.494
+    ax.plot(counts, decision_p99, color=COLORS["blue"], marker="o", markersize=3.2, linewidth=1.5,
+            label="scheduler p99")
+    ax.plot(counts, decision_max, color=COLORS["blue"], marker="s", markersize=3.0, linewidth=1.2,
+            linestyle="--", label="scheduler max")
+    ax.plot(counts, verify_p99, color=COLORS["green"], marker="D", markersize=3.0, linewidth=1.5,
+            label="verifier p99")
+    ax.axhline(5.0, color=COLORS["red"], linestyle="--", linewidth=1.2, label="budget")
+    ax.set_xscale("log", base=2)
+    ax.set_xticks(counts, [str(n) for n in counts])
+    ax.set_xlim(0.8, 80)
+    ax.set_ylim(0, 5.6)
+    ax.set_xlabel("pending recoveries")
+    ax.set_ylabel("latency (ms)")
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
+    top_legend(ax, ncol=2)
+    panel_label(ax, "b")
+
+    save(fig, "softwall_envelope")
+    return {"frontier": frontier, "physical_cases": physical, "decision_p99_ms": decision_p99,
+            "decision_max_ms": decision_max, "verify_p99_ms": verify_p99}
 
 
 def make_qualification_evidence() -> dict:
@@ -562,7 +653,7 @@ def make_qualification_evidence() -> dict:
     # (d) Fault coverage. A log scale keeps rare terminal events visible.
     ax = axes[1, 1]
     f = fault["summary"]
-    labels = ["NeuralRx", "recoveries", "corr. all-fail", "post-fault epochs", "replay pairs", "terminal faults"]
+    labels = ["NeuralRx", "recoveries", "corr. all-fail", "post-fault periods", "replay pairs", "terminal faults"]
     counts = [f["actual_nrx_requests"], f["physical_recoveries"], f["correlated_all_fail_recoveries"],
               f["post_terminal_radio_rounds"], f["stale_duplicate_nrx_pairs"] + f["stale_duplicate_recovery_pairs"],
               f["terminal_channel_faults"]]
@@ -845,6 +936,7 @@ def main() -> None:
     derive_background()
     execution = make_execution()
     debt = make_debt()
+    envelope = make_envelope()
     qualification = make_qualification_evidence()
     boundaries = make_outcome_boundaries()
     capacity = make_capacity_headroom()
@@ -854,12 +946,13 @@ def main() -> None:
         "figures": [
             "softwall_execution.pdf",
             "softwall_debt.pdf",
+            "softwall_envelope.pdf",
             "softwall_qualification_evidence.pdf",
             "softwall_outcome_boundaries.pdf",
             "softwall_capacity_headroom.pdf",
         ],
-        "derived": {"execution": execution, "debt": debt, "qualification": qualification,
-                    "boundaries": boundaries, "capacity": capacity},
+        "derived": {"execution": execution, "debt": debt, "envelope": envelope,
+                    "qualification": qualification, "boundaries": boundaries, "capacity": capacity},
         "claim_boundary": (
             "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; "
             "sample maxima are not WCET; the 4.5 ms production gate remains failed; and Sionna CDL-D/E "
@@ -868,8 +961,9 @@ def main() -> None:
     }
     manifest["output_sha256"] = {
         name: sha256(HERE / name)
-        for stem in ("softwall_execution", "softwall_debt", "softwall_qualification_evidence",
-                     "softwall_outcome_boundaries", "softwall_capacity_headroom")
+        for stem in ("softwall_execution", "softwall_debt", "softwall_envelope",
+                     "softwall_qualification_evidence", "softwall_outcome_boundaries",
+                     "softwall_capacity_headroom")
         for name in (f"{stem}.pdf", f"{stem}.svg")
     }
     (HERE / "softwall_figure_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

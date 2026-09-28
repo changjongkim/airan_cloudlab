@@ -64,16 +64,16 @@
 \begin{abstract}
 As AI-RAN platforms share GPUs between radio processing and AI inference, neural receivers introduce
 work that GPU schedulers do not track. Until its neural receiver (\NRx) completes, an uplink transport
-block (TB) owes a conventional recovery that is absent from the GPU queue but mandatory if the receiver
-fails. This paper presents \sys, a certified multi-GPU scheduler that treats each unresolved recovery
-as recovery debt. \sys admits speculative receivers, retimes recovery, and leases GPU time to external
+block (TB) has a pending recovery: a conventional decoding that is absent from the GPU queue but
+mandatory if the receiver fails. This paper presents \sys, a certified multi-GPU scheduler that tracks
+these pending recoveries explicitly. \sys admits speculative receivers, retimes recovery, and leases GPU time to external
 AI only when an independent verifier confirms that every unresolved TB can still recover if all of them
 fail. \sys preserves this certificate through CUDA launch, inter-GPU transport, and physical completion
 with bounded revalidation, latest-start enforcement, and fence-confirmed retirement. On two four-GPU A100
 nodes under a qualified synthetic timing contract, \sys records 0/120 safety violations in physical
-boundary diagnostics, where debt-blind admission records 40/40. Across 13,716 feasible capacity-model
+boundary diagnostics, where idle-time admission records 40/40. Across 13,716 feasible capacity-model
 points, \sys admits more AI capacity than static reservation at 26.2\%, and its p99 decision time is
-1.494~ms at 64 debts.
+1.494~ms at 64 pending recoveries.
 \end{abstract}
 
 \maketitle
@@ -111,9 +111,9 @@ reserves every possible recovery leaves the capacity released by \NRx success un
 \toprule
 System & Primary protected/allocated object & State not exposed to its scheduler \\
 \midrule
-YinYangRAN, CloudRIC, Concordia & Fraction, queue/deadline, or reserved capacity & Unqueued same-TB recovery debt \\
+YinYangRAN, CloudRIC, Concordia & Fraction, queue/deadline, or reserved capacity & Unqueued same-TB pending recovery \\
 DARIS, REEF, XSched, nvtaskset & GPU stage, kernel, context, or partition & Radio recovery, transport ownership, and single commit as one certificate \\
-ARCHES, OCUDU, SMEC & PHY choice, timing class, or edge SLO & Cross-instance all-fail debt plus atomic external-AI lease \\
+ARCHES, OCUDU, SMEC & PHY choice, timing class, or edge SLO & Cross-instance all-fail recovery set plus atomic external-AI lease \\
 \sys & Same-TB recovery obligation & Explicitly modeled, certified, and carried through physical completion \\
 \bottomrule
 \end{tabularx}
@@ -132,9 +132,9 @@ recovery that a speculative receiver may create nor keep an admission decision v
 launch and completion, where a decision that is valid when made can become invalid before it executes.
 
 In this paper, we present \sys, a certified multi-GPU scheduler for conditional recovery in AI-RAN.
-\sys represents each unresolved recovery as \emph{recovery debt} and accepts a scheduling decision
+\sys tracks each unresolved recovery as a \emph{pending recovery} and accepts a scheduling decision
 only when an independent verifier confirms that every unresolved TB can still recover if all of them
-fail. Specifically, \sys introduces 1) a debt-aware scheduling model that jointly decides \NRx
+fail. Specifically, \sys introduces 1) a recovery-aware scheduling model that jointly decides \NRx
 admission, recovery timing, and external-AI leases over one obligation set shared by several cuPHY
 instances, 2) a certificate-to-execution refinement that keeps each accepted decision valid through
 CUDA launch, IPC/P2P transport, and physical completion with bounded revalidation, absolute
@@ -142,10 +142,10 @@ latest-start enforcement, atomic outcome batches, and fence-confirmed retirement
 provenance-qualified feasibility envelope that classifies each state as qualified-safe-useful (\QSU),
 qualified-safe-no-slack (\QSN), mandatory-infeasible (\MI), or unqualified (\UQ) before execution. Our
 evaluation on two four-GPU A100 nodes under a qualified synthetic timing contract shows that physical
-boundary diagnostics record 0/120 safety violations for \sys and 40/40 for debt-blind admission. Across
+boundary diagnostics record 0/120 safety violations for \sys and 40/40 for idle-time admission. Across
 13,716 feasible capacity-model points, \sys admits more AI capacity than static reservation at 3,600
 (26.2\%). The scheduler matches an exact checker on 16,023 states, and its p99 decision time is
-1.494~ms at 64 debts. In the original trace mode, \sys and certificate-preserving recovery-first
+1.494~ms at 64 pending recoveries. In the original trace mode, \sys and certificate-preserving recovery-first
 deliver the same 349,387 timely tokens.
 
 \section{Background and Motivation}
@@ -159,12 +159,12 @@ of work: optional neural reception, mandatory conventional reception, and extern
 \begin{figure}[t]
   \centering
   \input{figures/softwall_airan_background.tex}
-  \caption{One uplink TB in one 180~ms release period. Until the 45~ms common cutoff, the TB owes a
-  conventional recovery that no GPU queue contains. A failed, late, or missing \NRx outcome requires
+  \caption{One uplink TB in one 180~ms release period. Until the 45~ms \NRx deadline, the TB has a
+  pending conventional recovery that no GPU queue contains. A failed, late, or missing \NRx outcome requires
   one cuPHY recovery that ends before the guard.}
   \Description{Three rows show the RAN owner, the NeuralRx endpoint, and the recovery lane over one
-  release period. A hatched recovery-debt bar spans release to the common cutoff. The owner commits
-  either the neural result after the cutoff or the conventional result after one recovery placed in a
+  release period. A hatched pending-recovery bar spans release to the NeuralRx deadline. The owner
+  commits either the neural result after the deadline or the conventional result after one recovery placed in a
   window that ends at the guard.}
   \label{fig:airan-background}
 \end{figure}
@@ -173,7 +173,7 @@ of work: optional neural reception, mandatory conventional reception, and extern
 An uplink TB is decoded by a conventional receiver, such as the cuPHY physical uplink shared channel
 (PUSCH) pipeline~\cite{aerial}, or by a neural receiver~\cite{deeprx,nrx5g}.
 In our evaluated contract (Figure~\ref{fig:airan-background}), a TB commits its \NRx result when the
-result passes its cyclic redundancy check (CRC) by the common cutoff; otherwise, one conventional
+result passes its cyclic redundancy check (CRC) by the \NRx deadline; otherwise, one conventional
 recovery must complete before the guard. Figure~\ref{fig:debt}a shows that this outcome is uncertain. Across a synthetic block-Rayleigh channel with 500 TBs per point and the CDL-D and CDL-E
 models~\cite{tr38901,sionna} with 50 TBs per point, the \NRx success rate rises from near 0\% to near
 100\% within 1~dB of the point at which the conventional receiver decodes half of the TBs. In CDL-D and
@@ -184,12 +184,12 @@ near this transition.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_debt.pdf}
-  \caption{Uncertain recovery debt across channels and failure rates. (a) Share of TBs that \NRx
+  \caption{Uncertain recovery need across channels and failure rates. (a) Share of TBs that \NRx
   (solid) and the conventional receiver (dashed) decode in three channel models; each SNR is shifted so
-  that the conventional receiver decodes half of the TBs at 0~dB. (b) Probability that an epoch with four
-  admitted TBs retains at least $k$ debts when each TB fails with probability $p$. Lines assume
+  that the conventional receiver decodes half of the TBs at 0~dB. (b) Probability that a period with four
+  admitted TBs requires at least $k$ recoveries when each TB fails with probability $p$. Lines assume
   independent failures; the band raises the correlation of the all-four event to 0.3. Circles are
-  deployment epochs that join the transition-SNR TBs of two consecutive measured epochs; squares group
+  deployment periods that join the transition-SNR TBs of two consecutive measured periods; squares group
   four consecutive receiver trials.}
   \Description{The left line chart shows decode success against SNR offset for NeuralRx and the
   conventional receiver in a block-Rayleigh, a CDL-D, and a CDL-E channel; every curve rises from zero to
@@ -217,7 +217,7 @@ miss the 21~ms deadline. Thus, an MPS share is safe only for the AI class under 
   pipeline against the MPS share of a co-running Qwen prefill class: one 16-token request (light) or
   eight 512-token requests (heavy). Lines connect run means, and bars span the runs. (b) Complementary
   CDF of latency normalized by its median: host construction of a scheduling certificate (1,200
-  epochs), cross-GPU receiver pairs at the 4.5~ms scale with a Python and a partly native C++/CUDA path
+  periods), cross-GPU receiver pairs at the 4.5~ms scale with a Python and a partly native C++/CUDA path
   (1,000 and 300 slots), and the \NRx TensorRT graph (300 slots).}
   \Description{The left line chart shows radio p99 latency for MPS shares of 20 to 100 percent for a
   light and a heavy AI class, with a band for the radio pipeline alone and a dashed deadline line that
@@ -244,25 +244,26 @@ public designs do not schedule the conditional recovery that neural reception cr
 
 Existing schedulers admit AI against the work in GPU queues or against a fixed reservation
 ~\cite{yinyangran,cloudric,concordia}. For neural reception, this admission exposes three challenges:
-uncertain recovery debt, recovery shared by several cuPHY instances, and decisions that must remain
+uncertain recovery need, recovery shared by several cuPHY instances, and decisions that must remain
 valid through execution.
 
-\noindent\textbf{Uncertain Recovery Debt.}
+\noindent\textbf{Pending Recovery.}
 Before the \NRx outcome resolves, the conventional recovery of a TB is conditional in the observed
-execution and mandatory in the failure branch. We call this obligation \emph{recovery debt}.
-Figure~\ref{fig:debt}b converts a per-TB debt probability $p$ into the debt that an epoch with four
-admitted TBs retains; measured epochs follow the curves for independent failures. Current-idle admission reserves no recovery and is wrong whenever one debt
-remains, which occurs in 34\% of epochs at $p=0.1$. Static reservation holds four recoveries, which an
-epoch uses only when all four TBs fail, once in $10^4$ epochs under independent failures. An
-intra-epoch failure correlation of 0.1 or 0.3 makes this all-four event 16 or 116 times more likely.
-Thus, planning for the typical debt is unsafe, and holding every reservation until all outcomes resolve
-leaves released capacity unused.
+execution and mandatory in the failure branch. We call it a \emph{pending recovery}.
+Figure~\ref{fig:debt}b converts a per-TB failure probability $p$ into the number of recoveries that a
+release period with four admitted TBs requires; measured periods follow the curves for independent
+failures. Idle-time admission reserves no recovery and is wrong whenever one recovery is required,
+which occurs in 34\% of periods at $p=0.1$. Static reservation holds four recoveries, which a period
+uses only when all four TBs fail, once in $10^4$ periods under independent failures. A within-period
+failure correlation of 0.1 or 0.3 makes this all-four event 16 or 116 times more likely. Thus,
+planning for the typical number of recoveries is unsafe, and holding every reservation until all
+outcomes resolve leaves released capacity unused.
 
 \begin{figure}[t]
   \centering
   \input{figures/softwall_scheduling_problem.tex}
-  \caption{Scheduling failures after two timely successes (TB1, TB2). (a) Current-idle admission
-  pushes a retained recovery past the guard. (b) Static reservation rejects a 128-token AI unit that fits
+  \caption{Scheduling failures after two timely successes (TB1, TB2). (a) Idle-time admission
+  pushes a required recovery past the guard. (b) Static reservation rejects a 128-token AI unit that fits
   once the successful reservations are released. (c) Per-instance certificates claim one lane interval.}
   \Description{Three lane timelines between 45 and 170 milliseconds with the guard and expiry marked.
   The first shows an AI unit followed by two recoveries whose second crosses the guard. The second
@@ -273,8 +274,8 @@ leaves released capacity unused.
 
 \noindent\textbf{Scheduling Failures.}
 Figure~\ref{fig:scheduling-problem} shows three scheduling failures after two timely successes in our
-evaluated contract. Current-idle admission sees an empty queue at the 45~ms cutoff, admits a 256-token
-AI unit, and pushes a retained recovery past the guard. Static reservation keeps the reservations of
+evaluated contract. Idle-time admission sees an empty queue at the 45~ms \NRx deadline, admits a
+256-token AI unit, and pushes a required recovery past the guard. Static reservation keeps the reservations of
 the two successful TBs and rejects a 128-token AI unit that fits after they are released. Per-instance
 certificates are each valid for one cuPHY instance, but they claim the same interval on the shared
 recovery lane. Thus, a scheduler must represent unresolved recovery explicitly, recompute the schedule
@@ -297,7 +298,7 @@ Counterexample & Broken assumption & Required refinement \\
 \midrule
 Local-safe/global-unsafe & Local certificates compose on a shared lane & Global obligation set and certificate \\
 Dispatch tail & A certificate stays fresh until launch & Bounded revalidation and physical latest-start \\
-Sequential cutoff replay & Simultaneous outcomes may apply in any order & Atomic outcome batch \\
+Sequential outcome replay & Simultaneous outcomes may apply in any order & Atomic outcome batch \\
 Fixed AI lease & Execution time covers launch control & Control charge and AI blackout \\
 Reply loss after effect & Retrying ambiguity is harmless & Generation quarantine and fail-closed admission \\
 Two outstanding prepares & RPC at-most-once implies visible ownership & Single unlaunched-token invariant \\
@@ -341,28 +342,28 @@ unqualified workloads remain outside the claim. Mandatory offered load without a
 \label{sec:design-overall}
 
 Figure~\ref{fig:overall} shows the scheduling loop on its runtime objects. Persistent MPS workers own
-GPU work, while one host coordinator owns the per-TB decision pages, the recovery-debt table, the
-recovery-lane certificate, and the verifier. Seven numbered steps follow one epoch through the
-four control objects, and the shared lane runs retained recoveries in certificate order. The same control
-layer serves a single GPU, where CUDA IPC rings connect the workers, and several GPUs, where retained
-debts from different cuPHY instances share one recovery lane over NVLink P2P. Both placements use the
+GPU work, while one host coordinator owns the per-TB decision pages, the pending-recovery table, the
+recovery-lane certificate, and the verifier. Seven numbered steps follow one release period through the
+four control objects, and the shared lane runs required recoveries in certificate order. The same control
+layer serves a single GPU, where CUDA IPC rings connect the workers, and several GPUs, where the
+required recoveries of different cuPHY instances share one recovery lane over NVLink P2P. Both placements use the
 same per-TB decision pages, AI lease RPC, and completion markers, and the figure draws the numbered
 steps for the evaluated multi-GPU placement.
 
 \begin{figure}[t]
   \centering
   \input{figures/softwall_overall_architecture.tex}
-  \caption{\sys architecture for one epoch. (1) Each owner publishes its \NRx outcome to a decision
-  page. (2) One common-cutoff batch updates the recovery-debt table. (3) The scheduler retimes retained
-  debts around a candidate AI lease. (4) The independent verifier checks the all-fail schedule, credits, and generation, and commits
+  \caption{\sys architecture for one release period. (1) Each owner publishes its \NRx outcome to a
+  decision page. (2) One outcome batch at the \NRx deadline updates the pending-recovery table. (3) The
+  scheduler retimes the required recoveries around a candidate AI lease. (4) The independent verifier checks the all-fail schedule, credits, and generation, and commits
   $X'$ or keeps $X_t$. (5) The
   coordinator publishes each action with its generation and (6) sends the lease with an absolute
-  latest-start. (7) A completion or non-launch marker retires the lease. The shared lane runs retained
+  latest-start. (7) A completion or non-launch marker retires the lease. The shared lane runs required
   recoveries in certificate order. The steps are drawn for the evaluated multi-GPU placement (b); the
   single-GPU placement (a) exchanges IQ, LLR, and TB buffers through CUDA IPC rings and uses the same
   steps. In (b), cuPHY instance 0 owns TB1--TB3, instance 1 owns TB4 and TB5, and ellipses mark further
   TBs.}
-  \Description{A control layer contains a decision-page table, a recovery-debt table, a recovery-lane
+  \Description{A control layer contains a decision-page table, a pending-recovery table, a recovery-lane
   calendar with a candidate AI lease, and an independent verifier. Below it are two separate
   placements: (a) one GPU whose cuPHY, NeuralRx, recovery, and AI processes share CUDA IPC rings and
   (b) a multi-GPU node with two cuPHY GPUs, a NeuralRx GPU with input, TensorRT, and
@@ -402,7 +403,7 @@ heuristic.
 \label{sec:design-recovery}
 
 An unresolved \NRx is a scheduling obligation even when no conventional kernel is queued. SoftWall
-records that obligation as recovery debt
+records that obligation as a pending recovery
 \begin{equation}
  R_i=(a_i(t),d_i-g_i,c_i,h_i),
 \end{equation}
@@ -418,7 +419,7 @@ $F\subseteq U(t)$.
 \end{proposition}
 \begin{proof}
 Delete successful requests from the all-fail schedule. Release, expiry, capacity, and non-overlap
-constraints of every retained interval remain unchanged.
+constraints of every remaining interval remain unchanged.
 \end{proof}
 The reduction replaces $2^{|U|}$ outcome schedules with one executable witness. It does not apply when
 success creates new mandatory work or changes another service bound; that case needs a new mode.
@@ -427,21 +428,21 @@ success creates new mandatory work or changes another service bound; that case n
   \centering
   \input{figures/softwall_atomic_replan.tex}
   \caption{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB
-  and rejects TB5; the 45~ms batch deletes two debts in one generation. (b) The verifier commits the
+  and rejects TB5; the 45~ms batch cancels two pending recoveries in one generation. (b) The verifier commits the
   128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the
   guard. AI units are Qwen prefill requests; hatching marks the 5~ms launch-control charge.}
   \Description{Four lane timelines between 45 and 170 milliseconds. The first shows four reserved
-  recoveries and a rejected fifth request that crosses the guard. The second shows two retained
+  recoveries and a rejected fifth request that crosses the guard. The second shows two required
   recoveries and released capacity until the guard. The third and fourth show a 128-token and a
-  256-token AI lease followed by the retained recoveries; the first is committed and the second,
+  256-token AI lease followed by the required recoveries; the first is committed and the second,
   which crosses the guard, is rejected.}
   \label{fig:atomic-replan}
 \end{figure}
 
 \paragraph{Mandatory-first transition.}
 Figure~\ref{fig:atomic-replan}a reserves $R_i$ before optional dispatch. Therefore, endpoint rejection never
-removes the conventional path. All outcomes observed at one cutoff enter one transition: timely
-success deletes debt, while failure, lateness, and missing evidence retain it. Sequential replay is
+removes the conventional path. All outcomes observed at one \NRx deadline enter one transition: a
+timely success cancels its pending recovery, while failure, lateness, and missing evidence keep it. Sequential replay is
 invalid because it can manufacture intermediate states that did not coexist.
 
 \paragraph{Global atomic state.}
@@ -528,9 +529,9 @@ provable.
 \textbf{Algorithm 1: \textsc{CertifyEvent}$(X_t,\mathcal{E}_t,\mathcal{A}_t,\pi)$}
 \begin{enumerate}[leftmargin=1.6em,itemsep=1pt,topsep=2pt]
   \item If any required bound disagrees with $\pi$, return \UQ and disable new optional work.
-  \item Apply the event batch $\mathcal{E}_t$ atomically: reserve debt for new radio jobs; delete debt
-        only for timely successes; retain debt for fail, late, or missing evidence.
-  \item Place every retained debt on its qualified physical lane. If no all-fail calendar exists,
+  \item Apply the event batch $\mathcal{E}_t$ atomically: add a pending recovery for each new radio job;
+        cancel it only for a timely success; keep it for failure, lateness, or missing evidence.
+  \item Place every required recovery on its qualified physical lane. If no all-fail calendar exists,
         return \MI and reject new \NRx and AI admission.
   \item Visit only visible AI jobs in deterministic policy order. For each job, construct $X'$ by
         jointly retiming recovery and adding one complete AI lease.
@@ -560,33 +561,33 @@ is safe under the sufficient, mode-specific condition
 The right side is the first recovery start retained by the certificate. Therefore, the inequality charges
 decision and launch delay rather than assuming immediate dispatch.
 
-\noindent\textbf{Current Idleness.}
-\begin{proposition}[Current idleness is insufficient]
+\noindent\textbf{Idle Time.}
+\begin{proposition}[Idle time is insufficient]
 On one non-preemptive lane with common guard $D$, unresolved bounds $c_1,\ldots,c_m$, and AI bound
 $b_{\mathrm{eff}}$, suppose mandatory-only execution is feasible but
 \begin{equation}
-  t+b_{\mathrm{eff}}+\sum_{i=1}^{m}c_i>D. \label{eq:debtblind}
+  t+b_{\mathrm{eff}}+\sum_{i=1}^{m}c_i>D. \label{eq:idletime}
 \end{equation}
-Then admitting AI from current idleness while ignoring unresolved recovery cannot guarantee the radio
+Then admitting AI into idle time while ignoring pending recovery cannot guarantee the radio
 contract.
 \end{proposition}
 \begin{proof}
 Choose the allowed realization in which AI and every recovery take their declared bounds. The final
-recovery completes after $D$ by Equation~\ref{eq:debtblind}; present idleness does not erase future
+recovery completes after $D$ by Equation~\ref{eq:idletime}; present idle time does not erase future
 mandatory demand.
 \end{proof}
 
 \paragraph{Safe reclaimable capacity.}
 The same invariant predicts the capacity that the algorithm may expose. Let $W$ be the guard window,
-$L$ the AI deadline, $a$ one complete AI transaction, $c$ one recovery bound, $M_g$ potential static
-debts, and $F_g$ realized debts on lane $g$. With $[x]_+=\max(0,x)$,
+$L$ the AI deadline, $a$ one complete AI transaction, $c$ one recovery bound, $M_g$ pending recoveries that
+static reservation holds, and $F_g$ required recoveries on lane $g$. With $[x]_+=\max(0,x)$,
 \begin{align}
  K_{\mathrm{static}}&=\sum_g\left\lfloor\frac{[\min(L,W-M_gc)]_+}{a}\right\rfloor,\\
  K_{\mathrm{RF}}&=\sum_g\left\lfloor\frac{[\min(L,W)-F_gc]_+}{a}\right\rfloor,\\
  K_{\sys}&=\sum_g\left\lfloor\frac{[\min(L,W-F_gc)]_+}{a}\right\rfloor. \label{eq:capacity}
 \end{align}
-Static holds all potential debt; recovery-first executes realized debt before AI; SoftWall may put AI
-first while retaining $F_gc$ before the guard. Multi-class BurstGPT batches use exact subset, lane,
+Static reservation holds every pending recovery; recovery-first executes required recoveries before
+AI; \sys may put AI first while keeping $F_gc$ before the guard. Multi-class BurstGPT batches use exact subset, lane,
 order, and recovery-insertion enumeration. Failure probabilities predict expected value, while the
 all-fail safety certificate is distribution-free.
 
@@ -697,7 +698,7 @@ claim it can support.
 \toprule
 RQ & Question & Decision criterion \\
 \midrule
-1 & What scheduling advantage does debt awareness provide? & More safe capacity than static reservation and no debt-blind false-safe admission. \\
+1 & What scheduling advantage does tracking pending recovery provide? & More safe capacity than static reservation and no false-safe idle-time admission. \\
 2 & How good are the online decisions? & Gap to exact/oracle schedules and sensitivity to each scheduling lever. \\
 3 & Can the scheduler predict and scale? & Exact, retrospective, and unopened-boundary decisions agree; construction stays bounded. \\
 4 & Does the accepted schedule survive physical execution? & Radio, recovery, AI, credit, and commit gates all pass. \\
@@ -757,7 +758,7 @@ AI-first placement only with a valid witness. The offline oracle sees the realiz
 an unattainable upper bound.
 
 \noindent\textbf{Diagnostic Baselines.}
-Debt-blind current-idle admission, local-only certificates, and uncontrolled MPS diagnose broken
+Idle-time admission, local-only certificates, and uncontrolled MPS diagnose broken
 assumptions. They are not safe performance comparators and are not used to claim throughput gains.
 
 \paragraph{Reproducibility.}
@@ -776,7 +777,7 @@ produced no experimental measurement or ground-truth label.
 \label{sec:evaluation}
 
 We present scheduling outcomes before implementation qualification. Figure~\ref{fig:capacity} answers
-the two headline questions: where debt-aware scheduling creates safe capacity, and which decision
+the two headline questions: where recovery-aware scheduling creates safe capacity, and which decision
 lever accounts for the remaining oracle gap. Later experiments establish that these schedules remain
 valid when mapped to CUDA workers, transport ownership, and failure handling.
 
@@ -795,11 +796,11 @@ valid when mapped to CUDA workers, transport ownership, and failure handling.
   \label{fig:capacity}
 \end{figure}
 
-\subsection{RQ1: Debt awareness expands safe capacity}
+\subsection{RQ1: Tracking pending recovery expands safe capacity}
 \label{sec:eval-capacity}
 
 Conditional recovery creates a three-way scheduling tradeoff. Static reservation is safe but can
-strand capacity, debt-blind admission uses that capacity without protecting radio recovery, and
+strand capacity, idle-time admission uses that capacity without protecting radio recovery, and
 \sys reclaims it only when a witness schedule exists.
 
 % provenance: C167_CAPACITY
@@ -808,18 +809,19 @@ The closed-form and exact multi-class capacity model covers 21,384 points over c
 outcome probability and correlation, expiry, recovery bound, AI class, deadline, and offered load.
 Mandatory recovery is infeasible at 7,668 points. Among the 13,716 feasible points, \sys exceeds
 static reservation at 3,600 (26.2\%), recovery-first trails its oracle by at least 5\% at 2,604
-(19.0\%), and debt-blind admission has positive violation probability at 4,338 (31.6\%). Exhaustive
+(19.0\%), and idle-time admission has positive violation probability at 4,338 (31.6\%). Exhaustive
 order checking agrees with the compact capacity calculation in all 5,376 checked cases. The
 representative point in Figure~\ref{fig:capacity}a shows that conditional release increases safe
 capacity while static reservation remains at zero.
 
 % provenance: C162_NECESSITY
 \noindent\textbf{What the certificate prevents.}
-E4 leaves two debts at 45~ms and exposes a context-256 request. Debt-blind admission permits a
-bound-respecting completion 12~ms beyond the 153~ms guard. E6b leaves one debt and makes context-64
+E4 leaves two required recoveries at 45~ms and exposes a context-256 request. Idle-time admission
+permits a
+bound-respecting completion 12~ms beyond the 153~ms guard. E6b leaves one required recovery and makes context-64
 unsafe at 89~ms by one millisecond. A prespecified diagnostic makes these allowed service vectors
 physical as a bound-padded diagnostic. Across two independent nodes,
-debt-blind E4 violates both guard and deadline in 40/40 selected rounds, and executing rejected E6b as
+idle-time admission in E4 violates both guard and deadline in 40/40 selected rounds, and executing rejected E6b as
 a shadow violates the guard in 40/40. \sys rejects both, admits the adjacent 88~ms point, and records
 0/120 selected safety violations (95\% rule-of-three upper bound 2.5\%). Jointly bound-valid counts are
 39/39, 39/39, and 0/119, respectively.
@@ -832,7 +834,7 @@ campaign is a necessity diagnostic for the declared contract, not a production-r
 claim.
 
 \paragraph{Takeaway 1.}
-Recovery debt is actionable scheduling state. It converts the unsafe capacity used by current-idle
+Pending recovery is actionable scheduling state. It converts the unsafe capacity used by idle-time
 admission and the stranded capacity held by static reservation into capacity that can be admitted with
 an explicit all-fail witness.
 
@@ -857,18 +859,18 @@ scheduling headroom in an intermediate deadline band.
 A certificate-preserving EDF/value AI-first greedy lies within 5\% of the fixed-placement exact oracle
 at 361 of the 362 advanced points; the remaining point has a 7.02\% gap. Flexible recovery placement
 has a positive upper-bound gain at 203 points: 0/102 one-GPU, 145/175 two-GPU, and 58/85 four-GPU
-points, with a 10.64\% median positive gain. Selecting the frozen Sionna strata to minimize debt under
-zero or 0.02 absolute radio-value loss reduces no recovery debt. The result localizes remaining
+points, with a 10.64\% median positive gain. Selecting the frozen Sionna strata to minimize pending recoveries
+under zero or 0.02 absolute radio-value loss removes no pending recovery. The result localizes remaining
 structural opportunity to cross-GPU recovery placement. Because this oracle excludes movement cost
 and physical qualification, it is a design target rather than an executed performance claim.
 
 % provenance: C159_BASELINE
 \noindent\textbf{Original-Mode Negative Result.}
 The calibration-only exact screen gives static global-safe, recovery-first, \sys, and the oracle the
-same radio decisions, arrivals, bounds, and one-Qwen-per-epoch capacity. After correcting a preserved
+same radio decisions, arrivals, bounds, and one-Qwen-per-period capacity. After correcting a preserved
 absolute-deadline interpretation defect without excluding a request or opening the holdout, exact
 matching assigns 856 timely requests and 349,387 tokens to recovery-first, \sys, and the oracle.
-Static reservation exposes no qualified same-epoch Qwen slot and returns zero. Charging every realized
+Static reservation exposes no qualified same-period Qwen slot and returns zero. Charging every realized
 recovery its full bound leaves recovery-first at 345,405 tokens, only 1.14\% below \sys and below the
 prespecified 5\% gate.
 
@@ -877,9 +879,9 @@ prespecified 5\% gate.
 \label{tab:necessity}
 \begin{tabularx}{\linewidth}{@{}p{0.26\linewidth}p{0.16\linewidth}p{0.18\linewidth}X@{}}
 \toprule
-Policy & All-fail check & AI before debt clears & Finding \\
+Policy & All-fail check & AI before recovery resolves & Finding \\
 \midrule
-Debt-blind current-idle & No & Yes & 40/40 E4 and 40/40 E6b guard violations \\
+Idle-time admission & No & Yes & 40/40 E4 and 40/40 E6b guard violations \\
 Static global-safe & Yes & Fixed residual only & 0 timely requests in the original trace mode \\
 Recovery-first & Yes & No & 349,387 timely tokens \\
 \sys & Yes & Only with witness & 349,387 tokens; predicts safe boundary \\
@@ -912,14 +914,16 @@ requests, 330 recoveries, 90 Qwen units, and 720 commits without an observed dea
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.92\linewidth]{../../docs/current/figures/softwall_c162_envelope_scalability.pdf}
-  \caption{Predictive scheduling and control cost. (a) The qualified AI-admission frontier moves with
-  recovery debt, AI class, and decision time; prespecified physical cases lie on the predicted side.
-  (b) Candidate construction and independent verification remain below the evaluated 5~ms control
-  budget through 64 debts. Latencies are finite-run measurements, not WCETs.}
-  \Description{The first plot shows the AI-admission frontier moving with recovery debt and context
-  size. The second shows scheduler and verifier latency through 64 debts with a five-millisecond
-  control-budget reference.}
+  \includegraphics[width=0.9\linewidth]{figures/softwall_envelope.pdf}
+  \caption{Predictive scheduling and control cost. (a) Latest decision time at which one AI unit of each
+  prompt length remains admissible with four admitted TBs and zero to four pending recoveries; circles
+  and crosses mark the prespecified physical cases that the scheduler admitted and rejected. (b)
+  Candidate construction and independent verification latency against the number of pending
+  recoveries, with the evaluated 5~ms control budget. Latencies are finite-run measurements, not WCETs.}
+  \Description{The first plot shows, for four prompt lengths, the latest admissible decision time
+  falling as the number of pending recoveries grows, with admitted and rejected physical cases on the
+  predicted sides. The second shows scheduler and verifier latency through 64 pending recoveries below a
+  five-millisecond control-budget line.}
   \label{fig:envelope}
 \end{figure}
 
@@ -927,8 +931,8 @@ requests, 330 recoveries, 90 Qwen units, and 720 commits without an observed dea
 \noindent\textbf{Decision Quality and Cost.}
 On 600 heterogeneous small states, exact search accepts 504 and the deterministic candidate accepts
 494. False-safe is 0/600 and false-conservative is ten; on the qualified mode, candidate and exact
-acceptance match all 16,023 states. A 2,800-state grid then spans 1--64 debts and capacities 1, 2, 4,
-and 8. Every returned certificate passes the verifier. At 64 debts, decision latency is 1.494~ms p99
+acceptance match all 16,023 states. A 2,800-state grid then spans 1-64 pending recoveries and capacities 1,
+2, 4, and 8. Every returned certificate passes the verifier. At 64 pending recoveries, decision latency is 1.494~ms p99
 and 2.197~ms maximum; verifier p99 is 0.131~ms.
 
 \paragraph{Takeaway 3.}
@@ -946,7 +950,7 @@ schedule executes the intended \NRx, shared recovery, external-AI, and radio-com
   \includegraphics[width=0.96\linewidth]{figures/softwall_qualification_evidence.pdf}
   \caption{Physical evidence for the scheduling contract. (a) MPS cap-only and lifecycle diagnostics
   retain deadline misses. (b) The scheduler admits every offered 16--128-token Qwen unit and rejects
-  larger classes when recovery debt consumes the window. (c) Whole-path samples remain inside their
+  larger classes when required recoveries consume the window. (c) Whole-path samples remain inside their
   mode contracts. (d) The fault campaign spans frequent execution and rare terminal events without an
   observed deadline or invariant violation.}
   \Description{Four panels show MPS-only deadline misses, executed and rejected Qwen classes, NeuralRx
@@ -956,7 +960,7 @@ schedule executes the intended \NRx, shared recovery, external-AI, and radio-com
 
 % provenance: Q2_WARM_PATH
 \noindent\textbf{Variable-Class Workload.}
-The frozen \texttt{P180/D155} campaign runs 600 epochs on each of two nodes with 16--512-token Qwen
+The frozen \texttt{P180/D155} campaign runs 600 release periods on each of two nodes with 16--512-token Qwen
 contexts. It executes 4,800 TensorRT \NRx requests, 1,312 shared-cuPHY recoveries, 1,077 Qwen units,
 and 4,800 single radio commits. The scheduler rejects 55 context-256 and 68 context-512 requests before
 launch and admits every offered 16--128-token request, as Figure~\ref{fig:qualification}b shows.
@@ -980,12 +984,12 @@ credit. Therefore, we combine finite-state checking with physical fault injectio
 
 % provenance: C160_FAULT
 \noindent\textbf{State and Physical Campaigns.}
-A finite-state audit checks 51 combinations of epoch, generation, fence, and marker state without an
+A finite-state audit checks 51 combinations of worker epoch, generation, fence, and marker state without an
 invariant violation. The A0--A6 physical campaign covers clean operation, correlated \NRx failure,
 reply delay before and after completion, stale and duplicate responses, terminal channel fault, and
-post-fault continuation. Across qualified nodes it executes 700 epochs, 2,800 \NRx requests, 942
+post-fault continuation. Across qualified nodes it executes 700 release periods, 2,800 \NRx requests, 942
 recoveries, and 2,800 commits with no observed deadline miss, including 40 replay pairs, four terminal
-faults, and 260 continuation epochs.
+faults, and 260 continuation periods.
 
 \noindent\textbf{Fail-Closed Scope.}
 One additional node violates the \NRx whole-path bound on its first round. We retain that run as \UQ
@@ -1079,7 +1083,7 @@ AI-RAN cover orchestration, MIG, heterogeneous placement, and worker location
 ~\cite{yinyangran,cloudric,interplay,caora,haf,distributedairan}. Concordia reclaims vRAN CPU capacity,
 while DARIS, REEF, XSched, and nvtaskset control GPU stages, kernels, or contexts
 ~\cite{concordia,daris,reef,xsched,nvtaskset}. Their scheduling units are resources or queued jobs,
-while recovery debt is future conventional work tied to one unresolved radio result.
+while a pending recovery is future conventional work tied to one unresolved radio result.
 
 ARCHES selects PHY experts, OCUDU exposes in-DU timing classes, and SMEC coordinates RAN/edge SLOs
 ~\cite{arches,ocudu,smec}. They rule out novelty claims for coexistence, fallback, or deadline
@@ -1126,7 +1130,7 @@ and replay qualification.
 
 \section{Conclusion}
 
-\sys represents optional-\NRx recovery debt, maintains a multi-cell all-fail certificate, and leases
+\sys tracks the pending recoveries of optional \NRx, maintains a multi-cell all-fail certificate, and leases
 external AI through physical completion. Measured counterexamples derive its refinement chain, while
 the capacity model locates safe reclamation and identifies cross-GPU recovery placement as the main
 remaining headroom. Two-node evidence validates qualified synthetic modes; finite samples,

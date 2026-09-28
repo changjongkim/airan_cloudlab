@@ -126,6 +126,117 @@
         "Rayleigh": -8.444620253164556
       }
     },
+    "envelope": {
+      "decision_max_ms": [
+        0.054832,
+        0.070552,
+        0.112719,
+        0.211104,
+        0.543833,
+        1.160912,
+        2.1974319999999996
+      ],
+      "decision_p99_ms": [
+        0.035807000000000005,
+        0.049593000000000005,
+        0.10016599999999999,
+        0.17731,
+        0.36,
+        0.986126,
+        1.4943320000000002
+      ],
+      "frontier": {
+        "128": [
+          [
+            108,
+            0
+          ],
+          [
+            83,
+            1
+          ],
+          [
+            58,
+            2
+          ]
+        ],
+        "256": [
+          [
+            83,
+            0
+          ],
+          [
+            58,
+            1
+          ]
+        ],
+        "512": [
+          [
+            73,
+            0
+          ],
+          [
+            48,
+            1
+          ]
+        ],
+        "64": [
+          [
+            113,
+            0
+          ],
+          [
+            88,
+            1
+          ],
+          [
+            63,
+            2
+          ]
+        ]
+      },
+      "physical_cases": [
+        {
+          "admit": true,
+          "case": "E3",
+          "decision_ms": 45,
+          "pending": 2
+        },
+        {
+          "admit": false,
+          "case": "E4",
+          "decision_ms": 45,
+          "pending": 2
+        },
+        {
+          "admit": true,
+          "case": "E5",
+          "decision_ms": 45,
+          "pending": 1
+        },
+        {
+          "admit": true,
+          "case": "E6a",
+          "decision_ms": 88,
+          "pending": 1
+        },
+        {
+          "admit": false,
+          "case": "E6b",
+          "decision_ms": 89,
+          "pending": 1
+        }
+      ],
+      "verify_p99_ms": [
+        0.012303000000000001,
+        0.014256999999999999,
+        0.018103,
+        0.028172999999999997,
+        0.04307,
+        0.075822,
+        0.13098400000000002
+      ]
+    },
     "execution": {
       "alone_p99_range_ms": [
         8.88661495,
@@ -209,7 +320,7 @@
       "fault_counts": {
         "NeuralRx": 2800,
         "corr. all-fail": 240,
-        "post-fault epochs": 260,
+        "post-fault periods": 260,
         "recoveries": 942,
         "replay pairs": 40,
         "terminal faults": 4
@@ -265,6 +376,7 @@
   "figures": [
     "softwall_execution.pdf",
     "softwall_debt.pdf",
+    "softwall_envelope.pdf",
     "softwall_qualification_evidence.pdf",
     "softwall_outcome_boundaries.pdf",
     "softwall_capacity_headroom.pdf"
@@ -272,18 +384,23 @@
   "output_sha256": {
     "softwall_capacity_headroom.pdf": "d9d86e3472dcf04a318d9aabad735e86723d945dea6edd66629865b2456cc783",
     "softwall_capacity_headroom.svg": "f1ff570c6e11865f46b833dc8564b8da1504240e01d78f9807b0653a1511b1e4",
-    "softwall_debt.pdf": "33d1e173a2522b249424ac561eaaf8372244707f42a899389e5edfabba1670db",
-    "softwall_debt.svg": "f59a1710f6f4dab4ce667559461d7136aeda3b0e250cbf9a6679d07890984eb7",
+    "softwall_debt.pdf": "95d57702b9df7200031a0ca61ae11205fd1b403badaaefb057df3f064e253d60",
+    "softwall_debt.svg": "14fdd72986462d40b836e9293bcf99657ad82e3e6b1a5cdb475e09c2434ac8a6",
+    "softwall_envelope.pdf": "7a539877a6b28187aab90ab38917f21d7757befbabb6f556e5e54ba2e11b42fe",
+    "softwall_envelope.svg": "e8cdb858da9ff9968c34c1363fdfebe6b583f38cd53bca81ed6cdcf872a0f095",
     "softwall_execution.pdf": "4888bfdd007e8ba5a5c8bc4e320e6989e5d03c74e41d2dd57b0ca0871e12449a",
     "softwall_execution.svg": "282caab7b59c6083ec931668ab52d59b81cca646e850eb74851253ed60b3fd52",
     "softwall_outcome_boundaries.pdf": "6b5cb3dc264aaaa03a6bc81c979dff6220d7e4f5b9239b9bb83e85b0ed7b3c81",
     "softwall_outcome_boundaries.svg": "b30f6e5469e2a8995f330a91d78bb433a66aab23cff6fe48a237e32a7d2a64f4",
-    "softwall_qualification_evidence.pdf": "c982d6fc4824ea3c9629650b45519848993d44d535c56e8b36a830cd8a0d5ce2",
-    "softwall_qualification_evidence.svg": "20f7d35f5665498519ebb921a584f8379ac6af162d0d2e0009e2e00aac200e12"
+    "softwall_qualification_evidence.pdf": "37dbc68a9d259e277bf142568050517aebb2fe08a875a1aecfc5b7380d6b574f",
+    "softwall_qualification_evidence.svg": "cc04b65927ed71ee9eb43a39c362a6c79d96434dd6718aadfbfbb986d77b40e3"
   },
   "schema": "softwall-paper-figure-manifest-v1",
   "source_sha256": {
     "results/softwall_multigpu/c161_full_fault_qualification.json": "d039bb3e5f3a7af4d51e1bf5c2c3a035a93846c8cef177453427edcdcb4a003b",
+    "results/softwall_multigpu/c162_feasibility_grid_v1.json": "f5da8016215c2896ef4d9f19be4e8ea386529a46c590407602fb116daddc60c7",
+    "results/softwall_multigpu/c162_scheduler_scalability_v1.json": "cce6f3eb3184b7007d1074f7212c37234c81ef0a0bee5ec8c774fc8015191fed",
+    "results/softwall_multigpu/c162a_boundary_dev_j58860486_protocol.json": "c192d1a5c013ddccb00b95420fc4ad76085106201884caea82a71fabb0fadef2",
     "results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json": "325ef86882c21ff58e78135a1fc1bc30e8211ffe139447665c6e4ec6526bc74d",
     "results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json": "e56cab58cbb0db923aaacef3bea5d8dcdfd466b7376fe476368073b644cd24a6",
     "results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json": "d5870419a4326d576c640e29a63878b47f1a49f3bec761a4aa8be9c87644d717",

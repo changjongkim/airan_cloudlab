@@ -1,6 +1,6 @@
 % Three scheduling failures on the shared recovery lane of the evaluated
 % P180/D155 mode. Requests, bounds, and lease classes are the evaluated ones:
-% two retained debts (TB3, TB4) after two timely successes (TB1, TB2).
+% two required recoveries (TB3, TB4) after two timely successes (TB1, TB2).
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
   \def\swT#1{3.85+(#1-40)*0.0555}
@@ -14,10 +14,10 @@
   \node[font=\itshape\tiny, text=dred, anchor=east] at ({\swT{153}},4.2) {guard};
   \node[font=\itshape\tiny, anchor=west] at ({\swT{155}},4.2) {expiry};
 
-  % (a) Current-idle admission: the queue is empty at the cutoff.
+  % (a) Idle-time admission: the queue is empty at the NeuralRx deadline.
   \node[font=\bfseries\scriptsize] at (0.18,3.95) {(a)};
   \node[font=\scriptsize, align=left, anchor=west] at (0.45,3.7)
-    {\textbf{Current-idle admission}\\\textit{queue empty at 45 ms}};
+    {\textbf{Idle-time admission}\\\textit{queue empty at 45 ms}};
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.38cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},3.7) {};
   \swJob{3.7}{50}{115}{aic}{AI, 256 tokens, admitted}

@@ -64,13 +64,13 @@
 
   % ------------------------------------------------ radio state (faults 3, 4)
   \draw[sub, fill=panel] (10.75,0.25) rectangle (13.75,5.25);
-  \node[pttl] at (12.25,5.03) {Radio state, epoch 17};
+  \node[pttl] at (12.25,5.03) {Radio state, period 17};
   \node[hcell, minimum width=2.8cm] at (10.85,4.78) {applied outcome batches};
-  \node[cell, minimum width=2.8cm, fill=okc] at (10.85,4.48) {nrx-17: two debts deleted};
+  \node[cell, minimum width=2.8cm, fill=okc] at (10.85,4.48) {nrx-17: TB1, TB2 cancelled};
   \node[rnum] at (11.02,3.9) {3};
   \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,3.9)
-    {replay of nrx-17 or an\\epoch-16 batch: no change};
-  \node[hcell, minimum width=2.8cm] at (10.85,3.4) {commit set (epoch, TB)};
+    {replay of nrx-17 or a\\period-16 batch: no change};
+  \node[hcell, minimum width=2.8cm] at (10.85,3.4) {commit set (period, TB)};
   \foreach \y/\k/\src in {3.1/{(17, TB1)}/NRx, 2.8/{(17, TB2)}/NRx,
                            2.5/{(17, TB3)}/cuPHY, 2.2/{(17, TB4)}/cuPHY} {
     \node[cell, minimum width=1.75cm] at (10.85,\y) {\k};

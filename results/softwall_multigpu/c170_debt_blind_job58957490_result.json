@@ -1,0 +1,199 @@
+{
+  "all_pass": false,
+  "artifact_sha256": {
+    "coordinator": "4928a27f57b301df23a42e8ae61a18b183de780a3bfabfdaf88d21c3587777e9",
+    "inventory": "ba5aed6c3727bea8f5d1a6bff102ea764a549037da4df659ad3b9eedeb70e22c",
+    "nrx_worker": "cab8813cbe912dda3325c8f6a41b73773ee08efc2a0c864520796318babc380c",
+    "peer_spec": "0b8eba08e0e72ec46b50b7cb87f13ed2f339359585b343e89dd905a77c9e5bff",
+    "protocol": "242816be54224717b8104d89fb390eb75880dcb86607f86e3deffe17ebfe5dd2",
+    "qwen": "6331554911c8e937d39c174c1c03a48e51ceff0603d29c34bda5d64fd708468b"
+  },
+  "campaign": "holdout",
+  "claim_boundary": "Prespecified C168/C169-failure-informed mechanism correction. The controller pads the complete acceptance-to-observation AI transaction after the worker response. Diagnostic only; forbidden for qualification or production-rate claims.",
+  "counts": {
+    "actual_nrx": 400,
+    "observed_deadline_misses": 21,
+    "qwen_units": 59,
+    "radio_commits": 400,
+    "recoveries": 140
+  },
+  "gates": {
+    "atomic_injection_and_owner_semantics": true,
+    "complete_physical_sample": true,
+    "frozen_source_and_capacity_hash_match": true,
+    "launch_control_within_declared_bound": false,
+    "model_predicts_every_softwall_decision": false,
+    "node_inventory_and_prespecified_exclusion": true,
+    "p2p_and_lifecycle": true,
+    "physical_nrx45_stable_success": true,
+    "predicted_guard_and_deadline_outcomes": false,
+    "prespecified_scenario_sample": true,
+    "qwen_bound_realization": true,
+    "qwen_launch_and_fence_semantics": false,
+    "recovery_bound_realization": true
+  },
+  "host": "nid001132",
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-1ee6ac61-44ab-b161-9de0-16bbb44716e7"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-afa7121e-c5d0-2eb5-4e9a-8b001ff7a220"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-4dea0284-873a-fa20-cc19-10ca82324573"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-cba17786-ea73-0caf-0d43-c838fbb66bcd"
+    }
+  ],
+  "iterations": 100,
+  "label": "c170_debt_blind_job58957490",
+  "per_scenario": {
+    "E4_debt_blind_launch": {
+      "bound_valid_deadline_violations": 19,
+      "bound_valid_guard_violations": 19,
+      "deadline_violation_fraction": 1.0,
+      "deadline_violations": 20,
+      "decision_ms": {
+        "count": 20,
+        "max": 45.053042,
+        "mean": 45.026985950000004,
+        "min": 45.01871,
+        "p50": 45.025113,
+        "p99": 45.053042
+      },
+      "guard_violation_fraction": 1.0,
+      "guard_violations": 20,
+      "jointly_bound_valid_rounds": 19,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": null,
+      "zero_guard_95pct_rule_of_three_upper": null
+    },
+    "E4_softwall_reject": {
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 20,
+        "max": 45.04689,
+        "mean": 45.02822779999999,
+        "min": 45.018995,
+        "p50": 45.027303,
+        "p99": 45.04689
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 20,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    },
+    "E6a_softwall_admit": {
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 20,
+        "max": 88.645634,
+        "mean": 87.82053295,
+        "min": 87.772077,
+        "p50": 87.777952,
+        "p99": 88.645634
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 20,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    },
+    "E6b_shadow_launch": {
+      "bound_valid_deadline_violations": 1,
+      "bound_valid_guard_violations": 18,
+      "deadline_violation_fraction": 0.05,
+      "deadline_violations": 1,
+      "decision_ms": {
+        "count": 20,
+        "max": 91.610978,
+        "mean": 89.5385259,
+        "min": 89.417876,
+        "p50": 89.427659,
+        "p99": 91.610978
+      },
+      "guard_violation_fraction": 1.0,
+      "guard_violations": 20,
+      "jointly_bound_valid_rounds": 18,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": null,
+      "zero_guard_95pct_rule_of_three_upper": null
+    },
+    "E6b_softwall_reject": {
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 20,
+        "max": 89.449883,
+        "mean": 89.42702179999999,
+        "min": 89.418705,
+        "p50": 89.424539,
+        "p99": 89.449883
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 20,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    }
+  },
+  "schema": "softwall-c170-debt-blind-result-v1",
+  "service_accuracy": {
+    "launch_control_ms": {
+      "count": 59,
+      "max": 5.244598,
+      "mean": 4.857123847457627,
+      "min": 4.850205,
+      "p50": 4.850424,
+      "p99": 4.850835
+    },
+    "qwen_lower_accuracy_fraction": 1.0,
+    "qwen_transaction_ms": {
+      "count": 59,
+      "max": 65.022815,
+      "mean": 44.76685454237287,
+      "min": 34.554947,
+      "p50": 34.581527,
+      "p99": 64.663759
+    },
+    "qwen_upper_compliance_fraction": 0.9661016949152542,
+    "recovery_lower_accuracy_fraction": 1.0,
+    "recovery_path_ms": {
+      "count": 140,
+      "max": 24.714598,
+      "mean": 24.550899278571425,
+      "min": 24.538907,
+      "p50": 24.543415,
+      "p99": 24.708956
+    },
+    "recovery_upper_compliance_fraction": 1.0
+  },
+  "slurm_job_id": "58957490",
+  "status": "C170_FAIL"
+}

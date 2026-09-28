@@ -1,0 +1,58 @@
+% Overall architecture of SoftWall, drawn in the shared CASCADE style.
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % Layer backgrounds.
+  \node[layer, minimum width=3.15cm, minimum height=5.25cm, anchor=south west] (ranlayer) at (0,0) {};
+  \node[layer, minimum width=6.25cm, minimum height=5.25cm, anchor=south west] (ctrllayer) at (3.45,0) {};
+  \node[layer, minimum width=5.80cm, minimum height=5.25cm, anchor=south west] (gpulayer) at (10.00,0) {};
+  \node[ttl, anchor=north] at (1.575,5.08) {RAN homes};
+  \node[ttl, anchor=north] at (6.575,5.08) {\SOFTWALLNAME{} scheduler};
+  \node[ttl, anchor=north] at (12.90,5.08) {Qualified multi-GPU execution};
+
+  % RAN homes and events.
+  \node[comp, fill=cyanp, minimum width=2.35cm] (homea) at (1.58,3.72) {Home A\\release / expiry};
+  \node[comp, fill=cyanp, minimum width=2.35cm] (homeb) at (1.58,2.62) {Home B\\release / expiry};
+  \node[comp, fill=white, minimum width=2.35cm] (aioq) at (1.58,1.18) {External-AI queue\\arrival / deadline};
+
+  % Scheduler pipeline.
+  \node[comp, fill=peach, minimum width=2.18cm] (events) at (4.75,3.72) {Event collector\\common cutoff};
+  \node[comp, fill=gold!45, minimum width=2.18cm] (debt) at (7.20,3.72) {Recovery-debt\\table};
+  \node[comp, fill=bluec!55, minimum width=2.18cm] (candidate) at (4.75,2.34) {Candidate scheduler\\replan + lease};
+  \node[comp, fill=greenc!65, minimum width=2.18cm] (verifier) at (7.20,2.34) {Independent verifier\\all-fail + ownership};
+  \node[comp, fill=white, minimum width=4.63cm] (state) at (5.97,0.93) {Committed state $X_t$\\calendar $S$ \; credits $Q,T$ \; leases $L$\\epochs $E$ \; commits $C$ \; ownership $G$};
+
+  % GPU components.
+  \node[comp, fill=peach, minimum width=2.18cm] (nrx0) at (11.50,3.72) {TensorRT NeuralRx\\local endpoint};
+  \node[comp, fill=peach, minimum width=2.18cm] (nrx1) at (14.25,3.72) {TensorRT NeuralRx\\remote endpoint};
+  \node[comp, fill=cyanp, minimum width=2.18cm] (cuphy) at (11.50,1.95) {Aerial / cuPHY\\recovery lane};
+  \node[comp, fill=bluec!55, minimum width=2.18cm] (qwen) at (14.25,1.95) {Qwen worker\\bounded AI unit};
+  \node[comp, fill=greenc!65, minimum width=4.93cm] (terminal) at (12.88,0.70) {CUDA fence / non-launch marker / single radio commit};
+
+  % Main control flow.
+  \draw[arr] (homea.east) -- (events.west);
+  \draw[arr] (homeb.east) -- (events.west);
+  \draw[arr] (aioq.east) -- ++(0.30,0) |- (candidate.west);
+  \draw[arr] (events.east) -- (debt.west);
+  \draw[arr] (debt.south) |- (candidate.north east);
+  \draw[arr] (candidate.east) -- (verifier.west);
+  \draw[arr] (verifier.south) -- (state.north east);
+  \draw[arr, draw=dblue] (state.east) -- ++(0.32,0) |- (cuphy.west);
+  \draw[arr, draw=dblue] (state.east) -- ++(0.52,0) |- (qwen.west);
+  \draw[arr, draw=hot] (debt.east) -- ++(0.35,0) |- (nrx0.west);
+  \draw[arr, draw=hot] (debt.east) -- ++(0.55,0) |- (nrx1.west);
+  \draw[arr] (nrx0.south) -- (terminal.north west);
+  \draw[arr] (nrx1.south) -- (terminal.north east);
+  \draw[arr] (cuphy.south) -- (terminal.north west);
+  \draw[arr] (qwen.south) -- (terminal.north east);
+  \draw[arr, draw=dred] (terminal.west) -- (9.82,0.18) -- (3.62,0.18) -- (3.62,3.72) -- (events.west);
+
+  % Transport labels and decision numbers.
+  \node[note] at (12.88,3.08) {CUDA IPC / NVLink P2P};
+  \node[num] at (3.43,4.13) {1};
+  \node[num] at (6.00,4.12) {2};
+  \node[num] at (5.97,2.78) {3};
+  \node[num] at (8.48,2.76) {4};
+  \node[num] at (9.76,1.58) {5};
+  \node[rnum] at (3.62,0.82) {6};
+\end{tikzpicture}%
+}

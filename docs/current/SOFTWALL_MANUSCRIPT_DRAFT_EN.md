@@ -1,8 +1,19 @@
-# SoftWall: Certifying Conditional Recovery for Shared-GPU AI-RAN
+# SoftWall: Certified Multi-GPU Scheduling for Conditional Recovery in AI-RAN
 
-**Working manuscript — September 25, 2026**  
-**Target scope:** measurement/modeling/systems venue  
+**Evidence-complete narrative draft — September 28, 2026**
+
+**Section-authoritative manuscript:** `paper/softwall_sigmetrics27/main.tex`
+
+**Current structure and style map:** `SOFTWALL_SCHEDULING_REFRAME_KO.md`
+
+**Target scope:** scheduling/measurement/modeling/systems venue
 **Claim boundary:** finite-sample qualification of specified A100 modes; no WCET or production-HARQ claim
+
+**Current paper order:** Section 2 combines Background and Motivation; Section 3 is the authoritative
+four-part design (`Overall architecture`, `Scheduling conditional recovery`, `Refining schedules to
+physical completion`, and `Certified event-scheduling algorithm`). The older numbered Model/Design
+notes below remain an evidence narrative; use `paper/softwall_sigmetrics27/main.tex` for section text
+and figure placement.
 
 ## Abstract
 
@@ -13,25 +24,32 @@ optional: until its result is known, the same transport block retains a conventi
 obligation. Across cells and RAN homes, these contingent obligations can collide on shared recovery
 resources even though they have not entered a runtime queue.
 
-We present **SoftWall**, a runtime substrate that represents unresolved conventional work as recovery
-debt. SoftWall continuously maintains an executable all-fail schedule for every unresolved neural
+We present **SoftWall**, a certified multi-GPU scheduler that represents unresolved conventional work
+as recovery debt. SoftWall continuously maintains an executable all-fail schedule for every unresolved neural
 receiver. It may retime recovery intervals and admit a bounded external-AI unit only through one
 generation-safe transaction that preserves this certificate. The transaction covers endpoint and
 transport credits, external-AI ownership, physical latest-start checks, CUDA completion fences, and
 single radio commit. We also derive a provenance-qualified feasibility envelope that distinguishes
 safe-and-useful, safe-without-slack, mandatory-infeasible, and unqualified modes.
 
-Two prespecified boundary states show why current GPU idleness is insufficient: debt-blind AI
-admission can cross the radio guard by 12 ms and 1 ms under the qualified contract, while SoftWall
-rejected all 60 corresponding requests before physical launch. On two independent 4×A100 nodes with MIG disabled
+Two prespecified boundary states show why current GPU idleness is insufficient. On two independent
+4×A100 nodes, a bound-padded diagnostic physically realized the declared service vector: debt-blind
+E4 execution violated both guard and deadline in 40/40 selected rounds, and an E6b shadow violated the
+guard in 40/40. Certificate-preserving arms had 0/120 violations (95% rule-of-three upper bound 2.5%).
+On two independent 4×A100 nodes with MIG disabled
 and MPS enabled, a warm `P180/D155` path executed 4,800 actual TensorRT neural-receiver requests,
 1,312 shared-cuPHY recoveries, 1,077 Qwen units, and 4,800 radio commits without an observed deadline,
 bound, transport, credit, or commit violation. A seven-class fault campaign executed another 2,800
 neural-receiver requests and 942 recoveries with no observed deadline miss. The model agreed with an
 exact checker on 16,023 qualified states and with 180 prespecified physical boundary rounds; a
 certified 64-debt scheduler had a 1.494 ms p99 decision latency. A strong certificate-preserving
-recovery-first baseline and an offline oracle found no material throughput advantage, so we make no
-optimizer claim. SoftWall instead identifies when conditional sharing is certifiably safe, when it
+Across 13,716 mandatory-feasible capacity points, SoftWall exceeded static reservation at 3,600 and
+debt-blind admission had positive violation probability at 4,338. A frozen trace screen found 362
+points with at least 5% scheduling headroom. Safe AI-first greedy closed 361 within 5% of the
+fixed-placement oracle, while flexible recovery placement had positive upper-bound gain at 203. A
+strong certificate-preserving recovery-first baseline and an offline oracle both found 349,387 timely
+tokens after correction of an absolute-deadline interpretation defect. Full-bound sensitivity differed
+by 1.14%, and we make no executed optimizer claim. SoftWall identifies when conditional sharing is certifiably safe, when it
 has no useful slack, and when the mode must be rejected or requalified. These timing claims are
 finite-sample qualifications of synthetic `P180/D155` modes. Applying the same qualification discipline
 to Aerial testMAC's 4.5 ms UL-indication threshold rejected every tested implementation; persistent
@@ -87,20 +105,19 @@ the adjacent 89 ms state rejects it before GPU launch.*
 
 We make four contributions:
 
-1. **Certificate-to-execution refinement.** We derive seven requirements from measured counterexamples
+1. **Safe reclaimable-capacity model.** We quantify timely AI capacity and unsafe debt-blind admission
+   over cells, homes, 1–4 GPUs, expiry, recovery cost, AI class, outcome probability, and correlation.
+2. **Certificate-to-execution refinement.** We derive seven requirements from measured counterexamples
    and implement atomic recovery retiming and external-AI leasing across RAN homes, shared cuPHY
    recovery, local/remote NeuralRx endpoints, and physical completion lifecycles.
-2. **Predictive feasibility envelope.** We classify qualified-safe-useful (QSU), qualified-safe-no-slack
+3. **Predictive feasibility envelope.** We classify qualified-safe-useful (QSU), qualified-safe-no-slack
    (QSN), mandatory-infeasible (MI), and unqualified (UQ) states using debt, decision time, AI class,
    capacity, and provenance. An independent verifier prevents heuristic schedules from causing unsafe
    admission.
-3. **Conditional-recovery model.** We specialize established primary/backup reasoning to same-TB
-   optional reception, shared recovery, and a third external-AI class. All admissible NeuralRx failure
-   subsets reduce to one executable all-fail certificate under explicit assumptions.
 4. **Physical evaluation and negative policy result.** We evaluate actual TensorRT NeuralRx, NVIDIA
    Aerial/cuPHY recovery, Qwen inference, MPS, CUDA IPC, and NVLink P2P on independent A100 nodes.
-   Strong baselines and an offline oracle show no material throughput headroom in the evaluated trace;
-   we therefore separate the substrate contribution from optimizer claims.
+   Strong baselines and a prespecified lever decomposition separate safe capacity, simple AI ordering,
+   and remaining cross-GPU recovery-placement headroom.
 
 SoftWall does not claim that MPS provides hard isolation, that the measured maxima are WCETs, or that
 the synthetic deadline is a production HARQ contract. Its guarantees are conditional on a qualified
@@ -275,6 +292,25 @@ This proposition does not say every sampled debt-blind run must miss. It says th
 provide the qualified guarantee. A conservative controller can remain safe by validating initial
 all-fail admission and physically draining unresolved recovery before AI. SoftWall is needed when the
 controller wants to place AI first without abandoning that guarantee.
+
+### 4.6 Safe reclaimable capacity
+
+For one homogeneous AI class, let `W` be the guard window after the decision, `L` its AI deadline,
+`a` the complete AI transaction bound, `c` one recovery bound, `M_g` the potential static debts on GPU
+lane `g`, and `F_g` its realized debts. Per-epoch request capacities are
+
+```text
+K_static   = sum_g floor(max(0, min(L, W - M_g c)) / a)
+K_RF       = sum_g floor(max(0, min(L, W) - F_g c) / a)
+K_SoftWall = sum_g floor(max(0, min(L, W - F_g c)) / a).
+```
+
+Static retains every potential recovery. Recovery-first drains realized recovery before AI. SoftWall
+may place AI before those recoveries when the retained certificate still fits. A debt-blind policy
+uses current idle capacity and is false-safe whenever assigned AI plus `F_g c` exceeds `W` on any
+lane. The stochastic model takes expectations over a home-local beta-binomial failure distribution;
+the all-fail safety certificate remains distribution-free. Variable-class BurstGPT batches use exact
+subset, lane, ordering, and recovery-insertion enumeration.
 
 ## 5. Design
 
@@ -467,13 +503,16 @@ Two prespecified C162 cases isolate necessity from throughput. In E4, two recove
 45 ms and a context-256 request is visible. Mandatory-only recovery is feasible, but admitting AI
 yields a bound-respecting completion of 165 ms, 12 ms past the 153 ms radio guard. In E6b, one debt
 remains and context-64 becomes unsafe at 89 ms: completion is 154 ms, one millisecond past the guard.
-An idle-only debt-blind policy accepts both states; SoftWall classified both as QSN and rejected the AI
-launch in 30/30 physical rounds per case across two nodes.
+An idle-only debt-blind policy accepts both states; SoftWall classified both as QSN. A prespecified
+diagnostic padded Qwen and conventional GPU work to the declared bounds. Across two independent nodes,
+the debt-blind E4 arm violated guard and deadline in 40/40 selected rounds, while the E6b shadow arm
+violated the guard in 40/40. SoftWall rejected both unsafe states, admitted the 88 ms E6a boundary,
+and had 0/120 selected safety violations (95% rule-of-three upper bound 2.5%). Bound-valid counts were
+39/39, 39/39, and 0/119, respectively.
 
-These are contract-level counterexamples, not observed debt-blind misses, because the rejected kernels
-were not launched. Separate MPS-only diagnostics did observe 2/1,500 and 1/1,500 misses at 100% and
-20% caps, and a lifecycle experiment observed 12/10,000 misses in its GPU/MPS arm versus 0/10,000 in
-the CPU sham.
+These are physical necessity witnesses under a bound-padded diagnostic. Padding realizes an allowed
+service vector; it is not production-rate, WCET, or production-HARQ qualification. The two timing-cell
+outliers and four of 168 recovery-bound overshoots on the holdout node remain in the artifact.
 
 The counterexamples are relative to the qualified `B_conv=25 ms` service contract. Holding all other
 charges fixed, E6b disappears at or below 24 ms; E4 remains until the bound reaches 19 ms, so only E4
@@ -488,25 +527,64 @@ prespecified physical validation.
 
 | Policy | All-fail check | AI before debt clears | Finding |
 |---|---|---|---|
-| Debt-blind current-idle | No | Yes | Cannot guarantee E4/E6b; unsafe diagnostic |
-| Certificate-preserving recovery-first | Yes | No | Safe comparator; 385,262 timely tokens |
+| Debt-blind current-idle | No | Yes | 40/40 E4 and 40/40 E6b guard violations |
+| Certificate-preserving recovery-first | Yes | No | Safe comparator; 349,387 timely tokens |
 | SoftWall | Yes | Only with witness | Same tokens; predicts safe/unsafe boundary |
 
 A failure-correlation sweep is unnecessary for this safety conclusion. The contract admits correlated
 all-fail behavior, so one bound-respecting all-fail branch disproves a guarantee from current idleness.
 Correlation probabilities matter for expected utility, which we do not claim to improve here.
 
-### 7.7 Strong baseline and no material headroom
+### 7.7 Capacity envelope and actionable headroom
 
-We compare SoftWall with the certificate-preserving recovery-first system described above. The only
-semantic difference is whether external AI may execute before unresolved recovery is physically
+<!-- provenance: C167_CAPACITY -->
+The closed-form and exact multi-class model covers 21,384 points over cells, homes, GPUs, NeuralRx
+success probability and correlation, expiry, recovery bound, AI class, deadline, and offered load.
+Mandatory recovery is infeasible at 7,668 points. Among 13,716 feasible points, SoftWall exceeds static
+reservation at 3,600 (26.2%), recovery-first trails its oracle by at least 5% at 2,604 (19.0%), and
+debt-blind admission has positive violation probability at 4,338 (31.6%). Exhaustive order checking
+matches the compact capacity calculation in all 5,376 checked cases.
+
+At the representative four-cell, two-home, one-GPU point with `B_conv=25 ms`, context 64, a 50 ms AI
+deadline, correlation 0.5, and four offered jobs, expected timely requests for
+static/recovery-first/SoftWall are `0/0.0144/0.2512`, `0/0.1406/0.6719`, and
+`0/0.5184/0.9472` as NeuralRx success probability rises from 0.2 to 0.5 and 0.8.
+
+<!-- provenance: C174_HEADROOM -->
+A frozen BurstGPT screen maps four calibration windows onto 2,592 topology, failure, recovery, SLO,
+and offered-unit points; 2,052 are mandatory-feasible. The advance rule requires at least 5%
+oracle-normalized headroom and a positive gap in every window. It advances 362 points: 298 at a
+100 ms SLO and 64 at 250 ms, with none at 50 ms or 1 s. The shortest jobs rarely fit even with future
+knowledge, while recovery-first catches up at 1 s. Useful scheduling headroom lies in an intermediate
+deadline band.
+
+<!-- provenance: C175_LEVERS -->
+All 362 advanced points then enter a prespecified development-only lever decomposition. A safe
+EDF/value AI-first greedy falls within 5% of the fixed-placement exact oracle at 361 points; the one
+exception has a 7.02% gap. Flexible recovery placement has positive upper-bound gain at 203 points:
+0/102 one-GPU, 145/175 two-GPU, and 58/85 four-GPU points, with a 10.64% median among positive gains.
+Selecting Sionna strata to minimize debt under zero or 0.02 absolute radio-value loss reduces no debt.
+The placement oracle excludes data movement cost and physical requalification. It identifies the next
+design target rather than an implemented performance result.
+
+![Capacity envelope and headroom decomposition](../../paper/softwall_sigmetrics27/figures/softwall_capacity_headroom.svg)
+
+*Figure 3: A representative expected-capacity point (left), the frozen trace headroom band (middle),
+and the fraction of advanced points closed by safe greedy or improved by flexible recovery placement
+(right).*
+
+The original C159 mode compares SoftWall with a certificate-preserving recovery-first system. Their
+only semantic difference is whether external AI may execute before unresolved recovery is physically
 completed.
 
 <!-- provenance: C159_BASELINE -->
 On four non-overlapping BurstGPT calibration windows containing 4,290 requests and 1,129,504 offered
-tokens, both systems assigned 931 timely requests and 385,262 tokens. Under a sensitivity that charged
-every recovery its full 25 ms bound, SoftWall improved timely token value by only 0.066%, far below the
-prespecified 5% minimum effect. We therefore did not open a confirmatory throughput holdout.
+tokens, the original selector incorrectly added arrival time to a field that already stored an absolute
+deadline. A frozen no-exclusion correction recomputed every row and preserved the earlier artifact.
+Recovery-first, SoftWall, and the offline oracle each assigned 856 timely requests and 349,387 tokens.
+Under a sensitivity that charged every recovery its full 25 ms bound, recovery-first reached 345,405
+tokens, a 1.14% gap below SoftWall and far below the prespecified 5% minimum effect. We therefore did
+not open a confirmatory throughput holdout.
 
 This negative result narrows the contribution. Conditional capacity exists and changes admission, but
 the evaluated 1 s AI SLO lets recovery-first service catch up. SoftWall is not presented as a higher-

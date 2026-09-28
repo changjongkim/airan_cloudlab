@@ -1,0 +1,351 @@
+{
+  "all_pass": true,
+  "analysis_role": "Deterministic completion of the static_global_safe row named in the frozen C159 prespec, plus an explicit structural offline upper bound. All inputs were previously opened; this is not a new confirmatory outcome.",
+  "gates": {
+    "confirmatory_holdout_remains_closed": true,
+    "frozen_hashes_match": true,
+    "oracle_equals_softwall": true,
+    "original_rows_reproduced": true,
+    "static_was_prespecified": true
+  },
+  "interpretation": "In the frozen P180/D155 C159 screen, static four-debt reservation leaves no qualified same-epoch Qwen slot. SoftWall recovers 385,262 timely tokens relative to that conservative baseline. Recovery-first, SoftWall, and the offline oracle tie under empirical recovery because one Qwen per epoch and a 1 s SLO leave no ordering headroom.",
+  "model": {
+    "capacity": "at most one Qwen unit per radio epoch",
+    "class_bounds_ms": {
+      "128": 40.0,
+      "16": 35.0,
+      "256": 65.0,
+      "32": 35.0,
+      "512": 75.0,
+      "64": 35.0
+    },
+    "control_bound_ms": 5.0,
+    "decision_ms": 45.0,
+    "oracle_semantics": "exact weighted selector with future calibration arrivals and the earliest legal per-epoch completion exposed by the C159 model",
+    "period_ms": 180.0,
+    "potential_recovery_debts": 4,
+    "radio_guard_ms": 153.0,
+    "recovery_bound_ms": 25.0,
+    "static_semantics": "retain four worst-case recovery reservations regardless of observed outcomes"
+  },
+  "protocol_sha256": "5a9414ce835508a6681d67403fb17c211280cc4713f397f41d6316c6254a2bf2",
+  "schema": "softwall-c166-static-global-safe-v1",
+  "source_sha256": {
+    "c159_prespec": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "c159_q3_analyzer": "a24bd8d058370c7e13e7654f757d57706dad37328b3e8dd515f41ccba1380d5b",
+    "c159_q3_result": "37298e64d351635f7973a25eac06a44cb85260f1eb06b65a909ba77173772ef8",
+    "c166_analyzer": "24354bd489cd2b44438200a1e624e0727b21fb9dc65c920b1adb0a7763e69538",
+    "calibration_trace": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f",
+    "q2_development_coordinator": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "q2_holdout_coordinator": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881"
+  },
+  "status": "C166_STATIC_GLOBAL_SAFE_PASS",
+  "summary": {
+    "offered_requests": 4290,
+    "offered_value_tokens": 1129504,
+    "slots": 1336,
+    "softwall_increment_over_static_requests": 931,
+    "softwall_increment_over_static_tokens": 385262,
+    "totals": {
+      "offline_oracle": {
+        "gap_to_oracle_pct": 0.0,
+        "timely_requests": 931,
+        "timely_value_tokens": 385262
+      },
+      "recovery_first_empirical": {
+        "gap_to_oracle_pct": 0.0,
+        "timely_requests": 931,
+        "timely_value_tokens": 385262
+      },
+      "recovery_first_full_bound": {
+        "gap_to_oracle_pct": 0.0661887235180215,
+        "timely_requests": 930,
+        "timely_value_tokens": 385007
+      },
+      "softwall": {
+        "gap_to_oracle_pct": 0.0,
+        "timely_requests": 931,
+        "timely_value_tokens": 385262
+      },
+      "static_global_safe": {
+        "gap_to_oracle_pct": 100.0,
+        "timely_requests": 0,
+        "timely_value_tokens": 0
+      }
+    }
+  },
+  "windows": [
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 1,
+            "256": 4,
+            "32": 0,
+            "512": 239,
+            "64": 0
+          },
+          "timely_requests": 245,
+          "timely_value_tokens": 94386
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 1,
+            "256": 4,
+            "32": 0,
+            "512": 239,
+            "64": 0
+          },
+          "timely_requests": 245,
+          "timely_value_tokens": 94386
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 1,
+            "256": 4,
+            "32": 0,
+            "512": 239,
+            "64": 0
+          },
+          "timely_requests": 245,
+          "timely_value_tokens": 94386
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 1,
+            "256": 4,
+            "32": 0,
+            "512": 239,
+            "64": 0
+          },
+          "timely_requests": 245,
+          "timely_value_tokens": 94386
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 0,
+      "q2_state_stream": "development",
+      "slots": 334,
+      "window_id": "w00-3063931"
+    },
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 0,
+            "32": 1,
+            "512": 227,
+            "64": 0
+          },
+          "timely_requests": 229,
+          "timely_value_tokens": 101292
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 0,
+            "32": 1,
+            "512": 227,
+            "64": 0
+          },
+          "timely_requests": 229,
+          "timely_value_tokens": 101292
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 0,
+            "32": 1,
+            "512": 227,
+            "64": 0
+          },
+          "timely_requests": 229,
+          "timely_value_tokens": 101292
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 0,
+            "32": 1,
+            "512": 227,
+            "64": 0
+          },
+          "timely_requests": 229,
+          "timely_value_tokens": 101292
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 266,
+      "q2_state_stream": "development",
+      "slots": 334,
+      "window_id": "w01-3064181"
+    },
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 232,
+            "64": 2
+          },
+          "timely_requests": 235,
+          "timely_value_tokens": 97454
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 232,
+            "64": 2
+          },
+          "timely_requests": 235,
+          "timely_value_tokens": 97454
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 232,
+            "64": 2
+          },
+          "timely_requests": 235,
+          "timely_value_tokens": 97454
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 232,
+            "64": 2
+          },
+          "timely_requests": 235,
+          "timely_value_tokens": 97454
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 0,
+      "q2_state_stream": "holdout",
+      "slots": 334,
+      "window_id": "w02-3063999"
+    },
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 3,
+            "32": 0,
+            "512": 219,
+            "64": 0
+          },
+          "timely_requests": 222,
+          "timely_value_tokens": 92130
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 3,
+            "32": 0,
+            "512": 219,
+            "64": 0
+          },
+          "timely_requests": 222,
+          "timely_value_tokens": 92130
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 2,
+            "32": 0,
+            "512": 219,
+            "64": 0
+          },
+          "timely_requests": 221,
+          "timely_value_tokens": 91875
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 3,
+            "32": 0,
+            "512": 219,
+            "64": 0
+          },
+          "timely_requests": 222,
+          "timely_value_tokens": 92130
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 266,
+      "q2_state_stream": "holdout",
+      "slots": 334,
+      "window_id": "w03-3064082"
+    }
+  ]
+}

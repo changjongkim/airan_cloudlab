@@ -1,0 +1,172 @@
+{
+  "claim_boundary": "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; sample maxima are not WCET; the 4.5 ms production gate remains failed; and Sionna CDL-D/E does not qualify Aerial TDL-A or field IQ.",
+  "derived": {
+    "boundaries": {
+      "channel_aggregate": {
+        "conventional_only": 12,
+        "exact_pvalue": 0.005401572654591291,
+        "neural_only": 31
+      },
+      "minimum_effect_pct": 5.0,
+      "production_labels": [
+        "precomputed split",
+        "raw-IQ P2P",
+        "same stream",
+        "frozen candidate"
+      ],
+      "production_late": [
+        1000,
+        148,
+        115,
+        5
+      ],
+      "production_totals": [
+        1000,
+        1000,
+        1000,
+        1000
+      ],
+      "throughput_gain_pct": [
+        0.0,
+        1.1397104070844077
+      ]
+    },
+    "capacity": {
+      "flexible_placement_positive_points": 203,
+      "greedy_within_5pct_points": 361,
+      "lever_candidate_points": 362,
+      "representative_recovery_first": [
+        0.014400000000000003,
+        0.14062500000000014,
+        0.5184000000000006
+      ],
+      "representative_softwall": [
+        0.2512000000000001,
+        0.6718750000000001,
+        0.9472000000000009
+      ],
+      "representative_static": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "representative_success_probability": [
+        0.2,
+        0.5,
+        0.8
+      ],
+      "trace_advanced_points": [
+        0,
+        298,
+        64,
+        0
+      ],
+      "trace_feasible_points": [
+        513,
+        513,
+        513,
+        513
+      ],
+      "trace_slo_ms": [
+        50,
+        100,
+        250,
+        1000
+      ]
+    },
+    "qualification": {
+      "fault_counts": {
+        "NeuralRx": 2800,
+        "corr. all-fail": 240,
+        "post-fault epochs": 260,
+        "recoveries": 942,
+        "replay pairs": 40,
+        "terminal faults": 4
+      },
+      "mps_diagnostics": [
+        {
+          "label": "cap 100",
+          "misses": 2,
+          "requests": 1500
+        },
+        {
+          "label": "cap 20",
+          "misses": 1,
+          "requests": 1500
+        },
+        {
+          "label": "CPU sham",
+          "misses": 0,
+          "requests": 10000
+        },
+        {
+          "label": "MPS client",
+          "misses": 12,
+          "requests": 10000
+        }
+      ],
+      "qwen_accepted": [
+        200,
+        200,
+        200,
+        200,
+        145,
+        132
+      ],
+      "qwen_contexts": [
+        16,
+        32,
+        64,
+        128,
+        256,
+        512
+      ],
+      "qwen_rejected": [
+        0,
+        0,
+        0,
+        0,
+        55,
+        68
+      ]
+    }
+  },
+  "figures": [
+    "softwall_airan_background.pdf",
+    "softwall_scheduling_problem.pdf",
+    "softwall_design_flow.pdf",
+    "softwall_qualification_evidence.pdf",
+    "softwall_outcome_boundaries.pdf",
+    "softwall_capacity_headroom.pdf"
+  ],
+  "output_sha256": {
+    "softwall_airan_background.pdf": "31fe06600a8f047f1393dc4e6cdbfd9844952bdfcc35b7c1c607055e05d85135",
+    "softwall_airan_background.svg": "9501f6248daa2a1dd1f17279fe5af0f56d39a722276eef54b410179c30094c96",
+    "softwall_capacity_headroom.pdf": "d9d86e3472dcf04a318d9aabad735e86723d945dea6edd66629865b2456cc783",
+    "softwall_capacity_headroom.svg": "f1ff570c6e11865f46b833dc8564b8da1504240e01d78f9807b0653a1511b1e4",
+    "softwall_design_flow.pdf": "9013bce6fb0f2af53fc126bfb2bdb2add259bb9ff56de949e38e1b1fd8d21c7f",
+    "softwall_design_flow.svg": "543b95d9bd5449cd02b6376fc24135543562b64697ca12ae2be1182327217327",
+    "softwall_outcome_boundaries.pdf": "6b5cb3dc264aaaa03a6bc81c979dff6220d7e4f5b9239b9bb83e85b0ed7b3c81",
+    "softwall_outcome_boundaries.svg": "b30f6e5469e2a8995f330a91d78bb433a66aab23cff6fe48a237e32a7d2a64f4",
+    "softwall_qualification_evidence.pdf": "c982d6fc4824ea3c9629650b45519848993d44d535c56e8b36a830cd8a0d5ce2",
+    "softwall_qualification_evidence.svg": "20f7d35f5665498519ebb921a584f8379ac6af162d0d2e0009e2e00aac200e12",
+    "softwall_scheduling_problem.pdf": "60cde68f5bb21db69ce93ce66a3e30e8fd4ab920bf5da88eb6d4c8343a0b037e",
+    "softwall_scheduling_problem.svg": "aa65502b15b329756682d60f2b8ef0326bfcbe9ae96ab9efa3f3ac8fb192dbf4"
+  },
+  "schema": "softwall-paper-figure-manifest-v1",
+  "source_sha256": {
+    "results/softwall_multigpu/c161_full_fault_qualification.json": "d039bb3e5f3a7af4d51e1bf5c2c3a035a93846c8cef177453427edcdcb4a003b",
+    "results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json": "e56cab58cbb0db923aaacef3bea5d8dcdfd466b7376fe476368073b644cd24a6",
+    "results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json": "d5870419a4326d576c640e29a63878b47f1a49f3bec761a4aa8be9c87644d717",
+    "results/softwall_multigpu/c173_deadline_correction_result_v1.json": "99efc84b6231b0b12cce8df5ec48126fec107e9e38d80377852e767e587f7d16",
+    "results/softwall_multigpu/c174_trace_oracle_screen_v1.json": "b37a287bb6f399380b307884b8d643ff2b99930f932adf87348de561c28ba0eb",
+    "results/softwall_multigpu/c175_lever_evaluation_v1.json": "1d0e375a63b792c6963d4731e61af911dc7344dba7d1ba4df894a394655715e7",
+    "results/softwall_multigpu/confirm159_q2_variable_two_node.json": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692",
+    "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_protocol.json": "a8bd890067653e5939be79dc8de27b1d08c78b30fa9a095fb342df7f629b9cfc",
+    "results/softwall_multigpu/softwall_production_exit_gate_v3.json": "c9c725dc57b3459013e80e456ae20ec5e17a91140e98ff4f57ab773f945ca27e",
+    "results/softwall_same_gpu/confirm26_physical_overrun.json": "b49652df1026f9c6ae7bed10fa3cc326b8fafaf73ef29dce250c0752990ca8ce",
+    "results/softwall_same_gpu/confirm46_retirement_cpu_control.json": "0217ed35f8aac946a4d98400bb67e4cd7f580e30ccc4836cae8f0add1a2cc744",
+    "results/softwall_same_gpu/confirm46_retirement_cpu_control_protocol.json": "4c5689ae9cb4bb5d6747b67afbd6f591878eed7b2ccab734c7b499aa3f96d065",
+    "results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json": "578296af73cdd4acd842ee7833769a3ea441bf2b20f4e220311bbe2ab2172528"
+  }
+}

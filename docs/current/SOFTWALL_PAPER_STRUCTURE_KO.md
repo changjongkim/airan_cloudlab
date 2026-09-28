@@ -1,8 +1,12 @@
-# SoftWall 논문 구조 초안: MIG-off MPS AI-and-RAN의 조건부 복구 substrate
+# SoftWall 논문 구조 초안: AI-RAN conditional recovery를 위한 certified multi-GPU scheduling
 
-**문서 상태:** 2026-09-25, claim audit를 통과한 영문 원고 초안과 C164 claim-scoped 5/10 lifecycle boundary 반영  
-**현재 논문축:** certified conditional-recovery substrate + feasibility envelope  
-**중단한 축:** 새로운 joint optimizer의 성능 우월성
+**문서 상태:** 2026-09-28, scheduling-first 20-page audited 영문 원고 반영
+
+**권위 구조:** [스케줄링 재프레이밍과 평가 순서](SOFTWALL_SCHEDULING_REFRAME_KO.md)
+
+**현재 논문축:** certified multi-GPU conditional-recovery scheduler + safe reclaimable-capacity envelope
+
+**중단한 축:** 새로운 AI-ordering optimizer의 처리량 우월성
 
 ---
 
@@ -30,11 +34,14 @@ C159-Q1/Q2는 pre-staged bank와 whole-path preflight를 사용해 이를 `P180/
 재자격했다. 두 독립 node의 Q2 합계는 1,200 epoch, actual NRx4,800, recovery1,312,
 variable-context Qwen1,077과 radio commit4,800이며 deadline·transport·recovery contract
 위반은 0이었다. 16--512 token 여섯 class가 모두 frozen bound를 통과했다. Calibration
-trace에서 같은 exact offline selector를 사용한 Q3 oracle은 SoftWall과
-certificate-preserving recovery-first Event-driven baseline에 모두 385,262 timely token을
-배정해 추가 이득 0.000%를 냈다. 이 동률은 certificate가 아니라 AI-first retiming의
-추가 처리량 주장을 기각한다.
-따라서 confirmatory 처리량 holdout은 사전 중단하고 substrate/fault/envelope 주장에 집중한다.
+trace의 absolute deadline을 arrival에 다시 더한 오류를 C173에서 전 행 무제외 교정한 뒤,
+SoftWall·certificate-preserving recovery-first·offline oracle은 모두 856 request와
+349,387 timely token이었다. Full-bound recovery-first gap도 1.14%로 5% MDE 아래였다. 반면
+C167의 13,716개 feasible capacity point 중 3,600개에서 SoftWall이 static reservation을
+넘었고, C174는 362개의 중간-SLO headroom 후보를 찾았다. C175에서 safe AI-first greedy는
+361/362를 fixed-placement oracle의 5% 안에서 닫았고 flexible recovery placement upper
+bound는 203/362에서 양수였다. 따라서 처리량 최적화의 남은 축은 AI ordering이 아니라
+multi-GPU recovery placement이며, 현재는 development upper bound로만 주장한다.
 
 C160/C161은 epoch·generation·fence state와 A0--A6 physical fault matrix를 검증했다. Qualified
 node의 합계는 actual NeuralRx2,800, recovery942, radio commit2,800, deadline miss0이며,
@@ -55,8 +62,9 @@ NeuralRx 실패, 복수 conventional recovery와 복구 전 AI lease를 deadline
 12.309 ms의 실제 GPU kernel overlap을 확인했다. 반면 세 단계의 독립 정책 실험에서
 exact/joint 선택은 강한 greedy 또는 max-radio와 같았고, 마지막 사전 고정 C102에서도
 39/39 동일했다. C102의 조건부 AI 용량은 37/39 상태에서 변했지만 radio-noninferior한
-AI 개선 선택은 0개였다. 결과적으로 본 연구의 기여는 새로운 optimizer가 아니라,
-MPS 위에서 조건부 복구 자원을 안전하게 가상화하는 substrate와 그 실행 가능 경계다.
+AI 개선 선택은 0개였다. 결과적으로 본 연구의 기여는 새로운 AI-ordering optimizer가 아니라,
+future mandatory recovery를 scheduling state로 만들고 admission·retiming·AI lease·physical
+ownership을 하나의 검증 가능한 결정으로 연결하는 certified scheduler와 그 실행 가능 경계다.
 
 BurstGPT 60초 trace를 Qwen2.5-1.5B prefill로 재생한 사전 고정 C113에서 SoftWall은
 두 독립 seed의 각 반복마다 81회와 88회의 multi-credit/AI-lease transaction을
@@ -429,9 +437,23 @@ max-radio 정책과 service profile을 주고, SoftWall이 `Static safe calendar
 
 ---
 
-## 3. Design
+## 3. Design — 권위 논문 구조
 
-### 3.1 객체와 상태
+최종 영문 원고는 Model과 Design을 분리하지 않고 다음 네 subsection으로 구성한다.
+
+| subsection | 역할 |
+|---|---|
+| **3.1 Overall architecture** | RAN/AI event → recovery debt → candidate scheduler → independent verifier → qualified multi-GPU execution → terminal event의 전체 순환 |
+| **3.2 Scheduling conditional recovery** | mandatory-first debt, all-fail dominance, common-cutoff outcome batch, recovery retiming과 AI lease의 원자 commit |
+| **3.3 Refining schedules to physical completion** | generation token, launch-time revalidation, IPC/P2P ownership, CUDA fence, quarantine와 single radio commit |
+| **3.4 Certified event-scheduling algorithm** | UQ/MI/QSN/QSU 판정, verified first-action dispatch, decision window와 safe reclaimable-capacity 모델 |
+
+세 component-level TikZ 그림과 한 algorithm box가 이 순서를 그대로 따른다. 권위 구현은
+`paper/softwall_sigmetrics27/main.tex`와 그 아래 `figures/softwall_*.tex`이다.
+
+## 상세 메커니즘 메모 — subsection 번호 아님
+
+### 객체와 상태
 
 SoftWall은 다음 객체를 유지한다.
 
@@ -446,7 +468,7 @@ SoftWall은 다음 객체를 유지한다.
 
 정책은 미래 CRC, 미래 AI 도착, test label, 실제 SNR과 미래 실행시간을 볼 수 없다.
 
-### 3.2 Mandatory-first admission
+### Mandatory-first admission
 
 RAN request가 도착하면 `reserve_mandatory`가 conventional recovery interval을 먼저
 확보한다. Optional NRx가 거절되어도 이 credit은 사라지지 않는다. 그 뒤 `admit_nrx`가
@@ -467,7 +489,7 @@ B_NRx_pair + n_cells × B_conv_path + guard <= D
 
 이다. Runtime은 이 합보다 세밀한 request별 interval schedule을 직접 검사한다.
 
-### 3.3 All-fail certificate
+### All-fail certificate
 
 어떤 시각 `t`에도 미해결 NRx가 전부 실패하거나 늦는 분기를 가정한다. 모든 요청의
 conventional interval이 같은 lane에서 충돌하지 않고 `d_i - guard` 전에 끝나면 그
@@ -480,7 +502,7 @@ schedule이 certificate다. Certificate가 없으면 optional NRx 또는 AI를 �
 > `conventional_commit_i <= d_i`인 충돌 없는 복구 계획이 남아 있어야 한다.
 > 물리적으로 끝나지 않은 GPU/IPC 자원은 재사용하지 않는다.
 
-### 3.4 Atomic replan and lease
+### Atomic replan and lease
 
 NRx 성공, 실패, late, AI 도착, AI 완료 때마다 남은 recovery credit을 다시 배치할 수
 있다. `replan_and_lease`는 다음을 하나의 transaction으로 검사한다.
@@ -494,7 +516,7 @@ NRx 성공, 실패, late, AI 도착, AI 완료 때마다 남은 recovery credit�
 기존 calendar와 credit이 그대로 남는다. 오래된 reservation으로 새 credit을 해제할 수
 없다.
 
-### 3.5 Event-driven execution
+### Event-driven execution
 
 Runtime은 매 사건에서 첫 non-preemptive action만 실행하고 다시 계획한다.
 
@@ -524,7 +546,7 @@ live credit과 겹칠 수 있다. 현재 executor는 모든 open recovery를 합
 `(reserved_start, deadline, slot_id)` 순서로 실행한다. Certificate가 존재한다는 사실과
 실제 executor가 그 schedule의 refinement라는 조건을 함께 만족해야 안전 정리가 성립한다.
 
-### 3.6 Fault and lifecycle handling
+### Fault and lifecycle handling
 
 - NRx failure/late: 해당 request의 reserved conventional을 실행한다.
 - Duplicate/stale response: epoch와 single-commit 검사로 폐기한다.
@@ -542,13 +564,13 @@ live credit과 겹칠 수 있다. 현재 executor는 모든 open recovery를 합
 - Python GC: GC ON/OFF를 서로 다른 mode로 취급한다. C89에서 GC ON은 NRx 50 ms 상한을
   실제로 깨뜨렸다.
 
-### 3.7 Controller 선택
+### Controller 선택
 
 C102 이후 radio subset은 `max-radio`로 고정한다. 선택된 subset에 대해서는 exact recovery
 recourse가 all-fail certificate와 보이는 AI request의 안전한 배치를 계산한다. 이 exact
 solver는 작은 상태의 증명서 생성기이며 새 최적화 기여가 아니다.
 
-### 3.8 Feasibility envelope
+### Feasibility envelope
 
 각 mode를 다음 네 상태로 분류한다.
 
@@ -581,7 +603,7 @@ phase와 이 완전한 admission charge를 명시해 capacity geometry를 실행
 과대해석하지 않는다. AI completion guard가 빠진 mode 입력은 0으로 기본 처리하지 않고
 자격 입력 오류로 거절한다.
 
-### 3.9 안전성 논증의 범위
+### 안전성 논증의 범위
 
 다음 가정 아래 runtime invariant를 귀납적으로 보일 수 있다.
 
@@ -608,7 +630,7 @@ certificate를 따르지 못한 mode는 즉시 `Unqualified`로 분류한다.
 논문의 보장 문장은 **자격화된 mode와 허용 fault class에 조건부인 safety theorem**으로
 제한한다.
 
-### 3.10 멀티 GPU transport-independent endpoint
+### 멀티 GPU transport-independent endpoint
 
 Conventional recovery와 최종 commit은 RAN home GPU에 유지하고, optional NeuralRx
 endpoint는 local CUDA IPC 또는 remote CUDA P2P를 사용한다. P2P 자체를 기여로 주장하지
@@ -645,7 +667,7 @@ C119/C120은 local 1개+remote 3개로 네 GPU를 모두 사용해 recovery/leas
 [C114 결과](../archive/SOFTWALL_CONFIRM114_MULTIGPU_RESULT_KO.md)와
 [멀티 GPU·모델링 로드맵](../archive/SOFTWALL_MULTIGPU_MODELING_ROADMAP_KO.md)에 있다.
 
-### 3.11 Sharded recovery home과 certificate 합성
+### Sharded recovery home과 certificate 합성
 
 Endpoint offload만으로는 home GPU의 receiver residency와 conventional recovery lane이
 줄지 않는다. SoftWall은 cell 집합을 여러 home GPU로 분할하고, 각 home이 자기 요청의
@@ -660,7 +682,7 @@ mandatory certificate의 분리 가능성은 유지된다. Shared NRx 또는 rec
 도입하면 이 단순 합성 조건이 깨지며, 영향받는 모든 home generation과 shared credit을
 하나의 multi-resource certificate로 검사해야 한다.
 
-### 3.12 Global AI request lease와 local certificate의 합성
+### Global AI request lease와 local certificate의 합성
 
 C123부터 두 recovery home은 한 BurstGPT request queue를 공유한다. Broker는 request를
 `ready -> held(home,generation) -> inflight -> completed/late`로 관리한다. Home은 먼저
@@ -699,7 +721,7 @@ V13 synchronous mode는 socket wait `T_sock=5 ms`와 admission wall bound `B_rpc
 세부 correction chain은 [C138–C140 판정](../archive/SOFTWALL_CONFIRM138_140_CONTROL_BOUND_CORRECTION_KO.md)에 있다.
 C141은 이 두 요소를 독립 A100 node에서 함께 재자격했다.
 
-### 3.13 Launch-time revalidated single-token pipelined control
+### Launch-time revalidated single-token pipelined control
 
 현재 V16-qualified mode의 V15 runtime은 control ownership과 RAN execution을 pipeline으로 분리한다.
 
@@ -726,7 +748,7 @@ token 분기의 실제 관측을 요구한다. V14 반례와 교정은
 [ownership correction](../archive/SOFTWALL_V14_OWNERSHIP_CORRECTION_KO.md)에, 두-node 결과는
 [C145--C146 결과](../archive/SOFTWALL_CONFIRM145_146_V15_SINGLE_TOKEN_RESULT_KO.md)에 고정했다.
 
-### 3.14 Shared mandatory-recovery calendar (V17 candidate)
+### Shared mandatory-recovery calendar (V17 candidate)
 
 V16의 multi-home 합성은 home마다 conventional recovery lane이 분리돼 있을 때 성립한다.
 여러 home이 한 recovery GPU를 공유하면 local certificate의 곱은 안전 조건이 아니다.
@@ -1212,12 +1234,12 @@ class가 최소 50개의 physical completion을 확보했다. 개발 중 stale l
 outcome의 sequential replay 반례를 보존했고, bounded revalidation+physical latest-start와
 common-cutoff atomic batch transition으로 교정한 뒤 독립 holdout까지 16/16 gate를 통과했다.
 
-C159-Q3는 calibration 네 창의 request4,290·offered1,129,504 token에 같은 exact offline
-selector를 적용했다. Q2 실측 recovery 시간을 사용한 certificate-preserving
-recovery-first Event-driven과 SoftWall은
-모두 931 request·385,262 token으로 같았다. Recovery마다 선언 25 ms를 모두 쓴 sensitivity도
-SoftWall 이득 0.066%로 사전 MDE 5%에 못 미쳤다. 따라서 confirmatory performance holdout은
-열지 않는다.
+C159-Q3의 원 selector는 absolute deadline에 arrival을 다시 더한 결함이 있었다. C173은
+같은 calibration 네 창의 request4,290·offered1,129,504 token 전 행을 무제외 재계산했다.
+Certificate-preserving recovery-first, SoftWall, offline oracle은 모두 856 request·349,387
+token이고 static global-safe는 0이었다. Recovery마다 선언 25 ms를 전부 청구한
+recovery-first는 345,405 token으로 SoftWall 대비 1.14% gap이며 사전 MDE 5% 아래다. 원
+artifact는 보존하지만 931/385,262와 0.066%를 authoritative 결과로 사용하지 않는다.
 
 C160은 epoch/generation/idempotency와 physical-fence lifecycle의 51개 state transition에서
 invariant violation0과 reject mutation0으로 통과했다. C161 1단계 A0/A1/A4와 2단계
@@ -1273,14 +1295,16 @@ steady AI unit bound로 취급하지 않는다. Optional inference는 0으로 �
 
 C159-Q3의 recovery-first는 certificate가 없는 기준선이 아니다. 같은 초기 all-fail radio
 admission을 사용하고 unresolved recovery를 먼저 물리적으로 drain한다. 따라서
-`385,262 = 385,262`가 기각한 것은 AI-first atomic retiming의 추가 처리량이지 recovery debt
+교정된 `349,387 = 349,387`이 기각한 것은 AI-first atomic retiming의 추가 처리량이지 recovery debt
 표현과 certificate 자체가 아니다.
 
 C162의 사전 고정 E4는 decision45ms, debt2, context256에서 mandatory-only는 feasible하지만
 debt-blind AI admission의 bound-respecting finish165ms가 guard153ms를 12ms 넘는다. E6b는
 decision89ms, debt1, context64에서 finish154ms로 1ms 넘는다. SoftWall은 두 상태를 QSN으로
-분류해 두 node 합계60/60회 GPU launch 전에 거절했다. 이는 observed debt-blind miss가 아니라
-contract-level counterexample다. C26/C46의 실제 MPS miss와 C153의 local-safe/global-unsafe
+분류해 두 node 합계60/60회 GPU launch 전에 거절했다. C172의 bound-padded physical
+diagnostic은 두 독립 node에서 debt-blind E4 guard+deadline 위반40/40과 E6b shadow guard
+위반40/40을 재현했고 SoftWall arm은0/120이었다. 이는 production/WCET가 아니라 선언
+service vector 안에서 current idleness가 false-safe임을 보이는 necessity witness다. C26/C46의 실제 MPS miss와 C153의 local-safe/global-unsafe
 fifth reject를 함께 보면, MPS 실패 → global obligation → AI-first admission의 세 층이
 연결된다.
 
@@ -1383,11 +1407,11 @@ strong-baseline 추가 이득은 약 0.1%로 기각됐다.
 
 C159는 source-time을 development/calibration/confirmatory holdout으로 먼저 분리했다.
 Q2에서 여섯 variable-context class를 실제 cuPHY/NeuralRx co-run P180 mode로 자격화한 뒤,
-Q3는 calibration 네 window에 exact offline weighted matching을 적용했다. SoftWall AI-first와
-실측 recovery-first Event-driven의 optimum은 385,262 token으로 같았다. 이 사전 upper-bound
-screen이 5% MDE에 실패했으므로 confirmatory holdout을 materialize하거나 online superiority
-CI를 계산하지 않았다. Trace는 Q3 결과를 얻기 위한 성능 표본이 아니라 no-headroom 판정을
-위한 calibration 입력으로 남는다.
+C173 교정 screen에서 SoftWall AI-first와 recovery-first·oracle은 349,387 token으로 같았다.
+C174는 같은 네 calibration window를 2,592개 topology/failure/SLO 점에 투영해 362개를
+5% headroom 후보로 올렸다. C175는 그 전부를 분해해 AI-first greedy가 361개를 닫고,
+flexible recovery placement만 203개에서 양의 상한을 가짐을 보였다. Confirmatory holdout은
+열지 않았고 placement 이득도 물리 처리량으로 승격하지 않는다.
 
 ---
 
@@ -1525,7 +1549,7 @@ lifecycle mode도 limitation/future work로 명시한다.
 | Repeated actual-NRx integration | C158 P600, C159-Q1/Q2 P180, C161 full qualification | P180/D155 variable-context와 qualified-node fault matrix PASS |
 | Predictive feasibility envelope | C162 exact16,023·retrospective1,200·physical boundary180, mismatch0 | qualified warm QSU/QSN/MI/UQ와 88/89 ms 경계 PASS |
 | Certified scheduler scalability | small exact600 false-safe0·false-conservative10; large2,800; debt64 p991.494ms | 반환 certificate 검증 실패0, finite CPU 5ms budget PASS |
-| Trace optimization headroom | Q3 exact offline: empirical Event-driven=SoftWall=385,262 token; contract sensitivity +0.066% | 5% MDE 실패, confirmatory performance holdout 중단 |
+| Capacity/headroom decomposition | C167 feasible13,716 중 SoftWall>static3,600; C174 후보362; C175 greedy within5% 361, placement positive203 | C159 원 mode는349,387 동률·full-bound gap1.14%; placement은 development upper bound |
 
 ## Appendix B. 권위 문서
 

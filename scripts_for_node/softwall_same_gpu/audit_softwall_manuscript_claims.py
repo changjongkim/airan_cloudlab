@@ -15,6 +15,7 @@ MANUSCRIPT = ROOT / "docs/current/SOFTWALL_MANUSCRIPT_DRAFT_EN.md"
 NOVELTY = ROOT / "docs/current/SOFTWALL_NOVELTY_DEFENSE_MATRIX_KO.md"
 CONTRACT_FIGURE = ROOT / "docs/current/figures/softwall_system_contract.svg"
 ENVELOPE_FIGURE = ROOT / "docs/current/figures/softwall_c162_envelope_scalability.svg"
+CAPACITY_FIGURE = ROOT / "paper/softwall_sigmetrics27/figures/softwall_capacity_headroom.svg"
 
 
 def load(name: str) -> dict:
@@ -105,21 +106,54 @@ def audit_quantitative_provenance(manuscript: str) -> tuple[dict, list[dict]]:
             ("results/softwall_multigpu/c162_scheduler_scalability_v1.json", "large_grid.by_debt.64.verify_us.p99", 130.984),
         ],
         "C162_NECESSITY": [
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "witnesses.0.decision_time_ms", 45),
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "witnesses.0.bound_respecting_finish_ms", 165),
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "witnesses.0.contract_excess_ms", 12),
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "witnesses.0.radio_guard_boundary_ms", 153),
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "witnesses.1.decision_time_ms", 89),
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "witnesses.1.bound_respecting_finish_ms", 154),
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "witnesses.1.contract_excess_ms", 1),
-            ("results/softwall_multigpu/softwall_necessity_witness_v2.json", "summary.physical_softwall_reject_rounds", 60),
+            ("results/softwall_multigpu/softwall_necessity_witness_v3.json", "witnesses.0.decision_time_ms", 45),
+            ("results/softwall_multigpu/softwall_necessity_witness_v3.json", "witnesses.0.bound_respecting_finish_ms", 165),
+            ("results/softwall_multigpu/softwall_necessity_witness_v3.json", "witnesses.0.contract_excess_ms", 12),
+            ("results/softwall_multigpu/softwall_necessity_witness_v3.json", "witnesses.1.decision_time_ms", 89),
+            ("results/softwall_multigpu/softwall_necessity_witness_v3.json", "witnesses.1.contract_excess_ms", 1),
+            ("results/softwall_multigpu/c172_debt_blind_two_node_v1.json", "per_scenario.E4_debt_blind_launch.deadline_violations", 40),
+            ("results/softwall_multigpu/c172_debt_blind_two_node_v1.json", "per_scenario.E6b_shadow_launch.guard_violations", 40),
+            ("results/softwall_multigpu/c172_debt_blind_two_node_v1.json", "safe_policy_summary.selected_rounds", 120),
+            ("results/softwall_multigpu/c172_debt_blind_two_node_v1.json", "safe_policy_summary.guard_violations", 0),
+            ("results/softwall_multigpu/c172_debt_blind_two_node_v1.json", "safe_policy_summary.zero_violation_95pct_rule_of_three_upper", 0.025),
         ],
         "C159_BASELINE": [
-            ("results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json", "summary.offered_requests", 4290),
-            ("results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json", "summary.offered_value_tokens", 1129504),
-            ("results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json", "summary.totals.softwall.timely_requests", 931),
-            ("results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json", "summary.totals.softwall.timely_value_tokens", 385262),
-            ("results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json", "summary.minimum_effect_pct", 5.0),
+            ("results/softwall_multigpu/c173_deadline_correction_result_v1.json", "summary.offered_requests", 4290),
+            ("results/softwall_multigpu/c173_deadline_correction_result_v1.json", "summary.offered_value_tokens", 1129504),
+            ("results/softwall_multigpu/c173_deadline_correction_result_v1.json", "summary.totals.softwall.timely_requests", 856),
+            ("results/softwall_multigpu/c173_deadline_correction_result_v1.json", "summary.totals.softwall.timely_value_tokens", 349387),
+            ("results/softwall_multigpu/c173_deadline_correction_result_v1.json", "summary.totals.recovery_first_full_bound.gap_to_oracle_pct", 1.1397104070844077),
+            ("results/softwall_multigpu/c173_deadline_correction_result_v1.json", "summary.minimum_effect_pct", 5.0),
+        ],
+        "C167_CAPACITY": [
+            ("results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json", "summary.grid_points", 21384),
+            ("results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json", "summary.mandatory_infeasible_points", 7668),
+            ("results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json", "summary.softwall_better_than_static_points", 3600),
+            ("results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json", "summary.recovery_first_gap_at_least_mde_points", 2604),
+            ("results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json", "summary.debt_blind_positive_violation_probability_points", 4338),
+            ("results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json", "exact_checker.cases", 5376),
+            ("results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json", "exact_checker.mismatches", 0),
+        ],
+        "C174_HEADROOM": [
+            ("results/softwall_multigpu/c174_trace_oracle_screen_v1.json", "summary.grid_points", 2592),
+            ("results/softwall_multigpu/c174_trace_oracle_screen_v1.json", "summary.mandatory_feasible_points", 2052),
+            ("results/softwall_multigpu/c174_trace_oracle_screen_v1.json", "summary.gap_at_least_mde_and_positive_all_windows_points", 362),
+            ("results/softwall_multigpu/c174_trace_oracle_screen_v1.json", "summary.minimum_effect_pct", 5.0),
+        ],
+        "C175_LEVERS": [
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "candidate_points", 362),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "greedy_within_5pct_of_fixed_oracle_points", 361),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "maximum_greedy_gap_pct", 7.021643287099046),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "flexible_recovery_positive_gain_points", 203),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "flexible_recovery_median_positive_gain_pct", 10.635520119364013),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "by_gpu.1.candidate_points", 102),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "by_gpu.1.flexible_recovery_positive_gain_points", 0),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "by_gpu.2.candidate_points", 175),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "by_gpu.2.flexible_recovery_positive_gain_points", 145),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "by_gpu.4.candidate_points", 85),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "by_gpu.4.flexible_recovery_positive_gain_points", 58),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "sionna_recovery_debt_reduction.0", 0.0),
+            ("results/softwall_multigpu/c175_lever_summary_v1.json", "sionna_recovery_debt_reduction.1", 0.0),
         ],
         "C164_LIFECYCLE": [
             ("results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json", "counts.qualified_or_partial_modes", 5),
@@ -210,10 +244,13 @@ def main() -> None:
     retro = load("c162_q2_retrospective_validation.json")
     boundary = load("c162_boundary_two_node.json")
     scale = load("c162_scheduler_scalability_v1.json")
-    oracle = load("confirm159_q3_oracle_screen_v1.json")
+    oracle = load("c173_deadline_correction_result_v1.json")
+    capacity = load("c167_reclaimable_capacity_model_v2.json")
+    headroom = load("c174_trace_oracle_screen_v1.json")
+    levers = load("c175_lever_summary_v1.json")
     lifecycle = load("c164_lifecycle_qualification_summary_v1.json")
     process = load("c164i3_processreplace_dev_j58862843_result.json")
-    necessity = load("softwall_necessity_witness_v2.json")
+    necessity = load("softwall_necessity_witness_v3.json")
     production = load("softwall_production_exit_gate_v3.json")
     manuscript = MANUSCRIPT.read_text()
     normalized_manuscript = " ".join(manuscript.split())
@@ -275,12 +312,24 @@ def main() -> None:
             and debt64["decision_us"]["p99"] == 1494.332
         ),
         "negative_performance_result": (
-            oracle["status"] == "C159_Q3_ORACLE_SCREEN_STOP_PERFORMANCE"
-            and oracle["open_confirmatory_holdout"] is False
+            oracle["status"] == "C173_DEADLINE_CORRECTION_PASS"
+            and oracle["all_pass"] is True
             and oracles["minimum_effect_pct"] == 5.0
-            and oracles["totals"]["event_empirical"]["timely_value_tokens"] == 385262
-            and oracles["totals"]["softwall"]["timely_value_tokens"] == 385262
-            and oracles["softwall_gain_over_event_empirical_pct"] == 0.0
+            and oracles["totals"]["recovery_first_empirical"]["timely_value_tokens"] == 349387
+            and oracles["totals"]["softwall"]["timely_value_tokens"] == 349387
+            and oracles["totals"]["recovery_first_empirical"]["gap_to_oracle_pct"] == 0.0
+        ),
+        "capacity_headroom_and_levers": (
+            capacity.get("all_pass") is True
+            and capacity["summary"]["grid_points"] == 21384
+            and capacity["exact_checker"] == {"cases": 5376, "mismatches": 0, "first_mismatches": []}
+            and headroom.get("all_pass") is True
+            and headroom["summary"]["mandatory_feasible_points"] == 2052
+            and headroom["summary"]["gap_at_least_mde_and_positive_all_windows_points"] == 362
+            and levers.get("all_pass") is True
+            and levers["greedy_within_5pct_of_fixed_oracle_points"] == 361
+            and levers["flexible_recovery_positive_gain_points"] == 203
+            and levers["sionna_recovery_debt_reduction"] == [0.0, 0.0]
         ),
         "claim_scoped_lifecycle": (
             lifecycle.get("claim_scope_complete") is True
@@ -301,8 +350,11 @@ def main() -> None:
             "1,077 Qwen units",
             "16,023 qualified states",
             "1.494 ms p99 decision",
-            "385,262 tokens",
-            "no material throughput advantage",
+            "349,387 tokens",
+            "21,384 points",
+            "3,600 (26.2%)",
+            "361 points",
+            "203 points",
         )),
         "necessity_witness": (
             necessity.get("all_pass") is True
@@ -316,14 +368,17 @@ def main() -> None:
             and necessity["contract_sensitivity"]["observed_sample_maxima_are_not_contract_bounds"]
                 ["c159_q2_authoritative_recovery_path_max_ms"] == 13.465105
             and "certificate-preserving recovery-first" in manuscript
-            and "contract-level counterexamples" in manuscript
-            and "not observed debt-blind misses" in manuscript
+            and necessity["summary"]["physical_debt_blind_E4_selected_deadline_violations"] == 40
+            and necessity["summary"]["physical_E6b_shadow_selected_guard_violations"] == 40
+            and necessity["summary"]["physical_softwall_selected_guard_violations"] == 0
+            and "bound-padded diagnostic" in manuscript
+            and "40/40" in manuscript
             and "E6b disappears at or below 24 ms" in manuscript
             and "E4 remains until the bound reaches 19 ms" in manuscript
         ),
         "manuscript_scope_present": all(token in normalized_manuscript for token in (
             "no WCET or production-HARQ claim",
-            "we make no optimizer claim",
+            "we make no executed optimizer claim",
             "finite-sample qualification",
             "production `d_MAC`",
             "Process/model cold, 5 min and 30 min idle, GC-on, and worker process replacement remain UQ",
@@ -363,8 +418,10 @@ def main() -> None:
         "paper_figures_present": (
             CONTRACT_FIGURE.stat().st_size > 1000
             and ENVELOPE_FIGURE.stat().st_size > 1000
+            and CAPACITY_FIGURE.stat().st_size > 1000
             and "figures/softwall_system_contract.svg" in manuscript
             and "figures/softwall_c162_envelope_scalability.svg" in manuscript
+            and "softwall_capacity_headroom.svg" in manuscript
         ),
         "forbidden_overclaim_absent": all(token not in manuscript.lower() for token in (
             "first ai-ran system",
@@ -384,10 +441,15 @@ def main() -> None:
         "c162_q2_retrospective_validation.json",
         "c162_boundary_two_node.json",
         "c162_scheduler_scalability_v1.json",
-        "confirm159_q3_oracle_screen_v1.json",
+        "c173_deadline_correction_result_v1.json",
+        "c167_reclaimable_capacity_model_v2.json",
+        "c174_trace_oracle_screen_v1.json",
+        "c175_lever_evaluation_v1.json",
+        "c175_lever_summary_v1.json",
         "c164_lifecycle_qualification_summary_v1.json",
         "c164i3_processreplace_dev_j58862843_result.json",
-        "softwall_necessity_witness_v2.json",
+        "softwall_necessity_witness_v3.json",
+        "c172_debt_blind_two_node_v1.json",
         "softwall_production_exit_gate_v3.json",
     ]
     output = {
@@ -407,6 +469,9 @@ def main() -> None:
             "boundary_rounds": boundary["total_rounds"],
             "debt64_decision_p99_ms": debt64["decision_us"]["p99"] / 1000.0,
             "oracle_timely_tokens": oracles["totals"]["softwall"]["timely_value_tokens"],
+            "capacity": capacity["summary"],
+            "headroom": headroom["summary"],
+            "levers": levers,
             "lifecycle_counts": lifecycle["counts"],
             "necessity": necessity["summary"],
             "production_exit": {
@@ -430,6 +495,7 @@ def main() -> None:
             "docs/current/SOFTWALL_NOVELTY_DEFENSE_MATRIX_KO.md": sha256(NOVELTY),
             "docs/current/figures/softwall_system_contract.svg": sha256(CONTRACT_FIGURE),
             "docs/current/figures/softwall_c162_envelope_scalability.svg": sha256(ENVELOPE_FIGURE),
+            "paper/softwall_sigmetrics27/figures/softwall_capacity_headroom.svg": sha256(CAPACITY_FIGURE),
             "scripts_for_node/softwall_same_gpu/audit_softwall_manuscript_claims.py": sha256(Path(__file__)),
         },
     }

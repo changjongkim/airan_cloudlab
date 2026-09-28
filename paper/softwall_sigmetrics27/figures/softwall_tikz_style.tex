@@ -1,0 +1,30 @@
+% Shared TikZ style for the SoftWall design figures (CASCADE look).
+% The ACM template owns the document font; figure-local components reuse it.
+\definecolor{panel}{gray}{0.94}
+\definecolor{cyanp}{HTML}{BFE6EC}
+\definecolor{peach}{HTML}{FBE1D2}
+\definecolor{hot}{HTML}{E8735A}
+\definecolor{gold}{HTML}{FFC000}
+\definecolor{bluec}{HTML}{8FAADC}
+\definecolor{greenc}{HTML}{A9D18E}
+\definecolor{dred}{HTML}{C00000}
+\definecolor{dblue}{HTML}{2E75B6}
+
+\tikzset{
+  layer/.style={draw=black!70, fill=panel, line width=0.5pt},
+  sub/.style={draw=black!60, line width=0.4pt},
+  comp/.style={draw=black, fill=white, line width=0.4pt, align=center,
+               font=\bfseries\scriptsize, inner sep=1.5pt, minimum height=0.55cm},
+  blk/.style={draw=black!70, line width=0.35pt, minimum width=0.5cm, minimum height=0.36cm,
+              inner sep=0pt, font=\bfseries\scriptsize},
+  free/.style={blk, pattern=north east lines, pattern color=black!55},
+  ttl/.style={font=\bfseries\small},
+  note/.style={font=\itshape\bfseries\scriptsize},
+  arr/.style={-{Latex[length=1.6mm]}, line width=0.8pt},
+  fat/.style={-{Triangle[length=2.2mm,width=3.4mm]}, line width=2.4pt},
+  num/.style={circle, fill=black, text=white, font=\bfseries\scriptsize,
+              inner sep=0.6pt, minimum size=0.33cm},
+  rnum/.style={num, fill=dred},
+}
+
+\newcommand{\SOFTWALLNAME}{SoftWall}

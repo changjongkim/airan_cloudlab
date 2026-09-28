@@ -1,10 +1,14 @@
-# SoftWall SIGMETRICS 2027 review manuscript
+# SoftWall certified-scheduling SIGMETRICS 2027 review manuscript
 
 This directory contains the anonymous `acmart` review manuscript.
 
 - `main.tex`: paper source
 - `references.bib`: normalized bibliography
-- `main.pdf`: compiled 15-page review PDF, including references
+- `figures/softwall_tikz_style.tex`: shared CASCADE-style TikZ vocabulary
+- `figures/softwall_overall_architecture.tex`: Section 3.1 scheduling loop
+- `figures/softwall_atomic_replan.tex`: Section 3.2 recovery/AI transaction
+- `figures/softwall_physical_refinement.tex`: Section 3.3 launch-to-fence refinement
+- `main.pdf`: compiled 20-page review PDF, including references
 
 Build from this directory on the project environment:
 

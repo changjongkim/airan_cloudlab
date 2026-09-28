@@ -1,0 +1,117 @@
+{
+  "all_pass": true,
+  "analysis_role": "Posthoc contract interpretation of prespecified C162 points; no new outcome was opened.",
+  "artifact_sha256": {
+    "results/softwall_multigpu/c162_boundary_two_node.json": "2daa077c46ffadc55d45e5149ac6eb51d2a753589713ea37d24a5875a18c207f",
+    "results/softwall_multigpu/c162_feasibility_grid_v1.json": "f5da8016215c2896ef4d9f19be4e8ea386529a46c590407602fb116daddc60c7",
+    "results/softwall_multigpu/c172_debt_blind_two_node_v1.json": "e4d59836f932c7ff3b40b6fe4484fa9ffed848115781012e43546e80179312d9",
+    "results/softwall_multigpu/c173_deadline_correction_result_v1.json": "99efc84b6231b0b12cce8df5ec48126fec107e9e38d80377852e767e587f7d16",
+    "results/softwall_multigpu/confirm159_q2_variable_two_node.json": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692"
+  },
+  "baseline_semantics": {
+    "c159_recovery_first": "certificate-preserving conservative policy that drains unresolved recovery before AI",
+    "debt_blind_diagnostic": "unsafe policy that treats current GPU idleness as sufficient and ignores unresolved recovery",
+    "softwall": "certificate-preserving policy that may place AI before recovery when a witness schedule remains",
+    "tie_interpretation": "The corrected 349387-token tie rejects material AI-first throughput benefit for the trace; it does not reject the all-fail certificate."
+  },
+  "claim": "Current GPU idleness is insufficient for early external-AI admission when unresolved same-TB recovery debt exists. For each witness, mandatory-only recovery is feasible, but a debt-blind AI admission has a duration realization within the qualified bounds that crosses the radio guard. C172 physically realized the declared service vector: E4 crossed guard and deadline, while the E6b shadow crossed the guard. SoftWall rejected the unsafe states.",
+  "contract_sensitivity": {
+    "interpretation": "E6b is a one-millisecond boundary witness and vanishes at B_conv <= 24 ms. E4 remains a witness until B_conv <= 19 ms. The strongest current Q2 sample maximum is 13.465105 ms rather than the earlier approximately 3.1 ms value, so hypothetically promoting it to a bound would remove both selected witnesses. A sample maximum cannot replace the qualified bound without requalification. For every positive recovery charge, Proposition 2 still yields a later decision-time false-safe interval; tightening the bound moves the boundary rather than making unresolved debt irrelevant.",
+    "observed_sample_maxima_are_not_contract_bounds": {
+      "c159_q2_authoritative_recovery_path_max_ms": 13.465105,
+      "c159_q2_recovery_path_median_ms": 3.40418,
+      "c162_boundary_recovery_path_max_ms": 8.950475,
+      "qualified_to_c162_sample_max_ratio": 2.793147849695128,
+      "qualified_to_q2_sample_max_ratio": 1.8566509507352524
+    },
+    "premise": "The guarantee is relative to the declared qualified service bound. A lower bound defines a different, unqualified mode until its complete calendar, workload, placement, and lifecycle are requalified.",
+    "qualified_recovery_bound_ms": 25,
+    "thresholds": {
+      "19_ms_lt_B_conv_le_24_ms": "E6b disappears but E4 remains false-safe",
+      "B_conv_gt_24_ms": "E4 and E6b are both false-safe for debt-blind admission",
+      "B_conv_le_19_ms": "both selected witnesses disappear"
+    }
+  },
+  "non_claims": [
+    "C172 is a bound-padded diagnostic, not production-rate, WCET, or production-HARQ qualification.",
+    "The witness does not claim a throughput benefit over certificate-preserving recovery-first.",
+    "Failure-correlation probabilities are not estimated; all-fail safety is distribution-free within the fault model."
+  ],
+  "schema": "softwall-necessity-witness-v3",
+  "status": "SOFTWALL_CONTRACT_NECESSITY_WITNESS_PASS",
+  "summary": {
+    "maximum_contract_excess_ms": 12,
+    "minimum_contract_excess_ms": 1,
+    "physical_E6b_shadow_selected_guard_violations": 40,
+    "physical_debt_blind_E4_selected_deadline_violations": 40,
+    "physical_softwall_reject_rounds": 60,
+    "physical_softwall_selected_guard_violations": 0,
+    "physical_softwall_selected_rounds": 120,
+    "physical_softwall_zero_95pct_upper": 0.025,
+    "prespecified_false_safe_cases": 2,
+    "recovery_first_timely_tokens": 349387,
+    "softwall_timely_tokens": 349387
+  },
+  "witnesses": [
+    {
+      "bound_respecting_finish_ms": 165,
+      "c172_physical_diagnostic": {
+        "bound_valid_deadline_violations": 39,
+        "bound_valid_guard_violations": 39,
+        "deadline_violations": 40,
+        "guard_violations": 40,
+        "jointly_bound_valid_rounds": 39,
+        "selected_rounds": 40,
+        "timing_invalid_attempts": 0,
+        "unused_timing_valid_attempts": 8
+      },
+      "case": "E4_two_unresolved_context256",
+      "context_length": 256,
+      "contract_excess_ms": 12,
+      "debt_blind_idle_only_decision": "ACCEPT",
+      "decision_time_ms": 45,
+      "mandatory_all_fail_safe": true,
+      "physical_softwall_reject_rounds": 30,
+      "radio_guard_boundary_ms": 153,
+      "sensitivity": {
+        "maximum_safe_recovery_bound_ms": 19.0,
+        "non_recovery_charge_ms": 115,
+        "recovery_waves": 2,
+        "unsafe_iff": "B_conv > 19.000 ms"
+      },
+      "softwall_ai_safe": false,
+      "softwall_state": "QSN",
+      "unresolved_debts": 2
+    },
+    {
+      "bound_respecting_finish_ms": 154,
+      "c172_physical_diagnostic": {
+        "bound_valid_deadline_violations": 0,
+        "bound_valid_guard_violations": 39,
+        "deadline_violations": 0,
+        "guard_violations": 40,
+        "jointly_bound_valid_rounds": 39,
+        "selected_rounds": 40,
+        "timing_invalid_attempts": 2,
+        "unused_timing_valid_attempts": 6
+      },
+      "case": "E6b_first_unsafe_context64",
+      "context_length": 64,
+      "contract_excess_ms": 1,
+      "debt_blind_idle_only_decision": "ACCEPT",
+      "decision_time_ms": 89,
+      "mandatory_all_fail_safe": true,
+      "physical_softwall_reject_rounds": 30,
+      "radio_guard_boundary_ms": 153,
+      "sensitivity": {
+        "maximum_safe_recovery_bound_ms": 24.0,
+        "non_recovery_charge_ms": 129,
+        "recovery_waves": 1,
+        "unsafe_iff": "B_conv > 24.000 ms"
+      },
+      "softwall_ai_safe": false,
+      "softwall_state": "QSN",
+      "unresolved_debts": 1
+    }
+  ]
+}

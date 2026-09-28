@@ -1,0 +1,120 @@
+{
+  "all_pass": true,
+  "analysis_role": "Deterministic aggregation of the two-node gate already fixed in both C172 protocols. No threshold, exclusion, or physical outcome is added.",
+  "claim_boundary": "Physical diagnostic of a declared B_conv=25 ms contract on two A100 nodes. Padding makes the allowed upper-bound execution observable; it is not a production-rate or WCET qualification claim.",
+  "counts": {
+    "actual_nrx": 960,
+    "observed_deadline_misses": 49,
+    "physical_attempts": 240,
+    "qwen_units": 120,
+    "radio_commits": 960,
+    "recoveries": 280,
+    "selected_boundary_rounds": 200,
+    "timing_invalid_attempts": 2,
+    "unused_timing_valid_attempts": 38
+  },
+  "gates": {
+    "both_frozen_runs_pass": true,
+    "debt_blind_E4_violates_guard_and_deadline": true,
+    "development_then_holdout_roles": true,
+    "forty_selected_rounds_per_scenario": true,
+    "holdout_reverses_scenario_order": true,
+    "identical_capacity_model": true,
+    "identical_frozen_sources": true,
+    "independent_seeds": true,
+    "shadow_E6b_violates_guard": true,
+    "softwall_bound_valid_rounds_have_zero_violations": true,
+    "softwall_selected_rounds_have_zero_violations": true,
+    "two_distinct_nonexcluded_nodes": true
+  },
+  "inputs": {
+    "development": {
+      "path": "results/softwall_multigpu/c172_debt_blind_job58957717_result.json",
+      "sha256": "f3517885d955053b21040f674c4d6e58134c8220f06ebf0ac6b05991f1c633be"
+    },
+    "development_protocol": {
+      "path": "results/softwall_multigpu/c172_debt_blind_job58957717_protocol.json",
+      "sha256": "4c138aeeafe3ba570f0b866cbd8ff2bacfa2266d67e454043111b35a7e46960e"
+    },
+    "holdout": {
+      "path": "results/softwall_multigpu/c172_debt_blind_job58957719_result.json",
+      "sha256": "6c31ed4b3277b0af8904368b579b802f043034aa144c982ce1de5d66f66526fe"
+    },
+    "holdout_protocol": {
+      "path": "results/softwall_multigpu/c172_debt_blind_job58957719_protocol.json",
+      "sha256": "27b729c7e61fd5e32981e7429909b82c4dbf6f93ba690ecabe5256c919b6f854"
+    }
+  },
+  "jobs": [
+    "58957717",
+    "58957719"
+  ],
+  "nodes": [
+    "nid001160",
+    "nid001000"
+  ],
+  "per_scenario": {
+    "E4_debt_blind_launch": {
+      "bound_valid_deadline_violations": 39,
+      "bound_valid_guard_violations": 39,
+      "deadline_violations": 40,
+      "guard_violations": 40,
+      "jointly_bound_valid_rounds": 39,
+      "selected_rounds": 40,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 8
+    },
+    "E4_softwall_reject": {
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violations": 0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 39,
+      "selected_rounds": 40,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 8
+    },
+    "E6a_softwall_admit": {
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violations": 0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 40,
+      "selected_rounds": 40,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 8
+    },
+    "E6b_shadow_launch": {
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 39,
+      "deadline_violations": 0,
+      "guard_violations": 40,
+      "jointly_bound_valid_rounds": 39,
+      "selected_rounds": 40,
+      "timing_invalid_attempts": 2,
+      "unused_timing_valid_attempts": 6
+    },
+    "E6b_softwall_reject": {
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violations": 0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 40,
+      "selected_rounds": 40,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 8
+    }
+  },
+  "safe_policy_summary": {
+    "bound_valid_deadline_violations": 0,
+    "bound_valid_guard_violations": 0,
+    "bound_valid_zero_95pct_rule_of_three_upper": 0.025210084033613446,
+    "deadline_violations": 0,
+    "guard_violations": 0,
+    "jointly_bound_valid_rounds": 119,
+    "selected_rounds": 120,
+    "zero_violation_95pct_rule_of_three_upper": 0.025
+  },
+  "schema": "softwall-c172-debt-blind-two-node-v1",
+  "status": "C172_TWO_NODE_PASS"
+}

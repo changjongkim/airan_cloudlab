@@ -1,0 +1,361 @@
+{
+  "all_pass": true,
+  "analysis_role": "Correction of an absolute-deadline interpretation defect in the opened C159/C166 calibration screen. No holdout is opened and no request, window, policy, bound, or threshold is changed.",
+  "defect": {
+    "correct_expression": "deadline_ms",
+    "effect": {
+      "offline_oracle": {
+        "timely_requests_delta": -75,
+        "timely_value_tokens_delta": -35875
+      },
+      "recovery_first_empirical": {
+        "timely_requests_delta": -75,
+        "timely_value_tokens_delta": -35875
+      },
+      "recovery_first_full_bound": {
+        "timely_requests_delta": -87,
+        "timely_value_tokens_delta": -39602
+      },
+      "softwall": {
+        "timely_requests_delta": -75,
+        "timely_value_tokens_delta": -35875
+      },
+      "static_global_safe": {
+        "timely_requests_delta": 0,
+        "timely_value_tokens_delta": 0
+      }
+    },
+    "incorrect_expression": "arrival_ms + deadline_ms",
+    "trace_encoding": "deadline_ms = arrival_ms + fixed_slo_ms"
+  },
+  "gates": {
+    "all_four_windows_recomputed": true,
+    "confirmatory_holdout_remains_closed": true,
+    "frozen_hashes_match": true,
+    "no_request_or_window_exclusion": true,
+    "static_and_oracle_rows_reported": true,
+    "trace_deadlines_are_absolute_and_fixed_slo": true
+  },
+  "protocol_sha256": "8f5379e326d8d735ed1a559bf5f6121302c9eb345e5cc1aeed11d2ef353b81b2",
+  "schema": "softwall-c173-deadline-correction-v1",
+  "source_sha256": {
+    "c159_prespec": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "c159_q3_analyzer": "a24bd8d058370c7e13e7654f757d57706dad37328b3e8dd515f41ccba1380d5b",
+    "c159_q3_result": "37298e64d351635f7973a25eac06a44cb85260f1eb06b65a909ba77173772ef8",
+    "c166_analyzer": "24354bd489cd2b44438200a1e624e0727b21fb9dc65c920b1adb0a7763e69538",
+    "c166_result": "cbc438a3750af55c8178fc97e8ae57d9d572de2aa3908056b9358050e282fc9f",
+    "c173_analyzer": "a7c20ef4b3691fd37ebde886b47ec62a91350092f1911c986d0d005e435fdafb",
+    "c173_test": "6a6ef83faa3db84bee157a640677dc15be845b2cf1f1dba3f2319c5775fea4ee",
+    "calibration_trace": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f",
+    "q2_development_coordinator": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "q2_holdout_coordinator": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881"
+  },
+  "status": "C173_DEADLINE_CORRECTION_PASS",
+  "summary": {
+    "minimum_effect_pct": 5.0,
+    "offered_requests": 4290,
+    "offered_value_tokens": 1129504,
+    "slots": 1336,
+    "totals": {
+      "offline_oracle": {
+        "gap_to_oracle_pct": 0.0,
+        "timely_requests": 856,
+        "timely_value_tokens": 349387
+      },
+      "recovery_first_empirical": {
+        "gap_to_oracle_pct": 0.0,
+        "timely_requests": 856,
+        "timely_value_tokens": 349387
+      },
+      "recovery_first_full_bound": {
+        "gap_to_oracle_pct": 1.1397104070844077,
+        "timely_requests": 843,
+        "timely_value_tokens": 345405
+      },
+      "softwall": {
+        "gap_to_oracle_pct": 0.0,
+        "timely_requests": 856,
+        "timely_value_tokens": 349387
+      },
+      "static_global_safe": {
+        "gap_to_oracle_pct": 100.0,
+        "timely_requests": 0,
+        "timely_value_tokens": 0
+      }
+    }
+  },
+  "windows": [
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 7,
+            "32": 0,
+            "512": 216,
+            "64": 0
+          },
+          "timely_requests": 224,
+          "timely_value_tokens": 86843
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 7,
+            "32": 0,
+            "512": 216,
+            "64": 0
+          },
+          "timely_requests": 224,
+          "timely_value_tokens": 86843
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 6,
+            "32": 0,
+            "512": 212,
+            "64": 0
+          },
+          "timely_requests": 219,
+          "timely_value_tokens": 85489
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 7,
+            "32": 0,
+            "512": 216,
+            "64": 0
+          },
+          "timely_requests": 224,
+          "timely_value_tokens": 86843
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 0,
+      "q2_state_stream": "development",
+      "slots": 334,
+      "window_id": "w00-3063931"
+    },
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 9,
+            "32": 1,
+            "512": 206,
+            "64": 0
+          },
+          "timely_requests": 217,
+          "timely_value_tokens": 92540
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 9,
+            "32": 1,
+            "512": 206,
+            "64": 0
+          },
+          "timely_requests": 217,
+          "timely_value_tokens": 92540
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 10,
+            "32": 1,
+            "512": 203,
+            "64": 0
+          },
+          "timely_requests": 215,
+          "timely_value_tokens": 91615
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 1,
+            "256": 9,
+            "32": 1,
+            "512": 206,
+            "64": 0
+          },
+          "timely_requests": 217,
+          "timely_value_tokens": 92540
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 266,
+      "q2_state_stream": "development",
+      "slots": 334,
+      "window_id": "w01-3064181"
+    },
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 13,
+            "32": 0,
+            "512": 202,
+            "64": 1
+          },
+          "timely_requests": 217,
+          "timely_value_tokens": 88529
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 13,
+            "32": 0,
+            "512": 202,
+            "64": 1
+          },
+          "timely_requests": 217,
+          "timely_value_tokens": 88529
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 12,
+            "32": 0,
+            "512": 199,
+            "64": 1
+          },
+          "timely_requests": 213,
+          "timely_value_tokens": 87566
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 1,
+            "16": 0,
+            "256": 13,
+            "32": 0,
+            "512": 202,
+            "64": 1
+          },
+          "timely_requests": 217,
+          "timely_value_tokens": 88529
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 0,
+      "q2_state_stream": "holdout",
+      "slots": 334,
+      "window_id": "w02-3063999"
+    },
+    {
+      "policies": {
+        "offline_oracle": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 10,
+            "32": 0,
+            "512": 188,
+            "64": 0
+          },
+          "timely_requests": 198,
+          "timely_value_tokens": 81475
+        },
+        "recovery_first_empirical": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 10,
+            "32": 0,
+            "512": 188,
+            "64": 0
+          },
+          "timely_requests": 198,
+          "timely_value_tokens": 81475
+        },
+        "recovery_first_full_bound": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 11,
+            "32": 0,
+            "512": 185,
+            "64": 0
+          },
+          "timely_requests": 196,
+          "timely_value_tokens": 80735
+        },
+        "softwall": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 10,
+            "32": 0,
+            "512": 188,
+            "64": 0
+          },
+          "timely_requests": 198,
+          "timely_value_tokens": 81475
+        },
+        "static_global_safe": {
+          "timely_by_context": {
+            "128": 0,
+            "16": 0,
+            "256": 0,
+            "32": 0,
+            "512": 0,
+            "64": 0
+          },
+          "timely_requests": 0,
+          "timely_value_tokens": 0
+        }
+      },
+      "q2_state_offset": 266,
+      "q2_state_stream": "holdout",
+      "slots": 334,
+      "window_id": "w03-3064082"
+    }
+  ]
+}

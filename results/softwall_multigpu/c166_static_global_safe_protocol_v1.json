@@ -1,0 +1,36 @@
+{
+  "analysis_role": "Complete the prespecified but previously omitted static_global_safe row and make the C159 structural oracle explicit.",
+  "exclusion_rule": "No rows, nodes, requests, or windows may be excluded.",
+  "frozen_semantics": {
+    "minimum_effect_pct": 5.0,
+    "offline_oracle": "same one-unit-per-epoch capacity and qualified bounds as C159; exact weighted matching sees all calibration arrivals and uses the earliest legal completion time",
+    "static_global_safe": "retain all four 25 ms recovery reservations after the 45 ms cutoff; admit a Qwen class only if it completes by both the 153 ms guard and the next 180 ms release"
+  },
+  "gates": {
+    "confirmatory_holdout_must_remain_unmaterialized": true,
+    "oracle_row_reported": true,
+    "reproduce_original_three_rows": true,
+    "static_row_reported_even_if_tied": true
+  },
+  "inputs": {
+    "c159_prespec": "results/softwall_multigpu/confirm159_experiment_prespec_v1.json",
+    "c159_q3_analyzer": "scripts_for_node/softwall_same_gpu/c159_q3_oracle_screen.py",
+    "c159_q3_result": "results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json",
+    "c166_analyzer": "scripts_for_node/softwall_same_gpu/analyze_c166_static_global_safe.py",
+    "calibration_trace": "data/current/softwall_c159_calibration_burst_windows_v1.json",
+    "q2_development_coordinator": "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json",
+    "q2_holdout_coordinator": "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json"
+  },
+  "schema": "softwall-c166-static-global-safe-protocol-v1",
+  "source_sha256": {
+    "c159_prespec": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "c159_q3_analyzer": "a24bd8d058370c7e13e7654f757d57706dad37328b3e8dd515f41ccba1380d5b",
+    "c159_q3_result": "37298e64d351635f7973a25eac06a44cb85260f1eb06b65a909ba77173772ef8",
+    "c166_analyzer": "24354bd489cd2b44438200a1e624e0727b21fb9dc65c920b1adb0a7763e69538",
+    "calibration_trace": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f",
+    "q2_development_coordinator": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "q2_holdout_coordinator": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881"
+  },
+  "status": "FROZEN_BEFORE_C166_ANALYSIS",
+  "stop_rule": "One deterministic pass; preserve PASS or FAIL without parameter changes."
+}

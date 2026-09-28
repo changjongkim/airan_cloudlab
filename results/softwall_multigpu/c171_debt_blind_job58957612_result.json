@@ -1,0 +1,235 @@
+{
+  "all_attempt_diagnostics": {
+    "launch_control_upper_overshoots": 0,
+    "qwen_units": 71,
+    "qwen_upper_overshoots": 1,
+    "recovery_units": 168,
+    "recovery_upper_overshoots": 0
+  },
+  "all_pass": false,
+  "artifact_sha256": {
+    "coordinator": "855101660bbc385fdbc27bc1803c8d5474d50adcd88a8ddc3e58bef28ab4d4d7",
+    "inventory": "74e6b39ac4420bafd6ae8e1721a791eb11582b6827f6c29d5af5a89802248a44",
+    "nrx_worker": "55e985718e1ee93a6966bec6fd67e4bdce46f5865cd2e4c10d115d8061d6b783",
+    "peer_spec": "d6f19ec4cd260b0ec69fdaa65ea7f689797b364a713569b80a5d4f82af95c620",
+    "protocol": "228cc8b85754d1a6cdd4d48b83b418446756093966f01f30d1e284d726a255be",
+    "qwen": "f45968a824958cdfebc625a25cb34dc4a1e904e395cf5b6061f8a38cef89da9e"
+  },
+  "campaign": "holdout",
+  "claim_boundary": "Prespecified C168/C169-failure-informed mechanism correction. The controller pads the complete acceptance-to-observation AI transaction after the worker response. Diagnostic only; forbidden for qualification or production-rate claims.",
+  "counts": {
+    "actual_nrx": 480,
+    "observed_deadline_misses": 25,
+    "physical_attempts": 120,
+    "qwen_units": 59,
+    "radio_commits": 480,
+    "recoveries": 140,
+    "selected_boundary_rounds": 100,
+    "timing_invalid_attempts": 1,
+    "unused_timing_valid_attempts": 19
+  },
+  "gates": {
+    "atomic_injection_and_owner_semantics": true,
+    "complete_physical_sample": true,
+    "frozen_source_and_capacity_hash_match": true,
+    "launch_control_within_declared_bound": true,
+    "model_predicts_every_softwall_decision": false,
+    "node_inventory_and_prespecified_exclusion": true,
+    "p2p_and_lifecycle": true,
+    "physical_nrx45_stable_success": true,
+    "predicted_guard_and_deadline_outcomes": true,
+    "prespecified_scenario_sample": true,
+    "qwen_bound_realization": true,
+    "qwen_launch_and_fence_semantics": false,
+    "recovery_bound_realization": true
+  },
+  "host": "nid001137",
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-2aad3a3e-aa3d-70ab-abb7-fed7730a51e7"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-1756821d-7d2d-8a80-06dd-a45389151a20"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-d84f3974-4ee4-9928-df3e-350608c4e503"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-51019895-3982-40cf-dd26-416402e0d3cc"
+    }
+  ],
+  "iterations": 120,
+  "label": "c171_debt_blind_job58957612",
+  "per_scenario": {
+    "E4_debt_blind_launch": {
+      "all_attempt_deadline_violations": 24,
+      "all_attempt_guard_violations": 24,
+      "attempts": 24,
+      "bound_valid_deadline_violations": 19,
+      "bound_valid_guard_violations": 19,
+      "deadline_violation_fraction": 1.0,
+      "deadline_violations": 20,
+      "decision_ms": {
+        "count": 24,
+        "max": 45.053433,
+        "mean": 45.02789895833334,
+        "min": 45.019765,
+        "p50": 45.023422,
+        "p99": 45.053433
+      },
+      "guard_violation_fraction": 1.0,
+      "guard_violations": 20,
+      "jointly_bound_valid_rounds": 19,
+      "n": 20,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 4,
+      "zero_deadline_95pct_rule_of_three_upper": null,
+      "zero_guard_95pct_rule_of_three_upper": null
+    },
+    "E4_softwall_reject": {
+      "all_attempt_deadline_violations": 0,
+      "all_attempt_guard_violations": 0,
+      "attempts": 24,
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 24,
+        "max": 45.078518,
+        "mean": 45.03157516666667,
+        "min": 45.020233,
+        "p50": 45.027278,
+        "p99": 45.078518
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 20,
+      "n": 20,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 4,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    },
+    "E6a_softwall_admit": {
+      "all_attempt_deadline_violations": 0,
+      "all_attempt_guard_violations": 0,
+      "attempts": 24,
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 24,
+        "max": 88.398122,
+        "mean": 87.80718874999998,
+        "min": 87.774159,
+        "p50": 87.779615,
+        "p99": 88.398122
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 20,
+      "n": 20,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 4,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    },
+    "E6b_shadow_launch": {
+      "all_attempt_deadline_violations": 1,
+      "all_attempt_guard_violations": 24,
+      "attempts": 24,
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 20,
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 24,
+        "max": 91.596279,
+        "mean": 89.519122375,
+        "min": 89.41904,
+        "p50": 89.426874,
+        "p99": 91.596279
+      },
+      "guard_violation_fraction": 1.0,
+      "guard_violations": 20,
+      "jointly_bound_valid_rounds": 20,
+      "n": 20,
+      "timing_invalid_attempts": 1,
+      "unused_timing_valid_attempts": 3,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": null
+    },
+    "E6b_softwall_reject": {
+      "all_attempt_deadline_violations": 0,
+      "all_attempt_guard_violations": 0,
+      "attempts": 24,
+      "bound_valid_deadline_violations": 0,
+      "bound_valid_guard_violations": 0,
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 24,
+        "max": 89.456092,
+        "mean": 89.42772062500002,
+        "min": 89.419444,
+        "p50": 89.422652,
+        "p99": 89.456092
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "jointly_bound_valid_rounds": 20,
+      "n": 20,
+      "timing_invalid_attempts": 0,
+      "unused_timing_valid_attempts": 4,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    }
+  },
+  "schema": "softwall-c171-debt-blind-result-v1",
+  "service_accuracy": {
+    "launch_control_ms": {
+      "count": 59,
+      "max": 4.850738,
+      "mean": 4.850369508474577,
+      "min": 4.850197,
+      "p50": 4.850348,
+      "p99": 4.850668
+    },
+    "qwen_lower_accuracy_fraction": 1.0,
+    "qwen_transaction_ms": {
+      "count": 59,
+      "max": 65.131409,
+      "mean": 44.74713577966102,
+      "min": 34.55336,
+      "p50": 34.5636,
+      "p99": 64.770589
+    },
+    "qwen_upper_compliance_fraction": 0.9830508474576272,
+    "recovery_lower_accuracy_fraction": 1.0,
+    "recovery_path_ms": {
+      "count": 140,
+      "max": 24.911058,
+      "mean": 24.553597385714298,
+      "min": 24.539337,
+      "p50": 24.542884,
+      "p99": 24.805353
+    },
+    "recovery_upper_compliance_fraction": 1.0
+  },
+  "slurm_job_id": "58957612",
+  "status": "C171_FAIL"
+}

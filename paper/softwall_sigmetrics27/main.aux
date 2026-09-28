@@ -6,104 +6,119 @@
 \@writefile{toc}{\contentsline {section}{Abstract}{1}{section*.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Claim boundary.}{2}{section*.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Artifact plan.}{2}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background and Motivation}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}AI-and-RAN on a shared GPU}{2}{subsection.2.1}\protected@file@percent }
 \citation{nvidiampS}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Background and Problem}{3}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}AI-and-RAN on a shared GPU}{3}{subsection.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Optional NeuralRx\xspace  creates future mandatory work}{3}{subsection.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Threat model and qualification}{3}{subsection.2.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Certificate-preserving AI-RAN path and one qualified boundary example. The all-fail schedule covers unresolved recovery, observed successes delete debt atomically, and external AI is admitted only when the remaining certificate stays executable.}}{4}{figure.caption.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces AI-RAN scheduling background. (a) A timely NeuralRx\xspace  result may commit directly, but failure, lateness, or missing evidence makes conventional recovery mandatory for the same TB. (b) Multiple RAN homes use local NeuralRx\xspace  endpoints while their recovery and external-AI work contend on a shared GPU lane through CUDA IPC or NVLink P2P.}}{3}{figure.caption.3}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:contract}{{1}{4}{Certificate-preserving AI-RAN path and one qualified boundary example. The all-fail schedule covers unresolved recovery, observed successes delete debt atomically, and external AI is admitted only when the remaining certificate stays executable}{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Failure-Derived Design Requirements}{4}{section.3}\protected@file@percent }
-\newlabel{sec:requirements}{{3}{4}{Failure-Derived Design Requirements}{section.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Model}{4}{section.4}\protected@file@percent }
-\newlabel{sec:model}{{4}{4}{Model}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Jobs, modes, and provenance}{4}{subsection.4.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Counterexamples define the certificate-to-execution refinement chain.}}{5}{table.caption.5}\protected@file@percent }
-\newlabel{tab:counterexamples}{{1}{5}{Counterexamples define the certificate-to-execution refinement chain}{table.caption.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Recovery debt and all-fail certificates}{5}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Global composition and atomic state}{6}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Decision window and necessity}{6}{subsection.4.4}\protected@file@percent }
-\newlabel{eq:window}{{7}{6}{Decision window and necessity}{equation.7}{}}
-\newlabel{eq:debtblind}{{8}{7}{Current idleness is insufficient}{equation.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Design}{7}{section.5}\protected@file@percent }
-\newlabel{sec:design}{{5}{7}{Design}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Overall architecture}{7}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Radio admission and outcome transition}{7}{subsection.5.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Predictive feasibility classes.}}{8}{table.caption.6}\protected@file@percent }
-\newlabel{tab:classes}{{2}{8}{Predictive feasibility classes}{table.caption.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}AI lease and physical enforcement}{8}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Distributed ownership and fault containment}{8}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Feasibility classification}{8}{subsection.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Implementation}{9}{section.6}\protected@file@percent }
-\newlabel{sec:implementation}{{6}{9}{Implementation}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Runtime topology}{9}{subsection.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Certificate engine}{9}{subsection.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Measurement and mode separation}{9}{subsection.6.3}\protected@file@percent }
+\newlabel{fig:airan-background}{{1}{3}{AI-RAN scheduling background. (a) A timely \NRx result may commit directly, but failure, lateness, or missing evidence makes conventional recovery mandatory for the same TB. (b) Multiple RAN homes use local \NRx endpoints while their recovery and external-AI work contend on a shared GPU lane through CUDA IPC or NVLink P2P}{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Optional NeuralRx\xspace  creates future mandatory work}{3}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Threat model and qualification}{4}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Missing scheduling state}{4}{subsection.2.4}\protected@file@percent }
+\newlabel{sec:requirements}{{2.4}{4}{Missing scheduling state}{subsection.2.4}{}}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 1: current idleness is not schedulable slack.}{4}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 2: worst-case reservation is safe but incomplete.}{4}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 3: feasibility follows the contended lane.}{4}{section*.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Why existing scheduling abstractions are insufficient. (a) Current-idle admission can overlap a future all-fail recovery. (b) Static reservation is safe but rejects an AI opportunity that timely NeuralRx\xspace  successes could release. (c) Per-home certificates can overlap after composition on the shared cuPHY lane. Dashed vertical lines mark the radio guard and expiry.}}{5}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:scheduling-problem}{{2}{5}{Why existing scheduling abstractions are insufficient. (a) Current-idle admission can overlap a future all-fail recovery. (b) Static reservation is safe but rejects an AI opportunity that timely \NRx successes could release. (c) Per-home certificates can overlap after composition on the shared cuPHY lane. Dashed vertical lines mark the radio guard and expiry}{figure.caption.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Counterexamples define the certificate-to-execution refinement chain.}}{5}{table.caption.8}\protected@file@percent }
+\newlabel{tab:counterexamples}{{1}{5}{Counterexamples define the certificate-to-execution refinement chain}{table.caption.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}SoftWall Design}{6}{section.3}\protected@file@percent }
+\newlabel{sec:design}{{3}{6}{SoftWall Design}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Overall architecture}{6}{subsection.3.1}\protected@file@percent }
+\newlabel{sec:design-overall}{{3.1}{6}{Overall architecture}{subsection.3.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Overall SoftWall architecture. (1) Homes and AI queues publish only currently visible events. (2) Each unresolved optional receiver owns conventional-recovery debt. (3) The candidate scheduler jointly retimes debt and proposes an AI lease. (4) An independent verifier checks the complete state. (5) Only a verified state grants dispatch authority. (6) Receiver outcomes and terminal fences trigger the next atomic transition.}}{6}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:overall}{{3}{6}{Overall SoftWall architecture. (1) Homes and AI queues publish only currently visible events. (2) Each unresolved optional receiver owns conventional-recovery debt. (3) The candidate scheduler jointly retimes debt and proposes an AI lease. (4) An independent verifier checks the complete state. (5) Only a verified state grants dispatch authority. (6) Receiver outcomes and terminal fences trigger the next atomic transition}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {paragraph}{Scheduling objects.}{6}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Qualified modes.}{7}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Separation of proposal and authority.}{7}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Scheduling conditional recovery}{7}{subsection.3.2}\protected@file@percent }
+\newlabel{sec:design-recovery}{{3.2}{7}{Scheduling conditional recovery}{subsection.3.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Conditional-recovery transaction. (a) SoftWall reserves debt before dispatching NeuralRx\xspace  ; one common-cutoff batch deletes debt only for timely successes. (b) It builds a private candidate that retimes retained recoveries around one bounded AI lease. The verifier commits the calendar and lease together or keeps the previous state unchanged.}}{7}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:atomic-replan}{{4}{7}{Conditional-recovery transaction. (a) SoftWall reserves debt before dispatching \NRx ; one common-cutoff batch deletes debt only for timely successes. (b) It builds a private candidate that retimes retained recoveries around one bounded AI lease. The verifier commits the calendar and lease together or keeps the previous state unchanged}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {paragraph}{Mandatory-first transition.}{8}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Global atomic state.}{8}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Refining schedules to physical completion}{8}{subsection.3.3}\protected@file@percent }
+\newlabel{sec:design-refinement}{{3.3}{8}{Refining schedules to physical completion}{subsection.3.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Certificate-to-execution refinement. (1) A certificate authorizes only its first non-preemptive action. (2) Prepare owns one generation-tagged token. (3) The worker revalidates an absolute latest-start before launch. (4) Persistent NeuralRx, cuPHY, or AI workers publish physical completion. (5) Only matching CUDA fences or qualified non-launch markers retire ownership; stale or ambiguous effects are quarantined.}}{8}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:refinement}{{5}{8}{Certificate-to-execution refinement. (1) A certificate authorizes only its first non-preemptive action. (2) Prepare owns one generation-tagged token. (3) The worker revalidates an absolute latest-start before launch. (4) Persistent NeuralRx, cuPHY, or AI workers publish physical completion. (5) Only matching CUDA fences or qualified non-launch markers retire ownership; stale or ambiguous effects are quarantined}{figure.caption.16}{}}
+\@writefile{toc}{\contentsline {paragraph}{Bounded launch.}{8}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Physical retirement.}{9}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Distributed ownership.}{9}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Why IPC/P2P is part of scheduling.}{9}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Certified event-scheduling algorithm}{9}{subsection.3.4}\protected@file@percent }
+\newlabel{sec:design-algorithm}{{3.4}{9}{Certified event-scheduling algorithm}{subsection.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a false-safe state.}}{9}{figure.caption.21}\protected@file@percent }
+\newlabel{alg:certify-event}{{6}{9}{SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a false-safe state}{figure.caption.21}{}}
+\@writefile{toc}{\contentsline {paragraph}{Decision window.}{9}{section*.22}\protected@file@percent }
+\newlabel{eq:window}{{6}{9}{Decision window}{equation.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces The scheduler's predictive outcomes.}}{10}{table.caption.24}\protected@file@percent }
+\newlabel{tab:classes}{{2}{10}{The scheduler's predictive outcomes}{table.caption.24}{}}
+\newlabel{eq:debtblind}{{7}{10}{Current idleness is insufficient}{equation.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{Safe reclaimable capacity.}{10}{section*.23}\protected@file@percent }
+\newlabel{eq:capacity}{{10}{10}{Safe reclaimable capacity}{equation.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Implementation}{10}{section.4}\protected@file@percent }
+\newlabel{sec:implementation}{{4}{10}{Implementation}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Runtime topology}{10}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Certificate engine}{11}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Measurement and mode separation}{11}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Evaluation Methodology}{11}{section.5}\protected@file@percent }
+\newlabel{sec:methodology}{{5}{11}{Evaluation Methodology}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Questions and metrics}{11}{subsection.5.1}\protected@file@percent }
 \citation{burstgpt}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Evaluation questions and their decision criteria.}}{10}{table.caption.7}\protected@file@percent }
-\newlabel{tab:rqs}{{3}{10}{Evaluation questions and their decision criteria}{table.caption.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Evaluation Methodology}{10}{section.7}\protected@file@percent }
-\newlabel{sec:methodology}{{7}{10}{Evaluation Methodology}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Questions and metrics}{10}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Testbed, workloads, and contract}{10}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Protocols and baselines}{11}{subsection.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Reproducibility.}{11}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Use of generative AI.}{11}{section*.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Evaluation}{11}{section.8}\protected@file@percent }
-\newlabel{sec:evaluation}{{8}{11}{Evaluation}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}MPS is a mechanism, not the contract}{11}{subsection.8.1}\protected@file@percent }
-\newlabel{sec:eval-mps}{{8.1}{11}{MPS is a mechanism, not the contract}{subsection.8.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}End-to-end variable-class qualification}{11}{subsection.8.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces End-to-end variable-class qualification.}}{12}{table.caption.10}\protected@file@percent }
-\newlabel{tab:q2}{{4}{12}{End-to-end variable-class qualification}{table.caption.10}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Fault closure}{12}{subsection.8.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Qualified AI-admission frontier versus debt, AI class, and decision time (a), and certified-scheduler latency through 64 debts (b). Prespecified physical cases lie on their predicted sides of the frontier. Latencies are finite-run measurements, not WCETs.}}{13}{figure.caption.11}\protected@file@percent }
-\newlabel{fig:envelope}{{2}{13}{Qualified AI-admission frontier versus debt, AI class, and decision time (a), and certified-scheduler latency through 64 debts (b). Prespecified physical cases lie on their predicted sides of the frontier. Latencies are finite-run measurements, not WCETs}{figure.caption.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Predicting an unopened physical boundary}{13}{subsection.8.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}Certified scheduler scalability}{13}{subsection.8.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.6}What the certificate prevents}{13}{subsection.8.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Safety necessity and AI-first utility are different comparisons.}}{14}{table.caption.12}\protected@file@percent }
-\newlabel{tab:necessity}{{5}{14}{Safety necessity and AI-first utility are different comparisons}{table.caption.12}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.7}Strong baseline and no material headroom}{14}{subsection.8.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Lifecycle envelope. ``Partial'' qualifies only the stated safe subset.}}{15}{table.caption.13}\protected@file@percent }
-\newlabel{tab:lifecycle}{{6}{15}{Lifecycle envelope. ``Partial'' qualifies only the stated safe subset}{table.caption.13}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.8}Lifecycle qualification}{15}{subsection.8.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.9}Production exit gates}{15}{subsection.8.9}\protected@file@percent }
-\citation{yinyangran}
-\citation{cloudric}
-\citation{interplay,caora}
-\citation{haf}
-\citation{distributedairan}
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Frozen disjoint-seed Sionna CDL-D/E holdout.}}{16}{table.caption.14}\protected@file@percent }
-\newlabel{tab:channel-holdout}{{7}{16}{Frozen disjoint-seed Sionna CDL-D/E holdout}{table.caption.14}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.10}Supported-channel NeuralRx\xspace  result}{16}{subsection.8.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}Related Work}{16}{section.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}AI-and-RAN resource allocation}{16}{subsection.9.1}\protected@file@percent }
-\citation{concordia}
-\citation{daris}
-\citation{reef,xsched,nvtaskset}
-\citation{arches}
-\citation{ocudu}
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Closest-work distinction. ``Not exposed'' describes the public design and is not a claim that the mechanism could never be extended.}}{17}{table.caption.15}\protected@file@percent }
-\newlabel{tab:closest}{{8}{17}{Closest-work distinction. ``Not exposed'' describes the public design and is not a claim that the mechanism could never be extended}{table.caption.15}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}GPU slack and real-time execution}{17}{subsection.9.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}AI/conventional PHY paths and MEC scheduling}{17}{subsection.9.3}\protected@file@percent }
-\citation{smec}
-\@writefile{toc}{\contentsline {section}{\numberline {10}Limitations}{18}{section.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}Timing contract and statistical bounds}{18}{subsection.10.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}Fault and lifecycle coverage}{18}{subsection.10.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Evaluation questions and their decision criteria.}}{12}{table.caption.25}\protected@file@percent }
+\newlabel{tab:rqs}{{3}{12}{Evaluation questions and their decision criteria}{table.caption.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Testbed, workloads, and contract}{12}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Protocols and baselines}{12}{subsection.5.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Scheduling capacity and decision quality. (a) Expected timely requests at a representative four-cell, two-home, one-GPU point with correlated outcomes. (b) Fraction of 513 mandatory-feasible trace points per SLO that pass the frozen 5\% headroom screen. (c) Of 362 advanced points, a safe AI-first greedy is within 5\% of the fixed-placement oracle at 361; flexible recovery placement has a positive upper-bound gain at 203.}}{13}{figure.caption.28}\protected@file@percent }
+\newlabel{fig:capacity}{{7}{13}{Scheduling capacity and decision quality. (a) Expected timely requests at a representative four-cell, two-home, one-GPU point with correlated outcomes. (b) Fraction of 513 mandatory-feasible trace points per SLO that pass the frozen 5\% headroom screen. (c) Of 362 advanced points, a safe AI-first greedy is within 5\% of the fixed-placement oracle at 361; flexible recovery placement has a positive upper-bound gain at 203}{figure.caption.28}{}}
+\@writefile{toc}{\contentsline {paragraph}{Reproducibility.}{13}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Use of generative AI.}{13}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Evaluation}{13}{section.6}\protected@file@percent }
+\newlabel{sec:evaluation}{{6}{13}{Evaluation}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}RQ1: Debt awareness expands safe capacity}{13}{subsection.6.1}\protected@file@percent }
+\newlabel{sec:eval-capacity}{{6.1}{13}{RQ1: Debt awareness expands safe capacity}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 1.}{14}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}RQ2: Decision quality and scheduling levers}{14}{subsection.6.2}\protected@file@percent }
+\newlabel{sec:eval-decision}{{6.2}{14}{RQ2: Decision quality and scheduling levers}{subsection.6.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Safety authority and AI-first scheduling utility are separate comparisons.}}{15}{table.caption.30}\protected@file@percent }
+\newlabel{tab:necessity}{{4}{15}{Safety authority and AI-first scheduling utility are separate comparisons}{table.caption.30}{}}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 2.}{15}{section*.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}RQ3: Prediction accuracy and control cost}{15}{subsection.6.3}\protected@file@percent }
+\newlabel{sec:eval-prediction}{{6.3}{15}{RQ3: Prediction accuracy and control cost}{subsection.6.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 3.}{15}{section*.33}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}RQ4: Accepted schedules survive physical execution}{15}{subsection.6.4}\protected@file@percent }
+\newlabel{sec:eval-physical}{{6.4}{15}{RQ4: Accepted schedules survive physical execution}{subsection.6.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Predictive scheduling and control cost. (a) The qualified AI-admission frontier moves with recovery debt, AI class, and decision time; prespecified physical cases lie on the predicted side. (b) Candidate construction and independent verification remain below the evaluated 5\nonbreakingspace ms control budget through 64 debts. Latencies are finite-run measurements, not WCETs.}}{16}{figure.caption.32}\protected@file@percent }
+\newlabel{fig:envelope}{{8}{16}{Predictive scheduling and control cost. (a) The qualified AI-admission frontier moves with recovery debt, AI class, and decision time; prespecified physical cases lie on the predicted side. (b) Candidate construction and independent verification remain below the evaluated 5~ms control budget through 64 debts. Latencies are finite-run measurements, not WCETs}{figure.caption.32}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Physical evidence for the scheduling contract. (a) MPS cap-only and lifecycle diagnostics retain deadline misses. (b) The scheduler admits every offered 16--128-token Qwen unit and rejects larger classes when recovery debt consumes the window. (c) Whole-path samples remain inside their mode contracts. (d) The fault campaign spans frequent execution and rare terminal events without an observed deadline or invariant violation.}}{16}{figure.caption.34}\protected@file@percent }
+\newlabel{fig:qualification}{{9}{16}{Physical evidence for the scheduling contract. (a) MPS cap-only and lifecycle diagnostics retain deadline misses. (b) The scheduler admits every offered 16--128-token Qwen unit and rejects larger classes when recovery debt consumes the window. (c) Whole-path samples remain inside their mode contracts. (d) The fault campaign spans frequent execution and rare terminal events without an observed deadline or invariant violation}{figure.caption.34}{}}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 4.}{17}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}RQ5: Faults preserve schedule ownership}{17}{subsection.6.5}\protected@file@percent }
+\newlabel{sec:eval-fault}{{6.5}{17}{RQ5: Faults preserve schedule ownership}{subsection.6.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 5.}{17}{section*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}RQ6: MPS and lifecycle define the mode}{17}{subsection.6.6}\protected@file@percent }
+\newlabel{sec:eval-mps}{{6.6}{17}{RQ6: MPS and lifecycle define the mode}{subsection.6.6}{}}
+\citation{yinyangran,cloudric,interplay,caora,haf,distributedairan}
+\citation{concordia,daris,reef,xsched,nvtaskset}
+\citation{arches,ocudu,smec}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 6.}{18}{section*.37}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}RQ7: Deployment exit gates}{18}{subsection.6.7}\protected@file@percent }
+\newlabel{sec:eval-exit}{{6.7}{18}{RQ7: Deployment exit gates}{subsection.6.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{Takeaway 7.}{18}{section*.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Related Work}{18}{section.7}\protected@file@percent }
 \bibstyle{ACM-Reference-Format}
 \bibdata{references}
 \bibcite{distributedairan}{{1}{2025}{{Ananthanarayanan et~al\mbox  {.}}}{{}}}
 \bibcite{daris}{{2}{2025}{{Babaei and Chantem}}{{}}}
 \bibcite{nvtaskset}{{3}{2025}{{Bakita and Anderson}}{{}}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Closest-work distinction in public designs.}}{19}{table.caption.39}\protected@file@percent }
+\newlabel{tab:closest}{{5}{19}{Closest-work distinction in public designs}{table.caption.39}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Limitations}{19}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{19}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{19}{section*.41}\protected@file@percent }
 \bibcite{concordia}{{4}{2021}{{Foukas and Radunovic}}{{}}}
 \bibcite{reef}{{5}{2022}{{Han et~al\mbox  {.}}}{{}}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}PHY and workload generality}{19}{subsection.10.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {11}Conclusion}{19}{section.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{19}{section*.17}\protected@file@percent }
 \bibcite{haf}{{6}{2026}{{Li et~al\mbox  {.}}}{{}}}
 \bibcite{nvidiampS}{{7}{2026}{{NVIDIA Corporation}}{{}}}
 \bibcite{ocudu}{{8}{2026}{{O'Shea et~al\mbox  {.}}}{{}}}

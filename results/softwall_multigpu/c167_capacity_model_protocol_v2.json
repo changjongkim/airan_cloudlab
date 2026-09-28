@@ -1,0 +1,147 @@
+{
+  "ai_deadline_rationale": {
+    "1000_ms": "the existing C159 BurstGPT/Qwen service objective",
+    "100_ms": "interactive near-real-time control sensitivity",
+    "50_ms": "synthetic fast closed-loop class representing channel/link-state inference or anomaly response; Qwen is only the bounded GPU service surrogate",
+    "non_claim": "These are sensitivity classes, not production AI-RAN SLO claims."
+  },
+  "correction": "Apply the global initial all-fail feasibility gate before every safe policy. Mandatory-infeasible points expose no certified AI capacity.",
+  "exclusion_rule": "No analytical state may be excluded.",
+  "grid": {
+    "ai_context": [
+      64,
+      256
+    ],
+    "ai_deadline_from_decision_ms": [
+      50,
+      100,
+      1000
+    ],
+    "ai_units_per_epoch": [
+      1,
+      4
+    ],
+    "cells": [
+      2,
+      4,
+      8,
+      16
+    ],
+    "failure_correlation": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "gpus": [
+      1,
+      2,
+      4
+    ],
+    "homes": [
+      1,
+      2,
+      4
+    ],
+    "nrx_success_probability": [
+      0.2,
+      0.5,
+      0.8
+    ],
+    "radio_expiry_ms": [
+      100,
+      155,
+      220
+    ],
+    "recovery_bound_ms": [
+      12,
+      25
+    ]
+  },
+  "minimum_effect_pct": 5.0,
+  "physical_validation_points": [
+    {
+      "cells": 4,
+      "context": 256,
+      "decision_ms": 45,
+      "expected_debt_blind_guard_excess_ms": 12,
+      "expected_softwall": "reject",
+      "expiry_ms": 155,
+      "gpus": 1,
+      "guard_ms": 2,
+      "homes": 2,
+      "id": "E4_debt_blind_two_debts_context256",
+      "recovery_bound_ms": 25,
+      "unresolved_debts": 2
+    },
+    {
+      "cells": 4,
+      "context": 64,
+      "decision_ms": 88,
+      "expected_guard_excess_ms": 0,
+      "expected_softwall": "admit",
+      "expiry_ms": 155,
+      "gpus": 1,
+      "guard_ms": 2,
+      "homes": 2,
+      "id": "E6a_latest_safe_context64",
+      "recovery_bound_ms": 25,
+      "unresolved_debts": 1
+    },
+    {
+      "cells": 4,
+      "context": 64,
+      "decision_ms": 89,
+      "expected_shadow_guard_excess_ms": 1,
+      "expected_softwall": "reject",
+      "expiry_ms": 155,
+      "gpus": 1,
+      "guard_ms": 2,
+      "homes": 2,
+      "id": "E6b_first_unsafe_context64",
+      "recovery_bound_ms": 25,
+      "unresolved_debts": 1
+    },
+    {
+      "cells": 4,
+      "context": 64,
+      "decision_ms": 45,
+      "expected_softwall": "admit",
+      "expiry_ms": 155,
+      "gpus": 2,
+      "guard_ms": 2,
+      "homes": 2,
+      "id": "two_gpu_balanced_two_debts_context64",
+      "recovery_bound_ms": 25,
+      "unresolved_by_gpu": [
+        1,
+        1
+      ]
+    }
+  ],
+  "policies": [
+    "static_global_safe",
+    "debt_blind_current_idle",
+    "certificate_preserving_recovery_first",
+    "softwall",
+    "offline_oracle"
+  ],
+  "predecessor": {
+    "diagnosis": "v1 counted slack on an idle GPU even when another lane's initial all-fail schedule was mandatory-infeasible",
+    "exact_mismatches": 144,
+    "path": "results/softwall_multigpu/c167_reclaimable_capacity_model_v1.json",
+    "sha256": "bddf8962361b6a485b6ce9ee9be0d161b0ba57162fd256e3c01122bb4f511f97",
+    "status": "C167_CAPACITY_MODEL_FAIL"
+  },
+  "schema": "softwall-c167-capacity-model-protocol-v2",
+  "source_sha256": {
+    "model": "cf057f784028d0cf82e50fdeb327739fa4130a57ddc8b80f437ede2f9070f9c0"
+  },
+  "status": "FROZEN_BEFORE_C167_V2_MODEL",
+  "stop_rule": "One frozen corrected grid. Preserve PASS or FAIL; no grid, threshold, or physical point changes after opening the result.",
+  "validation_order": [
+    "analytical grid",
+    "exhaustive small-state checker",
+    "two-node physical E4/E6 diagnostic",
+    "multi-GPU representative point"
+  ]
+}

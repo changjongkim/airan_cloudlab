@@ -1,0 +1,54 @@
+% Conditional-recovery scheduling transaction.
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[layer, minimum width=7.35cm, minimum height=5.25cm, anchor=south west] (left) at (0,0) {};
+  \node[layer, minimum width=7.75cm, minimum height=5.25cm, anchor=south west] (right) at (7.70,0) {};
+  \node[ttl, anchor=north] at (3.675,5.08) {(a) Outcome event changes recovery debt};
+  \node[ttl, anchor=north] at (11.575,5.08) {(b) Atomic recovery retiming + AI lease};
+
+  % Panel a: state transition.
+  \node[comp, fill=cyanp, minimum width=1.55cm] (release) at (0.98,3.40) {TB release};
+  \node[comp, fill=gold!45, minimum width=1.75cm] (reserve) at (3.05,3.40) {reserve $R_i$\\before NRx};
+  \node[comp, fill=peach, minimum width=1.65cm] (nrx) at (5.20,3.40) {dispatch\\NeuralRx};
+  \node[comp, fill=white, minimum width=1.42cm] (cutoff) at (6.50,1.80) {atomic\\outcome batch};
+  \draw[arr] (release) -- node[above,note] {mandatory first} (reserve);
+  \draw[arr] (reserve) -- (nrx);
+  \draw[arr] (nrx.south east) -- (cutoff.north);
+  \node[comp, fill=greenc!65, minimum width=1.62cm] (success) at (4.30,0.67) {timely success\\delete $R_i$};
+  \node[comp, fill=hot!35, minimum width=1.72cm] (failure) at (6.35,0.67) {fail / late / lost\\retain $R_i$};
+  \draw[arr] (cutoff.south west) -- (success.north);
+  \draw[arr] (cutoff.south east) -- (failure.north);
+  \node[num] at (1.95,3.82) {1};
+  \node[num] at (4.10,3.82) {2};
+  \node[rnum] at (5.58,1.82) {3};
+  \node[note, align=center] at (2.45,1.55) {Debt exists while the outcome is unresolved,\\even when no recovery kernel is queued.};
+
+  % Panel b: current and candidate calendars.
+  \node[note, anchor=east] at (9.12,3.82) {current $X_t$};
+  \draw[->, line width=0.45pt] (9.30,3.52) -- (14.90,3.52);
+  \node[blk, fill=hot!45, minimum width=0.92cm] at (11.05,3.52) {$R_1$};
+  \node[blk, fill=hot!45, minimum width=0.92cm] at (12.05,3.52) {$R_2$};
+  \node[blk, fill=hot!45, minimum width=0.92cm] at (13.05,3.52) {$R_3$};
+  \node[blk, fill=hot!45, minimum width=0.92cm] at (14.05,3.52) {$R_4$};
+  \node[note, anchor=west] at (14.30,3.84) {guard};
+  \draw[dred, dashed, line width=0.8pt] (14.55,3.10) -- (14.55,4.18);
+
+  \node[note, anchor=east] at (9.12,2.40) {candidate $X'$};
+  \draw[->, line width=0.45pt] (9.30,2.10) -- (14.90,2.10);
+  \node[blk, fill=bluec!60, minimum width=1.55cm] at (10.55,2.10) {AI lease};
+  \node[free, minimum width=0.66cm] at (11.72,2.10) {};
+  \node[blk, fill=hot!45, minimum width=0.92cm] at (12.38,2.10) {$R_2$};
+  \node[blk, fill=hot!45, minimum width=0.92cm] at (13.38,2.10) {$R_4$};
+  \node[note, anchor=west] at (14.30,2.42) {guard};
+  \draw[dred, dashed, line width=0.8pt] (14.55,1.68) -- (14.55,2.76);
+  \node[note, align=center] at (12.10,1.35) {success deletes $R_1,R_3$; retained debt is retimed};
+
+  \node[comp, fill=greenc!65, minimum width=2.15cm] (verify) at (9.92,0.55) {independent verifier\\checks complete $X'$};
+  \node[comp, fill=cyanp, minimum width=1.50cm] (commit) at (12.45,0.55) {commit $X'$};
+  \node[comp, fill=white, minimum width=1.42cm] (rollback) at (14.45,0.55) {keep $X_t$};
+  \draw[arr] (verify.east) -- node[above,note] {valid} (commit.west);
+  \draw[arr, draw=dred] (verify.south) -- ++(0,-0.32) -| node[pos=0.72,below,note] {invalid} (rollback.south);
+  \node[num] at (8.37,2.72) {4};
+  \node[num] at (11.35,0.97) {5};
+\end{tikzpicture}%
+}

@@ -1,0 +1,182 @@
+{
+  "all_pass": false,
+  "artifact_sha256": {
+    "coordinator": "b39b354c7c843f64561695f1a8aa72c8e60e1e4d5a16af6bb0697b368427d26e",
+    "inventory": "ac456b4d202c99f2d058f525493f5ff4f674207ee558de0f4f4a42a66f2b207d",
+    "nrx_worker": "e91f5a7f255225ac825465a687e84e2af5f4eb3394f1017182c568242ea1e3fc",
+    "peer_spec": "b5ddfd704cc3c9510ce1c46558b7ed978e3782b91c48d994c4db5187bc2233d0",
+    "protocol": "8e82f6d2d87b805bc0035f250558a7b079409384b4742f39a64cde31635ed7e7",
+    "qwen": "34da6b8b89b2b556acd6fd6fc733db760337c0b8ca84ae7e57f39af67a40bd0f"
+  },
+  "campaign": "development",
+  "claim_boundary": "Prespecified physical necessity diagnostic. GPU-resident padding realizes the previously declared service vector and is forbidden for qualification or production-rate claims.",
+  "counts": {
+    "actual_nrx": 400,
+    "observed_deadline_misses": 31,
+    "qwen_units": 40,
+    "radio_commits": 400,
+    "recoveries": 140
+  },
+  "gates": {
+    "atomic_injection_and_owner_semantics": true,
+    "complete_physical_sample": true,
+    "frozen_source_and_capacity_hash_match": true,
+    "launch_control_within_declared_bound": false,
+    "model_predicts_every_softwall_decision": false,
+    "node_inventory_and_prespecified_exclusion": true,
+    "p2p_and_lifecycle": true,
+    "physical_nrx45_stable_success": true,
+    "predicted_guard_and_deadline_outcomes": false,
+    "prespecified_scenario_sample": true,
+    "qwen_bound_realization": false,
+    "qwen_launch_and_fence_semantics": false,
+    "recovery_bound_realization": false
+  },
+  "host": "nid001216",
+  "inventory": [
+    {
+      "index": "0",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-94260ab9-68f8-60b3-5dca-88ea0f79e81c"
+    },
+    {
+      "index": "1",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-679d3bbb-56ca-326f-e26d-a21f632e7d28"
+    },
+    {
+      "index": "2",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-fc294130-e887-4773-b6f4-a32143489d29"
+    },
+    {
+      "index": "3",
+      "mig.mode.current": "Disabled",
+      "name": "NVIDIA A100-SXM4-40GB",
+      "uuid": "GPU-7ea7f844-b81d-08c1-995d-bb6a249caa03"
+    }
+  ],
+  "iterations": 100,
+  "label": "c168_debt_blind_job58957064",
+  "per_scenario": {
+    "E4_debt_blind_launch": {
+      "deadline_violation_fraction": 1.0,
+      "deadline_violations": 20,
+      "decision_ms": {
+        "count": 20,
+        "max": 45.040495,
+        "mean": 45.03077705,
+        "min": 45.020598,
+        "p50": 45.032712,
+        "p99": 45.040495
+      },
+      "guard_violation_fraction": 1.0,
+      "guard_violations": 20,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": null,
+      "zero_guard_95pct_rule_of_three_upper": null
+    },
+    "E4_softwall_reject": {
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 20,
+        "max": 47.224189,
+        "mean": 45.137760899999996,
+        "min": 45.0197,
+        "p50": 45.026132,
+        "p99": 47.224189
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    },
+    "E6a_softwall_admit": {
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 20,
+        "max": 87.790952,
+        "mean": 87.77803219999998,
+        "min": 87.769214,
+        "p50": 87.776808,
+        "p99": 87.790952
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    },
+    "E6b_shadow_launch": {
+      "deadline_violation_fraction": 0.55,
+      "deadline_violations": 11,
+      "decision_ms": {
+        "count": 20,
+        "max": 88.814662,
+        "mean": 88.78138895,
+        "min": 88.772456,
+        "p50": 88.778933,
+        "p99": 88.814662
+      },
+      "guard_violation_fraction": 1.0,
+      "guard_violations": 20,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": null,
+      "zero_guard_95pct_rule_of_three_upper": null
+    },
+    "E6b_softwall_reject": {
+      "deadline_violation_fraction": 0.0,
+      "deadline_violations": 0,
+      "decision_ms": {
+        "count": 20,
+        "max": 88.823972,
+        "mean": 88.7807899,
+        "min": 88.769714,
+        "p50": 88.779076,
+        "p99": 88.823972
+      },
+      "guard_violation_fraction": 0.0,
+      "guard_violations": 0,
+      "n": 20,
+      "zero_deadline_95pct_rule_of_three_upper": 0.15,
+      "zero_guard_95pct_rule_of_three_upper": 0.15
+    }
+  },
+  "schema": "softwall-c168-debt-blind-result-v1",
+  "service_accuracy": {
+    "launch_control_ms": {
+      "count": 40,
+      "max": 5.433877,
+      "mean": 5.176134325000001,
+      "min": 5.06872,
+      "p50": 5.159646,
+      "p99": 5.433877
+    },
+    "qwen_lower_accuracy_fraction": 1.0,
+    "qwen_transaction_ms": {
+      "count": 40,
+      "max": 66.727989,
+      "mean": 51.457690924999994,
+      "min": 36.295057,
+      "p50": 66.303656,
+      "p99": 66.727989
+    },
+    "recovery_lower_accuracy_fraction": 1.0,
+    "recovery_path_ms": {
+      "count": 140,
+      "max": 25.09566,
+      "mean": 24.898849542857135,
+      "min": 24.890572,
+      "p50": 24.893177,
+      "p99": 25.068498
+    }
+  },
+  "slurm_job_id": "58957064",
+  "status": "C168_FAIL"
+}

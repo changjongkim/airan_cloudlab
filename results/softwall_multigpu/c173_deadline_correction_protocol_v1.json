@@ -1,0 +1,47 @@
+{
+  "analysis_role": "Correct the C159/C166 selector from arrival_ms + deadline_ms to the trace's absolute deadline_ms field, then report every policy again.",
+  "exclusion_rule": "No request, window, policy, node stream, or result may be excluded.",
+  "frozen_semantics": {
+    "deadline": "deadline_ms is absolute within each 60 s trace window",
+    "eligibility": "arrival_ms <= slot decision_ms and slot completion_ms <= deadline_ms",
+    "fixed_slo_ms": 1000,
+    "policies": [
+      "static_global_safe",
+      "recovery_first_empirical",
+      "recovery_first_full_bound",
+      "softwall",
+      "offline_oracle"
+    ],
+    "requests": 4290,
+    "windows": 4
+  },
+  "holdout_rule": "Do not materialize the unopened C159 confirmatory workload holdout.",
+  "inputs": {
+    "c159_prespec": "results/softwall_multigpu/confirm159_experiment_prespec_v1.json",
+    "c159_q3_analyzer": "scripts_for_node/softwall_same_gpu/c159_q3_oracle_screen.py",
+    "c159_q3_result": "results/softwall_multigpu/confirm159_q3_oracle_screen_v1.json",
+    "c166_analyzer": "scripts_for_node/softwall_same_gpu/analyze_c166_static_global_safe.py",
+    "c166_result": "results/softwall_multigpu/c166_static_global_safe_result_v1.json",
+    "c173_analyzer": "scripts_for_node/softwall_same_gpu/analyze_c173_deadline_correction.py",
+    "c173_test": "scripts_for_node/softwall_same_gpu/test_analyze_c173_deadline_correction.py",
+    "calibration_trace": "data/current/softwall_c159_calibration_burst_windows_v1.json",
+    "q2_development_coordinator": "results/softwall_multigpu/raw/confirm159q2f_batch_dev_j58857672_coordinator.json",
+    "q2_holdout_coordinator": "results/softwall_multigpu/raw/confirm159q2g_batch_holdout_j58858194_coordinator.json"
+  },
+  "minimum_effect_pct": 5.0,
+  "schema": "softwall-c173-deadline-correction-protocol-v1",
+  "source_sha256": {
+    "c159_prespec": "9bca15a4e3da6c2fb601237fb6ac79009659ba2e483871c34bc54d21db68bb9b",
+    "c159_q3_analyzer": "a24bd8d058370c7e13e7654f757d57706dad37328b3e8dd515f41ccba1380d5b",
+    "c159_q3_result": "37298e64d351635f7973a25eac06a44cb85260f1eb06b65a909ba77173772ef8",
+    "c166_analyzer": "24354bd489cd2b44438200a1e624e0727b21fb9dc65c920b1adb0a7763e69538",
+    "c166_result": "cbc438a3750af55c8178fc97e8ae57d9d572de2aa3908056b9358050e282fc9f",
+    "c173_analyzer": "a7c20ef4b3691fd37ebde886b47ec62a91350092f1911c986d0d005e435fdafb",
+    "c173_test": "6a6ef83faa3db84bee157a640677dc15be845b2cf1f1dba3f2319c5775fea4ee",
+    "calibration_trace": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f",
+    "q2_development_coordinator": "37a186650d5a70c4589c8a4caefa70a2559e39aefdf646992c393f86d2e2a773",
+    "q2_holdout_coordinator": "a51c92397ce52bc9d6c4f87d04aa2c69244b6740854c99a9a9176c0845203881"
+  },
+  "status": "FROZEN_BEFORE_C173_ANALYSIS",
+  "stop_rule": "One deterministic pass; preserve every corrected value even if the prior conclusion changes."
+}

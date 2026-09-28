@@ -1,0 +1,81 @@
+{
+  "advance_rule": "Advance a grid point to scheduling-lever evaluation only when it is mandatory-feasible, oracle value is positive, the oracle-normalized aggregate gap is at least 5%, and oracle value exceeds recovery-first in each of the four frozen calibration windows.",
+  "analysis_role": "Find, before any policy implementation, whether an exact recovery-order oracle exceeds a certificate-preserving recovery-first baseline by at least 5% on frozen BurstGPT arrivals mapped to Qwen bounds.",
+  "batch_rule": "At each P180 decision, order requests that arrived after the prior decision and by the current decision by (arrival_ms, source_order); screen only the first N fixed by ai_units_per_epoch. No carry, future arrival, realized service, or policy outcome affects the batch.",
+  "exclusion_rule": "No trace window, request within the fixed batch rule, topology, outcome, or grid point may be excluded.",
+  "expected_grid_points": 2592,
+  "grid": {
+    "ai_slo_ms": [
+      50,
+      100,
+      250,
+      1000
+    ],
+    "ai_units_per_epoch": [
+      1,
+      2,
+      4
+    ],
+    "failure_correlation": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "gpus": [
+      1,
+      2,
+      4
+    ],
+    "nrx_success_probability": [
+      0.2,
+      0.5,
+      0.8
+    ],
+    "recovery_bound_ms": [
+      12.0,
+      25.0
+    ],
+    "topologies": [
+      {
+        "cells": 4,
+        "homes": 2
+      },
+      {
+        "cells": 8,
+        "homes": 2
+      },
+      {
+        "cells": 8,
+        "homes": 4
+      },
+      {
+        "cells": 16,
+        "homes": 4
+      }
+    ]
+  },
+  "holdout_rule": "Calibration only. Do not open or create a confirmatory workload holdout in this screen.",
+  "inputs": {
+    "c167_protocol": "results/softwall_multigpu/c167_capacity_model_protocol_v2.json",
+    "c167_result": "results/softwall_multigpu/c167_reclaimable_capacity_model_v2.json",
+    "c173_result": "results/softwall_multigpu/c173_deadline_correction_result_v1.json",
+    "calibration_trace": "data/current/softwall_c159_calibration_burst_windows_v1.json",
+    "capacity_model": "scripts_for_node/softwall_same_gpu/c167_reclaimable_capacity_model_v2.py",
+    "screen": "scripts_for_node/softwall_same_gpu/c174_trace_oracle_screen.py",
+    "test": "scripts_for_node/softwall_same_gpu/test_c174_trace_oracle_screen.py"
+  },
+  "minimum_effect_pct": 5.0,
+  "schema": "softwall-c174-trace-oracle-protocol-v1",
+  "slo_rationale": "BurstGPT supplies arrivals and token sizes but no SLO. 1000 ms retains the prior interactive sensitivity; 250 ms spans roughly two P180 decisions; 50 and 100 ms are explicitly synthetic near-real-time expiration sensitivities for AI outputs consumed within a current radio-control horizon. They are not BurstGPT or production claims.",
+  "source_sha256": {
+    "c167_protocol": "da3585b93bdffafe3745c016d92e8887a0e1dad232f58dc8a3d06c1edf805c13",
+    "c167_result": "d5870419a4326d576c640e29a63878b47f1a49f3bec761a4aa8be9c87644d717",
+    "c173_result": "99efc84b6231b0b12cce8df5ec48126fec107e9e38d80377852e767e587f7d16",
+    "calibration_trace": "9ad7e8d76d023dfba58fdc4954a1db6aa56e625c29c04d6b8a9c02a226ff0c3f",
+    "capacity_model": "cf057f784028d0cf82e50fdeb327739fa4130a57ddc8b80f437ede2f9070f9c0",
+    "screen": "4739bfe804bd0215078014588b0fa21bfba18b1d5b23293f56b51629a7f2f151",
+    "test": "c6efdaf8f5f3614e9fd6a568a748423739a7bceb1f8d4aaa0ea16c73f132c25c"
+  },
+  "status": "FROZEN_BEFORE_C174_SCREEN",
+  "stop_rule": "One deterministic screen of every grid point; retain positive, tied, infeasible, and zero-value rows."
+}

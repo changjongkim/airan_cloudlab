@@ -2,141 +2,136 @@
 % decision pages, the recovery-debt table, the recovery-lane certificate, and
 % the independent verifier. The data layer shows the same persistent MPS
 % workers in (a) a single-GPU placement whose processes share CUDA IPC rings
-% and (b) the evaluated four-GPU placement connected by CUDA IPC handles over
+% and (b) the evaluated multi-GPU placement connected by CUDA IPC handles over
 % NVLink P2P. TB1-TB5 are the five evaluated requests: cuPHY instance 0 owns
 % TB1-TB3 and instance 1 owns TB4-TB5. The example state is one common-cutoff
 % epoch with timely TB1/TB2 and retained TB3/TB4; TB5 was rejected at admission.
+% Numbered circles mark only the four cross-layer steps.
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
   \def\swT#1{8.0+(#1-45)*0.03}
 
   % ---------------------------------------------------------- control layer
-  \draw[layer] (0.15,5.0) rectangle (13.75,8.95);
-  \node[font=\bfseries\footnotesize, anchor=west] at (0.3,8.76)
+  \draw[layer] (0.15,5.25) rectangle (13.75,9.2);
+  \node[font=\bfseries\footnotesize, anchor=west] at (0.3,9.01)
     {Control layer: \SOFTWALLNAME{} coordinator (host process)};
 
-  % (2) Decision pages: the owner writes the outcome, the coordinator the action.
-  \draw[sub] (0.3,5.2) rectangle (3.8,8.25);
-  \node[num] at (0.55,8.02) {2};
-  \node[pttl, anchor=west] at (0.75,8.02) {Decision pages};
-  \node[hcell, minimum height=0.34cm, minimum width=0.60cm] at (0.38,7.72) {TB};
-  \node[hcell, minimum height=0.34cm, minimum width=1.00cm] at (0.98,7.72) {outcome};
-  \node[hcell, minimum height=0.34cm, minimum width=1.25cm] at (1.98,7.72) {action};
-  \node[hcell, minimum height=0.34cm, minimum width=0.50cm] at (3.23,7.72) {gen};
+  % Decision pages: the owner writes the outcome, the coordinator the action.
+  \draw[sub] (0.3,5.45) rectangle (3.8,8.5);
+  \node[pttl, anchor=west] at (0.45,8.27) {Decision pages};
+  \node[hcell, minimum height=0.34cm, minimum width=0.60cm] at (0.38,7.97) {TB};
+  \node[hcell, minimum height=0.34cm, minimum width=1.00cm] at (0.98,7.97) {outcome};
+  \node[hcell, minimum height=0.34cm, minimum width=1.25cm] at (1.98,7.97) {action};
+  \node[hcell, minimum height=0.34cm, minimum width=0.50cm] at (3.23,7.97) {gen};
   \foreach \y/\tb/\oc/\ocf/\ac in {
-      7.38/TB1/{\cmark\ timely}/okc/success,
-      7.04/TB2/{\cmark\ timely}/okc/success,
-      6.70/TB3/{\xmark\ CRC}/badc/recovery,
-      6.36/TB4/{\xmark\ late}/badc/recovery} {
+      7.63/TB1/{\cmark\ timely}/okc/success,
+      7.29/TB2/{\cmark\ timely}/okc/success,
+      6.95/TB3/{\xmark\ CRC}/badc/recovery,
+      6.61/TB4/{\xmark\ late}/badc/recovery} {
     \node[cell, minimum height=0.34cm, minimum width=0.60cm] at (0.38,\y) {\tb};
     \node[cell, minimum height=0.34cm, minimum width=1.00cm, fill=\ocf] at (0.98,\y) {\oc};
     \node[cell, minimum height=0.34cm, minimum width=1.25cm] at (1.98,\y) {\ac};
     \node[cell, minimum height=0.34cm, minimum width=0.50cm] at (3.23,\y) {$g{+}1$};
   }
-  \node[inote, align=center] at (2.05,5.6) {owner writes the outcome\\coordinator writes the action};
+  \node[inote, align=center] at (2.05,5.85) {owner writes the outcome\\coordinator writes the action};
 
-  % (3) Recovery-debt table after the common-cutoff batch.
-  \draw[sub] (4.1,5.2) rectangle (7.1,8.25);
-  \node[num] at (4.35,8.02) {3};
-  \node[pttl, anchor=west] at (4.55,8.02) {Recovery-debt table};
-  \node[hcell, minimum height=0.34cm, minimum width=0.55cm] at (4.22,7.72) {TB};
-  \node[hcell, minimum height=0.34cm, minimum width=0.85cm] at (4.77,7.72) {cuPHY};
-  \node[hcell, minimum height=0.34cm, minimum width=0.95cm] at (5.62,7.72) {window};
-  \node[hcell, minimum height=0.34cm, minimum width=0.40cm] at (6.57,7.72) {$c$};
+  % Recovery-debt table after the common-cutoff batch.
+  \draw[sub] (4.1,5.45) rectangle (7.1,8.5);
+  \node[pttl, anchor=west] at (4.25,8.27) {Recovery-debt table};
+  \node[hcell, minimum height=0.34cm, minimum width=0.55cm] at (4.22,7.97) {TB};
+  \node[hcell, minimum height=0.34cm, minimum width=0.85cm] at (4.77,7.97) {cuPHY};
+  \node[hcell, minimum height=0.34cm, minimum width=0.95cm] at (5.62,7.97) {window};
+  \node[hcell, minimum height=0.34cm, minimum width=0.40cm] at (6.57,7.97) {$c$};
   \foreach \y/\tb/\ph/\fc/\tc in {
-      7.38/TB1/0/white/black!45,
-      7.04/TB2/0/white/black!45,
-      6.70/TB3/0/debtc/black,
-      6.36/TB4/1/debtc/black} {
+      7.63/TB1/0/white/black!45,
+      7.29/TB2/0/white/black!45,
+      6.95/TB3/0/debtc/black,
+      6.61/TB4/1/debtc/black} {
     \node[cell, minimum height=0.34cm, minimum width=0.55cm, fill=\fc, text=\tc] at (4.22,\y) {\tb};
     \node[cell, minimum height=0.34cm, minimum width=0.85cm, fill=\fc, text=\tc] at (4.77,\y) {\ph};
     \node[cell, minimum height=0.34cm, minimum width=0.95cm, fill=\fc, text=\tc] at (5.62,\y) {45--153};
     \node[cell, minimum height=0.34cm, minimum width=0.40cm, fill=\fc, text=\tc] at (6.57,\y) {25};
   }
-  \draw[black!60, line width=0.5pt] (4.22,7.21) -- (6.97,7.21);
-  \draw[black!60, line width=0.5pt] (4.22,6.87) -- (6.97,6.87);
-  \node[inote, align=center] at (5.6,5.6) {one batch at 45 ms, gen $g$\\struck: timely successes};
+  \draw[black!60, line width=0.5pt] (4.22,7.46) -- (6.97,7.46);
+  \draw[black!60, line width=0.5pt] (4.22,7.12) -- (6.97,7.12);
+  \node[inote, align=center] at (5.6,5.85) {one batch at 45 ms, gen $g$\\struck: timely successes};
 
-  % (4) Recovery-lane certificate: current state and candidate lease.
-  \draw[sub] (7.4,5.2) rectangle (11.55,8.25);
-  \node[num] at (7.65,8.02) {4};
-  \node[pttl, anchor=west] at (7.85,8.02) {Recovery-lane certificate};
-  \node[font=\scriptsize, anchor=west] at (7.48,7.3) {$X_t$};
-  \node[font=\scriptsize, anchor=west] at (7.48,6.55) {$X'$};
+  % Recovery-lane certificate: current state and candidate lease.
+  \draw[sub] (7.4,5.45) rectangle (11.55,8.5);
+  \node[pttl, anchor=west] at (7.55,8.27) {Recovery-lane certificate};
+  \node[font=\scriptsize, anchor=west] at (7.48,7.55) {$X_t$};
+  \node[font=\scriptsize, anchor=west] at (7.48,6.8) {$X'$};
   \node[job, fill=recc, minimum width=0.75cm, minimum height=0.4cm, anchor=west]
-    at ({\swT{45}},7.3) {TB3};
+    at ({\swT{45}},7.55) {TB3};
   \node[job, fill=recc, minimum width=0.75cm, minimum height=0.4cm, anchor=west]
-    at ({\swT{70}},7.3) {TB4};
+    at ({\swT{70}},7.55) {TB4};
   \node[job, pattern=north east lines, pattern color=black!60, minimum width=0.15cm,
-        minimum height=0.4cm, anchor=west] at ({\swT{45}},6.55) {};
+        minimum height=0.4cm, anchor=west] at ({\swT{45}},6.8) {};
   \node[job, fill=aic, minimum width=1.2cm, minimum height=0.4cm, anchor=west]
-    at ({\swT{50}},6.55) {AI ctx128};
+    at ({\swT{50}},6.8) {AI ctx128};
   \node[job, fill=recc, minimum width=0.75cm, minimum height=0.4cm, anchor=west]
-    at ({\swT{90}},6.55) {TB3};
+    at ({\swT{90}},6.8) {TB3};
   \node[job, fill=recc, minimum width=0.75cm, minimum height=0.4cm, anchor=west]
-    at ({\swT{115}},6.55) {TB4};
-  \draw[line width=0.45pt] ({\swT{45}},6.0) -- ({\swT{160}},6.0);
+    at ({\swT{115}},6.8) {TB4};
+  \draw[line width=0.45pt] ({\swT{45}},6.25) -- ({\swT{160}},6.25);
   \foreach \t in {45,90,140,153} {
-    \draw[line width=0.45pt] ({\swT{\t}},6.0) -- ({\swT{\t}},5.93);
-    \node[font=\tiny] at ({\swT{\t}},5.8) {\t};
+    \draw[line width=0.45pt] ({\swT{\t}},6.25) -- ({\swT{\t}},6.18);
+    \node[font=\tiny] at ({\swT{\t}},6.05) {\t};
   }
-  \node[font=\tiny, anchor=west] at (7.48,5.8) {ms};
-  \draw[guard] ({\swT{153}},6.0) -- ({\swT{153}},7.6);
-  \node[font=\itshape\tiny, text=dred] at ({\swT{153}},7.72) {guard};
-  \node[inote] at (9.5,5.43) {hatched: launch-control charge};
+  \node[font=\tiny, anchor=west] at (7.48,6.05) {ms};
+  \draw[guard] ({\swT{153}},6.25) -- ({\swT{153}},7.85);
+  \node[font=\itshape\tiny, text=dred] at ({\swT{153}},7.97) {guard};
+  \node[inote] at (9.5,5.68) {hatched: launch-control charge};
 
-  % (5) Independent verifier.
-  \draw[sub] (11.85,5.2) rectangle (13.7,8.25);
-  \node[num] at (11.99,8.02) {5};
-  \node[pttl, anchor=north west, align=left] at (12.1,8.16) {Independent\\verifier};
-  \node[font=\tiny, align=left, anchor=west] at (11.95,7.12)
+  % Independent verifier.
+  \draw[sub] (11.85,5.45) rectangle (13.7,8.5);
+  \node[pttl, anchor=north west, align=left] at (11.95,8.41) {Independent\\verifier};
+  \node[font=\tiny, align=left, anchor=west] at (11.95,7.37)
     {all-fail by guard\\unique credits\\current generation};
   \node[comp, fill=okc, draw=green!45!black, minimum width=1.5cm, minimum height=0.4cm,
-        inner sep=0.5pt] at (12.77,6.3) {commit $X'$};
+        inner sep=0.5pt] at (12.77,6.55) {commit $X'$};
   \node[comp, fill=white, draw=dred, minimum width=1.5cm, minimum height=0.4cm,
-        inner sep=0.5pt] at (12.77,5.7) {else keep $X_t$};
+        inner sep=0.5pt] at (12.77,5.95) {else keep $X_t$};
 
-  % Control-layer flow.
-  \draw[arr] (3.8,6.8) -- (4.1,6.8);
-  \draw[arr] (7.1,6.8) -- (7.4,6.8);
-  \draw[arr] (11.55,6.8) -- (11.85,6.8);
+  % Control-layer flow: batch, retime, verify.
+  \draw[arr] (3.8,7.05) -- (4.1,7.05);
+  \draw[arr] (7.1,7.05) -- (7.4,7.05);
+  \draw[arr] (11.55,7.05) -- (11.85,7.05);
 
   % ------------------------------------------------------------- data layer
-  \draw[layer] (0.15,0.2) rectangle (13.75,4.75);
-  \node[font=\bfseries\footnotesize] at (7.0,4.57) {Data layer: persistent MPS workers};
-  \draw[black!45, dashed, line width=0.5pt] (4.61,0.35) -- (4.61,4.1);
+  \draw[layer] (0.15,0.2) rectangle (13.75,5.0);
+  \node[font=\bfseries\footnotesize] at (7.0,4.82) {Data layer: persistent MPS workers};
+  \draw[black!45, dashed, line width=0.5pt] (4.61,0.35) -- (4.61,4.35);
+  \node[font=\bfseries\scriptsize] at (2.385,4.2) {(a) Single GPU};
+  \node[font=\bfseries\scriptsize] at (9.175,4.2) {(b) Multi-GPU};
 
   % (a) Single GPU: every process shares CUDA IPC rings on one device.
-  \node[font=\bfseries\scriptsize] at (0.42,4.22) {(a)};
-  \draw[gpu] (0.3,0.4) rectangle (4.47,3.95);
-  \node[pttl] at (2.6,3.77) {GPU0 $\cdot$ all job classes};
-  \node[comp, minimum width=1.75cm, minimum height=0.62cm] at (1.25,3.18) {cuPHY L1\\TB owners};
-  \node[comp, fill=peach, minimum width=1.75cm, minimum height=0.62cm] at (3.5,3.18)
+  \draw[gpu] (0.3,1.15) rectangle (4.47,3.95);
+  \node[pttl] at (2.385,3.77) {GPU0 $\cdot$ all job classes};
+  \node[comp, minimum width=1.75cm, minimum height=0.6cm] at (1.25,3.2) {cuPHY L1\\TB owners};
+  \node[comp, fill=peach, minimum width=1.75cm, minimum height=0.6cm] at (3.5,3.2)
     {TensorRT\\NeuralRx};
-  \node[inote] at (2.375,2.6) {CUDA IPC rings};
+  \node[inote] at (2.385,2.72) {CUDA IPC rings};
   \foreach \i/\t/\f in {0/IQ/aic, 1/LLR/aic, 2/IQ/recc, 3/TB/recc, 4//white, 5//white, 6//white} {
-    \node[cell, minimum height=0.36cm, minimum width=0.54cm, fill=\f, font=\tiny]
-      at ({0.5+\i*0.54},2.38) {\t};
+    \node[cell, minimum height=0.34cm, minimum width=0.54cm, fill=\f, font=\tiny]
+      at ({0.5+\i*0.54},2.55) {\t};
   }
   \foreach \i in {4,5,6} {
     \fill[pattern=north east lines, pattern color=black!35]
-      ({0.5+\i*0.54},2.02) rectangle ({0.5+(\i+1)*0.54},2.38);
+      ({0.5+\i*0.54},2.21) rectangle ({0.5+(\i+1)*0.54},2.55);
   }
-  \node[comp, fill=recc, minimum width=1.75cm, minimum height=0.62cm] at (1.25,1.3)
+  \node[comp, fill=recc, minimum width=1.75cm, minimum height=0.6cm] at (1.25,1.6)
     {cuPHY\\recovery lane};
-  \node[comp, fill=aic, minimum width=1.75cm, minimum height=0.62cm] at (3.5,1.3)
+  \node[comp, fill=aic, minimum width=1.75cm, minimum height=0.6cm] at (3.5,1.6)
     {Qwen, latest-\\start gate};
-  \draw[darr] (0.9,2.87) -- (0.9,2.38);
-  \draw[darr] (3.5,2.38) -- (3.5,2.87);
-  \draw[darr] (1.25,2.02) -- (1.25,1.61);
-  \node[num] at (3.88,2.62) {1};
-  \node[num] at (1.62,1.82) {8};
-  \node[inote] at (2.375,0.6) {MPS clients on one device};
+  \draw[darr] (0.9,2.9) -- (0.9,2.55);
+  \draw[darr] (3.5,2.55) -- (3.5,2.9);
+  \draw[darr] (1.25,2.21) -- (1.25,1.9);
+  \node[inote] at (2.385,0.75) {MPS clients on one device};
 
-  % (b) Evaluated four-GPU placement.
-  \node[font=\bfseries\scriptsize] at (4.82,4.22) {(b)};
+  % (b) Multi-GPU: the evaluated four-GPU placement.
   % GPU0: cuPHY instance 0 owns TB1-TB3.
-  \draw[gpu] (4.75,1.2) rectangle (7.15,3.95);
+  \draw[gpu] (4.75,1.15) rectangle (7.15,3.95);
   \node[pttl] at (5.95,3.77) {GPU0 $\cdot$ cuPHY 0};
   \foreach \x/\tb in {4.8/TB1, 5.58/TB2, 6.36/TB3} {
     \draw[sub] (\x,2.6) rectangle ++(0.76,0.9);
@@ -150,7 +145,7 @@
   \node[inote] at (5.95,1.5) {MPS 50\%};
 
   % GPU1: cuPHY instance 1 owns TB4; TB5 was rejected at admission.
-  \draw[gpu] (7.3,1.2) rectangle (9.2,3.95);
+  \draw[gpu] (7.3,1.15) rectangle (9.2,3.95);
   \node[pttl] at (8.25,3.77) {GPU1 $\cdot$ cuPHY 1};
   \draw[sub] (7.38,2.6) rectangle ++(0.76,0.9);
   \node[pttl] at (7.76,3.3) {TB4};
@@ -165,16 +160,16 @@
     {TB5 rejected\\at admission};
 
   % GPU3: persistent NeuralRx endpoint.
-  \draw[gpu] (9.35,1.2) rectangle (10.85,3.95);
+  \draw[gpu] (9.35,1.15) rectangle (10.85,3.95);
   \node[pttl] at (10.1,3.77) {GPU3 $\cdot$ NRx};
   \node[comp, fill=peach, minimum width=1.3cm, minimum height=0.95cm] at (10.1,2.95)
     {TensorRT\\CUDA\\graph};
   \node[inote] at (10.1,1.7) {MPS 80\%};
 
   % GPU2: shared recovery lane and bounded external AI.
-  \draw[gpu] (11.0,1.2) rectangle (13.6,3.95);
+  \draw[gpu] (11.0,1.15) rectangle (13.6,3.95);
   \node[pttl, anchor=west] at (11.07,3.77) {GPU2 $\cdot$ shared};
-  \draw[sub, fill=peach] (11.1,1.3) rectangle (12.0,3.5);
+  \draw[sub, fill=peach] (11.1,1.25) rectangle (12.0,3.5);
   \node[pttl, align=center] at (11.55,3.18) {cuPHY\\lane};
   \node[job, fill=recc, minimum width=0.75cm, minimum height=0.36cm] at (11.55,2.55) {TB3};
   \node[job, fill=recc, minimum width=0.75cm, minimum height=0.36cm] at (11.55,1.97) {TB4};
@@ -189,27 +184,28 @@
   \draw[arr] (12.8,2.1) -- (12.8,1.85);
 
   % NVLink P2P: IQ/LLR to the NeuralRx endpoint, IQ/TB to the recovery lane.
-  \draw[line width=2.0pt, black!80] (5.95,0.75) -- (11.55,0.75);
+  \draw[line width=2.0pt, black!80] (5.95,0.72) -- (11.55,0.72);
   \foreach \x in {5.95,8.25,10.1,11.55} {
     \draw[line width=2.0pt, black!80, -{Triangle[length=1.6mm,width=2.8mm]}]
-      (\x,0.75) -- (\x,1.2);
+      (\x,0.72) -- (\x,1.15);
   }
-  \node[inote] at (8.75,0.45) {NVLink P2P through CUDA IPC handles};
-  \node[num] at (9.72,0.98) {1};
-  \node[num] at (11.18,0.98) {8};
+  \node[inote] at (8.75,0.42) {NVLink P2P through CUDA IPC handles};
 
-  % ------------------------------------------------------- cross-layer flow
-  % (2) outcome from each owner.
-  \draw[arr] (0.7,3.49) -- (0.7,5.2);
-  \node[inote, anchor=west] at (0.8,4.42) {outcome};
-  % (6) dispatch to every decision page and one lease to the AI worker.
-  \draw[arr, draw=dblue] (12.77,8.25) -- (12.77,8.45) -- (2.05,8.45) -- (2.05,8.25);
-  \node[num] at (7.0,8.45) {6};
-  \node[note, text=dblue, anchor=west] at (7.2,8.62) {dispatch: action and generation};
-  \draw[arr, draw=dblue] (13.05,5.2) -- (13.05,3.5);
-  \node[inote, text=dblue, anchor=east] at (12.93,4.42) {run(lease, latest-start)};
-  % (7) fence or non-launch marker retires the lease.
-  \draw[arr, draw=green!40!black] (13.5,1.6) -- (13.67,1.6) -- (13.67,5.2);
-  \node[num] at (13.36,4.42) {7};
+  % ----------------------------------------- cross-layer flow (four steps)
+  % (1) Each owner publishes its outcome to its decision page.
+  \draw[arr] (0.7,3.5) -- (0.7,5.45);
+  \node[num] at (0.98,4.55) {1};
+  \node[inote, anchor=west] at (1.17,4.55) {outcome};
+  % (2) Dispatch: one action and generation per decision page.
+  \draw[arr, draw=dblue] (12.77,8.5) -- (12.77,8.7) -- (2.05,8.7) -- (2.05,8.5);
+  \node[num] at (7.0,8.7) {2};
+  \node[note, text=dblue, anchor=west] at (7.2,8.87) {dispatch: action and generation};
+  % (3) One lease to the AI worker with an absolute latest-start.
+  \draw[arr, draw=dblue] (13.05,5.45) -- (13.05,3.5);
+  \node[num] at (12.78,4.55) {3};
+  \node[inote, text=dblue, anchor=east] at (12.58,4.55) {run(lease, latest-start)};
+  % (4) A completion or non-launch marker retires the lease.
+  \draw[arr, draw=green!40!black] (13.5,1.6) -- (13.67,1.6) -- (13.67,5.45);
+  \node[num] at (13.36,4.55) {4};
 \end{tikzpicture}%
 }

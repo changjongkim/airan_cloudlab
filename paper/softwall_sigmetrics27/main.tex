@@ -316,25 +316,27 @@ capacity model used by the implementation.
 
 Figure~\ref{fig:overall} shows the scheduling loop on its runtime objects. Persistent MPS workers own
 GPU work, while one host coordinator owns the per-TB decision pages, the recovery-debt table, the
-recovery-lane certificate, and the verifier. The numbered steps follow one epoch from \NRx input to the
-recovery that runs at its certificate start. The same control layer serves a single GPU, where CUDA
-IPC connects the workers, and several GPUs, where retained debts from different cuPHY instances share one
-recovery lane over NVLink P2P.
+recovery-lane certificate, and the verifier. The four numbered arrows mark the cross-layer steps
+of one epoch, and the shared lane runs retained recoveries in certificate order. The same control
+layer serves a single GPU, where CUDA IPC rings connect the workers, and several GPUs, where retained
+debts from different cuPHY instances share one recovery lane over NVLink P2P.
 
 \begin{figure}[H]
   \centering
   \input{figures/softwall_overall_architecture.tex}
-  \caption{\sys architecture. The control layer is identical for every placement: steps (2)--(7)
-  record outcomes, apply one cutoff batch, retime debts around a candidate lease, verify it, dispatch
-  actions and the lease, and retire the lease on a marker. The data layer shows (a) one GPU whose
-  processes exchange IQ, LLR, and TB buffers through CUDA IPC rings and (b) the evaluated four-GPU
-  placement over NVLink P2P, where cuPHY instance 0 owns TB1--TB3 and instance 1 owns TB4 and TB5.
-  Steps (1) and (8) are the \NRx input and the certificate-ordered recovery.}
+  \caption{\sys architecture. The control layer is identical for both placements. (1) Each owner
+  publishes its \NRx outcome to a decision page. One common-cutoff batch then updates the debt table,
+  the scheduler retimes retained debts around a candidate lease, and the independent verifier commits
+  $X'$ or keeps $X_t$. (2) The coordinator publishes each action with its generation and (3) sends the
+  lease with an absolute latest-start. (4) A completion or non-launch marker retires the lease. The
+  shared lane runs retained recoveries in certificate order. In (a), the processes on one GPU exchange
+  IQ, LLR, and TB buffers through CUDA IPC rings. In (b), the evaluated multi-GPU placement uses NVLink
+  P2P; cuPHY instance 0 owns TB1--TB3 and instance 1 owns TB4 and TB5.}
   \Description{A control layer contains a decision-page table, a recovery-debt table, a recovery-lane
-  calendar with a candidate AI lease, and an independent verifier. The data layer shows one GPU hosting
-  all job classes and a four-GPU node with two cuPHY GPUs, a NeuralRx GPU, and a shared recovery and
-  AI GPU connected by NVLink P2P. Numbered arrows follow input, outcome, batch, retiming, verification,
-  dispatch, fence, and recovery.}
+  calendar with a candidate AI lease, and an independent verifier. The data layer shows (a) one GPU
+  whose cuPHY, NeuralRx, recovery, and AI processes share CUDA IPC rings and (b) a multi-GPU node with
+  two cuPHY GPUs, a NeuralRx GPU, and a shared recovery and AI GPU connected by NVLink P2P. Four
+  numbered arrows mark the outcome, dispatch, lease, and marker steps between the layers.}
   \label{fig:overall}
 \end{figure}
 

@@ -319,15 +319,15 @@ GPU work, while one host coordinator owns the per-TB decision pages, the recover
 recovery-lane certificate, and the verifier. The four numbered arrows mark the cross-layer steps
 of one epoch, and the shared lane runs retained recoveries in certificate order. The same control
 layer serves a single GPU, where CUDA IPC rings connect the workers, and several GPUs, where retained
-debts from different cuPHY instances share one recovery lane over NVLink P2P. Both placements reach the
-coordinator through the same host interface: per-TB decision pages, the AI lease RPC, and completion
-markers.
+debts from different cuPHY instances share one recovery lane over NVLink P2P. Both placements use the
+same per-TB decision pages, AI lease RPC, and completion markers, and the figure draws the numbered
+steps for the evaluated multi-GPU placement.
 
 \begin{figure}[H]
   \centering
   \input{figures/softwall_overall_architecture.tex}
-  \caption{\sys architecture. Both placements reach the coordinator through one host interface.
-  (1) Each owner publishes its \NRx outcome to a decision page. One common-cutoff batch then updates
+  \caption{\sys architecture. The numbered steps are drawn for the evaluated placement (b); the
+  single-GPU placement (a) uses the same decision pages, lease RPC, and markers. (1) Each owner publishes its \NRx outcome to a decision page. One common-cutoff batch then updates
   the debt table, the scheduler retimes retained debts around a candidate lease, and the independent
   verifier commits $X'$ or keeps $X_t$. (2) The coordinator publishes each action with its generation
   and (3) sends the lease with an absolute latest-start through the AI lease RPC. (4) A completion or
@@ -336,9 +336,9 @@ markers.
   evaluated multi-GPU placement uses NVLink P2P; cuPHY instance 0 owns TB1--TB3, instance 1 owns TB4
   and TB5, and ellipses mark further TBs.}
   \Description{A control layer contains a decision-page table, a recovery-debt table, a recovery-lane
-  calendar with a candidate AI lease, and an independent verifier. A host-interface bar connects it to
-  both data-layer placements: (a) one GPU whose cuPHY, NeuralRx, recovery, and AI processes share CUDA
-  IPC rings and (b) a multi-GPU node with two cuPHY GPUs, a NeuralRx GPU with input, TensorRT, and
+  calendar with a candidate AI lease, and an independent verifier. Below it are two separate
+  placements: (a) one GPU whose cuPHY, NeuralRx, recovery, and AI processes share CUDA IPC rings and
+  (b) a multi-GPU node with two cuPHY GPUs, a NeuralRx GPU with input, TensorRT, and
   output stages, and a shared recovery and AI GPU connected by NVLink P2P. Four numbered arrows mark
   the outcome, dispatch, lease, and marker steps.}
   \label{fig:overall}

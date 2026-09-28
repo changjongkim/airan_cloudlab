@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import statistics
 from pathlib import Path
 
 import matplotlib
@@ -141,77 +142,129 @@ def save(fig, stem: str) -> None:
 
 
 def derive_motivation() -> None:
-    """Count retained debts and certificate lease decisions per measured epoch."""
+    """Derive per-epoch debt, lease, and launch-control records from the Q2 raw logs."""
     if not all(path.exists() for path in MOTIVATION_RAW):
         return
     pinned = load("q2")["artifact_sha256"]
+    transition = [tuple(key) for key in load("q2_protocol")["low_snr_keys"]]
+    assert len(transition) == 2
     debt_counts = {str(m): 0 for m in range(5)}
+    grouped_counts = {str(m): 0 for m in range(5)}
     classes = {}
-    epochs = 0
+    execution = {}
+    build_ms = []
+    retried = 0
+    epochs = joint = 0
+    key_failures = {"/".join(key): 0 for key in transition}
     for path in MOTIVATION_RAW:
         rel = str(path.relative_to(ROOT))
         assert pinned[rel] == sha256(path), f"raw log differs from pinned digest: {rel}"
-        for row in json.loads(path.read_text())["rounds"]:
+        rounds = sorted(json.loads(path.read_text())["rounds"], key=lambda row: row["sequence"])
+        assert len(rounds) % 2 == 0
+        failed_pairs = []
+        for row in rounds:
             epochs += 1
-            retained = len(row["outcome_transition"]["unresolved_obligations"])
-            debt_counts[str(retained)] += 1
+            unresolved = {tuple(key) for key in row["outcome_transition"]["unresolved_obligations"]}
+            # Only the two transition-SNR TBs ever miss the cutoff in this campaign.
+            assert unresolved <= set(transition), unresolved
+            debt_counts[str(len(unresolved))] += 1
+            for key in transition:
+                key_failures["/".join(key)] += key in unresolved
+            joint += len(unresolved) == 2
+            failed_pairs.append(len(unresolved))
             entry = classes.setdefault(str(row["context_length"]), {"offered": 0, "fits": 0, "breaks": 0})
             entry["offered"] += 1
             if row["lease_accepted"]:
                 entry["fits"] += 1
+                qwen = row["qwen"]
+                assert qwen["launched"] and qwen["context_length"] == row["context_length"]
+                execution.setdefault(str(row["context_length"]), []).append(round(qwen["execution_ms"], 3))
             else:
                 assert row["lease_reason"] == "lease_breaks_global_certificate", row["lease_reason"]
                 entry["breaks"] += 1
+            attempts = row["launch_revalidation_attempts"]
+            build_ms.append(round(attempts[0]["elapsed_ms"], 3))
+            retried += len(attempts) > 1
+        # Four-transition epochs join the transition TBs of consecutive epochs
+        # (sequence 2j-1 and 2j) of the same run.
+        for first, second in zip(failed_pairs[0::2], failed_pairs[1::2]):
+            grouped_counts[str(first + second)] += 1
+    mode = load("q2_protocol")["mode"]
     data = {
-        "schema": "softwall-motivation-data-v1",
+        "schema": "softwall-motivation-data-v2",
         "scope": ("Two-node warm P180/D155 campaign (development and holdout). Retained debts are "
-                  "the unresolved NeuralRx outcomes at the 45 ms common cutoff. A lease 'fits' when "
-                  "the certificate admitted it under declared bounds and 'breaks' when it violated "
-                  "the all-fail recovery schedule. Static reservation of all four admitted debts "
-                  "leaves 8 ms of the 108 ms window, so it admits no AI unit."),
+                  "the unresolved NeuralRx outcomes at the 45 ms common cutoff; only the two "
+                  "transition-SNR TBs miss it. Four-transition epochs join the transition TBs of "
+                  "consecutive measured epochs of the same run. A lease 'fits' when the certificate "
+                  "admitted it under declared bounds and 'breaks' when it violated the all-fail "
+                  "recovery schedule. Build time is the first launch-time certificate construction "
+                  "of each epoch; a construction over the launch-control bound is discarded and rebuilt."),
         "raw_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in MOTIVATION_RAW},
         "epochs": epochs,
         "retained_debt_epochs": debt_counts,
+        "transition_keys": ["/".join(key) for key in transition],
+        "transition_failures": key_failures,
+        "transition_joint_failures": joint,
+        "grouped_four_transition": {"epochs": epochs // 2, "retained_debt_epochs": grouped_counts},
         "lease_by_context": classes,
+        "mode": {name: mode[name] for name in ("ai_class_bounds_ms", "conventional_bound_ms", "expiry_ms",
+                                               "guard_ms", "launch_control_bound_ms", "nrx_bound_ms")},
+        "qwen_execution_ms": execution,
+        "certificate_build_ms": build_ms,
+        "certificate_rebuilt_epochs": retried,
     }
-    MOTIVATION_DATA.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+    MOTIVATION_DATA.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
+
+
+def top_legend(ax, ncol: int, handles=None, labels=None) -> None:
+    """Legend above the axes and above the panel marker."""
+    if handles is None:
+        handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 1.13), ncol=ncol, frameon=False,
+              handlelength=1.5, handletextpad=0.4, columnspacing=0.9, labelspacing=0.2, borderaxespad=0.0)
 
 
 def make_motivation() -> dict:
-    """Measured retained debt and the errors of the two existing admission views."""
+    """Retained debt at the cutoff and the errors of the two existing admission views."""
     data = json.loads(MOTIVATION_DATA.read_text())
     counts = data["retained_debt_epochs"]
     epochs = data["epochs"]
     assert epochs == 1200 and sum(counts.values()) == epochs
+    grouped = data["grouped_four_transition"]
+    assert grouped["epochs"] == 600 and sum(grouped["retained_debt_epochs"].values()) == 600
     classes = data["lease_by_context"]
     contexts = [16, 32, 64, 128, 256, 512]
     assert all(classes[str(c)]["offered"] == 200 for c in contexts)
     assert classes["256"]["breaks"] == 55 and classes["512"]["breaks"] == 68
 
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.95),
-                             gridspec_kw={"width_ratios": [0.85, 1.15]})
-    fig.subplots_adjust(wspace=0.42)
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3),
+                             gridspec_kw={"width_ratios": [1.0, 1.15]})
+    fig.subplots_adjust(wspace=0.36)
 
     # (a) Retained debts at the common cutoff, against the two fixed views.
     ax = axes[0]
     xs = list(range(5))
+    width = 0.38
     shares = [100.0 * counts[str(m)] / epochs for m in xs]
-    ax.bar(xs, shares, width=0.62, color=COLORS["orange"], zorder=3, label="measured epochs")
-    ax.axvline(0, color=COLORS["red"], linestyle=":", linewidth=1.4, zorder=2,
-               label="current-idle view")
-    ax.axvline(4, color=COLORS["gray"], linestyle="--", linewidth=1.4, zorder=2,
-               label="static reservation")
+    four = [100.0 * grouped["retained_debt_epochs"][str(m)] / grouped["epochs"] for m in xs]
+    ax.bar([x - width / 2 for x in xs], shares, width=width, color=COLORS["orange"], zorder=3,
+           label="2 transition TBs")
+    ax.bar([x + width / 2 for x in xs], four, width=width, color=COLORS["light_orange"],
+           edgecolor=COLORS["orange"], hatch="/////", linewidth=0.8, zorder=3, label="4 transition TBs")
+    # The two fixed views are labeled on their lines; the legend keeps the data.
+    ax.axvline(0, color=COLORS["red"], linestyle=":", linewidth=1.4, zorder=4)
+    ax.axvline(4, color=COLORS["gray"], linestyle="--", linewidth=1.4, zorder=4)
+    ax.text(0.1, 56, "current-idle", ha="left", va="center", fontsize=6.8, color=COLORS["red"])
+    ax.text(3.9, 56, "static", ha="right", va="center", fontsize=6.8, color=COLORS["gray"])
     ax.set_xticks(xs)
     ax.set_xlim(-0.6, 4.6)
-    ax.set_ylim(0, 60)
+    ax.set_ylim(0, 62)
+    ax.set_yticks([0, 20, 40, 60])
     ax.set_xlabel("retained debts at cutoff")
     ax.set_ylabel("epochs (%)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
-    handles, labels = ax.get_legend_handles_labels()
-    order = [labels.index(name) for name in ("measured epochs", "current-idle view", "static reservation")]
-    ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="upper center",
-              bbox_to_anchor=(0.5, -0.3), ncol=1, frameon=False, handlelength=1.6, labelspacing=0.25)
+    top_legend(ax, ncol=1)
     panel_label(ax, "a")
 
     # (b) Per AI class: static rejects units that fit; current-idle admits units
@@ -227,20 +280,106 @@ def make_motivation() -> dict:
            label="current-idle admits a breaking unit")
     ax.set_xticks(xs, [str(c) for c in contexts])
     ax.set_ylim(0, 105)
+    ax.set_yticks([0, 50, 100])
     ax.set_xlabel("AI prompt length (tokens)")
-    ax.set_ylabel("epochs of the class (%)")
+    ax.set_ylabel("epochs (%)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.3), ncol=1, frameon=False,
-              handlelength=1.4, labelspacing=0.25)
+    top_legend(ax, ncol=1)
     panel_label(ax, "b")
 
     save(fig, "softwall_motivation")
     return {
         "epochs": epochs,
         "retained_debt_share_pct": dict(zip(["0", "1", "2", "3", "4"], shares)),
+        "grouped_four_transition_share_pct": dict(zip(["0", "1", "2", "3", "4"], four)),
         "static_wrong_pct": dict(zip([str(c) for c in contexts], static_wrong)),
         "current_idle_wrong_pct": dict(zip([str(c) for c in contexts], idle_wrong)),
+    }
+
+
+def make_lease_timing() -> dict:
+    """AI lease length against the debt-dependent slack, and the launch-control tail."""
+    data = json.loads(MOTIVATION_DATA.read_text())
+    mode = data["mode"]
+    contexts = [16, 32, 64, 128, 256, 512]
+    bounds = [mode["ai_class_bounds_ms"][str(c)] for c in contexts]
+    charge = mode["launch_control_bound_ms"]
+    recovery = mode["conventional_bound_ms"]
+    window = mode["expiry_ms"] - mode["guard_ms"] - mode["nrx_bound_ms"]
+    assert (window, recovery, charge) == (108, 25, 5)
+    execution = data["qwen_execution_ms"]
+    assert sum(len(execution[str(c)]) for c in contexts) == 1077
+    medians = [statistics.median(execution[str(c)]) for c in contexts]
+    maxima = [max(execution[str(c)]) for c in contexts]
+    assert all(peak <= bound for peak, bound in zip(maxima, bounds))
+    build = sorted(data["certificate_build_ms"])
+    assert len(build) == 1200 and data["certificate_rebuilt_epochs"] == 2
+    tail = [value for value in build if value > charge]
+    assert len(tail) == 2
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3),
+                             gridspec_kw={"width_ratios": [1.6, 1.0]})
+    fig.subplots_adjust(wspace=0.42)
+
+    # (a) A lease occupies its class bound plus the launch-control charge. It
+    # fits after m retained debts when it ends before the window minus m bounds.
+    ax = axes[0]
+    xs = list(range(len(contexts)))
+    ax.bar(xs, bounds, width=0.6, color=COLORS["light_blue"], edgecolor=COLORS["blue"], linewidth=0.8,
+           zorder=3, label="class bound")
+    ax.bar(xs, [charge] * len(xs), bottom=bounds, width=0.6, color="white", edgecolor=COLORS["blue"],
+           hatch="/////", linewidth=0.8, zorder=3, label="launch-control charge")
+    ax.vlines(xs, medians, maxima, color=COLORS["dark"], linewidth=1.6, zorder=4)
+    ax.scatter(xs, medians, s=9, color=COLORS["dark"], zorder=5, label="measured execution")
+    for m in range(5):
+        slack = window - m * recovery
+        ax.axhline(slack, color=COLORS["gray"], linestyle="--", linewidth=0.9, zorder=2,
+                   label="slack after $m$ debts" if m == 0 else None)
+        ax.text(-0.95, slack, f"$m$={m}", ha="center", va="center", fontsize=6.5, color=COLORS["dark"],
+                bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.4}, zorder=2.4)
+    ax.set_xticks(xs, [str(c) for c in contexts])
+    ax.set_xlim(-1.35, len(xs) - 0.45)
+    ax.set_ylim(0, 115)
+    ax.set_yticks([0, 50, 100])
+    ax.set_xlabel("AI prompt length (tokens)")
+    ax.set_ylabel("after cutoff (ms)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    handles, labels = ax.get_legend_handles_labels()
+    order = [labels.index(name) for name in ("class bound", "launch-control charge", "measured execution",
+                                             "slack after $m$ debts")]
+    top_legend(ax, ncol=2, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
+    panel_label(ax, "a")
+
+    # (b) Complementary CDF of the first launch-time certificate construction.
+    ax = axes[1]
+    n = len(build)
+    ax.step(build, [(n - i) / n for i in range(n)], where="pre", color=COLORS["blue"], linewidth=1.5,
+            label="certificate build")
+    ax.scatter(tail, [(n - build.index(value)) / n for value in tail], s=12, color=COLORS["blue"], zorder=4)
+    ax.axvline(charge, color=COLORS["red"], linestyle="--", linewidth=1.2, label="launch-control charge")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(0.7, 50)
+    ax.set_ylim(5e-4, 1.5)
+    ax.set_xticks([1, 5, 10, 30], ["1", "5", "10", "30"])
+    ax.set_xlabel("build time (ms)")
+    ax.set_ylabel("CCDF")
+    ax.grid(which="major", **GRID)
+    ax.set_axisbelow(True)
+    top_legend(ax, ncol=1)
+    panel_label(ax, "b")
+
+    save(fig, "softwall_lease_timing")
+    return {
+        "window_ms": window,
+        "lease_ms": [bound + charge for bound in bounds],
+        "slack_after_m_ms": [window - m * recovery for m in range(5)],
+        "execution_median_ms": dict(zip([str(c) for c in contexts], medians)),
+        "execution_max_ms": dict(zip([str(c) for c in contexts], maxima)),
+        "build_median_ms": statistics.median(build),
+        "build_over_charge_ms": tail,
     }
 
 
@@ -615,6 +754,7 @@ def make_capacity_headroom() -> dict:
 def main() -> None:
     derive_motivation()
     motivation = make_motivation()
+    lease_timing = make_lease_timing()
     qualification = make_qualification_evidence()
     boundaries = make_outcome_boundaries()
     capacity = make_capacity_headroom()
@@ -623,12 +763,13 @@ def main() -> None:
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in SOURCES.values()},
         "figures": [
             "softwall_motivation.pdf",
+            "softwall_lease_timing.pdf",
             "softwall_qualification_evidence.pdf",
             "softwall_outcome_boundaries.pdf",
             "softwall_capacity_headroom.pdf",
         ],
-        "derived": {"motivation": motivation, "qualification": qualification, "boundaries": boundaries,
-                    "capacity": capacity},
+        "derived": {"motivation": motivation, "lease_timing": lease_timing, "qualification": qualification,
+                    "boundaries": boundaries, "capacity": capacity},
         "claim_boundary": (
             "All plots reproduce finite-sample audited artifacts. Diagnostic campaigns are not pooled; "
             "sample maxima are not WCET; the 4.5 ms production gate remains failed; and Sionna CDL-D/E "
@@ -637,8 +778,8 @@ def main() -> None:
     }
     manifest["output_sha256"] = {
         name: sha256(HERE / name)
-        for stem in ("softwall_motivation", "softwall_qualification_evidence", "softwall_outcome_boundaries",
-                     "softwall_capacity_headroom")
+        for stem in ("softwall_motivation", "softwall_lease_timing", "softwall_qualification_evidence",
+                     "softwall_outcome_boundaries", "softwall_capacity_headroom")
         for name in (f"{stem}.pdf", f"{stem}.svg")
     }
     (HERE / "softwall_figure_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

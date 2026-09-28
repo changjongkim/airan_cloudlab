@@ -74,6 +74,45 @@
         1000
       ]
     },
+    "lease_timing": {
+      "build_median_ms": 1.06,
+      "build_over_charge_ms": [
+        23.725,
+        30.991
+      ],
+      "execution_max_ms": {
+        "128": 25.77,
+        "16": 28.831,
+        "256": 40.579,
+        "32": 24.55,
+        "512": 67.338,
+        "64": 25.466
+      },
+      "execution_median_ms": {
+        "128": 23.6815,
+        "16": 22.742,
+        "256": 36.227,
+        "32": 22.351,
+        "512": 66.579,
+        "64": 22.3945
+      },
+      "lease_ms": [
+        40,
+        40,
+        40,
+        45,
+        70,
+        80
+      ],
+      "slack_after_m_ms": [
+        108,
+        83,
+        58,
+        33,
+        8
+      ],
+      "window_ms": 108
+    },
     "motivation": {
       "current_idle_wrong_pct": {
         "128": 0.0,
@@ -84,6 +123,13 @@
         "64": 0.0
       },
       "epochs": 1200,
+      "grouped_four_transition_share_pct": {
+        "0": 4.166666666666667,
+        "1": 19.333333333333332,
+        "2": 37.5,
+        "3": 31.666666666666668,
+        "4": 7.333333333333333
+      },
       "retained_debt_share_pct": {
         "0": 21.416666666666668,
         "1": 47.833333333333336,
@@ -159,6 +205,7 @@
   },
   "figures": [
     "softwall_motivation.pdf",
+    "softwall_lease_timing.pdf",
     "softwall_qualification_evidence.pdf",
     "softwall_outcome_boundaries.pdf",
     "softwall_capacity_headroom.pdf"
@@ -166,8 +213,10 @@
   "output_sha256": {
     "softwall_capacity_headroom.pdf": "d9d86e3472dcf04a318d9aabad735e86723d945dea6edd66629865b2456cc783",
     "softwall_capacity_headroom.svg": "f1ff570c6e11865f46b833dc8564b8da1504240e01d78f9807b0653a1511b1e4",
-    "softwall_motivation.pdf": "95f85ffda1b127b51b6ba36358378c8f66d7ac04b9fbe73ef2535f1b33a9341f",
-    "softwall_motivation.svg": "f3067f1618a8a8c14e80ddb3f0343d7467de860e2cbe679135ab57ac04e5d516",
+    "softwall_lease_timing.pdf": "ed4324ab7342131bbbfcc24584fc902b96729f7f89e480b11f7e672b3a059cff",
+    "softwall_lease_timing.svg": "4989b06712bb7abcee67e43f83a7192a1cd5e242fb86f8978fdfbce1c406d0aa",
+    "softwall_motivation.pdf": "3010ce8e961e7596015642bd5566d8dbff38a1af13b01e2b9d6b7296c0c718f2",
+    "softwall_motivation.svg": "e835e8be3c20c727c56cfe1285d1a038224af4d33fc864ffdbd4ee404683def2",
     "softwall_outcome_boundaries.pdf": "6b5cb3dc264aaaa03a6bc81c979dff6220d7e4f5b9239b9bb83e85b0ed7b3c81",
     "softwall_outcome_boundaries.svg": "b30f6e5469e2a8995f330a91d78bb433a66aab23cff6fe48a237e32a7d2a64f4",
     "softwall_qualification_evidence.pdf": "c982d6fc4824ea3c9629650b45519848993d44d535c56e8b36a830cd8a0d5ce2",

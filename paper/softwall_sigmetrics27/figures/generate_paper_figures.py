@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the additional SoftWall paper figures from audited result JSON.
+"""Generate the additional Backstop paper figures from audited result JSON.
 
 Run from anywhere after loading the NERSC Python module:
   module load python/3.11-24.1.0
@@ -93,7 +93,7 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-# matplotlib tab10 palette. SoftWall data is drawn in blue and reference or
+# matplotlib tab10 palette. Backstop data is drawn in blue and reference or
 # baseline data in gray; light variants are used only for box fills.
 COLORS = {
     "blue": "#1F77B4",
@@ -635,7 +635,7 @@ def make_eval_capacity() -> dict:
     useful = [row for row in feasible if row["oracle_requests"] > 0]
     policies = (("static_requests", "static", COLORS["gray"], ":", "o"),
                 ("recovery_first_requests", "recovery-first", COLORS["gray"], "--", "s"),
-                ("softwall_requests", "SoftWall", COLORS["blue"], "-", "D"))
+                ("softwall_requests", "Backstop", COLORS["blue"], "-", "D"))
 
     def share(group, key):
         return 100.0 * statistics.mean(row[key] / row["oracle_requests"] for row in group)
@@ -699,7 +699,7 @@ def make_eval_capacity() -> dict:
     handles = [Line2D([], [], color=color, linestyle=style, marker=marker, markersize=3.6, linewidth=1.5)
                for _, _, color, style, marker in policies]
     handles.append(Line2D([], [], color=COLORS["red"], marker="^", markersize=3.8, linewidth=1.5))
-    figure_legend(fig, handles, ["static reservation", "recovery-first", "SoftWall", "idle-time admission"],
+    figure_legend(fig, handles, ["static reservation", "recovery-first", "Backstop", "idle-time admission"],
                   ncol=4, compact=True)
     save(fig, "softwall_eval_capacity")
     summary["feasible_points"] = len(feasible)
@@ -716,7 +716,7 @@ def make_eval_drivers() -> dict:
     useful = [row for row in feasible if row["oracle_requests"] > 0]
     policies = (("static_requests", "static", COLORS["gray"], ":", "o"),
                 ("recovery_first_requests", "recovery-first", COLORS["gray"], "--", "s"),
-                ("softwall_requests", "SoftWall", COLORS["blue"], "-", "D"))
+                ("softwall_requests", "Backstop", COLORS["blue"], "-", "D"))
     successes = [0.2, 0.5, 0.8]
     expiries = [100, 155, 220]
     # Every NeuralRx success probability covers the same mandatory-feasible
@@ -786,7 +786,7 @@ def make_eval_drivers() -> dict:
     handles = [Line2D([], [], color=color, linestyle=style, marker=marker, markersize=3.6, linewidth=1.5)
                for _, _, color, style, marker in policies]
     handles.append(Line2D([], [], color=COLORS["red"], marker="^", markersize=3.8, linewidth=1.5))
-    figure_legend(fig, handles, ["static reservation", "recovery-first", "SoftWall", "idle-time admission"],
+    figure_legend(fig, handles, ["static reservation", "recovery-first", "Backstop", "idle-time admission"],
                   ncol=4, compact=True)
     save(fig, "softwall_eval_drivers")
     return summary
@@ -827,7 +827,7 @@ def make_eval_trace() -> dict:
     ax.set_axisbelow(True)
     panel_label(ax, "a")
 
-    # (b) Distribution of the SoftWall-to-recovery-first value ratio.
+    # (b) Distribution of the Backstop-to-recovery-first value ratio.
     ax = axes[1]
     values = sorted(ratios)
     n = len(values)
@@ -838,14 +838,14 @@ def make_eval_trace() -> dict:
     ax.set_xticks([1, 2, 5, 10, 20], ["1", "2", "5", "10", "20"])
     ax.set_ylim(0, 102)
     ax.set_yticks([0, 50, 100])
-    ax.set_xlabel("on-time AI tokens,\nSoftWall / recovery-first")
+    ax.set_xlabel("on-time AI tokens,\nBackstop / recovery-first")
     ax.set_ylabel("headroom points\nat or below (%)")
     ax.grid(**GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "b")
 
     handles = [Rectangle((0, 0), 1, 1, color=COLORS["gray"]), Rectangle((0, 0), 1, 1, color=COLORS["blue"])]
-    figure_legend(fig, handles, ["recovery-first", "SoftWall"], ncol=2)
+    figure_legend(fig, handles, ["recovery-first", "Backstop"], ncol=2)
     save(fig, "softwall_eval_trace")
     return {"recovery_first_pct_of_oracle": dict(zip(map(str, gpus), rf_mean)),
             "softwall_pct_of_oracle": dict(zip(map(str, gpus), sw_mean)),
@@ -898,8 +898,8 @@ def make_eval_safety() -> dict:
     ax.set_axisbelow(True)
     panel_label(ax, "a")
 
-    # (b) AI units per prompt length in the two-node campaign: run by SoftWall,
-    # and rejected by SoftWall because they break the certified recovery bound
+    # (b) AI units per prompt length in the two-node campaign: run by Backstop,
+    # and rejected by Backstop because they break the certified recovery bound
     # (idle-time admission would run them). Static reservation runs none.
     ax = axes[1]
     q2 = load("q2")["summary"]
@@ -928,8 +928,8 @@ def make_eval_safety() -> dict:
                Rectangle((0, 0), 1, 1, color=COLORS["blue"]),
                Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
                Rectangle((0, 0), 1, 1, facecolor=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////")]
-    figure_legend(fig, handles, ["SoftWall attempt", "AI run by SoftWall", "AI launched anyway (baseline)",
-                                 "AI rejected by SoftWall"], ncol=2, compact=True)
+    figure_legend(fig, handles, ["Backstop attempt", "AI run by Backstop", "AI launched anyway (baseline)",
+                                 "AI rejected by Backstop"], ncol=2, compact=True)
     save(fig, "softwall_eval_safety")
     return {"boundary": summary, "qwen_executed": dict(zip(map(str, contexts), executed)),
             "qwen_rejected": dict(zip(map(str, contexts), rejected))}
@@ -1322,7 +1322,7 @@ def make_eval_sensitivity() -> dict:
     fig.subplots_adjust(wspace=0.42)
 
     # (a) Excess of the last recovery past the guard when the unit that
-    # SoftWall rejects runs anyway, as a function of the recovery bound, with
+    # Backstop rejects runs anyway, as a function of the recovery bound, with
     # the bound-padded physical attempts at the qualified bound.
     ax = axes[0]
     bounds = list(range(10, 31))
@@ -1425,7 +1425,7 @@ def make_capacity_headroom() -> dict:
     series = [
         ("static", "static_requests", COLORS["gray"], ":", "o"),
         ("recovery-first", "recovery_first_requests", COLORS["gray"], "--", "s"),
-        ("SoftWall", "softwall_requests", COLORS["blue"], "-", "D"),
+        ("Backstop", "softwall_requests", COLORS["blue"], "-", "D"),
     ]
     for label, field, color, line, marker in series:
         ax.plot(pp, [row[field] for row in representative], label=label, color=color,

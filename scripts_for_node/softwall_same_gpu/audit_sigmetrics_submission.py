@@ -144,7 +144,8 @@ def main():
         "acmart_review_anonymous": r"\documentclass[acmsmall,screen,review,anonymous]{acmart}" in tex,
         "no_author_block": not re.search(r"\\author\s*\{", tex),
         "no_identity_or_local_path_leak": not identity_hits,
-        "title_and_abstract_present": r"\title{SoftWall:" in tex and r"\begin{abstract}" in tex,
+        "title_and_abstract_present": (re.search(r"\\title(\[[^\]]*\])?\{Backstop:", tex) is not None
+                                       and r"\begin{abstract}" in tex),
         "conference_metadata_present": "SIGMETRICS 2027" in tex and "June 7--11, 2027" in tex,
         "official_cfp_rechecked": (
             cfp.get("all_pass") is True

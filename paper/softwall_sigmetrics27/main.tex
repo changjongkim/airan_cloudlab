@@ -17,7 +17,7 @@
 \settopmatter{printacmref=true,printccs=true,printfolios=true}
 \renewcommand\footnotetextcopyrightpermission[1]{}
 
-\newcommand{\sys}{SoftWall\xspace}
+\newcommand{\sys}{Backstop\xspace}
 \newcommand{\QSU}{\textsc{QSU}\xspace}
 \newcommand{\QSN}{\textsc{QSN}\xspace}
 \newcommand{\MI}{\textsc{MI}\xspace}
@@ -30,7 +30,8 @@
 
 \begin{document}
 
-\title{SoftWall: Certified Multi-GPU Scheduling for Conditional Recovery in AI-RAN}
+\title[Backstop: Recovery-Certified GPU Sharing in AI-RAN]{Backstop: Recovery-Certified GPU Sharing Between
+Neural Receivers and AI Inference in AI-RAN}
 
 \acmConference[SIGMETRICS '27]{ACM SIGMETRICS 2027}{June 7--11, 2027}{Atlanta, Georgia, USA}
 \acmYear{2027}
@@ -131,7 +132,8 @@ their scheduling units are resources or queued jobs. Their public designs neithe
 recovery that a speculative receiver may create nor keep an admission decision valid through GPU
 launch and completion, where a decision that is valid when made can become invalid before it executes.
 
-In this paper, we present \sys, a certified multi-GPU scheduler for conditional recovery in AI-RAN.
+In this paper, we present \sys, a recovery-certified multi-GPU scheduler that shares AI-RAN GPUs
+between neural receivers and AI inference.
 \sys tracks each unresolved recovery as a \emph{pending recovery} and accepts a scheduling decision
 only when an independent verifier confirms that every unresolved TB can still recover if all of them
 fail. Specifically, \sys introduces 1) a recovery-aware scheduling model that jointly decides \NRx
@@ -309,7 +311,7 @@ Warm-bound reuse & Lifecycle does not affect service tails & Provenance-scoped q
 \end{tabularx}
 \end{table}
 
-\section{SoftWall Design}
+\section{Backstop Design}
 \label{sec:design}
 
 \sys schedules pending recovery as explicit state and keeps each scheduling decision valid until its GPU
@@ -567,7 +569,7 @@ proven.
         terminal event retires ownership and invokes \textsc{CertifyEvent} again.
 \end{enumerate}
 \end{minipage}}
-\caption{SoftWall's online scheduling algorithm. Candidate order controls efficiency; the verifier
+\caption{Backstop's online scheduling algorithm. Candidate order controls efficiency; the verifier
 controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a
 false-safe state.}
 \Description{Six pseudocode steps check provenance, apply outcomes atomically, build an all-fail
@@ -670,7 +672,7 @@ Arbitrary GPU hangs, driver reset, unbounded host suspension, production-clock u
 unqualified workloads remain outside the claim. Mandatory offered load without an all-fail schedule is
 \MI rather than a reason to weaken the safety check.
 
-\subsection{SoftWall implementation}
+\subsection{Backstop implementation}
 \label{sec:implementation}
 
 \sys binds the model to persistent CUDA workers and explicit control objects, which makes certificate
@@ -782,9 +784,9 @@ produced no experimental measurement or ground-truth label.
   recovery-first, and \sys never violate the all-fail schedule. Idle-time admission is omitted from (a)
   and (b) because the AI that it admits exceeds the safe capacity.}
   \Description{Three line charts. The first two show AI capacity as a percentage of the offline oracle
-  against the number of cells and against the AI deadline; SoftWall stays at one hundred percent while
+  against the number of cells and against the AI deadline; Backstop stays at one hundred percent while
   recovery-first and static reservation fall below it. The third shows the radio violation probability
-  of idle-time admission rising with the number of cells while SoftWall stays at zero.}
+  of idle-time admission rising with the number of cells while Backstop stays at zero.}
   \label{fig:eval-capacity}
 \end{figure}
 
@@ -812,11 +814,11 @@ completes before the guard.
   release period against the \NRx success rate. (b) AI capacity relative to the offline oracle against
   the radio expiry. (c) Radio violation probability of idle-time admission against the \NRx success
   rate. Each success rate covers the same 4,572 mandatory-feasible configurations.}
-  \Description{Three line charts. The first shows the AI units per period of SoftWall rising with the
-  NeuralRx success rate while static reservation stays flat and recovery-first stays below SoftWall.
-  The second shows static reservation far below the oracle at a 100-millisecond expiry while SoftWall
+  \Description{Three line charts. The first shows the AI units per period of Backstop rising with the
+  NeuralRx success rate while static reservation stays flat and recovery-first stays below Backstop.
+  The second shows static reservation far below the oracle at a 100-millisecond expiry while Backstop
   stays at the oracle. The third shows the violation probability of idle-time admission falling as
-  NeuralRx succeeds more often while SoftWall stays at zero.}
+  NeuralRx succeeds more often while Backstop stays at zero.}
   \label{fig:eval-drivers}
 \end{figure}
 
@@ -851,8 +853,8 @@ to 6.2\% as the success rate grows, and it is largest when \NRx fails most often
   per GPU count. (b) Cumulative distribution of the ratio between the timely value of \sys and that of
   certificate-preserving recovery-first.}
   \Description{A grouped bar chart shows that recovery-first reaches about half to three quarters of the
-  oracle value on one to four GPUs while SoftWall reaches nearly all of it. A CDF shows the per-point
-  ratio of SoftWall to recovery-first value, from one to about seventeen.}
+  oracle value on one to four GPUs while Backstop reaches nearly all of it. A CDF shows the per-point
+  ratio of Backstop to recovery-first value, from one to about seventeen.}
   \label{fig:eval-trace}
 \end{figure}
 
@@ -970,8 +972,8 @@ records 0/120 safety violations (95\% rule-of-three upper bound 2.5\%). Jointly 
   runs and units that it rejects because they break the certified recovery bound; idle-time admission
   would run all of them, and static reservation runs none.}
   \Description{A strip plot shows baseline attempts ending after the guard in cases E4 and E6b and every
-  SoftWall attempt ending before it, including the admitted E6a case. A stacked bar chart shows that
-  SoftWall executes all 16- to 128-token units and part of the 256- and 512-token units, and that the
+  Backstop attempt ending before it, including the admitted E6a case. A stacked bar chart shows that
+  Backstop executes all 16- to 128-token units and part of the 256- and 512-token units, and that the
   remaining units would break the recovery bound.}
   \label{fig:eval-safety}
 \end{figure}
@@ -1234,7 +1236,8 @@ replay qualification.
 
 \section{Conclusion}
 
-In this paper, we present \sys, a certified multi-GPU scheduler for conditional recovery in AI-RAN. By
+In this paper, we present \sys, a recovery-certified multi-GPU scheduler that shares AI-RAN GPUs
+between neural receivers and AI inference. By
 tracking each pending recovery and admitting AI only with an executable all-fail schedule, \sys keeps
 radio recovery within its deadline while it reclaims the GPU capacity that neural-receiver success
 releases. Our evaluation shows that \sys reaches the oracle AI capacity across 13,716 feasible model

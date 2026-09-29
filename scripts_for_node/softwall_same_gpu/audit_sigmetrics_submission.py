@@ -200,7 +200,7 @@ def main():
             and "E4 remains until 19" in tex
         ),
         "lifecycle_scope_preserved": (
-            re.search(r"five qualified or partial subsets and five\s+\\UQ", tex) is not None
+            re.search(r"five validated or partly validated subsets and five\s+\\UQ", tex) is not None
             and re.search(r"does not require or imply a 10/10\s+lifecycle", tex) is not None
             and lifecycle.get("claim_scope_complete") is True
             and lifecycle.get("counts", {}).get("qualified_or_partial_modes") == 5
@@ -212,7 +212,7 @@ def main():
         ),
         "production_and_wcet_limits_present": (
             "make no production" in normalized_tex
-            and "mechanism evidence rather than qualification or WCET" in normalized_tex
+            and "mechanism evidence rather than validation or WCET" in normalized_tex
             and "WCET" in tex
             and production.get("all_pass") is False
             and production.get("status") == "FAIL_CURRENT_DESIGN_NOT_PRODUCTION_QUALIFIED"

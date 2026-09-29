@@ -382,36 +382,43 @@ def make_execution() -> dict:
     top_legend(ax, ncol=2, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
     panel_label(ax, "a")
 
-    # (b) Complementary CDF of latency normalized by its own median.
+    # (b) How much slower the p99 and the slowest run are than the median run,
+    # per path, from the most stable to the least stable.
     ax = axes[1]
-    series = (("certificate_build", "host scheduling", COLORS["orange"]),
-              ("pair_python", "receiver pair (Python)", COLORS["brown"]),
-              ("pair_native", "receiver pair (C++)", COLORS["cyan"]),
-              ("kernel", "NeuralRx GPU kernel", COLORS["gray"]))
+    series = (("kernel", "NeuralRx\nkernel"), ("pair_native", "C++\npair"),
+              ("pair_python", "Python\npair"), ("certificate_build", "host\nscheduling"))
     tails = {}
-    for key, label, color in series:
+    xs = list(range(len(series)))
+    p99_ratio, max_ratio = [], []
+    for key, _ in series:
         values = sorted(data["latency_ms"][key])
         median = statistics.median(values)
         n = len(values)
-        ax.step([value / median for value in values], [(n - i) / n for i in range(n)], where="pre", color=color,
-                linewidth=1.5, label=label)
-        tails[key] = {"n": n, "median_ms": median, "max_ms": values[-1], "max_over_median": values[-1] / median}
+        p99 = values[round(0.99 * (n - 1))]
+        tails[key] = {"n": n, "median_ms": median, "p99_ms": p99, "max_ms": values[-1],
+                      "p99_over_median": p99 / median, "max_over_median": values[-1] / median}
+        p99_ratio.append(p99 / median)
+        max_ratio.append(values[-1] / median)
     assert len(data["latency_ms"]["certificate_build"]) == 1200
-    ax.set_xscale("log")
+    width = 0.36
+    ax.bar([x - width / 2 for x in xs], p99_ratio, width=width, color=COLORS["light_orange"],
+           edgecolor=COLORS["orange"], linewidth=0.6, zorder=3)
+    ax.bar([x + width / 2 for x in xs], max_ratio, width=width, color=COLORS["orange"], zorder=3)
+    for x, value in zip(xs, max_ratio):
+        ax.text(x + width / 2, value * 1.15, f"{value:.0f}\u00d7" if value >= 10 else f"{value:.1f}\u00d7",
+                ha="center", va="bottom", fontsize=6.3, color=COLORS["dark"])
     ax.set_yscale("log")
-    ax.set_xlim(0.8, 40)
-    ax.set_ylim(5e-4, 1.5)
-    ax.set_xticks([1, 3, 10, 30], ["1", "3", "10", "30"])
-    ax.set_xlabel("latency \u00f7 its median")
-    ax.set_ylabel("share of runs\nslower than this")
-    ax.grid(which="major", **GRID)
+    ax.set_ylim(0.8, 90)
+    ax.set_yticks([1, 3, 10, 30], ["1", "3", "10", "30"])
+    ax.set_xticks(xs, [label for _, label in series])
+    ax.tick_params(axis="x", labelsize=6.3)
+    ax.set_ylabel("latency \u00f7 median")
+    ax.grid(axis="y", which="major", **GRID)
     ax.set_axisbelow(True)
-    handles, labels = ax.get_legend_handles_labels()
-    order = [labels.index(name) for name in ("host scheduling", "receiver pair (Python)", "receiver pair (C++)",
-                                             "NeuralRx GPU kernel")]
-    # No curve enters the upper-right area, which holds the legend.
-    ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="upper right", frameon=False,
-              fontsize=6.6, handlelength=1.4, handletextpad=0.35, labelspacing=0.15, borderaxespad=0.2)
+    ax.legend([Rectangle((0, 0), 1, 1, facecolor=COLORS["light_orange"], edgecolor=COLORS["orange"]),
+               Rectangle((0, 0), 1, 1, facecolor=COLORS["orange"])], ["p99", "slowest run"],
+              loc="upper left", frameon=False, fontsize=6.6, handlelength=1.2, handletextpad=0.35,
+              labelspacing=0.15, borderaxespad=0.2)
     panel_label(ax, "b")
 
     save(fig, "softwall_execution")
@@ -479,10 +486,18 @@ def make_debt() -> dict:
             if y > 0:
                 ax.scatter(p, y, marker=marker, s=16, color=shades[k - 1], edgecolor=COLORS["dark"],
                            linewidth=0.6, zorder=5)
+    # The two numbers the text uses: at p = 0.1, a period needs a recovery in
+    # 34% of periods, and all four fail once in 10,000 periods.
+    ax.axvline(0.1, color=COLORS["gray"], linestyle=":", linewidth=0.9, zorder=2)
+    for y, text, ty in ((debt_tail_model(0.1, 1, 0.0), "34%", debt_tail_model(0.1, 1, 0.0) * 1.25),
+                        (debt_tail_model(0.1, 4, 0.0), "1 in 10,000", 5.5e-5)):
+        ax.scatter(0.1, y, s=18, color=COLORS["dark"], zorder=6)
+        ax.text(0.115, ty, text, ha="left", va="bottom" if text == "34%" else "center", fontsize=6.5,
+                color=COLORS["dark"], zorder=6)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlim(0.01, 1.0)
-    ax.set_ylim(1e-4, 1.6)
+    ax.set_ylim(2.5e-5, 1.6)
     ax.set_xticks([0.01, 0.1, 1.0], ["0.01", "0.1", "1"])
     ax.set_xlabel("per-TB failure probability")
     ax.set_ylabel("probability that this\nmany of 4 TBs fail")
@@ -1114,6 +1129,7 @@ def make_eval_online() -> dict:
     charge = mode["launch_control_bound_ms"]
     bounds = {int(k): v for k, v in mode["ai_class_bounds_ms"].items()}
 
+    offset = mode["nrx_bound_ms"]  # plot time since TB arrival, as the other timeline figures do
     fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.45, 1.1]})
     fig.subplots_adjust(wspace=0.36)
 
@@ -1126,23 +1142,26 @@ def make_eval_online() -> dict:
         lease = bounds[p["context"]] + charge
         base = 0.0
         if p["admitted"]:
-            ax.bar(x, lease, bottom=0, width=0.78, color=COLORS["light_blue"], edgecolor=COLORS["blue"],
+            ax.bar(x, lease, bottom=offset, width=0.78, color=COLORS["light_blue"], edgecolor=COLORS["blue"],
                    linewidth=0.5, zorder=3)
-            ax.bar(x, p["execution_ms"], bottom=charge, width=0.36, color=COLORS["blue"], zorder=4)
+            ax.bar(x, p["execution_ms"], bottom=offset + charge, width=0.36, color=COLORS["blue"], zorder=4)
             base = lease
-        ax.bar(x, p["pending"] * recovery, bottom=base, width=0.78, color=COLORS["light_orange"],
+        ax.bar(x, p["pending"] * recovery, bottom=offset + base, width=0.78, color=COLORS["light_orange"],
                edgecolor=COLORS["orange"], linewidth=0.5, zorder=3)
         if not p["admitted"]:
-            ax.bar(x, lease, bottom=p["pending"] * recovery, width=0.78, color="none", edgecolor=COLORS["red"],
-                   hatch="/////", linewidth=0.7, zorder=3)
-    ax.axhline(window, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=5)
-    ax.text(21.0, window + 3, "recovery deadline", ha="center", va="bottom", fontsize=6.5, color=COLORS["red"])
+            ax.bar(x, lease, bottom=offset + p["pending"] * recovery, width=0.78, color="none",
+                   edgecolor=COLORS["red"], hatch="/////", linewidth=0.7, zorder=3)
+    ax.axhline(offset + window, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=5)
+    ax.text(21.0, offset + window + 3, "recovery deadline", ha="center", va="bottom", fontsize=6.5,
+            color=COLORS["red"])
+    ax.axhline(offset, color=COLORS["dark"], linestyle=":", linewidth=1.0, zorder=5)
+    ax.text(21.0, offset - 3, "NeuralRx deadline", ha="center", va="top", fontsize=6.3, color=COLORS["dark"])
     ax.set_xlim(-0.8, 35.8)
-    ax.set_ylim(0, 150)
-    ax.set_yticks([0, 50, 100])
+    ax.set_ylim(20, 195)
+    ax.set_yticks([45, 100, 153])
     ax.set_xticks([0, 11, 23, 35], ["1", "12", "24", "36"])
-    ax.set_xlabel("release period")
-    ax.set_ylabel("time after NeuralRx\ndeadline (ms)")
+    ax.set_xlabel("period")
+    ax.set_ylabel("time since TB\narrival (ms)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "a")
@@ -1165,21 +1184,22 @@ def make_eval_online() -> dict:
     handles = []
     for label, test, marker, edge, face in kinds:
         chosen = [p for p in periods if test(p)]
-        ax.scatter([p["certified_end_ms"] for p in chosen], [p["measured_end_ms"] for p in chosen], s=11,
+        ax.scatter([offset + p["certified_end_ms"] for p in chosen], [offset + p["measured_end_ms"] for p in chosen],
+                   s=11,
                    marker=marker, facecolor=face, edgecolor=edge, linewidths=0.6, zorder=3)
         handles.append(Line2D([], [], marker=marker, linestyle="none", markerfacecolor=face, markeredgecolor=edge,
                               markersize=4.2))
     assert all(p["measured_end_ms"] < p["certified_end_ms"] <= window for p in periods)
-    ax.plot([0, 120], [0, 120], color=COLORS["gray"], linestyle=":", linewidth=1.0, zorder=2)
-    ax.text(6, 112, "Backstop periods", ha="left", va="top", fontsize=6.6, color=COLORS["blue"])
-    ax.text(40, 44, "measured = scheduled", ha="center", va="bottom", fontsize=6.0, color=COLORS["gray"],
+    ax.plot([40, 165], [40, 165], color=COLORS["gray"], linestyle=":", linewidth=1.0, zorder=2)
+    ax.text(48, 158, "Backstop periods", ha="left", va="top", fontsize=6.6, color=COLORS["blue"])
+    ax.text(75, 79, "measured = scheduled", ha="center", va="bottom", fontsize=6.0, color=COLORS["gray"],
             rotation=45, rotation_mode="anchor", transform_rotates_text=True)
-    ax.axvline(window, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=2)
-    ax.text(window - 2, 6, "recovery\ndeadline", ha="right", va="bottom", fontsize=6.5, color=COLORS["red"])
-    ax.set_xlim(0, 120)
-    ax.set_ylim(0, 120)
-    ax.set_xticks([0, 50, 100])
-    ax.set_yticks([0, 50, 100])
+    ax.axvline(offset + window, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=2)
+    ax.text(offset + window - 2, 44, "recovery\ndeadline", ha="right", va="bottom", fontsize=6.5, color=COLORS["red"])
+    ax.set_xlim(40, 165)
+    ax.set_ylim(40, 165)
+    ax.set_xticks([50, 100, 150])
+    ax.set_yticks([50, 100, 150])
     ax.set_xlabel("scheduled finish (ms)")
     ax.set_ylabel("measured finish (ms)")
     ax.grid(**GRID)
@@ -1466,11 +1486,12 @@ def make_eval_burst() -> dict:
             values = [runs[(name, key, "natural")]["on_time_tokens_per_s"] for name in patterns]
         summary["on_time_tokens_per_s"][label] = dict(zip(patterns, values))
         ax.plot(xs, values, color=color, linestyle=style, marker=marker, markersize=3.4, linewidth=1.4)
+    ax.text(2.25, 650, "unsafe,\nsee (b)", ha="left", va="bottom", fontsize=6.0, color=COLORS["red"])
     ax.set_xticks(xs, labels, rotation=35, ha="right", rotation_mode="anchor")
     ax.tick_params(axis="x", labelsize=6.4)
     ax.set_xlabel("AI arrivals (burstier \u2192)")
     ax.set_ylabel("on-time AI tokens\nper second")
-    ax.set_ylim(-30, 820)
+    ax.set_ylim(-30, 900)
     ax.set_yticks([0, 250, 500, 750])
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)

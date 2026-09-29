@@ -895,25 +895,33 @@
           "max_ms": 30.9915,
           "max_over_median": 29.226235382874385,
           "median_ms": 1.0604,
-          "n": 1200
+          "n": 1200,
+          "p99_ms": 1.4057,
+          "p99_over_median": 1.3256318370426254
         },
         "kernel": {
           "max_ms": 0.88717,
           "max_over_median": 1.034751421490013,
           "median_ms": 0.857375,
-          "n": 300
+          "n": 300,
+          "p99_ms": 0.88637,
+          "p99_over_median": 1.0338183408660155
         },
         "pair_native": {
           "max_ms": 9.9618,
           "max_over_median": 3.7344379674232906,
           "median_ms": 2.6675500000000003,
-          "n": 300
+          "n": 300,
+          "p99_ms": 8.8497,
+          "p99_over_median": 3.3175385653502274
         },
         "pair_python": {
           "max_ms": 15.4855,
           "max_over_median": 4.041839584475243,
           "median_ms": 3.8313,
-          "n": 1000
+          "n": 1000,
+          "p99_ms": 9.5049,
+          "p99_over_median": 2.4808550622504106
         }
       }
     }
@@ -938,12 +946,12 @@
   "output_sha256": {
     "softwall_capacity_headroom.pdf": "c43a3a9a20c5b3d6267056a2ce4b01c7b3ff271d3b584a25c58bab8a95053d1e",
     "softwall_capacity_headroom.svg": "7827bb247441226b0bbdc65859bf3b69db58cf6ed1e20c5f441d2a73c2df544c",
-    "softwall_debt.pdf": "d78b11438d11aecb5887c220413bb3793c1b8ac50186e492ead25465a95ed86e",
-    "softwall_debt.svg": "880dc5c8ed7d8ff4b4711f54fddb1565d63db671ee2568eaef45b637caddafc4",
+    "softwall_debt.pdf": "ed13e0b0af0c07afd691afc04e130e55b962e4b001abffedc823ff94ca25848b",
+    "softwall_debt.svg": "718b39761c8cdcca49ed5b9c6b6d784fce712f75d7a9885527373ce221872b92",
     "softwall_envelope.pdf": "fede1c96693915b19c8d90c0122481a947fbb45b421e38cab9678a1872485c27",
     "softwall_envelope.svg": "c2433147174f3b8eae7639f341685d55e7c52337b16bff3f19745d342e80c01e",
-    "softwall_eval_burst.pdf": "159b99a58e15ec4ee19e51cd346072a61e20974526b8209a0712e71ba5f7dc88",
-    "softwall_eval_burst.svg": "0cf9cf06eea308b4e621867fdd50d0f75fba7204df480da2e3076c46ec1409fe",
+    "softwall_eval_burst.pdf": "a927274fb788d27f929725a5d851c11c8e367c3ef08145cd8f89ad6c26929a4f",
+    "softwall_eval_burst.svg": "5e559476089766330c0ec908cd05f241e25fcdf523172199f85059387a4cef24",
     "softwall_eval_capacity.pdf": "e904f12c1b55875cfb875a963307fe0f81fdb845282b8431ee64691bbc619fa9",
     "softwall_eval_capacity.svg": "835a9313c45b52b711891789ff058e1335a8494aed5a1f6609a751e002be8f2b",
     "softwall_eval_drivers.pdf": "318ecab52f7c68ac0c0bd11443229171119a171469a40a96f30c5bd12000c313",
@@ -952,8 +960,8 @@
     "softwall_eval_early.svg": "1ab9d04347bfb24881b9d4b4a0e0342ce322d555a16fa362c8c84859b05959b9",
     "softwall_eval_load.pdf": "8b373c75b86d4229b4e3671bd79353e787fad477dc3a7ee48df0ef9b51359f0c",
     "softwall_eval_load.svg": "7cd36c20519c8beba4675c4812ca9503ee060e263d245c962685b34fd7793992",
-    "softwall_eval_online.pdf": "070d79fe54989bf8eba1154bcdd9aae2507e4765befc27fea2e0a84145d9fd66",
-    "softwall_eval_online.svg": "ad8ffc265e3b3d972478e00dd41233952fd047a65c26aec416d47e1bfb60f69c",
+    "softwall_eval_online.pdf": "b186947777832d59160bb049003d18653b09f4fd648662f87d5377ba1830ba79",
+    "softwall_eval_online.svg": "db92bb70e5d1f8326ca63b181362f6a53c3e004d9915fb5c303c16fb136555aa",
     "softwall_eval_refinement.pdf": "447db102a400171a696c297fe23800f7893d72df954d444f3de04a46a2dd285d",
     "softwall_eval_refinement.svg": "664dd449d256a002df9ac2f96d138733ba451c645b83bab2eb5f395d26654a8d",
     "softwall_eval_safety.pdf": "46e13c84e1c220673f90b93a6b36943efc8ab3e0c311f2e4ed205219e55eca47",
@@ -964,8 +972,8 @@
     "softwall_eval_single.svg": "297dfb73adc934e8a1d24d33fa55f59101571a3a58fae5cf0e12db0b585cc6ae",
     "softwall_eval_trace.pdf": "54fc8dddb62f0173c16ff90d842f0462ef9acaa2bbb92d251313459aa03a4f3d",
     "softwall_eval_trace.svg": "bac2d859414035235b8111ee30a0ecd0c38e61043c7e584dbc19398da923db6d",
-    "softwall_execution.pdf": "65cd8452a8c366e4c2d2814ba3d118810b826f7919df68ab81b2994e2223ac83",
-    "softwall_execution.svg": "96e751209b1ab33e5471e39dcade9ffb636296a718a5e0970fe77f679e236c2d"
+    "softwall_execution.pdf": "69d4a2d70c5eca81002c9d54be359c20e9f5bc1ad6bd4918a6a701af61c8afde",
+    "softwall_execution.svg": "876542a211f6aca391774c059900cc283b5abecd5700ad6a91467de9fe011e7b"
   },
   "schema": "softwall-paper-figure-manifest-v1",
   "source_sha256": {

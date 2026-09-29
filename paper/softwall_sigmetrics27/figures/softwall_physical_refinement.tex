@@ -1,84 +1,73 @@
-% Enforcement of one AI slot as the evaluated message sequence. The
-% lease stages, the launch/completion marker files, the latest-start gate, and
-% the four injected fault arms follow the evaluated coordinator, AI worker, and
-% fault-state model. Black numbers are the normal path; red numbers are faults.
+% Enforcing one AI slot on the GPU. (a) The normal path of one AI slot across
+% the coordinator, the marker files, the Qwen worker, and the GPU stream, with
+% the latest-start gate of the evaluated AI worker. (b) The injected runtime
+% faults of the fault campaign and what the runtime does for each.
 \resizebox{\linewidth}{!}{%
-\begin{tikzpicture}[x=1cm,y=1cm]
+\begin{tikzpicture}[x=1cm,y=1cm,
+    tcell/.style={cell, align=left, inner xsep=2.5pt, minimum height=0.34cm, text depth=0.5ex},
+    thead/.style={tcell, fill=black!10, font=\bfseries\scriptsize}]
+  \node[font=\bfseries\scriptsize, anchor=west] at (-0.15,5.62) {(a) Normal path of one AI slot};
+
   % ------------------------------------------------------------ lifelines
   \foreach \x/\t/\w in {1.5/{Coordinator (host)}/2.3, 4.3/{Marker files}/1.7,
-                         6.9/{Qwen worker}/1.9, 9.4/{GPU2 CUDA stream}/2.1} {
-    \node[comp, fill=panel, minimum width=\w cm, minimum height=0.42cm] at (\x,5.0) {\t};
-    \draw[black!45, dashed, line width=0.5pt] (\x,4.79) -- (\x,0.9);
+                         6.9/{Qwen worker}/1.9, 9.4/{GPU stream}/1.9} {
+    \node[comp, fill=panel, minimum width=\w cm, minimum height=0.42cm] at (\x,5.1) {\t};
+    \draw[black!45, dashed, line width=0.5pt] (\x,4.89) -- (\x,0.95);
   }
 
-  % (1) Commit a lease with an absolute latest-start.
-  \node[comp, fill=aic, minimum width=2.3cm, minimum height=0.46cm] at (1.5,4.45)
+  % (1) Commit an AI slot with an absolute latest-start.
+  \node[comp, fill=aic, minimum width=2.3cm, minimum height=0.46cm] at (1.5,4.5)
     {commit AI slot $L$\\version $g{+}1$};
-  \node[num] at (0.18,4.45) {1};
+  \node[num] at (0.18,4.5) {1};
 
   % (2) Run request.
-  \draw[arr] (1.5,3.98) -- (6.9,3.98);
-  \node[note, anchor=south, fill=white, inner sep=1pt] at (4.9,4.0) {run($L$, latest-start)};
-  \node[num] at (2.8,4.1) {2};
+  \draw[arr] (1.5,4.02) -- (6.9,4.02);
+  \node[note, anchor=south, fill=white, inner sep=1pt] at (4.9,4.04) {run($L$, latest-start)};
+  \node[num] at (2.8,4.14) {2};
 
-  % (3) Launch-time gate on the worker.
-  \node[comp, minimum width=2.1cm, minimum height=0.34cm] at (6.9,3.6) {now $\le$ latest-start?};
-  \node[num] at (5.6,3.6) {3};
-  \draw[arr, dashed] (5.85,3.33) -- (1.5,3.33);
-  \node[inote, anchor=south, fill=white, inner sep=1pt] at (3.3,3.35) {no: non-launch reply, no kernel};
-  \draw[arr] (7.4,3.43) |- (9.4,3.2);
-  \node[inote, anchor=south] at (8.68,3.2) {yes: submit};
-  \node[job, fill=aic, minimum width=0.42cm, minimum height=0.95cm] at (9.4,2.725) {};
-  \node[inote, anchor=west, align=left] at (9.68,2.8) {prefill\\kernels};
-  \draw[arr] (6.9,2.95) -- (4.93,2.95);
-  \node[cell, fill=white, minimum width=1.25cm, anchor=center] at (4.3,2.95) {L.launch};
-  \node[inote, anchor=south] at (5.9,2.95) {write};
+  % (3) Launch gate on the worker: a late request runs no kernel.
+  \node[comp, minimum width=2.1cm, minimum height=0.34cm] at (6.9,3.62) {now $\le$ latest-start?};
+  \node[num] at (5.6,3.62) {3};
+  \draw[arr, dashed] (5.85,3.35) -- (1.5,3.35);
+  \node[inote, anchor=south, fill=white, inner sep=1pt] at (3.3,3.37) {no: reply ``not launched'', no kernel};
+  \draw[arr] (7.4,3.45) |- (9.4,3.22);
+  \node[inote, anchor=south] at (8.68,3.22) {yes: submit};
+  \node[job, fill=aic, minimum width=0.42cm, minimum height=0.95cm] at (9.4,2.745) {};
+  \node[inote, anchor=west, align=left] at (9.68,2.82) {prefill\\kernels};
+  \draw[arr] (6.9,2.97) -- (4.93,2.97);
+  \node[cell, fill=white, minimum width=1.25cm, anchor=center] at (4.3,2.97) {L.launch};
+  \node[inote, anchor=south] at (5.9,2.97) {write};
 
-  % (4) Completion fence: CUDA event, completion marker, reply.
-  \draw[arr] (9.4,2.25) -- (6.9,2.25);
-  \node[inote, anchor=south] at (8.15,2.25) {CUDA event done};
-  \node[num] at (9.83,2.25) {4};
-  \draw[arr] (6.9,2.05) -- (4.93,2.05);
-  \node[cell, fill=okc, minimum width=1.25cm, anchor=center] at (4.3,2.05) {L.complete};
-  \node[inote, anchor=south] at (5.9,2.05) {write};
-  \draw[arr] (6.9,1.65) -- (1.5,1.65);
-  \node[inote, anchor=south] at (6.2,1.65) {reply};
+  % (4) GPU completion: CUDA event, completion marker, reply.
+  \draw[arr] (9.4,2.27) -- (6.9,2.27);
+  \node[inote, anchor=south] at (8.15,2.27) {CUDA event done};
+  \node[num] at (9.83,2.27) {4};
+  \draw[arr] (6.9,2.07) -- (4.93,2.07);
+  \node[cell, fill=okc, minimum width=1.25cm, anchor=center] at (4.3,2.07) {L.complete};
+  \node[inote, anchor=south] at (5.9,2.07) {write};
+  \draw[arr] (6.9,1.67) -- (1.5,1.67);
+  \node[inote, anchor=south] at (6.2,1.67) {reply};
 
-  % (5) Retire only with matching physical evidence.
+  % (5) Free the slot only on a matching completion marker.
   \node[comp, fill=okc, draw=green!45!black, minimum width=2.3cm, minimum height=0.46cm]
-    at (1.5,1.2) {free $L$ on marker\\version $g{+}2$};
-  \node[num] at (0.18,1.2) {5};
+    at (1.5,1.22) {free $L$ on marker\\version $g{+}2$};
+  \node[num] at (0.18,1.22) {5};
 
-  % Fault 1: a late or lost reply after the fence is reconciled from the marker.
-  \draw[arr, draw=dred, dashed] (1.5,2.05) -- (3.67,2.05);
-  \node[font=\itshape\scriptsize, text=dred, anchor=south] at (2.55,2.05) {read marker};
-  \node[rnum] at (0.18,2.05) {1};
-  \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (1.6,2.62)
-    {reply late or lost\\after GPU completion};
-
-  % Fault 2: a channel lost before the fence leaves only the launch marker.
-  \node[comp, draw=dred, fill=badc, minimum width=7.0cm, minimum height=0.5cm, align=center]
-    at (4.05,0.5) {channel lost before GPU completion: only L.launch exists\\
-                   keep $L$ and stop AI admission; radio recovery continues};
-  \node[rnum] at (0.18,0.5) {2};
-
-  % ------------------------------------------------ radio state (faults 3, 4)
-  \draw[sub, fill=panel] (10.75,0.25) rectangle (13.75,5.25);
-  \node[pttl] at (12.25,5.03) {Radio state, period 17};
-  \node[hcell, minimum width=2.8cm] at (10.85,4.78) {applied outcome batches};
-  \node[cell, minimum width=2.8cm, fill=okc] at (10.85,4.48) {batch 17: TB1, TB2 cancelled};
-  \node[rnum] at (11.02,3.9) {3};
-  \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,3.9)
-    {replayed batch 17 or stale\\batch 16: no change};
-  \node[hcell, minimum width=2.8cm] at (10.85,3.4) {commit set (period, TB)};
-  \foreach \y/\k/\src in {3.1/{(17, TB1)}/NeuralRx, 2.8/{(17, TB2)}/NeuralRx,
-                           2.5/{(17, TB3)}/cuPHY, 2.2/{(17, TB4)}/cuPHY} {
-    \node[cell, minimum width=1.75cm] at (10.85,\y) {\k};
-    \node[cell, minimum width=1.05cm] at (12.6,\y) {\src};
+  % ------------------------------------------------- (b) faults and responses
+  \node[font=\bfseries\scriptsize, anchor=west] at (-0.15,0.55) {(b) Injected faults and what the runtime does};
+  \node[thead, text width=3.75cm] at (-0.15,0.33) {injected fault};
+  \node[thead, text width=2.85cm] at (3.75,0.33) {what the runtime finds};
+  \node[thead, text width=3.95cm] at (6.75,0.33) {what \SOFTWALLNAME{} does};
+  \foreach \row/\fault/\seen/\act in {
+      1/{AI slot held past its latest-start}/{now $>$ latest-start}/{reply ``not launched''; no kernel},
+      2/{reply late or lost after GPU finish}/{L.complete exists}/{free $L$ from the marker},
+      3/{AI channel lost before GPU finish}/{only L.launch exists}/{keep $L$, stop AI; recovery goes on},
+      4/{stale or replayed \NRx result}/{batch already applied}/{no change to the radio state},
+      5/{second recovery response for a TB}/{TB already committed}/{no second commit}} {
+    \pgfmathsetmacro{\y}{0.33 - 0.34*\row}
+    \node[tcell, text width=3.75cm] at (-0.15,\y) {\fault};
+    \node[tcell, text width=2.85cm] at (3.75,\y) {\seen};
+    \node[tcell, text width=3.95cm] at (6.75,\y) {\act};
   }
-  \node[rnum] at (11.02,1.5) {4};
-  \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,1.5)
-    {second response for\\(17, TB4): no commit};
-  \node[inote, align=center] at (12.25,0.7) {one commit per TB};
 \end{tikzpicture}%
 }

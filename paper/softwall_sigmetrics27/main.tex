@@ -18,10 +18,10 @@
 \renewcommand\footnotetextcopyrightpermission[1]{}
 
 \newcommand{\sys}{Backstop\xspace}
-\newcommand{\QSU}{\textsc{QSU}\xspace}
-\newcommand{\QSN}{\textsc{QSN}\xspace}
-\newcommand{\MI}{\textsc{MI}\xspace}
-\newcommand{\UQ}{\textsc{UQ}\xspace}
+\newcommand{\QSU}{\textsc{Safe+AI}\xspace}
+\newcommand{\QSN}{\textsc{Safe-only}\xspace}
+\newcommand{\MI}{\textsc{Infeasible}\xspace}
+\newcommand{\UQ}{\textsc{Unqualified}\xspace}
 \newcommand{\NRx}{NeuralRx\xspace}
 \newcommand{\kcj}[1]{\textcolor{red}{#1}}
 
@@ -30,7 +30,7 @@
 
 \begin{document}
 
-\title[Backstop: Recovery-Certified GPU Sharing in AI-RAN]{Backstop: Recovery-Certified GPU Sharing Between
+\title[Backstop: Recovery-Safe GPU Sharing in AI-RAN]{Backstop: Recovery-Safe GPU Sharing Between
 Neural Receivers and AI Inference in AI-RAN}
 
 \acmConference[SIGMETRICS '27]{ACM SIGMETRICS 2027}{June 7--11, 2027}{Atlanta, Georgia, USA}
@@ -60,17 +60,17 @@ Neural Receivers and AI Inference in AI-RAN}
 \ccsdesc[500]{Computer systems organization~Real-time systems}
 \ccsdesc[300]{Networks~Network resources allocation}
 
-\keywords{AI-RAN, GPU scheduling, neural receiver, conditional recovery, MPS, feasibility certificate}
+\keywords{AI-RAN, GPU scheduling, neural receiver, conditional recovery, MPS, admission control}
 
 \begin{abstract}
 As AI-RAN platforms share GPUs between radio processing and AI inference, neural receivers introduce
 work that GPU schedulers do not track. Until its neural receiver (\NRx) completes, an uplink transport
 block (TB) has a pending recovery: a conventional decoding that is absent from the GPU queue but
-mandatory if the receiver fails. This paper presents \sys, a certified multi-GPU scheduler that tracks
-these pending recoveries explicitly. \sys admits speculative receivers, retimes recovery, and leases GPU time to external
+mandatory if the receiver fails. This paper presents \sys, a multi-GPU scheduler that tracks
+these pending recoveries explicitly. \sys admits speculative receivers, retimes recovery, and grants GPU time to external
 AI only when an independent verifier confirms that every unresolved TB can still recover if all of them
-fail. \sys preserves this certificate through CUDA launch, inter-GPU transport, and physical completion
-with bounded revalidation, latest-start enforcement, and fence-confirmed retirement. On two four-GPU A100
+fail. \sys keeps each accepted decision valid through CUDA launch, inter-GPU transport, and physical completion
+with bounded revalidation, latest-start enforcement, and freeing of GPU time only after confirmed completion. On two four-GPU A100
 nodes under a qualified synthetic timing contract, \sys records 0/120 safety violations in physical
 boundary diagnostics, where idle-time admission records 40/40. Across 13,716 feasible capacity-model
 points, \sys admits more AI capacity than static reservation at 26.2\%, and its p99 decision time is
@@ -113,9 +113,9 @@ reserves every possible recovery leaves the capacity released by \NRx success un
 System & Primary protected/allocated object & State not exposed to its scheduler \\
 \midrule
 YinYangRAN, CloudRIC, Concordia & Fraction, queue/deadline, or reserved capacity & Unqueued same-TB pending recovery \\
-DARIS, REEF, XSched, nvtaskset & GPU stage, kernel, context, or partition & Radio recovery, transport ownership, and single commit as one certificate \\
-ARCHES, OCUDU, SMEC & PHY choice, timing class, or edge SLO & Cross-instance all-fail recovery set plus atomic external-AI lease \\
-\sys & Same-TB recovery obligation & Explicitly modeled, certified, and carried through physical completion \\
+DARIS, REEF, XSched, nvtaskset & GPU stage, kernel, context, or partition & Radio recovery, transport ownership, and single commit in one verified schedule \\
+ARCHES, OCUDU, SMEC & PHY choice, timing class, or edge SLO & Cross-instance all-fail recovery set plus atomic external-AI slot \\
+\sys & Same-TB pending recovery & Explicitly modeled, verified, and carried through physical completion \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -132,27 +132,26 @@ their scheduling units are resources or queued jobs. Their public designs neithe
 recovery that a speculative receiver may create nor keep an admission decision valid through GPU
 launch and completion, where a decision that is valid when made can become invalid before it executes.
 
-In this paper, we present \sys, a recovery-certified multi-GPU scheduler that shares AI-RAN GPUs
+In this paper, we present \sys, a recovery-safe multi-GPU scheduler that shares AI-RAN GPUs
 between neural receivers and AI inference.
 \sys tracks each unresolved recovery as a \emph{pending recovery} and accepts a scheduling decision
 only when an independent verifier confirms that every unresolved TB can still recover if all of them
 fail. Specifically, \sys introduces 1) a recovery-aware scheduling model that jointly decides \NRx
-admission, recovery timing, and external-AI leases over one obligation set shared by several cuPHY
-instances, 2) a certificate-to-execution refinement that keeps each accepted decision valid through
+admission, recovery timing, and external-AI slots over one set of pending recoveries shared by several cuPHY
+instances, 2) schedule enforcement that keeps each accepted decision valid through
 CUDA launch, IPC/P2P transport, and physical completion with bounded revalidation, absolute
-latest-start enforcement, atomic outcome batches, and fence-confirmed retirement, and 3) a
-provenance-qualified feasibility envelope that classifies each state as qualified-safe-useful (\QSU),
-qualified-safe-no-slack (\QSN), mandatory-infeasible (\MI), or unqualified (\UQ) before execution. Our
+latest-start enforcement, atomic outcome batches, and freeing of GPU time only after confirmed completion, and 3) an admission limit, qualified by the measurement conditions of every bound, that classifies each state
+as \QSU, \QSN, \MI, or \UQ before execution. Our
 evaluation on two four-GPU A100 nodes under a qualified synthetic timing contract shows that physical
 boundary diagnostics record 0/120 safety violations for \sys and 40/40 for idle-time admission. Under
 bursty BurstGPT-based arrivals with a 200~ms AI SLO, \sys serves 6.2-18.5\% more on-time AI tokens than
-certificate-preserving recovery-first, while idle-time admission breaks the guard in up to 10.0\% of
-periods. In
-1,200 physical release periods, every schedule ends inside its certificate, and under seven injected
+its recovery-first ablation and static reservation serves none, while idle-time admission misses the
+recovery deadline in up to 10.0\% of periods. In
+1,200 physical release periods, the shared lane finishes every period before its scheduled end, and under seven injected
 fault classes every TB commits exactly once before expiry. Across
 13,716 feasible capacity-model points, \sys admits more AI capacity than static reservation at 3,600
 (26.2\%). The scheduler matches an exact checker on 16,023 states, and its p99 decision time is
-1.494~ms at 64 pending recoveries. In the original trace mode, \sys and certificate-preserving recovery-first
+1.494~ms at 64 pending recoveries. In the original trace mode, \sys and recovery-first
 deliver the same 349,387 timely tokens.
 
 \section{Background and Motivation}
@@ -168,20 +167,21 @@ of work: optional neural reception, mandatory conventional reception, and extern
   \input{figures/softwall_airan_background.tex}
   \caption{One uplink TB in one 180~ms release period. Until the 45~ms \NRx deadline, the TB has a
   pending conventional recovery that no GPU queue contains. A failed, late, or missing \NRx outcome requires
-  one cuPHY recovery that ends before the guard.}
+  one cuPHY recovery that ends before the recovery deadline.}
   \Description{Three rows show the RAN owner, the NeuralRx endpoint, and the recovery lane over one
   release period. A hatched pending-recovery bar spans release to the NeuralRx deadline. The owner
   commits either the neural result after the deadline or the conventional result after one recovery placed in a
-  window that ends at the guard.}
+  window that ends at the recovery deadline.}
   \label{fig:airan-background}
 \end{figure}
 
 \noindent\textbf{Neural Reception.}
 An uplink TB is decoded by a conventional receiver, such as the cuPHY physical uplink shared channel
-(PUSCH) pipeline~\cite{aerial}, or by a neural receiver~\cite{deeprx,nrx5g}.
-In our evaluated contract (Figure~\ref{fig:airan-background}), a TB commits its \NRx result when the
+(PUSCH) pipeline~\cite{aerial}, or by a neural receiver~\cite{deeprx,nrx5g}. A cuPHY instance runs the
+PUSCH pipelines of several cells, and in our evaluated contract each cell sends one TB per release period.
+In this contract (Figure~\ref{fig:airan-background}), a TB commits its \NRx result when the
 result passes its cyclic redundancy check (CRC) by the \NRx deadline; otherwise, one conventional
-recovery must complete before the guard. Figure~\ref{fig:debt}a shows that this outcome is uncertain. Across a synthetic block-Rayleigh channel with 500 TBs per point and the CDL-D and CDL-E
+recovery must complete before the recovery deadline. Figure~\ref{fig:debt}a shows that this outcome is uncertain. Across a synthetic block-Rayleigh channel with 500 TBs per point and the CDL-D and CDL-E
 models~\cite{tr38901,sionna} with 50 TBs per point, the \NRx success rate rises from near 0\% to near
 100\% within 1~dB of the point at which the conventional receiver decodes half of the TBs. In CDL-D and
 CDL-E, the conventional receiver also decodes TBs that \NRx misses. The channel quality indicator that
@@ -223,14 +223,13 @@ miss the 21~ms deadline. Thus, an MPS share is safe only for the AI class under 
   \caption{Execution variability on shared A100 GPUs. (a) Radio p99 of a two-cell 273-PRB PUSCH
   pipeline against the MPS share of a co-running Qwen prefill class: one 16-token request (light) or
   eight 512-token requests (heavy). Lines connect run means, and bars span the runs. (b) Fraction of
-  runs whose latency exceeds a multiple of its median: certificate build on the host (1,200 periods),
-  cross-GPU receiver pairs at the 4.5~ms scale on a Python and a partly native C++/CUDA path (1,000 and
-  300 slots), and the \NRx kernel as a TensorRT graph (300 slots).}
+  runs whose latency exceeds a multiple of its median: schedule construction on the host (1,200 periods),
+  cross-GPU receiver pairs at the 4.5~ms scale on a Python and a partly native C++/CUDA path (1,000 and 300 radio slots), and the \NRx kernel as a TensorRT graph (300 slots).}
   \Description{The left line chart shows radio p99 latency for MPS shares of 20 to 100 percent for a
   light and a heavy AI class, with a band for the radio pipeline alone and a dashed deadline line that
   only the heavy class at 100 percent crosses. The right log-log plot shows complementary CDFs of latency
   divided by its median; the GPU kernel drops at one, the receiver pairs extend to about four, and host
-  certificate construction extends to about thirty.}
+  schedule construction extends to about thirty.}
   \label{fig:execution}
 \end{figure}
 
@@ -238,7 +237,7 @@ miss the 21~ms deadline. Thus, an MPS share is safe only for the AI class under 
 Figure~\ref{fig:execution}b normalizes each latency by its median. The \NRx TensorRT graph stays within
 3.5\% of its median, while end-to-end paths do not. At the 4.5~ms indication deadline of the Aerial
 testMAC~\cite{aerial}, cross-GPU receiver pairs reach 4.0 and 3.7 times their median in a Python path
-and a partly native C++/CUDA path. Host construction of a scheduling certificate reaches 29 times its
+and a partly native C++/CUDA path. Host construction of a schedule reaches 29 times its
 median. Thus, a schedule computed from kernel execution times can become invalid before it executes.
 
 These properties couple radio correctness to GPU admission decisions that precede the receiver outcome.
@@ -251,7 +250,7 @@ public designs do not schedule the conditional recovery that neural reception cr
 
 Existing schedulers admit AI against the work in GPU queues or against a fixed reservation
 ~\cite{yinyangran,cloudric,concordia}. For neural reception, this admission exposes three challenges:
-uncertain recovery need, recovery shared by several cuPHY instances, and decisions that must remain
+uncertain recovery need, one recovery lane shared by the cells of several cuPHY instances, and decisions that must remain
 valid through execution.
 
 \noindent\textbf{Pending Recovery.}
@@ -270,11 +269,11 @@ outcomes resolve leaves released capacity unused.
   \centering
   \input{figures/softwall_scheduling_problem.tex}
   \caption{Scheduling failures after two timely successes (TB1, TB2). (a) Idle-time admission
-  pushes a required recovery past the guard. (b) Static reservation rejects a 128-token AI unit that fits
-  once the successful reservations are released. (c) Per-instance certificates claim one lane interval.}
-  \Description{Three lane timelines between 45 and 170 milliseconds with the guard and expiry marked.
-  The first shows an AI unit followed by two recoveries whose second crosses the guard. The second
-  shows four reservations, two of them for successful requests, and a rejected AI unit. The third shows
+  pushes a required recovery past the recovery deadline. (b) Static reservation rejects a 128-token AI request that fits
+  once the successful reservations are released. (c) Per-instance schedules claim the same lane interval.}
+  \Description{Three lane timelines between 45 and 170 milliseconds with the recovery deadline and expiry marked.
+  The first shows an AI request followed by two recoveries whose second crosses the recovery deadline. The second
+  shows four reservations, two of them for successful requests, and a rejected AI request. The third shows
   two per-instance calendars that occupy the same lane interval.}
   \label{fig:scheduling-problem}
 \end{figure}
@@ -282,34 +281,34 @@ outcomes resolve leaves released capacity unused.
 \noindent\textbf{Scheduling Failures.}
 Figure~\ref{fig:scheduling-problem} shows three scheduling failures after two timely successes in our
 evaluated contract. Idle-time admission sees an empty queue at the 45~ms \NRx deadline, admits a
-256-token AI unit, and pushes a required recovery past the guard. Static reservation keeps the reservations of
-the two successful TBs and rejects a 128-token AI unit that fits after they are released. Per-instance
-certificates are each valid for one cuPHY instance, but they claim the same interval on the shared
+256-token AI request, and pushes a required recovery past the recovery deadline. Static reservation keeps the reservations of
+the two successful TBs and rejects a 128-token AI request that fits after they are released. Per-instance
+schedules are each valid for one cuPHY instance, but they claim the same interval on the shared
 recovery lane. Thus, a scheduler must represent unresolved recovery explicitly, recompute the schedule
-at each outcome event, and certify the global obligation set of the contended lane.
+at each outcome event, and verify one schedule for the global set of pending recoveries on the contended lane.
 
 \noindent\textbf{Execution Gaps.}
 A feasible schedule must remain feasible when it executes. Table~\ref{tab:counterexamples} lists seven
 counterexamples that define this requirement. In our development runs, a 23.5~ms host stall launched a
-128-token AI unit outside its certified interval, and applying simultaneous outcomes in sequence created
-an intermediate state that never existed. Thus, a certificate must charge launch control, apply
-simultaneous outcomes atomically, and bind ownership to physical completion. This motivates the certificate-to-execution refinement of \sys in
+128-token AI request outside its scheduled interval, and applying simultaneous outcomes in sequence created
+an intermediate state that never existed. Thus, a scheduler must charge launch control in every schedule, apply
+simultaneous outcomes atomically, and bind ownership to physical completion. This motivates how \sys enforces its schedules in
 Section~\ref{sec:design}.
 
 \begin{table}[H]
-\caption{Counterexamples define the certificate-to-execution refinement chain.}
+\caption{Counterexamples define what schedule enforcement must cover.}
 \label{tab:counterexamples}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
 \toprule
-Counterexample & Broken assumption & Required refinement \\
+Counterexample & Broken assumption & Required enforcement \\
 \midrule
-Local-safe/global-unsafe & Local certificates compose on a shared lane & Global obligation set and certificate \\
-Dispatch tail & A certificate stays fresh until launch & Bounded revalidation and physical latest-start \\
+Local-safe/global-unsafe & Local schedules compose on a shared lane & One schedule for the global pending-recovery set \\
+Dispatch tail & A verified schedule stays valid until launch & Bounded revalidation and physical latest-start \\
 Sequential outcome replay & Simultaneous outcomes may apply in any order & Atomic outcome batch \\
-Fixed AI lease & Execution time covers launch control & Control charge and AI blackout \\
-Reply loss after effect & Retrying ambiguity is harmless & Generation quarantine and fail-closed admission \\
-Two outstanding prepares & RPC at-most-once implies visible ownership & Single unlaunched-token invariant \\
-Warm-bound reuse & Lifecycle does not affect service tails & Provenance-scoped qualification \\
+Fixed AI slot & Execution time covers launch control & Launch budget and AI busy interval \\
+Reply loss after effect & Retrying ambiguity is harmless & Version invalidation and no AI admission without evidence \\
+Two outstanding prepares & RPC at-most-once implies visible ownership & At most one pending launch ticket \\
+Warm-bound reuse & Lifecycle does not affect service tails & Qualification per measurement condition \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -318,8 +317,8 @@ Warm-bound reuse & Lifecycle does not affect service tails & Provenance-scoped q
 \label{sec:design}
 
 \sys schedules pending recovery as explicit state and keeps each scheduling decision valid until its GPU
-effect completes. This section presents the architecture, the pending-recovery certificate, its
-refinement to physical execution, and the event algorithm, and then states the guarantee scope and the
+effect completes. This section presents the architecture, pending-recovery scheduling,
+schedule enforcement on the GPU, and the event algorithm, and then states the guarantee scope and the
 implementation.
 
 \subsection{Overall architecture}
@@ -330,16 +329,16 @@ implementation.
   \input{figures/softwall_overall_architecture.tex}
   \caption{\sys architecture for one release period. Steps: \NRx outcome (\ding{182}), outcome batch
   (\ding{183}), recovery retiming (\ding{184}), independent verification (\ding{185}), dispatch
-  (\ding{186}), AI lease (\ding{187}), and completion marker (\ding{188}). The steps are drawn for the
+  (\ding{186}), AI slot (\ding{187}), and completion marker (\ding{188}). The steps are drawn for the
   evaluated multi-GPU placement (b); the single-GPU placement (a) exchanges IQ, LLR, and TB buffers
-  through CUDA IPC rings and uses the same steps. In (b), cuPHY instance 0 owns TB1-TB3, instance 1 owns
-  TB4 and TB5, and ellipses mark further TBs.}
+  through CUDA IPC rings and uses the same steps. In (b), each TB comes from a different cell; cuPHY
+  instance 0 owns TB1-TB3, instance 1 owns TB4 and TB5, and ellipses mark further TBs.}
   \Description{A control layer contains a decision-page table, a pending-recovery table, a recovery-lane
-  calendar with a candidate AI lease, and an independent verifier. Below it are two separate
+  calendar with a candidate AI slot, and an independent verifier. Below it are two separate
   placements: (a) one GPU whose cuPHY, NeuralRx, recovery, and AI processes share CUDA IPC rings and
   (b) a multi-GPU node with two cuPHY GPUs, a NeuralRx GPU with input, TensorRT, and
   output stages, and a shared recovery and AI GPU connected by NVLink P2P. Seven numbered steps mark
-  outcome, batch, retiming, verification, dispatch, lease, and marker.}
+  outcome, batch, retiming, verification, dispatch, AI slot, and marker.}
   \label{fig:overall}
 \end{figure}
 
@@ -351,12 +350,11 @@ its CRC, TB4 is late, and TB5 is rejected at admission.
 
 \noindent\textbf{Control Layer.}
 One host coordinator holds four control objects. \textit{Decision Pages} record, for each TB, the \NRx
-outcome, the resulting action, and the generation of the decision. \textit{Pending Recoveries} lists every
+outcome, the resulting action, and the version of the decision. \textit{Pending Recoveries} lists every
 TB whose conventional recovery is still required, with its cuPHY instance, its recovery window, and its
 recovery bound $c$; in the example, TB3 and TB4 remain with the 45-153~ms window and $c=25$~ms, while the
-entries of TB1 and TB2 are cancelled. \textit{Recovery-Lane Certificate} holds the current schedule $X_t$
-of the shared recovery lane and a candidate $X'$ that adds one AI lease with its 5~ms launch-control
-charge before the guard. \textit{Independent Verifier} commits $X'$ or keeps $X_t$.
+entries of TB1 and TB2 are cancelled. \textit{Recovery-Lane Schedule} holds the current schedule $X_t$
+of the shared recovery lane and a candidate $X'$ that adds one AI slot with its 5~ms launch budget before the recovery deadline. \textit{Independent Verifier} commits $X'$ or keeps $X_t$.
 
 \noindent\textbf{Execution Layer.}
 Persistent MPS workers execute all GPU work. In the multi-GPU placement (Figure~\ref{fig:overall}b),
@@ -370,11 +368,11 @@ buffers through CUDA IPC rings.
 \noindent\textbf{Scheduling Loop.}
 Each cuPHY instance publishes the \NRx outcome of its TBs to a decision page (\ding{182}). At the
 \NRx deadline, one outcome batch updates the pending-recovery table (\ding{183}). The candidate scheduler
-retimes the required recoveries around a candidate AI lease (\ding{184}), and the independent verifier
-checks the all-fail schedule, credits, and generation before it commits $X'$ or keeps $X_t$
-(\ding{185}). The coordinator then publishes each action with its generation (\ding{186}) and sends the AI
-lease with an absolute latest-start to the Qwen worker (\ding{187}). A completion or non-launch marker
-retires the lease (\ding{188}), and the shared lane runs the required recoveries in certificate order.
+retimes the required recoveries around a candidate AI slot (\ding{184}), and the independent verifier
+checks the all-fail schedule, credits, and version before it commits $X'$ or keeps $X_t$
+(\ding{185}). The coordinator then publishes each action with its version (\ding{186}) and sends the AI
+slot with an absolute latest-start to the Qwen worker (\ding{187}). A completion or non-launch marker
+frees the slot (\ding{188}), and the shared lane runs the required recoveries in the committed order.
 
 \noindent\textbf{Scheduling Objects.}
 The scheduler uses only the information that is visible at the current event. A radio job and an
@@ -386,178 +384,177 @@ external-AI job are
 where $r_i$ and $d_i$ are the release and expiry, $h_i$ is the owning cuPHY instance, $c_i$ is the
 conventional host-to-commit bound, $K_i$ contains the eligible \NRx endpoints, and $q_i$ is the optional
 radio value; $u_a$, $v_a$, $\ell_a$, $b_a$, and $g_a$ are the AI arrival, timely value, deadline,
-physical-completion bound, and recovery guard. Decisions cannot use future CRC outcomes, future arrivals,
+physical-completion bound, and recovery margin. Decisions cannot use future CRC outcomes, future arrivals,
 realized service times, or hidden channel labels.
 
 \noindent\textbf{Qualified Modes.}
-A service bound is valid for scheduling only with a matching provenance
+A service bound is valid for scheduling only under matching measurement conditions
 \begin{equation}
  \pi=(\text{GPU},\text{placement},\text{MPS},\text{lifecycle},\text{co-run},\text{software}).
 \end{equation}
-Therefore, a warm local measurement cannot certify a cold, restarted, or remote path. The scheduler marks
-a state \UQ whenever a required bound lacks the active provenance, even when a sample finishes before its
+Therefore, a warm local measurement cannot qualify a cold, restarted, or remote path. The scheduler marks
+a state \UQ whenever a required bound was not measured under the active conditions, even when a sample finishes before its
 deadline.
 
 \noindent\textbf{Separation of Proposal and Authority.}
 The candidate scheduler may use a fast list heuristic and may reject a feasible placement. It cannot
-create a false-safe execution because only the verifier can commit a candidate. With this separation,
+create an unsafe execution because only the verifier can commit a candidate. With this separation,
 the evaluation compares decision quality with an exact oracle while safety remains independent of the
 heuristic.
 
 \subsection{Pending-recovery scheduling}
 \label{sec:design-recovery}
 
-An unresolved \NRx is a scheduling obligation even when no conventional kernel is queued. \sys records
-this obligation as a pending recovery
+An unresolved \NRx creates required future work even when no conventional kernel is queued. \sys records
+this work as a pending recovery
 \begin{equation}
  R_i=(a_i(t),d_i-g_i,c_i,h_i),
 \end{equation}
-where $a_i(t)$ is its earliest legal start. For the unresolved set $U(t)$, an all-fail certificate
+where $a_i(t)$ is its earliest legal start. For the unresolved set $U(t)$, an all-fail schedule
 assigns every $R_i$ a non-overlapping interval $[s_i,s_i+c_i]$ on its physical recovery lane, after
-release and before $d_i-g_i$. Contending transport and AI blackout intervals belong to the same
-certificate.
+release and before $d_i-g_i$. Contending transport and AI busy intervals belong to the same
+schedule.
 
 \noindent\textbf{All-Fail Dominance.}
-The certificate needs one schedule, not one schedule per combination of outcomes.
+\sys needs one schedule, not one schedule per combination of outcomes.
 \begin{proposition}[All-fail dominance]
 If a timely \NRx success only deletes its conventional recovery and does not increase any remaining
-job's demand, a feasible certificate for $U(t)$ is feasible for every failure subset
+job's demand, a feasible all-fail schedule for $U(t)$ is feasible for every failure subset
 $F\subseteq U(t)$.
 \end{proposition}
 \begin{proof}
 Delete successful requests from the all-fail schedule. Release, expiry, capacity, and non-overlap
 constraints of every remaining interval remain unchanged.
 \end{proof}
-The reduction replaces $2^{|U|}$ outcome schedules with one executable witness. It does not apply when a
+The reduction replaces $2^{|U|}$ outcome schedules with one executable schedule. It does not apply when a
 success creates new mandatory work or changes another service bound; that case requires a new mode.
 
 \begin{figure}[H]
   \centering
   \input{figures/softwall_atomic_replan.tex}
   \caption{One transaction on the shared lane. (a) Admission reserves one all-fail recovery per TB
-  and rejects TB5; the 45~ms batch cancels two pending recoveries in one generation. (b) The verifier commits the
-  128-token AI lease and keeps $X_t$ for the 256-token AI lease, whose last recovery would end after the
-  guard. AI units are Qwen prefill requests; hatching marks the 5~ms launch-control charge.}
+  and rejects TB5; the 45~ms batch cancels two pending recoveries in one atomic update. (b) The verifier commits the
+  128-token AI slot and keeps $X_t$ for the 256-token AI slot, whose last recovery would end after the
+  recovery deadline. AI requests are Qwen prefill requests; hatching marks the 5~ms launch budget.}
   \Description{Four lane timelines between 45 and 170 milliseconds. The first shows four reserved
-  recoveries and a rejected fifth request that crosses the guard. The second shows two required
-  recoveries and released capacity until the guard. The third and fourth show a 128-token and a
-  256-token AI lease followed by the required recoveries; the first is committed and the second,
-  which crosses the guard, is rejected.}
+  recoveries and a rejected fifth request that crosses the recovery deadline. The second shows two required
+  recoveries and released capacity until the recovery deadline. The third and fourth show a 128-token and a
+  256-token AI slot followed by the required recoveries; the first is committed and the second,
+  which crosses the recovery deadline, is rejected.}
   \label{fig:atomic-replan}
 \end{figure}
 
 \noindent\textbf{Admission and Outcome Batch.}
 Figure~\ref{fig:atomic-replan}a shows one transaction on the shared lane. At release, admission reserves
-one pending recovery per TB before any optional dispatch (\ding{182}). TB1-TB4 fit before the guard, and
-TB5 is rejected because its reservation would cross the guard. Therefore, endpoint rejection never removes
-the conventional path. At the 45~ms \NRx deadline, one outcome batch applies all observed outcomes in one
-generation (\ding{183}): TB1 and TB2 succeed and cancel their pending recoveries, while TB3 and TB4 fail
-and keep theirs. The capacity that TB1 and TB2 release stays free until the guard, and the certificate
+one pending recovery per TB before any optional dispatch (\ding{182}). TB1-TB4 fit before the recovery deadline, and
+TB5 is rejected because its reservation would cross the recovery deadline. Therefore, endpoint rejection never removes
+the conventional path. At the 45~ms \NRx deadline, one outcome batch applies all observed outcomes as one atomic
+update (\ding{183}): TB1 and TB2 succeed and cancel their pending recoveries, while TB3 and TB4 fail
+and keep theirs. The capacity that TB1 and TB2 release stays free until the recovery deadline, and the committed schedule
 $X_t$ holds two recoveries. Sequential replay of the same outcomes is invalid because it can create
 intermediate states that never coexisted.
 
-\noindent\textbf{Candidate Lease.}
-Figure~\ref{fig:atomic-replan}b adds one AI lease to $X_t$. For a 128-token unit, the candidate $X'$
-places the 5~ms launch-control charge and the AI lease first and retimes TB3 and TB4 behind them
-(\ding{184}). The last recovery still ends before the guard, and the verifier commits $X'$ as generation
-$g+1$ (\ding{185}). For a 256-token unit, TB4 would end after the guard; the verifier rejects $X'$ and
+\noindent\textbf{Candidate AI Slot.}
+Figure~\ref{fig:atomic-replan}b adds one AI slot to $X_t$. For a 128-token request, the candidate $X'$
+places the 5~ms launch budget and the AI slot first and retimes TB3 and TB4 behind them
+(\ding{184}). The last recovery still ends before the recovery deadline, and the verifier commits $X'$ as version
+$g+1$ (\ding{185}). For a 256-token request, TB4 would end after the recovery deadline; the verifier rejects $X'$ and
 keeps $X_t$.
 
 \noindent\textbf{Global Atomic State.}
-Certificate scope follows the contended lane: disjoint lanes compose by union, while cuPHY instances that
-share a recovery lane require one global obligation set. The complete runtime state is
+Schedule scope follows the contended lane: disjoint lanes compose by union, while cuPHY instances that
+share a recovery lane require one global set of pending recoveries. The complete runtime state is
 \begin{equation}
  X_t=(S_t,Q_t,T_t,L_t,E_t,C_t,G_t),
 \end{equation}
 where $S$ is the recovery schedule, $Q$ and $T$ are the endpoint and transport credits, $L$ holds the AI
-leases, $E$ holds the fences and worker epochs, $C$ is the radio commit state, and $G$ is the
+slots, $E$ holds the completion events and worker epochs, $C$ is the radio commit state, and $G$ is the
 multi-instance AI ownership. The verifier commits a private $X'$ only when
 \begin{align}
 \mathrm{VALID}(X') \equiv {}& \mathrm{ExecutableRecovery}(S') \land
  \mathrm{UniqueCredits}(Q',T') \nonumber\\
- &\land\ \mathrm{TimelyAI}(L',E') \land \mathrm{CurrentGenerations}(X').
+ &\land\ \mathrm{TimelyAI}(L',E') \land \mathrm{CurrentVersions}(X').
 \end{align}
-A rejected candidate leaves $X_t$ intact, which eliminates partial calendar updates and orphan AI leases.
+A rejected candidate leaves $X_t$ intact, which eliminates partial calendar updates and orphan AI slots.
 
 \noindent\textbf{Safety Invariant.}
-The verifier and the refinement in Section~\ref{sec:design-refinement} maintain one invariant across
+The verifier and the enforcement in Section~\ref{sec:design-refinement} maintain one invariant across
 all events.
-\begin{invariant}[Certificate-to-execution refinement]
+\begin{invariant}[Recovery, ownership, and single commit]
 For every admitted radio request, every allowed unresolved-outcome branch retains a collision-free
 conventional path completing by expiry. No endpoint, transport, AI, or output credit is reused before
 matching terminal physical evidence, and each request commits at most one radio result.
 \end{invariant}
 
-\subsection{Refinement to physical execution}
+\subsection{Enforcing the schedule on the GPU}
 \label{sec:design-refinement}
 
 A feasible host calendar is insufficient unless launch and ownership follow it.
-Figure~\ref{fig:refinement} follows one committed AI lease $L$ across the coordinator, the marker files,
+Figure~\ref{fig:refinement} follows one committed AI slot $L$ across the coordinator, the marker files,
 the Qwen worker, and the GPU2 CUDA stream, together with four injected faults and the radio state of
 period 17.
 
 \begin{figure}[H]
   \centering
   \input{figures/softwall_physical_refinement.tex}
-  \caption{Refinement of one AI lease. Black steps: commit with a latest-start (\ding{182}), run request
+  \caption{Enforcing one AI slot on the GPU. Black steps: commit with a latest-start (\ding{182}), run request
   (\ding{183}), launch gate and launch marker (\ding{184}), CUDA event and completion marker
-  (\ding{185}), and retirement on a matching marker (\ding{186}). Red faults: marker reconciliation after
-  a late reply (\textcolor{dred}{\ding{182}}), AI quarantine after channel loss
+  (\ding{185}), and freeing on a matching marker (\ding{186}). Red faults: marker reconciliation after
+  a late reply (\textcolor{dred}{\ding{182}}), AI admission stop after channel loss
   (\textcolor{dred}{\ding{183}}), and no-op outcome and response replays (\textcolor{dred}{\ding{184}},
   \textcolor{dred}{\ding{185}}).}
   \Description{A message sequence among the coordinator, marker files, the AI worker, and the GPU
-  stream shows lease commit, the run request, the latest-start gate, kernel submission with a launch
-  marker, the CUDA event, the completion marker, the reply, and lease retirement. Red paths show marker
-  reconciliation, AI quarantine after channel loss, and no-op replays in a radio-state table.}
+  stream shows slot commit, the run request, the latest-start gate, kernel submission with a launch
+  marker, the CUDA event, the completion marker, the reply, and the freed slot. Red paths show marker
+  reconciliation, AI admission stop after channel loss, and no-op replays in a radio-state table.}
   \label{fig:refinement}
 \end{figure}
 
 \noindent\textbf{Bounded Launch.}
-The coordinator commits $L$ as generation $g+1$ (\ding{182}) and sends $\mathrm{run}(L,\text{latest-start})$
-to the Qwen worker (\ding{183}). Prepare creates one unlaunched token that carries the calendar
-generation, worker epoch, ring and transport credit, and absolute latest-start. The worker launches only
+The coordinator commits $L$ as version $g+1$ (\ding{182}) and sends $\mathrm{run}(L,\text{latest-start})$
+to the Qwen worker (\ding{183}). Prepare creates one launch ticket that carries the calendar
+version, worker epoch, ring and transport credit, and absolute latest-start. The worker launches only
 when the current time is at or before the latest-start (\ding{184}); it then writes the launch marker
 \texttt{L.launch} and submits the prefill kernels to the GPU2 stream. Otherwise, it replies with a
 non-launch marker and does not execute the stale schedule.
 
 \noindent\textbf{Physical Retirement.}
 When the CUDA event completes, the worker writes the completion marker \texttt{L.complete} and replies
-(\ding{185}). The coordinator retires $L$ only on a marker that matches its generation and advances to
-generation $g+2$ (\ding{186}). RPC completion is not GPU completion. Therefore, leases and credits remain
-owned until a matching CUDA fence, and a transport-copy fence cannot replace a receiver or recovery
+(\ding{185}). The coordinator frees $L$ only on a marker that matches its version and advances to
+version $g+2$ (\ding{186}). RPC completion is not GPU completion. Therefore, slots and credits remain
+owned until a matching CUDA completion event, and a transport-copy completion cannot replace a receiver or recovery
 completion.
 
 \noindent\textbf{Fault Handling.}
-The red steps show the injected faults. When the reply is delayed or lost after the fence, the
-coordinator reads \texttt{L.complete} and retires $L$ from the marker (\textcolor{dred}{\ding{182}}).
-When the channel is lost before the fence, only \texttt{L.launch} exists at the end of the lease; the
-coordinator keeps $L$ owned, quarantines AI admission, and continues radio recovery
+The red steps show the injected faults. When the reply is delayed or lost after GPU completion, the
+coordinator reads \texttt{L.complete} and frees $L$ from the marker (\textcolor{dred}{\ding{182}}).
+When the channel is lost before GPU completion, only \texttt{L.launch} exists at the end of the slot; the
+coordinator keeps $L$ owned, stops AI admission, and continues radio recovery
 (\textcolor{dred}{\ding{183}}). A replay of the nrx-17 outcome batch or of a period-16 batch leaves the
 radio state unchanged (\textcolor{dred}{\ding{184}}), and a second response for TB4 of period 17
 produces no commit because the commit set holds one entry per TB (\textcolor{dred}{\ding{185}}). A
-timeout without physical evidence quarantines the generation and closes new optional admission.
+timeout without physical evidence invalidates the version and closes new optional admission.
 
 \noindent\textbf{Distributed and Transport Ownership.}
-One global AI queue can serve several cuPHY instances, but each instance holds at most one unlaunched
-token in an ownership epoch, and commit transfers launch authority only while the local and global
-certificates remain current. CUDA IPC and NVLink P2P avoid a host-staging copy and also make ownership
-explicit: each ring slot has one generation, one physical completion state, and one scheduler-visible
-retirement event. Therefore, \sys charges transport inside the qualified service path. Same-worker
-reconnect carries the generation through bounded markers, while full process replacement without durable
+One global AI queue can serve several cuPHY instances, but each instance holds at most one pending
+launch ticket in an ownership epoch, and commit transfers launch authority only while the local and global
+schedules remain current. CUDA IPC and NVLink P2P avoid a host-staging copy and also make ownership
+explicit: each ring entry has one version, one physical completion state, and one scheduler-visible completion event. Therefore, \sys charges transport inside the qualified service path. Same-worker
+reconnect carries the version through bounded markers, while full process replacement without durable
 reconciliation remains \UQ.
 
-\subsection{Certified event-scheduling algorithm}
+\subsection{Event-scheduling algorithm}
 \label{sec:design-algorithm}
 
 \sys is an event-driven scheduling algorithm with a verified commit point. Algorithm~1 runs at every
-event batch and rejects optional work whenever provenance, recovery feasibility, or ownership cannot be
+event batch and rejects optional work whenever measurement conditions, recovery feasibility, or ownership cannot be
 proven.
 
 \begin{figure}[H]
 \centering
 \fbox{\begin{minipage}{0.94\linewidth}
 \small
-\textbf{Algorithm 1: \textsc{CertifyEvent}$(X_t,\mathcal{E}_t,\mathcal{A}_t,\pi)$}
+\textbf{Algorithm 1: \textsc{ScheduleEvent}$(X_t,\mathcal{E}_t,\mathcal{A}_t,\pi)$}
 \begin{enumerate}[leftmargin=1.6em,itemsep=1pt,topsep=2pt]
   \item If any required bound disagrees with $\pi$, return \UQ and disable new optional work.
   \item Apply the event batch $\mathcal{E}_t$ atomically: add a pending recovery for each new radio job;
@@ -565,25 +562,24 @@ proven.
   \item Place every required recovery on its qualified physical lane. If no all-fail calendar exists,
         return \MI and reject new \NRx and AI admission.
   \item Visit only visible AI jobs in deterministic policy order. For each job, construct $X'$ by
-        jointly retiming recovery and adding one complete AI lease.
+        jointly retiming recovery and adding one complete AI slot.
   \item If the independent verifier accepts $X'$, atomically commit it, dispatch its first action,
         and return \QSU. Otherwise discard $X'$ without changing $X_t$.
   \item If no AI candidate passes, commit the recovery-only calendar and return \QSN. A matching
-        terminal event retires ownership and invokes \textsc{CertifyEvent} again.
+        terminal event ends ownership and invokes \textsc{ScheduleEvent} again.
 \end{enumerate}
 \end{minipage}}
 \caption{Backstop's online scheduling algorithm. Candidate order controls efficiency; the verifier
-controls safety. Consequently, a heuristic can be false-conservative but cannot authorize a
-false-safe state.}
-\Description{Six pseudocode steps check provenance, apply outcomes atomically, build an all-fail
+controls safety. Consequently, a heuristic can reject a safe candidate but cannot authorize an unsafe state.}
+\Description{Six pseudocode steps check measurement conditions, apply outcomes atomically, build an all-fail
 calendar, test visible AI candidates, commit one verified first action, or retain a recovery-only
 calendar.}
-\label{alg:certify-event}
+\label{alg:schedule-event}
 \end{figure}
 
 \noindent\textbf{Event Processing.}
 Step~1 disables new optional work and returns \UQ when a required bound disagrees with the active
-provenance $\pi$. Step~2 applies the event batch atomically: it adds a pending recovery for each new radio
+measurement conditions $\pi$. Step~2 applies the event batch atomically: it adds a pending recovery for each new radio
 job, cancels a pending recovery only for a timely success, and keeps it for failure, lateness, or missing
 evidence. Step~3 places every required recovery on its qualified lane and returns \MI when no all-fail
 calendar exists. Steps~4 and~5 visit the visible AI jobs in a deterministic policy order, build one
@@ -591,21 +587,21 @@ candidate $X'$ per job, and commit the first candidate that the verifier accepts
 Step~6 commits the recovery-only calendar and returns \QSN when no AI candidate passes.
 
 \noindent\textbf{Decision Window.}
-For $m_h$ equal-length recoveries compacted at expiry $d_h$ with guard $g_h$, let $b_{\mathrm{eff}}$
-include synchronous control, AI service, and the completion guard. AI-first execution is safe under the
+For $m_h$ equal-length recoveries compacted at expiry $d_h$ with margin $g_h$, let $b_{\mathrm{eff}}$
+include synchronous control, AI service, and the completion margin. AI-first execution is safe under the
 sufficient, mode-specific condition
 \begin{equation}
  T_{\mathrm{dec},h}+b_{\mathrm{eff}}
  \le d_h-g_h-m_hc_h. \label{eq:window}
 \end{equation}
-The right side is the first recovery start that the certificate keeps. Therefore, the inequality charges
+The right side is the latest time at which the first required recovery can start. Therefore, the inequality charges
 decision and launch delay and does not assume immediate dispatch.
 
 \noindent\textbf{Idle Time.}
 The same window shows why idle GPU time cannot authorize admission.
 \begin{proposition}[Idle time is insufficient]
 \label{prop:idletime}
-On one non-preemptive lane with common guard $D$, unresolved bounds $c_1,\ldots,c_m$, and AI bound
+On one non-preemptive lane with common recovery deadline $D$, unresolved bounds $c_1,\ldots,c_m$, and AI bound
 $b_{\mathrm{eff}}$, suppose mandatory-only execution is feasible but
 \begin{equation}
   t+b_{\mathrm{eff}}+\sum_{i=1}^{m}c_i>D. \label{eq:idletime}
@@ -619,7 +615,7 @@ mandatory demand.
 \end{proof}
 
 \noindent\textbf{Safe Reclaimable Capacity.}
-The same invariant predicts the capacity that the algorithm can expose. Let $W$ be the guard window, $L$
+The same invariant predicts the capacity that the algorithm can expose. Let $W$ be the window up to the recovery deadline, $L$
 the AI deadline, $a$ one complete AI transaction, $c$ one recovery bound, $M_g$ the pending recoveries
 that static reservation holds, and $F_g$ the required recoveries on lane $g$. With $[x]_+=\max(0,x)$,
 \begin{align}
@@ -628,9 +624,9 @@ that static reservation holds, and $F_g$ the required recoveries on lane $g$. Wi
  K_{\text{\sys}}&=\sum_g\left\lfloor\frac{[\min(L,W-F_gc)]_+}{a}\right\rfloor. \label{eq:capacity}
 \end{align}
 Static reservation holds every pending recovery, recovery-first executes the required recoveries before
-AI, and \sys may place AI first while keeping $F_gc$ before the guard. Multi-class BurstGPT batches use
+AI, and \sys may place AI first while keeping $F_gc$ before the recovery deadline. Multi-class BurstGPT batches use
 exact subset, lane, order, and recovery-insertion enumeration. Failure probabilities predict expected
-value, while the all-fail safety certificate does not depend on the failure distribution.
+value, while the all-fail safety check does not depend on the failure distribution.
 
 \begin{table}[t]
 \caption{The scheduler's predictive outcomes.}
@@ -639,10 +635,10 @@ value, while the all-fail safety certificate does not depend on the failure dist
 \toprule
 Class & Meaning \\
 \midrule
-\QSU & All-fail recovery is executable and at least one qualified AI unit is admissible. \\
+\QSU & All-fail recovery is executable and at least one qualified AI request is admissible. \\
 \QSN & All-fail recovery is executable, but the visible AI candidate cannot safely fit. \\
 \MI  & The mandatory all-fail schedule is infeasible under known bounds. \\
-\UQ  & A required bound or lifecycle provenance is absent or failed qualification. \\
+\UQ  & A required bound was not measured under the active conditions or failed qualification. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -659,7 +655,7 @@ bounds, and \UQ refuses to reuse evidence from a different physical mode.
 bounds to the environment in which they were measured and defines the events that the runtime must
 contain.
 
-\noindent\textbf{Mode Provenance.}
+\noindent\textbf{Mode Conditions.}
 A mode fixes GPU topology, MPS settings, process lifecycle, worker epoch, memory residency, co-run class,
 software, and finite-sample whole-path bounds. Changing any element requires requalification. The
 synthetic release period and result expiry used in evaluation are harness parameters, not NR slot or
@@ -668,7 +664,7 @@ production HARQ timing.
 \noindent\textbf{Contained Events.}
 The runtime handles \NRx failure and lateness, stale and duplicate messages, bounded reply loss before or
 after a control-plane effect, missing AI replies after physical completion, and same-worker channel
-reconnection. It fails closed when terminal physical evidence is absent.
+reconnection. It stops new AI admission when completion evidence is absent.
 
 \noindent\textbf{Excluded Events.}
 Arbitrary GPU hangs, driver reset, unbounded host suspension, production-clock uncertainty, and
@@ -678,7 +674,7 @@ unqualified workloads remain outside the claim. Mandatory offered load without a
 \subsection{Backstop implementation}
 \label{sec:implementation}
 
-\sys binds the model to persistent CUDA workers and explicit control objects, which makes certificate
+\sys binds the model to persistent CUDA workers and explicit control objects, which makes schedule
 state observable and enforceable across process and GPU boundaries.
 
 \noindent\textbf{Radio and AI Workers.}
@@ -691,25 +687,24 @@ lane and the Qwen worker, which runs as a low-priority MPS client with a 20\% th
 
 \noindent\textbf{Transport and Control.}
 CUDA IPC rings connect processes on one GPU, and NVLink P2P rings connect GPUs. Each slot carries a
-request generation and a physical completion state. Copy completion does not imply receiver or recovery
-completion; the owning worker publishes a separate terminal fence. The controller stores recovery
+request version and a physical completion state. Copy completion does not imply receiver or recovery
+completion; the owning worker publishes a separate completion event. The controller stores recovery
 calendars, endpoint and transport credits, worker epochs, global AI ownership, and single-commit state.
 Unix-domain RPC carries control messages, while CUDA-resident data stays on the IPC and P2P paths.
 
-\noindent\textbf{Certificate Engine.}
-The certificate engine separates schedule construction from admission authority. The candidate scheduler
+\noindent\textbf{Schedule Builder and Verifier.}
+\sys separates schedule construction from admission authority. The candidate scheduler
 applies deterministic list orders to radio jobs and visible AI candidates and emits a complete schedule,
 an ownership delta, and a mode fingerprint; exact search serves only as a small-state oracle. The
-independent verifier checks job identity, release, qualified service, expiry, lane capacity, overlap, AI
-blackout, credit uniqueness, and generation, and the runtime cannot execute a candidate that the verifier
-rejects. The executor performs the first non-preemptive action of an accepted certificate, observes its
+independent verifier checks job identity, release, qualified service, expiry, lane capacity, overlap, AI busy intervals, credit uniqueness, and version, and the runtime cannot execute a candidate that the verifier
+rejects. The executor performs the first non-preemptive action of an accepted schedule, observes its
 terminal event, and replans; it never reorders physical work from an unverified host-side queue.
 
 \noindent\textbf{Measurement and Mode Separation.}
-Instrumentation separates logical decisions, host progress, GPU execution, and physical retirement,
+Instrumentation separates logical decisions, host progress, GPU execution, and physical completion,
 which prevents a host timestamp from being reported as a kernel boundary. The runtime records release,
 admission, dispatch, worker observation, CUDA completion, commit return, request and payload identity,
-ring generation, worker epoch, and lease retirement, and Nsight traces check GPU ordering for selected
+ring version, worker epoch, and slot freeing time, and Nsight traces check GPU ordering for selected
 modes. The qualified C158-C162 path uses pyAerial with persistent workers. A later native C++ effort
 verifies input-layout and decoder parity only; it is not timing-qualified, and its measurements are never
 mixed with the service bounds of the Python mode. Manifests preserve source hashes, protocols, seeds,
@@ -724,7 +719,7 @@ maps to a machine-readable artifact and field set.
 
 \noindent\textbf{Hardware Specification.}
 We evaluate \sys on two independent nodes, each with four NVIDIA A100-SXM4-40GB GPUs connected by
-third-generation NVLink. MIG is disabled and MPS is enabled on every GPU. In the multi-GPU placement,
+third-version NVLink. MIG is disabled and MPS is enabled on every GPU. In the multi-GPU placement,
 GPU0 and GPU1 run the two cuPHY instances at a 50\% MPS share, GPU3 runs the TensorRT \NRx worker at
 80\%, and GPU2 runs the shared cuPHY recovery lane at 80\% and the Qwen worker at 20\% with low
 priority. Facility identity is withheld for anonymous review.
@@ -734,7 +729,7 @@ The trace-driven evaluation (Sections~\ref{sec:eval-capacity} and~\ref{sec:eval-
 capacity and timely AI value with an exact-checked capacity model and BurstGPT traces, without executing
 kernels. The physical evaluation (Sections~\ref{sec:eval-online}-\ref{sec:eval-prediction}) runs the
 complete scheduler on both nodes and measures online scheduling, AI service under bursty arrivals, radio
-safety at the certificate boundary, execution refinement under injected faults, prediction accuracy, and
+safety at the admission boundary, schedule enforcement under injected faults, prediction accuracy, and
 decision cost. Section~\ref{sec:eval-sensitivity} varies the recovery bound,
 the MPS configuration, and the worker lifecycle.
 
@@ -742,19 +737,23 @@ the MPS configuration, and the worker lifecycle.
 Radio execution uses NVIDIA Aerial cuPHY~\cite{aerial} and a TensorRT FP16 \NRx. The evaluated warm mode
 uses a synthetic 180~ms release period and a 155~ms result expiry (\texttt{P180/D155}), with
 finite-sample whole-path bounds $B_{\mathrm{NRx}}=45$~ms, $B_{\mathrm{conv}}=25$~ms, and
-$B_{\mathrm{AI}}(\text{context64})=35$~ms and a 2~ms guard. The period is not an NR slot, and the expiry
-is not a production HARQ deadline. Qwen2.5-1.5B prefill~\cite{qwen25} with 16-512-token prompts creates
+$B_{\mathrm{AI}}(\text{context64})=35$~ms and a 2~ms margin before the expiry. The period is not an NR slot, and the expiry
+is not a production HARQ deadline. In every period, four admitted cells each send one single-UE, 273-PRB
+uplink TB; the cuPHY instance on GPU0 serves three of them and the instance on GPU1 serves one.
+Qwen2.5-1.5B prefill~\cite{qwen25} with 16-512-token prompts creates
 external GPU contention, and BurstGPT~\cite{burstgpt} supplies arrivals and token values from four
 non-overlapping public-trace windows and the prompts of the bursty physical campaign. Synthetic channels drive system qualification; a separate Sionna
 CDL-D/E mode tests radio value (Section~\ref{sec:limitations}).
 
 \noindent\textbf{Baselines.}
 Every baseline makes the same radio decisions and sees the same arrivals, bounds, and workers as \sys.
-\emph{Idle-time admission} admits AI into GPU time that is idle at the decision and ignores pending
-recovery. \emph{Static reservation} holds the recovery of every admitted TB until expiry. The
-\emph{certificate-preserving recovery-first} policy keeps the initial all-fail admission and the
-single-commit rule of \sys but runs every required recovery before external AI. The \emph{offline
-oracle} sees the realized trace and bounds the attainable value. Idle-time admission and uncontrolled MPS
+Two baselines follow the sharing approaches of Section~\ref{sec:related}. \emph{Static reservation}
+holds the recovery of every admitted TB until expiry, as reservation-based sharing does, and
+\emph{idle-time admission} admits AI into GPU time that is idle at the decision and ignores pending
+recovery, as work-conserving sharing does. The \emph{recovery-first} policy is an ablation of \sys: it keeps pending-recovery
+tracking, the all-fail admission check, and the single-commit rule
+of \sys but runs every required recovery before external AI, which isolates the effect of AI-first
+order. The \emph{offline oracle} sees the realized trace and bounds the attainable value. Idle-time admission and uncontrolled MPS
 are diagnostic baselines; they expose broken assumptions and are not safe performance comparators.
 
 \noindent\textbf{Experimental Discipline.}
@@ -797,9 +796,9 @@ produced no experimental measurement or ground-truth label.
 % provenance: C167_CAPACITY
 \noindent\textbf{Capacity across Cells and Deadlines.}
 Figure~\ref{fig:eval-capacity} evaluates the exact-checked capacity model over 21,384 points that vary
-cells, cuPHY instances, GPUs, \NRx success probability and correlation, expiry, recovery bound, AI
+cells (one TB per cell and period), cuPHY instances, GPUs, \NRx success probability and correlation, expiry, recovery bound, AI
 class, AI deadline, and offered load. Mandatory recovery is infeasible at 7,668 points. The model decides
-all AI units at one common time after the outcome batch, and at all 13,716 feasible points \sys admits
+all AI requests at one common time after the outcome batch, and at all 13,716 feasible points \sys admits
 the same AI capacity as the offline oracle. Static reservation reaches 85.3\% of the oracle with two
 cells and 59.3\% with 16 cells because it holds every pending recovery until expiry. Recovery-first
 reaches 92.4\% and 83.3\% because it runs required recovery before AI; at a 50~ms AI deadline, it
@@ -809,16 +808,25 @@ but its radio violation probability rises from 9.9\% with two cells to 24.4\% wi
 positive at 4,338 feasible points (31.6\%). Exhaustive order checking agrees with the compact capacity
 calculation in all 5,376 checked cases. \sys achieves this capacity by admitting AI against the
 all-fail schedule of the remaining recoveries and by placing AI first whenever that schedule still
-completes before the guard.
+completes before the recovery deadline.
+
+\noindent\textbf{Where the Throughput Comes From.}
+Tracking pending recovery is the main source of the throughput gain. Static reservation holds every
+pending recovery until expiry and reaches only 59.3-85.3\% of the AI capacity of \sys across cell
+counts. Recovery-first tracks pending recovery like \sys and reaches 83.3-92.4\%, because both policies
+fit the same AI work and required recoveries into one window. The remaining gap comes from order:
+recovery-first loses the AI requests whose deadline passes while the required recoveries run first.
+Therefore, at a 1,000~ms AI deadline recovery-first reaches 100\% of the capacity of \sys, and at a
+50~ms deadline it reaches 62.7\% (Figure~\ref{fig:eval-capacity}b).
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_drivers.pdf}
-  \caption{Drivers of safe AI capacity in the exact-checked capacity model. (a) Mean AI units per
+  \caption{Drivers of safe AI capacity in the exact-checked capacity model. (a) Mean AI requests per
   release period against the \NRx success rate. (b) AI capacity relative to the offline oracle against
   the radio expiry. (c) Radio violation probability of idle-time admission against the \NRx success
   rate. Each success rate covers the same 4,572 mandatory-feasible configurations.}
-  \Description{Three line charts. The first shows the AI units per period of Backstop rising with the
+  \Description{Three line charts. The first shows the AI requests per period of Backstop rising with the
   NeuralRx success rate while static reservation stays flat and recovery-first stays below Backstop.
   The second shows static reservation far below the oracle at a 100-millisecond expiry while Backstop
   stays at the oracle. The third shows the violation probability of idle-time admission falling as
@@ -830,10 +838,10 @@ completes before the guard.
 \noindent\textbf{Capacity Released by NeuralRx Success.}
 Figure~\ref{fig:eval-drivers}a isolates the capacity that a timely \NRx success releases. Each success
 rate covers the same 4,572 mandatory-feasible configurations. As the success rate grows from 0.2 to
-0.8, \sys admits 1.19, 1.32, and 1.43 AI units per period on average, while static reservation stays at
-1.09 units because it holds every pending recovery regardless of the outcome. Recovery-first rises from
-0.98 to 1.36 units and admits fewer units than static reservation at a 0.2 success rate, because it
-runs the many required recoveries before any AI unit. \sys converts each success into AI capacity
+0.8, \sys admits 1.19, 1.32, and 1.43 AI requests per period on average, while static reservation stays at
+1.09 requests because it holds every pending recovery regardless of the outcome. Recovery-first rises from
+0.98 to 1.36 requests and admits fewer requests than static reservation at a 0.2 success rate, because it
+runs the many required recoveries before any AI request. \sys converts each success into AI capacity
 because the outcome batch cancels the pending recovery of every successful TB and \sys places AI first
 against the remaining all-fail schedule.
 
@@ -855,7 +863,7 @@ to 6.2\% as the success rate grows, and it is largest when \NRx fails most often
   \caption{Timely AI value on BurstGPT traces at the 362 prespecified headroom points; timely value counts
   the AI tokens served within their SLO. (a) Mean timely value relative to the fixed-placement oracle
   per GPU count. (b) Cumulative distribution of the ratio between the timely value of \sys and that of
-  certificate-preserving recovery-first.}
+  recovery-first.}
   \Description{A grouped bar chart shows that recovery-first reaches about half to three quarters of the
   oracle value on one to four GPUs while Backstop reaches nearly all of it. A CDF shows the per-point
   ratio of Backstop to recovery-first value, from one to about seventeen.}
@@ -865,8 +873,8 @@ to 6.2\% as the success rate grows, and it is largest when \NRx fails most often
 % provenance: C174_HEADROOM
 \noindent\textbf{Trace Headroom.}
 A frozen screen maps four BurstGPT windows onto 2,592 topology, failure, recovery, AI-SLO, and
-offered-unit points, of which 2,052 are mandatory-feasible. At a 50~ms AI SLO, even the oracle places no
-AI unit. At 100, 250, and 1,000~ms, recovery-first reaches 75.8\%, 98.0\%, and 100\% of the oracle on
+offered-load points, of which 2,052 are mandatory-feasible. At a 50~ms AI SLO, even the oracle places no
+AI request. At 100, 250, and 1,000~ms, recovery-first reaches 75.8\%, 98.0\%, and 100\% of the oracle on
 average. The prespecified screen advances the 362 points at which recovery-first trails the oracle by at
 least 5\% in every window: 298 at a 100~ms SLO and 64 at 250~ms.
 
@@ -876,10 +884,10 @@ Figure~\ref{fig:eval-trace}a shows that \sys closes this gap. On one GPU, recove
 51.7\% of the fixed-placement oracle and \sys delivers 99.8\%; on two and four GPUs, recovery-first
 delivers 67.4\% and 75.5\%, while \sys stays above 99.8\%. Figure~\ref{fig:eval-trace}b shows that \sys
 delivers 1.44$\times$ the timely value of recovery-first at the median and up to 17.2$\times$. The
-certificate-preserving AI-first greedy of \sys is within 5\% of the fixed-placement oracle at 361 of the
-362 points, and the remaining point has a 7.02\% gap. \sys achieves this by leasing AI before required
-recovery whenever the all-fail schedule still ends before the guard, while recovery-first delays every AI
-unit behind the required recoveries and misses tight AI SLOs. Flexible recovery placement across GPUs
+AI-first greedy order of \sys is within 5\% of the fixed-placement oracle at 361 of the
+362 points, and the remaining point has a 7.02\% gap. \sys achieves this by placing AI before required
+recovery whenever the all-fail schedule still ends before the recovery deadline, while recovery-first delays every AI
+request behind the required recoveries and misses tight AI SLOs. Flexible recovery placement across GPUs
 has a positive upper-bound gain at 203 points: 0/102 one-GPU, 145/175 two-GPU, and 58/85 four-GPU
 points, with a 10.64\% median positive gain. Because this oracle excludes movement cost and physical
 qualification, it is a design target, and we make no executed optimizer claim. Selecting the frozen
@@ -895,7 +903,7 @@ absolute-deadline interpretation defect without excluding a request or opening t
 matching assigns 856 timely requests and 349,387 tokens to recovery-first, \sys, and the oracle, and
 static reservation exposes no qualified same-period Qwen slot. Charging every required recovery its full
 bound leaves recovery-first at 345,405 tokens, only 1.14\% below \sys and below the prespecified 5\%
-gate. Thus, the original mode contains no ordering headroom, and certificate-preserving recovery-first
+gate. Thus, the original mode contains no ordering headroom, and recovery-first
 remains the strong safe baseline in that mode.
 
 \subsection{Online scheduling on physical GPUs}
@@ -904,9 +912,9 @@ remains the strong safe baseline in that mode.
 % provenance: Q2_WARM_PATH
 \noindent\textbf{Two-Node Campaign.}
 The frozen \texttt{P180/D155} campaign runs 600 release periods on each of two nodes and offers one Qwen
-unit of 16-512 tokens in every period. It executes 4,800 TensorRT \NRx requests, 1,312 shared-cuPHY
-recoveries, 1,077 Qwen units, and 4,800 single radio commits without a deadline, bound, guard, credit,
-or commit violation; 0/4,800 deadline misses gives a 95\% rule-of-three upper bound of 0.0625\%.
+request of 16-512 tokens in every period. It executes 4,800 TensorRT \NRx requests, 1,312 shared-cuPHY
+recoveries, 1,077 Qwen requests, and 4,800 single radio commits without a violation of any deadline, bound, credit,
+or commit rule; 0/4,800 deadline misses gives a 95\% rule-of-three upper bound of 0.0625\%.
 Maximum \NRx, recovery, and radio-commit paths are 18.123, 13.465, and 118.022~ms against contracts of
 45, 25, and 155~ms. Nsight verifies 191 \NRx-Qwen kernel-overlap segments totaling 8.932~ms and
 conventional overlap with the \NRx of another cell in 12/12 windows for 12.309~ms, which establishes
@@ -915,38 +923,38 @@ physical co-execution rather than service bounds.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_online.pdf}
-  \caption{Online scheduling in the two-node campaign, measured from the \NRx deadline. (a) Certificate
-  of the shared lane in 36 consecutive release periods: each admitted AI lease includes the 5~ms
-  launch-control charge, and the required recoveries follow it with their full bound; a rejected AI
-  lease is drawn where it would end. (b) Measured against certified finish of the last action on the
+  \caption{Online scheduling in the two-node campaign, measured from the \NRx deadline. (a) Committed
+  schedule of the shared lane in 36 consecutive release periods: each admitted AI slot includes the 5~ms
+  launch budget, and the required recoveries follow it with their full bound; a rejected AI
+  slot is drawn where it would end. (b) Measured against scheduled finish of the last action on the
   shared lane, the AI prefill or the last recovery, in all 1,200 periods; the marker gives the required
-  recoveries of the period, orange marks a rejected AI unit, and the dotted diagonal marks equality.}
-  \Description{A stacked bar chart shows, for 36 release periods, an AI lease with the measured prefill
-  inside it and one or two recoveries above it, all below the guard at 108 milliseconds; two rejected
-  leases would cross the guard. A scatter plot shows the measured and certified end of every period,
-  with all points below the diagonal and left of the guard.}
+  recoveries of the period, orange marks a rejected AI request, and the dotted diagonal marks equality.}
+  \Description{A stacked bar chart shows, for 36 release periods, an AI slot with the measured prefill
+  inside it and one or two recoveries above it, all below the recovery deadline at 108 milliseconds; two rejected
+  slots would cross the recovery deadline. A scatter plot shows the measured and scheduled end of every period,
+  with all points below the diagonal and left of the recovery deadline.}
   \label{fig:eval-online}
 \end{figure}
 
-\noindent\textbf{AI-First Certificates.}
-Figure~\ref{fig:eval-online}a shows the certificates that \sys commits in 36 consecutive periods of the
-development run. In every admitted period, the AI lease takes the shared lane first, and the required
-recoveries follow it with their full 25~ms bound and still end before the guard, 108~ms after the \NRx
-deadline. \sys rejects an AI unit only when its lease and the required recoveries would cross the
-guard, as for the 256-token unit of period 5 and the 512-token unit of period 36, which each meet two
+\noindent\textbf{AI-First Schedules.}
+Figure~\ref{fig:eval-online}a shows the schedules that \sys commits in 36 consecutive periods of the
+development run. In every admitted period, the AI slot takes the shared lane first, and the required
+recoveries follow it with their full 25~ms bound and still end before the recovery deadline, 108~ms after the \NRx
+deadline. \sys rejects an AI request only when its slot and the required recoveries would cross the
+recovery deadline, as for the 256-token request of period 5 and the 512-token request of period 36, which each meet two
 required recoveries. Static reservation holds all four pending recoveries, or 100~ms of this window,
-and admits no unit in this mode.
+and admits no AI request in this mode.
 
-\noindent\textbf{Execution inside the Certificate.}
+\noindent\textbf{Execution inside the Schedule.}
 Figure~\ref{fig:eval-online}b compares, for every period, the measured end of the last lane action with
-the end that its certificate allows. Every period ends before its certified end, and every certified
-end lies before the guard. The latest measured end is 72.9~ms after the \NRx deadline, 35.1~ms before
-the guard, and the smallest margin to a certificate is 12.7~ms. The margin exists because the
-certificate charges every AI unit its class bound and every recovery its full bound, while \sys retires
-a lease at its CUDA completion and replans the required recoveries from that time. In two periods, the
-coordinator applies the outcome batch 23.8 and 31.0~ms after the \NRx deadline; \sys certifies the lease
-from the actual decision time, and both periods end before their certified ends. Thus, the committed
-schedule is executable on the physical lane, and the certificate charges the decision delay that it
+the end that its schedule allows. Every period ends before its scheduled end, and every scheduled
+end lies before the recovery deadline. The latest measured end is 72.9~ms after the \NRx deadline, 35.1~ms before
+the recovery deadline, and the smallest margin to a scheduled end is 12.7~ms. The margin exists because the
+schedule charges every AI request its class bound and every recovery its full bound, while \sys frees
+a slot at its CUDA completion and replans the required recoveries from that time. In two periods, the
+coordinator applies the outcome batch 23.8 and 31.0~ms after the \NRx deadline; \sys verifies the slot
+from the actual decision time, and both periods end before their scheduled ends. Thus, the committed
+schedule is executable on the physical lane, and the schedule charges the decision delay that it
 observes.
 
 \subsection{AI service under bursty arrivals}
@@ -960,7 +968,7 @@ requests/s for 108~s. The prompts are drawn from all BurstGPT requests and round
 lengths, and 47.4\% of them round to 512 tokens. Six arrival patterns share this sequence and differ only
 in arrival times: evenly spaced arrivals, the per-second arrivals of a BurstGPT segment, and Gamma
 arrivals with an inter-arrival CV of 1 (Poisson), 2, 4, and 8. Every request has a 200~ms SLO for its first
-token, and up to four AI leases share one period in FIFO order. All policies of a pattern observe the same
+token, and up to four AI slots share one period in FIFO order. All policies of a pattern observe the same
 \NRx outcome sequence, which makes each comparison paired.
 
 \begin{figure}[t]
@@ -968,14 +976,14 @@ token, and up to four AI leases share one period in FIFO order. All policies of 
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_burst.pdf}
   \caption{AI service and radio safety under bursty AI arrivals on the physical two-node path. Every
   pattern carries the same 329 BurstGPT prompts at 3 requests/s for 108~s and differs only in arrival
-  times; the AI SLO is 200~ms. (a) AI tokens served within their SLO; static reservation admits no unit.
-  (b) Periods in which the admitted AI breaks the guard at the declared bounds (lines, measured service
-  times), and periods whose last recovery physically ends after the guard when every unit takes its
-  bound (padded runs). (c) Gain of \sys over recovery-first against the AI SLO: replay mean over the six
+  times; the AI SLO is 200~ms. (a) AI tokens served within their SLO; static reservation admits no AI request.
+  (b) Periods in which the admitted AI misses the recovery deadline at the declared bounds (lines, measured service
+  times), and periods whose last recovery physically ends after the recovery deadline when every AI request and recovery takes its
+bound (padded runs). (c) Gain of \sys over recovery-first against the AI SLO: replay mean over the six
   patterns with its range (band), and the measured runs at 200~ms.}
   \Description{A line chart shows the on-time AI tokens per second of four policies falling as the
   arrivals become burstier, with Backstop above recovery-first, idle-time admission above Backstop, and
-  static reservation at zero. A second chart shows idle-time admission breaking the guard in up to ten
+  static reservation at zero. A second chart shows idle-time admission missing the recovery deadline in up to ten
   percent of periods while Backstop and recovery-first stay at zero. A third chart shows the gain of
   Backstop over recovery-first falling from about a third at a 150-millisecond SLO to a few percent at
   500 milliseconds.}
@@ -985,98 +993,123 @@ token, and up to four AI leases share one period in FIFO order. All policies of 
 \noindent\textbf{AI Service.}
 Figure~\ref{fig:eval-burst}a shows the AI tokens served within their SLO. \sys serves 6.2-18.5\% more on-time
 tokens than recovery-first under every pattern: 18.5\% for BurstGPT arrivals, 10.6\% for Poisson arrivals,
-and 6.2\% for CV-8 bursts. Static reservation holds all four recoveries and serves no AI unit in this
-mode. Idle-time admission serves 1.36-1.53$\times$ the tokens of \sys because it also admits units whose
-recoveries no longer fit before the guard. As the arrivals become burstier, every policy serves fewer
+and 6.2\% for CV-8 bursts. Static reservation holds all four recoveries and serves no AI request in this
+mode. Idle-time admission serves 1.36-1.53$\times$ the tokens of \sys because it also admits requests whose
+recoveries no longer fit before the recovery deadline. As the arrivals become burstier, every policy serves fewer
 tokens because a burst exceeds the window of one period and its requests expire.
 
 \noindent\textbf{Radio Safety under Bursts.}
-Figure~\ref{fig:eval-burst}b shows the price of that extra AI. Idle-time admission breaks the guard at the
+Figure~\ref{fig:eval-burst}b shows the price of that extra AI. Idle-time admission misses the recovery deadline at the
 declared bounds in 1.7-10.0\% of periods, most often for smooth arrivals, where a request waits in almost
-every period. When every AI unit and recovery takes its declared bound, its last recovery physically ends
-after the guard in 2.7-9.7\% of periods, and 128 radio results miss the expiry. \sys and recovery-first
-never break the guard, and no radio result misses the expiry in any of their 18 runs. Under the same
+every period. When every AI request and recovery takes its declared bound, its last recovery physically ends
+after the recovery deadline in 2.7-9.7\% of periods, and 128 radio results miss the expiry. \sys and recovery-first
+never miss the recovery deadline, and no radio result misses the expiry in any of their 18 runs. Under the same
 padded execution, \sys serves 10.6-18.5\% more on-time tokens than recovery-first.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_load.pdf}
+  \caption{On-time AI throughput under increasing load with Poisson arrivals. (a) Measured runs with a
+  200~ms SLO; the 3.05 requests/s point is the Poisson run of Figure~\ref{fig:eval-burst}, taken on the
+  other node. (b) Replay with the measured service distributions and a 1,000~ms SLO. Static reservation
+  admits no AI request in this mode.}
+  \Description{Two line charts of on-time AI tokens per second against the offered load. In the first,
+  Backstop stays above recovery-first from two requests per second on, idle-time admission is highest,
+  and static reservation stays at zero. In the second, Backstop and recovery-first overlap, idle-time
+  admission is slightly higher, and static reservation stays at zero.}
+  \label{fig:eval-load}
+\end{figure}
+
+% provenance: C176_LOAD
+\noindent\textbf{Throughput under Load.}
+Figure~\ref{fig:eval-load} raises the offered AI load with Poisson arrivals. With a 200~ms SLO, \sys serves
+10.6-21.2\% more on-time AI tokens than recovery-first from 1.92 to 4.95 requests/s, and the two nearly tie
+at 0.98 requests/s. Static reservation serves no AI request at any load, and idle-time admission serves
+the most but breaks the recovery deadline at the declared bounds in 19-88 of 600 periods. With a
+1,000~ms SLO (Figure~\ref{fig:eval-load}b), \sys and recovery-first reach the same throughput at every
+load because both fit the same AI work and required recoveries into each window. Thus, tracking pending
+recovery sets how much AI one window can hold, and AI-first order sets how much of it meets a tight
+deadline.
 
 \noindent\textbf{Where the Gain Comes From.}
 Figure~\ref{fig:eval-burst}c varies the AI SLO in a replay with the measured service distributions of the
 two-node campaign, averaged over five seeds. The gain of \sys over recovery-first shrinks as the SLO
 loosens: 34.3\% on average at 150~ms, 14.2\% at 200~ms, 5.3\% at 300~ms, and 2.7\% at 500~ms. The measured
 gains at 200~ms, 6.2-18.5\%, lie close to the replay range of 8.8-21.4\%. \sys achieves this gain because it
-certifies an AI lease ahead of the required recoveries, while recovery-first must charge every required
-recovery its full bound before an AI lease can meet its SLO. Thus, the ordering matters for interactive
+places a verified AI slot ahead of the required recoveries, while recovery-first must charge every required
+recovery its full bound before an AI slot can meet its SLO. Thus, the ordering matters for interactive
 AI SLOs and fades for loose ones, consistent with the tie of the original mode in
 Section~\ref{sec:eval-trace}.
 
-\subsection{Radio safety at the certificate boundary}
+\subsection{Radio safety at the admission boundary}
 \label{sec:eval-physical}
 
 % provenance: C162_NECESSITY
-\noindent\textbf{What the certificate prevents.}
+\noindent\textbf{What the Admission Check Prevents.}
 Figure~\ref{fig:eval-safety}a runs three prespecified boundary cases on two independent nodes as a
-bound-padded diagnostic, in which every recovery and AI unit takes its declared bound. In E4, two
-required recoveries remain at 45~ms and a 256-token AI unit is offered; idle-time admission launches it,
-and the last recovery ends 10.6-11.7~ms after the 153~ms guard in every attempt. In E6b, one recovery
-remains and a 64-token unit arrives at 89~ms; launching the unit that \sys rejects moves the last
-recovery 0.4-2.8~ms past the guard. \sys rejects both units, admits the adjacent 88~ms case E6a, and
-ends every attempt before the guard. Across the selected rounds, idle-time admission in E4 violates both
-guard and deadline in 40/40 rounds, the shadow launch in E6b violates the guard in 40/40, and \sys
+bound-padded diagnostic, in which every recovery and AI request takes its declared bound. In E4, two
+required recoveries remain at 45~ms and a 256-token AI request is offered; idle-time admission launches it,
+and the last recovery ends 10.6-11.7~ms after the 153~ms recovery deadline in every attempt. In E6b, one recovery
+remains and a 64-token request arrives at 89~ms; launching the request that \sys rejects moves the last
+recovery 0.4-2.8~ms past the recovery deadline. \sys rejects both requests, admits the adjacent 88~ms case E6a, and
+ends every attempt before the recovery deadline. Across the selected rounds, idle-time admission in E4 misses both the recovery deadline and the expiry in 40/40 rounds, the forced launch in E6b misses the recovery deadline in 40/40, and \sys
 records 0/120 safety violations (95\% rule-of-three upper bound 2.5\%). Jointly bound-valid counts are
 39/39, 39/39, and 0/119, respectively.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_safety.pdf}
-  \caption{Radio safety at the certificate boundary on two nodes. (a) End of the last recovery in every
-  attempt of the bound-padded boundary diagnostic. E4 offers a 256-token unit with two required
-  recoveries at 45~ms; E6b and E6a offer a 64-token unit with one required recovery at 89 and 88~ms.
-  Baseline attempts launch the unit anyway: idle-time admission in E4 and a shadow launch of the unit
-  that \sys rejects in E6b. (b) AI units per prompt length in the two-node campaign: units that \sys
-  runs and units that it rejects because they break the certified recovery bound; idle-time admission
+  \caption{Radio safety at the admission boundary on two nodes. (a) End of the last recovery in every
+  attempt of the bound-padded boundary diagnostic. E4 offers a 256-token request with two required
+  recoveries at 45~ms; E6b and E6a offer a 64-token request with one required recovery at 89 and 88~ms.
+  Baseline attempts launch the request anyway: idle-time admission in E4 and a forced launch of the request
+  that \sys rejects in E6b. (b) AI requests per prompt length in the two-node campaign: requests that \sys
+runs and requests that it rejects because the required recoveries would then miss the recovery deadline; idle-time admission
   would run all of them, and static reservation runs none.}
-  \Description{A strip plot shows baseline attempts ending after the guard in cases E4 and E6b and every
+  \Description{A strip plot shows baseline attempts ending after the recovery deadline in cases E4 and E6b and every
   Backstop attempt ending before it, including the admitted E6a case. A stacked bar chart shows that
-  Backstop executes all 16- to 128-token units and part of the 256- and 512-token units, and that the
-  remaining units would break the recovery bound.}
+  Backstop executes all 16- to 128-token requests and part of the 256- and 512-token requests, and that the
+  remaining requests would break the recovery bound.}
   \label{fig:eval-safety}
 \end{figure}
 
 % provenance: Q2_WARM_PATH
-\noindent\textbf{Rejected Units.}
+\noindent\textbf{Rejected Requests.}
 Figure~\ref{fig:eval-safety}b shows the same boundary in the two-node campaign. \sys executes every
-offered 16-128-token unit and rejects 55 of the 256-token and 68 of the 512-token units before launch.
-These are exactly the units that break the certified recovery bound when two recoveries remain.
-Idle-time admission would launch all 1,200 units, including these 123, and static reservation would
-launch none. Thus, \sys admits every unit that the all-fail schedule allows and no unit that it
+offered 16-128-token request and rejects 55 of the 256-token and 68 of the 512-token requests before launch.
+These are exactly the requests that would push the last of two required recoveries past the recovery
+deadline.
+Idle-time admission would launch all 1,200 requests, including these 123, and static reservation would
+launch none. Thus, \sys admits every request that the all-fail schedule allows and no request that it
 forbids.
 
-\subsection{Execution refinement and fault containment}
+\subsection{Schedule enforcement and fault containment}
 \label{sec:eval-refinement}
 
 \noindent\textbf{Latest-Start Enforcement.}
-A certificate remains valid only if the GPU cannot start a lease later than the certificate assumes.
-Figure~\ref{fig:eval-refinement}a shows the arrival of each lease at the Qwen worker relative to its
-absolute latest-start. All 1,077 leases of the two-node campaign arrive 2.9-3.8~ms before the
-latest-start and launch. The held-lease fault keeps 52 leases until 6.4-7.2~ms after the latest-start, and
+A committed schedule remains valid only if the GPU cannot start a slot later than the schedule assumes.
+Figure~\ref{fig:eval-refinement}a shows the arrival of each slot at the Qwen worker relative to its
+absolute latest-start. All 1,077 slots of the two-node campaign arrive 2.9-3.8~ms before the
+latest-start and launch. The held-slot fault keeps 52 slots until 6.4-7.2~ms after the latest-start, and
 the worker refuses all 52 before GPU launch with a non-launch marker. A launch that ignored the
-latest-start would run these units up to 7.2~ms later than their certificates and push the required
-recoveries toward the guard. \sys achieves this by binding the absolute latest-start to the lease at
+latest-start would run these requests up to 7.2~ms later than their schedules allow and push the required
+recoveries toward the recovery deadline. \sys achieves this by binding the absolute latest-start to the slot at
 commit and by checking it in the worker immediately before kernel submission.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_refinement.pdf}
-  \caption{Execution refinement and radio commit time. (a) Arrival of each AI lease at the Qwen worker
-  relative to its absolute latest-start: the 1,077 leases of the two-node campaign and the 52 leases
-  that the held-lease fault keeps past the latest-start. (b) Commit time of every recovered TB in the
-  two-node campaign, grouped by the prompt length of the AI lease that runs before its recovery; the
+  \caption{Schedule enforcement and radio commit time. (a) Arrival of each AI slot at the Qwen worker
+  relative to its absolute latest-start: the 1,077 slots of the two-node campaign and the 52 slots
+  that the held-slot fault keeps past the latest-start. (b) Commit time of every recovered TB in the
+  two-node campaign, grouped by the prompt length of the AI slot that runs before its recovery; the
   dotted line marks the median commit of the TBs that \NRx decodes. (c) Commit time of every TB under
   each injected fault: no fault, all TBs of a period fail, stale and duplicate \NRx outcomes, a late AI
-  reply after GPU completion, an AI lease held past its latest-start, an AI channel lost before GPU
+  reply after GPU completion, an AI slot held past its latest-start, an AI channel lost before GPU
   completion, and stale and duplicate recovery responses.}
-  \Description{A strip plot shows all campaign leases arriving about three milliseconds before their
-  latest-start and launching, and all held leases arriving six to seven milliseconds after it and being
-  refused. Box plots show recovered TBs committing later after longer AI leases, and every TB of seven
+  \Description{A strip plot shows all campaign slots arriving about three milliseconds before their
+  latest-start and launching, and all held slots arriving six to seven milliseconds after it and being
+  refused. Box plots show recovered TBs committing later after longer AI slots, and every TB of seven
   fault classes committing, all below the 155-millisecond expiry.}
   \label{fig:eval-refinement}
 \end{figure}
@@ -1085,18 +1118,18 @@ commit and by checking it in the worker immediately before kernel submission.
 \noindent\textbf{Radio Commit Time.}
 AI-first placement delays the required recoveries, and Figure~\ref{fig:eval-refinement}b measures this cost
 on every TB of the two-node campaign. The 3,488 TBs with a timely \NRx success commit in the outcome
-batch at a median of 46.1~ms after release, independent of the AI lease. Recovered TBs commit at a
-median of 62.1~ms when no AI lease precedes the recovery, 72.7-73.7~ms after a 16-128-token lease,
-86.0~ms after a 256-token lease, and 116.4~ms after a 512-token lease. The latest commit, 118.022~ms,
+batch at a median of 46.1~ms after release, independent of the AI slot. Recovered TBs commit at a
+median of 62.1~ms when no AI slot precedes the recovery, 72.7-73.7~ms after a 16-128-token slot,
+86.0~ms after a 256-token slot, and 116.4~ms after a 512-token slot. The latest commit, 118.022~ms,
 precedes the 155~ms expiry by 37.0~ms. Thus, AI-first placement moves a recovery commit later by at most
-the certified lease length and never past the expiry, because the certificate charges each lease before
+the scheduled slot length and never past the expiry, because the schedule charges each slot before
 the recoveries that follow it.
 
 % provenance: C160_FAULT
 \noindent\textbf{Fault Containment.}
-A stale message or a lost reply can retire the wrong physical credit even when the schedule is
+A stale message or a lost reply can free the wrong physical credit even when the schedule is
 feasible. Therefore, we combine finite-state checking with physical fault injection. A finite-state
-audit checks 51 combinations of worker epoch, generation, fence, and marker state without an invariant
+audit checks 51 combinations of worker epoch, version, completion, and marker state without an invariant
 violation. The physical campaign injects seven fault classes on the two qualified nodes.
 Figure~\ref{fig:eval-refinement}c shows that every TB in every class commits exactly once before
 expiry. The largest commit time is 125.2~ms when every TB of a period fails and all four recoveries run,
@@ -1113,7 +1146,7 @@ applies to the two qualified nodes and the declared fault and lifecycle classes.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_envelope.pdf}
-  \caption{Predictive scheduling and control cost. (a) Latest decision time at which one AI unit of each
+  \caption{Predictive scheduling and control cost. (a) Latest decision time at which one AI request of each
   prompt length remains admissible with four admitted TBs and zero to four pending recoveries; circles
   and crosses mark the prespecified physical tests that the scheduler admitted and rejected, labeled
   with their prompt length. (b)
@@ -1129,21 +1162,21 @@ applies to the two qualified nodes and the declared fault and lifecycle classes.
 % provenance: C162_ENVELOPE
 \noindent\textbf{Prediction Agreement.}
 Figure~\ref{fig:envelope}a shows the latest decision time at which each AI class remains admissible as
-pending recoveries accumulate. The envelope matches exact feasibility on 16,023 states and all 1,200
+pending recoveries accumulate. The admission limit matches exact feasibility on 16,023 states and all 1,200
 retrospective physical decisions. We then freeze seven boundary cases, their order, and node-specific
 seeds. Across two independent nodes and 180 rounds, model and runtime agree in every round: a 64-token
-unit at 88~ms is admitted in 30/30 rounds, while 89~ms or later is rejected in 30/30. The campaign
-executes 720 \NRx requests, 330 recoveries, 90 Qwen units, and 720 commits without an observed deadline
+request at 88~ms is admitted in 30/30 rounds, while 89~ms or later is rejected in 30/30. The campaign
+executes 720 \NRx requests, 330 recoveries, 90 Qwen requests, and 720 commits without an observed deadline
 miss.
 
 % provenance: C162_SCHEDULER
 \noindent\textbf{Decision Cost.}
-On 600 heterogeneous small states, exact search accepts 504 and the certified candidate accepts 494,
-with zero false-safe and ten false-conservative decisions; on the qualified mode, candidate and exact
+On 600 heterogeneous small states, exact search accepts 504 and the candidate scheduler accepts 494,
+with zero unsafe acceptances and ten needless rejections; on the qualified mode, candidate and exact
 acceptance match all 16,023 states. Figure~\ref{fig:envelope}b scales the candidate to 64 pending
-recoveries on a 2,800-state grid with lane capacities of 1, 2, 4, and 8. Every returned certificate
+recoveries on a 2,800-state grid with lane capacities of 1, 2, 4, and 8. Every returned schedule
 passes the verifier. At 64 pending recoveries, the decision latency is 1.494~ms p99 and 2.197~ms
-maximum, and the verifier latency is 0.131~ms p99, within the 5~ms launch-control charge. \sys achieves
+maximum, and the verifier latency is 0.131~ms p99, within the 5~ms launch budget. \sys achieves
 this cost because the candidate list-schedules only visible jobs and the independent verifier checks
 one proposed schedule.
 
@@ -1153,13 +1186,13 @@ one proposed schedule.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_sensitivity.pdf}
-  \caption{Sensitivity to the recovery bound. (a) End of the last recovery relative to the guard when
-  the unit that \sys rejects runs anyway, against the recovery bound $B_{\mathrm{conv}}$: lines follow
+  \caption{Sensitivity to the recovery bound. (a) End of the last recovery relative to the recovery deadline when
+  the request that \sys rejects runs anyway, against the recovery bound $B_{\mathrm{conv}}$: lines follow
   the bound-respecting schedules of E4 and E6b, and crosses mark the physical attempts measured at the
-  certified 25~ms bound. (b) Fraction of the 1,312 measured recovery times of the two-node campaign that
+  qualified 25~ms bound. (b) Fraction of the 1,312 measured recovery times of the two-node campaign that
   exceed a given length, with the bounds at which E4 and E6b disappear (E4 and E6b limits) and the
-  certified bound.}
-  \Description{A line chart shows the excess of the last recovery past the guard growing linearly with
+  qualified bound.}
+  \Description{A line chart shows the excess of the last recovery past the recovery deadline growing linearly with
   the recovery bound for E4 and E6b, crossing zero at 19 and 24 milliseconds, with physical attempts
   near the lines at 25 milliseconds. A complementary distribution shows all measured recovery paths
   ending below 14 milliseconds, left of both thresholds and the contract.}
@@ -1169,20 +1202,19 @@ one proposed schedule.
 % provenance: C162_NECESSITY
 \noindent\textbf{Recovery Bound.}
 The boundary cases use the qualified $B_{\mathrm{conv}}=25$~ms contract. Figure~\ref{fig:eval-sensitivity}a
-shows how the excess of a rejected unit depends on this bound. The excess of E4 grows by 2~ms and that
+shows how the excess of a rejected request depends on this bound. The excess of E4 grows by 2~ms and that
 of E6b by 1~ms per millisecond of bound because each required recovery adds its bound to the end of the
-last recovery, and the physical attempts measured at the certified bound lie within 1.8~ms of these
+last recovery, and the physical attempts measured at the qualified bound lie within 1.8~ms of these
 lines.
 E6b disappears at or below 24~ms, while E4 remains until 19~ms. Figure~\ref{fig:eval-sensitivity}b
 shows that the 1,312 measured recovery paths have a median of 3.404~ms and a maximum of 13.465~ms,
 below both thresholds. A sample maximum cannot replace a service contract; lowering the bound defines
-another mode and requires requalification, and Proposition~\ref{prop:idletime} still yields a later
-false-safe decision time for every positive bound. Therefore, the padded campaign is a necessity
+another mode and requires requalification, and Proposition~\ref{prop:idletime} still yields a later decision time at which ignoring pending recovery is unsafe, for every positive bound. Therefore, the padded campaign is a necessity
 diagnostic for the declared contract, not a production-rate or WCET claim.
 
 % provenance: Q1_MPS_DIAGNOSTICS
 \noindent\textbf{MPS Configuration.}
-MPS controls concurrency without certifying time. A separate-client overrun produces 2/1,500 deadline
+MPS controls concurrency but does not bound time. A separate-client overrun produces 2/1,500 deadline
 misses at a 100\% cap and 1/1,500 at a 20\% cap, and a matched lifecycle comparison observes 0/10,000
 misses for a CPU socket sham and 12/10,000 for the GPU/MPS-client arm. The two campaigns are reported
 separately and do not imply a monotonic cap effect. Thus, neither the cap selection nor the current
@@ -1200,6 +1232,7 @@ an independent holdout. Durable journal recovery would be a new mechanism and re
 paper.
 
 \section{Related Work}
+\label{sec:related}
 
 \noindent\textbf{GPU Sharing in AI-RAN and vRAN.}
 Previous studies on AI-RAN and virtualized RAN (vRAN) platforms focus on sharing compute between
@@ -1214,7 +1247,7 @@ SLOs~\cite{arches,ocudu,smec}.
 Our study aligns with these efforts to reclaim RAN compute for other workloads. However, their scheduling
 units are resources or queued jobs, and their public designs do not represent the recovery that a
 speculative neural receiver may create. \sys bridges this gap by tracking each pending recovery and by
-joining one all-fail recovery calendar across cuPHY instances to an external-AI lease that holds through
+joining one all-fail recovery calendar across cuPHY instances to an external-AI slot that holds through
 physical completion.
 
 \noindent\textbf{Real-Time GPU Scheduling and Fault-Tolerant Reservation.}
@@ -1228,21 +1261,21 @@ parts and schedules the optional part only when time remains~\cite{liu1991imprec
 
 While our study aligns with these reservation and preemption techniques, preemption and partitioning
 control kernels that are already queued, and backup overloading assumes that primaries do not fail
-together. \sys bridges this gap by certifying the recovery of every pending receiver under the all-fail
-assumption, releasing it on a timely success, and carrying that certificate through GPU launch, transport
-ownership, and physical retirement.
+together. \sys bridges this gap by verifying one all-fail schedule for the recovery of every pending receiver,
+releasing a recovery on a timely success, and enforcing that schedule through GPU launch, transport
+ownership, and physical completion.
 
 \noindent\textbf{Scoped Difference.}
 Across public designs reviewed through September 2026, we found no system that combines an executable
-all-fail calendar for unresolved same-TB recovery, external-AI leasing through physical retirement, and a
-provenance-qualified predictive envelope. This is a scoped literature finding, not a claim about
+all-fail calendar for unresolved same-TB recovery, external-AI slots held until physical completion, and a
+predictive admission limit qualified by measurement conditions. This is a scoped literature finding, not a claim about
 unpublished work or other terminology.
 
 \section{Limitations}
 \label{sec:limitations}
 
 \noindent\textbf{Claim Boundary.}
-The guarantee is conditional on the qualified bounds and provenance of the evaluated mode. \sys does
+The guarantee is conditional on the qualified bounds and measurement conditions of the evaluated mode. \sys does
 not claim that MPS provides hard isolation, that finite-sample maxima are WCETs, or that the synthetic
 timing contract is a production HARQ deadline. Five lifecycle subsets are qualified or partially
 qualified and five remain \UQ; the claim does not require or imply a 10/10 lifecycle matrix.
@@ -1299,12 +1332,12 @@ replay qualification.
 
 \section{Conclusion}
 
-In this paper, we present \sys, a recovery-certified multi-GPU scheduler that shares AI-RAN GPUs
+In this paper, we present \sys, a recovery-safe multi-GPU scheduler that shares AI-RAN GPUs
 between neural receivers and AI inference. By
 tracking each pending recovery and admitting AI only with an executable all-fail schedule, \sys keeps
 radio recovery within its deadline while it reclaims the GPU capacity that neural-receiver success
 releases. Our evaluation shows that \sys reaches the oracle AI capacity across 13,716 feasible model
-points and delivers a median of 1.44$\times$ the timely AI value of certificate-preserving recovery-first
+points and delivers a median of 1.44$\times$ the timely AI value of recovery-first
 at the trace headroom points. On two four-GPU nodes, \sys records 0/120 safety violations in boundary cases
 where idle-time admission violates 40/40, serves 6.2-18.5\% more on-time AI tokens than recovery-first
 under bursty AI arrivals, and commits every TB exactly once under seven injected fault classes. These results qualify a synthetic timing mode, not

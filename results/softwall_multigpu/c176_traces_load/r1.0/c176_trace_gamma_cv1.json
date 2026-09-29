@@ -1,0 +1,773 @@
+{
+ "schema": "softwall-c176-burst-trace-v1",
+ "source": {
+  "path": "data/public/burstgpt/BurstGPT_1.csv",
+  "sha256": "46fc9480ef0b748ecb2b51d512ff08c196b031782cbe6f78e28044d768e86d5a",
+  "window_first_row": 367022,
+  "window_requests": 106,
+  "window_start_timestamp_s": 1355672.0,
+  "window_cv": 0.5241982677525293,
+  "median_cv_of_candidates": 0.5241982677525293,
+  "candidates": 2000,
+  "rule": "first qualifying windows with a request count within 5% of rate x duration; choose the window whose CV is closest to their median CV"
+ },
+ "summary": {
+  "pattern": "gamma_cv1",
+  "requests": 106,
+  "duration_s": 108.0,
+  "rate_per_s": 0.9814814814814815,
+  "interarrival_cv": 1.0596021680945404,
+  "bucket_counts": {
+   "16": 1,
+   "32": 1,
+   "64": 4,
+   "128": 25,
+   "256": 27,
+   "512": 48
+  }
+ },
+ "requests": [
+  {
+   "request_id": "c176-gamma_cv1-00000",
+   "arrival_ms": 0.0,
+   "raw_request_tokens": 200,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00001",
+   "arrival_ms": 55.268,
+   "raw_request_tokens": 133,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00002",
+   "arrival_ms": 500.051,
+   "raw_request_tokens": 2437,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00003",
+   "arrival_ms": 898.001,
+   "raw_request_tokens": 3245,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00004",
+   "arrival_ms": 1306.765,
+   "raw_request_tokens": 2238,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00005",
+   "arrival_ms": 2060.209,
+   "raw_request_tokens": 208,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00006",
+   "arrival_ms": 2118.588,
+   "raw_request_tokens": 392,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00007",
+   "arrival_ms": 2651.161,
+   "raw_request_tokens": 111,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00008",
+   "arrival_ms": 3929.827,
+   "raw_request_tokens": 102,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00009",
+   "arrival_ms": 5418.627,
+   "raw_request_tokens": 78,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00010",
+   "arrival_ms": 8487.826,
+   "raw_request_tokens": 289,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00011",
+   "arrival_ms": 11646.882,
+   "raw_request_tokens": 183,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00012",
+   "arrival_ms": 12068.936,
+   "raw_request_tokens": 221,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00013",
+   "arrival_ms": 12416.606,
+   "raw_request_tokens": 1192,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00014",
+   "arrival_ms": 12715.283,
+   "raw_request_tokens": 226,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00015",
+   "arrival_ms": 12881.691,
+   "raw_request_tokens": 68,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00016",
+   "arrival_ms": 13032.699,
+   "raw_request_tokens": 219,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00017",
+   "arrival_ms": 14840.028,
+   "raw_request_tokens": 63,
+   "context_length": 64,
+   "value_tokens": 64
+  },
+  {
+   "request_id": "c176-gamma_cv1-00018",
+   "arrival_ms": 15216.125,
+   "raw_request_tokens": 108,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00019",
+   "arrival_ms": 16753.336,
+   "raw_request_tokens": 1176,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00020",
+   "arrival_ms": 19023.618,
+   "raw_request_tokens": 204,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00021",
+   "arrival_ms": 20237.873,
+   "raw_request_tokens": 59,
+   "context_length": 64,
+   "value_tokens": 64
+  },
+  {
+   "request_id": "c176-gamma_cv1-00022",
+   "arrival_ms": 21458.883,
+   "raw_request_tokens": 350,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00023",
+   "arrival_ms": 22093.43,
+   "raw_request_tokens": 596,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00024",
+   "arrival_ms": 22910.364,
+   "raw_request_tokens": 404,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00025",
+   "arrival_ms": 23795.735,
+   "raw_request_tokens": 637,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00026",
+   "arrival_ms": 25805.825,
+   "raw_request_tokens": 496,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00027",
+   "arrival_ms": 25821.81,
+   "raw_request_tokens": 71,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00028",
+   "arrival_ms": 25828.549,
+   "raw_request_tokens": 110,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00029",
+   "arrival_ms": 26918.601,
+   "raw_request_tokens": 108,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00030",
+   "arrival_ms": 28007.202,
+   "raw_request_tokens": 1734,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00031",
+   "arrival_ms": 28999.848,
+   "raw_request_tokens": 74,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00032",
+   "arrival_ms": 29800.444,
+   "raw_request_tokens": 2676,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00033",
+   "arrival_ms": 30304.562,
+   "raw_request_tokens": 108,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00034",
+   "arrival_ms": 31004.265,
+   "raw_request_tokens": 94,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00035",
+   "arrival_ms": 31551.791,
+   "raw_request_tokens": 830,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00036",
+   "arrival_ms": 32367.298,
+   "raw_request_tokens": 481,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00037",
+   "arrival_ms": 32656.187,
+   "raw_request_tokens": 827,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00038",
+   "arrival_ms": 32986.535,
+   "raw_request_tokens": 64,
+   "context_length": 64,
+   "value_tokens": 64
+  },
+  {
+   "request_id": "c176-gamma_cv1-00039",
+   "arrival_ms": 35376.943,
+   "raw_request_tokens": 113,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00040",
+   "arrival_ms": 35394.777,
+   "raw_request_tokens": 736,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00041",
+   "arrival_ms": 35906.233,
+   "raw_request_tokens": 206,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00042",
+   "arrival_ms": 42448.561,
+   "raw_request_tokens": 319,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00043",
+   "arrival_ms": 43440.559,
+   "raw_request_tokens": 138,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00044",
+   "arrival_ms": 44751.919,
+   "raw_request_tokens": 89,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00045",
+   "arrival_ms": 46869.372,
+   "raw_request_tokens": 117,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00046",
+   "arrival_ms": 48212.889,
+   "raw_request_tokens": 638,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00047",
+   "arrival_ms": 48619.796,
+   "raw_request_tokens": 257,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00048",
+   "arrival_ms": 50402.599,
+   "raw_request_tokens": 156,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00049",
+   "arrival_ms": 50691.215,
+   "raw_request_tokens": 76,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00050",
+   "arrival_ms": 52610.575,
+   "raw_request_tokens": 180,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00051",
+   "arrival_ms": 53218.27,
+   "raw_request_tokens": 131,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00052",
+   "arrival_ms": 53308.043,
+   "raw_request_tokens": 297,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00053",
+   "arrival_ms": 53471.292,
+   "raw_request_tokens": 2285,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00054",
+   "arrival_ms": 56331.886,
+   "raw_request_tokens": 302,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00055",
+   "arrival_ms": 56356.909,
+   "raw_request_tokens": 416,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00056",
+   "arrival_ms": 59529.256,
+   "raw_request_tokens": 1099,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00057",
+   "arrival_ms": 61300.062,
+   "raw_request_tokens": 750,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00058",
+   "arrival_ms": 64437.29,
+   "raw_request_tokens": 86,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00059",
+   "arrival_ms": 64437.671,
+   "raw_request_tokens": 344,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00060",
+   "arrival_ms": 64839.198,
+   "raw_request_tokens": 447,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00061",
+   "arrival_ms": 65655.532,
+   "raw_request_tokens": 79,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00062",
+   "arrival_ms": 67096.313,
+   "raw_request_tokens": 284,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00063",
+   "arrival_ms": 67800.862,
+   "raw_request_tokens": 199,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00064",
+   "arrival_ms": 67925.577,
+   "raw_request_tokens": 3750,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00065",
+   "arrival_ms": 68048.508,
+   "raw_request_tokens": 25,
+   "context_length": 32,
+   "value_tokens": 32
+  },
+  {
+   "request_id": "c176-gamma_cv1-00066",
+   "arrival_ms": 68247.262,
+   "raw_request_tokens": 86,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00067",
+   "arrival_ms": 68491.989,
+   "raw_request_tokens": 247,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00068",
+   "arrival_ms": 68903.69,
+   "raw_request_tokens": 210,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00069",
+   "arrival_ms": 69558.409,
+   "raw_request_tokens": 407,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00070",
+   "arrival_ms": 69836.388,
+   "raw_request_tokens": 891,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00071",
+   "arrival_ms": 70702.474,
+   "raw_request_tokens": 81,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00072",
+   "arrival_ms": 73265.686,
+   "raw_request_tokens": 203,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00073",
+   "arrival_ms": 73311.905,
+   "raw_request_tokens": 116,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00074",
+   "arrival_ms": 76100.492,
+   "raw_request_tokens": 587,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00075",
+   "arrival_ms": 79164.666,
+   "raw_request_tokens": 390,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00076",
+   "arrival_ms": 79259.989,
+   "raw_request_tokens": 551,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00077",
+   "arrival_ms": 79344.088,
+   "raw_request_tokens": 299,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00078",
+   "arrival_ms": 82595.652,
+   "raw_request_tokens": 568,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00079",
+   "arrival_ms": 82639.37,
+   "raw_request_tokens": 153,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00080",
+   "arrival_ms": 83442.195,
+   "raw_request_tokens": 269,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00081",
+   "arrival_ms": 84679.959,
+   "raw_request_tokens": 253,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00082",
+   "arrival_ms": 84764.317,
+   "raw_request_tokens": 144,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00083",
+   "arrival_ms": 84918.61,
+   "raw_request_tokens": 202,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00084",
+   "arrival_ms": 87778.158,
+   "raw_request_tokens": 59,
+   "context_length": 64,
+   "value_tokens": 64
+  },
+  {
+   "request_id": "c176-gamma_cv1-00085",
+   "arrival_ms": 88040.431,
+   "raw_request_tokens": 1228,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00086",
+   "arrival_ms": 88443.212,
+   "raw_request_tokens": 192,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00087",
+   "arrival_ms": 88878.201,
+   "raw_request_tokens": 2451,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00088",
+   "arrival_ms": 89345.518,
+   "raw_request_tokens": 216,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00089",
+   "arrival_ms": 90116.489,
+   "raw_request_tokens": 196,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00090",
+   "arrival_ms": 91186.618,
+   "raw_request_tokens": 135,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00091",
+   "arrival_ms": 92029.158,
+   "raw_request_tokens": 117,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00092",
+   "arrival_ms": 92909.84,
+   "raw_request_tokens": 348,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00093",
+   "arrival_ms": 93832.471,
+   "raw_request_tokens": 1974,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00094",
+   "arrival_ms": 95301.692,
+   "raw_request_tokens": 218,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00095",
+   "arrival_ms": 95763.138,
+   "raw_request_tokens": 13,
+   "context_length": 16,
+   "value_tokens": 16
+  },
+  {
+   "request_id": "c176-gamma_cv1-00096",
+   "arrival_ms": 95824.441,
+   "raw_request_tokens": 117,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00097",
+   "arrival_ms": 98477.258,
+   "raw_request_tokens": 366,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00098",
+   "arrival_ms": 99388.533,
+   "raw_request_tokens": 920,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00099",
+   "arrival_ms": 99676.293,
+   "raw_request_tokens": 97,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00100",
+   "arrival_ms": 100248.93,
+   "raw_request_tokens": 65,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00101",
+   "arrival_ms": 100462.314,
+   "raw_request_tokens": 655,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00102",
+   "arrival_ms": 101317.656,
+   "raw_request_tokens": 255,
+   "context_length": 256,
+   "value_tokens": 256
+  },
+  {
+   "request_id": "c176-gamma_cv1-00103",
+   "arrival_ms": 101352.029,
+   "raw_request_tokens": 116,
+   "context_length": 128,
+   "value_tokens": 128
+  },
+  {
+   "request_id": "c176-gamma_cv1-00104",
+   "arrival_ms": 101718.135,
+   "raw_request_tokens": 975,
+   "context_length": 512,
+   "value_tokens": 512
+  },
+  {
+   "request_id": "c176-gamma_cv1-00105",
+   "arrival_ms": 103289.082,
+   "raw_request_tokens": 3029,
+   "context_length": 512,
+   "value_tokens": 512
+  }
+ ]
+}

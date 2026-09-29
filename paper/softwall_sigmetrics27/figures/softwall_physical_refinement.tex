@@ -1,4 +1,4 @@
-% Certificate-to-execution refinement as the evaluated message sequence. The
+% Enforcement of one AI slot as the evaluated message sequence. The
 % lease stages, the launch/completion marker files, the latest-start gate, and
 % the four injected fault arms follow the evaluated coordinator, AI worker, and
 % fault-state model. Black numbers are the normal path; red numbers are faults.
@@ -13,7 +13,7 @@
 
   % (1) Commit a lease with an absolute latest-start.
   \node[comp, fill=aic, minimum width=2.3cm, minimum height=0.46cm] at (1.5,4.45)
-    {commit lease $L$\\generation $g{+}1$};
+    {commit AI slot $L$\\version $g{+}1$};
   \node[num] at (0.18,4.45) {1};
 
   % (2) Run request.
@@ -46,7 +46,7 @@
 
   % (5) Retire only with matching physical evidence.
   \node[comp, fill=okc, draw=green!45!black, minimum width=2.3cm, minimum height=0.46cm]
-    at (1.5,1.2) {retire $L$ on marker\\generation $g{+}2$};
+    at (1.5,1.2) {free $L$ on marker\\version $g{+}2$};
   \node[num] at (0.18,1.2) {5};
 
   % Fault 1: a late or lost reply after the fence is reconciled from the marker.

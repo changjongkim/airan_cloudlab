@@ -13,7 +13,7 @@
   % ---------------------------------------------------- guard and expiry
   \draw[guard] ({\swT{153}},0.95) -- ({\swT{153}},4.8);
   \draw[expiry] ({\swT{155}},0.95) -- ({\swT{155}},4.8);
-  \node[font=\itshape\tiny, text=dred, anchor=east] at ({\swT{153}},4.92) {guard};
+  \node[font=\itshape\tiny, text=dred, anchor=east] at ({\swT{153}},4.92) {recovery deadline};
   \node[font=\itshape\tiny, anchor=west] at ({\swT{155}},4.92) {expiry};
 
   % --------------------------------------------------------------- axis
@@ -48,9 +48,9 @@
   \swJob{3.45}{70}{95}{recc}{TB4}
   \node[job, draw=green!45!black, dashed, fill=okc, minimum height=0.4cm,
         minimum width={(153-95)*0.0555 cm}, anchor=west, font=\itshape\scriptsize]
-    at ({\swT{95}},3.45) {free until the guard};
+    at ({\swT{95}},3.45) {free until the deadline};
   \node[comp, fill=debtc, minimum width=2.0cm, minimum height=0.4cm] at (12.9,3.45)
-    {$X_t$: generation $g$};
+    {$X_t$: version $g$};
 
   \draw[black!40, dashed, line width=0.4pt] (0.1,2.93) -- (13.8,2.93);
 
@@ -59,7 +59,7 @@
   % Row 3: context-128 lease first, recoveries retimed before the guard.
   \node[num] at (0.55,2.4) {3};
   \node[font=\scriptsize, align=left, anchor=west] at (0.75,2.4)
-    {\textbf{Candidate $X'$ (128 tokens)}\\\textit{AI lease first, recoveries retimed}};
+    {\textbf{Candidate $X'$ (128 tokens)}\\\textit{AI slot first, recoveries retimed}};
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.4cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},2.4) {};
   \swJob{2.4}{50}{90}{aic}{AI, 128 tokens}
@@ -71,7 +71,7 @@
   % Row 4: context-256 lease pushes the last recovery past the guard.
   \node[num] at (0.55,1.5) {3};
   \node[font=\scriptsize, align=left, anchor=west] at (0.75,1.5)
-    {\textbf{Candidate $X'$ (256 tokens)}\\\textit{AI lease first, recoveries retimed}};
+    {\textbf{Candidate $X'$ (256 tokens)}\\\textit{AI slot first, recoveries retimed}};
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.4cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},1.5) {};
   \swJob{1.5}{50}{115}{aic}{AI, 256 tokens}
@@ -83,6 +83,6 @@
     {\xmark\ reject, keep $X_t$};
   \node[num] at (11.5,2.4) {4};
   \node[num] at (11.5,1.5) {4};
-  \node[inote, anchor=west] at ({\swT{45}},1.12) {hatched: 5 ms launch-control charge};
+  \node[inote, anchor=west] at ({\swT{45}},1.12) {hatched: 5 ms launch budget};
 \end{tikzpicture}%
 }

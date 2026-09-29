@@ -27,7 +27,7 @@ release_lead_ms=${SOFTWALL_C176_RELEASE_LEAD_MS:-3000}
 prefix=${SOFTWALL_C176_PREFIX:-c176}
 prespec="$SOFTWALL_ROOT/results/softwall_multigpu/confirm159_experiment_prespec_v1.json"
 result_root="$SOFTWALL_ROOT/results/softwall_multigpu"
-trace_dir="$result_root/c176_traces"
+trace_dir=${SOFTWALL_C176_TRACE_DIR:-$result_root/c176_traces}
 raw="$result_root/raw"
 mkdir -p "$raw" "$SOFTWALL_ROOT/mps/$SLURM_JOB_ID"
 

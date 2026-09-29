@@ -20,7 +20,7 @@ import re
 import statistics
 from pathlib import Path
 
-LABEL = re.compile(r"^(?P<prefix>c176)_(?P<pattern>[a-z0-9_]+?)_(?P<policy>backstop|recovery_first|idle_time)_"
+LABEL = re.compile(r"^(?P<prefix>c176[a-z0-9]*)_(?P<pattern>[a-z0-9_]+?)_(?P<policy>backstop|recovery_first|idle_time)_"
                    r"(?P<mode>natural|padded)_j(?P<job>\d+)_coordinator\.json$")
 
 
@@ -57,6 +57,7 @@ def summarize_run(path: Path, match) -> dict:
     outcome_sequence = [sorted(tuple(key) for key in row["success_keys"]) for row in rounds]
     return {
         "label": path.name.replace("_coordinator.json", ""),
+        "prefix": match["prefix"],
         "pattern": match["pattern"], "policy": match["policy"], "mode": match["mode"], "job": match["job"],
         "host": run["host"], "error": run["error"], "completed_rounds": run["completed_rounds"],
         "iterations": run["iterations"], "slo_ms": run["slo_ms"], "max_leases": run["max_leases"],
@@ -89,10 +90,16 @@ def main() -> None:
     parser.add_argument("--traces", type=Path, required=True)
     parser.add_argument("--jobs", nargs="+", required=True, help="Slurm job ids of the campaign")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--prefix-traces", nargs="*", default=[],
+                        help="PREFIX=DIR pairs for runs whose traces live outside --traces")
     args = parser.parse_args()
+    trace_dirs = {"c176": args.traces}
+    for item in args.prefix_traces:
+        prefix, directory = item.split("=", 1)
+        trace_dirs[prefix] = Path(directory)
 
     runs = []
-    for path in sorted(args.raw.glob("c176_*_coordinator.json")):
+    for path in sorted(args.raw.glob("c176*_coordinator.json")):
         match = LABEL.match(path.name)
         if match and match["job"] in args.jobs:
             runs.append(summarize_run(path, match))
@@ -100,23 +107,28 @@ def main() -> None:
         raise SystemExit("no C176 runs found for the given jobs")
     trace_summary = json.loads((args.traces / "c176_trace_summary.json").read_text())
     for run in runs:
-        trace = json.loads((args.traces / f"c176_trace_{run['pattern']}.json").read_text())
+        directory = trace_dirs[run["prefix"]]
+        run["trace_dir"] = str(directory)
+        trace = json.loads((directory / f"c176_trace_{run['pattern']}.json").read_text())
         run["offered_tokens_per_s"] = (sum(row["value_tokens"] for row in trace["requests"])
                                        / (run["iterations"] * 0.18))
         run["interarrival_cv"] = trace["summary"]["interarrival_cv"]
-        run["trace_sha256"] = sha256(args.traces / f"c176_trace_{run['pattern']}.json")
+        run["trace_sha256"] = sha256(directory / f"c176_trace_{run['pattern']}.json")
+        run["offered_rate_per_s"] = trace["summary"]["rate_per_s"]
 
     # Paired radio: one NeuralRx outcome sequence per pattern, mode, and node.
     paired = {}
     for run in runs:
-        paired.setdefault((run["pattern"], run["mode"], run["host"]), set()).add(run["outcome_sequence_sha256"])
+        paired.setdefault((run["prefix"], run["pattern"], run["mode"], run["host"]), set()).add(
+            run["outcome_sequence_sha256"])
     comparisons = []
-    for (pattern, mode) in sorted({(run["pattern"], run["mode"]) for run in runs}):
-        group = {run["policy"]: run for run in runs if run["pattern"] == pattern and run["mode"] == mode}
+    for (prefix, pattern, mode) in sorted({(run["prefix"], run["pattern"], run["mode"]) for run in runs}):
+        group = {run["policy"]: run for run in runs
+                 if run["prefix"] == prefix and run["pattern"] == pattern and run["mode"] == mode}
         if {"backstop", "recovery_first"} <= set(group):
             backstop, recovery = group["backstop"], group["recovery_first"]
             comparisons.append({
-                "pattern": pattern, "mode": mode,
+                "prefix": prefix, "pattern": pattern, "mode": mode,
                 "backstop_over_recovery_first_tokens": (backstop["on_time_tokens_per_s"]
                                                          / max(recovery["on_time_tokens_per_s"], 1e-9)),
                 "backstop_over_idle_time_tokens": (backstop["on_time_tokens_per_s"]
@@ -127,8 +139,8 @@ def main() -> None:
         "schema": "softwall-c176-burst-campaign-v1",
         "jobs": args.jobs,
         "trace_source": trace_summary["source"],
-        "runs": sorted(runs, key=lambda run: (run["mode"], run["interarrival_cv"], run["policy"])),
-        "paired_outcomes_identical": {f"{k[0]}|{k[1]}|{k[2]}": len(v) == 1 for k, v in paired.items()},
+        "runs": sorted(runs, key=lambda run: (run["prefix"], run["mode"], run["interarrival_cv"], run["policy"])),
+        "paired_outcomes_identical": {"|".join(k): len(v) == 1 for k, v in paired.items()},
         "comparisons": comparisons,
         "all_runs_completed": all(run["error"] is None and run["completed_rounds"] == run["iterations"]
                                   for run in runs),

@@ -158,7 +158,7 @@ def main():
         "ccs_and_keywords_present": r"\begin{CCSXML}" in tex and r"\keywords{" in tex,
         "formal_contract_present": (
             "All-fail dominance" in tex
-            and "Certificate-to-execution refinement" in tex
+            and "Recovery, ownership, and single commit" in tex
             and r"T_{\mathrm{dec},h}+b_{\mathrm{eff}}" in tex
         ),
         "four_way_envelope_present": all(x in tex for x in [r"\QSU", r"\QSN", r"\MI", r"\UQ"]),
@@ -192,8 +192,8 @@ def main():
             and necessity["summary"]["maximum_contract_excess_ms"] == 12
             and necessity["contract_sensitivity"]["thresholds"]["19_ms_lt_B_conv_le_24_ms"]
                 == "E6b disappears but E4 remains false-safe"
-            and "What the certificate prevents" in tex
-            and "certificate-preserving recovery-first" in tex
+            and "What the Admission Check Prevents" in tex
+            and r"\emph{recovery-first} policy is an ablation of \sys" in normalized_tex
             and "bound-padded diagnostic" in tex
             and "40/40" in tex
             and "E6b disappears at or below 24" in tex

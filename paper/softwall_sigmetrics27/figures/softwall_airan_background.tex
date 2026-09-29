@@ -18,7 +18,7 @@
   \node[font=\itshape\tiny, anchor=south] at ({\swT{45}},2.95) {NeuralRx deadline};
   \draw[guard] ({\swT{153}},0.55) -- ({\swT{153}},2.95);
   \draw[expiry] ({\swT{155}},0.55) -- ({\swT{155}},2.95);
-  \node[font=\itshape\tiny, text=dred, anchor=south east] at ({\swT{153}},2.95) {guard};
+  \node[font=\itshape\tiny, text=dred, anchor=south east] at ({\swT{153}},2.95) {recovery deadline};
   \node[font=\itshape\tiny, anchor=south west] at ({\swT{155}},2.95) {expiry};
 
   % Owner row: release, pending recovery until the outcome, one commit, next release.
@@ -49,7 +49,7 @@
   \node[job, fill=recc, minimum height=0.36cm, minimum width={25*0.0556 cm}, anchor=west]
     at ({\swT{70}},0.95) {cuPHY};
   \node[font=\itshape\scriptsize, anchor=west, fill=white, inner sep=1pt] at ({\swT{101}},0.95)
-    {window ends at the guard};
+    {recovery window};
   \draw[arr, draw=dred] ({\swT{95}},1.13) -- ({\swT{100}},2.27);
 
   % Axis.

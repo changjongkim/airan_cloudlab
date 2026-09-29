@@ -11,7 +11,7 @@
   % ---------------------------------------------------- guard and expiry
   \draw[guard] ({\swT{153}},0.62) -- ({\swT{153}},4.1);
   \draw[expiry] ({\swT{155}},0.62) -- ({\swT{155}},4.1);
-  \node[font=\itshape\tiny, text=dred, anchor=east] at ({\swT{153}},4.2) {guard};
+  \node[font=\itshape\tiny, text=dred, anchor=east] at ({\swT{153}},4.2) {recovery deadline};
   \node[font=\itshape\tiny, anchor=west] at ({\swT{155}},4.2) {expiry};
 
   % (a) Idle-time admission: the queue is empty at the NeuralRx deadline.
@@ -26,7 +26,7 @@
         minimum width={25*0.0555 cm}, anchor=west] at ({\swT{140}},3.7) {};
   \node[font=\bfseries\scriptsize] at ({\swT{146.5}},3.7) {TB4};
   \node[comp, draw=dred, minimum width=2.1cm, minimum height=0.38cm] at (12.75,3.7)
-    {\xmark\ recovery misses guard};
+    {\xmark\ recovery misses deadline};
 
   % (b) Static reservation: successful TBs keep their reservations.
   \node[font=\bfseries\scriptsize] at (0.18,2.9) {(b)};
@@ -45,10 +45,10 @@
   \node[comp, draw=dred, minimum width=2.1cm, minimum height=0.38cm] at (12.75,2.65)
     {\xmark\ 128-token AI rejected};
 
-  % (c) Per-instance certificates: each cuPHY instance is feasible alone, not on one lane.
+  % (c) Per-instance schedules: each cuPHY instance is feasible alone, not on one lane.
   \node[font=\bfseries\scriptsize] at (0.18,1.85) {(c)};
   \node[font=\scriptsize, align=left, anchor=west] at (0.45,1.35)
-    {\textbf{Per-instance certificates}\\\textit{each cuPHY checked alone}};
+    {\textbf{Per-instance schedules}\\\textit{each cuPHY instance checked alone}};
   \node[font=\itshape\tiny, anchor=west] at ({\swT{121}},1.6) {cuPHY 0};
   \node[font=\itshape\tiny, anchor=west] at ({\swT{97.5}},1.1) {cuPHY 1};
   \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,

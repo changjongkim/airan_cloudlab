@@ -1,5 +1,5 @@
 % Backstop architecture. The control layer is placement-independent: per-TB
-% decision pages, the pending-recovery table, the recovery-lane certificate, and
+% decision pages, the pending-recovery table, the recovery-lane schedule, and
 % the independent verifier. Below it are two separate placements: (a) a single
 % GPU whose processes share CUDA IPC rings and (b) the evaluated multi-GPU node
 % connected by CUDA IPC handles over NVLink P2P. The numbered cross-layer steps
@@ -22,7 +22,7 @@
   \node[hcell, minimum height=0.28cm, minimum width=0.58cm] at (0.38,6.17) {TB};
   \node[hcell, minimum height=0.28cm, minimum width=0.98cm] at (0.96,6.17) {outcome};
   \node[hcell, minimum height=0.28cm, minimum width=1.20cm] at (1.94,6.17) {action};
-  \node[hcell, minimum height=0.28cm, minimum width=0.48cm] at (3.14,6.17) {gen};
+  \node[hcell, minimum height=0.28cm, minimum width=0.48cm] at (3.14,6.17) {ver};
   \foreach \y/\tb/\oc/\ocf/\ac in {
       5.89/TB1/{\cmark\ timely}/okc/success,
       5.61/TB2/{\cmark\ timely}/okc/success,
@@ -54,9 +54,9 @@
   \draw[black!60, line width=0.5pt] (4.36,5.75) -- (6.98,5.75);
   \draw[black!60, line width=0.5pt] (4.36,5.47) -- (6.98,5.47);
 
-  % Recovery-lane certificate: current state and candidate lease.
+  % Recovery-lane schedule: current state and candidate AI slot.
   \draw[sub] (7.65,4.6) rectangle (11.45,6.55);
-  \node[pttl, anchor=west] at (7.8,6.37) {Recovery-lane certificate};
+  \node[pttl, anchor=west] at (7.8,6.37) {Recovery-lane schedule};
   \node[font=\scriptsize, anchor=west] at (7.73,5.87) {$X_t$};
   \node[font=\scriptsize, anchor=west] at (7.73,5.37) {$X'$};
   \node[job, fill=recc, minimum width=0.675cm, minimum height=0.34cm, anchor=west]
@@ -66,7 +66,7 @@
   \node[job, pattern=north east lines, pattern color=black!60, minimum width=0.135cm,
         minimum height=0.34cm, anchor=west] at ({\swT{45}},5.37) {};
   \node[job, fill=aic, minimum width=1.08cm, minimum height=0.34cm, anchor=west]
-    at ({\swT{50}},5.37) {AI lease};
+    at ({\swT{50}},5.37) {AI slot};
   \node[job, fill=recc, minimum width=0.675cm, minimum height=0.34cm, anchor=west]
     at ({\swT{90}},5.37) {TB3};
   \node[job, fill=recc, minimum width=0.675cm, minimum height=0.34cm, anchor=west]
@@ -80,7 +80,7 @@
   \node[font=\tiny, anchor=east] at ({\swT{140}+0.05},4.79) {140};
   \node[font=\tiny, anchor=west] at ({\swT{153}-0.05},4.79) {153};
   \draw[guard] ({\swT{153}},4.97) -- ({\swT{153}},6.13);
-  \node[font=\itshape\tiny, text=dred] at ({\swT{153}},6.23) {guard};
+  \node[font=\itshape\tiny, text=dred] at ({\swT{153}},6.23) {deadline};
 
   % Independent verifier.
   \draw[sub] (12.0,4.6) rectangle (13.7,6.55);
@@ -211,11 +211,11 @@
   \draw[arr, draw=dblue] (12.85,6.55) -- (12.85,6.77) -- (2.0,6.77) -- (2.0,6.55);
   \node[num] at (7.0,6.77) {5};
   \node[note, text=dblue, anchor=west, fill=panel, inner sep=1pt] at (7.2,6.77)
-    {dispatch: action and generation};
+    {dispatch: action and version};
   % (6) One lease with an absolute latest-start.
   \draw[arr, draw=dblue] (13.3,4.6) -- (13.3,3.1);
   \node[num] at (13.02,4.25) {6};
-  \node[inote, text=dblue, anchor=east] at (12.82,4.25) {AI lease, latest start};
+  \node[inote, text=dblue, anchor=east] at (12.82,4.25) {AI slot, latest start};
   % (7) A completion or non-launch marker retires the lease.
   \draw[arr, draw=green!45!black, line width=1.1pt]
     (13.475,1.4) -- (14.45,1.4) -- (14.45,5.85) -- (13.7,5.85);
@@ -223,9 +223,9 @@
 
   % Legend.
   \node[font=\itshape\scriptsize, align=center] at (6.95,-0.17)
-    {TB: uplink transport block \quad AI lease: one bounded Qwen prefill unit \quad
-     hatched: 5 ms launch-control charge \quad $\hat{H}$: channel estimate\\
-     gen: generation \quad $c$: recovery bound \quad NRx, rec: NeuralRx and recovery path \quad
+    {TB: uplink transport block \quad AI slot: GPU time for one Qwen prefill request \quad
+     hatched: 5 ms launch budget \quad $\hat{H}$: channel estimate\\
+     ver: version \quad $c$: recovery bound \quad NRx, rec: NeuralRx and recovery path \quad
      $X_t$, $X'$: current and candidate schedule};
 \end{tikzpicture}%
 }

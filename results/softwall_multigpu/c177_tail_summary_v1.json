@@ -1,0 +1,1538 @@
+{
+ "schema": "softwall-c177-tail-summary-v1",
+ "multi": {
+  "runs": 39,
+  "nrx_path_ms": {
+   "count": 93600,
+   "p50": 4.994174,
+   "p99": 6.920956,
+   "max": 34.719919,
+   "bound": 45.0,
+   "over_bound": 0
+  },
+  "recovery_path_ms": {
+   "count": 27651,
+   "p50": 2.968178,
+   "p99": 4.284625,
+   "max": 14.088697,
+   "bound": 25.0,
+   "over_bound": 0
+  },
+  "ai_execution_ms": {
+   "16": {
+    "count": 60,
+    "p50": 21.966633,
+    "p99": 23.902976,
+    "max": 24.079256,
+    "bound": 35,
+    "over_bound": 0
+   },
+   "32": {
+    "count": 100,
+    "p50": 21.228997,
+    "p99": 23.918837,
+    "max": 24.02918,
+    "bound": 35,
+    "over_bound": 0
+   },
+   "64": {
+    "count": 336,
+    "p50": 21.352875,
+    "p99": 24.982142,
+    "max": 29.377941,
+    "bound": 35,
+    "over_bound": 0
+   },
+   "128": {
+    "count": 1472,
+    "p50": 21.500912,
+    "p99": 24.667524,
+    "max": 31.914663,
+    "bound": 40,
+    "over_bound": 0
+   },
+   "256": {
+    "count": 1287,
+    "p50": 27.679214,
+    "p99": 30.977364,
+    "max": 41.314985,
+    "bound": 65,
+    "over_bound": 0
+   },
+   "512": {
+    "count": 2115,
+    "p50": 51.277448,
+    "p99": 52.385284,
+    "max": 53.448568,
+    "bound": 75,
+    "over_bound": 0
+   }
+  },
+  "ai_executions": 5370,
+  "ai_overruns": [],
+  "first_period_missing_outcomes": [],
+  "failed_runs": [],
+  "radio_commits": 93600,
+  "radio_deadline_misses": [
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 6,
+    "release_to_commit_ms": 170.061874
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 27,
+    "release_to_commit_ms": 169.80097
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 28,
+    "release_to_commit_ms": 159.780348
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 33,
+    "release_to_commit_ms": 169.817786
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 34,
+    "release_to_commit_ms": 159.87192
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 48,
+    "release_to_commit_ms": 169.921382
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 67,
+    "release_to_commit_ms": 169.943797
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 75,
+    "release_to_commit_ms": 169.65455
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 77,
+    "release_to_commit_ms": 159.884552
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 88,
+    "release_to_commit_ms": 169.833684
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 89,
+    "release_to_commit_ms": 169.979124
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 111,
+    "release_to_commit_ms": 169.849111
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 133,
+    "release_to_commit_ms": 169.710883
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 148,
+    "release_to_commit_ms": 159.958787
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 152,
+    "release_to_commit_ms": 170.119845
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 160,
+    "release_to_commit_ms": 159.880674
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 163,
+    "release_to_commit_ms": 169.790698
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 165,
+    "release_to_commit_ms": 169.948581
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 173,
+    "release_to_commit_ms": 169.863649
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 189,
+    "release_to_commit_ms": 159.808697
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 193,
+    "release_to_commit_ms": 170.007448
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 197,
+    "release_to_commit_ms": 159.887983
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 210,
+    "release_to_commit_ms": 169.698093
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 226,
+    "release_to_commit_ms": 170.674476
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 244,
+    "release_to_commit_ms": 169.730473
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 282,
+    "release_to_commit_ms": 159.779441
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 285,
+    "release_to_commit_ms": 159.872938
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 286,
+    "release_to_commit_ms": 159.942983
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 287,
+    "release_to_commit_ms": 169.706345
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 297,
+    "release_to_commit_ms": 159.939375
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 303,
+    "release_to_commit_ms": 159.919311
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 304,
+    "release_to_commit_ms": 169.823024
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 311,
+    "release_to_commit_ms": 159.799401
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 315,
+    "release_to_commit_ms": 170.055012
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 326,
+    "release_to_commit_ms": 169.853491
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 338,
+    "release_to_commit_ms": 159.85883
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 350,
+    "release_to_commit_ms": 169.729578
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 378,
+    "release_to_commit_ms": 170.057055
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 382,
+    "release_to_commit_ms": 169.722103
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 394,
+    "release_to_commit_ms": 169.815873
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 396,
+    "release_to_commit_ms": 169.788468
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 399,
+    "release_to_commit_ms": 159.759689
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 402,
+    "release_to_commit_ms": 159.824121
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 414,
+    "release_to_commit_ms": 160.055186
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 432,
+    "release_to_commit_ms": 159.981526
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 474,
+    "release_to_commit_ms": 169.858839
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 492,
+    "release_to_commit_ms": 170.067174
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 524,
+    "release_to_commit_ms": 169.723729
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 528,
+    "release_to_commit_ms": 159.93356
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 537,
+    "release_to_commit_ms": 160.309708
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 554,
+    "release_to_commit_ms": 159.753978
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 558,
+    "release_to_commit_ms": 169.781147
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 573,
+    "release_to_commit_ms": 169.677122
+   },
+   {
+    "label": "c176_burstgpt_idle_time_padded_j59060857",
+    "sequence": 600,
+    "release_to_commit_ms": 170.129668
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 3,
+    "release_to_commit_ms": 171.089058
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 5,
+    "release_to_commit_ms": 160.29477
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 23,
+    "release_to_commit_ms": 160.124892
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 31,
+    "release_to_commit_ms": 169.832888
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 44,
+    "release_to_commit_ms": 169.813464
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 55,
+    "release_to_commit_ms": 169.816076
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 60,
+    "release_to_commit_ms": 170.036886
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 66,
+    "release_to_commit_ms": 159.780132
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 88,
+    "release_to_commit_ms": 169.856052
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 124,
+    "release_to_commit_ms": 170.065602
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 133,
+    "release_to_commit_ms": 159.810007
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 160,
+    "release_to_commit_ms": 159.877273
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 162,
+    "release_to_commit_ms": 159.960111
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 163,
+    "release_to_commit_ms": 159.751977
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 165,
+    "release_to_commit_ms": 159.902305
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 170,
+    "release_to_commit_ms": 169.827184
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 173,
+    "release_to_commit_ms": 159.920199
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 210,
+    "release_to_commit_ms": 169.761577
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 218,
+    "release_to_commit_ms": 169.828647
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 225,
+    "release_to_commit_ms": 159.852113
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 226,
+    "release_to_commit_ms": 159.857061
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 234,
+    "release_to_commit_ms": 169.856621
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 238,
+    "release_to_commit_ms": 170.121568
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 244,
+    "release_to_commit_ms": 159.752597
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 258,
+    "release_to_commit_ms": 169.767489
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 262,
+    "release_to_commit_ms": 169.924277
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 287,
+    "release_to_commit_ms": 169.942581
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 290,
+    "release_to_commit_ms": 169.774232
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 296,
+    "release_to_commit_ms": 160.159429
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 304,
+    "release_to_commit_ms": 169.962589
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 310,
+    "release_to_commit_ms": 169.769007
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 315,
+    "release_to_commit_ms": 169.738682
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 341,
+    "release_to_commit_ms": 159.940049
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 353,
+    "release_to_commit_ms": 169.827406
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 364,
+    "release_to_commit_ms": 169.805751
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 366,
+    "release_to_commit_ms": 159.864001
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 394,
+    "release_to_commit_ms": 169.829359
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 396,
+    "release_to_commit_ms": 159.822002
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 402,
+    "release_to_commit_ms": 160.053742
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 432,
+    "release_to_commit_ms": 159.799353
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 438,
+    "release_to_commit_ms": 160.062064
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 445,
+    "release_to_commit_ms": 169.886235
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 451,
+    "release_to_commit_ms": 169.848104
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 474,
+    "release_to_commit_ms": 169.827836
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 480,
+    "release_to_commit_ms": 170.048986
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 483,
+    "release_to_commit_ms": 159.906597
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 499,
+    "release_to_commit_ms": 159.741659
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 501,
+    "release_to_commit_ms": 159.782605
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 503,
+    "release_to_commit_ms": 170.175683
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 524,
+    "release_to_commit_ms": 169.849697
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 538,
+    "release_to_commit_ms": 159.91799
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 543,
+    "release_to_commit_ms": 169.772363
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 548,
+    "release_to_commit_ms": 169.766486
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 556,
+    "release_to_commit_ms": 169.779761
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 590,
+    "release_to_commit_ms": 159.948925
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 594,
+    "release_to_commit_ms": 169.872423
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 598,
+    "release_to_commit_ms": 170.115158
+   },
+   {
+    "label": "c176_gamma_cv1_idle_time_padded_j59060857",
+    "sequence": 600,
+    "release_to_commit_ms": 169.834161
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 3,
+    "release_to_commit_ms": 160.436418
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 59,
+    "release_to_commit_ms": 174.7725
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 173,
+    "release_to_commit_ms": 169.975532
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 186,
+    "release_to_commit_ms": 169.926437
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 202,
+    "release_to_commit_ms": 160.194438
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 274,
+    "release_to_commit_ms": 170.183761
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 290,
+    "release_to_commit_ms": 169.844209
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 336,
+    "release_to_commit_ms": 169.897698
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 338,
+    "release_to_commit_ms": 159.915759
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 396,
+    "release_to_commit_ms": 174.888468
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 397,
+    "release_to_commit_ms": 159.891216
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 429,
+    "release_to_commit_ms": 159.86337
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 460,
+    "release_to_commit_ms": 170.226984
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 502,
+    "release_to_commit_ms": 170.010227
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 525,
+    "release_to_commit_ms": 160.048904
+   },
+   {
+    "label": "c176_gamma_cv4_idle_time_padded_j59060857",
+    "sequence": 590,
+    "release_to_commit_ms": 170.145135
+   }
+  ]
+ },
+ "single": {
+  "runs": 42,
+  "nrx_path_ms": {
+   "count": 94459,
+   "p50": 4.879898,
+   "p99": 6.723506,
+   "max": 346.124093,
+   "bound": 45.0,
+   "over_bound": 11
+  },
+  "recovery_path_ms": {
+   "count": 27915,
+   "p50": 2.864453,
+   "p99": 3.748384,
+   "max": 14.333989,
+   "bound": 25.0,
+   "over_bound": 0
+  },
+  "ai_execution_ms": {
+   "16": {
+    "count": 62,
+    "p50": 21.925279,
+    "p99": 24.254276,
+    "max": 24.573774,
+    "bound": 35,
+    "over_bound": 0
+   },
+   "32": {
+    "count": 102,
+    "p50": 21.585564,
+    "p99": 24.365332,
+    "max": 29.097646,
+    "bound": 35,
+    "over_bound": 0
+   },
+   "64": {
+    "count": 343,
+    "p50": 21.639375,
+    "p99": 25.097078,
+    "max": 29.983121,
+    "bound": 35,
+    "over_bound": 0
+   },
+   "128": {
+    "count": 1492,
+    "p50": 21.719631,
+    "p99": 27.594431,
+    "max": 33.327186,
+    "bound": 40,
+    "over_bound": 0
+   },
+   "256": {
+    "count": 1300,
+    "p50": 27.686651,
+    "p99": 33.519909,
+    "max": 77.613283,
+    "bound": 65,
+    "over_bound": 1
+   },
+   "512": {
+    "count": 2138,
+    "p50": 51.299347,
+    "p99": 52.563048,
+    "max": 107.60328,
+    "bound": 75,
+    "over_bound": 1
+   }
+  },
+  "ai_executions": 5437,
+  "ai_overruns": [
+   {
+    "label": "c177_burstgpt_recovery_first_padded_j59066762",
+    "context_length": 256,
+    "ms": 77.613,
+    "bound_ms": 65
+   },
+   {
+    "label": "c177r4_gamma_cv1_backstop_natural_j59066762",
+    "context_length": 512,
+    "ms": 107.603,
+    "bound_ms": 75
+   }
+  ],
+  "first_period_missing_outcomes": [
+   {
+    "label": "c177_gamma_cv1_backstop_padded_j59066762",
+    "missing": 4
+   },
+   {
+    "label": "c177_gamma_cv1_recovery_first_padded_j59066762",
+    "missing": 1
+   },
+   {
+    "label": "c177_gamma_cv2_backstop_natural_j59066762",
+    "missing": 1
+   },
+   {
+    "label": "c177r2_gamma_cv1_idle_time_natural_j59066762",
+    "missing": 1
+   },
+   {
+    "label": "c177r5_gamma_cv1_backstop_natural_j59066762",
+    "missing": 4
+   }
+  ],
+  "failed_runs": [
+   {
+    "label": "c177_gamma_cv1_backstop_padded_j59066762",
+    "error": "RuntimeError(\"post-outcome certificate infeasible at current time: ('home0', 'h0-r0')\")",
+    "completed_rounds": 1
+   },
+   {
+    "label": "c177r4_gamma_cv1_backstop_natural_j59066762",
+    "error": "RuntimeError('lease retire failed sequence=213: remaining_certificate_infeasible')",
+    "completed_rounds": 212
+   },
+   {
+    "label": "c177r5_gamma_cv1_backstop_natural_j59066762",
+    "error": "RuntimeError(\"post-outcome certificate infeasible at current time: ('home0', 'h0-r0')\")",
+    "completed_rounds": 1
+   }
+  ],
+  "radio_commits": 94459,
+  "radio_deadline_misses": [
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 6,
+    "release_to_commit_ms": 169.703556
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 27,
+    "release_to_commit_ms": 170.873977
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 28,
+    "release_to_commit_ms": 159.934535
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 33,
+    "release_to_commit_ms": 169.830963
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 34,
+    "release_to_commit_ms": 159.744963
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 48,
+    "release_to_commit_ms": 169.781389
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 67,
+    "release_to_commit_ms": 169.906482
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 75,
+    "release_to_commit_ms": 169.784134
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 77,
+    "release_to_commit_ms": 159.719242
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 88,
+    "release_to_commit_ms": 169.736048
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 89,
+    "release_to_commit_ms": 169.695897
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 111,
+    "release_to_commit_ms": 169.752761
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 133,
+    "release_to_commit_ms": 169.846436
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 148,
+    "release_to_commit_ms": 159.746873
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 152,
+    "release_to_commit_ms": 169.773826
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 160,
+    "release_to_commit_ms": 159.710521
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 163,
+    "release_to_commit_ms": 169.72364
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 165,
+    "release_to_commit_ms": 169.749836
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 173,
+    "release_to_commit_ms": 169.815994
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 189,
+    "release_to_commit_ms": 159.751736
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 193,
+    "release_to_commit_ms": 169.847994
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 197,
+    "release_to_commit_ms": 159.767456
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 210,
+    "release_to_commit_ms": 169.757235
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 226,
+    "release_to_commit_ms": 169.744731
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 244,
+    "release_to_commit_ms": 169.91802
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 282,
+    "release_to_commit_ms": 159.905334
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 285,
+    "release_to_commit_ms": 159.863627
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 286,
+    "release_to_commit_ms": 159.734018
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 287,
+    "release_to_commit_ms": 169.80063
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 297,
+    "release_to_commit_ms": 159.85174
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 303,
+    "release_to_commit_ms": 159.958955
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 304,
+    "release_to_commit_ms": 169.812585
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 311,
+    "release_to_commit_ms": 159.825598
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 315,
+    "release_to_commit_ms": 169.756902
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 326,
+    "release_to_commit_ms": 169.876778
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 338,
+    "release_to_commit_ms": 159.835232
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 350,
+    "release_to_commit_ms": 169.831823
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 378,
+    "release_to_commit_ms": 169.768988
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 382,
+    "release_to_commit_ms": 169.71034
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 394,
+    "release_to_commit_ms": 169.818776
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 396,
+    "release_to_commit_ms": 169.833667
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 399,
+    "release_to_commit_ms": 159.697095
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 402,
+    "release_to_commit_ms": 159.73913
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 414,
+    "release_to_commit_ms": 159.867805
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 432,
+    "release_to_commit_ms": 159.747756
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 474,
+    "release_to_commit_ms": 169.76162
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 492,
+    "release_to_commit_ms": 169.78065
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 524,
+    "release_to_commit_ms": 169.813616
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 528,
+    "release_to_commit_ms": 159.729147
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 537,
+    "release_to_commit_ms": 159.771019
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 554,
+    "release_to_commit_ms": 159.74963
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 558,
+    "release_to_commit_ms": 169.871583
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 573,
+    "release_to_commit_ms": 169.834712
+   },
+   {
+    "label": "c177_burstgpt_idle_time_padded_j59066762",
+    "sequence": 600,
+    "release_to_commit_ms": 169.737228
+   },
+   {
+    "label": "c177_gamma_cv1_backstop_padded_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 337.153162
+   },
+   {
+    "label": "c177_gamma_cv1_backstop_padded_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 287.607663
+   },
+   {
+    "label": "c177_gamma_cv1_backstop_padded_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 263.052895
+   },
+   {
+    "label": "c177_gamma_cv1_backstop_padded_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 312.149045
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 3,
+    "release_to_commit_ms": 170.120165
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 5,
+    "release_to_commit_ms": 160.340021
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 23,
+    "release_to_commit_ms": 159.882049
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 31,
+    "release_to_commit_ms": 170.050307
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 44,
+    "release_to_commit_ms": 169.778944
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 55,
+    "release_to_commit_ms": 169.990413
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 60,
+    "release_to_commit_ms": 169.866014
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 66,
+    "release_to_commit_ms": 159.834789
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 88,
+    "release_to_commit_ms": 169.81942
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 124,
+    "release_to_commit_ms": 169.640753
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 133,
+    "release_to_commit_ms": 159.912763
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 160,
+    "release_to_commit_ms": 159.821217
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 162,
+    "release_to_commit_ms": 159.705676
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 163,
+    "release_to_commit_ms": 159.81295
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 165,
+    "release_to_commit_ms": 159.770461
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 170,
+    "release_to_commit_ms": 169.774051
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 173,
+    "release_to_commit_ms": 159.773357
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 210,
+    "release_to_commit_ms": 169.769495
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 218,
+    "release_to_commit_ms": 169.763083
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 225,
+    "release_to_commit_ms": 159.838461
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 226,
+    "release_to_commit_ms": 159.800955
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 234,
+    "release_to_commit_ms": 169.821888
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 238,
+    "release_to_commit_ms": 169.825471
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 244,
+    "release_to_commit_ms": 159.783244
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 258,
+    "release_to_commit_ms": 169.835015
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 262,
+    "release_to_commit_ms": 169.95361
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 287,
+    "release_to_commit_ms": 169.797355
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 290,
+    "release_to_commit_ms": 169.846039
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 296,
+    "release_to_commit_ms": 159.789736
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 304,
+    "release_to_commit_ms": 169.756694
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 310,
+    "release_to_commit_ms": 169.770048
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 315,
+    "release_to_commit_ms": 169.910872
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 341,
+    "release_to_commit_ms": 159.869765
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 353,
+    "release_to_commit_ms": 169.848351
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 364,
+    "release_to_commit_ms": 169.838492
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 366,
+    "release_to_commit_ms": 160.349291
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 394,
+    "release_to_commit_ms": 169.85305
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 396,
+    "release_to_commit_ms": 159.735022
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 402,
+    "release_to_commit_ms": 160.024169
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 432,
+    "release_to_commit_ms": 159.90398
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 438,
+    "release_to_commit_ms": 159.777202
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 445,
+    "release_to_commit_ms": 169.799339
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 451,
+    "release_to_commit_ms": 169.961209
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 474,
+    "release_to_commit_ms": 169.849759
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 480,
+    "release_to_commit_ms": 169.945061
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 483,
+    "release_to_commit_ms": 159.844218
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 499,
+    "release_to_commit_ms": 159.724349
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 501,
+    "release_to_commit_ms": 159.775798
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 503,
+    "release_to_commit_ms": 169.893416
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 524,
+    "release_to_commit_ms": 169.794121
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 538,
+    "release_to_commit_ms": 159.782571
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 543,
+    "release_to_commit_ms": 169.947284
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 548,
+    "release_to_commit_ms": 169.751348
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 556,
+    "release_to_commit_ms": 169.769119
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 590,
+    "release_to_commit_ms": 159.760716
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 594,
+    "release_to_commit_ms": 169.904324
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 598,
+    "release_to_commit_ms": 169.739173
+   },
+   {
+    "label": "c177_gamma_cv1_idle_time_padded_j59066762",
+    "sequence": 600,
+    "release_to_commit_ms": 169.82578
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 3,
+    "release_to_commit_ms": 160.753836
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 59,
+    "release_to_commit_ms": 175.752592
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 173,
+    "release_to_commit_ms": 170.189681
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 186,
+    "release_to_commit_ms": 169.921535
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 202,
+    "release_to_commit_ms": 160.003361
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 274,
+    "release_to_commit_ms": 170.046042
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 290,
+    "release_to_commit_ms": 169.855013
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 336,
+    "release_to_commit_ms": 170.019789
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 338,
+    "release_to_commit_ms": 159.838971
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 396,
+    "release_to_commit_ms": 174.651776
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 397,
+    "release_to_commit_ms": 159.777869
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 429,
+    "release_to_commit_ms": 159.810152
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 460,
+    "release_to_commit_ms": 169.835987
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 502,
+    "release_to_commit_ms": 169.860504
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 525,
+    "release_to_commit_ms": 160.026412
+   },
+   {
+    "label": "c177_gamma_cv4_idle_time_padded_j59066762",
+    "sequence": 590,
+    "release_to_commit_ms": 169.862634
+   },
+   {
+    "label": "c177r5_gamma_cv1_backstop_natural_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 353.331591
+   },
+   {
+    "label": "c177r5_gamma_cv1_backstop_natural_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 356.660644
+   },
+   {
+    "label": "c177r5_gamma_cv1_backstop_natural_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 350.002619
+   },
+   {
+    "label": "c177r5_gamma_cv1_backstop_natural_j59066762",
+    "sequence": 1,
+    "release_to_commit_ms": 360.019143
+   }
+  ]
+ },
+ "globs": {
+  "multi": [
+   "c176_*_j59059475_coordinator.json",
+   "c176_*_j59060857_coordinator.json",
+   "c176r*_j59062792_coordinator.json"
+  ],
+  "single": [
+   "c177*_j59066762_coordinator.json",
+   "c177_*_j59069688_coordinator.json",
+   "c177r*_j59070452_coordinator.json"
+  ]
+ },
+ "note": "AI execution is the Qwen worker's accepted-to-completed time against the class bound; the NeuralRx path is release to result and the recovery path is the pre-padding service path."
+}

@@ -146,7 +146,9 @@ evaluation on two four-GPU A100 nodes under a qualified synthetic timing contrac
 boundary diagnostics record 0/120 safety violations for \sys and 40/40 for idle-time admission. Under
 bursty BurstGPT-based arrivals with a 200~ms AI SLO, \sys serves 6.2-18.5\% more on-time AI tokens than
 its recovery-first ablation and static reservation serves none, while idle-time admission misses the
-recovery deadline in up to 10.0\% of periods. In
+recovery deadline in up to 10.0\% of periods. On one GPU, \sys makes the same decisions, and early AI
+slots that share the GPU with \NRx serve 2.6-70.3\% more on-time AI tokens without losing a timely \NRx
+result. In
 1,200 physical release periods, the shared lane finishes every period before its scheduled end, and under seven injected
 fault classes every TB commits exactly once before expiry. Across
 13,716 feasible capacity-model points, \sys admits more AI capacity than static reservation at 3,600
@@ -181,7 +183,7 @@ An uplink TB is decoded by a conventional receiver, such as the cuPHY physical u
 PUSCH pipelines of several cells, and in our evaluated contract each cell sends one TB per release period.
 In this contract (Figure~\ref{fig:airan-background}), a TB commits its \NRx result when the
 result passes its cyclic redundancy check (CRC) by the \NRx deadline; otherwise, one conventional
-recovery must complete before the recovery deadline. Figure~\ref{fig:debt}a shows that this outcome is uncertain. Across a synthetic block-Rayleigh channel with 500 TBs per point and the CDL-D and CDL-E
+recovery must complete before the recovery deadline. Figure~\ref{fig:debt}a shows that this outcome is uncertain. Across a synthetic fading channel without a direct path (block Rayleigh) with 500 TBs per point and two 3GPP channels with a direct path, the CDL-D and CDL-E
 models~\cite{tr38901,sionna} with 50 TBs per point, the \NRx success rate rises from near 0\% to near
 100\% within 1~dB of the point at which the conventional receiver decodes half of the TBs. In CDL-D and
 CDL-E, the conventional receiver also decodes TBs that \NRx misses. The channel quality indicator that
@@ -192,9 +194,11 @@ near this transition.
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_debt.pdf}
   \caption{Uncertain recovery need across channels and failure rates. (a) Share of TBs that \NRx
-  (solid) and the conventional receiver (dashed) decode in three channel models; the relative SNR is 0~dB where
-  the conventional receiver decodes half of the TBs. (b) Probability that a period with four
-  admitted TBs requires at least $k$ recoveries when each TB fails with probability $p$. Lines assume
+  (solid) and the conventional receiver (dashed) decode in three channels: a synthetic fading channel
+  without a direct path (block Rayleigh) and two 3GPP channels with a direct path (CDL-D) and a strong
+  direct path (CDL-E); the relative SNR is 0~dB where the conventional receiver decodes half of the TBs.
+  (b) Probability that one or more, two or more, three or more, or all four TBs of a period fail when
+  each TB fails with probability $p$. Lines assume
   independent failures; the band raises the correlation of the all-four event to 0.3. Circles are
   measured periods that join the transition-SNR TBs of two consecutive campaign periods; squares are
   grouped trials of four consecutive receiver trials.}
@@ -222,8 +226,8 @@ miss the 21~ms deadline. Thus, an MPS share is safe only for the AI class under 
   \includegraphics[width=0.9\linewidth]{figures/softwall_execution.pdf}
   \caption{Execution variability on shared A100 GPUs. (a) Radio p99 of a two-cell 273-PRB PUSCH
   pipeline against the MPS share of a co-running Qwen prefill class: one 16-token request (light) or
-  eight 512-token requests (heavy). Lines connect run means, and bars span the runs. (b) Fraction of
-  runs whose latency exceeds a multiple of its median: schedule construction on the host (1,200 periods),
+  eight 512-token requests (heavy). Lines connect run means, and bars span the runs. (b) Share of
+  runs slower than a multiple of their median latency: host scheduling (1,200 periods),
   cross-GPU receiver pairs at the 4.5~ms scale on a Python and a partly native C++/CUDA path (1,000 and 300 radio slots), and the \NRx kernel as a TensorRT graph (300 slots).}
   \Description{The left line chart shows radio p99 latency for MPS shares of 20 to 100 percent for a
   light and a heavy AI class, with a band for the radio pipeline alone and a dashed deadline line that
@@ -461,6 +465,17 @@ places the 5~ms launch budget and the AI slot first and retimes TB3 and TB4 behi
 $g+1$ (\ding{185}). For a 256-token request, TB4 would end after the recovery deadline; the verifier rejects $X'$ and
 keeps $X_t$.
 
+\noindent\textbf{Early AI Slot.}
+The recovery lane stays idle from release until the \NRx deadline, when the first recovery can start.
+Therefore, \sys also runs the same check at release: an \emph{early AI slot} starts at release, and the
+verifier commits it only when the all-fail schedule of every admitted TB, with the slot as an AI busy
+interval, still ends before the recovery deadline. In the evaluated contract, four recoveries take
+100~ms of the 108~ms recovery window, and an early slot may end up to 8~ms after the \NRx deadline.
+This limit admits a 16-128-token request and rejects a 256- or 512-token request. On one GPU,
+the early slot shares the GPU with \NRx. A \NRx result that the slot delays past the \NRx deadline only
+becomes a required recovery, which the all-fail schedule already holds. Thus, an early slot can cost
+\NRx value but not radio safety.
+
 \noindent\textbf{Global Atomic State.}
 Schedule scope follows the contended lane: disjoint lanes compose by union, while cuPHY instances that
 share a recovery lane require one global set of pending recoveries. The complete runtime state is
@@ -683,7 +698,10 @@ AI run in separate persistent workers. TensorRT \NRx workers hold preallocated b
 persistent Aerial cuPHY workers execute conventional recovery, and a Qwen2.5-1.5B worker executes bounded
 prefill classes. In the evaluated placement (Figure~\ref{fig:overall}b), GPU0 and GPU1 host the cuPHY
 instances with a 50\% MPS thread limit, GPU3 hosts the \NRx endpoint, and GPU2 hosts the shared cuPHY
-lane and the Qwen worker, which runs as a low-priority MPS client with a 20\% thread limit.
+lane and the Qwen worker, which runs as a low-priority MPS client with a 20\% thread limit. In the
+single-GPU placement (Figure~\ref{fig:overall}a), the same workers share one GPU with the same MPS
+limits. One cuPHY receiver of the harness holds 8.6~GiB, and the recovery lane runs one recovery at a
+time. Therefore, the single-GPU lane keeps one receiver for all cells.
 
 \noindent\textbf{Transport and Control.}
 CUDA IPC rings connect processes on one GPU, and NVLink P2P rings connect GPUs. Each slot carries a
@@ -719,7 +737,10 @@ maps to a machine-readable artifact and field set.
 
 \noindent\textbf{Hardware Specification.}
 We evaluate \sys on two independent nodes, each with four NVIDIA A100-SXM4-40GB GPUs connected by
-third-version NVLink. MIG is disabled and MPS is enabled on every GPU. In the multi-GPU placement,
+third-generation NVLink. The bursty-arrival, load, and single-GPU campaigns
+(Sections~\ref{sec:eval-burst} and~\ref{sec:eval-single}) run on further nodes of the same system with four
+A100-SXM4-80GB GPUs each; a single-GPU run uses one of the four GPUs. MIG is disabled and MPS is enabled
+on every GPU. In the multi-GPU placement,
 GPU0 and GPU1 run the two cuPHY instances at a 50\% MPS share, GPU3 runs the TensorRT \NRx worker at
 80\%, and GPU2 runs the shared cuPHY recovery lane at 80\% and the Qwen worker at 20\% with low
 priority. Facility identity is withheld for anonymous review.
@@ -728,7 +749,8 @@ priority. Facility identity is withheld for anonymous review.
 The trace-driven evaluation (Sections~\ref{sec:eval-capacity} and~\ref{sec:eval-trace}) measures safe AI
 capacity and timely AI value with an exact-checked capacity model and BurstGPT traces, without executing
 kernels. The physical evaluation (Sections~\ref{sec:eval-online}-\ref{sec:eval-prediction}) runs the
-complete scheduler on both nodes and measures online scheduling, AI service under bursty arrivals, radio
+complete scheduler on both nodes and measures online scheduling, AI service under bursty arrivals, the
+single-GPU placement with early AI slots, radio
 safety at the admission boundary, schedule enforcement under injected faults, prediction accuracy, and
 decision cost. Section~\ref{sec:eval-sensitivity} varies the recovery bound,
 the MPS configuration, and the worker lifecycle.
@@ -963,7 +985,7 @@ observes.
 % provenance: C176_BURST
 \noindent\textbf{Bursty Workload.}
 AI requests arrive in bursts, and during a burst the scheduler decides how much AI each recovery window
-can absorb. Therefore, we replay one sequence of 329 BurstGPT prompts on the physical two-node path at 3
+can absorb. Therefore, we replay one sequence of 329 BurstGPT prompts on the physical multi-GPU path at 3
 requests/s for 108~s. The prompts are drawn from all BurstGPT requests and rounded up to the six prompt
 lengths, and 47.4\% of them round to 512 tokens. Six arrival patterns share this sequence and differ only
 in arrival times: evenly spaced arrivals, the per-second arrivals of a BurstGPT segment, and Gamma
@@ -974,7 +996,7 @@ token, and up to four AI slots share one period in FIFO order. All policies of a
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_burst.pdf}
-  \caption{AI service and radio safety under bursty AI arrivals on the physical two-node path. Every
+  \caption{AI service and radio safety under bursty AI arrivals on the physical multi-GPU path. Every
   pattern carries the same 329 BurstGPT prompts at 3 requests/s for 108~s and differs only in arrival
   times; the AI SLO is 200~ms. (a) AI tokens served within their SLO; static reservation admits no AI request.
   (b) Periods in which the admitted AI misses the recovery deadline at the declared bounds (lines, measured service
@@ -1040,6 +1062,93 @@ places a verified AI slot ahead of the required recoveries, while recovery-first
 recovery its full bound before an AI slot can meet its SLO. Thus, the ordering matters for interactive
 AI SLOs and fades for loose ones, consistent with the tie of the original mode in
 Section~\ref{sec:eval-trace}.
+
+\subsection{Single-GPU placement}
+\label{sec:eval-single}
+
+% provenance: C177_SINGLE
+\noindent\textbf{One-GPU Setup.}
+\sys also schedules a single GPU (Figure~\ref{fig:overall}a). We rerun the bursty-arrival and load
+campaigns of Section~\ref{sec:eval-burst} with every process on one A100-SXM4-80GB GPU: the four
+cuPHY owners at a 50\% MPS share, the \NRx worker and the recovery lane at 80\%, and the Qwen worker at
+20\% with low priority. Same-device CUDA IPC copies replace NVLink P2P, and the radio protocol, seeds,
+bounds, traces, and policies stay unchanged. Thus, every single-GPU run pairs with its multi-GPU run.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_single.pdf}
+  \caption{Single-GPU placement against the paired multi-GPU runs. (a) On-time AI tokens per second
+  of the 30 paired natural runs (six arrival patterns at 3 requests/s and four Poisson loads); the
+  diagonal marks equal service. (b) AI prefill time per prompt length over every run, stopped and
+  padded runs included: p99 (bars) and maximum (circles) against the class bound (red). (c) Peak GPU
+  memory of the multi-GPU placement summed over its four GPUs and of the single-GPU placement with
+  one shared recovery receiver; the dashed line marks the memory of one A100.}
+  \Description{A scatter plot shows the on-time AI tokens of every single-GPU run on the diagonal
+  against its multi-GPU run. A bar chart shows AI prefill p99 per prompt length for four GPUs and one
+  GPU, with maxima that exceed the class bound only on one GPU for 256 and 512 tokens. A second bar
+  chart shows the multi-GPU placement using 81.7 GiB summed, above the 80 GiB line, and one GPU using
+  54.3 GiB.}
+  \label{fig:eval-single}
+\end{figure}
+
+\noindent\textbf{Memory on One GPU.}
+Memory limits the single-GPU placement before compute does. One cuPHY receiver of our harness holds
+8.6~GiB, and the multi-GPU placement peaks at 81.7~GiB summed over its four GPUs, above the 80~GiB
+of one A100 (Figure~\ref{fig:eval-single}c). With one receiver per cell on the recovery lane, the
+single-GPU run runs out of memory. The lane runs one recovery at a time, and a recovery depends only
+on the IQ window that the owner installs. Therefore, the single-GPU lane keeps one receiver for all
+cells, and the GPU peaks at 54.3~GiB.
+
+\noindent\textbf{Same Decisions on One GPU.}
+Figure~\ref{fig:eval-single}a pairs the 30 natural runs on one GPU with their multi-GPU runs. The
+on-time AI tokens match exactly in 27 pairs and differ by at most 3.6\% in the other three. Under
+the bursty patterns, \sys serves 6.2-18.5\% more on-time tokens than recovery-first on both
+placements, and idle-time admission misses the recovery deadline at the declared bounds in
+1.7-10.0\% of periods on both. The placements agree because \sys separates the GPU in time: \NRx
+runs before the \NRx deadline, and AI slots and recoveries run after it. Over the paired natural
+runs, the p99 of every service path moves by at most 1.6~ms; for example, \NRx results arrive
+within 6.7~ms against 7.0~ms.
+
+\noindent\textbf{Tails on One GPU.}
+One GPU leaves the medians and p99 unchanged but lengthens the tails
+(Figure~\ref{fig:eval-single}b). Two of the 5,437 single-GPU prefills exceed their class bound: a
+256-token request takes 77.6~ms against 65~ms, and a 512-token request takes 107.6~ms against 75~ms.
+In the second case, the verifier finds at slot release that the remaining recovery no longer fits
+before the recovery deadline, and the run stops. In addition, 5 of the 42 single-GPU runs lose a
+\NRx outcome at the first cutoff after startup. In two of them, the owners stall for up to 0.35~s,
+the first period's recoveries miss the deadline, 8 radio results miss the expiry, and the run stops.
+None of the 39 multi-GPU runs shows any of these events. Thus, the single-GPU placement
+is a separate mode: it needs a warm-up before the first release and bounds measured on one GPU, and
+we report its runs as development evidence.
+
+% provenance: C178_EARLY
+\noindent\textbf{Early AI Slots.}
+On one GPU, an early AI slot shares the GPU with \NRx (Section~\ref{sec:design-recovery}). We pair \sys
+with and without early slots under the same traces, on one node except for the CV-8 pair.
+Figure~\ref{fig:eval-early}a shows that early slots serve 2.6-70.3\% more on-time AI tokens under the six
+arrival patterns, and the gain grows with burstiness: a burst leaves short requests queued at the next
+release, and an early slot serves them before the \NRx deadline. Under Poisson load, the gain is
+5.4-14.5\% (Figure~\ref{fig:eval-early}c). Early slots do not delay \NRx: the p99 of the \NRx result
+stays within 6.5-7.2~ms, far below the 45~ms deadline, even in padded runs that hold every early slot on
+the GPU for its full bound (Figure~\ref{fig:eval-early}b), and no run loses a timely \NRx success. No
+early-slot run misses the recovery deadline or the expiry. \sys achieves this gain because the all-fail
+schedule already holds the recovery of every admitted TB at release. The planner skips slots that
+cannot end in time before it calls the verifier, which keeps planning within the 5~ms launch budget when
+a burst fills the queue.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_early.pdf}
+  \caption{Early AI slots on one GPU, paired with \sys without them. (a) On-time AI tokens per second
+  under the six arrival patterns at 3 requests/s. (b) p99 of the \NRx release-to-result path in
+  natural runs (lines) and padded runs (circles), against the 45~ms \NRx deadline. (c) On-time AI
+  tokens per second against the offered Poisson load, with a 200~ms AI SLO.}
+  \Description{A line chart shows Backstop with early AI slots serving more on-time AI tokens than
+  Backstop under every arrival pattern, with the gap growing as arrivals become burstier. A second
+  chart shows the NeuralRx p99 of both policies near 7 milliseconds, far below the 45-millisecond
+  deadline. A third chart shows early AI slots serving more tokens at every offered load.}
+  \label{fig:eval-early}
+\end{figure}
 
 \subsection{Radio safety at the admission boundary}
 \label{sec:eval-physical}
@@ -1188,10 +1297,10 @@ one proposed schedule.
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_sensitivity.pdf}
   \caption{Sensitivity to the recovery bound. (a) End of the last recovery relative to the recovery deadline when
   the request that \sys rejects runs anyway, against the recovery bound $B_{\mathrm{conv}}$: lines follow
-  the bound-respecting schedules of E4 and E6b, and crosses mark the physical attempts measured at the
-  qualified 25~ms bound. (b) Fraction of the 1,312 measured recovery times of the two-node campaign that
-  exceed a given length, with the bounds at which E4 and E6b disappear (E4 and E6b limits) and the
-  qualified bound.}
+  the bound-respecting schedules of the 256-token case (E4) and the 64-token case (E6b), and markers
+  show the physical attempts measured at the qualified 25~ms bound. (b) Share of the 1,312 measured
+  recovery times of the two-node campaign that exceed a given length, with the bounds at which each case
+  disappears (limits) and the qualified bound.}
   \Description{A line chart shows the excess of the last recovery past the recovery deadline growing linearly with
   the recovery bound for E4 and E6b, crossing zero at 19 and 24 milliseconds, with physical attempts
   near the lines at 25 milliseconds. A complementary distribution shows all measured recovery paths
@@ -1340,7 +1449,8 @@ releases. Our evaluation shows that \sys reaches the oracle AI capacity across 1
 points and delivers a median of 1.44$\times$ the timely AI value of recovery-first
 at the trace headroom points. On two four-GPU nodes, \sys records 0/120 safety violations in boundary cases
 where idle-time admission violates 40/40, serves 6.2-18.5\% more on-time AI tokens than recovery-first
-under bursty AI arrivals, and commits every TB exactly once under seven injected fault classes. These results qualify a synthetic timing mode, not
+under bursty AI arrivals, and commits every TB exactly once under seven injected fault classes. On one
+GPU, early AI slots add 2.6-70.3\% more on-time AI tokens without losing a timely \NRx result. These results qualify a synthetic timing mode, not
 production HARQ timing.
 
 \bibliographystyle{ACM-Reference-Format}

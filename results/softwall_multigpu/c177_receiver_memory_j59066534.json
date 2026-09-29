@@ -1,0 +1,25 @@
+{
+ "schema": "softwall-c177-receiver-memory-v1",
+ "slurm_job_id": "59066534",
+ "host": "nid200428",
+ "gpu": "NVIDIA A100-SXM4-80GB",
+ "script": "scripts_for_node/softwall_same_gpu/c177_receiver_memory.py",
+ "container": "nvcr.io/nvidia/aerial/aerial-cuda-accelerated-ran:25-3-cubb",
+ "mps": false,
+ "unit": "GiB of device memory in use (cudaMemGetInfo), one process on an otherwise idle GPU",
+ "measured": {
+  "context": 0.419,
+  "one_receiver": 9.081,
+  "pool_used_1": 0.007,
+  "pool_total_1": 0.008,
+  "two_receivers": 17.71,
+  "pool_used_2": 0.014,
+  "pool_total_2": 0.016,
+  "after_free_all_blocks": 17.71
+ },
+ "per_receiver_gib": {
+  "first": 8.662,
+  "second": 8.629
+ },
+ "note": "PairedDualReceiver(enable_local_neural=False); the CuPy pool holds under 0.02 GiB, so the memory is cuPHY/pyAerial object state."
+}

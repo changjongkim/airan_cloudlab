@@ -20,7 +20,7 @@ import re
 import statistics
 from pathlib import Path
 
-LABEL = re.compile(r"^(?P<prefix>c176[a-z0-9]*)_(?P<pattern>[a-z0-9_]+?)_(?P<policy>backstop|recovery_first|idle_time)_"
+LABEL = re.compile(r"^(?P<prefix>c17[678][a-z0-9]*)_(?P<pattern>[a-z0-9_]+?)_(?P<policy>backstop_early|backstop|recovery_first|idle_time)_"
                    r"(?P<mode>natural|padded)_j(?P<job>\d+)_coordinator\.json$")
 
 
@@ -44,22 +44,31 @@ def summarize_run(path: Path, match) -> dict:
     owners = sorted(path.parent.glob(path.name.replace("_coordinator.json", "_home*_owner.json")))
     if len(owners) != 4:
         raise SystemExit(f"{path.name}: expected four owner logs, found {len(owners)}")
-    commits = misses = 0
+    commits = misses = timely = 0
+    nrx_paths = []
     for owner in owners:
         records = json.loads(owner.read_text())["records"]
         commits += sum(record["commit_count"] for record in records)
         misses += sum(bool(record["deadline_miss"]) for record in records)
+        timely += sum(bool(record.get("timely_success")) for record in records)
+        nrx_paths += [record["nrx_release_to_complete_ms"] for record in records
+                      if record.get("nrx_release_to_complete_ms") is not None]
     rounds = run["rounds"]
     duration_s = run["iterations"] * run["period_ms"] / 1000.0
     served = [row for row in run["requests"] if row["status"] == "served"]
     on_time = [row for row in served if row.get("on_time")]
     trace_requests = run["ai_trace"]["requests"]
     outcome_sequence = [sorted(tuple(key) for key in row["success_keys"]) for row in rounds]
+    same_device = any(value == "same_device" for value in run.get("peer_access", {}).values())
+    inventory = path.parent / path.name.replace("_coordinator.json", "_gpu_inventory.csv")
+    gpu_models = sorted({line.split(",")[1].strip() for line in inventory.read_text().splitlines()[1:] if line.strip()})
     return {
         "label": path.name.replace("_coordinator.json", ""),
         "prefix": match["prefix"],
         "pattern": match["pattern"], "policy": match["policy"], "mode": match["mode"], "job": match["job"],
         "host": run["host"], "error": run["error"], "completed_rounds": run["completed_rounds"],
+        "placement": "single-GPU" if same_device else "multi-GPU",
+        "gpu_models": gpu_models,
         "iterations": run["iterations"], "slo_ms": run["slo_ms"], "max_leases": run["max_leases"],
         "trace_requests": trace_requests, "requests_arrived": run["requests_arrived"],
         "requests_served": len(served), "requests_on_time": len(on_time),
@@ -77,7 +86,12 @@ def summarize_run(path: Path, match) -> dict:
                                             if row["last_recovery_complete_ms"] is not None), default=None),
         "radio_commits": commits, "radio_deadline_misses": misses,
         "required_recoveries": sum(len(row["unresolved_keys"]) for row in rounds),
-        "late_launches": sum(1 for row in rounds for attempt in row["lease_attempts"] if not attempt["launched"]),
+        "late_launches": sum(1 for row in rounds for attempt in row["lease_attempts"] + row.get("early_attempts", [])
+                             if not attempt["launched"]),
+        "requests_served_early": run.get("requests_served_early", 0),
+        "timely_nrx_successes": timely,
+        "nrx_path_ms": {"p50": percentile(nrx_paths, 0.5), "p99": percentile(nrx_paths, 0.99),
+                        "max": max(nrx_paths, default=None)},
         "outcome_sequence_sha256": hashlib.sha256(json.dumps(outcome_sequence).encode()).hexdigest(),
         "coordinator_sha256": sha256(path),
         "owner_sha256": {owner.name: sha256(owner) for owner in owners},
@@ -90,6 +104,10 @@ def main() -> None:
     parser.add_argument("--traces", type=Path, required=True)
     parser.add_argument("--jobs", nargs="+", required=True, help="Slurm job ids of the campaign")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--claim-scope", default=None, help="override the claim-scope text")
+    parser.add_argument("--prefixes", nargs="*", default=None, help="only runs with these label prefixes")
+    parser.add_argument("--exclude", nargs="*", default=[],
+                        help="labels of failed runs kept in the ledger but left out of every metric")
     parser.add_argument("--prefix-traces", nargs="*", default=[],
                         help="PREFIX=DIR pairs for runs whose traces live outside --traces")
     args = parser.parse_args()
@@ -99,15 +117,24 @@ def main() -> None:
         trace_dirs[prefix] = Path(directory)
 
     runs = []
-    for path in sorted(args.raw.glob("c176*_coordinator.json")):
+    excluded = []
+    for path in sorted(args.raw.glob("c17[678]*_coordinator.json")):
         match = LABEL.match(path.name)
-        if match and match["job"] in args.jobs:
+        if match and match["job"] in args.jobs and (args.prefixes is None or match["prefix"] in args.prefixes):
+            label = path.name.replace("_coordinator.json", "")
+            if label in args.exclude:
+                raw = json.loads(path.read_text())
+                excluded.append({"label": label, "error": raw["error"], "completed_rounds": raw["completed_rounds"],
+                                 "iterations": raw["iterations"], "coordinator_sha256": sha256(path)})
+                continue
             runs.append(summarize_run(path, match))
+    if sorted(run["label"] for run in excluded) != sorted(args.exclude):
+        raise SystemExit(f"--exclude names runs that were not found: {args.exclude}")
     if not runs:
         raise SystemExit("no C176 runs found for the given jobs")
     trace_summary = json.loads((args.traces / "c176_trace_summary.json").read_text())
     for run in runs:
-        directory = trace_dirs[run["prefix"]]
+        directory = trace_dirs.get(run["prefix"], args.traces)
         run["trace_dir"] = str(directory)
         trace = json.loads((directory / f"c176_trace_{run['pattern']}.json").read_text())
         run["offered_tokens_per_s"] = (sum(row["value_tokens"] for row in trace["requests"])
@@ -135,6 +162,12 @@ def main() -> None:
                                                     / max(group["idle_time"]["on_time_tokens_per_s"], 1e-9)
                                                     if "idle_time" in group else None),
             })
+        if {"backstop", "backstop_early"} <= set(group):
+            comparisons.append({
+                "prefix": prefix, "pattern": pattern, "mode": mode,
+                "backstop_early_over_backstop_tokens": (group["backstop_early"]["on_time_tokens_per_s"]
+                                                        / max(group["backstop"]["on_time_tokens_per_s"], 1e-9)),
+            })
     result = {
         "schema": "softwall-c176-burst-campaign-v1",
         "jobs": args.jobs,
@@ -142,12 +175,13 @@ def main() -> None:
         "runs": sorted(runs, key=lambda run: (run["prefix"], run["mode"], run["interarrival_cv"], run["policy"])),
         "paired_outcomes_identical": {"|".join(k): len(v) == 1 for k, v in paired.items()},
         "comparisons": comparisons,
+        "excluded_runs": excluded,
         "all_runs_completed": all(run["error"] is None and run["completed_rounds"] == run["iterations"]
                                   for run in runs),
         "certified_policies_safe": all(run["contract_broken_periods"] == 0 and run["physical_guard_misses"] == 0
                                        and run["radio_deadline_misses"] == 0
                                        for run in runs if run["policy"] != "idle_time"),
-        "claim_scope": ("Two-node P180/D155 mode, one node per execution mode, one run per pattern and policy. "
+        "claim_scope": args.claim_scope or ("Two-node P180/D155 mode, one node per execution mode, one run per pattern and policy. "
                         "Natural runs use measured service times; padded runs hold every AI unit and recovery on "
                         "the GPU until its declared bound (bound-realization diagnostic). Static reservation "
                         "admits no AI unit in this mode and is not run."),

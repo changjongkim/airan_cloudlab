@@ -61,6 +61,13 @@ SOURCES = {
     "burst_replay": ROOT / "results/softwall_multigpu/c176_replay_slo_v1.json",
     "load_campaign": ROOT / "results/softwall_multigpu/c176_load_campaign_v1.json",
     "load_replay": ROOT / "results/softwall_multigpu/c176_replay_load_v1.json",
+    "single_campaign": ROOT / "results/softwall_multigpu/c177_single_gpu_campaign_v1.json",
+    "single_load": ROOT / "results/softwall_multigpu/c177_load_campaign_v1.json",
+    "placement": ROOT / "results/softwall_multigpu/c177_placement_comparison_v1.json",
+    "single_memory": ROOT / "results/softwall_multigpu/c177_memory_v1.json",
+    "single_tail": ROOT / "results/softwall_multigpu/c177_tail_summary_v1.json",
+    "early_campaign": ROOT / "results/softwall_multigpu/c178_early_campaign_v1.json",
+    "early_load": ROOT / "results/softwall_multigpu/c178_load_campaign_v1.json",
 }
 
 # Raw per-request records behind the two background figures. The Q2
@@ -366,7 +373,7 @@ def make_execution() -> dict:
     ax.set_xlim(10, 110)
     ax.set_ylim(0, 25)
     ax.set_yticks([0, 10, 20])
-    ax.set_xlabel("AI GPU share by MPS (%)")
+    ax.set_xlabel("GPU share given to AI (%)")
     ax.set_ylabel("radio p99\nlatency (ms)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
@@ -377,10 +384,10 @@ def make_execution() -> dict:
 
     # (b) Complementary CDF of latency normalized by its own median.
     ax = axes[1]
-    series = (("certificate_build", "schedule build", COLORS["orange"]),
-              ("pair_python", "receivers (Python)", COLORS["brown"]),
-              ("pair_native", "receivers (C++)", COLORS["cyan"]),
-              ("kernel", "NeuralRx kernel", COLORS["gray"]))
+    series = (("certificate_build", "host scheduling", COLORS["orange"]),
+              ("pair_python", "receiver pair (Python)", COLORS["brown"]),
+              ("pair_native", "receiver pair (C++)", COLORS["cyan"]),
+              ("kernel", "NeuralRx GPU kernel", COLORS["gray"]))
     tails = {}
     for key, label, color in series:
         values = sorted(data["latency_ms"][key])
@@ -395,13 +402,13 @@ def make_execution() -> dict:
     ax.set_xlim(0.8, 40)
     ax.set_ylim(5e-4, 1.5)
     ax.set_xticks([1, 3, 10, 30], ["1", "3", "10", "30"])
-    ax.set_xlabel("latency / median latency")
-    ax.set_ylabel("fraction of runs\nabove")
+    ax.set_xlabel("latency \u00f7 its median")
+    ax.set_ylabel("share of runs\nslower than this")
     ax.grid(which="major", **GRID)
     ax.set_axisbelow(True)
     handles, labels = ax.get_legend_handles_labels()
-    order = [labels.index(name) for name in ("schedule build", "receivers (Python)", "receivers (C++)",
-                                             "NeuralRx kernel")]
+    order = [labels.index(name) for name in ("host scheduling", "receiver pair (Python)", "receiver pair (C++)",
+                                             "NeuralRx GPU kernel")]
     # No curve enters the upper-right area, which holds the legend.
     ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="upper right", frameon=False,
               fontsize=6.6, handlelength=1.4, handletextpad=0.35, labelspacing=0.15, borderaxespad=0.2)
@@ -440,11 +447,11 @@ def make_debt() -> dict:
     ax.set_ylabel("TBs decoded (%)")
     ax.grid(**GRID)
     ax.set_axisbelow(True)
-    handles = [Line2D([], [], color=color, linewidth=2.2) for color in channel_colors.values()]
-    handles += [Line2D([], [], color=COLORS["dark"], linestyle="-", linewidth=1.5),
-                Line2D([], [], color=COLORS["dark"], linestyle="--", linewidth=1.2)]
-    labels = list(channel_colors) + ["NeuralRx", "conventional"]
-    top_legend(ax, ncol=2, handles=handles, labels=labels)
+    # Readers know a channel by whether a direct path exists; the caption names the models.
+    plain = {"Rayleigh": "no direct path", "CDL-D": "direct path", "CDL-E": "strong direct path"}
+    ax.legend([Line2D([], [], color=color, linewidth=2.2) for color in channel_colors.values()],
+              [plain[name] for name in channel_colors], loc="upper left", frameon=False, fontsize=6.2,
+              handlelength=1.2, handletextpad=0.35, labelspacing=0.15, borderaxespad=0.2)
     panel_label(ax, "a")
 
     # (b) Probability that an epoch with four admitted TBs retains at least k
@@ -462,7 +469,7 @@ def make_debt() -> dict:
     # Curve labels sit where no other curve or the band passes.
     for k, (p, y, va) in zip(range(1, 5), ((0.013, 0.09, "bottom"), (0.04, 0.0165, "bottom"),
                                            (0.05, 0.0008, "bottom"), (0.36, 0.0012, "top"))):
-        ax.text(p, y, f"$k$={k}", ha="center", va=va, fontsize=6.8,
+        ax.text(p, y, ("\u22651", "\u22652", "\u22653", "all 4")[k - 1], ha="center", va=va, fontsize=6.8,
                 color=shades[k - 1] if k > 1 else COLORS["dark"])
     measured = [(deployment["p"], debt_histogram_tail(deployment["retained_debt_epochs"]), "o")]
     measured += [(group["p"], debt_histogram_tail(group["retained_debt_epochs"]), "s")
@@ -478,7 +485,7 @@ def make_debt() -> dict:
     ax.set_ylim(1e-4, 1.6)
     ax.set_xticks([0.01, 0.1, 1.0], ["0.01", "0.1", "1"])
     ax.set_xlabel("per-TB failure probability")
-    ax.set_ylabel("P(at least $k$ of\n4 TBs fail)")
+    ax.set_ylabel("probability that this\nmany of 4 TBs fail")
     ax.grid(which="major", **GRID)
     ax.set_axisbelow(True)
     handles = [Line2D([], [], color=shades[3], linewidth=1.5),
@@ -487,8 +494,12 @@ def make_debt() -> dict:
                       markersize=4.5),
                Line2D([], [], color=shades[1], marker="s", linestyle="none", markeredgecolor=COLORS["dark"],
                       markersize=4.2)]
-    top_legend(ax, ncol=2, handles=[handles[0], handles[2], handles[1], handles[3]],
-               labels=["independent", "measured periods", "correlated", "grouped trials"], align="right")
+    # One legend above both panels: receiver line styles for (a), models and measurements for (b).
+    receivers = [Line2D([], [], color=COLORS["dark"], linestyle="-", linewidth=1.5),
+                 Line2D([], [], color=COLORS["dark"], linestyle="--", linewidth=1.2)]
+    figure_legend(fig, [receivers[0], receivers[1], handles[0], handles[1], handles[2], handles[3]],
+                  ["NeuralRx", "conventional receiver", "independent failures", "correlated failures",
+                   "measured periods", "measured trials"], ncol=3, compact=True)
     panel_label(ax, "b")
 
     save(fig, "softwall_debt")
@@ -662,7 +673,7 @@ def make_eval_capacity() -> dict:
                 linewidth=1.5, label=label)
     ax.set_xticks(range(len(cells)), [str(c) for c in cells])
     ax.set_xlabel("number of cells")
-    ax.set_ylabel("safe AI capacity\n(% of oracle)")
+    ax.set_ylabel("safe AI capacity\n(% of best possible)")
     ax.set_ylim(40, 105)
     ax.set_yticks([50, 75, 100])
     ax.grid(axis="y", **GRID)
@@ -765,7 +776,7 @@ def make_eval_drivers() -> dict:
                 linewidth=1.5)
     ax.set_xticks(range(len(expiries)), [str(e) for e in expiries])
     ax.set_xlabel("radio expiry (ms)")
-    ax.set_ylabel("safe AI capacity\n(% of oracle)")
+    ax.set_ylabel("safe AI capacity\n(% of best possible)")
     ax.set_ylim(25, 105)
     ax.set_yticks([25, 50, 75, 100])
     ax.grid(axis="y", **GRID)
@@ -827,7 +838,7 @@ def make_eval_trace() -> dict:
     ax.bar([x + width / 2 for x in xs], sw_mean, width=width, color=COLORS["blue"], zorder=3)
     ax.set_xticks(xs, [str(g) for g in gpus])
     ax.set_xlabel("number of GPUs")
-    ax.set_ylabel("on-time AI tokens\n(% of oracle)")
+    ax.set_ylabel("on-time AI tokens\n(% of best possible)")
     ax.set_ylim(0, 105)
     ax.set_yticks([0, 50, 100])
     ax.grid(axis="y", **GRID)
@@ -894,8 +905,8 @@ def make_eval_safety() -> dict:
     ax.axhline(expiry, color=COLORS["dark"], linestyle=":", linewidth=1.1, zorder=2)
     ax.text(-0.55, guard - 1.5, "recovery deadline", ha="left", va="top", fontsize=6.5, color=COLORS["red"])
     ax.text(2.45, expiry + 1.5, "expiry", ha="right", va="bottom", fontsize=6.5, color=COLORS["dark"])
-    ax.set_xticks([0, 1, 2], ["E4\n256 tokens\n2 recoveries", "E6b\n64 tokens\nat 89 ms",
-                              "E6a\n64 tokens\nat 88 ms"])
+    ax.set_xticks([0, 1, 2], ["256-token AI,\n2 recoveries\nleft", "64-token AI\nat 89 ms",
+                              "64-token AI\nat 88 ms"])
     ax.tick_params(axis="x", labelsize=6.4)
     ax.set_xlim(-0.6, 2.5)
     ax.set_ylim(85, 172)
@@ -1389,7 +1400,7 @@ def make_eval_sensitivity() -> dict:
     n = len(paths)
     ax.step(paths, [(n - i) / n for i in range(n)], where="post", color=COLORS["blue"], linewidth=1.4)
     ax.text(5.0, 0.3, "Backstop recoveries", ha="left", va="center", fontsize=6.3, color=COLORS["blue"])
-    for x, style, label in ((19, "-", "E4 limit"), (24, "--", "E6b limit")):
+    for x, style, label in ((19, "-", "256-token limit"), (24, "--", "64-token limit")):
         ax.axvline(x, color=COLORS["red"], linestyle=style, linewidth=1.0)
         ax.text(x - 0.6, 0.02, label, ha="right", va="center", fontsize=6.3, color=COLORS["red"], rotation=90)
     ax.axvline(bound, color=COLORS["blue"], linestyle=":", linewidth=1.1)
@@ -1413,8 +1424,8 @@ def make_eval_sensitivity() -> dict:
                Line2D([], [], marker="o", linestyle="none", markerfacecolor="none",
                       markeredgecolor=COLORS["blue"], markersize=4.5)]
     figure_legend(fig, [handles[0], handles[2], handles[4], handles[1], handles[3], handles[5]],
-                  ["E4, launched anyway", "E6b, launched anyway", "measured, launched anyway",
-                   "E4, Backstop", "E6b, Backstop", "measured, Backstop"], ncol=2, compact=True)
+                  ["256-token AI, launched anyway", "64-token AI, launched anyway", "measured, launched anyway",
+                   "256-token AI, Backstop", "64-token AI, Backstop", "measured, Backstop"], ncol=2, compact=True)
     save(fig, "softwall_eval_sensitivity")
     return {"excess_at_contract_ms": {case: excess(case, bound) for case in cases},
             "zero_excess_bound_ms": {"E4": 19, "E6b": 24},
@@ -1604,6 +1615,206 @@ def make_eval_load() -> dict:
     return summary
 
 
+def make_eval_single() -> dict:
+    """Single-GPU placement against the paired multi-GPU runs (C177 against C176)."""
+    placement = load("placement")
+    memory = load("single_memory")
+    tail = load("single_tail")
+    assert placement["safe_policies_zero_violations"] and not placement["unpaired"]["single"]
+    policies = (("recovery_first", "recovery-first", COLORS["gray"], "--", "s"),
+                ("backstop", "Backstop", COLORS["blue"], "-", "D"),
+                ("idle_time", "idle-time admission", COLORS["red"], "-", "^"))
+
+    fig, axes = plt.subplots(1, 3, figsize=(FIG_WIDTH, 1.5), gridspec_kw={"width_ratios": [1.0, 1.25, 0.95]})
+    fig.subplots_adjust(wspace=0.6)
+    summary = {"paired_tokens": {}, "ai_tail_ms": {}, "memory_gib": {}}
+
+    # (a) On-time AI tokens per second of every paired natural run: the six
+    # arrival patterns at 3 requests/s and the four Poisson loads.
+    ax = axes[0]
+    ax.plot([0, 1100], [0, 1100], color=COLORS["gray"], linestyle=":", linewidth=1.0, zorder=1)
+    for key, label, color, _, marker in policies:
+        pairs = [p for p in placement["pairs"] if p["policy"] == key and p["mode"] == "natural"]
+        xs = [p["multi"]["on_time_tokens_per_s"] for p in pairs]
+        ys = [p["single"]["on_time_tokens_per_s"] for p in pairs]
+        summary["paired_tokens"][label] = {"pairs": len(pairs),
+                                           "exact": sum(1 for x, y in zip(xs, ys) if abs(x - y) < 1e-9),
+                                           "max_relative_difference": max(abs(y - x) / max(x, 1e-9)
+                                                                          for x, y in zip(xs, ys))}
+        ax.scatter(xs, ys, s=14, marker=marker, facecolor="white", edgecolor=color, linewidths=1.0, zorder=3)
+    ax.set_xlim(0, 1100)
+    ax.set_ylim(0, 1100)
+    ax.set_xticks([0, 500, 1000])
+    ax.set_yticks([0, 500, 1000])
+    ax.set_xlabel("four GPUs")
+    ax.set_ylabel("one GPU: on-time\nAI tokens per second")
+    ax.text(1050, 110, "equal on\nthe diagonal", ha="right", va="bottom", fontsize=6.0, color=COLORS["gray"])
+    ax.grid(**GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    # (b) AI prefill time per prompt length over every run, failed and padded
+    # runs included: p99 (bars) and maximum (markers) against the class bound.
+    ax = axes[1]
+    contexts = ["64", "128", "256", "512"]
+    gx = list(range(len(contexts)))
+    width = 0.36
+    for offset, name, color in ((-width / 2, "multi", COLORS["light_gray"]), (width / 2, "single", COLORS["blue"])):
+        rows = [tail[name]["ai_execution_ms"][c] for c in contexts]
+        summary["ai_tail_ms"][name] = {c: {"p99": r["p99"], "max": r["max"], "over_bound": r["over_bound"]}
+                                       for c, r in zip(contexts, rows)}
+        ax.bar([x + offset for x in gx], [r["p99"] for r in rows], width=width, color=color,
+               edgecolor=COLORS["gray"] if name == "multi" else color, linewidth=0.6, zorder=3)
+        ax.scatter([x + offset for x in gx], [r["max"] for r in rows], s=16, marker="o",
+                   facecolor="white", edgecolor=COLORS["dark"] if name == "multi" else COLORS["blue"],
+                   linewidths=1.0, zorder=4)
+    bounds = [tail["single"]["ai_execution_ms"][c]["bound"] for c in contexts]
+    for x, bound in zip(gx, bounds):
+        ax.plot([x - 0.42, x + 0.42], [bound, bound], color=COLORS["red"], linewidth=1.3, zorder=5)
+    ax.set_xticks(gx, contexts)
+    ax.tick_params(axis="x", labelsize=6.8)
+    ax.set_xlabel("prompt length (tokens)")
+    ax.set_ylabel("AI prefill time (ms)")
+    ax.set_ylim(0, 118)
+    ax.set_yticks([0, 25, 50, 75, 100])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    # (c) Peak GPU memory: the multi-GPU placement summed over its GPUs and
+    # the single-GPU placement with one shared recovery receiver.
+    ax = axes[2]
+    per_gpu = memory["multi_gpu_600_periods_peak_gib"]
+    bottom = 0.0
+    shades = (COLORS["light_gray"], "#C9CED6", "#AEB5BF", "#8E96A1")
+    for (gpu, value), shade in zip(sorted(per_gpu.items()), shades):
+        ax.bar(0, value, bottom=bottom, width=0.6, color=shade, edgecolor=COLORS["gray"], linewidth=0.5, zorder=3)
+        bottom += value
+    single_peak = memory["single_gpu_shared_recovery_receiver_max_gib"]
+    ax.bar(1, single_peak, width=0.6, color=COLORS["blue"], zorder=3)
+    ax.axhline(memory["gpu_capacity_gib"], color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=4)
+    ax.text(1.35, memory["gpu_capacity_gib"] + 2, "one GPU", ha="right", va="bottom", fontsize=6.3, color=COLORS["red"])
+    summary["memory_gib"] = {"multi_gpu_sum": round(bottom, 2), "single_gpu": single_peak}
+    ax.set_xticks([0, 1], ["4 GPUs\n(summed)", "1 GPU"])
+    ax.tick_params(axis="x", labelsize=6.6)
+    ax.set_xlim(-0.55, 1.55)
+    ax.set_ylabel("peak GPU memory (GiB)")
+    ax.set_ylim(0, 100)
+    ax.set_yticks([0, 40, 80])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "c")
+
+    handles = [Line2D([], [], color=color, linestyle="none", marker=marker, markerfacecolor="white",
+                      markeredgecolor=color, markersize=4.2) for _, _, color, _, marker in policies]
+    handles += [Rectangle((0, 0), 1, 1, facecolor=COLORS["light_gray"], edgecolor=COLORS["gray"], linewidth=0.6),
+                 Rectangle((0, 0), 1, 1, facecolor=COLORS["blue"]),
+                 Line2D([], [], marker="o", linestyle="none", markerfacecolor="white", markeredgecolor=COLORS["dark"],
+                        markersize=4.2),
+                 Line2D([], [], color=COLORS["red"], linewidth=1.3)]
+    names = [label for _, label, _, _, _ in policies] + ["four GPUs (p99)", "one GPU (p99)", "maximum", "bound"]
+    figure_legend(fig, handles, names, ncol=4, compact=True)
+    save(fig, "softwall_eval_single")
+    return summary
+
+
+def make_eval_early() -> dict:
+    """Early AI slots on one GPU against Backstop on the same node (C178)."""
+    campaign = load("early_campaign")
+    assert campaign["certified_policies_safe"] and campaign["all_runs_completed"]
+    runs = {(run["pattern"], run["policy"], run["mode"]): run for run in campaign["runs"]}
+    load_runs = {(round(run["offered_rate_per_s"], 2), run["policy"]): run for run in load("early_load")["runs"]}
+    for run in campaign["runs"]:
+        if run["pattern"] == "gamma_cv1" and run["mode"] == "natural":
+            load_runs[(round(run["offered_rate_per_s"], 2), run["policy"])] = run
+    policies = (("backstop", "Backstop", COLORS["blue"], "-", "D"),
+                ("backstop_early", "Backstop + early AI slot", COLORS["green"], "-", "o"))
+    patterns = [name for name, _ in BURST_PATTERNS if (name, "backstop_early", "natural") in runs]
+    labels = [label for name, label in BURST_PATTERNS if name in patterns]
+    xs = list(range(len(patterns)))
+
+    fig, axes = plt.subplots(1, 3, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.15, 1.15, 1.0]})
+    fig.subplots_adjust(wspace=0.8)
+    summary = {"on_time_tokens_per_s": {}, "gain_percent": {}, "nrx_p99_ms": {}, "padded_nrx_p99_ms": {},
+               "timely_nrx_successes": {}, "early_served": {}, "load_tokens_per_s": {}}
+
+    # (a) On-time AI tokens per second on one GPU.
+    ax = axes[0]
+    for key, label, color, style, marker in policies:
+        values = [runs[(name, key, "natural")]["on_time_tokens_per_s"] for name in patterns]
+        summary["on_time_tokens_per_s"][label] = dict(zip(patterns, values))
+        summary["timely_nrx_successes"][label] = {name: runs[(name, key, "natural")]["timely_nrx_successes"]
+                                                  for name in patterns}
+        ax.plot(xs, values, color=color, linestyle=style, marker=marker, markersize=3.4, linewidth=1.4)
+    summary["gain_percent"] = {name: 100.0 * (runs[(name, "backstop_early", "natural")]["on_time_tokens_per_s"]
+                                              / runs[(name, "backstop", "natural")]["on_time_tokens_per_s"] - 1.0)
+                               for name in patterns}
+    summary["early_served"] = {name: runs[(name, "backstop_early", "natural")]["requests_served_early"]
+                               for name in patterns}
+    ax.set_xticks(xs, labels, rotation=35, ha="right", rotation_mode="anchor")
+    ax.tick_params(axis="x", labelsize=6.4)
+    ax.set_xlabel("AI arrivals (burstier →)")
+    ax.set_ylabel("on-time AI tokens\nper second")
+    ax.set_ylim(-30, 820)
+    ax.set_yticks([0, 250, 500, 750])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    # (b) p99 of the NeuralRx release-to-result path: natural runs (lines)
+    # and padded runs in which every AI slot holds the GPU for its bound
+    # (markers), against the NeuralRx deadline.
+    ax = axes[1]
+    for key, label, color, style, marker in policies:
+        values = [runs[(name, key, "natural")]["nrx_path_ms"]["p99"] for name in patterns]
+        summary["nrx_p99_ms"][label] = dict(zip(patterns, values))
+        ax.plot(xs, values, color=color, linestyle=style, marker=marker, markersize=3.4, linewidth=1.4)
+        padded = [(i, runs[(name, key, "padded")]["nrx_path_ms"]["p99"])
+                  for i, name in enumerate(patterns) if (name, key, "padded") in runs]
+        summary["padded_nrx_p99_ms"][label] = {patterns[i]: v for i, v in padded}
+        ax.scatter([i for i, _ in padded], [v for _, v in padded], s=26, marker=marker, facecolor="white",
+                   edgecolor=color, linewidths=1.1, zorder=4)
+    ax.axhline(45, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=2)
+    ax.text(len(patterns) - 1, 43, "NeuralRx deadline", ha="right", va="top", fontsize=6.3, color=COLORS["red"])
+    ax.set_xticks(xs, labels, rotation=35, ha="right", rotation_mode="anchor")
+    ax.tick_params(axis="x", labelsize=6.4)
+    ax.set_xlabel("AI arrivals (burstier →)")
+    ax.set_ylabel("NeuralRx result\np99 (ms)")
+    ax.set_ylim(0, 50)
+    ax.set_yticks([0, 15, 30, 45])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    # (c) On-time AI tokens per second against the offered Poisson load.
+    ax = axes[2]
+    rates = sorted({rate for rate, _ in load_runs})
+    for key, label, color, style, marker in policies:
+        values = [load_runs[(rate, key)]["on_time_tokens_per_s"] for rate in rates if (rate, key) in load_runs]
+        summary["load_tokens_per_s"][label] = {f"{rate:.2f}": load_runs[(rate, key)]["on_time_tokens_per_s"]
+                                               for rate in rates if (rate, key) in load_runs}
+        ax.plot([rate for rate in rates if (rate, key) in load_runs], values, color=color, linestyle=style,
+                marker=marker, markersize=3.4, linewidth=1.4)
+    ax.set_xlabel("offered AI load\n(requests/s)")
+    ax.set_ylabel("on-time AI\ntokens/s")
+    ax.set_xlim(0.5, 5.5)
+    ax.set_ylim(-40, 1300)
+    ax.set_yticks([0, 500, 1000])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "c")
+
+    handles = [Line2D([], [], color=color, linestyle=style, marker=marker, markersize=3.4, linewidth=1.4)
+               for _, _, color, style, marker in policies]
+    handles += [Line2D([], [], marker="o", linestyle="none", markerfacecolor="white", markeredgecolor=COLORS["green"],
+                       markersize=4.5),
+                Line2D([], [], color=COLORS["red"], linestyle="--", linewidth=1.1)]
+    names = [label for _, label, _, _, _ in policies] + ["padded run", "NeuralRx deadline"]
+    figure_legend(fig, handles, names, ncol=4, compact=True)
+    save(fig, "softwall_eval_early")
+    return summary
+
+
 def make_capacity_headroom() -> dict:
     """Capacity model, trace headroom screen, and prespecified lever decomposition."""
     capacity = load("capacity")
@@ -1726,6 +1937,8 @@ def main() -> None:
         "eval_online": make_eval_online(),
         "eval_burst": make_eval_burst(),
         "eval_load": make_eval_load(),
+        "eval_single": make_eval_single(),
+        "eval_early": make_eval_early(),
         "eval_refinement": make_eval_refinement(),
         "envelope": make_envelope(),
         "eval_sensitivity": make_eval_sensitivity(),
@@ -1733,7 +1946,7 @@ def main() -> None:
     }
     stems = ("softwall_execution", "softwall_debt", "softwall_eval_capacity", "softwall_eval_drivers",
              "softwall_eval_trace", "softwall_eval_safety", "softwall_eval_online", "softwall_eval_burst",
-             "softwall_eval_load",
+             "softwall_eval_load", "softwall_eval_single", "softwall_eval_early",
              "softwall_eval_refinement",
              "softwall_envelope", "softwall_eval_sensitivity", "softwall_capacity_headroom")
     manifest = {

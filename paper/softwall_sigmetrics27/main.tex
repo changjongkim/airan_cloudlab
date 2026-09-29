@@ -187,12 +187,12 @@ near this transition.
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_debt.pdf}
   \caption{Uncertain recovery need across channels and failure rates. (a) Share of TBs that \NRx
-  (solid) and the conventional receiver (dashed) decode in three channel models; each SNR is shifted so
-  that the conventional receiver decodes half of the TBs at 0~dB. (b) Probability that a period with four
+  (solid) and the conventional receiver (dashed) decode in three channel models; the relative SNR is 0~dB where
+  the conventional receiver decodes half of the TBs. (b) Probability that a period with four
   admitted TBs requires at least $k$ recoveries when each TB fails with probability $p$. Lines assume
   independent failures; the band raises the correlation of the all-four event to 0.3. Circles are
-  deployment periods that join the transition-SNR TBs of two consecutive measured periods; squares group
-  four consecutive receiver trials.}
+  measured periods that join the transition-SNR TBs of two consecutive campaign periods; squares are
+  grouped trials of four consecutive receiver trials.}
   \Description{The left line chart shows decode success against SNR offset for NeuralRx and the
   conventional receiver in a block-Rayleigh, a CDL-D, and a CDL-E channel; every curve rises from zero to
   one hundred percent within about one decibel. The right log-log plot shows, against the per-TB failure
@@ -217,10 +217,10 @@ miss the 21~ms deadline. Thus, an MPS share is safe only for the AI class under 
   \includegraphics[width=0.9\linewidth]{figures/softwall_execution.pdf}
   \caption{Execution variability on shared A100 GPUs. (a) Radio p99 of a two-cell 273-PRB PUSCH
   pipeline against the MPS share of a co-running Qwen prefill class: one 16-token request (light) or
-  eight 512-token requests (heavy). Lines connect run means, and bars span the runs. (b) Complementary
-  CDF of latency normalized by its median: host construction of a scheduling certificate (1,200
-  periods), cross-GPU receiver pairs at the 4.5~ms scale with a Python and a partly native C++/CUDA path
-  (1,000 and 300 slots), and the \NRx TensorRT graph (300 slots).}
+  eight 512-token requests (heavy). Lines connect run means, and bars span the runs. (b) Fraction of
+  runs whose latency exceeds a multiple of its median: certificate build on the host (1,200 periods),
+  cross-GPU receiver pairs at the 4.5~ms scale on a Python and a partly native C++/CUDA path (1,000 and
+  300 slots), and the \NRx kernel as a TensorRT graph (300 slots).}
   \Description{The left line chart shows radio p99 latency for MPS shares of 20 to 100 percent for a
   light and a heavy AI class, with a band for the radio pipeline alone and a dashed deadline line that
   only the heavy class at 100 percent crosses. The right log-log plot shows complementary CDFs of latency
@@ -599,6 +599,7 @@ decision and launch delay and does not assume immediate dispatch.
 \noindent\textbf{Idle Time.}
 The same window shows why idle GPU time cannot authorize admission.
 \begin{proposition}[Idle time is insufficient]
+\label{prop:idletime}
 On one non-preemptive lane with common guard $D$, unresolved bounds $c_1,\ldots,c_m$, and AI bound
 $b_{\mathrm{eff}}$, suppose mandatory-only execution is feasible but
 \begin{equation}
@@ -804,15 +805,51 @@ calculation in all 5,376 checked cases. \sys achieves this capacity by admitting
 all-fail schedule of the remaining recoveries and by placing AI first whenever that schedule still
 completes before the guard.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_drivers.pdf}
+  \caption{Drivers of safe AI capacity in the exact-checked capacity model. (a) Mean AI units per
+  release period against the \NRx success rate. (b) AI capacity relative to the offline oracle against
+  the radio expiry. (c) Radio violation probability of idle-time admission against the \NRx success
+  rate. Each success rate covers the same 4,572 mandatory-feasible configurations.}
+  \Description{Three line charts. The first shows the AI units per period of SoftWall rising with the
+  NeuralRx success rate while static reservation stays flat and recovery-first stays below SoftWall.
+  The second shows static reservation far below the oracle at a 100-millisecond expiry while SoftWall
+  stays at the oracle. The third shows the violation probability of idle-time admission falling as
+  NeuralRx succeeds more often while SoftWall stays at zero.}
+  \label{fig:eval-drivers}
+\end{figure}
+
+% provenance: C167_CAPACITY
+\noindent\textbf{Capacity Released by NeuralRx Success.}
+Figure~\ref{fig:eval-drivers}a isolates the capacity that a timely \NRx success releases. Each success
+rate covers the same 4,572 mandatory-feasible configurations. As the success rate grows from 0.2 to
+0.8, \sys admits 1.19, 1.32, and 1.43 AI units per period on average, while static reservation stays at
+1.09 units because it holds every pending recovery regardless of the outcome. Recovery-first rises from
+0.98 to 1.36 units and admits fewer units than static reservation at a 0.2 success rate, because it
+runs the many required recoveries before any AI unit. \sys converts each success into AI capacity
+because the outcome batch cancels the pending recovery of every successful TB and \sys places AI first
+against the remaining all-fail schedule.
+
+\noindent\textbf{Radio Expiry.}
+Figure~\ref{fig:eval-drivers}b varies the radio expiry. At a 100~ms expiry, static reservation reaches
+only 37.9\% of the oracle because the reserved recoveries fill most of the short window; at 220~ms, it
+reaches 96.5\%. Recovery-first follows the opposite trend, from 93.8\% to 83.6\%, because a longer window
+makes the AI deadline the binding constraint, and running the recoveries first then delays AI past its
+deadline. \sys stays at the oracle capacity at every expiry. Figure~\ref{fig:eval-drivers}c shows the
+cost of ignoring pending recovery: the violation probability of idle-time admission falls from 26.4\%
+to 6.2\% as the success rate grows, and it is largest when \NRx fails most often.
+
 \subsection{Timely AI value on real traces}
 \label{sec:eval-trace}
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/softwall_eval_trace.pdf}
-  \caption{Timely AI value on BurstGPT traces at the 362 prespecified headroom points. (a) Mean timely
-  value relative to the fixed-placement oracle per GPU count. (b) CDF of the ratio between the timely
-  value of \sys and that of certificate-preserving recovery-first.}
+  \caption{Timely AI value on BurstGPT traces at the 362 prespecified headroom points; timely value counts
+  the AI tokens served within their SLO. (a) Mean timely value relative to the fixed-placement oracle
+  per GPU count. (b) Cumulative distribution of the ratio between the timely value of \sys and that of
+  certificate-preserving recovery-first.}
   \Description{A grouped bar chart shows that recovery-first reaches about half to three quarters of the
   oracle value on one to four GPUs while SoftWall reaches nearly all of it. A CDF shows the per-point
   ratio of SoftWall to recovery-first value, from one to about seventeen.}
@@ -858,21 +895,6 @@ remains the strong safe baseline in that mode.
 \subsection{Online scheduling on physical GPUs}
 \label{sec:eval-online}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_online.pdf}
-  \caption{Online scheduling in the two-node campaign, measured from the \NRx deadline. (a) Certificate
-  of the shared lane in 36 consecutive release periods: each admitted AI lease includes the 5~ms
-  launch-control charge, and the required recoveries follow it with their full bound; a rejected AI
-  lease is drawn where it would end. (b) Measured against certified end of the last lane action in all
-  1,200 periods; the dotted diagonal marks equality.}
-  \Description{A stacked bar chart shows, for 36 release periods, an AI lease with the measured prefill
-  inside it and one or two recoveries above it, all below the guard at 108 milliseconds; two rejected
-  leases would cross the guard. A scatter plot shows the measured and certified end of every period,
-  with all points below the diagonal and left of the guard.}
-  \label{fig:eval-online}
-\end{figure}
-
 % provenance: Q2_WARM_PATH
 \noindent\textbf{Two-Node Campaign.}
 The frozen \texttt{P180/D155} campaign runs 600 release periods on each of two nodes and offers one Qwen
@@ -883,6 +905,22 @@ Maximum \NRx, recovery, and radio-commit paths are 18.123, 13.465, and 118.022~m
 45, 25, and 155~ms. Nsight verifies 191 \NRx-Qwen kernel-overlap segments totaling 8.932~ms and
 conventional overlap with the \NRx of another cell in 12/12 windows for 12.309~ms, which establishes
 physical co-execution rather than service bounds.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_online.pdf}
+  \caption{Online scheduling in the two-node campaign, measured from the \NRx deadline. (a) Certificate
+  of the shared lane in 36 consecutive release periods: each admitted AI lease includes the 5~ms
+  launch-control charge, and the required recoveries follow it with their full bound; a rejected AI
+  lease is drawn where it would end. (b) Measured against certified finish of the last action on the
+  shared lane, the AI prefill or the last recovery, in all 1,200 periods; the marker gives the required
+  recoveries of the period, orange marks a rejected AI unit, and the dotted diagonal marks equality.}
+  \Description{A stacked bar chart shows, for 36 release periods, an AI lease with the measured prefill
+  inside it and one or two recoveries above it, all below the guard at 108 milliseconds; two rejected
+  leases would cross the guard. A scatter plot shows the measured and certified end of every period,
+  with all points below the diagonal and left of the guard.}
+  \label{fig:eval-online}
+\end{figure}
 
 \noindent\textbf{AI-First Certificates.}
 Figure~\ref{fig:eval-online}a shows the certificates that \sys commits in 36 consecutive periods of the
@@ -908,21 +946,6 @@ observes.
 \subsection{Radio safety at the certificate boundary}
 \label{sec:eval-physical}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_safety.pdf}
-  \caption{Radio safety at the certificate boundary on two nodes. (a) End of the last
-  recovery in every attempt of the bound-padded boundary diagnostic; baseline attempts are idle-time
-  admission in E4 and the shadow launch of the unit that \sys rejects in E6b. (b) Qwen units per prompt
-  length in the two-node campaign: units executed by \sys and units that only idle-time admission would
-  launch because they break the certified recovery bound; static reservation launches none.}
-  \Description{A strip plot shows baseline attempts ending after the guard in cases E4 and E6b and every
-  SoftWall attempt ending before it, including the admitted E6a case. A stacked bar chart shows that
-  SoftWall executes all 16- to 128-token units and part of the 256- and 512-token units, and that the
-  remaining units would break the recovery bound.}
-  \label{fig:eval-safety}
-\end{figure}
-
 % provenance: C162_NECESSITY
 \noindent\textbf{What the certificate prevents.}
 Figure~\ref{fig:eval-safety}a runs three prespecified boundary cases on two independent nodes as a
@@ -936,6 +959,23 @@ guard and deadline in 40/40 rounds, the shadow launch in E6b violates the guard 
 records 0/120 safety violations (95\% rule-of-three upper bound 2.5\%). Jointly bound-valid counts are
 39/39, 39/39, and 0/119, respectively.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_safety.pdf}
+  \caption{Radio safety at the certificate boundary on two nodes. (a) End of the last recovery in every
+  attempt of the bound-padded boundary diagnostic. E4 offers a 256-token unit with two required
+  recoveries at 45~ms; E6b and E6a offer a 64-token unit with one required recovery at 89 and 88~ms.
+  Baseline attempts launch the unit anyway: idle-time admission in E4 and a shadow launch of the unit
+  that \sys rejects in E6b. (b) AI units per prompt length in the two-node campaign: units that \sys
+  runs and units that it rejects because they break the certified recovery bound; idle-time admission
+  would run all of them, and static reservation runs none.}
+  \Description{A strip plot shows baseline attempts ending after the guard in cases E4 and E6b and every
+  SoftWall attempt ending before it, including the admitted E6a case. A stacked bar chart shows that
+  SoftWall executes all 16- to 128-token units and part of the 256- and 512-token units, and that the
+  remaining units would break the recovery bound.}
+  \label{fig:eval-safety}
+\end{figure}
+
 % provenance: Q2_WARM_PATH
 \noindent\textbf{Rejected Units.}
 Figure~\ref{fig:eval-safety}b shows the same boundary in the two-node campaign. \sys executes every
@@ -948,41 +988,54 @@ forbids.
 \subsection{Execution refinement and fault containment}
 \label{sec:eval-refinement}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_refinement.pdf}
-  \caption{Execution refinement under physical faults. (a) Arrival of each AI lease at the Qwen worker
-  relative to its absolute latest-start: the 1,077 leases of the two-node campaign and the 52 leases
-  that fault class A4 holds past the latest-start. (b) Release-to-commit time of every TB in fault
-  classes A0-A6: no fault, correlated all-fail, stale and duplicate \NRx outcomes, Qwen reply delay
-  after the fence, lease held past the latest-start, Qwen channel loss before the fence, and stale and
-  duplicate recovery responses.}
-  \Description{A strip plot shows all campaign leases arriving about three milliseconds before their
-  latest-start and launching, and all held leases arriving six to seven milliseconds after it and being
-  refused. Box plots show the release-to-commit time of every TB in seven fault classes, all below the
-  155-millisecond expiry.}
-  \label{fig:eval-refinement}
-\end{figure}
-
 \noindent\textbf{Latest-Start Enforcement.}
 A certificate remains valid only if the GPU cannot start a lease later than the certificate assumes.
 Figure~\ref{fig:eval-refinement}a shows the arrival of each lease at the Qwen worker relative to its
 absolute latest-start. All 1,077 leases of the two-node campaign arrive 2.9-3.8~ms before the
-latest-start and launch. Fault class A4 holds 52 leases until 6.4-7.2~ms after the latest-start, and
+latest-start and launch. The held-lease fault keeps 52 leases until 6.4-7.2~ms after the latest-start, and
 the worker refuses all 52 before GPU launch with a non-launch marker. A launch that ignored the
 latest-start would run these units up to 7.2~ms later than their certificates and push the required
 recoveries toward the guard. \sys achieves this by binding the absolute latest-start to the lease at
 commit and by checking it in the worker immediately before kernel submission.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_refinement.pdf}
+  \caption{Execution refinement and radio commit time. (a) Arrival of each AI lease at the Qwen worker
+  relative to its absolute latest-start: the 1,077 leases of the two-node campaign and the 52 leases
+  that the held-lease fault keeps past the latest-start. (b) Commit time of every recovered TB in the
+  two-node campaign, grouped by the prompt length of the AI lease that runs before its recovery; the
+  dotted line marks the median commit of the TBs that \NRx decodes. (c) Commit time of every TB under
+  each injected fault: no fault, all TBs of a period fail, stale and duplicate \NRx outcomes, a late AI
+  reply after GPU completion, an AI lease held past its latest-start, an AI channel lost before GPU
+  completion, and stale and duplicate recovery responses.}
+  \Description{A strip plot shows all campaign leases arriving about three milliseconds before their
+  latest-start and launching, and all held leases arriving six to seven milliseconds after it and being
+  refused. Box plots show recovered TBs committing later after longer AI leases, and every TB of seven
+  fault classes committing, all below the 155-millisecond expiry.}
+  \label{fig:eval-refinement}
+\end{figure}
+
+% provenance: Q2_WARM_PATH
+\noindent\textbf{Radio Commit Time.}
+AI-first placement delays the required recoveries, and Figure~\ref{fig:eval-refinement}b measures this cost
+on every TB of the two-node campaign. The 3,488 TBs with a timely \NRx success commit in the outcome
+batch at a median of 46.1~ms after release, independent of the AI lease. Recovered TBs commit at a
+median of 62.1~ms when no AI lease precedes the recovery, 72.7-73.7~ms after a 16-128-token lease,
+86.0~ms after a 256-token lease, and 116.4~ms after a 512-token lease. The latest commit, 118.022~ms,
+precedes the 155~ms expiry by 37.0~ms. Thus, AI-first placement moves a recovery commit later by at most
+the certified lease length and never past the expiry, because the certificate charges each lease before
+the recoveries that follow it.
 
 % provenance: C160_FAULT
 \noindent\textbf{Fault Containment.}
 A stale message or a lost reply can retire the wrong physical credit even when the schedule is
 feasible. Therefore, we combine finite-state checking with physical fault injection. A finite-state
 audit checks 51 combinations of worker epoch, generation, fence, and marker state without an invariant
-violation. The physical campaign injects the seven fault classes A0-A6 on the two qualified nodes.
-Figure~\ref{fig:eval-refinement}b shows that every TB in every class commits exactly once before
-expiry. The largest release-to-commit time is 125.2~ms in A1, in which every TB of a period fails and
-all four recoveries run, and it stays 29.8~ms before the 155~ms expiry. The campaign executes 700
+violation. The physical campaign injects seven fault classes on the two qualified nodes.
+Figure~\ref{fig:eval-refinement}c shows that every TB in every class commits exactly once before
+expiry. The largest commit time is 125.2~ms when every TB of a period fails and all four recoveries run,
+and it stays 29.8~ms before the 155~ms expiry. The campaign executes 700
 release periods, 2,800 \NRx requests, 942 recoveries, and 2,800 commits without an observed deadline
 miss, including 40 replay pairs, four terminal faults, and 260 continuation periods; 0/2,800 misses
 gives a 95\% rule-of-three upper bound of 0.107\%. One additional node violates the \NRx whole-path
@@ -997,7 +1050,8 @@ applies to the two qualified nodes and the declared fault and lifecycle classes.
   \includegraphics[width=0.9\linewidth]{figures/softwall_envelope.pdf}
   \caption{Predictive scheduling and control cost. (a) Latest decision time at which one AI unit of each
   prompt length remains admissible with four admitted TBs and zero to four pending recoveries; circles
-  and crosses mark the prespecified physical cases that the scheduler admitted and rejected. (b)
+  and crosses mark the prespecified physical tests that the scheduler admitted and rejected, labeled
+  with their prompt length. (b)
   Candidate construction and independent verification latency against the number of pending
   recoveries, with the evaluated 5~ms control budget. Latencies are finite-run measurements, not WCETs.}
   \Description{The first plot shows, for four prompt lengths, the latest admissible decision time
@@ -1031,12 +1085,35 @@ one proposed schedule.
 \subsection{Sensitivity analysis}
 \label{sec:eval-sensitivity}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_sensitivity.pdf}
+  \caption{Sensitivity to the recovery bound. (a) End of the last recovery relative to the guard when
+  the unit that \sys rejects runs anyway, against the recovery bound $B_{\mathrm{conv}}$: lines follow
+  the bound-respecting schedules of E4 and E6b, and crosses mark the physical attempts measured at the
+  certified 25~ms bound. (b) Fraction of the 1,312 measured recovery times of the two-node campaign that
+  exceed a given length, with the bounds at which E4 and E6b disappear (E4 and E6b limits) and the
+  certified bound.}
+  \Description{A line chart shows the excess of the last recovery past the guard growing linearly with
+  the recovery bound for E4 and E6b, crossing zero at 19 and 24 milliseconds, with physical attempts
+  near the lines at 25 milliseconds. A complementary distribution shows all measured recovery paths
+  ending below 14 milliseconds, left of both thresholds and the contract.}
+  \label{fig:eval-sensitivity}
+\end{figure}
+
+% provenance: C162_NECESSITY
 \noindent\textbf{Recovery Bound.}
-The boundary cases use the qualified $B_{\mathrm{conv}}=25$~ms contract.
-E6b disappears at or below 24~ms, while E4 remains until 19~ms. The observed recovery maximum is 13.465~ms, but a sample maximum
-cannot replace a service contract; lowering the bound defines another mode and requires
-requalification. Therefore, the padded campaign is a necessity diagnostic for the declared contract,
-not a production-rate or WCET claim.
+The boundary cases use the qualified $B_{\mathrm{conv}}=25$~ms contract. Figure~\ref{fig:eval-sensitivity}a
+shows how the excess of a rejected unit depends on this bound. The excess of E4 grows by 2~ms and that
+of E6b by 1~ms per millisecond of bound because each required recovery adds its bound to the end of the
+last recovery, and the physical attempts measured at the certified bound lie within 1.8~ms of these
+lines.
+E6b disappears at or below 24~ms, while E4 remains until 19~ms. Figure~\ref{fig:eval-sensitivity}b
+shows that the 1,312 measured recovery paths have a median of 3.404~ms and a maximum of 13.465~ms,
+below both thresholds. A sample maximum cannot replace a service contract; lowering the bound defines
+another mode and requires requalification, and Proposition~\ref{prop:idletime} still yields a later
+false-safe decision time for every positive bound. Therefore, the padded campaign is a necessity
+diagnostic for the declared contract, not a production-rate or WCET claim.
 
 % provenance: Q1_MPS_DIAGNOSTICS
 \noindent\textbf{MPS Configuration.}

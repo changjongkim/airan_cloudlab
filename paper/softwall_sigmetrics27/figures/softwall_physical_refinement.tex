@@ -13,7 +13,7 @@
 
   % (1) Commit a lease with an absolute latest-start.
   \node[comp, fill=aic, minimum width=2.3cm, minimum height=0.46cm] at (1.5,4.45)
-    {commit lease $L$\\committed, gen $g{+}1$};
+    {commit lease $L$\\generation $g{+}1$};
   \node[num] at (0.18,4.45) {1};
 
   % (2) Run request.
@@ -46,7 +46,7 @@
 
   % (5) Retire only with matching physical evidence.
   \node[comp, fill=okc, draw=green!45!black, minimum width=2.3cm, minimum height=0.46cm]
-    at (1.5,1.2) {retire $L$ on match\\gen $g{+}2$};
+    at (1.5,1.2) {retire $L$ on marker\\generation $g{+}2$};
   \node[num] at (0.18,1.2) {5};
 
   % Fault 1: a late or lost reply after the fence is reconciled from the marker.
@@ -54,24 +54,24 @@
   \node[font=\itshape\scriptsize, text=dred, anchor=south] at (2.55,2.05) {read marker};
   \node[rnum] at (0.18,2.05) {1};
   \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (1.6,2.62)
-    {reply delayed or lost\\after the fence};
+    {reply late or lost\\after GPU completion};
 
   % Fault 2: a channel lost before the fence leaves only the launch marker.
   \node[comp, draw=dred, fill=badc, minimum width=7.0cm, minimum height=0.5cm, align=center]
-    at (4.05,0.5) {channel lost before the fence: only L.launch at lease end\\
-                   keep $L$ and quarantine AI; radio recovery continues};
+    at (4.05,0.5) {channel lost before GPU completion: only L.launch exists\\
+                   keep $L$ and stop AI admission; radio recovery continues};
   \node[rnum] at (0.18,0.5) {2};
 
   % ------------------------------------------------ radio state (faults 3, 4)
   \draw[sub, fill=panel] (10.75,0.25) rectangle (13.75,5.25);
   \node[pttl] at (12.25,5.03) {Radio state, period 17};
   \node[hcell, minimum width=2.8cm] at (10.85,4.78) {applied outcome batches};
-  \node[cell, minimum width=2.8cm, fill=okc] at (10.85,4.48) {nrx-17: TB1, TB2 cancelled};
+  \node[cell, minimum width=2.8cm, fill=okc] at (10.85,4.48) {batch 17: TB1, TB2 cancelled};
   \node[rnum] at (11.02,3.9) {3};
   \node[font=\itshape\tiny, text=dred, anchor=west, align=left] at (11.2,3.9)
-    {replay of nrx-17 or a\\period-16 batch: no change};
+    {replayed batch 17 or stale\\batch 16: no change};
   \node[hcell, minimum width=2.8cm] at (10.85,3.4) {commit set (period, TB)};
-  \foreach \y/\k/\src in {3.1/{(17, TB1)}/NRx, 2.8/{(17, TB2)}/NRx,
+  \foreach \y/\k/\src in {3.1/{(17, TB1)}/NeuralRx, 2.8/{(17, TB2)}/NeuralRx,
                            2.5/{(17, TB3)}/cuPHY, 2.2/{(17, TB4)}/cuPHY} {
     \node[cell, minimum width=1.75cm] at (10.85,\y) {\k};
     \node[cell, minimum width=1.05cm] at (12.6,\y) {\src};

@@ -56,6 +56,7 @@ SOURCES = {
     "necessity_holdout": ROOT / "results/softwall_multigpu/c172_debt_blind_job58957719_result.json",
     "fault_phase1": ROOT / "results/softwall_multigpu/c161_phase1_two_node.json",
     "fault_phase2": ROOT / "results/softwall_multigpu/c161_phase2_two_node.json",
+    "necessity_witness": ROOT / "results/softwall_multigpu/softwall_necessity_witness_v3.json",
 }
 
 # Raw per-request records behind the two background figures. The Q2
@@ -153,15 +154,20 @@ def panel_label(ax, label: str) -> None:
 
 
 def save(fig, stem: str) -> None:
+    # The tight bounding box of matplotlib 3.8 narrows axis labels to their
+    # anchor; listing the labels keeps a long label from being cut at the edge.
+    labels = fig.get_default_bbox_extra_artists() + [axis.label for ax in fig.axes for axis in (ax.xaxis, ax.yaxis)]
     fig.savefig(
         HERE / f"{stem}.pdf",
         bbox_inches="tight",
+        bbox_extra_artists=labels,
         pad_inches=0.04,
         metadata={"CreationDate": None, "ModDate": None},
     )
     fig.savefig(
         HERE / f"{stem}.svg",
         bbox_inches="tight",
+        bbox_extra_artists=labels,
         pad_inches=0.04,
         metadata={"Date": None},
     )
@@ -312,12 +318,13 @@ def derive_background() -> None:
     BACKGROUND_DATA.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
 
 
-def top_legend(ax, ncol: int, handles=None, labels=None) -> None:
-    """Legend above the axes and above the panel marker."""
+def top_legend(ax, ncol: int, handles=None, labels=None, align: str = "center") -> None:
+    """Legend above the axes and above the panel marker; a right-aligned legend ends at the right spine."""
     if handles is None:
         handles, labels = ax.get_legend_handles_labels()
-    ax.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 1.13), ncol=ncol, frameon=False,
-              handlelength=1.5, handletextpad=0.4, columnspacing=0.9, labelspacing=0.2, borderaxespad=0.0)
+    anchor = {"center": ("lower center", 0.5), "right": ("lower right", 1.0)}[align]
+    ax.legend(handles, labels, loc=anchor[0], bbox_to_anchor=(anchor[1], 1.13), ncol=ncol, frameon=False,
+              handlelength=1.3, handletextpad=0.35, columnspacing=0.7, labelspacing=0.2, borderaxespad=0.0)
 
 
 def make_execution() -> dict:
@@ -331,15 +338,15 @@ def make_execution() -> dict:
     assert all(sweeps[name]["by_share"][str(s)]["misses"] == 0
                for name in ("light", "heavy") for s in [0] + shares if (name, s) != ("heavy", 100))
 
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3))
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3), gridspec_kw={"width_ratios": [0.85, 1.15]})
     fig.subplots_adjust(wspace=0.45)
 
     # (a) Radio p99 against the MPS share of a co-running Qwen prefill class.
     # Lines connect the mean over runs; bars span the runs.
     ax = axes[0]
     alone = [value for sweep in sweeps.values() for value in sweep["by_share"]["0"]["p99_ms"]]
-    ax.axhspan(min(alone), max(alone), color=COLORS["light_gray"], zorder=1, label="RAN alone")
-    ax.axhline(deadline, color=COLORS["red"], linestyle="--", linewidth=1.2, zorder=2, label="deadline")
+    ax.axhspan(min(alone), max(alone), color=COLORS["light_gray"], zorder=1, label="radio alone")
+    ax.axhline(deadline, color=COLORS["red"], linestyle="--", linewidth=1.2, zorder=2, label="radio deadline")
     summary = {}
     for name, color, marker, label in (("light", COLORS["green"], "o", "light AI"),
                                        ("heavy", COLORS["purple"], "s", "heavy AI")):
@@ -352,21 +359,21 @@ def make_execution() -> dict:
     ax.set_xlim(10, 110)
     ax.set_ylim(0, 25)
     ax.set_yticks([0, 10, 20])
-    ax.set_xlabel("AI MPS share (%)")
-    ax.set_ylabel("radio p99 (ms)")
+    ax.set_xlabel("AI GPU share by MPS (%)")
+    ax.set_ylabel("radio p99\nlatency (ms)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     handles, labels = ax.get_legend_handles_labels()
-    order = [labels.index(name) for name in ("light AI", "RAN alone", "heavy AI", "deadline")]
+    order = [labels.index(name) for name in ("light AI", "radio alone", "heavy AI", "radio deadline")]
     top_legend(ax, ncol=2, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
     panel_label(ax, "a")
 
     # (b) Complementary CDF of latency normalized by its own median.
     ax = axes[1]
-    series = (("certificate_build", "host build", COLORS["orange"]),
-              ("pair_python", "Python pair", COLORS["brown"]),
-              ("pair_native", "native pair", COLORS["cyan"]),
-              ("kernel", "GPU kernel", COLORS["gray"]))
+    series = (("certificate_build", "certificate build", COLORS["orange"]),
+              ("pair_python", "receivers (Python)", COLORS["brown"]),
+              ("pair_native", "receivers (C++)", COLORS["cyan"]),
+              ("kernel", "NeuralRx kernel", COLORS["gray"]))
     tails = {}
     for key, label, color in series:
         values = sorted(data["latency_ms"][key])
@@ -381,13 +388,16 @@ def make_execution() -> dict:
     ax.set_xlim(0.8, 40)
     ax.set_ylim(5e-4, 1.5)
     ax.set_xticks([1, 3, 10, 30], ["1", "3", "10", "30"])
-    ax.set_xlabel("latency / median")
-    ax.set_ylabel("CCDF")
+    ax.set_xlabel("latency / median latency")
+    ax.set_ylabel("fraction of runs\nabove")
     ax.grid(which="major", **GRID)
     ax.set_axisbelow(True)
     handles, labels = ax.get_legend_handles_labels()
-    order = [labels.index(name) for name in ("host build", "native pair", "Python pair", "GPU kernel")]
-    top_legend(ax, ncol=2, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
+    order = [labels.index(name) for name in ("certificate build", "receivers (Python)", "receivers (C++)",
+                                             "NeuralRx kernel")]
+    # No curve enters the upper-right area, which holds the legend.
+    ax.legend([handles[i] for i in order], [labels[i] for i in order], loc="upper right", frameon=False,
+              fontsize=6.6, handlelength=1.4, handletextpad=0.35, labelspacing=0.15, borderaxespad=0.2)
     panel_label(ax, "b")
 
     save(fig, "softwall_execution")
@@ -401,7 +411,7 @@ def make_debt() -> dict:
     deployment = data["deployment_joined"]
     assert deployment["epochs"] == 600
 
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3))
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3), gridspec_kw={"width_ratios": [0.85, 1.15]})
     fig.subplots_adjust(wspace=0.6)
 
     # (a) Waterfalls of both receivers, shifted so that the conventional
@@ -419,7 +429,7 @@ def make_debt() -> dict:
     ax.set_xlim(-1.7, 0.6)
     ax.set_ylim(-4, 104)
     ax.set_yticks([0, 50, 100])
-    ax.set_xlabel("SNR offset (dB)")
+    ax.set_xlabel("relative SNR (dB)")
     ax.set_ylabel("TBs decoded (%)")
     ax.grid(**GRID)
     ax.set_axisbelow(True)
@@ -427,8 +437,7 @@ def make_debt() -> dict:
     handles += [Line2D([], [], color=COLORS["dark"], linestyle="-", linewidth=1.5),
                 Line2D([], [], color=COLORS["dark"], linestyle="--", linewidth=1.2)]
     labels = list(channel_colors) + ["NeuralRx", "conventional"]
-    order = [0, 3, 1, 4, 2]
-    top_legend(ax, ncol=3, handles=[handles[i] for i in order], labels=[labels[i] for i in order])
+    top_legend(ax, ncol=2, handles=handles, labels=labels)
     panel_label(ax, "a")
 
     # (b) Probability that an epoch with four admitted TBs retains at least k
@@ -446,7 +455,7 @@ def make_debt() -> dict:
     # Curve labels sit where no other curve or the band passes.
     for k, (p, y, va) in zip(range(1, 5), ((0.013, 0.09, "bottom"), (0.04, 0.0165, "bottom"),
                                            (0.05, 0.0008, "bottom"), (0.36, 0.0012, "top"))):
-        ax.text(p, y, "all 4" if k == 4 else f"$\\geq${k}", ha="center", va=va, fontsize=6.8,
+        ax.text(p, y, f"$k$={k}", ha="center", va=va, fontsize=6.8,
                 color=shades[k - 1] if k > 1 else COLORS["dark"])
     measured = [(deployment["p"], debt_histogram_tail(deployment["retained_debt_epochs"]), "o")]
     measured += [(group["p"], debt_histogram_tail(group["retained_debt_epochs"]), "s")
@@ -461,8 +470,8 @@ def make_debt() -> dict:
     ax.set_xlim(0.01, 1.0)
     ax.set_ylim(1e-4, 1.6)
     ax.set_xticks([0.01, 0.1, 1.0], ["0.01", "0.1", "1"])
-    ax.set_xlabel("per-TB failure probability $p$")
-    ax.set_ylabel("$P$(recoveries $\\geq k$)")
+    ax.set_xlabel("per-TB failure probability")
+    ax.set_ylabel("P(at least $k$ of\n4 TBs fail)")
     ax.grid(which="major", **GRID)
     ax.set_axisbelow(True)
     handles = [Line2D([], [], color=shades[3], linewidth=1.5),
@@ -472,7 +481,7 @@ def make_debt() -> dict:
                Line2D([], [], color=shades[1], marker="s", linestyle="none", markeredgecolor=COLORS["dark"],
                       markersize=4.2)]
     top_legend(ax, ncol=2, handles=[handles[0], handles[2], handles[1], handles[3]],
-               labels=["independent", "deployment", "correlated", "receiver trials"])
+               labels=["independent", "measured periods", "correlated", "grouped trials"], align="right")
     panel_label(ax, "b")
 
     save(fig, "softwall_debt")
@@ -497,7 +506,7 @@ def make_envelope() -> dict:
     contexts = [64, 128, 256, 512]
     shades = {64: "#9ECAE1", 128: "#6BAED6", 256: "#3182BD", 512: "#08519C"}
 
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3), gridspec_kw={"width_ratios": [1.2, 1.0]})
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.3), gridspec_kw={"width_ratios": [1.1, 1.05]})
     fig.subplots_adjust(wspace=0.5)
 
     # (a) Latest decision time at which one AI unit of each class still admits
@@ -514,8 +523,12 @@ def make_envelope() -> dict:
                 points.append((max(safe), pending))
         frontier[str(context)] = points
         ax.plot([x for x, _ in points], [y for _, y in points], color=shades[context], marker="o",
-                markersize=3.2, linewidth=1.5, label=f"ctx {context}")
+                markersize=3.2, linewidth=1.5, label=f"{context} tokens")
     physical = []
+    # Prompt-length label of each physical test: offset from the marker and
+    # alignment, chosen so that no label touches a line or another label.
+    label_at = {"E3": (-1.2, 0.33, "right"), "E4": (1.4, 0.33, "left"), "E5": (1.4, -0.33, "left"),
+                "E6a": (-1.4, -0.33, "right"), "E6b": (1.4, 0.33, "left")}
     for case in cases:
         if case["context_length"] is None:
             continue
@@ -523,15 +536,18 @@ def make_envelope() -> dict:
         name = case["case_id"].split("_")[0]
         x = case["conservative_prediction_time_ms"]
         physical.append({"case": name, "decision_ms": x, "pending": pending, "admit": case["expected_lease"]})
+        dx, dy, align = label_at[name]
+        ax.text(x + dx, pending + dy, str(case["context_length"]), ha=align, va="center", fontsize=6.2,
+                color=COLORS["dark"])
         if case["expected_lease"]:
             ax.scatter(x, pending, marker="o", s=22, facecolor="white", edgecolor=COLORS["green"], linewidth=1.4,
                        zorder=5)
         else:
             ax.scatter(x, pending, marker="x", s=24, color=COLORS["red"], linewidth=1.5, zorder=5)
-        # Admitted cases are labeled below their marker and rejected cases above.
-        ax.text(x + 1.5, pending + (0.2 if not case["expected_lease"] else -0.2), name, fontsize=6.3,
-                color=COLORS["dark"], ha="left", va="bottom" if not case["expected_lease"] else "top")
-    ax.set_xlim(40, 120)
+    # A decision left of a line admits that AI unit; a later decision rejects it.
+    ax.text(56, 3.75, "\u2190 admit", ha="right", va="center", fontsize=6.4, color=COLORS["gray"])
+    ax.text(104, 3.75, "reject \u2192", ha="left", va="center", fontsize=6.4, color=COLORS["gray"])
+    ax.set_xlim(35, 120)
     ax.set_ylim(-0.3, 4.3)
     ax.set_yticks(range(5))
     ax.set_xlabel("decision time after release (ms)")
@@ -542,7 +558,7 @@ def make_envelope() -> dict:
     handles += [Line2D([], [], marker="o", linestyle="none", markerfacecolor="white",
                        markeredgecolor=COLORS["green"], markeredgewidth=1.4, markersize=4.5),
                 Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markeredgewidth=1.5, markersize=4.5)]
-    labels += ["admitted", "rejected"]
+    labels += ["tested: admitted", "tested: rejected"]
     top_legend(ax, ncol=3, handles=handles, labels=labels)
     panel_label(ax, "a")
 
@@ -555,21 +571,23 @@ def make_envelope() -> dict:
     verify_p99 = [by_count[str(n)]["verify_us"]["p99"] / 1000 for n in counts]
     assert round(decision_p99[-1], 3) == 1.494
     ax.plot(counts, decision_p99, color=COLORS["blue"], marker="o", markersize=3.2, linewidth=1.5,
-            label="scheduler p99")
+            label="decision p99")
     ax.plot(counts, decision_max, color=COLORS["blue"], marker="s", markersize=3.0, linewidth=1.2,
-            linestyle="--", label="scheduler max")
+            linestyle="--", label="decision max")
     ax.plot(counts, verify_p99, color=COLORS["green"], marker="D", markersize=3.0, linewidth=1.5,
             label="verifier p99")
-    ax.axhline(5.0, color=COLORS["red"], linestyle="--", linewidth=1.2, label="budget")
+    ax.axhline(5.0, color=COLORS["red"], linestyle="--", linewidth=1.2)
+    ax.text(70, 5.1, "5 ms control budget", ha="right", va="bottom", fontsize=6.4, color=COLORS["red"])
     ax.set_xscale("log", base=2)
     ax.set_xticks(counts, [str(n) for n in counts])
     ax.set_xlim(0.8, 80)
-    ax.set_ylim(0, 5.6)
     ax.set_xlabel("pending recoveries")
     ax.set_ylabel("latency (ms)")
+    ax.set_ylim(0, 6.0)
     ax.grid(**GRID)
     ax.set_axisbelow(True)
-    top_legend(ax, ncol=2)
+    ax.legend(loc="upper left", bbox_to_anchor=(0.0, 0.8), frameon=False, fontsize=6.6, handlelength=1.6,
+              handletextpad=0.35, labelspacing=0.15, borderaxespad=0.2)
     panel_label(ax, "b")
 
     save(fig, "softwall_envelope")
@@ -577,10 +595,11 @@ def make_envelope() -> dict:
             "decision_max_ms": decision_max, "verify_p99_ms": verify_p99}
 
 
-def figure_legend(fig, handles, labels, ncol: int) -> None:
-    """One legend above all panels of a figure."""
+def figure_legend(fig, handles, labels, ncol: int, compact: bool = False) -> None:
+    """One legend above all panels of a figure; compact spacing keeps long names within the width."""
     fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=ncol, frameon=False,
-               handlelength=1.8, handletextpad=0.4, columnspacing=1.2, borderaxespad=0.0)
+               handlelength=1.3 if compact else 1.8, handletextpad=0.35 if compact else 0.4,
+               columnspacing=0.8 if compact else 1.2, borderaxespad=0.0)
 
 
 def derive_eval() -> None:
@@ -635,8 +654,8 @@ def make_eval_capacity() -> dict:
         ax.plot(range(len(cells)), values, color=color, linestyle=style, marker=marker, markersize=3.6,
                 linewidth=1.5, label=label)
     ax.set_xticks(range(len(cells)), [str(c) for c in cells])
-    ax.set_xlabel("cells")
-    ax.set_ylabel("AI capacity\n(% of oracle)")
+    ax.set_xlabel("number of cells")
+    ax.set_ylabel("safe AI capacity\n(% of oracle)")
     ax.set_ylim(40, 105)
     ax.set_yticks([50, 75, 100])
     ax.grid(axis="y", **GRID)
@@ -669,7 +688,7 @@ def make_eval_capacity() -> dict:
     ax.plot(range(len(cells)), [0.0] * len(cells), color=COLORS["blue"], marker="D", markersize=3.6,
             linewidth=1.5)
     ax.set_xticks(range(len(cells)), [str(c) for c in cells])
-    ax.set_xlabel("cells")
+    ax.set_xlabel("number of cells")
     ax.set_ylabel("radio violation\nprobability (%)")
     ax.set_ylim(-2, 35)
     ax.set_yticks([0, 15, 30])
@@ -680,10 +699,96 @@ def make_eval_capacity() -> dict:
     handles = [Line2D([], [], color=color, linestyle=style, marker=marker, markersize=3.6, linewidth=1.5)
                for _, _, color, style, marker in policies]
     handles.append(Line2D([], [], color=COLORS["red"], marker="^", markersize=3.8, linewidth=1.5))
-    figure_legend(fig, handles, ["static", "recovery-first", "SoftWall", "idle-time"], ncol=4)
+    figure_legend(fig, handles, ["static reservation", "recovery-first", "SoftWall", "idle-time admission"],
+                  ncol=4, compact=True)
     save(fig, "softwall_eval_capacity")
     summary["feasible_points"] = len(feasible)
     summary["useful_points"] = len(useful)
+    return summary
+
+
+def make_eval_drivers() -> dict:
+    """NeuralRx success and radio expiry as drivers of safe AI capacity (C167)."""
+    capacity = load("capacity")
+    rows = [dict(zip(capacity["row_fields"], row)) for row in capacity["rows"]]
+    feasible = [row for row in rows if row["mandatory_feasible"] == 1]
+    assert len(feasible) == 13716
+    useful = [row for row in feasible if row["oracle_requests"] > 0]
+    policies = (("static_requests", "static", COLORS["gray"], ":", "o"),
+                ("recovery_first_requests", "recovery-first", COLORS["gray"], "--", "s"),
+                ("softwall_requests", "SoftWall", COLORS["blue"], "-", "D"))
+    successes = [0.2, 0.5, 0.8]
+    expiries = [100, 155, 220]
+    # Every NeuralRx success probability covers the same mandatory-feasible
+    # configurations, so the success panels compare identical point sets.
+    by_success = {p: [row for row in feasible if row["success_probability"] == p] for p in successes}
+    assert len({len(group) for group in by_success.values()}) == 1
+    summary = {"units_by_success": {}, "share_by_expiry": {}, "idle_violation_by_success": {},
+               "points_per_success": len(by_success[0.2]),
+               "points_by_expiry": {str(e): sum(1 for row in feasible if row["expiry_ms"] == e) for e in expiries}}
+
+    fig, axes = plt.subplots(1, 3, figsize=(FIG_WIDTH, 1.35))
+    fig.subplots_adjust(wspace=0.78)
+
+    # (a) Mean AI units admitted per release period as NeuralRx succeeds more
+    # often. Static reservation holds every pending recovery and cannot use
+    # the capacity that a success releases.
+    ax = axes[0]
+    for key, label, color, style, marker in policies:
+        values = [statistics.mean(row[key] for row in by_success[p]) for p in successes]
+        summary["units_by_success"][label] = dict(zip(map(str, successes), values))
+        ax.plot(range(len(successes)), values, color=color, linestyle=style, marker=marker, markersize=3.6,
+                linewidth=1.5)
+    ax.set_xticks(range(len(successes)), [str(p) for p in successes])
+    ax.set_xlabel("NeuralRx success rate")
+    ax.set_ylabel("admitted AI units\nper period")
+    ax.set_ylim(0.8, 1.6)
+    ax.set_yticks([1.0, 1.2, 1.4])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    # (b) Capacity relative to the oracle as the radio expiry tightens.
+    ax = axes[1]
+    for key, label, color, style, marker in policies:
+        values = [100.0 * statistics.mean(row[key] / row["oracle_requests"] for row in useful
+                                          if row["expiry_ms"] == e) for e in expiries]
+        summary["share_by_expiry"][label] = dict(zip(map(str, expiries), values))
+        ax.plot(range(len(expiries)), values, color=color, linestyle=style, marker=marker, markersize=3.6,
+                linewidth=1.5)
+    ax.set_xticks(range(len(expiries)), [str(e) for e in expiries])
+    ax.set_xlabel("radio expiry (ms)")
+    ax.set_ylabel("safe AI capacity\n(% of oracle)")
+    ax.set_ylim(25, 105)
+    ax.set_yticks([25, 50, 75, 100])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    # (c) Radio violation probability of idle-time admission as NeuralRx
+    # succeeds more often; the certified policies never violate.
+    ax = axes[2]
+    violation = [100.0 * statistics.mean(row["debt_blind_violation_probability"] for row in by_success[p])
+                 for p in successes]
+    summary["idle_violation_by_success"] = dict(zip(map(str, successes), violation))
+    ax.plot(range(len(successes)), violation, color=COLORS["red"], marker="^", markersize=3.8, linewidth=1.5)
+    ax.plot(range(len(successes)), [0.0] * len(successes), color=COLORS["blue"], marker="D", markersize=3.6,
+            linewidth=1.5)
+    ax.set_xticks(range(len(successes)), [str(p) for p in successes])
+    ax.set_xlabel("NeuralRx success rate")
+    ax.set_ylabel("radio violation\nprobability (%)")
+    ax.set_ylim(-2, 35)
+    ax.set_yticks([0, 15, 30])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "c")
+
+    handles = [Line2D([], [], color=color, linestyle=style, marker=marker, markersize=3.6, linewidth=1.5)
+               for _, _, color, style, marker in policies]
+    handles.append(Line2D([], [], color=COLORS["red"], marker="^", markersize=3.8, linewidth=1.5))
+    figure_legend(fig, handles, ["static reservation", "recovery-first", "SoftWall", "idle-time admission"],
+                  ncol=4, compact=True)
+    save(fig, "softwall_eval_drivers")
     return summary
 
 
@@ -714,8 +819,8 @@ def make_eval_trace() -> dict:
     ax.bar([x - width / 2 for x in xs], rf_mean, width=width, color=COLORS["gray"], zorder=3)
     ax.bar([x + width / 2 for x in xs], sw_mean, width=width, color=COLORS["blue"], zorder=3)
     ax.set_xticks(xs, [str(g) for g in gpus])
-    ax.set_xlabel("GPUs")
-    ax.set_ylabel("timely AI value\n(% of oracle)")
+    ax.set_xlabel("number of GPUs")
+    ax.set_ylabel("on-time AI tokens\n(% of oracle)")
     ax.set_ylim(0, 105)
     ax.set_yticks([0, 50, 100])
     ax.grid(axis="y", **GRID)
@@ -733,8 +838,8 @@ def make_eval_trace() -> dict:
     ax.set_xticks([1, 2, 5, 10, 20], ["1", "2", "5", "10", "20"])
     ax.set_ylim(0, 102)
     ax.set_yticks([0, 50, 100])
-    ax.set_xlabel("SoftWall / recovery-first value")
-    ax.set_ylabel("CDF (%)")
+    ax.set_xlabel("on-time AI tokens,\nSoftWall / recovery-first")
+    ax.set_ylabel("headroom points\nat or below (%)")
     ax.grid(**GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "b")
@@ -760,8 +865,8 @@ def make_eval_safety() -> dict:
               ("E6a_softwall_admit", 2.0, COLORS["blue"], "o"))
     guard, expiry = 153.0, 155.0
 
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.4), gridspec_kw={"width_ratios": [1.25, 1.0]})
-    fig.subplots_adjust(wspace=0.38)
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.4, 1.0]})
+    fig.subplots_adjust(wspace=0.4)
 
     # (a) Completion of the last recovery in every physical attempt. A small
     # deterministic horizontal offset separates overlapping attempts.
@@ -781,19 +886,21 @@ def make_eval_safety() -> dict:
     ax.axhline(guard, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=2)
     ax.axhline(expiry, color=COLORS["dark"], linestyle=":", linewidth=1.1, zorder=2)
     ax.text(-0.55, guard - 1.5, "guard", ha="left", va="top", fontsize=6.5, color=COLORS["red"])
-    ax.set_xticks([0, 1, 2], ["E4", "E6b", "E6a"])
-    ax.set_xlabel("boundary case")
-    ax.set_xlim(-0.6, 2.4)
+    ax.text(2.45, expiry + 1.5, "expiry", ha="right", va="bottom", fontsize=6.5, color=COLORS["dark"])
+    ax.set_xticks([0, 1, 2], ["E4\n256 tokens\n2 recoveries", "E6b\n64 tokens\nat 89 ms",
+                              "E6a\n64 tokens\nat 88 ms"])
+    ax.tick_params(axis="x", labelsize=6.4)
+    ax.set_xlim(-0.6, 2.5)
     ax.set_ylim(85, 172)
     ax.set_yticks([100, 125, 150])
-    ax.set_ylabel("last recovery\nend (ms)")
+    ax.set_ylabel("last recovery finish\n(ms after release)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "a")
 
-    # (b) Qwen units per prompt length in the two-node campaign: executed by
-    # SoftWall, and admitted only by idle-time admission because they break
-    # the certified recovery bound. Static reservation admits none.
+    # (b) AI units per prompt length in the two-node campaign: run by SoftWall,
+    # and rejected by SoftWall because they break the certified recovery bound
+    # (idle-time admission would run them). Static reservation runs none.
     ax = axes[1]
     q2 = load("q2")["summary"]
     contexts = [16, 32, 64, 128, 256, 512]
@@ -806,21 +913,23 @@ def make_eval_safety() -> dict:
     ax.bar([x for x, _, _ in broken], [r for _, _, r in broken], bottom=[e for _, e, _ in broken], width=0.62,
            color=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////", linewidth=0.8, zorder=3)
     ax.set_xticks(xs, [str(c) for c in contexts])
+    ax.tick_params(axis="x", labelsize=6.6)
     ax.set_xlabel("prompt length (tokens)")
-    ax.set_ylabel("Qwen units")
+    ax.set_ylabel("AI units\n(Qwen prefill)")
     ax.set_ylim(0, 215)
     ax.set_yticks([0, 100, 200])
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "b")
 
+    # Legend rows: (a) attempt markers, then (b) bar segments.
     handles = [Line2D([], [], marker="o", linestyle="none", markerfacecolor="none",
                       markeredgecolor=COLORS["blue"], markersize=4.5),
-               Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
                Rectangle((0, 0), 1, 1, color=COLORS["blue"]),
+               Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
                Rectangle((0, 0), 1, 1, facecolor=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////")]
-    figure_legend(fig, handles, ["SoftWall attempt", "baseline attempt", "executed by SoftWall",
-                                 "breaks the bound"], ncol=4)
+    figure_legend(fig, handles, ["SoftWall attempt", "AI run by SoftWall", "AI launched anyway (baseline)",
+                                 "AI rejected by SoftWall"], ncol=2, compact=True)
     save(fig, "softwall_eval_safety")
     return {"boundary": summary, "qwen_executed": dict(zip(map(str, contexts), executed)),
             "qwen_rejected": dict(zip(map(str, contexts), rejected))}
@@ -876,6 +985,11 @@ def derive_runtime() -> None:
     # of the CUDA completion of the prefill and the completion of the last
     # recovery. Both are relative to the NeuralRx deadline.
     periods = []
+    # Release-to-commit time of every TB, by commit path and by the AI lease
+    # that precedes the recoveries of its period, and the physical path of
+    # every recovery (CUDA start to completion, as in the Q2 analyzer).
+    q2_commits = {"nrx": [], "none": [], "16-64": [], "128": [], "256": [], "512": []}
+    recovery_paths = []
     for key in ("q2_dev", "q2_holdout"):
         path = BACKGROUND_RAW[key]
         assert q2_pinned[str(path.relative_to(ROOT))] == sha256(path)
@@ -883,6 +997,22 @@ def derive_runtime() -> None:
         recoveries = {}
         for record in raw_run["physical_recoveries"]:
             recoveries.setdefault(record["sequence"], []).append(record)
+            recovery_paths.append(round((record["actual_completed_ns"] - record["actual_start_ns"]) / 1e6, 4))
+        by_sequence = {row["sequence"]: row for row in raw_run["rounds"]}
+        owners = sorted(path.parent.glob(path.name.replace("_coordinator.json", "_home*_owner.json")))
+        assert len(owners) == 4, key
+        for owner in owners:
+            assert q2_pinned[str(owner.relative_to(ROOT))] == sha256(owner), owner.name
+            for record in json.loads(owner.read_text())["records"]:
+                assert record["commit_count"] == 1 and not record["deadline_miss"]
+                row = by_sequence[record["sequence"]]
+                if record["commit_source"] == "actual_nrx":
+                    group = "nrx"
+                else:
+                    assert record["commit_source"] == "shared_conventional"
+                    group = ("none" if not row["lease_accepted"] else
+                             "16-64" if row["context_length"] <= 64 else str(row["context_length"]))
+                q2_commits[group].append(round(record["release_to_commit_ms"], 3))
         for row in sorted(raw_run["rounds"], key=lambda r: r["sequence"]):
             qwen = row["qwen"] if row["lease_accepted"] else None
             required = len(row["outcome_transition"]["unresolved_obligations"])
@@ -945,6 +1075,8 @@ def derive_runtime() -> None:
                  "launch_control_bound_ms": mode["launch_control_bound_ms"],
                  "ai_class_bounds_ms": mode["ai_class_bounds_ms"]},
         "q2_periods": periods,
+        "q2_commits_ms": q2_commits,
+        "q2_recovery_path_ms": recovery_paths,
         "fault_commits_ms": commits,
         "fault_commit_counts": commit_counts,
         "fault_deadline_misses": misses,
@@ -992,7 +1124,7 @@ def make_eval_online() -> dict:
     ax.set_yticks([0, 50, 100])
     ax.set_xticks([0, 11, 23, 35], ["1", "12", "24", "36"])
     ax.set_xlabel("release period")
-    ax.set_ylabel("after NeuralRx\ndeadline (ms)")
+    ax.set_ylabel("time after NeuralRx\ndeadline (ms)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "a")
@@ -1001,16 +1133,16 @@ def make_eval_online() -> dict:
                     Rectangle((0, 0), 1, 1, facecolor=COLORS["blue"]),
                     Rectangle((0, 0), 1, 1, facecolor=COLORS["light_orange"], edgecolor=COLORS["orange"]),
                     Rectangle((0, 0), 1, 1, facecolor=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////")]
-    lane_labels = ["admitted AI lease", "measured prefill", "required recovery", "rejected AI lease"]
+    lane_labels = ["AI lease", "measured prefill", "recovery", "rejected AI lease"]
 
     # (b) Measured against certified end of the last lane action, all 1,200
     # periods. Points below the diagonal finish inside their certificate.
     ax = axes[1]
-    kinds = (("AI only", lambda p: p["admitted"] and p["pending"] == 0, "o", COLORS["blue"], "none"),
-             ("AI + 1 recovery", lambda p: p["admitted"] and p["pending"] == 1, "^", COLORS["blue"], COLORS["blue"]),
-             ("AI + 2 recoveries", lambda p: p["admitted"] and p["pending"] == 2, "s", COLORS["blue"],
+    kinds = (("AI, no recovery", lambda p: p["admitted"] and p["pending"] == 0, "o", COLORS["blue"], "none"),
+             ("AI, 1 recovery", lambda p: p["admitted"] and p["pending"] == 1, "^", COLORS["blue"], COLORS["blue"]),
+             ("AI, 2 recoveries", lambda p: p["admitted"] and p["pending"] == 2, "s", COLORS["blue"],
               COLORS["light_blue"]),
-             ("recoveries only", lambda p: not p["admitted"], "s", COLORS["orange"], COLORS["light_orange"]))
+             ("AI rejected", lambda p: not p["admitted"], "s", COLORS["orange"], COLORS["light_orange"]))
     assert sum(sum(1 for p in periods if test(p)) for _, test, *_ in kinds) == len(periods)
     handles = []
     for label, test, marker, edge, face in kinds:
@@ -1029,8 +1161,8 @@ def make_eval_online() -> dict:
     ax.set_ylim(0, 120)
     ax.set_xticks([0, 50, 100])
     ax.set_yticks([0, 50, 100])
-    ax.set_xlabel("certified end (ms)")
-    ax.set_ylabel("measured end (ms)")
+    ax.set_xlabel("certified finish (ms)")
+    ax.set_ylabel("measured finish (ms)")
     ax.grid(**GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "b")
@@ -1039,7 +1171,7 @@ def make_eval_online() -> dict:
     # (a), the second row the schedule kinds of (b).
     order = [h for pair in zip(lane_handles, handles) for h in pair]
     names = [n for pair in zip(lane_labels, [k[0] for k in kinds]) for n in pair]
-    figure_legend(fig, order, names, ncol=4)
+    figure_legend(fig, order, names, ncol=4, compact=True)
     save(fig, "softwall_eval_online")
     late = [p for p in periods if p["decision_ms"] > mode["nrx_bound_ms"] + 1.0]
     return {"window_ms": window,
@@ -1050,20 +1182,40 @@ def make_eval_online() -> dict:
                                 p["measured_end_ms"]] for p in late]}
 
 
+FAULT_NAMES = {"no_fault": "no fault", "correlated_all_fail": "all TBs fail",
+               "stale_duplicate_nrx": "stale NeuralRx", "post_fence_reply_delay": "late AI reply",
+               "latest_start_nonlaunch": "held AI lease", "pre_fence_channel_loss": "lost AI channel",
+               "stale_duplicate_recovery": "stale recovery"}
+
+
+def commit_boxes(ax, groups, positions):
+    ax.boxplot(groups, positions=positions, widths=0.55, whis=(0, 100), patch_artist=True,
+               medianprops={"color": COLORS["dark"], "linewidth": 1.0},
+               boxprops={"facecolor": COLORS["light_blue"], "edgecolor": COLORS["blue"], "linewidth": 0.8},
+               whiskerprops={"color": COLORS["blue"], "linewidth": 0.8},
+               capprops={"color": COLORS["blue"], "linewidth": 0.8})
+
+
 def make_eval_refinement() -> dict:
-    """Latest-start enforcement and radio commits under injected faults (Q2, C161)."""
+    """Latest-start enforcement and radio commit time without and with faults (Q2, C161)."""
     data = json.loads(RUNTIME_DATA.read_text())
     mode = data["mode"]
+    expiry = mode["expiry_ms"]
     launched = [p["arrival_minus_latest_start_ms"] for p in data["q2_periods"] if p["admitted"]]
     held = data["held_leases"]
     assert len(launched) == 1077 and len(held) == 52 and not any(h["launched"] for h in held)
     assert all(v < 0 for v in launched) and all(h["arrival_minus_latest_start_ms"] > 0 for h in held)
     assert all(v == 0 for v in data["fault_deadline_misses"].values())
+    q2_commits = data["q2_commits_ms"]
+    order = ["none", "16-64", "128", "256", "512"]
+    assert sum(len(q2_commits[name]) for name in order + ["nrx"]) == 4800 and len(q2_commits["nrx"]) == 3488
+    assert max(max(values) for values in q2_commits.values()) < expiry
 
-    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.0, 1.35]})
-    fig.subplots_adjust(wspace=0.45)
+    fig, axes = plt.subplots(1, 3, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.15, 1.0, 1.25]})
+    fig.subplots_adjust(wspace=0.62)
 
-    # (a) Lease arrival at the Qwen worker relative to its latest-start.
+    # (a) Arrival of each AI lease at the Qwen worker relative to its absolute
+    # latest start: leases of the two-node campaign and leases held past it.
     ax = axes[0]
     rows = ((1, launched, COLORS["blue"], "o"), (0, [h["arrival_minus_latest_start_ms"] for h in held],
                                                   COLORS["red"], "x"))
@@ -1075,49 +1227,164 @@ def make_eval_refinement() -> dict:
             ax.scatter(values, [y + o for o in offsets], s=9, marker="o", facecolor="none", edgecolor=color,
                        linewidths=0.7, zorder=3)
     ax.axvline(0.0, color=COLORS["dark"], linestyle="--", linewidth=1.1, zorder=2)
-    ax.set_yticks([0, 1], ["held\nlease", "two-node\ncampaign"])
-    ax.set_ylim(-0.6, 1.6)
+    # Each group is labeled directly above its points.
+    ax.text(statistics.median(launched), 1.42, "on time", ha="center", va="bottom", fontsize=6.3,
+            color=COLORS["blue"])
+    ax.text(statistics.median(h["arrival_minus_latest_start_ms"] for h in held), 0.42, "too late", ha="center",
+            va="bottom", fontsize=6.3, color=COLORS["red"])
+    ax.set_yticks([0, 1], ["held\nleases", "campaign\nleases"])
+    ax.set_ylim(-0.6, 1.8)
     ax.set_xlim(-6, 10)
     ax.set_xticks([-5, 0, 5, 10])
-    ax.set_xlabel("arrival - latest-start (ms)")
+    ax.set_xlabel("arrival relative to\nlatest-start (ms)")
     ax.grid(axis="x", **GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "a")
 
-    # (b) Release-to-commit time of every TB in each fault class.
+    # (b) Commit time of every recovered TB in the two-node campaign, by the
+    # AI lease that precedes its recovery; the dotted line is the median
+    # commit of TBs that NeuralRx decodes.
     ax = axes[1]
-    commits = data["fault_commits_ms"]
-    xs = list(range(len(FAULT_ORDER)))
-    ax.boxplot([commits[name] for name, _ in FAULT_ORDER], positions=xs, widths=0.55, whis=(0, 100),
-               patch_artist=True, medianprops={"color": COLORS["dark"], "linewidth": 1.0},
-               boxprops={"facecolor": COLORS["light_blue"], "edgecolor": COLORS["blue"], "linewidth": 0.8},
-               whiskerprops={"color": COLORS["blue"], "linewidth": 0.8},
-               capprops={"color": COLORS["blue"], "linewidth": 0.8})
-    ax.axhline(mode["expiry_ms"], color=COLORS["red"], linestyle="--", linewidth=1.1)
-    ax.text(len(FAULT_ORDER) - 0.5, mode["expiry_ms"] + 3, "expiry", ha="right", va="bottom", fontsize=6.5,
-            color=COLORS["red"])
-    ax.set_xticks(xs, [label.split(" ", 1)[0] for _, label in FAULT_ORDER])
-    ax.set_xlim(-0.6, len(FAULT_ORDER) - 0.4)
+    commit_boxes(ax, [q2_commits[name] for name in order], range(len(order)))
+    nrx_median = statistics.median(q2_commits["nrx"])
+    ax.axhline(nrx_median, color=COLORS["green"], linestyle=":", linewidth=1.2)
+    ax.text(len(order) - 0.45, nrx_median - 4, "NeuralRx-decoded", ha="right", va="top", fontsize=6.2,
+            color=COLORS["green"])
+    ax.axhline(expiry, color=COLORS["red"], linestyle="--", linewidth=1.1)
+    ax.text(len(order) - 0.45, expiry + 3, "expiry", ha="right", va="bottom", fontsize=6.5, color=COLORS["red"])
+    ax.set_xticks(range(len(order)), order, rotation=35, ha="right", rotation_mode="anchor")
+    ax.tick_params(axis="x", labelsize=6.4)
+    ax.set_xlim(-0.6, len(order) - 0.4)
     ax.set_ylim(0, 180)
     ax.set_yticks([0, 50, 100, 150])
-    ax.set_xlabel("fault class")
-    ax.set_ylabel("release to\ncommit (ms)")
+    ax.set_xlabel("AI tokens before recovery")
+    ax.set_ylabel("TB commit time\n(ms after release)")
     ax.grid(axis="y", **GRID)
     ax.set_axisbelow(True)
     panel_label(ax, "b")
+
+    # (c) Commit time of every TB in each injected fault class.
+    ax = axes[2]
+    commits = data["fault_commits_ms"]
+    commit_boxes(ax, [commits[name] for name, _ in FAULT_ORDER], range(len(FAULT_ORDER)))
+    ax.axhline(expiry, color=COLORS["red"], linestyle="--", linewidth=1.1)
+    ax.text(len(FAULT_ORDER) - 0.5, expiry + 3, "expiry", ha="right", va="bottom", fontsize=6.5,
+            color=COLORS["red"])
+    ax.set_xticks(range(len(FAULT_ORDER)), [FAULT_NAMES[name] for name, _ in FAULT_ORDER], rotation=40,
+                  ha="right", rotation_mode="anchor")
+    ax.tick_params(axis="x", labelsize=6.2)
+    ax.set_xlim(-0.6, len(FAULT_ORDER) - 0.4)
+    ax.set_ylim(0, 180)
+    ax.set_yticks([0, 50, 100, 150])
+    ax.set_xlabel("injected fault")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "c")
 
     handles = [Line2D([], [], marker="o", linestyle="none", markerfacecolor="none", markeredgecolor=COLORS["blue"],
                       markersize=4.5),
                Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
                Line2D([], [], color=COLORS["dark"], linestyle="--", linewidth=1.1)]
-    figure_legend(fig, handles, ["launched", "refused (non-launch)", "latest-start"], ncol=3)
+    figure_legend(fig, handles, ["launched", "refused before launch", "latest-start"], ncol=3)
     save(fig, "softwall_eval_refinement")
     return {"launched_arrival_ms": [min(launched), max(launched)],
             "held_arrival_ms": [min(h["arrival_minus_latest_start_ms"] for h in held),
                                 max(h["arrival_minus_latest_start_ms"] for h in held)],
+            "q2_commit_ms": {name: {"tbs": len(q2_commits[name]), "min": min(q2_commits[name]),
+                                    "median": statistics.median(q2_commits[name]), "max": max(q2_commits[name])}
+                             for name in order + ["nrx"]},
             "fault_commit_max_ms": {name: max(commits[name]) for name, _ in FAULT_ORDER},
             "fault_commit_counts": data["fault_commit_counts"],
             "fault_tbs": {name: len(commits[name]) for name, _ in FAULT_ORDER}}
+
+
+def make_eval_sensitivity() -> dict:
+    """Recovery-bound sensitivity of the boundary witnesses and measured recovery paths (C172, Q2)."""
+    witness = load("necessity_witness")
+    runtime = json.loads(RUNTIME_DATA.read_text())
+    attempts = json.loads(EVAL_DATA.read_text())["boundary_attempts"]
+    bound = witness["contract_sensitivity"]["qualified_recovery_bound_ms"]
+    cases = {w["case"].split("_", 1)[0]: w for w in witness["witnesses"]}
+    assert set(cases) == {"E4", "E6b"} and bound == 25
+
+    def excess(case, recovery_bound):
+        w = cases[case]
+        return (w["bound_respecting_finish_ms"] + w["unresolved_debts"] * (recovery_bound - bound)
+                - w["radio_guard_boundary_ms"])
+
+    # The bound at which each witness disappears matches the recorded thresholds.
+    assert excess("E4", 19) == 0 and excess("E4", 20) > 0
+    assert excess("E6b", 24) == 0 and excess("E6b", 25) > 0
+    paths = sorted(runtime["q2_recovery_path_ms"])
+    assert len(paths) == 1312 and abs(paths[-1] - 13.4651) < 1e-3
+
+    fig, axes = plt.subplots(1, 2, figsize=(FIG_WIDTH, 1.4), gridspec_kw={"width_ratios": [1.15, 1.0]})
+    fig.subplots_adjust(wspace=0.42)
+
+    # (a) Excess of the last recovery past the guard when the unit that
+    # SoftWall rejects runs anyway, as a function of the recovery bound, with
+    # the bound-padded physical attempts at the qualified bound.
+    ax = axes[0]
+    bounds = list(range(10, 31))
+    styles = {"E4": ("-", "E4_debt_blind_launch"), "E6b": ("--", "E6b_shadow_launch")}
+    for case, (style, scenario) in styles.items():
+        ax.plot(bounds, [excess(case, b) for b in bounds], color=COLORS["red"], linestyle=style, linewidth=1.5)
+        measured = [a["last_recovery_complete_ms"] - cases[case]["radio_guard_boundary_ms"] for a in attempts
+                    if a["scenario"] == scenario]
+        offsets = [((i % 9) - 4) * 0.12 for i in range(len(measured))]
+        ax.scatter([bound + o for o in offsets], measured, s=9, marker="x", color=COLORS["red"], linewidths=0.8,
+                   zorder=3)
+    ax.axhspan(0, 30, color=COLORS["light_red"], alpha=0.45, zorder=0)
+    ax.axhline(0, color=COLORS["dark"], linewidth=0.8)
+    ax.axvline(bound, color=COLORS["blue"], linestyle=":", linewidth=1.1)
+    ax.text(bound - 0.4, -24, "certified\nbound", ha="right", va="bottom", fontsize=6.3, color=COLORS["blue"])
+    ax.axvline(paths[-1], color=COLORS["gray"], linestyle=":", linewidth=1.1)
+    ax.text(paths[-1] + 0.4, -24, "largest\nmeasured", ha="left", va="bottom", fontsize=6.3,
+            color=COLORS["gray"])
+    ax.text(10.6, 24, "radio violation", ha="left", va="top", fontsize=6.3, color=COLORS["red"])
+    ax.set_xlim(10, 30)
+    ax.set_ylim(-26, 26)
+    ax.set_xticks([10, 15, 20, 25, 30])
+    ax.set_yticks([-20, 0, 20])
+    ax.set_xlabel("recovery bound (ms)")
+    ax.set_ylabel("last recovery past\nthe guard (ms)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    # (b) Complementary CDF of the physical path of every recovery in the
+    # two-node campaign, against the thresholds of (a) and the contract.
+    ax = axes[1]
+    n = len(paths)
+    ax.step(paths, [(n - i) / n for i in range(n)], where="post", color=COLORS["blue"], linewidth=1.4)
+    for x, style, label in ((19, "-", "E4 limit"), (24, "--", "E6b limit")):
+        ax.axvline(x, color=COLORS["red"], linestyle=style, linewidth=1.0)
+        ax.text(x - 0.6, 0.02, label, ha="right", va="center", fontsize=6.3, color=COLORS["red"], rotation=90)
+    ax.axvline(bound, color=COLORS["blue"], linestyle=":", linewidth=1.1)
+    ax.text(bound + 0.7, 0.02, "certified bound", ha="left", va="center", fontsize=6.3, color=COLORS["blue"],
+            rotation=90)
+    ax.set_yscale("log")
+    ax.set_xlim(0, 30)
+    ax.set_ylim(5e-4, 1.5)
+    ax.set_xticks([0, 10, 20, 30])
+    ax.set_xlabel("measured recovery time (ms)")
+    ax.set_ylabel("fraction of\nrecoveries above")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    handles = [Line2D([], [], color=COLORS["red"], linestyle="-", linewidth=1.5),
+               Line2D([], [], color=COLORS["red"], linestyle="--", linewidth=1.5),
+               Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
+               Line2D([], [], color=COLORS["blue"], linewidth=1.4)]
+    figure_legend(fig, [handles[0], handles[2], handles[1], handles[3]],
+                  ["E4: idle-time admission", "measured at the bound", "E6b: AI launched at 89 ms",
+                   "measured recovery time"], ncol=2, compact=True)
+    save(fig, "softwall_eval_sensitivity")
+    return {"excess_at_contract_ms": {case: excess(case, bound) for case in cases},
+            "zero_excess_bound_ms": {"E4": 19, "E6b": 24},
+            "recovery_path_ms": {"count": n, "median": statistics.median(paths), "max": paths[-1],
+                                 "p99": paths[int(0.99 * (n - 1))]}}
 
 
 def make_capacity_headroom() -> dict:
@@ -1236,16 +1503,18 @@ def main() -> None:
         "execution": make_execution(),
         "debt": make_debt(),
         "eval_capacity": make_eval_capacity(),
+        "eval_drivers": make_eval_drivers(),
         "eval_trace": make_eval_trace(),
         "eval_safety": make_eval_safety(),
         "eval_online": make_eval_online(),
         "eval_refinement": make_eval_refinement(),
         "envelope": make_envelope(),
+        "eval_sensitivity": make_eval_sensitivity(),
         "capacity_headroom": make_capacity_headroom(),
     }
-    stems = ("softwall_execution", "softwall_debt", "softwall_eval_capacity", "softwall_eval_trace",
-             "softwall_eval_safety", "softwall_eval_online", "softwall_eval_refinement", "softwall_envelope",
-             "softwall_capacity_headroom")
+    stems = ("softwall_execution", "softwall_debt", "softwall_eval_capacity", "softwall_eval_drivers",
+             "softwall_eval_trace", "softwall_eval_safety", "softwall_eval_online", "softwall_eval_refinement",
+             "softwall_envelope", "softwall_eval_sensitivity", "softwall_capacity_headroom")
     manifest = {
         "schema": "softwall-paper-figure-manifest-v1",
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in SOURCES.values()},

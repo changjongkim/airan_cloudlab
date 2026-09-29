@@ -254,6 +254,53 @@
       },
       "useful_points": 10314
     },
+    "eval_drivers": {
+      "idle_violation_by_success": {
+        "0.2": 26.43628890399758,
+        "0.5": 16.76663613932375,
+        "0.8": 6.199271342106123
+      },
+      "points_by_expiry": {
+        "100": 3348,
+        "155": 5184,
+        "220": 5184
+      },
+      "points_per_success": 4572,
+      "share_by_expiry": {
+        "SoftWall": {
+          "100": 100.0,
+          "155": 100.0,
+          "220": 100.0
+        },
+        "recovery-first": {
+          "100": 93.75763178690781,
+          "155": 89.82717657579732,
+          "220": 83.56073940077556
+        },
+        "static": {
+          "100": 37.88592329552812,
+          "155": 64.48509533827018,
+          "220": 96.45587401703425
+        }
+      },
+      "units_by_success": {
+        "SoftWall": {
+          "0.2": 1.185918964836841,
+          "0.5": 1.3198889280620094,
+          "0.8": 1.4342438007499247
+        },
+        "recovery-first": {
+          "0.2": 0.9792287318327727,
+          "0.5": 1.164578378641748,
+          "0.8": 1.3592339276028254
+        },
+        "static": {
+          "0.2": 1.0925196850393704,
+          "0.5": 1.09251968503937,
+          "0.8": 1.0925196850393706
+        }
+      }
+    },
     "eval_online": {
       "certified_end_max_ms": 105.0396,
       "late_decisions": [
@@ -325,7 +372,45 @@
       "launched_arrival_ms": [
         -3.7606,
         -2.9183
-      ]
+      ],
+      "q2_commit_ms": {
+        "128": {
+          "max": 102.379,
+          "median": 73.725,
+          "min": 73.08,
+          "tbs": 230
+        },
+        "16-64": {
+          "max": 103.549,
+          "median": 72.6765,
+          "min": 71.339,
+          "tbs": 656
+        },
+        "256": {
+          "max": 87.191,
+          "median": 86.037,
+          "min": 85.521,
+          "tbs": 90
+        },
+        "512": {
+          "max": 118.022,
+          "median": 116.41,
+          "min": 115.58,
+          "tbs": 90
+        },
+        "none": {
+          "max": 74.109,
+          "median": 62.0985,
+          "min": 49.538,
+          "tbs": 246
+        },
+        "nrx": {
+          "max": 76.993,
+          "median": 46.093,
+          "min": 45.962,
+          "tbs": 3488
+        }
+      }
     },
     "eval_safety": {
       "boundary": {
@@ -375,6 +460,22 @@
         "32": 0,
         "512": 68,
         "64": 0
+      }
+    },
+    "eval_sensitivity": {
+      "excess_at_contract_ms": {
+        "E4": 12,
+        "E6b": 1
+      },
+      "recovery_path_ms": {
+        "count": 1312,
+        "max": 13.4651,
+        "median": 3.40415,
+        "p99": 4.2306
+      },
+      "zero_excess_bound_ms": {
+        "E4": 19,
+        "E6b": 24
       }
     },
     "eval_trace": {
@@ -477,32 +578,38 @@
     "softwall_execution.pdf",
     "softwall_debt.pdf",
     "softwall_eval_capacity.pdf",
+    "softwall_eval_drivers.pdf",
     "softwall_eval_trace.pdf",
     "softwall_eval_safety.pdf",
     "softwall_eval_online.pdf",
     "softwall_eval_refinement.pdf",
     "softwall_envelope.pdf",
+    "softwall_eval_sensitivity.pdf",
     "softwall_capacity_headroom.pdf"
   ],
   "output_sha256": {
     "softwall_capacity_headroom.pdf": "d9d86e3472dcf04a318d9aabad735e86723d945dea6edd66629865b2456cc783",
     "softwall_capacity_headroom.svg": "f1ff570c6e11865f46b833dc8564b8da1504240e01d78f9807b0653a1511b1e4",
-    "softwall_debt.pdf": "95d57702b9df7200031a0ca61ae11205fd1b403badaaefb057df3f064e253d60",
-    "softwall_debt.svg": "14fdd72986462d40b836e9293bcf99657ad82e3e6b1a5cdb475e09c2434ac8a6",
-    "softwall_envelope.pdf": "7a539877a6b28187aab90ab38917f21d7757befbabb6f556e5e54ba2e11b42fe",
-    "softwall_envelope.svg": "e8cdb858da9ff9968c34c1363fdfebe6b583f38cd53bca81ed6cdcf872a0f095",
-    "softwall_eval_capacity.pdf": "5f562da67f2613b2a6932b31e4aa1069877e403b965587f246481afffb17297a",
-    "softwall_eval_capacity.svg": "cb8f32336258374581d2a1d24006683e095a1a3699fbb2ad393d5cdc4961b498",
-    "softwall_eval_online.pdf": "0f51600a750e48a3a4d60b388ac691808ece21b741d636e07b8e9cb57a9f6e8c",
-    "softwall_eval_online.svg": "a6475eaf4c6f856264be2a197ce758b88cdc28dd993a48c74c156ff61ff2311c",
-    "softwall_eval_refinement.pdf": "cabb5bc7ca67890c587fb46a12718e95156c70ba41303baad88587d456a06ce4",
-    "softwall_eval_refinement.svg": "7a32dde2293adae2b08b15147b6c4a346c7ca1431254df64ca60a7db33d067fd",
-    "softwall_eval_safety.pdf": "6d06ae24eeda19f1f5a6bbb58f96f3697c86efebb1478848d21a855f36d26c77",
-    "softwall_eval_safety.svg": "f70f8e017ad0cedb59fc77117717710e01ae3f545dc7e680c520cbe837420245",
-    "softwall_eval_trace.pdf": "ffcf1a7c81a5b7ac4f7e973003c71383d87e329d350754e32b4879f09292ded5",
-    "softwall_eval_trace.svg": "13c23042fd8c6d591f9b279bf233db548b6e8b00cba5af39a5cbe46956e9b4b8",
-    "softwall_execution.pdf": "4888bfdd007e8ba5a5c8bc4e320e6989e5d03c74e41d2dd57b0ca0871e12449a",
-    "softwall_execution.svg": "282caab7b59c6083ec931668ab52d59b81cca646e850eb74851253ed60b3fd52"
+    "softwall_debt.pdf": "69886ac0514144ba6ff94ab33e30907f8d332f42e6a0cc0969870f84ea6ccd03",
+    "softwall_debt.svg": "17b11bf5958477783987541e4784a9969df0b7aefecc3f67af0e542f1e7ee55d",
+    "softwall_envelope.pdf": "1bae09223ce1178f7c7486a352a10b0d9465580589c8eeee78285e80aacf75e2",
+    "softwall_envelope.svg": "a211843af5f5210fe805b9c8cc389e7cc4bcb30718c3a8c06ef175bbc6004ea4",
+    "softwall_eval_capacity.pdf": "ffb729085ec9dc0f29b842516c96f1c7c32f54bf52dc3ddaffc2254b440141d0",
+    "softwall_eval_capacity.svg": "58dcb9e1f3db2fd8640e1357787fa9eda724a5659223ca89f27fedf0d169f723",
+    "softwall_eval_drivers.pdf": "ddd1f76f230f6a0e28f75a93960ade5985e2058211113f9897575f5db9dccae4",
+    "softwall_eval_drivers.svg": "dca011362c6b66db3b01a92be2987bbe70e8a3ca43520d7d7266b7213921eba6",
+    "softwall_eval_online.pdf": "a44605a0cb50de66f18f931064faf7d38c9b07595e976c0f043d554ef653c4f7",
+    "softwall_eval_online.svg": "4fff963efdda773a5668e7d613d7a86e35f54d6c2f8dccf4128f01b2b1b37be1",
+    "softwall_eval_refinement.pdf": "823fada0d88383754b874797ab7fcb7fba43e1d1d7196759fc0bc18313faaf53",
+    "softwall_eval_refinement.svg": "66b2ebba840915776bf267942e0f332b9f959bbc443f47b61f887a5dd5db50dc",
+    "softwall_eval_safety.pdf": "e49da9d0890e77a4b799e84d0a35888a6260c450c5bec59c7a6599c4eb2ce31b",
+    "softwall_eval_safety.svg": "c06d52b46b1c828a5a920fa3b8212fddbb59affaf35ab98cece0b8e12a0a1ad9",
+    "softwall_eval_sensitivity.pdf": "db62e5b3c125df0f7bc0f74e2964854dd337229b2ffb37390d7fbded678dfe8a",
+    "softwall_eval_sensitivity.svg": "90054a0bcd2d52cb9455c76497b650b437d4ffb82e5415eb6b00935da4ac7b2f",
+    "softwall_eval_trace.pdf": "e818e2a1509bab98dbe88060e7dc96aff834be5866429ba713370ba8efcf98ee",
+    "softwall_eval_trace.svg": "1098595822f50c598da8cddb7e3cfab35777b3b55fb0a854761d9f7088d078af",
+    "softwall_execution.pdf": "ed9f0064e4655570dd6031b1fc931f63633038ccd076757d30c020546c32305c",
+    "softwall_execution.svg": "51e20a525a114a7091c060a1fe4b65cdb825563b5e854d3a15c278a26bd26bf9"
   },
   "schema": "softwall-paper-figure-manifest-v1",
   "source_sha256": {
@@ -523,6 +630,7 @@
     "results/softwall_multigpu/c175_lever_evaluation_v1.json": "1d0e375a63b792c6963d4731e61af911dc7344dba7d1ba4df894a394655715e7",
     "results/softwall_multigpu/confirm159_q2_variable_two_node.json": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692",
     "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_protocol.json": "a8bd890067653e5939be79dc8de27b1d08c78b30fa9a095fb342df7f629b9cfc",
+    "results/softwall_multigpu/softwall_necessity_witness_v3.json": "6ddcda444ae2f3a603df1f71f7467487d8d8db33d7c4c0b5f1dc4e6e75e3d7ad",
     "results/softwall_multigpu/softwall_production_exit_gate_v3.json": "c9c725dc57b3459013e80e456ae20ec5e17a91140e98ff4f57ab773f945ca27e",
     "results/softwall_same_gpu/confirm10_paired2_qwen_s1_job58625542_d21.json": "ccdd56461587fc82b792cd26ca0bde0182a676e29af29c49845e6ecadf86b585",
     "results/softwall_same_gpu/confirm10_paired2_qwen_s1_protocol.json": "42f601eea3ef78c872e0b16cfcb437868b8c44ef85dfd77bc241dcf74426a732",

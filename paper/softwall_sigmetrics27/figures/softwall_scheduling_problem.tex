@@ -17,7 +17,7 @@
   % (a) Idle-time admission: the queue is empty at the NeuralRx deadline.
   \node[font=\bfseries\scriptsize] at (0.18,3.95) {(a)};
   \node[font=\scriptsize, align=left, anchor=west] at (0.45,3.7)
-    {\textbf{Idle-time admission}\\\textit{queue empty at 45 ms}};
+    {\textbf{Idle-time admission}\\\textit{GPU idle at 45 ms}};
   \node[job, pattern=north east lines, pattern color=black!60, minimum height=0.38cm,
         minimum width={5*0.0555 cm}, anchor=west] at ({\swT{45}},3.7) {};
   \swJob{3.7}{50}{115}{aic}{AI, 256 tokens, admitted}
@@ -31,7 +31,7 @@
   % (b) Static reservation: successful TBs keep their reservations.
   \node[font=\bfseries\scriptsize] at (0.18,2.9) {(b)};
   \node[font=\scriptsize, align=left, anchor=west] at (0.45,2.65)
-    {\textbf{Static reservation}\\\textit{success does not release}};
+    {\textbf{Static reservation}\\\textit{successes stay reserved}};
   \node[job, fill=black!8, pattern=north east lines, pattern color=black!35,
         minimum height=0.38cm, minimum width={25*0.0555 cm}, anchor=west]
     at ({\swT{45}},2.65) {};
@@ -48,7 +48,7 @@
   % (c) Per-instance certificates: each cuPHY instance is feasible alone, not on one lane.
   \node[font=\bfseries\scriptsize] at (0.18,1.85) {(c)};
   \node[font=\scriptsize, align=left, anchor=west] at (0.45,1.35)
-    {\textbf{Per-instance certificates}\\\textit{each instance valid alone}};
+    {\textbf{Per-instance certificates}\\\textit{each cuPHY checked alone}};
   \node[font=\itshape\tiny, anchor=west] at ({\swT{121}},1.6) {cuPHY 0};
   \node[font=\itshape\tiny, anchor=west] at ({\swT{97.5}},1.1) {cuPHY 1};
   \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
@@ -61,7 +61,7 @@
   \node[job, fill=recc, draw=dred, line width=0.9pt, minimum height=0.38cm,
         minimum width={25*0.0555 cm}, anchor=west] at ({\swT{70}},1.1) {TB5};
   \node[comp, draw=dred, minimum width=2.1cm, minimum height=0.38cm] at (12.75,1.35)
-    {\xmark\ overlap on one lane};
+    {\xmark\ overlap on shared lane};
 
   % --------------------------------------------------------------- axis
   \draw[line width=0.45pt] ({\swT{42}},0.62) -- ({\swT{175}},0.62);

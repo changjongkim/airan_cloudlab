@@ -7,7 +7,7 @@
 
   % Row labels.
   \node[pttl, anchor=west] at (0.1,2.45) {cuPHY L1 (TB owner)};
-  \node[pttl, anchor=west] at (0.1,1.7) {NeuralRx endpoint};
+  \node[pttl, anchor=west] at (0.1,1.7) {NeuralRx receiver};
   \node[pttl, anchor=west] at (0.1,0.95) {Recovery lane};
   \foreach \y in {2.45,1.7,0.95} {
     \draw[black!25, line width=0.4pt] ({\swT{0}},\y) -- ({\swT{185}},\y);
@@ -30,10 +30,10 @@
   \node[font=\bfseries\scriptsize, fill=white, inner sep=1pt] at ({\swT{22.5}},2.45)
     {pending recovery};
   \node[comp, fill=okc, draw=green!45!black, minimum height=0.36cm, inner sep=1pt,
-        anchor=west] at ({\swT{47}},2.45) {\cmark\ commit NRx result};
+        anchor=west] at ({\swT{47}},2.45) {\cmark\ commit NeuralRx};
   \node[font=\itshape\scriptsize, fill=white, inner sep=1pt] at ({\swT{95.5}},2.45) {or};
   \node[comp, fill=badc, draw=dred, minimum height=0.36cm, inner sep=1pt, anchor=west]
-    at ({\swT{99}},2.45) {\xmark\ commit cuPHY result};
+    at ({\swT{99}},2.45) {\xmark\ commit recovery};
   \node[font=\scriptsize, text=navyf] at ({\swT{180}},2.76) {$\blacktriangledown$};
   \node[font=\itshape\tiny, anchor=south] at ({\swT{180}},2.84) {next release};
 

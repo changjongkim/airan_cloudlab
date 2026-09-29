@@ -163,13 +163,16 @@ work: optional neural reception, mandatory conventional reception, and external 
   \centering
   \input{figures/softwall_airan_background.tex}
   \caption{One uplink TB in one 180~ms period of our test timeline, which is slower than 5G slot timing.
-  Until the 45~ms \NRx deadline, the TB has a pending recovery that no GPU queue contains. If the \NRx
-  result fails, is late, or is missing, one cuPHY recovery must finish before the 153~ms recovery
-  deadline.}
-  \Description{Three rows show the TB owner, the NeuralRx receiver, and the recovery GPU over one period.
-  A hatched pending-recovery bar spans the TB arrival to the NeuralRx deadline. The owner commits either
-  the neural result after the deadline or the conventional result after one recovery placed in a window
-  that ends at the recovery deadline.}
+  cuPHY receives the TB and hands it to \NRx at once, and until the 45~ms \NRx deadline the TB has a
+  pending recovery that no GPU queue contains. (a) If the \NRx result passes the CRC, cuPHY commits it,
+  and the recovery is cancelled. (b) If the result fails the CRC, is late, or is missing, cuPHY decodes
+  the same TB again on the recovery GPU before the 153~ms recovery deadline.}
+  \Description{Two timelines of one TB over one period. In both, cuPHY receives the TB at 0 milliseconds
+  and hands it to NeuralRx, and a hatched pending-recovery bar spans 0 to 45 milliseconds. (a) NeuralRx
+  passes the CRC, cuPHY commits the NeuralRx result at 45 milliseconds, and the recovery window on the
+  recovery GPU is free for AI. (b) NeuralRx fails the CRC, cuPHY hands the same TB to the recovery GPU at
+  45 milliseconds, and a cuPHY recovery decodes it inside the window that ends at the 153-millisecond
+  recovery deadline.}
   \label{fig:airan-background}
 \end{figure}
 

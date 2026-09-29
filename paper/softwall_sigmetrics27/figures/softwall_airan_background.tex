@@ -1,66 +1,80 @@
-% One uplink TB in one release period of the evaluated P180/D155 mode. The
-% conventional recovery is not queued before the outcome, yet it remains owed
-% until the NeuralRx deadline shows a timely NeuralRx success.
+% One uplink TB in one period of the evaluated P180/D155 test timeline, split by
+% the NeuralRx outcome. In both cases, the cuPHY owner receives the TB, hands it
+% to the NeuralRx worker at once, and holds a pending recovery until the 45 ms
+% NeuralRx deadline. (a) The NeuralRx result passes the CRC: the owner commits
+% it, and the recovery of the TB is cancelled, which frees its GPU time. (b) The
+% result fails the CRC, is late, or is missing: the owner hands the same TB to
+% cuPHY recovery on the recovery GPU, which must finish before the 153 ms
+% recovery deadline. Until 45 ms the two cases look the same.
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
   \def\swT#1{3.3+(#1)*0.0556}
 
-  % Row labels.
-  \node[pttl, anchor=west] at (0.1,2.45) {cuPHY L1 (TB owner)};
-  \node[pttl, anchor=west] at (0.1,1.7) {NeuralRx receiver};
-  \node[pttl, anchor=west] at (0.1,0.95) {Recovery GPU};
-  \foreach \y in {2.45,1.7,0.95} {
+  % Deadlines shared by both cases.
+  \draw[black!70, dashed, line width=0.7pt] ({\swT{45}},1.0) -- ({\swT{45}},5.75);
+  \node[font=\itshape\tiny, anchor=south] at ({\swT{45}},5.75) {NeuralRx deadline};
+  \draw[guard] ({\swT{153}},1.0) -- ({\swT{153}},5.75);
+  \node[font=\itshape\tiny, text=dred, anchor=south] at ({\swT{153}},5.75) {recovery deadline};
+
+  % Case titles and rows.
+  \node[font=\bfseries\scriptsize, anchor=west] at (0.0,5.62) {(a) NeuralRx passes the CRC by 45 ms};
+  \node[font=\bfseries\scriptsize, anchor=west] at (0.0,3.32) {(b) NeuralRx fails the CRC or is late};
+  \foreach \y/\t in {5.0/{cuPHY (TB owner)}, 4.38/{NeuralRx receiver}, 3.76/{Recovery GPU},
+                     2.7/{cuPHY (TB owner)}, 2.08/{NeuralRx receiver}, 1.46/{Recovery GPU}} {
+    \node[pttl, anchor=west] at (0.1,\y) {\t};
     \draw[black!25, line width=0.4pt] ({\swT{0}},\y) -- ({\swT{185}},\y);
   }
 
-  % NeuralRx deadline, guard, expiry, and the next release.
-  \draw[black!70, dashed, line width=0.7pt] ({\swT{45}},0.55) -- ({\swT{45}},2.95);
-  \node[font=\itshape\tiny, anchor=south] at ({\swT{45}},2.95) {NeuralRx deadline};
-  \draw[guard] ({\swT{153}},0.55) -- ({\swT{153}},2.95);
-  \draw[expiry] ({\swT{155}},0.55) -- ({\swT{155}},2.95);
-  \node[font=\itshape\tiny, text=dred, anchor=south east] at ({\swT{153}},2.95) {recovery deadline};
-  \node[font=\itshape\tiny, anchor=south west] at ({\swT{155}},2.95) {expiry};
-
-  % Owner row: release, pending recovery until the outcome, one commit, next release.
-  \node[font=\scriptsize, text=navyf] at ({\swT{0}},2.76) {$\blacktriangledown$};
-  \node[font=\itshape\tiny, anchor=south] at ({\swT{0}},2.84) {release};
-  \node[job, pattern=north east lines, pattern color=gold!90!black, draw=gold!80!black,
-        minimum height=0.36cm, minimum width={45*0.0556 cm}, anchor=west]
-    at ({\swT{0}},2.45) {};
-  \node[font=\bfseries\scriptsize, fill=white, inner sep=1pt] at ({\swT{22.5}},2.45)
-    {pending recovery};
-  \node[comp, fill=okc, draw=green!45!black, minimum height=0.36cm, inner sep=1pt,
-        anchor=west] at ({\swT{47}},2.45) {\cmark\ commit NeuralRx};
-  \node[font=\itshape\scriptsize, fill=white, inner sep=1pt] at ({\swT{95.5}},2.45) {or};
-  \node[comp, fill=badc, draw=dred, minimum height=0.36cm, inner sep=1pt, anchor=west]
-    at ({\swT{99}},2.45) {\xmark\ commit recovery};
-  \node[font=\scriptsize, text=navyf] at ({\swT{180}},2.76) {$\blacktriangledown$};
-  \node[font=\itshape\tiny, anchor=south] at ({\swT{180}},2.84) {next release};
-
-  % NeuralRx row: TensorRT execution and the outcome at the owner.
-  \node[job, fill=peach, minimum height=0.36cm, minimum width={14*0.0556 cm}, anchor=west]
-    at ({\swT{3}},1.7) {};
-  \node[font=\itshape\scriptsize, anchor=west, fill=white, inner sep=1pt] at ({\swT{19}},1.7) {TensorRT};
-  \draw[arr] ({\swT{17}},1.88) -- ({\swT{17}},2.27);
-
-  % Recovery row: executed only after a failed, late, or missing outcome.
-  \node[job, dashed, draw=dred, fill=white, minimum height=0.36cm,
-        minimum width={(153-45)*0.0556 cm}, anchor=west] at ({\swT{45}},0.95) {};
-  \node[job, fill=recc, minimum height=0.36cm, minimum width={25*0.0556 cm}, anchor=west]
-    at ({\swT{70}},0.95) {cuPHY};
-  \node[font=\itshape\scriptsize, anchor=west, fill=white, inner sep=1pt] at ({\swT{101}},0.95)
-    {recovery window};
-  \draw[arr, draw=dred] ({\swT{95}},1.13) -- ({\swT{100}},2.27);
-
-  % Axis.
-  \draw[line width=0.45pt] ({\swT{0}},0.55) -- ({\swT{185}},0.55);
-  \foreach \t in {0,45,153,180} {
-    \draw[line width=0.45pt] ({\swT{\t}},0.55) -- ({\swT{\t}},0.48);
+  % Common start: cuPHY receives the TB, hands it to NeuralRx at once, and
+  % holds a pending recovery until the NeuralRx deadline.
+  \foreach \o/\n in {5.0/4.38, 2.7/2.08} {
+    \node[font=\scriptsize, text=navyf] at ({\swT{0}},\o+0.3) {$\blacktriangledown$};
+    \node[font=\itshape\tiny, anchor=west] at ({\swT{0}+0.1},\o+0.31) {TB arrives};
+    \node[job, pattern=north east lines, pattern color=gold!90!black, draw=gold!80!black,
+          minimum height=0.34cm, minimum width={45*0.0556 cm}, anchor=west] at ({\swT{0}},\o) {};
+    \node[font=\bfseries\scriptsize, fill=white, inner sep=1pt] at ({\swT{25}},\o) {pending recovery};
+    \draw[arr] ({\swT{2.5}},\o-0.17) -- ({\swT{2.5}},\n+0.17);
+    \node[job, fill=peach, minimum height=0.34cm, minimum width={15*0.0556 cm}, anchor=west]
+      at ({\swT{2}},\n) {};
+    \node[font=\itshape\scriptsize, anchor=west, fill=white, inner sep=1pt] at ({\swT{19}},\n) {TensorRT};
+    \draw[arr] ({\swT{17}},\n+0.17) -- ({\swT{17}},\o-0.17);
   }
-  \node[font=\tiny, anchor=north] at ({\swT{0}},0.48) {0};
-  \node[font=\tiny, anchor=north] at ({\swT{45}},0.48) {45};
-  \node[font=\tiny, anchor=north east] at ({\swT{153}},0.48) {153};
-  \node[font=\tiny, anchor=north] at ({\swT{180}},0.48) {180};
-  \node[font=\tiny, anchor=west] at ({\swT{185}},0.55) {ms};
+
+  % (a) The owner commits the NeuralRx result, and the recovery is cancelled.
+  \node[font=\scriptsize, text=green!40!black, anchor=west] at ({\swT{18}},4.69) {\cmark\ CRC pass};
+  \node[comp, fill=okc, draw=green!45!black, minimum height=0.34cm, inner sep=1pt, anchor=west]
+    at ({\swT{47}},5.0) {\cmark\ commit NeuralRx result};
+  \node[job, dashed, draw=black!45, fill=aic!35, minimum height=0.34cm,
+        minimum width={(153-45)*0.0556 cm}, anchor=west] at ({\swT{45}},3.76) {};
+  \node[font=\itshape\scriptsize] at ({\swT{99}},3.76) {recovery cancelled: this GPU time can run AI};
+  \node[font=\scriptsize, text=navyf] at ({\swT{180}},5.3) {$\blacktriangledown$};
+  \node[font=\itshape\tiny, anchor=east] at ({\swT{180}-0.1},5.31) {next TB};
+
+  % (b) The owner hands the same TB to cuPHY recovery on the recovery GPU.
+  \node[font=\scriptsize, text=dred, anchor=west] at ({\swT{18}},2.39) {\xmark\ CRC fail};
+  \node[job, dashed, draw=dred, fill=white, minimum height=0.34cm,
+        minimum width={(153-45)*0.0556 cm}, anchor=west] at ({\swT{45}},1.46) {};
+  \draw[arr, draw=dred] ({\swT{48}},2.53) -- ({\swT{48}},1.63);
+  \node[font=\itshape\scriptsize, text=dred, anchor=west, fill=white, inner sep=1pt]
+    at ({\swT{49}},2.08) {same TB};
+  \node[job, fill=recc, minimum height=0.34cm, minimum width={25*0.0556 cm}, anchor=west]
+    at ({\swT{60}},1.46) {cuPHY};
+  \node[font=\itshape\scriptsize, anchor=west, fill=white, inner sep=1pt] at ({\swT{89}},1.46)
+    {recovery window: decode the same TB again};
+  \draw[arr] ({\swT{85}},1.63) -- ({\swT{85}},2.53);
+  \node[comp, fill=recc!45, draw=black!70, minimum height=0.34cm, inner sep=1pt, anchor=west]
+    at ({\swT{87}},2.7) {commit recovery result};
+
+  % Axis and the part that both cases share.
+  \draw[line width=0.45pt] ({\swT{0}},1.0) -- ({\swT{185}},1.0);
+  \foreach \t in {0,45,153,180} {
+    \draw[line width=0.45pt] ({\swT{\t}},1.0) -- ({\swT{\t}},0.93);
+    \node[font=\tiny, anchor=north] at ({\swT{\t}},0.93) {\t};
+  }
+  \node[font=\tiny, anchor=west] at ({\swT{185}},1.0) {ms};
+  \draw[black!60, line width=0.5pt] ({\swT{0}},0.7) -- ({\swT{0}},0.63) -- ({\swT{45}},0.63)
+    -- ({\swT{45}},0.7);
+  \node[font=\itshape\scriptsize, anchor=north west] at ({\swT{0}-0.05},0.6)
+    {until 45 ms, (a) and (b) look the same: the recovery may still be needed};
 \end{tikzpicture}%
 }

@@ -1,12 +1,12 @@
 % Backstop architecture. The control layer is placement-independent: per-TB
-% decision pages, the pending-recovery table, the recovery-lane schedule, and
-% the independent verifier. Below it are two separate placements: (a) a single
-% GPU that hosts every process (Section 4.6) and (b) the evaluated multi-GPU node
+% decision pages, the pending-recovery table, the shared-GPU schedule, and the
+% independent verifier. Below it are two separate placements: (a) a single GPU
+% whose processes share CUDA IPC rings and (b) the evaluated multi-GPU node
 % connected by CUDA IPC handles over NVLink P2P. The numbered cross-layer steps
 % are drawn for (b); (a) uses the same seven steps. TB1-TB5 are the five evaluated
 % requests: cuPHY instance 0 owns TB1-TB3 and instance 1 owns TB4-TB5. The
-% example state is one release period with timely TB1/TB2 and required
-% TB3/TB4; TB5 was rejected at admission.
+% example state is one period with timely TB1/TB2 and required TB3/TB4; TB5 was
+% rejected at admission.
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[x=1cm,y=1cm]
   \def\swT#1{8.2+(#1-45)*0.027}
@@ -48,7 +48,7 @@
   \draw[black!60, line width=0.5pt] (4.36,5.75) -- (6.96,5.75);
   \draw[black!60, line width=0.5pt] (4.36,5.47) -- (6.96,5.47);
 
-  % Recovery-lane schedule: current state and candidate AI slot.
+  % Shared-GPU schedule: current state and candidate AI slot.
   \draw[sub] (7.65,4.6) rectangle (11.45,6.55);
   \node[pttl, anchor=west] at (7.8,6.37) {Shared-GPU schedule};
   \node[font=\scriptsize, anchor=west] at (7.73,5.87) {$X_t$};
@@ -97,11 +97,30 @@
   \node[font=\bfseries\scriptsize] at (1.925,3.85) {(a) Single GPU};
   \draw[gpu] (0.3,0.8) rectangle (3.55,3.6);
   \node[pttl] at (1.925,3.43) {GPU0 $\cdot$ all processes};
-  \node[comp, minimum width=2.95cm, minimum height=0.4cm] at (1.925,2.95) {cuPHY owners, MPS 50\%};
-  \node[comp, fill=peach, minimum width=2.95cm, minimum height=0.4cm] at (1.925,2.42) {NeuralRx, MPS 80\%};
-  \node[comp, fill=recc, minimum width=2.95cm, minimum height=0.4cm] at (1.925,1.89) {cuPHY recovery, MPS 80\%};
-  \node[comp, fill=aic, minimum width=2.95cm, minimum height=0.4cm] at (1.925,1.36) {Qwen worker, MPS 20\%};
-  \node[inote, align=center] at (1.925,0.5) {CUDA IPC on one GPU;\\same seven steps as (b)};
+  \node[comp, minimum width=1.35cm, minimum height=0.5cm] at (1.03,2.97) {cuPHY\\TB owners};
+  \node[comp, fill=peach, minimum width=1.35cm, minimum height=0.5cm] at (2.82,2.97)
+    {TensorRT\\NeuralRx};
+  % CUDA IPC rings: one table with a header row, shared by the three processes.
+  \node[cell, fill=white, minimum width=2.94cm, minimum height=0.24cm, font=\itshape\scriptsize]
+    at (0.455,2.3) {CUDA IPC rings};
+  \foreach \i/\t/\f/\c in {0/IQ/aic/black, 1/LLR/aic/black, 2/IQ/recc/black, 3/TB/recc/black,
+                             4/free/white/black!45, 5/free/white/black!45} {
+    \node[cell, minimum height=0.25cm, minimum width=0.49cm, fill=\f, text=\c, font=\tiny]
+      at ({0.455+\i*0.49},2.06) {\t};
+  }
+  \node[comp, fill=recc, minimum width=1.35cm, minimum height=0.5cm] at (1.03,1.2)
+    {cuPHY\\recovery};
+  \node[comp, fill=aic, minimum width=1.35cm, minimum height=0.5cm] at (2.82,1.2)
+    {Qwen with\\latest-start};
+  \draw[darr] (1.03,2.72) -- (1.03,2.3);
+  \draw[darr] (2.82,2.3) -- (2.82,2.72);
+  \draw[darr] (1.03,1.81) -- (1.03,1.45);
+  \node[inote] at (1.925,0.62) {MPS clients on one device};
+  \node[inote, anchor=east] at (1.4,0.34) {steps};
+  \node[num, minimum size=0.27cm, font=\bfseries\tiny] at (1.6,0.34) {1};
+  \node[font=\scriptsize] at (1.83,0.34) {--};
+  \node[num, minimum size=0.27cm, font=\bfseries\tiny] at (2.06,0.34) {7};
+  \node[inote, anchor=west] at (2.25,0.34) {as in (b)};
 
   % ------------------------------------------------- (b) Multi-GPU placement
   \draw[layer] (3.9,0.18) rectangle (13.75,4.05);
@@ -111,8 +130,12 @@
   \draw[gpu] (4.0,0.8) rectangle (6.35,3.6);
   \node[pttl] at (5.175,3.43) {GPU0 $\cdot$ cuPHY 0};
   \foreach \x/\tb in {4.05/TB1, 4.69/TB2, 5.33/TB3} {
-    \draw[sub] (\x,2.7) rectangle ++(0.6,0.5);
-    \node[pttl] at (\x+0.3,2.95) {\tb};
+    \draw[sub] (\x,2.5) rectangle ++(0.6,0.76);
+    \node[pttl] at (\x+0.3,3.13) {\tb};
+    \node[cell, fill=aic, minimum width=0.54cm, minimum height=0.2cm, font=\tiny]
+      at (\x+0.03,2.99) {NRx};
+    \node[cell, fill=recc, minimum width=0.54cm, minimum height=0.2cm, font=\tiny]
+      at (\x+0.03,2.77) {rec};
   }
   \node[font=\bfseries\scriptsize] at (6.14,2.88) {\dots};
   \node[comp, minimum width=1.4cm, minimum height=0.5cm] at (5.175,1.85) {one commit\\per TB};
@@ -121,10 +144,15 @@
   % GPU1: cuPHY instance 1 owns TB4; TB5 was rejected at admission.
   \draw[gpu] (6.5,0.8) rectangle (8.45,3.6);
   \node[pttl] at (7.475,3.43) {GPU1 $\cdot$ cuPHY 1};
-  \draw[sub] (6.55,2.7) rectangle ++(0.6,0.5);
-  \node[pttl] at (6.85,2.95) {TB4};
-  \draw[draw=black!45, dashed, line width=0.5pt] (7.19,2.7) rectangle ++(0.6,0.5);
-  \node[pttl, text=black!45] at (7.49,2.95) {TB5 \textcolor{dred}{\xmark}};
+  \draw[sub] (6.55,2.5) rectangle ++(0.6,0.76);
+  \node[pttl] at (6.85,3.13) {TB4};
+  \node[cell, fill=aic, minimum width=0.54cm, minimum height=0.2cm, font=\tiny]
+    at (6.58,2.99) {NRx};
+  \node[cell, fill=recc, minimum width=0.54cm, minimum height=0.2cm, font=\tiny]
+    at (6.58,2.77) {rec};
+  \draw[draw=black!45, dashed, line width=0.5pt] (7.19,2.5) rectangle ++(0.6,0.76);
+  \node[pttl, text=black!45] at (7.49,3.13) {TB5};
+  \node[font=\bfseries\small, text=dred] at (7.49,2.8) {\xmark};
   \node[font=\bfseries\scriptsize] at (8.12,2.88) {\dots};
   \node[comp, minimum width=1.4cm, minimum height=0.5cm] at (7.475,1.85) {one commit\\per TB};
   \node[inote] at (7.475,1.1) {MPS 50\%};
@@ -133,7 +161,7 @@
   \draw[gpu] (8.6,0.8) rectangle (10.7,3.6);
   \node[pttl] at (9.65,3.43) {GPU3 $\cdot$ NeuralRx};
   \node[cell, fill=white, minimum width=1.85cm, minimum height=0.26cm, font=\tiny, anchor=center]
-    at (9.65,2.95) {input: IQ samples via P2P};
+    at (9.65,2.95) {input: IQ, $\hat{H}$ via P2P};
   \node[comp, fill=peach, minimum width=1.85cm, minimum height=0.55cm] at (9.65,2.25)
     {TensorRT FP16\\CUDA graph};
   \node[cell, fill=white, minimum width=1.85cm, minimum height=0.26cm, font=\tiny, anchor=center]
@@ -142,7 +170,7 @@
   \draw[arr] (9.65,1.975) -- (9.65,1.68);
   \node[inote] at (9.65,1.05) {MPS 80\%};
 
-  % GPU2: shared recovery lane and bounded external AI.
+  % GPU2: shared GPU with cuPHY recovery and bounded external AI.
   \draw[gpu] (10.85,0.8) rectangle (13.6,3.6);
   \node[pttl] at (12.225,3.43) {GPU2 $\cdot$ shared};
   \draw[sub, fill=peach] (10.95,0.88) rectangle (11.8,3.25);
@@ -157,7 +185,7 @@
     {completion\\marker};
   \draw[arr] (12.7,2.3) -- (12.7,1.65);
 
-  % NVLink P2P: IQ/LLR to the NeuralRx worker, IQ/TB to the recovery lane.
+  % NVLink P2P: IQ/LLR to the NeuralRx worker, IQ/TB to the recovery worker.
   \draw[line width=2.0pt, black!80] (5.175,0.55) -- (11.375,0.55);
   \foreach \x in {5.175,7.475,9.65,11.375} {
     \draw[line width=2.0pt, black!80, -{Triangle[length=1.4mm,width=2.6mm]}]
@@ -185,8 +213,10 @@
   \node[num] at (14.1,3.6) {7};
 
   % Legend.
-  \node[font=\itshape\scriptsize, align=center] at (6.95,-0.12)
+  \node[font=\itshape\scriptsize, align=center] at (6.95,-0.17)
     {TB: uplink transport block \quad AI slot: GPU time for one Qwen prefill request \quad
-     hatched: 5 ms launch budget \quad $X_t$, $X'$: current and candidate schedule};
+     hatched: 5 ms launch budget\\
+     $\hat{H}$: channel estimate \quad NRx, rec: NeuralRx and recovery path \quad
+     $X_t$, $X'$: current and candidate schedule};
 \end{tikzpicture}%
 }

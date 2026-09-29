@@ -331,12 +331,14 @@ GPU, and the scheduling algorithm, and then states what \sys guarantees and how 
   \NRx deadline (\ding{183}), recoveries rescheduled around an AI slot (\ding{184}), independent check
   (\ding{185}), actions sent (\ding{186}), AI slot sent (\ding{187}), and completion marker
   (\ding{188}). The steps are drawn for the evaluated four-GPU node (b); on one GPU (a), the same
-  processes exchange buffers through CUDA IPC and follow the same steps. Each TB comes from a different
-  cell; cuPHY instance 0 owns TB1-TB3, instance 1 owns TB4 and TB5, and ellipses mark further TBs.}
+  processes exchange IQ, LLR, and TB buffers through CUDA IPC rings and follow the same steps. Each TB
+  comes from a different cell; cuPHY instance 0 owns TB1-TB3, instance 1 owns TB4 and TB5, and ellipses
+  mark further TBs.}
   \Description{A control layer on the host contains a table of receiver results, a table of pending
   recoveries, the schedule of the shared GPU with a candidate AI slot, and an independent verifier. Below
-  it are two placements: (a) one GPU that runs every process and (b) a four-GPU node with two cuPHY GPUs,
-  a NeuralRx GPU, and a shared GPU for recovery and AI, connected by NVLink. Seven numbered steps mark the
+  it are two placements: (a) one GPU that runs every process, where the cuPHY owners, NeuralRx, and cuPHY
+  recovery exchange buffers through CUDA IPC rings, and (b) a four-GPU node with two cuPHY GPUs, a
+  NeuralRx GPU, and a shared GPU for recovery and AI, connected by NVLink. Seven numbered steps mark the
   path of one period.}
   \label{fig:overall}
 \end{figure}
@@ -371,8 +373,8 @@ proposes a candidate that reschedules the needed recoveries around one AI slot (
 independent verifier checks the worst-case recovery schedule, the buffer slots, and the version before it
 commits $X'$ or keeps $X_t$ (\ding{185}). The coordinator then sends each action with its version
 (\ding{186}) and sends the AI slot with a latest start time to the Qwen worker (\ding{187}). A completion
-or ``not launched'' marker frees the slot (\ding{188}), and the shared GPU runs the needed recoveries in
-the committed order.
+marker or a ``not launched'' reply frees the slot (\ding{188}), and the shared GPU runs the needed
+recoveries in the committed order.
 
 \noindent\textbf{Scheduling Inputs.}
 The scheduler uses only information that is visible at the current event. A radio job and an AI job are
@@ -501,20 +503,26 @@ is reused before the GPU reports that its work finished, and each TB commits at 
 
 A correct schedule on the host is not enough unless launches and ownership follow it.
 Figure~\ref{fig:refinement}a follows one committed AI slot $L$ across the coordinator, the marker files,
-the Qwen worker, and the GPU stream, and Figure~\ref{fig:refinement}b lists the injected faults and what
-the runtime does for each.
+the Qwen worker, and the GPU stream, and Figures~\ref{fig:refinement}b-e show each injected fault on the
+same kind of timeline.
 
 \begin{figure}[H]
   \centering
   \input{figures/softwall_physical_refinement.tex}
   \caption{Enforcing one AI slot on the GPU. (a) Normal path: commit with a latest start time
   (\ding{182}), run request (\ding{183}), launch check and launch marker (\ding{184}), GPU completion
-  and completion marker (\ding{185}), and freeing on a matching marker (\ding{186}). (b) The injected
-  runtime faults of the fault campaign and what the runtime does for each.}
-  \Description{A message sequence among the coordinator, the marker files, the Qwen worker, and the GPU
-  stream shows the slot commit, the run request, the latest-start check, kernel launch with a launch
-  marker, GPU completion, the completion marker, the reply, and the freed slot. A table below lists five
-  injected faults, what the runtime finds, and what Backstop does.}
+  and completion marker (\ding{185}), and freeing on a matching marker (\ding{186}). (b)-(e) Injected
+  faults on the same kind of timeline: (b) a run request that arrives after its latest start time, (c) a
+  reply that is late or lost after the GPU finished, (d) an AI channel lost before the GPU finished, and
+  (e) repeated or old \NRx results (TB1) and recovery responses (TB3). Red marks the fault, and the box at
+  the bottom of (b)-(d) shows what the coordinator does.}
+  \Description{Five message sequences. (a) The coordinator, the marker files, the Qwen worker, and the GPU
+  stream exchange the slot commit, the run request, the latest-start check, kernel launch with a launch
+  marker, GPU completion, the completion marker, the reply, and the freed slot. (b) A late run request is
+  refused without a kernel, and the slot is freed at once. (c) The reply is lost after the GPU finished;
+  the coordinator finds the completion marker, frees the slot, and stops AI. (d) The channel closes while
+  the kernels run; the coordinator finds only the launch marker, keeps the slot, stops AI, and continues
+  radio recovery. (e) Repeated or old radio results change nothing, and each TB commits once.}
   \label{fig:refinement}
 \end{figure}
 
@@ -522,8 +530,9 @@ the runtime does for each.
 The coordinator commits $L$ as version $g+1$ (\ding{182}) and sends $\mathrm{run}(L,\text{latest start})$
 to the Qwen worker (\ding{183}). The request carries the schedule version, the worker epoch, the buffer
 slots, and the latest start time. The worker launches only if the current time is at or before the latest
-start time (\ding{184}); it then writes the launch marker \texttt{L.launch} and submits the prefill
-kernels. Otherwise, it replies ``not launched'' and runs nothing.
+start time (\ding{184}); it then submits the prefill kernels and writes the launch marker
+\texttt{L.launch}. Otherwise, it replies ``not launched'' and runs nothing, and the coordinator frees $L$
+at once (Figure~\ref{fig:refinement}b).
 
 \noindent\textbf{Freeing GPU Time.}
 When the GPU finishes, the worker writes the completion marker \texttt{L.complete} and replies
@@ -533,12 +542,12 @@ owned until the matching GPU completion event, and the end of a data copy does n
 receiver or a recovery.
 
 \noindent\textbf{Fault Handling.}
-Figure~\ref{fig:refinement}b lists the injected faults. When the reply is late or lost after the GPU
-finished, the coordinator reads \texttt{L.complete} and frees $L$ from the marker. When the channel is
-lost before the GPU finished, only \texttt{L.launch} exists; the coordinator keeps $L$ owned, stops AI
-admission, and continues radio recovery. A stale or replayed \NRx result leaves the radio state
-unchanged, and a second recovery response produces no commit because each TB commits once. A timeout
-without completion evidence invalidates the version and stops new AI admission.
+Figures~\ref{fig:refinement}c-e show the other injected faults. When the reply is late or lost after the
+GPU finished (c), the coordinator times out, finds \texttt{L.complete}, frees $L$ from the marker, and
+stops AI admission. When the channel is lost before the GPU finished (d), only \texttt{L.launch} exists;
+the coordinator keeps $L$ owned because its kernels may still run, stops AI admission, and continues radio
+recovery. A repeated or old \NRx result leaves the radio state unchanged, and a repeated recovery response
+produces no second commit because each TB commits once (e).
 
 \noindent\textbf{Buffer Ownership.}
 One AI queue can serve several cuPHY instances, but each instance has at most one pending launch request
@@ -1195,7 +1204,7 @@ A committed schedule stays valid only if the GPU cannot start a slot later than 
 Figure~\ref{fig:eval-refinement}a shows when each slot reaches the Qwen worker, relative to its latest
 start time. All 1,077 slots of the two-node campaign arrive 2.9-3.8~ms before the latest start time and
 launch. A fault that holds the AI slot delays 52 slots until 6.4-7.2~ms after the latest start time, and
-the worker refuses all 52 before launch with a ``not launched'' marker. Without this check, these requests
+the worker refuses all 52 before launch with a ``not launched'' reply. Without this check, these requests
 would run up to 7.2~ms later than their schedules allow and push the needed recoveries toward the recovery
 deadline. \sys prevents this by attaching the latest start time to the slot at commit and checking it in
 the worker right before kernel submission.

@@ -207,6 +207,119 @@
         0.13098400000000002
       ]
     },
+    "eval_burst": {
+      "broken_percent": {
+        "Backstop": {
+          "burstgpt": 0.0,
+          "gamma_cv1": 0.0,
+          "gamma_cv2": 0.0,
+          "gamma_cv4": 0.0,
+          "gamma_cv8": 0.0,
+          "steady": 0.0
+        },
+        "idle-time admission": {
+          "burstgpt": 9.166666666666666,
+          "gamma_cv1": 10.0,
+          "gamma_cv2": 6.166666666666667,
+          "gamma_cv4": 2.8333333333333335,
+          "gamma_cv8": 1.6666666666666667,
+          "steady": 10.0
+        },
+        "recovery-first": {
+          "burstgpt": 0.0,
+          "gamma_cv1": 0.0,
+          "gamma_cv2": 0.0,
+          "gamma_cv4": 0.0,
+          "gamma_cv8": 0.0,
+          "steady": 0.0
+        }
+      },
+      "gain_over_recovery_first": {
+        "physical_by_pattern": {
+          "burstgpt": 18.530774321641296,
+          "gamma_cv1": 10.584389047813648,
+          "gamma_cv2": 11.483550589695856,
+          "gamma_cv4": 17.496635262449534,
+          "gamma_cv8": 6.177606177606165,
+          "steady": 13.96114586763253
+        },
+        "replay_mean_by_slo": {
+          "150.0": 34.29882007869082,
+          "200.0": 14.211481472965215,
+          "300.0": 5.272214009945612,
+          "500.0": 2.6671364062985203
+        },
+        "replay_range_by_slo": {
+          "150.0": [
+            19.330922242314653,
+            45.32281205164992
+          ],
+          "200.0": [
+            8.78809355067327,
+            21.385684409363837
+          ],
+          "300.0": [
+            3.4125918318982595,
+            6.57196378395255
+          ],
+          "500.0": [
+            0.14009526478004908,
+            6.687982946975746
+          ]
+        }
+      },
+      "on_time_tokens_per_s": {
+        "Backstop": {
+          "burstgpt": 530.6666666666666,
+          "gamma_cv1": 400.8888888888889,
+          "gamma_cv2": 266.0740740740741,
+          "gamma_cv4": 129.33333333333334,
+          "gamma_cv8": 40.74074074074074,
+          "steady": 512.7407407407408
+        },
+        "idle-time admission": {
+          "burstgpt": 736.8888888888889,
+          "gamma_cv1": 614.5185185185185,
+          "gamma_cv2": 390.51851851851853,
+          "gamma_cv4": 176.0,
+          "gamma_cv8": 59.111111111111114,
+          "steady": 740.2962962962963
+        },
+        "recovery-first": {
+          "burstgpt": 447.7037037037037,
+          "gamma_cv1": 362.51851851851853,
+          "gamma_cv2": 238.66666666666666,
+          "gamma_cv4": 110.07407407407408,
+          "gamma_cv8": 38.370370370370374,
+          "steady": 449.9259259259259
+        },
+        "static reservation": {
+          "burstgpt": 0.0,
+          "gamma_cv1": 0.0,
+          "gamma_cv2": 0.0,
+          "gamma_cv4": 0.0,
+          "gamma_cv8": 0.0,
+          "steady": 0.0
+        }
+      },
+      "padded_guard_miss_percent": {
+        "Backstop": {
+          "burstgpt": 0.0,
+          "gamma_cv1": 0.0,
+          "gamma_cv4": 0.0
+        },
+        "idle-time admission": {
+          "burstgpt": 9.0,
+          "gamma_cv1": 9.666666666666666,
+          "gamma_cv4": 2.6666666666666665
+        },
+        "recovery-first": {
+          "burstgpt": 0.0,
+          "gamma_cv1": 0.0,
+          "gamma_cv4": 0.0
+        }
+      }
+    },
     "eval_capacity": {
       "by_cells": {
         "Backstop": {
@@ -582,6 +695,7 @@
     "softwall_eval_trace.pdf",
     "softwall_eval_safety.pdf",
     "softwall_eval_online.pdf",
+    "softwall_eval_burst.pdf",
     "softwall_eval_refinement.pdf",
     "softwall_envelope.pdf",
     "softwall_eval_sensitivity.pdf",
@@ -592,20 +706,22 @@
     "softwall_capacity_headroom.svg": "7827bb247441226b0bbdc65859bf3b69db58cf6ed1e20c5f441d2a73c2df544c",
     "softwall_debt.pdf": "69886ac0514144ba6ff94ab33e30907f8d332f42e6a0cc0969870f84ea6ccd03",
     "softwall_debt.svg": "17b11bf5958477783987541e4784a9969df0b7aefecc3f67af0e542f1e7ee55d",
-    "softwall_envelope.pdf": "1bae09223ce1178f7c7486a352a10b0d9465580589c8eeee78285e80aacf75e2",
-    "softwall_envelope.svg": "a211843af5f5210fe805b9c8cc389e7cc4bcb30718c3a8c06ef175bbc6004ea4",
+    "softwall_envelope.pdf": "fede1c96693915b19c8d90c0122481a947fbb45b421e38cab9678a1872485c27",
+    "softwall_envelope.svg": "c2433147174f3b8eae7639f341685d55e7c52337b16bff3f19745d342e80c01e",
+    "softwall_eval_burst.pdf": "07b0e6808afc7f14056d6cb8870ff4c7dfbb2c67de75394d324539fdd14ffb14",
+    "softwall_eval_burst.svg": "01e7826d321ed689f6d96981815aa582cdcb9f3fe59bc3fe88e17f37c2b43077",
     "softwall_eval_capacity.pdf": "2f0166f4916ddab2e2751f7b677bc94b7c96bef857f20f10388960b1afa1f823",
     "softwall_eval_capacity.svg": "da34e52a63dd3319d7f702c3c65970d667dd67346228206cbe8e8573b6bd6576",
     "softwall_eval_drivers.pdf": "d14c4c47eb1b4d6cec67e67e04f9c7aa5ccb79107fb6e5a64192807dd215642e",
     "softwall_eval_drivers.svg": "9b813ba6bb801a830f996301b156852b3c275c233ef40640a832adaf6150bea7",
-    "softwall_eval_online.pdf": "a44605a0cb50de66f18f931064faf7d38c9b07595e976c0f043d554ef653c4f7",
-    "softwall_eval_online.svg": "4fff963efdda773a5668e7d613d7a86e35f54d6c2f8dccf4128f01b2b1b37be1",
-    "softwall_eval_refinement.pdf": "823fada0d88383754b874797ab7fcb7fba43e1d1d7196759fc0bc18313faaf53",
-    "softwall_eval_refinement.svg": "66b2ebba840915776bf267942e0f332b9f959bbc443f47b61f887a5dd5db50dc",
+    "softwall_eval_online.pdf": "88e10cb24f109510d7fbd1432b73c57952b2b78a35be3e32b9e75131284d2780",
+    "softwall_eval_online.svg": "fad43de9bf0628591ac3d14f22341001e1c740f4dd884054aee501a3c98be855",
+    "softwall_eval_refinement.pdf": "1e6a12fb209437a2e21c11f35f049fda7e4079e921660b07cfb1601bb1f99e49",
+    "softwall_eval_refinement.svg": "3ccb4077e458d6fe33f7aaf419f12eaf190a3401e121b955aedea915dd093159",
     "softwall_eval_safety.pdf": "1b042e194540e96bc697aaa661e05469d118e0c29965f5f8bcb4fac722f5e863",
     "softwall_eval_safety.svg": "4c2c12ff95f1ce5f45433a1b3071e8d559f9048ba8851b0f4bcdd17530bf55eb",
-    "softwall_eval_sensitivity.pdf": "db62e5b3c125df0f7bc0f74e2964854dd337229b2ffb37390d7fbded678dfe8a",
-    "softwall_eval_sensitivity.svg": "90054a0bcd2d52cb9455c76497b650b437d4ffb82e5415eb6b00935da4ac7b2f",
+    "softwall_eval_sensitivity.pdf": "8aca597f473d18fa9b54b87e3a2e25db4b511d9cb019119d9c5768993d28ab12",
+    "softwall_eval_sensitivity.svg": "d7d81adcf5795433e9f5905573140c7a659f2db7bed4720e35244bac628a6847",
     "softwall_eval_trace.pdf": "9854b3d2c672187a3bb8d392b54149ff0f90a319e386a8466ecb39024f9c5454",
     "softwall_eval_trace.svg": "967bddc62592a8fc0dfba7eab8aeeb6ca38519610dcd88d2307146448730f1fb",
     "softwall_execution.pdf": "ed9f0064e4655570dd6031b1fc931f63633038ccd076757d30c020546c32305c",
@@ -628,6 +744,8 @@
     "results/softwall_multigpu/c173_deadline_correction_result_v1.json": "99efc84b6231b0b12cce8df5ec48126fec107e9e38d80377852e767e587f7d16",
     "results/softwall_multigpu/c174_trace_oracle_screen_v1.json": "b37a287bb6f399380b307884b8d643ff2b99930f932adf87348de561c28ba0eb",
     "results/softwall_multigpu/c175_lever_evaluation_v1.json": "1d0e375a63b792c6963d4731e61af911dc7344dba7d1ba4df894a394655715e7",
+    "results/softwall_multigpu/c176_burst_campaign_v1.json": "eb5e8fb40f9e8360176e522d05f331dd300f0b6ede925ce53493ebff591f1232",
+    "results/softwall_multigpu/c176_replay_slo_v1.json": "89af0bb97b29bfa6ac0ce40e7e85d050aec13d806f3fedd36ce187ea44ba2512",
     "results/softwall_multigpu/confirm159_q2_variable_two_node.json": "4f228d827d733660d751e8b97b2854b5daa1eacb6502b3c1187ad0352f921692",
     "results/softwall_multigpu/confirm159q2f_batch_dev_j58857672_protocol.json": "a8bd890067653e5939be79dc8de27b1d08c78b30fa9a095fb342df7f629b9cfc",
     "results/softwall_multigpu/softwall_necessity_witness_v3.json": "6ddcda444ae2f3a603df1f71f7467487d8d8db33d7c4c0b5f1dc4e6e75e3d7ad",

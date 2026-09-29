@@ -144,7 +144,10 @@ latest-start enforcement, atomic outcome batches, and fence-confirmed retirement
 provenance-qualified feasibility envelope that classifies each state as qualified-safe-useful (\QSU),
 qualified-safe-no-slack (\QSN), mandatory-infeasible (\MI), or unqualified (\UQ) before execution. Our
 evaluation on two four-GPU A100 nodes under a qualified synthetic timing contract shows that physical
-boundary diagnostics record 0/120 safety violations for \sys and 40/40 for idle-time admission. In
+boundary diagnostics record 0/120 safety violations for \sys and 40/40 for idle-time admission. Under
+bursty BurstGPT-based arrivals with a 200~ms AI SLO, \sys serves 6.2-18.5\% more on-time AI tokens than
+certificate-preserving recovery-first, while idle-time admission breaks the guard in up to 10.0\% of
+periods. In
 1,200 physical release periods, every schedule ends inside its certificate, and under seven injected
 fault classes every TB commits exactly once before expiry. Across
 13,716 feasible capacity-model points, \sys admits more AI capacity than static reservation at 3,600
@@ -730,8 +733,9 @@ priority. Facility identity is withheld for anonymous review.
 The trace-driven evaluation (Sections~\ref{sec:eval-capacity} and~\ref{sec:eval-trace}) measures safe AI
 capacity and timely AI value with an exact-checked capacity model and BurstGPT traces, without executing
 kernels. The physical evaluation (Sections~\ref{sec:eval-online}-\ref{sec:eval-prediction}) runs the
-complete scheduler on both nodes and measures online scheduling, radio safety at the certificate
-boundary, execution refinement under injected faults, prediction accuracy, and decision cost. Section~\ref{sec:eval-sensitivity} varies the recovery bound,
+complete scheduler on both nodes and measures online scheduling, AI service under bursty arrivals, radio
+safety at the certificate boundary, execution refinement under injected faults, prediction accuracy, and
+decision cost. Section~\ref{sec:eval-sensitivity} varies the recovery bound,
 the MPS configuration, and the worker lifecycle.
 
 \noindent\textbf{Workloads and Contract.}
@@ -741,7 +745,7 @@ finite-sample whole-path bounds $B_{\mathrm{NRx}}=45$~ms, $B_{\mathrm{conv}}=25$
 $B_{\mathrm{AI}}(\text{context64})=35$~ms and a 2~ms guard. The period is not an NR slot, and the expiry
 is not a production HARQ deadline. Qwen2.5-1.5B prefill~\cite{qwen25} with 16-512-token prompts creates
 external GPU contention, and BurstGPT~\cite{burstgpt} supplies arrivals and token values from four
-non-overlapping public-trace windows. Synthetic channels drive system qualification; a separate Sionna
+non-overlapping public-trace windows and the prompts of the bursty physical campaign. Synthetic channels drive system qualification; a separate Sionna
 CDL-D/E mode tests radio value (Section~\ref{sec:limitations}).
 
 \noindent\textbf{Baselines.}
@@ -944,6 +948,65 @@ coordinator applies the outcome batch 23.8 and 31.0~ms after the \NRx deadline; 
 from the actual decision time, and both periods end before their certified ends. Thus, the committed
 schedule is executable on the physical lane, and the certificate charges the decision delay that it
 observes.
+
+\subsection{AI service under bursty arrivals}
+\label{sec:eval-burst}
+
+% provenance: C176_BURST
+\noindent\textbf{Bursty Workload.}
+AI requests arrive in bursts, and during a burst the scheduler decides how much AI each recovery window
+can absorb. Therefore, we replay one sequence of 329 BurstGPT prompts on the physical two-node path at 3
+requests/s for 108~s. The prompts are drawn from all BurstGPT requests and rounded up to the six prompt
+lengths, and 47.4\% of them round to 512 tokens. Six arrival patterns share this sequence and differ only
+in arrival times: evenly spaced arrivals, the per-second arrivals of a BurstGPT segment, and Gamma
+arrivals with an inter-arrival CV of 1 (Poisson), 2, 4, and 8. Every request has a 200~ms SLO for its first
+token, and up to four AI leases share one period in FIFO order. All policies of a pattern observe the same
+\NRx outcome sequence, which makes each comparison paired.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/softwall_eval_burst.pdf}
+  \caption{AI service and radio safety under bursty AI arrivals on the physical two-node path. Every
+  pattern carries the same 329 BurstGPT prompts at 3 requests/s for 108~s and differs only in arrival
+  times; the AI SLO is 200~ms. (a) AI tokens served within their SLO; static reservation admits no unit.
+  (b) Periods in which the admitted AI breaks the guard at the declared bounds (lines, measured service
+  times), and periods whose last recovery physically ends after the guard when every unit takes its
+  bound (padded runs). (c) Gain of \sys over recovery-first against the AI SLO: replay mean over the six
+  patterns with its range (band), and the measured runs at 200~ms.}
+  \Description{A line chart shows the on-time AI tokens per second of four policies falling as the
+  arrivals become burstier, with Backstop above recovery-first, idle-time admission above Backstop, and
+  static reservation at zero. A second chart shows idle-time admission breaking the guard in up to ten
+  percent of periods while Backstop and recovery-first stay at zero. A third chart shows the gain of
+  Backstop over recovery-first falling from about a third at a 150-millisecond SLO to a few percent at
+  500 milliseconds.}
+  \label{fig:eval-burst}
+\end{figure}
+
+\noindent\textbf{AI Service.}
+Figure~\ref{fig:eval-burst}a shows the AI tokens served within their SLO. \sys serves 6.2-18.5\% more on-time
+tokens than recovery-first under every pattern: 18.5\% for BurstGPT arrivals, 10.6\% for Poisson arrivals,
+and 6.2\% for CV-8 bursts. Static reservation holds all four recoveries and serves no AI unit in this
+mode. Idle-time admission serves 1.36-1.53$\times$ the tokens of \sys because it also admits units whose
+recoveries no longer fit before the guard. As the arrivals become burstier, every policy serves fewer
+tokens because a burst exceeds the window of one period and its requests expire.
+
+\noindent\textbf{Radio Safety under Bursts.}
+Figure~\ref{fig:eval-burst}b shows the price of that extra AI. Idle-time admission breaks the guard at the
+declared bounds in 1.7-10.0\% of periods, most often for smooth arrivals, where a request waits in almost
+every period. When every AI unit and recovery takes its declared bound, its last recovery physically ends
+after the guard in 2.7-9.7\% of periods, and 128 radio results miss the expiry. \sys and recovery-first
+never break the guard, and no radio result misses the expiry in any of their 18 runs. Under the same
+padded execution, \sys serves 10.6-18.5\% more on-time tokens than recovery-first.
+
+\noindent\textbf{Where the Gain Comes From.}
+Figure~\ref{fig:eval-burst}c varies the AI SLO in a replay with the measured service distributions of the
+two-node campaign, averaged over five seeds. The gain of \sys over recovery-first shrinks as the SLO
+loosens: 34.3\% on average at 150~ms, 14.2\% at 200~ms, 5.3\% at 300~ms, and 2.7\% at 500~ms. The measured
+gains at 200~ms, 6.2-18.5\%, lie close to the replay range of 8.8-21.4\%. \sys achieves this gain because it
+certifies an AI lease ahead of the required recoveries, while recovery-first must charge every required
+recovery its full bound before an AI lease can meet its SLO. Thus, the ordering matters for interactive
+AI SLOs and fades for loose ones, consistent with the tie of the original mode in
+Section~\ref{sec:eval-trace}.
 
 \subsection{Radio safety at the certificate boundary}
 \label{sec:eval-physical}
@@ -1243,8 +1306,8 @@ radio recovery within its deadline while it reclaims the GPU capacity that neura
 releases. Our evaluation shows that \sys reaches the oracle AI capacity across 13,716 feasible model
 points and delivers a median of 1.44$\times$ the timely AI value of certificate-preserving recovery-first
 at the trace headroom points. On two four-GPU nodes, \sys records 0/120 safety violations in boundary cases
-where idle-time admission violates 40/40, and every TB commits exactly once under seven injected fault
-classes. These results qualify a synthetic timing mode, not
+where idle-time admission violates 40/40, serves 6.2-18.5\% more on-time AI tokens than recovery-first
+under bursty AI arrivals, and commits every TB exactly once under seven injected fault classes. These results qualify a synthetic timing mode, not
 production HARQ timing.
 
 \bibliographystyle{ACM-Reference-Format}

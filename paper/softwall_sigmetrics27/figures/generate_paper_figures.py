@@ -57,6 +57,8 @@ SOURCES = {
     "fault_phase1": ROOT / "results/softwall_multigpu/c161_phase1_two_node.json",
     "fault_phase2": ROOT / "results/softwall_multigpu/c161_phase2_two_node.json",
     "necessity_witness": ROOT / "results/softwall_multigpu/softwall_necessity_witness_v3.json",
+    "burst_campaign": ROOT / "results/softwall_multigpu/c176_burst_campaign_v1.json",
+    "burst_replay": ROOT / "results/softwall_multigpu/c176_replay_slo_v1.json",
 }
 
 # Raw per-request records behind the two background figures. The Q2
@@ -318,13 +320,16 @@ def derive_background() -> None:
     BACKGROUND_DATA.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
 
 
-def top_legend(ax, ncol: int, handles=None, labels=None, align: str = "center") -> None:
+def top_legend(ax, ncol: int, handles=None, labels=None, align: str = "center", title=None) -> None:
     """Legend above the axes and above the panel marker; a right-aligned legend ends at the right spine."""
     if handles is None:
         handles, labels = ax.get_legend_handles_labels()
     anchor = {"center": ("lower center", 0.5), "right": ("lower right", 1.0)}[align]
-    ax.legend(handles, labels, loc=anchor[0], bbox_to_anchor=(anchor[1], 1.13), ncol=ncol, frameon=False,
-              handlelength=1.3, handletextpad=0.35, columnspacing=0.7, labelspacing=0.2, borderaxespad=0.0)
+    legend = ax.legend(handles, labels, loc=anchor[0], bbox_to_anchor=(anchor[1], 1.13), ncol=ncol,
+                       frameon=False, handlelength=1.3, handletextpad=0.35, columnspacing=0.7, labelspacing=0.2,
+                       borderaxespad=0.0, title=title, title_fontproperties={"weight": "bold", "size": 7.5})
+    if title:
+        legend._legend_box.align = "left"
 
 
 def make_execution() -> dict:
@@ -559,7 +564,7 @@ def make_envelope() -> dict:
                        markeredgecolor=COLORS["green"], markeredgewidth=1.4, markersize=4.5),
                 Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markeredgewidth=1.5, markersize=4.5)]
     labels += ["tested: admitted", "tested: rejected"]
-    top_legend(ax, ncol=3, handles=handles, labels=labels)
+    top_legend(ax, ncol=3, handles=handles, labels=labels, title="Backstop admission limit by prompt length")
     panel_label(ax, "a")
 
     # (b) Candidate construction and verification latency against the number
@@ -571,11 +576,11 @@ def make_envelope() -> dict:
     verify_p99 = [by_count[str(n)]["verify_us"]["p99"] / 1000 for n in counts]
     assert round(decision_p99[-1], 3) == 1.494
     ax.plot(counts, decision_p99, color=COLORS["blue"], marker="o", markersize=3.2, linewidth=1.5,
-            label="decision p99")
+            label="Backstop decision p99")
     ax.plot(counts, decision_max, color=COLORS["blue"], marker="s", markersize=3.0, linewidth=1.2,
-            linestyle="--", label="decision max")
+            linestyle="--", label="Backstop decision max")
     ax.plot(counts, verify_p99, color=COLORS["green"], marker="D", markersize=3.0, linewidth=1.5,
-            label="verifier p99")
+            label="Backstop verifier p99")
     ax.axhline(5.0, color=COLORS["red"], linestyle="--", linewidth=1.2)
     ax.text(70, 5.1, "5 ms control budget", ha="right", va="bottom", fontsize=6.4, color=COLORS["red"])
     ax.set_xscale("log", base=2)
@@ -1133,7 +1138,7 @@ def make_eval_online() -> dict:
                     Rectangle((0, 0), 1, 1, facecolor=COLORS["blue"]),
                     Rectangle((0, 0), 1, 1, facecolor=COLORS["light_orange"], edgecolor=COLORS["orange"]),
                     Rectangle((0, 0), 1, 1, facecolor=COLORS["light_red"], edgecolor=COLORS["red"], hatch="/////")]
-    lane_labels = ["AI lease", "measured prefill", "recovery", "rejected AI lease"]
+    lane_labels = ["Backstop lease", "measured prefill", "recovery", "rejected lease"]
 
     # (b) Measured against certified end of the last lane action, all 1,200
     # periods. Points below the diagonal finish inside their certificate.
@@ -1153,6 +1158,7 @@ def make_eval_online() -> dict:
                               markersize=4.2))
     assert all(p["measured_end_ms"] < p["certified_end_ms"] <= window for p in periods)
     ax.plot([0, 120], [0, 120], color=COLORS["gray"], linestyle=":", linewidth=1.0, zorder=2)
+    ax.text(6, 112, "Backstop periods", ha="left", va="top", fontsize=6.6, color=COLORS["blue"])
     ax.text(40, 44, "measured = certified", ha="center", va="bottom", fontsize=6.0, color=COLORS["gray"],
             rotation=45, rotation_mode="anchor", transform_rotates_text=True)
     ax.axvline(window, color=COLORS["red"], linestyle="--", linewidth=1.1, zorder=2)
@@ -1285,7 +1291,10 @@ def make_eval_refinement() -> dict:
                       markersize=4.5),
                Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
                Line2D([], [], color=COLORS["dark"], linestyle="--", linewidth=1.1)]
-    figure_legend(fig, handles, ["launched", "refused before launch", "latest-start"], ncol=3)
+    handles.append(Rectangle((0, 0), 1, 1, facecolor=COLORS["light_blue"], edgecolor=COLORS["blue"]))
+    figure_legend(fig, [handles[0], handles[2], handles[1], handles[3]],
+                  ["launched by Backstop", "latest-start", "refused by Backstop", "Backstop TB commit time"],
+                  ncol=2, compact=True)
     save(fig, "softwall_eval_refinement")
     return {"launched_arrival_ms": [min(launched), max(launched)],
             "held_arrival_ms": [min(h["arrival_minus_latest_start_ms"] for h in held),
@@ -1326,26 +1335,46 @@ def make_eval_sensitivity() -> dict:
     # the bound-padded physical attempts at the qualified bound.
     ax = axes[0]
     bounds = list(range(10, 31))
-    styles = {"E4": ("-", "E4_debt_blind_launch"), "E6b": ("--", "E6b_shadow_launch")}
-    for case, (style, scenario) in styles.items():
+    styles = {"E4": ("-", "E4_debt_blind_launch", "E4_softwall_reject"),
+              "E6b": ("--", "E6b_shadow_launch", "E6b_softwall_reject")}
+
+    def without_unit(case, recovery_bound):
+        # The unit is rejected: the required recoveries run from the decision.
+        w = cases[case]
+        return w["decision_time_ms"] + w["unresolved_debts"] * recovery_bound - w["radio_guard_boundary_ms"]
+
+    backstop_curves = {}
+    for case, (style, launched_scenario, backstop_scenario) in styles.items():
         ax.plot(bounds, [excess(case, b) for b in bounds], color=COLORS["red"], linestyle=style, linewidth=1.5)
-        measured = [a["last_recovery_complete_ms"] - cases[case]["radio_guard_boundary_ms"] for a in attempts
-                    if a["scenario"] == scenario]
-        offsets = [((i % 9) - 4) * 0.12 for i in range(len(measured))]
-        ax.scatter([bound + o for o in offsets], measured, s=9, marker="x", color=COLORS["red"], linewidths=0.8,
-                   zorder=3)
+        # Backstop admits the unit while its certificate holds and rejects it afterward.
+        fine = [10 + i * 0.05 for i in range(401)]
+        curve = [excess(case, b) if excess(case, b) <= 0 else without_unit(case, b) for b in fine]
+        backstop_curves[case] = curve
+        ax.plot(fine, curve, color=COLORS["blue"], linestyle=style, linewidth=1.5)
+        for scenario, marker, color in ((launched_scenario, "x", COLORS["red"]), (backstop_scenario, "o", COLORS["blue"])):
+            measured = [a["last_recovery_complete_ms"] - cases[case]["radio_guard_boundary_ms"] for a in attempts
+                        if a["scenario"] == scenario]
+            offsets = [((i % 9) - 4) * 0.12 for i in range(len(measured))]
+            if marker == "x":
+                ax.scatter([bound + o for o in offsets], measured, s=9, marker="x", color=color, linewidths=0.8,
+                           zorder=3)
+            else:
+                ax.scatter([bound + o for o in offsets], measured, s=9, marker="o", facecolor="none",
+                           edgecolor=color, linewidths=0.7, zorder=3)
+    assert max(max(curve) for curve in backstop_curves.values()) <= 0
     ax.axhspan(0, 30, color=COLORS["light_red"], alpha=0.45, zorder=0)
     ax.axhline(0, color=COLORS["dark"], linewidth=0.8)
     ax.axvline(bound, color=COLORS["blue"], linestyle=":", linewidth=1.1)
-    ax.text(bound - 0.4, -24, "certified\nbound", ha="right", va="bottom", fontsize=6.3, color=COLORS["blue"])
+    ax.text(bound + 0.55, -20, "certified bound", ha="left", va="center", fontsize=6.0, color=COLORS["blue"],
+            rotation=90)
     ax.axvline(paths[-1], color=COLORS["gray"], linestyle=":", linewidth=1.1)
-    ax.text(paths[-1] + 0.4, -24, "largest\nmeasured", ha="left", va="bottom", fontsize=6.3,
-            color=COLORS["gray"])
-    ax.text(10.6, 24, "radio violation", ha="left", va="top", fontsize=6.3, color=COLORS["red"])
+    ax.text(paths[-1] + 0.55, -43, "largest measured", ha="left", va="center", fontsize=5.8,
+            color=COLORS["gray"], rotation=90)
+    ax.text(10.6, 26, "radio violation", ha="left", va="top", fontsize=6.3, color=COLORS["red"])
     ax.set_xlim(10, 30)
-    ax.set_ylim(-26, 26)
+    ax.set_ylim(-72, 30)
     ax.set_xticks([10, 15, 20, 25, 30])
-    ax.set_yticks([-20, 0, 20])
+    ax.set_yticks([-60, -30, 0, 20])
     ax.set_xlabel("recovery bound (ms)")
     ax.set_ylabel("last recovery past\nthe guard (ms)")
     ax.grid(axis="y", **GRID)
@@ -1357,6 +1386,7 @@ def make_eval_sensitivity() -> dict:
     ax = axes[1]
     n = len(paths)
     ax.step(paths, [(n - i) / n for i in range(n)], where="post", color=COLORS["blue"], linewidth=1.4)
+    ax.text(5.0, 0.3, "Backstop recoveries", ha="left", va="center", fontsize=6.3, color=COLORS["blue"])
     for x, style, label in ((19, "-", "E4 limit"), (24, "--", "E6b limit")):
         ax.axvline(x, color=COLORS["red"], linestyle=style, linewidth=1.0)
         ax.text(x - 0.6, 0.02, label, ha="right", va="center", fontsize=6.3, color=COLORS["red"], rotation=90)
@@ -1374,17 +1404,142 @@ def make_eval_sensitivity() -> dict:
     panel_label(ax, "b")
 
     handles = [Line2D([], [], color=COLORS["red"], linestyle="-", linewidth=1.5),
+               Line2D([], [], color=COLORS["blue"], linestyle="-", linewidth=1.5),
                Line2D([], [], color=COLORS["red"], linestyle="--", linewidth=1.5),
+               Line2D([], [], color=COLORS["blue"], linestyle="--", linewidth=1.5),
                Line2D([], [], marker="x", linestyle="none", color=COLORS["red"], markersize=4.5),
-               Line2D([], [], color=COLORS["blue"], linewidth=1.4)]
-    figure_legend(fig, [handles[0], handles[2], handles[1], handles[3]],
-                  ["E4: idle-time admission", "measured at the bound", "E6b: AI launched at 89 ms",
-                   "measured recovery time"], ncol=2, compact=True)
+               Line2D([], [], marker="o", linestyle="none", markerfacecolor="none",
+                      markeredgecolor=COLORS["blue"], markersize=4.5)]
+    figure_legend(fig, [handles[0], handles[2], handles[4], handles[1], handles[3], handles[5]],
+                  ["E4, launched anyway", "E6b, launched anyway", "measured, launched anyway",
+                   "E4, Backstop", "E6b, Backstop", "measured, Backstop"], ncol=2, compact=True)
     save(fig, "softwall_eval_sensitivity")
     return {"excess_at_contract_ms": {case: excess(case, bound) for case in cases},
             "zero_excess_bound_ms": {"E4": 19, "E6b": 24},
             "recovery_path_ms": {"count": n, "median": statistics.median(paths), "max": paths[-1],
                                  "p99": paths[int(0.99 * (n - 1))]}}
+
+
+BURST_PATTERNS = (("steady", "steady"), ("burstgpt", "BurstGPT"), ("gamma_cv1", "Poisson"),
+                  ("gamma_cv2", "CV 2"), ("gamma_cv4", "CV 4"), ("gamma_cv8", "CV 8"))
+
+
+def make_eval_burst() -> dict:
+    """AI service and radio safety under bursty AI arrivals (C176 physical runs and SLO replay)."""
+    campaign = load("burst_campaign")
+    replay = load("burst_replay")
+    runs = {(run["pattern"], run["policy"], run["mode"]): run for run in campaign["runs"]}
+    assert campaign["certified_policies_safe"] and campaign["all_runs_completed"]
+    patterns = [name for name, _ in BURST_PATTERNS if (name, "backstop", "natural") in runs]
+    labels = [label for name, label in BURST_PATTERNS if name in patterns]
+    xs = list(range(len(patterns)))
+    policies = (("static", "static reservation", COLORS["gray"], ":", "o"),
+                ("recovery_first", "recovery-first", COLORS["gray"], "--", "s"),
+                ("backstop", "Backstop", COLORS["blue"], "-", "D"),
+                ("idle_time", "idle-time admission", COLORS["red"], "-", "^"))
+
+    fig, axes = plt.subplots(1, 3, figsize=(FIG_WIDTH, 1.45), gridspec_kw={"width_ratios": [1.15, 1.15, 1.15]})
+    fig.subplots_adjust(wspace=0.62)
+    summary = {"on_time_tokens_per_s": {}, "broken_percent": {}, "padded_guard_miss_percent": {},
+               "gain_over_recovery_first": {}}
+
+    # (a) On-time AI tokens per second under natural execution. Static
+    # reservation holds all four recoveries and admits no unit in this mode.
+    ax = axes[0]
+    for key, label, color, style, marker in policies:
+        if key == "static":
+            values = [0.0 for _ in patterns]
+        else:
+            values = [runs[(name, key, "natural")]["on_time_tokens_per_s"] for name in patterns]
+        summary["on_time_tokens_per_s"][label] = dict(zip(patterns, values))
+        ax.plot(xs, values, color=color, linestyle=style, marker=marker, markersize=3.4, linewidth=1.4)
+    ax.set_xticks(xs, labels, rotation=35, ha="right", rotation_mode="anchor")
+    ax.tick_params(axis="x", labelsize=6.4)
+    ax.set_xlabel("AI arrivals (burstier \u2192)")
+    ax.set_ylabel("on-time AI tokens\nper second")
+    ax.set_ylim(-30, 820)
+    ax.set_yticks([0, 250, 500, 750])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "a")
+
+    # (b) Periods in which the admitted AI breaks the guard at the declared
+    # bounds (natural runs), and periods whose last recovery physically ends
+    # after the guard when every unit takes its bound (padded runs).
+    ax = axes[1]
+    for key, label, color, style, marker in policies:
+        if key == "static":
+            continue
+        values = [100.0 * runs[(name, key, "natural")]["contract_broken_periods"]
+                  / runs[(name, key, "natural")]["iterations"] for name in patterns]
+        summary["broken_percent"][label] = dict(zip(patterns, values))
+        ax.plot(xs, values, color=color, linestyle=style, marker=marker, markersize=3.4, linewidth=1.4)
+        padded = [(i, 100.0 * runs[(name, key, "padded")]["physical_guard_misses"]
+                   / runs[(name, key, "padded")]["iterations"])
+                  for i, name in enumerate(patterns) if (name, key, "padded") in runs]
+        if padded:
+            summary["padded_guard_miss_percent"][label] = {patterns[i]: v for i, v in padded}
+            ax.scatter([i for i, _ in padded], [v for _, v in padded], s=26, marker=marker, facecolor="white",
+                       edgecolor=color, linewidths=1.1, zorder=4)
+    ax.set_xticks(xs, labels, rotation=35, ha="right", rotation_mode="anchor")
+    ax.tick_params(axis="x", labelsize=6.4)
+    ax.set_xlabel("AI arrivals (burstier \u2192)")
+    ax.set_ylabel("periods breaking\nthe guard (%)")
+    ax.set_ylim(-1, 14)
+    ax.set_yticks([0, 5, 10])
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "b")
+
+    # (c) Gain of Backstop over recovery-first in on-time AI tokens against
+    # the AI SLO: replay mean over the six patterns (line, with the range) and
+    # the physical runs at the 200 ms SLO (markers).
+    ax = axes[2]
+    rows = {(row["pattern"], row["slo_ms"], row["policy"]): row for row in replay["summary"]}
+    slos = sorted({row["slo_ms"] for row in replay["summary"]})
+    gains = {slo: [100.0 * (rows[(name, slo, "backstop")]["on_time_tokens_per_s"]
+                            / rows[(name, slo, "recovery_first")]["on_time_tokens_per_s"] - 1.0)
+                   for name, _ in BURST_PATTERNS] for slo in slos}
+    mean = [statistics.mean(gains[slo]) for slo in slos]
+    sx = list(range(len(slos)))
+    ax.fill_between(sx, [min(gains[slo]) for slo in slos], [max(gains[slo]) for slo in slos],
+                    color=COLORS["light_gray"], linewidth=0, zorder=1)
+    ax.plot(sx, mean, color=COLORS["dark"], marker="s", markersize=3.0, linewidth=1.3, zorder=3)
+    physical = [100.0 * (runs[(name, "backstop", "natural")]["on_time_tokens_per_s"]
+                         / runs[(name, "recovery_first", "natural")]["on_time_tokens_per_s"] - 1.0)
+                for name in patterns]
+    slo_ms = runs[(patterns[0], "backstop", "natural")]["slo_ms"]
+    ax.scatter([slos.index(slo_ms)] * len(physical), physical, s=18, marker="o", facecolor="white",
+               edgecolor=COLORS["blue"], linewidths=1.0, zorder=4)
+    summary["gain_over_recovery_first"] = {"replay_mean_by_slo": dict(zip(map(str, slos), mean)),
+                                           "replay_range_by_slo": {str(slo): [min(gains[slo]), max(gains[slo])]
+                                                                   for slo in slos},
+                                           "physical_by_pattern": dict(zip(patterns, physical))}
+    ax.axhline(0, color=COLORS["dark"], linewidth=0.7)
+    ax.set_xticks(sx, [str(int(slo)) for slo in slos])
+    ax.tick_params(axis="x", labelsize=6.6)
+    ax.set_xlim(-0.4, len(slos) - 0.6)
+    ax.set_xlabel("AI SLO (ms)")
+    ax.set_ylabel("Backstop gain over\nrecovery-first (%)")
+    ax.grid(axis="y", **GRID)
+    ax.set_axisbelow(True)
+    panel_label(ax, "c")
+
+    handles = [Line2D([], [], color=color, linestyle=style, marker=marker, markersize=3.4, linewidth=1.4)
+               for _, _, color, style, marker in policies]
+    extra = [Line2D([], [], marker="^", linestyle="none", markerfacecolor="white", markeredgecolor=COLORS["red"],
+                    markersize=4.5),
+             Line2D([], [], color=COLORS["dark"], marker="s", markersize=3.0, linewidth=1.3),
+             Line2D([], [], marker="o", linestyle="none", markerfacecolor="white", markeredgecolor=COLORS["blue"],
+                    markersize=4.2)]
+    names = [label for _, label, _, _, _ in policies]
+    # Column-major order: the first row names the policies, the second the
+    # replay line of (c), the measured runs of (c), and the padded runs of (b).
+    order = [handles[0], extra[1], handles[1], extra[2], handles[2], extra[0], handles[3]]
+    order_names = [names[0], "replay mean", names[1], "measured run", names[2], "padded run", names[3]]
+    figure_legend(fig, order, order_names, ncol=4, compact=True)
+    save(fig, "softwall_eval_burst")
+    return summary
 
 
 def make_capacity_headroom() -> dict:
@@ -1507,13 +1662,15 @@ def main() -> None:
         "eval_trace": make_eval_trace(),
         "eval_safety": make_eval_safety(),
         "eval_online": make_eval_online(),
+        "eval_burst": make_eval_burst(),
         "eval_refinement": make_eval_refinement(),
         "envelope": make_envelope(),
         "eval_sensitivity": make_eval_sensitivity(),
         "capacity_headroom": make_capacity_headroom(),
     }
     stems = ("softwall_execution", "softwall_debt", "softwall_eval_capacity", "softwall_eval_drivers",
-             "softwall_eval_trace", "softwall_eval_safety", "softwall_eval_online", "softwall_eval_refinement",
+             "softwall_eval_trace", "softwall_eval_safety", "softwall_eval_online", "softwall_eval_burst",
+             "softwall_eval_refinement",
              "softwall_envelope", "softwall_eval_sensitivity", "softwall_capacity_headroom")
     manifest = {
         "schema": "softwall-paper-figure-manifest-v1",

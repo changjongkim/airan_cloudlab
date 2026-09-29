@@ -1,0 +1,105 @@
+{
+ "source": {
+  "path": "data/public/burstgpt/BurstGPT_1.csv",
+  "sha256": "46fc9480ef0b748ecb2b51d512ff08c196b031782cbe6f78e28044d768e86d5a",
+  "window_first_row": 144059,
+  "window_requests": 329,
+  "window_start_timestamp_s": 853163.0,
+  "window_cv": 0.6851124256394363,
+  "median_cv_of_candidates": 0.6850773521491821,
+  "candidates": 2000,
+  "rule": "first qualifying windows with a request count within 5% of rate x duration; choose the window whose CV is closest to their median CV"
+ },
+ "patterns": {
+  "steady": {
+   "pattern": "steady",
+   "requests": 329,
+   "duration_s": 108.0,
+   "rate_per_s": 3.0462962962962963,
+   "interarrival_cv": 1.5217600497844965e-06,
+   "bucket_counts": {
+    "16": 2,
+    "32": 4,
+    "64": 13,
+    "128": 62,
+    "256": 92,
+    "512": 156
+   }
+  },
+  "gamma_cv1": {
+   "pattern": "gamma_cv1",
+   "requests": 329,
+   "duration_s": 108.0,
+   "rate_per_s": 3.0462962962962963,
+   "interarrival_cv": 0.9303416822993806,
+   "bucket_counts": {
+    "16": 2,
+    "32": 4,
+    "64": 13,
+    "128": 62,
+    "256": 92,
+    "512": 156
+   }
+  },
+  "gamma_cv2": {
+   "pattern": "gamma_cv2",
+   "requests": 329,
+   "duration_s": 108.0,
+   "rate_per_s": 3.0462962962962963,
+   "interarrival_cv": 1.8036055513865714,
+   "bucket_counts": {
+    "16": 2,
+    "32": 4,
+    "64": 13,
+    "128": 62,
+    "256": 92,
+    "512": 156
+   }
+  },
+  "gamma_cv4": {
+   "pattern": "gamma_cv4",
+   "requests": 329,
+   "duration_s": 108.0,
+   "rate_per_s": 3.0462962962962963,
+   "interarrival_cv": 3.6282258524951634,
+   "bucket_counts": {
+    "16": 2,
+    "32": 4,
+    "64": 13,
+    "128": 62,
+    "256": 92,
+    "512": 156
+   }
+  },
+  "gamma_cv8": {
+   "pattern": "gamma_cv8",
+   "requests": 329,
+   "duration_s": 108.0,
+   "rate_per_s": 3.0462962962962963,
+   "interarrival_cv": 8.385053526244986,
+   "bucket_counts": {
+    "16": 2,
+    "32": 4,
+    "64": 13,
+    "128": 62,
+    "256": 92,
+    "512": 156
+   }
+  },
+  "burstgpt": {
+   "pattern": "burstgpt",
+   "requests": 329,
+   "duration_s": 108.0,
+   "rate_per_s": 3.0462962962962963,
+   "interarrival_cv": 0.6851125279541338,
+   "bucket_counts": {
+    "16": 2,
+    "32": 4,
+    "64": 13,
+    "128": 62,
+    "256": 92,
+    "512": 156
+   }
+  }
+ }
+}

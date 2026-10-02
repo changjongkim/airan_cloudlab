@@ -4,6 +4,10 @@ Status: draft, 2026-10-01. Not merged into `paper/softwall_sigmetrics27`. Every 
 [BACKSTOP_V4_VERIFICATION_KO.md](BACKSTOP_V4_VERIFICATION_KO.md) (sections in brackets). Citation keys in
 brackets are placeholders; add a reference only after checking the source.
 
+> 2026-10-02: the evaluation numbers and the AI admission rule below are those of v12. The current text is
+> `paper/backstop_slot_v7/main.tex`, which uses the v13 rule (low-priority AI, free-receiver rule) and the
+> sweeps of [BACKSTOP_V13_SWEEPS_KO.md](BACKSTOP_V13_SWEEPS_KO.md).
+
 ## Abstract
 
 AI-RAN servers run the uplink physical layer and AI inference on the same GPUs. Neural receivers decode

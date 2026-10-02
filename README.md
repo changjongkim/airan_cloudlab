@@ -1,395 +1,796 @@
-# AI-RAN 공유 GPU 연구 워크스페이스
+# Backstop: AI-RAN 공유 GPU에서 Neural Receiver 복구 경로와 AI 추론의 공존
 
-**기준일:** 2026-09-25
-**현재 연구:** SoftWall — MIG를 사용하지 않는 공유 GPU(MPS)에서 optional NeuralRx의 조건부 복구 의무를 인증하는 runtime substrate
-**현재 단계:** 원고 provenance 정리 완료. Production P2 bounded campaign은 frozen 개발 gate 995/1,000 실패와 사전 중단 규칙에 따라 종료했으며, 유일한 활성 production blocker는 target-DU timing contract(P1)임
-**투고 목표:** ACM SIGMETRICS 2027 Winter 사이클 — abstract 2027-01-04 23:59 AoE, paper 2027-01-11 23:59 AoE, 통보 2027-03-10 (공식 CFP, 2026-09-25 확인)
-**최신 스냅샷 태그:** `softwall-sigmetrics-snapshot-20260925` (commit `2a97f8b`)
+**기준일:** 2026-10-02
+**연구 주제:** 무선 PHY와 외부 AI 추론이 같은 GPU를 쓰는 AI-RAN 서버에서, neural receiver(NRx)를 실패한 transport block(TB)의 복구 경로로 쓰면서 L1 마감과 복구 수를 지키고 AI 추론을 최대한 처리하는 GPU 공유 방식
+**현재 단계:** 스킴 구현, 수신기 검증, 기존 방식 다섯 가지와의 sweep 비교, 논문 초안 작성을 마쳤다. 실제 L2 연동과 실측 채널 검증은 하지 않았다.
+**논문 초안:** [paper/backstop_slot_v7/main.pdf](paper/backstop_slot_v7/main.pdf) (14쪽)
 
-이 파일은 저장소의 단일 진입점이다. 연구 경과, 현재 결론, 기각된 주장, 미해결 사항, 알려진 오류를 모두 기록한다.
+이 문서는 저장소의 단일 진입점이다. 문제 정의, 기존 연구와의 차이, 노벨티를 확보한 방법, 스킴, 실험 결과, 한계, 결론을 순서대로 적는다. 모든 수치는 12장에 적은 원본 파일에서 나온 값이다.
+
+## 목차
+
+1. [문제 정의](#1-문제-정의)
+2. [기존 연구와의 차이](#2-기존-연구와의-차이)
+3. [노벨티를 확보한 방법](#3-노벨티를-확보한-방법)
+4. [스킴](#4-스킴)
+5. [실험 환경과 방법](#5-실험-환경과-방법)
+6. [실험 결과](#6-실험-결과)
+7. [유리하지 않은 결과와 철회한 주장](#7-유리하지-않은-결과와-철회한-주장)
+8. [한계](#8-한계)
+9. [결론](#9-결론)
+10. [재현 방법](#10-재현-방법)
+11. [연구 경과](#11-연구-경과)
+12. [저장소 구조와 원본 파일](#12-저장소-구조와-원본-파일)
 
 ---
 
-## 1. 연구 문제
+## 1. 문제 정의
 
-AI-and-RAN 플랫폼은 무선 PHY 처리와 외부 AI 추론을 같은 GPU에서 실행하려 한다. NVIDIA MPS는 여러 CUDA process의 동시 실행을 제공하지만 무선 경로에 대한 시간 계약을 제공하지 않는다.
+### 1.1 배경
 
-NeuralRx가 optional인 경우 문제가 추가된다. NeuralRx 결과가 확정되기 전까지 같은 transport block(TB)의 conventional receiver 경로는 실행 여부가 정해지지 않은 **미래의 필수 작업**으로 남는다. 이 작업은 아직 어떤 queue에도 들어가지 않았으므로, 현재 GPU가 비어 있다는 관측만으로 외부 AI를 먼저 실행하면 이후 복구 구간을 침범할 수 있다. 여러 cell과 여러 RAN home의 조건부 복구 의무는 공유 복구 자원에서 충돌할 수 있다.
+AI-RAN 서버는 여러 셀의 uplink PHY를 GPU에서 복호하고, 남는 GPU 시간으로 AI 추론 요청을 처리한다. 무선 작업에는 슬롯 단위 마감이 있고 AI 요청에는 응답 시간 제한이 있다.
 
-## 2. 스킴: SoftWall
+이 연구의 시간 조건은 다음과 같다.
 
-### 2.1 핵심 정의
-
-- **Recovery debt:** 미확정 NeuralRx 결과 `i`가 유도하는 conventional 복구 작업 `R_i = (a_i(t), d_i − g_i, c_i, h_i)`.
-- **All-fail certificate:** 미해결 debt 집합 `U(t)` 전체가 동시에 실패해도 모든 복구가 release, deadline, 자원 용량, 비중첩 조건을 만족하는 실행 가능 일정.
-- **런타임 상태:** `X_t = (S, Q, T, L, E, C, G)` — 복구 일정, endpoint credit, IPC/P2P transport generation, AI lease, 물리 fence와 worker epoch, radio commit 상태, 다중 home AI 소유권.
-
-### 2.2 불변식과 명제
-
-- **커밋 조건:** 후보 상태 `X'`는 다음을 모두 만족할 때만 `X_t`를 대체한다. 그렇지 않으면 `X_t`는 변경되지 않는다.
-  ```text
-  VALID(X') = 복구 일정이 실행 가능
-            ∧ endpoint·transport credit이 유일
-            ∧ AI 완료가 자기 deadline과 복구 guard보다 앞섬
-            ∧ 모든 generation과 worker epoch이 일치
-  ```
-- **Lemma 1 (all-fail dominance):** NeuralRx 성공이 자기 복구만 삭제하고 남은 작업의 demand를 늘리지 않으면, `U(t)`에 대한 certificate는 모든 실패 부분집합에 대해 유효하다. `2^|U|` 열거가 필요하지 않다. 성공이 새 필수 작업을 만들거나 다른 복구의 bound를 바꾸는 mode에는 적용되지 않는다.
-- **Lemma 1b (disjoint-home composition):** 복구 lane이 서로 분리된 home의 certificate는 합집합으로 합성된다. 복구 GPU를 공유하면 합성되지 않으므로 전역 certificate를 구성한다.
-- **결정 구간 조건:** home `h`에 동일 길이 복구 `m_h`개가 deadline 꼬리에 남았을 때, AI transaction을 먼저 실행하는 충분조건은
-  ```text
-  T_dec,h + b_eff ≤ d_h − g_h − m_h · c_h
-  ```
-  이다. 같은 debt 수와 AI class가 88 ms에서 안전하고 89 ms에서 불안전한 이유를 이 식이 설명한다.
-- **Proposition 2 (현재의 idle은 불충분):** 단일 비선점 복구 lane, 공통 guard 경계 `D`, 미해결 복구 bound `c_1…c_m`, AI transaction bound `b_eff`에서 mandatory-only 실행은 가능하지만 `t + b_eff + Σ c_i > D`이면, 시각 `t`의 GPU idle만으로 AI를 수락하는 정책은 무선 계약을 보장할 수 없다.
-
-### 2.3 실행 절차
-
-1. **Mandatory-first admission:** 무선 release 시 conventional 복구를 먼저 예약한다. NeuralRx는 전체 경로 bound가 fallback cutoff 안에 들어가고 endpoint가 generation이 일치하는 ring credit을 가질 때만 수락한다.
-2. **Outcome batch 적용:** 공통 cutoff의 NeuralRx 결과를 한 묶음으로 적용한다. 적시 성공은 debt를 삭제하고, 실패·지연·증거 없음은 debt를 유지한다.
-3. **AI lease와 launch-time enforcement:** worker에 절대 latest-start 시각을 전달하고, 그 이후 CUDA kernel을 발사하지 않는다. launch control 구간보다 오래된 certificate는 폐기하고 재계산한다.
-4. **원자 commit:** 복구 재배치와 AI lease 발급을 한 generation으로 commit한다.
-5. **Lease 회수:** 일치하는 물리 완료 fence 또는 자격 있는 non-launch 기록으로만 회수한다. 증거 없는 timeout은 credit을 quarantine한다.
-
-### 2.4 설계 요소의 근거
-
-각 설계 요소는 측정된 반례에서 도입했다.
-
-| 반례 | 깨진 가정 | 도입한 요소 |
+| 항목 | 값 | 근거 |
 |---|---|---|
-| Local-safe / global-unsafe 복구 | local certificate가 공유 lane에서 합성된다 | 전역 obligation 집합과 전역 certificate |
-| 23.530 ms dispatch tail | certificate가 kernel launch 시점까지 유효하다 | Bounded revalidation과 물리 latest-start |
-| 순차 common-cutoff 재생 | 동시 결과를 임의 순서로 적용할 수 있다 | Atomic outcome batch |
-| 고정 AI lease | AI 실행시간이 launch control을 포함한다 | Launch-time control과 AI blackout |
-| 효과 발생 후 reply 손실 | 모호한 연산의 재시도는 무해하다 | Generation quarantine과 fail-closed admission |
-| 두 개의 미완료 prepare | at-most-once RPC가 소유권 가시성을 보장한다 | Single unlaunched-token 불변식 |
-| Warm bound 재사용 | 배치와 수명주기가 service tail을 바꾸지 않는다 | Provenance 범위의 자격 검증 |
+| TDD 패턴 | DDDSU, subcarrier 간격 30 kHz | 셀마다 2.5 ms에 UL 슬롯 하나 |
+| L1 마감 | 수신 샘플 도착 후 4.0 ms | 샘플은 슬롯 시작 0.5 ms 뒤 도착, L1 결과는 슬롯 시작 4.5 ms 뒤 필요 |
+| 재전송 | 원래 슬롯의 7.5 ms 뒤 UL 슬롯 | 바로 앞 S 슬롯에서 K2=1로 grant. PUSCH 준비 시간 12심볼(TS 38.214 표 6.4-1) |
+| 복구 마감 | 도착 후 11.5 ms | 4.2절 |
 
-### 2.5 Feasibility 분류
+Neural receiver는 채널 추정, 등화, demapping을 학습된 모델로 대체하는 수신기다. 기존 수신기(이 연구에서는 NVIDIA Aerial cuPHY)가 복호하지 못한 TB를 복호하면 그 TB의 재전송이 없어지고 UL 슬롯 하나가 남는다.
 
-debt 수, AI class, 판단 시각, 수명주기 provenance를 입력으로 실행 전에 분류한다.
+### 1.2 측정으로 확인한 두 사실
 
-| 분류 | 의미 |
+**사실 1. 기존 수신기보다 확실히 나은 NRx는 UL 주기보다 느리다.** 두 수신기의 LDPC 반복 횟수를 20회로 맞추고 공개 NRx(NVlabs `neural_rx`)와 cuPHY를 같은 슬롯에서 비교했다(6.1절).
+
+- 실시간용 모델 `nrx_rt`(엔진 1.35 ms)는 두 UE의 채널 상관이 중간 이상일 때만 cuPHY보다 많이 복호한다. 상관이 낮은 채널과 UMi 채널에서는 cuPHY 실패의 2%만 추가로 복호한다.
+- 큰 모델 `nrx_large`(엔진 4.29 ms)는 시험한 세 채널 모두에서 cuPHY 실패의 15–67%를 추가로 복호한다.
+- 큰 모델의 슬롯 하나 경로는 단독 5.3 ms, 셀과 같이 돌 때 6.3 ms다. UL 주기 2.5 ms의 2.1–2.5배이므로 매 슬롯에 돌릴 수 없다.
+
+**사실 2. 기존 GPU 공유 수단은 NRx의 복구를 지키지 못한다.** 16셀, GPU 4장, 큰 모델을 복구 경로로 쓰는 조건에서 AI를 같은 GPU에 넣었다(6.4절).
+
+- MPS 비율 한도는 프로세스 시작 뒤 바꿀 수 없다. 전 부하에서 복구를 지키는 비율은 10%이고, 그 비율의 AI 처리량은 5.2k tokens/s다. 비율을 50%로 올리면 복구를 9.2% 잃고 L1 놓침이 0.10%가 된다.
+- AI를 낮은 MPS 우선순위로 두면 L1 마감은 지켜진다. 그러나 복구를 8.0% 잃는다.
+- GPU에 무선 작업이 없을 때만 AI를 돌리면 복구는 99.7%를 지키지만 AI 처리량이 4.7k tokens/s다.
+
+### 1.3 문제 진술
+
+위 두 사실에서 문제는 다음과 같이 정해진다.
+
+> 큰 NRx를 매 슬롯의 수신기로 쓸 수 없으므로 실패한 TB의 복구 경로로 써야 한다. 이 복구 경로는 기존 수신기, AI 추론과 같은 GPU를 쓴다. (a) 모든 TB의 L1 마감, (b) NRx가 복구하는 TB 수, (c) AI 요청의 응답 시간 제한을 함께 지키면서 AI 처리량을 최대화하는 GPU 공유 방식이 필요하다.
+
+기존 수단이 (b)를 지키지 못하는 이유는 6.8절의 측정으로 확인했다. 실패한 TB는 도착 후 3.9 ms 안에 NRx를 시작해야 하고, 그때 NRx가 모두 실행 중이면 그 TB의 복구 기회는 없어진다. AI가 NRx를 느리게 만들면 NRx가 늦게 비고, 다음 실패 TB가 빈 NRx를 찾지 못한다. 비율 한도와 우선순위는 실행 중인 작업의 속도만 조절하므로 이 상태를 보지 못한다.
+
+---
+
+## 2. 기존 연구와의 차이
+
+### 2.1 무선과 다른 작업이 GPU를 나누는 연구
+
+| 연구 | GPU의 무선 작업 | NRx | 외부 AI | GPU를 나누는 방법 | 결정 간격 | 확인 범위 |
+|---|---|---|---|---|---|---|
+| YinYangRAN (INFOCOM'24) | LDPC 복호 | 없음 | 트래픽 예측 모델 추론 | MPS 비율. 학습된 예측기가 비율 선택 | 1초 이상. 비율 변경 0.27초 동안 CPU로 처리 | 원문 |
+| CloudRIC (MobiCom'24) | LDPC 복호. 여러 DU가 CPU와 GPU pool 공유 | 없음 | 없음 | 요청마다 처리기 선택 | 요청 단위 | 원문 |
+| Concordia (SIGCOMM'21) | CPU vRAN 전체 (GPU 아님) | 없음 | 일반 CPU 작업 | 무선이 쓸 core를 예측해 예약 | – | 이전 검토 |
+| AI-RAN 실험 (SoftBank·NVIDIA, arXiv'25) | Aerial 5G (4T4R, 100 MHz) | 동시 실행 실험에 없음 | LLM | MIG 40% / 60% 고정 분할 | 고정 | 원문 |
+| Interplay (INFOCOM'25 WS), CAORA (arXiv'25) | 작업량 수준 모델 | 없음 | AI | MIG 동적 분할 | orchestrator | 이전 검토 |
+| SMEC (NSDI'26) | srsRAN (별도 서버) | 없음 | MEC GPU 작업 | MEC 서버에서 MPS 우선순위 | – | 이전 검토 |
+| **Backstop** | cuPHY PUSCH 전체 + **NRx** | **있음** | Qwen2.5-1.5B prefill | 낮은 우선순위 AI를 조각 단위로 허락 | 15–57 µs | – |
+
+평가 규모는 다음과 같다.
+
+| 연구 | 무선 규모 | GPU | 외부 AI | 무선 입력 |
+|---|---|---|---|---|
+| YinYangRAN | 100 MHz DU 1개 | A100 1장 | 있음 | 모의 RU·UE |
+| CloudRIC | 100 MHz DU 최대 30개 | V100 1장 + CPU pool | 없음 | 모의 RU·UE |
+| AI-RAN 실험 | gNB 1개 | GH200의 GPU 1장 | 있음 | 실제 망 |
+| ARCHES | 셀 1개 | GH200 | 없음 | 실제 망 |
+| **Backstop** | 100 MHz 셀 16–48개 | A100 4장 | 있음 | 미리 생성한 IQ |
+
+- 이 연구들의 GPU 무선 작업은 LDPC 복호 또는 기존 PHY다. 확인한 범위에서 NRx를 무선 작업에 넣고 외부 AI와 GPU를 나눈 연구는 없다.
+- 이 연구들의 무선 작업은 TB마다 필수 작업 하나이고 마감도 하나다. Backstop의 무선 작업은 필수 작업(기존 수신기)과 선택 작업(NRx 복구) 둘이고 마감도 둘이다.
+- 셀 수만 보면 CloudRIC이 같은 규모다. 외부 AI와 GPU를 나누는 연구 가운데서는 확인한 범위에서 Backstop의 평가 규모가 가장 크다.
+- Backstop의 입력은 미리 생성한 IQ이고, AI-RAN 실험과 ARCHES는 실제 망이다.
+
+### 2.2 Neural receiver 연구
+
+| 연구 | 다루는 것 | 외부 AI와 GPU 공유 | 확인 범위 |
+|---|---|---|---|
+| DeepRx (2021), 5G NR MU-MIMO NRx (2023) | NRx 모델과 BLER | 없음 | 참고문헌 |
+| 실시간 NRx (NVIDIA, 2025) | A100에서 1 ms 안에 도는 NRx, site-specific 미세 조정 | 없음 | 초록 |
+| ARCHES (arXiv'26) | Aerial PUSCH 안에서 AI 채널 추정기와 MMSE 추정기를 슬롯 경계에서 전환 | 없음 | 원문 |
+| OCUDU dApp (arXiv'26) | 수신 체인 안의 신경망 equalizer. 기존 경로를 항상 유지 | 초록에 없음 | 초록 |
+
+- 이 연구들은 NRx의 복호 성능과 수신기 전환 시점을 다룬다. NRx가 쓰는 GPU 시간이 다른 작업의 마감에 주는 영향과, 남는 GPU를 AI에 줄 수 있는 양은 다루지 않는다.
+- NVlabs의 NRx 평가는 LDPC 20회를 쓰고 cuPHY의 기본 설정은 이 연구의 TB 크기에서 10회다. 반복 횟수를 맞춘 비교는 확인한 범위에서 없다(3.1절).
+
+### 2.3 일반 GPU 스케줄링 연구
+
+| 연구 | 끼워 넣는 단위 | 넣어도 되는지 판단하는 기준 | 무선 마감 계산 |
+|---|---|---|---|
+| REEF (OSDI'22) | GPU kernel | 우선순위. 높은 우선순위가 오면 낮은 쪽을 중단 | 없음 |
+| Orion (EuroSys'24) | GPU kernel | 높은 우선순위 작업이 없을 때, 또는 kernel이 작고 자원 성격이 다를 때 | 없음 |
+| DARIS (DAC'25) | DNN stage | MPS·stream·stage 경계 | 관측 기준 |
+| XSched (OSDI'25), nvtaskset | context, kernel | 우선순위 | 없음 |
+| **Backstop** | LLM prefill의 layer × token 묶음 (세 가지 크기) | TB별 마감 여유 + 빈 NRx 수 | TB마다 계산 |
+
+- AI를 작은 단위로 나눠 높은 우선순위 작업 사이에 넣는 방법은 이 연구들에 이미 있다. Backstop의 노벨티는 이 방법 자체에 있지 않다.
+- 이 연구들은 실행 중인 높은 우선순위 작업의 지연을 보호한다. 아직 시작하지 않은 복구 작업이 쓸 자원(빈 NRx)을 보호하는 기준은 없다.
+
+### 2.4 차이 요약
+
+| 항목 | 기존 연구 | Backstop |
+|---|---|---|
+| GPU의 무선 작업 | LDPC 복호 또는 기존 PHY | 기존 수신기(모든 TB) + NRx(실패한 TB) |
+| NRx의 역할 | 기존 수신기의 대체 또는 슬롯 단위 전환 | 기존 수신기가 실패한 TB의 복구 경로 |
+| TB당 마감 | 하나 | 둘: L1 마감 4.0 ms, 복구 마감 11.5 ms |
+| NRx를 돌릴 TB | 모든 TB 또는 채널·MAC 지표로 선택 | 그 TB의 기존 수신기 결과(실패 code block 수)로 선택 |
+| 수신기 비교 조건 | LDPC 반복 횟수가 수신기마다 다름 | 두 수신기 모두 20회 |
+| AI에 GPU를 주는 방법 | 고정 비율, 1초 이상 간격의 비율 변경, 우선순위 | 낮은 우선순위 + 조각마다 허락 |
+| AI 허락의 판단 기준 | 간섭 크기, 우선순위 | TB별 마감 여유와 서버 전체의 빈 NRx 수 |
+| 평가 (외부 AI와 공유하는 연구) | DU 또는 gNB 1개, GPU 1장 | 16–48셀, GPU 4장 |
+
+### 2.5 실험에서 기존 방식을 구현한 방법
+
+기존 방식과의 성능 비교는 그 방식의 동작을 이 저장소의 런타임에 구현해서 했다. 해당 논문의 코드를 실행하지 않았다. 따라서 비교 결과는 "그 방식"에 대한 것이고 "그 시스템"에 대한 것이 아니다.
+
+| 비교 대상 | 구현 | 대응하는 기존 연구 | 원본과 다른 점 |
+|---|---|---|---|
+| 고정 비율 | AI worker에 MPS 비율 고정 | AI-RAN 실험의 MIG 분할 | MIG 대신 MPS 비율 사용 |
+| 부하 따라 비율 | GPU마다 비율이 다른 AI worker를 미리 띄우고, 최근 100 ms 무선 부하로 하나만 활성화 | YinYangRAN | 예측기 없음. 전환 비용 0. 부하를 즉시 알거나 1초 늦게 앎. 비율 2–3개 |
+| 낮은 우선순위 | AI worker에 `CUDA_MPS_CLIENT_PRIORITY=1`, 비율 한도와 조합 | SMEC | SMEC은 무선과 다른 서버에서 사용 |
+| 낮은 우선순위 + 부하 따라 비율 | 위 둘의 조합 | 해당 연구 없음 | 기존 수단으로 구성할 수 있는 가장 강한 조합 |
+| 유휴 시간만 | GPU에 무선 작업이 없을 때만 AI. 다음 UL 도착 전에 종료 | Orion, REEF | kernel 단위가 아니라 AI 단위 기준 |
+| 보호 없음 | 비율 100%, 우선순위 같음 | 기본 MPS | – |
+
+비교 대상에 유리한 가정을 두었다. 전환 비용은 0이고(MPS 비율은 실제로는 프로세스를 다시 띄워야 바뀐다), 부하를 지연 없이 아는 경우를 포함했다. NRx 규칙, AI 요청, 요청 배치와 입장 제어는 모든 방식이 같다.
+
+---
+
+## 3. 노벨티를 확보한 방법
+
+노벨티는 주장으로 정하지 않고 측정에서 도출했다. 각 항목은 측정 → 발견 → 설계 → 반증 시도의 순서로 확보했다. 반증에 실패한 항목만 남겼고, 반증된 주장은 7장에 적었다.
+
+### 3.1 N1: LDPC 반복 횟수를 맞춘 수신기 비교
+
+- **측정.** 같은 슬롯을 cuPHY와 NRx로 복호하되 두 수신기의 LDPC 반복 횟수를 10, 20, 40회로 맞췄다.
+- **발견.** 횟수를 맞추지 않으면 실시간용 NRx가 cuPHY 실패의 25–35%를 복호하는 것처럼 보인다(cuPHY 10회, NRx 20회). 20회로 맞추면 2%다. cuPHY를 10회에서 20회로 올리는 것만으로 단일 UE 실패 TB 158개 중 152개가 복호된다.
+- **결과.** 같은 횟수에서 cuPHY보다 확실히 나은 것은 큰 모델(`nrx_large`)뿐이고, 그 이득은 채널에 따라 15–67%다(6.1절).
+- **의미.** 이후의 모든 주장은 "큰 NRx를 쓴다"를 전제로 한다. 이 전제가 문제(1.2절 사실 1)를 만든다.
+
+이 항목은 연구 도중 자기 결과를 반증하면서 확보했다. 초기에 보고한 "NRx가 기존 실패의 62%를 복호한다"는 cuPHY 10회 기준에서만 성립했고, 철회했다(7장).
+
+### 3.2 N2: 큰 NRx를 복구 전용으로 쓰는 구조와 두 마감
+
+- **측정.** 큰 모델을 모든 슬롯에 돌리는 방식과 실패한 TB에만 돌리는 방식을 비교했다.
+- **발견.** 상관이 낮은 채널과 UMi에서 "cuPHY만 성공한 TB"가 0개다. 따라서 "cuPHY 먼저, 실패하면 NRx"의 복호 결과는 NRx를 모든 슬롯에 돌린 결과와 같다(TB 600개 중 572개). NRx 실행은 슬롯의 25%로 줄어든다.
+- **설계.** TB마다 L1 마감(4.0 ms, 기존 수신기)과 복구 마감(11.5 ms, NRx)을 둔다. NRx 결과가 복구 마감 안에 나오면 그 TB의 재전송을 취소한다.
+- **검증.** 큰 모델을 주 수신기로 쓰면 NRx가 슬롯의 39%만 처리하고 복호 성공이 89.4%다. 복구 방식은 94.5–95.1%다(6.2절).
+
+### 3.3 N3: 기존 수신기의 실패 code block 수로 복구할 TB 선택
+
+- **측정.** 기존 수신기가 보고하는 실패 code block 수와 NRx 복구 성공률의 관계를 채널별로 측정했다.
+- **발견.** UMi 채널에서 실패 TB의 87%는 code block이 전부 실패한 것이고 NRx도 그 2%만 복구한다. 실패 code block이 9개 이하인 슬롯의 TB는 93%가 복구된다.
+- **설계.** 슬롯의 실패 code block 수가 K 이하인 TB만 NRx로 보낸다.
+- **검증.** UMi에서 NRx 실행이 85% 줄고 복구는 5% 준다(6.3절). 기존 연구는 NRx를 돌릴 대상을 채널·MAC 지표나 슬롯 단위로 고르고, 그 TB의 복호 결과로 고르지 않는다.
+
+### 3.4 N4: 복구를 잃는 원인의 규명
+
+- **측정.** AI를 넣은 실행에서 잃은 복구를 AI 없는 실행과 TB 단위로 대조해 원인을 분류했다.
+- **발견.** 보호 없음을 제외하면 잃은 복구의 83–99%가 "빈 NRx가 없어 시작하지 못함"이고, "NRx가 복구 마감 뒤에 끝남"은 17% 이하다(6.8절). AI 없이도 후보의 4%가 같은 이유로 버려지고, 이 값은 NRx 4개·실행 6.3 ms·초당 243회 조건의 Erlang-B 계산(5%)과 맞는다.
+- **의미.** "실행 중인 NRx가 마감 안에 끝나는가"만 보는 규칙은 충분하지 않다. 이 연구의 이전 규칙(v12)이 그런 규칙이었고, 낮은 우선순위 + 고정 비율과 같은 성능이었다(7장).
+
+### 3.5 N5: 빈 NRx 여유를 지키는 AI 허락 규칙
+
+- **설계.** AI를 낮은 MPS 우선순위로 실행하고 조각 단위로 허락한다. NRx가 실행 중인 GPU에서는 서버 전체의 빈 NRx가 R개 이상일 때만 AI 조각을 허락한다. NRx 4개에서 R=3이며, 이는 "다른 NRx가 실행 중이 아닐 때만"과 같다.
+- **근거.** NRx 하나만 실행 중이면 그 NRx가 늦게 끝나도 다음 실패 TB는 다른 NRx를 쓴다. 두 개 이상 실행 중이면 느려진 NRx가 다음 실패 TB의 시작을 막는다.
+- **검증.** 낮은 우선순위만 쓰면 48.4k tokens/s에 복구 92.0%다. NRx 옆에서 AI를 금지하면 25.3k에 97.4%다. 빈 NRx 여유 규칙은 39.5k에 97.4%다(6.8절). 복구를 유지하면서 AI 처리량이 1.56배가 된다.
+
+### 3.6 검증 방식
+
+- **강한 기준선을 포함했다.** 낮은 MPS 우선순위는 이 연구의 이전 규칙과 같은 성능을 내는 기준선이었다. 이 기준선을 제외하면 "고정 10%의 5배"라는 결과가 나오지만, 낮은 우선순위를 아는 독자에게 방어할 수 없다. 기준선에 포함하고 그 위에서 규칙을 다시 설계했다.
+- **비교 대상에 유리한 가정을 두었다.** 2.5절.
+- **유리하지 않은 조건을 측정하고 기록했다.** GPU 1장, 48셀, 셀 버스트, 20셀(7장).
+- **자기 결과를 반증했다.** NRx 입력 형식 오류, LDPC 횟수 불일치, 우선순위 없는 기준선의 세 가지를 발견해 이전 수치를 철회했다(7장).
+
+---
+
+## 4. 스킴
+
+### 4.1 구성
+
+서버에 네 종류의 프로세스가 있다. 모든 프로세스는 공유 메모리의 상태 하나와 시계 하나를 읽는다.
+
+| 프로세스 | 수 | 하는 일 |
+|---|---|---|
+| 기존 수신기 | 셀마다 하나 | 2.5 ms마다 그 셀의 TB를 cuPHY로 복호. CRC 결과와 실패 code block 수를 상태에 기록 |
+| NRx | GPU마다 하나 | TB 하나씩 복호. 모든 셀의 슬롯 버퍼를 매핑해 어느 셀의 TB든 처리 |
+| AI worker | GPU마다 하나 | LLM prefill을 단위로 나눠, 허락받은 조각 안에서만 실행 |
+| Controller | 서버에 하나 | 실패 TB를 NRx에 배정, GPU별 AI 조각 허락, AI 요청을 GPU에 배치 |
+
+### 4.2 복구 경로
+
+1. 슬롯의 샘플이 도착하면 기존 수신기가 복호한다. L1 마감은 도착 후 4.0 ms다.
+2. CRC가 실패하고 슬롯의 실패 code block 수가 K 이하면 그 TB는 복구 후보가 된다(K=9, 채널 혼합 조건).
+3. Controller는 후보의 최신 시작 시각을 `도착 + 복구 마감 − NRx 시간 한도 = 도착 + 11.5 − 7.6 = 도착 + 3.9 ms`로 계산한다.
+4. 후보를 최신 시작 시각 순으로 빈 NRx에 배정한다. 최신 시작 시각을 넘긴 후보는 버리고 그 TB는 재전송된다.
+5. NRx 결과는 CRC 통과, payload 일치, 복구 마감 안 종료를 모두 만족할 때만 복구로 센다.
+
+복구 마감 6.5 ms는 기존 재전송 슬롯을 유지하지만 큰 모델(6.3 ms)이 들어가지 않는다. 11.5 ms는 복구에 실패한 TB의 재전송을 5 ms 늦춘다(6.10절).
+
+### 4.3 AI 허락
+
+AI worker는 Qwen2.5-1.5B prefill을 "layer 하나 × token 묶음(128, 512, 1,024)" 단위로 나눈다. 각 단위는 GPU graph 하나이고 측정한 시간 한도가 있다. AI worker는 낮은 MPS 우선순위로 실행하고 비율 한도는 두지 않는다.
+
+Controller는 루프마다 GPU별로 다음 조건을 모두 만족하는 가장 큰 단위 크기 c를 골라, AI 작업량 4 ms 이하의 조각을 허락한다.
+
+| 조건 | 내용 |
 |---|---|
-| QSU | 안전하며 AI에 사용할 여유가 있음 |
-| QSN | 안전하지만 여유가 없음 |
-| MI | 필수 부하만으로 실행 불가능 |
-| UQ | 자격 검증되지 않음 |
+| 빈 NRx 여유 | 이 GPU에서 NRx가 실행 중이면, 서버의 빈 NRx가 R개 이상이어야 한다 (NRx 4개에서 R=3) |
+| 실행 중인 NRx의 마감 | 이 GPU의 모든 실행 중 NRx에 대해 `시작 시각 + B(c) ≤ 복구 마감`. B(c)는 크기 c의 AI와 같이 돌 때의 NRx 시간 한도 |
+| 기존 수신기 | 크기 c가 기존 수신기 옆에서 허용되지 않으면, 이 GPU의 셀이 복호 중이 아니어야 하고 조각이 다음 슬롯 도착 전에 끝나야 한다 |
+| 곧 시작할 NRx | 이 GPU의 TB가 아직 후보가 될 수 있으면, 조각이 그 TB의 최신 시작 시각 전에 끝나야 한다 |
+| 대기 중인 후보 | 빈 NRx를 기다리는 후보가 없어야 한다 |
 
-### 2.6 검증된 mode
+조건을 만족하는 크기가 없으면 그 루프에서 그 GPU에는 AI를 주지 않는다. Controller 루프 하나는 15–57 µs다.
 
-```text
-P = 180 ms, D = 155 ms, guard = 2 ms
-B_NRx = 45 ms, B_conv = 25 ms, B_AI(context64) = 35 ms
+아래 그림은 측정한 실행에서 GPU 4장의 25 ms 구간이다. 0–2 ms에는 GPU 3의 NRx 하나만 실행 중이어서 AI가 옆에서 실행된다. 9 ms에 GPU 0과 GPU 1에서 NRx 둘이 시작하면 빈 NRx가 2개가 되고, GPU 0의 AI가 멈춘다. 두 NRx는 6.2–6.3 ms(단독 실행과 같은 시간)에 끝난다. NRx가 없는 GPU 2, 3의 AI는 계속 실행된다.
 
-4-debt all-fail      45 + 4×25 + 2      = 147 ms ≤ 155   수락
-5-debt all-fail      45 + 5×25 + 2      = 172 ms > 155   거절
-2 성공 + AI          45 + 2×25 + 35 + 2 = 132 ms         AI lease 가능
-```
+![서버 전체 시간표](docs/current/figures/backstop_v13/timeline_server.png)
 
-`P180/D155`는 harness 계약이며 5G NR slot 주기나 production HARQ 기한이 아니다.
+### 4.4 시간 한도
 
-## 3. 확정된 결과
+한도는 평가 하드웨어에서 모든 셀이 실행되고 한 단위 크기의 낮은 우선순위 AI가 계속 실행되는 조건으로 측정했다(16셀).
 
-모든 결과는 A100-SXM4-40GB, MIG OFF, MPS ON, warm persistent process의 유한 표본이다. WCET가 아니다.
-
-| 실험 | 결과 | 원본 |
+| AI | 기존 수신기 완료 p99 / p99.9 (ms) | NRx 실행 p50 / p99 (ms) |
 |---|---|---|
-| C159-Q2 가변 context | 두 노드, 1,200 rounds, 실제 TensorRT NeuralRx 4,800건(성공 3,488), 물리 복구 1,312건, Qwen 1,077 unit, deadline miss 0. NeuralRx release→complete p99 8.10 ms, max 18.12 ms. Certificate가 context256 55건, context512 68건을 거절 | `results/softwall_multigpu/confirm159_q2_variable_two_node.json` |
-| C158 반복 자격 검증 | 두 노드, NeuralRx 2,000건(성공 1,440), 물리 복구 560건, Qwen 500 unit, deadline miss 0, recovery contract 위반 0 | `results/softwall_multigpu/confirm158_repeated_actual_nrx_two_node.json` |
-| C161 fault 자격 검증 | NeuralRx 2,800건, 물리 복구 942건, correlated all-fail 복구 240건, stale/duplicate NeuralRx 20쌍, stale/duplicate 복구 20쌍, terminal channel fault 4건, deadline miss 0 | `results/softwall_multigpu/c161_full_fault_qualification.json` |
-| C156 GPU timeline | Qwen kernel 2,448개와 복구 kernel 212개에서 금지된 중첩 0 ns, 미포착 worker event 0 | `results/softwall_multigpu/confirm156_156b_two_node_gpu_timeline.json` |
-| C162 경계 예측 | 두 노드, 독립 seed, holdout에서 case 순서 역전, 180 rounds. NeuralRx 720건, 주입 복구 330건, Qwen 90 unit, deadline miss 0. context64가 88 ms에서 30/30 수락, 89 ms에서 30/30 거절 | `results/softwall_multigpu/c162_boundary_two_node.json` |
-| C162 scheduler 확장성 | 현재 mode 16,023개 상태에서 exact checker와 불일치 0. 소규모 600개 상태에서 false-safe 0, false-conservative 10(1.7%). 64-debt 결정 p99 1.494 ms, 검증 p99 0.131 ms | `results/softwall_multigpu/c162_scheduler_scalability_v1.json` |
-| C135 static 대비 | 288개 분기에서 static 계약은 거절하고 conditional certificate는 안전하게 수락하는 exchange 10건 | `results/softwall_multigpu/confirm135_static_counterfactual_audit_v1.json` |
-| 필요성 증거 | 사전 고정된 C162 상태 2개에서 debt-blind AI 수락 시 선언 bound 기준 완료가 guard를 1–12 ms 초과. SoftWall은 두 노드에서 60/60회 GPU launch 전에 거절 | `results/softwall_multigpu/softwall_necessity_witness_v2.json` |
-| Envelope v16 | QSU 6, QSN 0, MI 3, UQ 13. v15의 three-point mode를 강등하고 v16 four-point mode를 승격. prepare/commit/complete/abort 네 연산에 서로 다른 물리 노드 4대에서 fault 8 arm, 모든 fault 뒤 무선 지속. RAN-critical 연산은 commit뿐 | `results/softwall_multigpu/softwall_envelope_v16_validation_summary.json` |
-| C121/C122 sharded home | 2 GPU·8 cell 5,440 TB, 4 GPU·12 cell 8,160 TB, home 간 release 차이 0 ns, safety 위반 0 | `docs/current/SOFTWALL_FORMAL_MODEL_KO.md` §9 |
-| P3 채널 호환성 | Sionna CDL-D: conventional 153/250, NeuralRx 164/250. CDL-E: 155/250, 163/250. 저 SNR에서 NeuralRx만 성공 31건, conventional만 성공 12건, paired exact p = 0.00540. 범위는 Sionna CDL-D/E, 100 ns, MCS7, FP32 | `results/softwall_same_gpu/sionna_cdl_de_holdout_gate_job58868184.json` |
+| 없음 | 2.92 / 3.23 | 6.28 / 6.79 |
+| 비율 70%, 128 token | 3.25 / 3.46 | 7.37 / 8.09 |
+| 비율 70%, 1,024 token | 3.96 / 4.52 | 8.39 / 9.43 |
+| 낮은 우선순위 + 70%, 128 token | 3.19 / 3.56 | 7.25 / 7.56 |
+| 낮은 우선순위 + 70%, 1,024 token | 3.30 / 4.29 | 7.60 / 8.04 |
+| 낮은 우선순위, 한도 없음, 1,024 token | 3.44 / 4.05 | 7.89 / 8.51 |
 
-## 4. 기각된 주장
+- NRx 시간 한도: 단독 7.6 ms, AI와 같이 돌 때 8.1 / 8.5 / 8.7 ms(128 / 512 / 1,024 token).
+- GPU당 4셀에서는 세 크기 모두 기존 수신기 옆에서 허용한다. GPU당 5셀에서는 128 token만 허용한다(기존 수신기 완료 p99.9: 128 token 3.65 ms, 512 token 4.45 ms, 1,024 token 4.28 ms).
+- AI 요청은 "시간 제한의 75% 안에 끝난다"고 예측될 때만 받는다. 모든 방식이 같은 입장 제어를 쓴다.
 
-아래 주장은 실험으로 기각했으며 원고에 음성 결과로 포함한다.
+구현은 cuPHY, TensorRT, PyTorch 위의 Python 약 3.0천 줄이다(`scripts_for_node/backstop_slot/`).
 
-| 주장 | 실험 | 결과 |
-|---|---|---|
-| Joint optimizer가 max-radio보다 우수하다 | C102 | 실행 가능 39개 상태에서 선택 차이 0, AI 차이 0 |
-| AI-first retiming이 처리량을 높인다 | C113, 원고 §6 | BurstGPT 4,290 requests, 1,129,504 offered tokens에서 SoftWall과 certificate-preserving recovery-first 모두 timely 931 requests, 385,262 tokens. 복구 전체 bound 부과 시 +0.066%로 사전 등록한 5% 기준 미달. Confirmatory holdout은 열지 않음 |
-| 같은 2-GPU 예산에서 처리량 우위가 있다 | C115 | +0.080% / +0.138%, 두 신뢰구간 모두 0 포함 |
-| Global routing이 처리량을 높인다 | C124, C126 | C126 radio decision parity 실패, 우위 미지지 |
-| NRx 개수를 안정적 AI 비용 스칼라로 쓸 수 있다 | C104, C105 | 순서별 부호 반전 |
-| MPS cap이 격리를 제공한다 | C26 | cap100 2/1,500, cap20 1/1,500 miss |
-| 부하를 올리면 eager-dual이 먼저 실패한다 | C51 | 1 cell, P90/45/25/12에서 eager miss 0 |
+---
 
-385,262 동률은 certificate의 필요성을 기각하지 않는다. 비교 대상은 초기 all-fail admission을 사용하는 certificate-preserving 정책이며, 동률은 AI-first retiming이 이 trace에서 추가 처리량을 만들지 못했음을 뜻한다.
-
-## 5. Production exit gate
-
-판정 원본: `results/softwall_multigpu/softwall_production_gates_current_v3.json`, `results/softwall_multigpu/softwall_production_exit_gate_v3.json`
-
-| Gate | 판정 | 내용 |
-|---|---|---|
-| P1 LIVE_DU_CLOCK | FAIL | Target DU의 timing contract 부재. 첫 번째 차단 요소 |
-| P2 FAST_PATH | FAIL | persistent-input path 4.5 ms 이내 995/1,000, 초과 5건. frozen 개발 gate 실패로 독립 holdout 미개방 |
-| P3 CHANNEL_COMPATIBILITY | PASS | Sionna CDL-D/E 한정 |
-| P4 INTEGRATED_REQUALIFICATION | FAIL | 통합 production 재자격 미수행 |
-
-`claim_decision`: production HARQ 보장 REJECT, 외부 TDL NeuralRx 지원 REJECT, Sionna CDL-D/E NeuralRx 지원 FINITE_SAMPLE_PASS, synthetic qualified substrate RETAIN.
-
-### 5.1 Production timing 기준
-
-Aerial checkout의 testMAC 설정에서 확인한 indication threshold는 다음과 같다.
-
-```text
-early HARQ          T0 + 2.0 ms
-UL indication       T0 + 4.5 ms
-PRACH indication    T0 + 4.5 ms
-UCI indication      T0 + 4.5 ms
-```
-
-`scf_fapi_handler::validate_indication_timing`은 SFN/slot으로 `T0`를 복원하고 handler 진입 시각이 threshold를 넘으면 late로 센다. NVIDIA는 testMAC을 controlled environment용 L2 개발 도구로 정의하므로 이 값을 field DU의 production `d_MAC`으로 취급하지 않는다.
-
-### 5.2 4.5 ms 경로 진단
-
-Clean synthetic PUSCH, AI 없음, warm persistent process 표본이다. 원본: `docs/current/SOFTWALL_PRODUCTION_EXIT_PLAN_KO.md` §1.2
-
-| 경로 | 4.5 ms 이내 | p50 | p99 | 판정 |
-|---|---:|---:|---:|---|
-| Local NeuralRx 후 conventional | 0/1,000 | 6.609 ms | 6.984 ms | 순차 fallback 기각 |
-| Same-GPU speculative dual path | 0/1,000 | 6.828 ms | 17.552 ms | GPU 경합으로 기각 |
-| GPU0 LS + GPU1 NRx + GPU0 conventional | 0/1,000 | 5.942 ms | 11.897 ms | GPU0 직렬화로 기각 |
-| Raw-IQ P2P, GPU1 full NeuralRx | 852/1,000 | 3.831 ms | 9.506 ms | tail로 FAIL |
-| 위 경로, Python GC OFF | 838/1,000 | 3.988 ms | 10.041 ms | GC 원인 가설 기각 |
-| 위 경로, caller-owned same-stream + busy poll | 885/1,000 | 3.929 ms | 11.696 ms | tail로 FAIL |
-| 위 경로, persistent input + stream ordering | **995/1,000** | **3.813 ms** | **3.995 ms** | correctness 1,000/1,000, late 5로 FAIL |
-
-### 5.3 Stage 귀속
-
-원본: `results/softwall_multigpu/c163_raw_p2p_v5_stage_profile_analysis_job58868184.json`의 `stages.*.gpu_ms`와 `copy`. 300 timed unit 중 timely 265, late 35. Profiling은 timing을 바꾸므로 기전 진단 전용이다. AI를 실행하지 않은 경로에서 측정했다.
-
-GPU 실행 시간 (ms):
-
-| Stage | p50 | p99 | max | timely 평균 | late 평균 | pair wall과 Pearson |
-|---|---:|---:|---:|---:|---:|---:|
-| cuPHY LS channel estimation | 0.866 | 4.873 | 9.592 | 0.930 | 3.972 | 0.960 |
-| TensorRT graph (NeuralRx) | 0.857 | 0.886 | 0.887 | 0.862 | 0.865 | 0.076 |
-| CRC | 0.246 | 0.321 | 0.817 | 0.251 | 0.256 | 0.022 |
-| LDPC decode | 0.196 | 0.207 | 0.252 | 0.197 | 0.200 | 0.136 |
-| derate_match | 0.154 | 0.168 | 2.254 | 0.153 | 0.216 | 0.081 |
-| tensor_preparation | 0.030 | 0.031 | 0.031 | 0.030 | 0.030 | 0.023 |
-| dmrs_removal | 0.007 | 0.008 | 0.008 | 0.007 | 0.007 | 0.001 |
-
-P2P copy GPU 시간: forward p50 20.7 µs, p99 69.3 µs, max 85.8 µs. Backward p50 15.1 µs, p99 26.4 µs, max 43.3 µs.
-
-Channel estimation은 timely unit과 late unit 사이에서 GPU 시간이 달라지는 유일한 stage이며(평균 0.930 ms 대 3.972 ms), pair latency와의 상관계수가 0.960이다. TensorRT graph의 GPU 시간은 약 0.86 ms로 4.5 ms 예산의 약 19%를 차지하지만 분산이 작고(p99 0.886 ms), timely와 late 사이의 평균 차이가 0.003 ms이며, pair latency와의 상관계수가 0.076이다. P2P 전송은 100 µs 미만이다.
-
-이 진단 뒤 C165는 per-request complex allocation과 redundant pre-CE host sync를 제거했다. Frozen 개발 gate는 995/1,000으로 개선됐지만 통과하지 못해 holdout을 열지 않았다. Late 5건 중 4건은 GPU0 conventional completion, 1건은 remote NeuralRx였고 pair latency 상관도는 conventional GPU 0.918, remote NeuralRx 0.331이었다. Profiler-only conventional 진단에서는 equalization이 total service와 가장 강하게 연결됐다(`r=0.761`). 따라서 남은 4.5 ms 위반은 remote CE 하나가 아니라 양 GPU의 cuPHY service tail이다.
-
-Host enqueue 시간(`host_enqueue_us`)은 GPU 시간과 별개로 기록되어 있다. Channel estimation host enqueue는 p50 0.578 ms, p99 4.595 ms, max 9.283 ms이고, TensorRT graph host enqueue는 p50 7.3 µs이다. TensorRT의 7.3 µs는 enqueue 비용이며 NeuralRx 실행 시간이 아니다.
-
-## 6. 주장 범위
-
-- MPS는 실행 기반이며 격리 수단이 아니다. 보호는 admission, 예약, 수명주기 계약에서 나온다.
-- 모든 bound는 유한 표본 whole-path bound이다. 관측 위반 0은 WCET나 실패 확률 0을 증명하지 않는다.
-- 자격 검증은 노드, GPU, 소프트웨어, 배치, 수명주기 지문에 한정된다. 범위 밖 mode는 재자격 검증이 필요하다.
-- 하드웨어는 A100 계열만 검증했다. 다른 GPU 계열은 검증하지 않았다.
-- Fault model은 임의의 GPU/driver hang과 완전한 process 교체 복구를 제외한다.
-- 무선 결과는 synthetic 채널과 Sionna CDL-D/E에 한정된다. Aerial TDL-A와 field IQ는 포함하지 않는다.
-- 처리량 optimizer 우위는 주장하지 않는다.
-
-### 6.1 수명주기 자격
-
-원본: `results/softwall_multigpu/c164_lifecycle_qualification_summary_v1.json`. 10개 mode 중 5개가 자격 또는 부분 자격, 5개가 UQ이다.
-
-| Mode | 상태 |
-|---|---|
-| warm_persistent | QUALIFIED_BOUNDARY_SUBSET |
-| idle_30s_first | QUALIFIED_BOUNDARY_SUBSET |
-| mps_restart_first | QUALIFIED_AFTER_REQUALIFICATION_SUBSET |
-| qwen_reload_first | QUALIFIED_MANDATORY_ONLY_SUBSET |
-| worker_channel_reconnect_same_epoch | QUALIFIED_RECONCILIATION_SUBSET |
-| cold_first | UQ_NO_WHOLE_MODE_EVIDENCE |
-| gc_on | UQ_OBSERVED_BOUND_FAILURE |
-| idle_5m_first | UQ_NO_PHYSICAL_SAMPLE |
-| idle_30m_first | UQ_NO_PHYSICAL_SAMPLE |
-| worker_process_replacement | UQ_SINGLE_NODE_DEVELOPMENT_ONLY |
-
-MPS restart와 Qwen reload 중의 가용성은 주장하지 않는다.
-
-## 7. 알려진 문제와 조치 상태
-
-2026-09-25 감사에서 확인한 항목과 현재 상태이다.
-
-| # | 문제 | 상태 |
-|---|---|---|
-| 1 | `RESEARCH_PLAN_SOFTWALL_KO.md`의 NeuralRx 용량 수치가 두 출처를 혼합했다. 문서는 "full A100 1164.1 req/s, 서비스 1.34 ms"로 기재했으나 `NRX_CAPACITY.csv`의 full GPU 1 replica 값은 1130.5 req/s, 평균 0.882 ms, p99 1.107 ms이다. 1.34 ms는 4g MIG 행(745.1 req/s)의 값이다. 같은 문서의 P2P 76.84 µs는 같은 GPU 안 MIG 쌍의 단일 process 측정값이다. | 문서를 `docs/archive/`로 이동하고 보관 사유를 첫 줄에 기재했다. 본문 수치는 이력으로 남아 있으므로 인용하지 않는다. |
-| 2 | `analyze_mig_mps_combined.py`와 MIG/MPS 영문·한국어 보고서가 "SP + MPS pct=30"을 45 ms fallback으로 기재했다. 실측은 N=6에서 145.9 ms이다. | 수치를 145.9 ms로 정정하고, 세 파일을 현재 SoftWall production 판정에서 제외되는 과거 재현 자료로 명시했다. |
-| 3 | 원고 §9의 long-tail 서술에 수치가 없었다. | `main.tex`에 C158 attempt 4의 NeuralRx 완료 350.948 ms를 기재했다. 원인은 미확정이다. |
-| 4 | `fallback_start_ns`는 예약 시각이며 실제 시작 시각이 아니다. | 원고의 시간 판정은 commit return을 기준으로 한다. Fallback의 실제 GPU 시작 시각은 계측하지 않는다. |
-| 5 | `docs/current/`의 `SOFTWALL_*.md`가 74개였고 노벨티 판정 문서가 시점별로 중복되었다. | `docs/current/`를 17개 문서로 줄이고 나머지를 `docs/archive/`로 옮겼다. |
-| 6 | 일부 이전 문서가 참조하는 `task1_final/gdr_pool_20260814T014651Z/`, `results/isca_v2/mig_causal_20260813T1138Z/`, `cloudlab_final_snapshot_20260814/`가 저장소에 없다. `task1_final/`에는 `chain/`만 있다. | 미해결. 해당 문서는 `docs/archive/`에 있으며 현재 주장의 근거로 사용하지 않는다. |
-| 7 | `SOFTWALL_SIGMETRICS27_SUBMISSION_PLAN_KO.md`가 Fall 마감(abstract 2026-10-02, paper 2026-10-09)을 기재했다. | **해결.** 공식 CFP를 재확인하고 Winter abstract 2027-01-04, paper 2027-01-11, notification 2027-03-10 AoE로 갱신했다. |
-
-## 8. 먼저 읽을 문서
-
-| 순서 | 문서 | 내용 |
-|---|---|---|
-| 1 | `paper/softwall_sigmetrics27/main.pdf` | 투고 원고 (15쪽, 참고문헌 포함) |
-| 2 | `docs/current/SOFTWALL_MANUSCRIPT_DRAFT_EN.md` | 원고의 Markdown 원본 |
-| 3 | `docs/current/SOFTWALL_FORMAL_MODEL_KO.md` | 형식 모델, Lemma, 입증 의무와 현재 증거 |
-| 4 | `docs/current/SOFTWALL_NOVELTY_DEFENSE_MATRIX_KO.md` | 가장 가까운 선행 연구, 중복 주장, 예상 반론 |
-| 5 | `docs/current/SOFTWALL_RELATED_WORK_AUDIT_KO.md` | 선행 연구 감사 |
-| 6 | `docs/current/SOFTWALL_PRODUCTION_EXIT_PLAN_KO.md` | Production gate와 4.5 ms 진단 |
-| 7 | `docs/current/SOFTWALL_STRONG_BASELINE_SPEC_KO.md` | 강한 결합 baseline의 공정 비교 명세 |
-| 8 | `docs/current/SOFTWALL_RESEARCH_GUIDELINE_KO.md` | 실험 선정·측정·증거 등급·주장 규칙 |
-| 9 | `results/softwall_same_gpu/EXPERIMENT_GATE_LEDGER_KO.md` | 단일 GPU 실험의 사전 고정 PASS/FAIL 원장 |
-| 10 | `docs/current/CURRENT_RESEARCH_INDEX_KO.md` | 전체 문서 인덱스 |
-
-### 8.1 기계 감사
-
-| 감사 | 결과 | 원본 |
-|---|---|---|
-| 원고 주장 감사 | 134/134 PASS (`forbidden_overclaim_absent`, `negative_performance_result` 포함) | `results/softwall_multigpu/softwall_manuscript_claim_audit_v1.json` |
-| 투고 감사 | 27/27 PASS | `results/softwall_multigpu/softwall_sigmetrics_submission_audit_v1.json` |
-| C162 재현성 manifest | 83개 파일 | `results/softwall_multigpu/c162_artifact_manifest.json` |
-
-## 9. 연구 경과
-
-### 9.1 CloudLab MIG–NRx / DART-Rx (2026-05 ~ 2026-08)
-
-CloudLab d8545(A100 ×4, ConnectX-6 Dx)에서 MIG 기반 L1–NeuralRx 배치를 연구했다.
-
-- MIG local, MIG+MPS, Full MPS, cross-partition P2P, NIC GDR의 다섯 배치를 비교했다. Same-partition 배치의 L1 active-time 증가율은 1.601×(Full MPS), 1.621×(MIG local), 1.702×(MIG+MPS)였고, cross-partition P2P는 1.043×였다.
-- 독립 NeuralRx process를 1개에서 8개로 늘리면 full A100 MPS에서 20-cell L1 p99가 42.3 ms에서 189.3 ms로, 4g MIG 안의 MPS에서 40.7 ms에서 435.7 ms로 증가했다.
-- chain19(273개 조건)에서 MIG cross-partition + AI측 MPS는 N=6–16에서 L1 p99 39.5–43.8 ms로 baseline 38.5 ms에 근접했다. Same-partition MPS는 pct=30 최적 설정에서도 N=6 145.9 ms, 기본 pct=100에서 411.3 ms였다.
-- 고정 MIG에서 NeuralRx capacity가 partition별로 고정되는 fragmentation 문제를 다루는 DART-Rx(admission, reservation, expiry, single commit, lease)를 설계했다.
-
-관련 문서: `docs/archive/RESEARCH_WALKTHROUGH_KO.md`, `docs/archive/MIG_NRX_DART_RESEARCH_SYNTHESIS_KO.md`, `results/20260803/`
-
-### 9.2 Perlmutter no-MIG 측정 (2026-06)
-
-Perlmutter A100에서 MIG OFF 상태로 CloudLab 실험을 재측정했다.
-
-- 기본 time-slicing에서 L1 + NeuralRx p99는 389 ms, MPS에서 40 ms였다.
-- 메모리 대역폭 포화 워크로드(sat_hbm)에서 MPS p99는 6,985 ms로 time-slicing 426 ms보다 16.4배 나빴고, 5회 중 2회만 붕괴하는 bistable 거동을 보였다.
-- GPU idle gap의 약 85%가 host의 `cudaFree`·memcpy 블로킹 구간과 시간적으로 겹쳤다.
-
-관련 문서: `results/visual_evidence/PERLMUTTER_NOMIG_VISUAL_EVIDENCE_KR.md`, `results/perlmutter_handoff/`
-
-### 9.3 방향 전환 (2026-09-19 ~ 2026-09-20)
-
-- MIG를 제약 조건으로 두고 MPS 위에서 최적화하는 방향을 정했다.
-- 4-GPU 노드의 L1 전용 GPU와 NVLink P2P NeuralRx pool을 전제로 한 연구 계획서를 작성했으나, 이후 같은 GPU / MIG OFF / MPS 검증으로 우선순위를 변경했다.
-
-### 9.4 SoftWall 단일 GPU (2026-09-20 ~ 2026-09-22, confirm2–105)
-
-- 같은 입력의 conventional·NeuralRx full receiver를 구성하고 수신기 상보성을 실측했다(−8.5 dB에서 conventional 180/500, NeuralRx 489/500, 합집합 491/500).
-- 원자 복구 예약, single commit, bounded AI lease를 별도 MPS endpoint와 CUDA IPC로 연결했다.
-- MPS cap(C26), admission quarantine(C29), 즉시 client 종료(C30)가 모두 deadline 보호에 실패함을 확인했다. C46에서 CPU sham 대조군 0/10,000, MPS client 12/10,000 miss(부호검정 p = 0.0039)로 GPU client 수명주기가 위험 요소임을 분리했다. C40 ABBA에서 첫 conventional fallback의 cold start(22.8 / 35.3 ms 대 warm-up 후 2.28 / 2.29 ms)를 확인했다.
-- 1 cell 부하 진단(C51)에서 eager-dual은 모든 주기에서 miss 0이었다.
-- 복수 recovery credit의 원자적 재배치와 AI lease transaction을 구현했다(runtime unit test 21개, fault regression 10,000회).
-- C102에서 joint optimizer가 max-radio와 선택 차이 0으로 판정되어 optimizer 우위 주장을 종료했다.
-
-### 9.5 SoftWall 멀티 GPU와 형식 모델 (2026-09-23 ~ 2026-09-24, C113–C150)
-
-- 실제 BurstGPT trace와 Qwen2.5-1.5B로 강한 baseline을 비교했다(C113).
-- local CUDA-IPC endpoint와 remote NVLink P2P endpoint를 같은 certificate에 연결했다(C114, C116, C119/C120).
-- Component bound는 isolated scalar가 아니라 co-run class vector여야 함을 확인했다(C117 2 ms 후보 실패, C118 3 ms 재자격).
-- Endpoint 추가로는 home receiver 메모리 한계가 줄지 않으므로 sharded home이 필요함을 계산하고 물리 검증했다(C121/C122).
-- 형식 모델 v11–v16을 반복 개정했다. 각 개정은 물리 실험으로 강등 또는 승격을 판정받았다.
-- Broker fault, control-point fault, abort, single-token 불변식을 검증했다(C127–C148).
-
-### 9.6 통합, 경계 예측, 원고 (2026-09-24 ~ 2026-09-25, C151–C164)
-
-- Shared cuPHY 복구 경로를 두 노드에서 검증했다(C151/C152).
-- 전역 certificate의 사전 거절, NRx 성공에 따른 credit 해제, Qwen lease, shared cuPHY 복구를 통합 경로에서 확인했다(C153–C157).
-- C158, C159에서 캠페인 규모 자격 검증을 수행했다.
-- C161에서 7종 fault를 검증했다.
-- C162에서 경계 예측과 scheduler 확장성을 검증했다.
-- C163에서 production timing 기준을 Aerial 코드에서 확인하고 exit gate를 정의했다. P3는 Sionna CDL-D/E로 통과했다.
-- C164에서 수명주기 matrix를 10개 중 5개까지 자격 검증했다.
-- 영문 원고와 SIGMETRICS LaTeX 원고를 작성했다.
-
-## 10. 작업 기록
-
-### 10.1 저장소 관리와 계획·분석 문서
-
-- `git@github.com:changjongkim/airan_cloudlab.git`를 `kcj/airan_cloudlab`에 changjongkim 계정으로 clone하고, 이전 로컬 사본은 `kcj/airan_cloudlab_old_20260919`로 보존했다.
-- MPS 방향 연구 계획서(`docs/archive/RESEARCH_PLAN_SOFTWALL_KO.md`), 노벨리티 실행안(`docs/archive/SOFTWALL_NOVELTY_ACTION_PLAN_KO.md`), 연구 진행 가이드라인(`docs/current/SOFTWALL_RESEARCH_GUIDELINE_KO.md`)을 작성했다.
-- 필요성 반론의 판정은 `docs/archive/SOFTWALL_NECESSITY_GAP_DECISION_KO.md`에 있으며, 결론은 원고 본문에 반영되었다.
-- 실험 결과를 원본 파일과 대조해 수치 불일치, 하드코딩 상수, 누락 데이터셋을 확인했다(§7).
-- 2026-09-25에 5일간의 미커밋 작업(2,393개 파일)을 commit `2a97f8b`로 올리고 태그 `softwall-sigmetrics-snapshot-20260925`를 생성했다.
-
-### 10.2 실험, 모델, 원고
-
-- confirm2–C164의 실험 protocol을 사전 고정하고 실행했다. 실패한 시도와 오염된 결과는 삭제하지 않고 보존했다.
-- 형식 모델, certified scheduler, feasibility checker, 원고 주장 감사와 투고 감사를 구현했다.
-- 영문 원고와 LaTeX 원고를 작성했다.
-
-## 11. 다음 작업
-
-1. 원고 정리: **완료.** 수치 provenance, C158 tail, P3 Results 승격, P2 stage attribution, Winter CFP와 문서 archive를 claim/submission audit으로 고정했다.
-2. P1 target-DU timing contract 확보: 최소 schema, 세 획득 경로와 parametric bridge를 timing-contract 문서에 고정했다. 실제 target DU trace가 없으면 `UQ_NO_PRODUCTION_TRACE`를 유지한다.
-3. P2 fast path bounded campaign: **사전 중단 규칙에 따라 종료.** Persistent-input 구현은 remote NeuralRx–pair 상관을 0.9603에서 0.3307로 낮췄지만 frozen gate가 995/1,000으로 실패했고 holdout을 열지 않았다. Native N0 parity fixture는 양 decoder의 같은 1,377-byte TB와 두 raw-IQ layout의 183,456개 복소 원소에 대한 C++ bitwise 일치로 통과했다. C++/CUDA IQ bridge도 fixture bitwise parity와 양 decoder 300/300 correctness를 통과했지만 진단 deadline은 298/300이었다. Persistent monolithic conventional은 300/300 correct였고 p50 1.014 ms였으나 max 5.363 ms였으며, 두 partial-native path를 결합한 C168은 293/300이었다. N1/N2는 현재 논문의 다음 작업이 아니라 보류된 engineering roadmap이다. 실제 target-DU `D`와 clock provenance를 P1에서 확보하고 새 protocol을 사전 고정한 경우에만 재개한다.
-
-다음 항목은 수행하지 않는다: 새 메커니즘 추가, 나머지 수명주기 UQ 5개 채우기, 처리량 우위 재시도, P1 이전의 P4 통합 재자격, 새 문서 생성.
-
-## 12. 실행 환경
+## 5. 실험 환경과 방법
 
 | 항목 | 값 |
 |---|---|
-| 시스템 | NERSC Perlmutter |
-| GPU | NVIDIA A100-SXM4-40GB ×4, NVLink, MIG OFF |
-| GPU 공유 | NVIDIA MPS (`nvidia-cuda-mps-control`, compute node에서 daemon 실행) |
+| 시스템 | NERSC Perlmutter, 노드 하나 |
+| GPU | NVIDIA A100 80GB × 4, MPS, MIG 미사용 |
+| CPU | AMD EPYC 7763, 64 core |
 | 컨테이너 | Shifter, `nvcr.io/nvidia/aerial/aerial-cuda-accelerated-ran:25-3-cubb` |
-| PHY | Aerial 25.3.2, pyAerial, cuPHY |
-| NeuralRx | pyAerial neural receiver, ONNX → TensorRT, persistent binding과 CUDA Graph |
-| AI 워크로드 | Qwen2.5-1.5B, BurstGPT trace |
-| Slurm 계정 | `m1248_g`, `m5320_g` |
-| MPS pipe | `$SCRATCH` 아래에 두어 Shifter가 같은 절대 경로로 mount하도록 한다 |
+| 기존 수신기 | Aerial cuPHY PUSCH (MMSE, 시간 보간), LDPC 20회 |
+| NRx | NVlabs `neural_rx`의 `nrx_large` (2-UE MU-MIMO, 273 PRB, TensorRT FP16), 뒤의 LDPC 20회 |
+| 셀 | 100 MHz. 약한 셀: 2-UE MU-MIMO, 16QAM, 273 PRB, 슬롯당 code block 20개. 나머지: 단일 UE, 2 layer |
+| 약한 셀의 채널 | NVlabs link simulation의 세 채널을 섞음: 상관 낮음 2–3 dB, 상관 높음 13–16 dB, UMi 4–6 dB |
+| 기본 배치 | 16셀, GPU당 4셀, GPU당 약한 셀 1개, GPU당 NRx 1개 |
+| AI | Qwen2.5-1.5B prefill, prompt 최대 1,024 token(BurstGPT 길이 분포), 시간 제한 200 ms |
+| AI 제공량 | GPU당 초당 32개 요청(서버 53k tokens/s)이 기본 |
+| 실행 길이 | 10–40초. 시드 2–3개 평균 |
 
-### 12.1 Git 설정
+측정 지표는 다음과 같다.
 
-이 저장소는 changjongkim 계정으로 push한다. 전역 SSH 설정은 공유 계정 소유자의 것이므로 변경하지 않고 저장소 local 설정을 사용한다.
+| 지표 | 정의 |
+|---|---|
+| AI 처리량 | 200 ms 안에 끝난 요청의 prompt token 수(초당). 제한을 넘긴 요청은 세지 않는다 |
+| L1 놓침 | 기존 수신기 결과가 L1 마감(4.0 ms)을 넘긴 TB의 비율 |
+| 복구 유지율 | 복구 마감 안에 NRx가 복구한 TB 수를 같은 시드의 AI 없는 실행과 비교한 비율 |
+| NRx 제때 완료 | 실행한 NRx 가운데 복구 마감 안에 끝난 비율 |
 
-```text
-core.sshCommand = ssh -i ~/.ssh/changjong_ed25519 -o IdentitiesOnly=yes
-user.name       = changjongkim
-user.email      = changjong5238@gmail.com
+모든 측정은 GPU에서의 end-to-end 실행이다. cuPHY가 모든 TB를 복호하고, NRx가 실제 수신 슬롯을 복호하고, AI worker가 실제 prefill을 실행한다. 슬롯은 미리 생성했고 RU와 L2는 없다.
+
+---
+
+## 6. 실험 결과
+
+### 6.1 수신기 비교 (LDPC 반복 횟수 일치)
+
+실시간용 모델 `nrx_rt`와 cuPHY.
+
+| 채널 | TB | LDPC | cuPHY | nrx_rt | NRx만 성공 | cuPHY만 성공 | cuPHY 실패 중 NRx가 복호 |
+|---|---|---|---|---|---|---|---|
+| 2-UE 16QAM, 상관 낮음, 2–3 dB | 600 | 10 | 438 | 396 | 4 | 46 | 2% |
+| | | 20 | 515 | 484 | 2 | 33 | 2% |
+| | | 40 | 541 | 511 | 3 | 33 | 5% |
+| 2-UE 16QAM, UMi, 1–6 dB | 600 | 10 | 405 | 402 | 4 | 7 | 2% |
+| | | 20 | 425 | 420 | 4 | 9 | 2% |
+| | | 40 | 431 | 425 | 2 | 8 | 1% |
+| 2-UE 16QAM, 상관 중간, 8–18 dB | 600 | 20 | 321 | 372 | 59 | 8 | 21% |
+| 2-UE 16QAM, 상관 높음, 10–16 dB | 1,400 | 10 | 844 | 976 | 167 | 35 | 30% |
+| | | 20 | 946 | 1,099 | 174 | 21 | 38% |
+| | | 40 | 979 | 1,135 | 180 | 24 | 43% |
+
+큰 모델 `nrx_large`와 cuPHY.
+
+| 채널 | TB | LDPC | cuPHY | nrx_large | NRx만 성공 | cuPHY만 성공 | cuPHY 실패 중 NRx가 복호 |
+|---|---|---|---|---|---|---|---|
+| 상관 낮음, 2–3 dB | 600 | 10 | 438 | 534 | 96 | 0 | 59% |
+| | | 20 | 515 | 572 | 57 | 0 | 67% |
+| | | 40 | 540 | 579 | 39 | 0 | 65% |
+| UMi, 1–6 dB | 600 | 10 | 405 | 436 | 31 | 0 | 16% |
+| | | 20 | 425 | 451 | 26 | 0 | 15% |
+| | | 40 | 431 | 458 | 27 | 0 | 16% |
+| 상관 높음, 10–16 dB | 1,400 | 10 | 843 | 1,069 | 248 | 22 | 45% |
+| | | 20 | 947 | 1,159 | 233 | 21 | 51% |
+| | | 40 | 981 | 1,191 | 226 | 16 | 54% |
+
+단일 UE(pyAerial 예제 NRx, QPSK, CDL-D).
+
+| SNR 구간 | TB | LDPC | cuPHY | NRx | cuPHY 실패 중 NRx가 복호 |
+|---|---|---|---|---|---|
+| −3.8 ~ −3.2 dB | 512 | 10 | 354 | 439 | 85/158 (54%) |
+| | | 20 | 506 | 510 | 5/6 |
+| | | 40 | 512 | 512 | – |
+| −4.6 ~ −2.4 dB | 512 | 10 | 284 | 311 | 12% |
+| | | 20 | 376 | 386 | 12% |
+| | | 40 | 410 | 414 | 11% |
+
+| 모델 | 엔진 GPU 시간 | 슬롯 하나의 경로 (단독) | 셀과 같이 돌 때 | cuPHY (같은 슬롯) |
+|---|---|---|---|---|
+| nrx_rt | 1.35 ms | 2.4 ms | 2.7–3.0 ms | 0.8–0.9 ms |
+| nrx_large | 4.29 ms | 5.3 ms | 6.3 ms | 0.8–0.9 ms |
+
+- 단일 UE의 좁은 SNR 구간에서 cuPHY는 10회 354개, 20회 506개, 40회 512개를 복호한다. 10회 기준의 NRx 이득(54%)은 대부분 반복 횟수 차이다.
+- 20회의 비용은 code block 13개 TB에서 +19%(0.79 → 0.94 ms), 20개 TB에서 +15%(0.78 → 0.90 ms)다.
+- 런타임 경로(LS 추정 → TensorRT → LDPC)는 LDPC를 20회로 맞추면 NVlabs 자체 평가와 TB 800개 중 794개가 일치한다.
+- NRx 입력 형식: LS 추정값을 DMRS 심볼 순서로 펼치고 1/√2를 곱해야 한다. pyAerial 예제 형식으로 넣으면 약한 TB 256개 중 NRx 복호가 134개이고, 맞는 형식은 211개다.
+
+### 6.2 복구 경로 단독 (AI 없음)
+
+| 조건 | 약한 셀 TB 중 cuPHY 실패 | 그중 NRx가 제때 복구 |
+|---|---|---|
+| 상관 낮음, 16셀, 4,000 주기 | 14.3–14.6% | 63–66% |
+| 상관 높음, 16셀 | 16.1–16.4% | 53–57% |
+| 채널 혼합(K=9), 16셀 | 15.8–17.3% | 38% |
+
+| 큰 모델의 사용 방식 (약한 셀 4개, AI 없음) | NRx가 처리한 슬롯 | 약한 셀의 복호 성공 |
+|---|---|---|
+| 주 수신기 (모든 슬롯을 NRx로) | 39% | 89.4% |
+| 복구 경로 (실패한 TB만) | 실패한 TB의 슬롯만 처리, NRx 용량의 55% 사용 | 94.5–95.1% |
+
+- 상관 낮은 채널의 단독 복호: TB 600개 중 cuPHY 515, NRx 572, cuPHY만 성공 0. 실패한 TB에만 NRx를 돌린 결과(572)가 모든 슬롯에 돌린 결과(572)와 같고, NRx 실행은 슬롯 300개 중 74개(25%)다.
+- 채널 혼합 단독 복호: TB 2,000개 중 cuPHY 1,663, NRx 1,796, NRx만 성공 149(cuPHY 실패 337개의 44%), cuPHY만 성공 16.
+
+### 6.3 복구할 TB 선택
+
+| 채널 | 실패 code block 수 (슬롯의 두 UE 합) | 복구 성공률 |
+|---|---|---|
+| 상관 낮음 | 1–3개 | 97% (38개 중 37개) |
+| | 4–9개 | 54% (24개 중 13개) |
+| | 10개 이상 | 30% (23개 중 7개) |
+| UMi | 9개 이하 | 93% (14개 중 13개) |
+| | 전부 실패 (실패 TB의 87%) | 2% |
+| 채널 혼합 | 9개 이하 | 75% (167개 중 125개) |
+| | 10개 이상 | 14% (170개 중 24개) |
+
+| 조건 (AI 없음) | 규칙 | NRx 실행 | 복구한 TB | 실행당 복구 |
+|---|---|---|---|---|
+| UMi, 약한 셀 4개 | 실패 전부 | 4,891–4,926 | 663–757 | – |
+| | 9개 이하 | 651–777 | 589–746 | – |
+| 상관 낮음, 약한 셀 8개 | 실패 전부 | 5,572–5,707 | 4,124–4,513 | 0.77 |
+| | 9개 이하 | 4,445–4,672 | 3,857–4,348 | 0.90 |
+| | 3개 이하 | 3,077–3,722 | 3,005–3,758 | 0.99 |
+
+- UMi에서 9개 이하 규칙은 NRx 실행을 85% 줄이고 복구를 5% 줄인다.
+- 약한 셀 8개(NRx 용량 부족)에서 3개 이하 규칙은 실행을 40%, 복구를 22% 줄이고 실행당 복구를 0.77에서 0.99로 올린다.
+- 실패 수가 적은 TB에 NRx를 먼저 주는 순위 방식(문턱 없음)은 복구가 4% 적었다. 문턱 방식을 쓴다.
+
+### 6.4 AI 부하 sweep: L1 마감과 AI 처리량
+
+16셀 전 부하, 시드 3. AI 제공량 13k / 27k / 53k / 106k tokens/s. 칸은 "AI 처리량 / 복구 유지율 / L1 놓침"이다. AI 없는 실행은 L1 놓침 0.033%, 복구 초당 202 TB다.
+
+| 방식 | 13k 제공 | 27k 제공 | 53k 제공 | 106k 제공 |
+|---|---|---|---|---|
+| **Backstop** | 13.3k / 98.8% / 0.04% | 26.7k / 98.1% / 0.03% | **39.5k / 97.4% / 0.04%** | 28.1k / 97.8% / 0.03% |
+| 고정 10% | 3.0k / 97.9% / 0.03% | 4.4k / 97.7% / 0.05% | 5.2k / 97.1% / 0.05% | 5.6k / 97.7% / 0.03% |
+| 고정 30% | 13.1k / 97.0% / 0.04% | 21.3k / 94.7% / 0.05% | 20.3k / 93.7% / 0.04% | 16.7k / 94.4% / 0.06% |
+| 고정 50% | 13.3k / 97.3% / 0.05% | 26.5k / 95.1% / 0.05% | 35.5k / 90.8% / 0.10% | 24.6k / 91.2% / 0.11% |
+| 보호 없음 (고정 100%) | 13.3k / 93.0% / 0.32% | 26.7k / 83.8% / 0.61% | 50.6k / 53.2% / 2.04% | 34.9k / 70.5% / 0.95% |
+| 낮은 우선순위 + 30% | 12.9k / 97.8% / 0.04% | 18.9k / 97.3% / 0.05% | 17.7k / 96.4% / 0.03% | 15.2k / 96.2% / 0.06% |
+| 낮은 우선순위 + 50% | 13.3k / 97.8% / 0.04% | 26.1k / 96.7% / 0.03% | 32.6k / 94.3% / 0.04% | 23.1k / 94.5% / 0.05% |
+| 낮은 우선순위 + 70% | 13.3k / 97.9% / 0.03% | 26.7k / 96.8% / 0.06% | 41.9k / 93.4% / 0.05% | 28.6k / 92.8% / 0.04% |
+| 낮은 우선순위, 한도 없음 | 13.3k / 97.7% / 0.04% | 26.7k / 96.3% / 0.06% | 48.4k / 92.0% / 0.07% | 33.4k / 91.7% / 0.04% |
+| 유휴 시간만 | – | – | 4.7k / 99.7% / 0.03% | – |
+
+![AI 부하 sweep](docs/current/figures/backstop_v13/ai_load_sweep.png)
+
+![전 부하에서의 AI 처리량과 복구 유지율](docs/current/figures/backstop_v13/frontier_full_load.png)
+
+- **L1 마감.** Backstop의 L1 놓침은 모든 AI 부하에서 0.03–0.04%로 AI 없는 실행(0.033%)과 같다. 우선순위 없는 고정 50%는 0.10–0.11%, 보호 없음은 0.3–2.0%다(기존 수신기 완료 p99.9 5.2 ms). 낮은 우선순위를 쓰는 방식은 0.03–0.07%다.
+- **AI 처리량.** 제공량 13k, 27k에서 Backstop은 모든 요청을 처리한다. 53k에서 39.5k를 처리하고 복구 97.4%를 유지한다. 같은 복구 수준의 고정 10%(5.2k)의 7.6배, 낮은 우선순위 + 30%(17.7k)의 2.2배다.
+- **같은 AI 처리량.** 낮은 우선순위 + 70%는 41.9k를 처리하고 복구를 6.6% 잃는다. Backstop은 2.6%를 잃는다(2.5배 적음).
+- **과부하(106k).** 모든 방식의 처리량이 줄어든다. 입장 제어가 짧은 요청을 주로 받아 token당 GPU 시간이 늘기 때문이다. Backstop 28.1k에 97.8%, 낮은 우선순위 + 70% 28.6k에 92.8%.
+- 시드 범위(53k 제공): Backstop AI 37.4–41.9k, 복구 97.1–97.6%. 고정 10% 5.1–5.5k, 96.8–97.7%. 낮은 우선순위 + 30% 17.6–17.8k, 96.2–96.9%. 낮은 우선순위 + 70% 39.7–44.3k, 92.5–94.4%.
+
+### 6.5 부하 변화
+
+#### 6.5.1 전 부하와 절반 부하의 교대
+
+2초마다 "모든 셀 활성"과 "셀마다 확률 0.5로 활성"이 교대한다. 16셀, 20초 실행, 시드 3.
+
+| 방식 | AI 처리량 (시드 범위) | 복구 유지율 (시드 범위) | L1 놓침 |
+|---|---|---|---|
+| **Backstop** | **46.2k** (45.2–48.0k) | **98.8%** (98.3–99.2%) | 0.03% |
+| 고정 10% | 5.8k (5.7–5.9k) | 98.6% (98.5–98.6%) | 0.03% |
+| 고정 30% | 22.6k (21.9–23.2k) | 96.0% (95.8–96.3%) | 0.03% |
+| 부하 따라 10/50% | 23.6k (23.0–24.3k) | 97.7% (97.6–97.8%) | 0.02% |
+| 부하 따라 10/50%, 1초 지연 | 20.0k (19.8–20.4k) | 96.1% (95.7–96.5%) | 0.04% |
+| 낮은 우선순위 + 30% | 20.9k (20.0–21.5k) | 97.8% (97.4–98.0%) | 0.02% |
+| 낮은 우선순위 + 50% | 37.0k (35.6–38.1k) | 96.5% (96.3–96.7%) | 0.03% |
+| 낮은 우선순위 + 70% | 46.5k (45.2–48.0k) | 95.4% (95.0–95.7%) | 0.03% |
+| 낮은 우선순위 + 부하 따라 30/70% | 34.5k (33.9–34.9k) | 97.5% (97.3–97.7%) | 0.02% |
+| 낮은 우선순위 + 부하 따라 30/70%, 1초 지연 | 32.1k (31.2–32.9k) | 96.5% (96.4–96.6%) | 0.02% |
+
+![부하 교대에서의 AI 처리량과 복구 유지율](docs/current/figures/backstop_v13/frontier_changing_2s.png)
+
+- 고정 10%의 8.0배(복구 수준 같음), 부하 따라 비율의 2.0배(1초 지연 시 2.3배), 낮은 우선순위 + 부하 따라 비율의 1.34배(1초 지연 시 1.44배)다. 부하 따라 비율 계열 네 가지와의 비교에서 Backstop의 복구 유지율이 1.1–2.7%p 높다.
+- 낮은 우선순위 + 70%는 AI 처리량이 같고(46.5k) 복구를 4.6% 잃는다. Backstop은 1.2%를 잃는다(3.8배 적음).
+
+교대 간격을 바꾼 결과(0.2초와 5초는 시드 2)다. 칸은 "AI 처리량 / 복구 유지율"이다.
+
+| 교대 간격 | Backstop | 고정 10% | 부하 따라 10/50% (1초 지연) | 낮은 우선순위 + 부하 따라 30/70% (1초 지연) | 낮은 우선순위 + 70% |
+|---|---|---|---|---|---|
+| 0.2초 | 48.4k / 98.7% | 5.7k / 98.7% | 21.7k / 96.8% (19.9k / 95.0%) | 35.9k / 97.2% (34.5k / 96.1%) | 47.2k / 95.5% |
+| 2초 | 46.2k / 98.8% | 5.8k / 98.6% | 23.6k / 97.7% (20.0k / 96.1%) | 34.5k / 97.5% (32.1k / 96.5%) | 46.5k / 95.4% |
+| 5초 | 46.2k / 98.6% | 5.7k / 98.8% | 23.9k / 98.0% (21.7k / 97.9%) | 34.3k / 97.6% (32.3k / 97.3%) | 46.2k / 94.7% |
+
+![교대 간격별 결과](docs/current/figures/backstop_v13/changing_interval.png)
+
+0.2초 교대에서 부하 따라 10/50%의 L1 놓침은 0.05%, 1초 지연 시 0.13%다. Backstop은 0.03%다.
+
+#### 6.5.2 무작위 계단 부하
+
+활성 셀 비율이 25 / 50 / 75 / 100% 사이를 0.5–1.5초 간격의 무작위 시점에 바뀐다. 16셀, 40초 실행, 시드 2. 칸은 "AI 처리량 / 복구 유지율"이다.
+
+| 방식 | 전체 | 부하 25% 구간 | 부하 50% 구간 | 부하 75% 구간 | 부하 100% 구간 |
+|---|---|---|---|---|---|
+| **Backstop** | **48.6k / 99.3%** | 50.6k / 100% | 52.3k / 99.9% | 48.3k / 99.3% | 41.6k / 99.0% |
+| 고정 10% | 5.9k / 99.3% | 6.0k / 100% | 6.2k / 99.9% | 6.0k / 99.6% | 5.5k / 98.5% |
+| 부하 따라 10/30/50% | 29.1k / 98.2% | 44.9k / 99.8% | 43.9k / 99.3% | 24.6k / 98.6% | 3.6k / 96.9% |
+| 낮은 우선순위 + 30% | 21.7k / 98.8% | 25.1k / 99.9% | 23.6k / 99.9% | 20.7k / 99.1% | 18.1k / 97.8% |
+| 낮은 우선순위 + 50% | 38.9k / 97.7% | 43.0k / 100% | 42.0k / 99.9% | 37.7k / 98.8% | 33.3k / 94.7% |
+| 낮은 우선순위 + 70% | 48.0k / 97.2% | 49.7k / 99.9% | 51.1k / 100% | 47.1k / 98.1% | 43.3k / 93.9% |
+| 낮은 우선순위 + 부하 따라 30/50/70% | 40.3k / 98.5% | 49.9k / 100% | 50.9k / 99.9% | 39.1k / 98.9% | 20.2k / 96.9% |
+| 위와 같음, 1초 지연 | 39.5k / 97.2% | 40.9k / 100% | 39.7k / 100% | 38.9k / 98.4% | 38.3k / 93.7% |
+
+![무작위 계단 부하의 시간별 결과](docs/current/figures/backstop_v13/random_steps_series.png)
+
+![무작위 계단 부하에서의 AI 처리량과 복구 유지율](docs/current/figures/backstop_v13/frontier_random_steps.png)
+
+- Backstop은 AI 처리량과 복구 유지율이 모두 가장 높다(복구는 고정 10%와 같음).
+- 차이는 전 부하 구간에서 생긴다. Backstop은 그 구간에서 41.6k를 처리하고 99.0%를 유지한다. 부하 따라 비율은 낮은 비율로 내려가 20.2k를 처리하고, 고정 70%는 43.3k를 처리하지만 복구가 93.9%다.
+- 부하를 1초 늦게 알면 전 부하 구간에 높은 비율이 남아 복구가 93.7%다.
+- L1 놓침은 모든 방식이 0.004–0.03%다(AI 없음 0.005%).
+
+#### 6.5.3 버스트
+
+칸은 "AI 처리량 / 복구 유지율"이다. 시드 2.
+
+| 조건 | Backstop | 고정 10% | 낮은 우선순위 + 30% | 낮은 우선순위 + 70% | 낮은 우선순위 + 부하 따라 30/70% (1초 지연) |
+|---|---|---|---|---|---|
+| AI 요청 버스트 (도착 간격 변동계수 4), 16셀 전 부하 | 26.8k / 98.3% | 3.7k / 98.0% | 12.7k / 97.6% | 27.6k / 95.2% | – |
+| 셀 버스트 20 ms, 16셀 | 52.4k / 99.6% | 6.1k / 100% | 23.7k / 99.6% | 51.1k / 99.3% | 51.1k / 99.1% (49.8k / 99.5%) |
+| 셀 버스트 2초, 16셀 | 51.6k / 99.3% | 6.1k / 99.7% | 23.2k / 99.0% | 50.4k / 98.2% | 45.6k / 98.4% (45.0k / 98.4%) |
+| 셀 버스트 20 ms, 32셀 | 39.9k / 98.3% | 5.4k / 99.0% | 17.4k / 98.1% | 40.9k / 95.9% | 19.2k / 97.5% (18.6k / 97.9%) |
+| 셀 버스트 2초, 32셀 | 40.1k / 97.6% | 5.5k / 98.6% | 18.2k / 98.2% | 41.9k / 95.7% | 22.3k / 97.3% (22.3k / 97.6%) |
+
+- 셀 버스트는 각 셀이 독립적으로 켜지고 꺼지는 조건이다(평균 절반 부하, 평균 연속 활성 20 ms 또는 2초).
+- AI 요청 버스트에서 Backstop은 고정 10%의 7.2배, 낮은 우선순위 + 30%의 2.1배다. L1 놓침 0.03%.
+- 16셀 셀 버스트는 NRx 수요가 전 부하의 절반이다. 낮은 우선순위 + 70%와의 차이가 작다(AI 처리량 +2.4–2.5%, 복구 +0.3–1.1%p).
+- 셀 버스트의 L1 놓침은 AI 없이도 높다. 16셀 2초 버스트 0.17%, 32셀 20 ms 버스트 0.11%, 32셀 2초 버스트 0.83%(GPU 하나에 6–8셀이 수 초 동안 활성). 모든 방식이 AI 없는 실행과 같은 수준이거나 그보다 높고 Backstop이 낮지 않다. 이 조건으로 L1을 비교하지 않는다.
+
+### 6.6 NRx 수요 sweep: NRx 처리량과 복구 마감
+
+16셀 전 부하, AI 53k 제공. 약한 셀 수를 0 / 2 / 4 / 6 / 8개로 늘렸다. 시드 2(4개는 시드 3). 칸은 "AI 처리량 / 복구 유지율"이다.
+
+| 약한 셀 | AI 없이 NRx 실행 (TB/s) | AI 없이 복구 (TB/s) | Backstop: AI / 복구 (TB/s) / 유지율 | 고정 10% | 고정 30% | 낮은 우선순위 + 30% | 낮은 우선순위 + 50% | 낮은 우선순위 + 70% |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 0 | 0 | 53.9k / – / – | 6.0k | – | 28.4k | – | 53.4k |
+| 2 | 278 | 125 | 51.1k / 124 / 99.0% | 5.5k / 98.8% | 23.2k / 97.3% | 21.4k / 98.1% | 38.9k / 97.7% | 48.5k / 97.8% |
+| 4 | 459 | 202 | 39.5k / 196 / 97.4% | 5.2k / 97.1% | 20.3k / 93.7% | 17.7k / 96.4% | 32.6k / 94.3% | 41.9k / 93.4% |
+| 6 | 673 | 282 | 25.9k / 276 / 97.8% | 4.8k / 98.3% | 16.6k / 95.5% | 14.0k / 96.8% | 24.8k / 95.0% | 32.1k / 94.8% |
+| 8 | 863 | 366 | 14.6k / 355 / 96.9% | 4.4k / 97.6% | 14.4k / 90.7% | 11.3k / 95.4% | 19.2k / 92.2% | 25.4k / 89.3% |
+
+![NRx 수요 sweep](docs/current/figures/backstop_v13/nrx_demand.png)
+
+- **NRx 처리량.** Backstop에서 복구는 초당 124 → 196 → 276 → 355 TB로 수요에 따라 증가하고, 모든 지점에서 AI 없는 실행의 96.9–99.0%다.
+- **복구 마감.** 실행한 NRx 가운데 복구 마감 안에 끝난 비율은 99.9–100%다.
+- **AI의 양보.** NRx 수요가 0이면 Backstop은 제공된 AI를 모두 처리한다(53.9k). 수요가 늘면 AI 처리량을 줄인다(51.1k → 14.6k). 고정 방식은 줄이지 못하고 복구를 잃는다. 낮은 우선순위 + 70%는 약한 셀 8개에서 복구를 10.7% 잃는다.
+- 약한 셀 8개에서 Backstop은 고정 10%의 3.3배다. 낮은 우선순위 + 30%보다 AI 처리량이 1.3배이고 복구 유지율이 1.5%p 높다.
+- L1 놓침: Backstop 0.03–0.05%, AI 없는 실행 0.03–0.08%.
+
+### 6.7 규모
+
+#### 6.7.1 셀 수
+
+GPU 4장, AI 53k 제공. 같은 무선 부하를 더 많은 셀에 나눴다. 칸은 "AI 처리량 / 복구 유지율 / L1 놓침"이다. 시드 2(16셀은 시드 3).
+
+| 셀 | AI 없음 L1 놓침 | Backstop | 고정 10% | 낮은 우선순위 + 30% | 낮은 우선순위 + 50% | 낮은 우선순위 + 70% |
+|---|---|---|---|---|---|---|
+| 16 (전 부하) | 0.03% | 39.5k / 97.4% / 0.04% | 5.2k / 97.1% / 0.05% | 17.7k / 96.4% / 0.03% | 32.6k / 94.3% / 0.04% | 41.9k / 93.4% / 0.05% |
+| 32 (절반 부하) | 0.03% | 38.0k / 98.6% / 0.06% | 5.1k / 99.2% / 0.06% | 16.9k / 99.0% / 0.05% | 31.1k / 97.3% / 0.05% | 40.0k / 96.3% / 0.06% |
+| 48 (1/3 부하) | 0.09% | 37.7k / 98.3% / 0.14% | 5.1k / 99.3% / 0.12% | 16.8k / 98.6% / 0.12% | 31.1k / 97.0% / 0.11% | 39.4k / 96.5% / 0.09% |
+| 20 (전 부하, GPU당 5셀) | 0.03% | 27.2k / 96.1% / 0.03% | 5.1k / 99.3% / 0.02% | 17.0k / 96.1% / 0.04% | 31.8k / 94.4% / 0.05% | 40.5k / 94.2% / 0.04% |
+
+![셀 수별 결과](docs/current/figures/backstop_v13/cells.png)
+
+- 16, 32, 48셀에서 Backstop의 AI 처리량은 37.7–39.5k, 복구 유지율은 97.4–98.6%다. 고정 10%의 7.4–7.6배, 낮은 우선순위 + 30%의 2.2배다.
+- 48셀은 한 슬롯에 GPU당 최대 12셀이 활성이다. AI 없이 L1 놓침이 0.09%이고 모든 방식이 0.09–0.14%다. Backstop이 낮지 않다.
+- 20셀 전 부하에서 Backstop은 기존 수신기 옆에 128 token 단위만 허용한다. L1 놓침 0.034%(AI 없음 0.025%). 우선순위 없는 고정 30%와 50%는 0.10%와 0.23%, 낮은 우선순위·한도 없음은 0.09%다. AI 처리량은 같은 복구(96.1%)의 낮은 우선순위 + 30%의 1.6배다. 고정 10%는 복구를 99.3% 유지하며, Backstop은 그보다 3.2%p 낮다.
+- 프로토타입은 셀마다 프로세스 하나를 쓰고 MPS는 GPU당 약 15개 프로세스까지 받는다. 48셀이 실행 가능한 최대다.
+
+#### 6.7.2 GPU 수
+
+GPU당 4셀, 전 부하, 시드 2(4장은 시드 3). 칸은 "AI 처리량 / 복구 유지율"이다.
+
+| GPU (셀) | AI 없이 복구 (TB/s) | Backstop | 고정 10% | 낮은 우선순위 + 30% | 낮은 우선순위 + 50% | 낮은 우선순위 + 70% |
+|---|---|---|---|---|---|---|
+| 1 (4) | 53 | 8.8k / 100% | 1.1k / 100% | 3.7k / 100% | 6.9k / 100.8% | 8.4k / 100% |
+| 2 (8) | 110 | 19.4k / 98.5% | 2.3k / 98.7% | 8.1k / 99.0% | 15.4k / 98.6% | 19.4k / 96.9% |
+| 4 (16) | 202 | 39.5k / 97.4% | 5.2k / 97.1% | 17.7k / 96.4% | 32.6k / 94.3% | 41.9k / 93.4% |
+
+![GPU 수별 결과](docs/current/figures/backstop_v13/gpus.png)
+
+- Backstop의 AI 처리량은 GPU 수에 비례한다(GPU당 8.8k, 9.7k, 9.9k). 복구도 53, 110, 202 TB/s로 비례한다.
+- 빈 NRx 여유 규칙의 효과는 NRx가 여러 개일 때 생긴다. GPU 1장(NRx 1개)에서는 NRx가 길어져도 잃는 복구가 같아 모든 방식이 100%이고, Backstop과 낮은 우선순위 + 70%가 같다. GPU 2장에서 +1.6%p, 4장에서 +4.0%p다.
+- GPU 1장에서 Backstop의 L1 놓침은 0.085%(p99.9 3.98 ms)로 AI 없는 실행(0.035%)보다 높다. 시드 2, 10초 실행의 값이다.
+
+### 6.8 규칙별 기여와 복구를 잃는 원인
+
+16셀 전 부하, AI 53k 제공.
+
+규칙을 하나씩 더한 결과(시드 3):
+
+| 구성 | AI 처리량 | 복구 유지율 | L1 놓침 |
+|---|---|---|---|
+| 낮은 우선순위만 (허락 없음) | 48.4k | 92.0% | 0.07% |
+| + 조각 허락, NRx 옆에서 AI 금지 | 25.3k | 97.4% | 0.04% |
+| + 빈 NRx 2개 이상이면 NRx 옆 허용 | 41.3k | 96.5% | 0.05% |
+| **+ 빈 NRx 3개 이상이면 NRx 옆 허용 (Backstop)** | **39.5k** | **97.4%** | 0.04% |
+| Backstop + 비율 한도 70% | 34.9k | 96.2% | 0.03% |
+| v12 규칙 (우선순위 같음, 한도 70%, 마감 조건만) | 22.8k | 97.1% | 0.03% |
+
+잃은 복구의 원인(시드 1, 2 합계, AI 없는 실행과 TB 단위 대조):
+
+| 방식 | 잃은 복구 | 빈 NRx가 없어 시작 못 함 | NRx가 복구 마감 뒤에 끝남 | NRx 실행 시간 중앙값 |
+|---|---|---|---|---|
+| AI 없음 | – | – | – | 6.3 ms |
+| Backstop | 120 | 119 | 0 | 7.0 ms |
+| 고정 10% | 128 | 123 | 3 | 6.8 ms |
+| 고정 30% | 256 | 249 | 6 | 7.5 ms |
+| 고정 50% | 373 | 309 | 61 | 8.2 ms |
+| 보호 없음 (고정 100%) | 1,849 | 391 | 1,452 | 9.1 ms |
+| 낮은 우선순위 + 30% | 153 | 150 | 3 | 7.0 ms |
+| 낮은 우선순위 + 70% | 278 | 272 | 3 | 7.6 ms |
+| 낮은 우선순위, 한도 없음 | 337 | 313 | 23 | 8.0 ms |
+
+- 낮은 우선순위만으로는 AI 처리량이 가장 많고 복구를 8.0% 잃는다.
+- NRx 옆에서 AI를 금지하면 복구는 유지되고 AI 처리량이 절반이 된다.
+- 빈 NRx 여유 규칙(R=3)은 복구를 유지하면서 AI 처리량을 25.3k에서 39.5k로 올린다. NRx 실행 시간의 21%는 NRx 하나만 실행 중인 시간이고, 그 시간에는 AI가 옆에서 실행돼도 잃는 복구가 없다.
+- 비율 한도 70%를 더하면 AI 처리량만 줄어든다.
+- 보호 없음을 제외하면 잃은 복구의 83–99%가 "빈 NRx가 없어 시작 못 함"이다.
+- Backstop의 NRx 실행 시간 중앙값(7.0 ms)은 낮은 우선순위 + 30%와 같고 AI 처리량은 2.2배다.
+
+### 6.9 AI 조각 길이
+
+16셀 전 부하, 시드 1과 2, 같은 job에서 측정. 칸은 "AI 처리량 / 복구 유지율"이다.
+
+| 조각 한도 | 빈 NRx 여유 3 | 빈 NRx 여유 2 |
+|---|---|---|
+| 4.0 ms (sweep에 사용) | 40.2k / 98.0% | 41.2k / 97.7% |
+| 2.5 ms | 40.1k / 98.8% | 41.7k / 98.2% |
+| 1.5 ms | 36.0k / 98.8% | 37.7k / 98.2% |
+
+- 낮은 우선순위의 AI 조각은 무선 작업 옆에서 한도보다 오래 걸린다(실제 시간 중앙값 2.3 ms, p90 4.6 ms, p99 8.7 ms). AI를 멈춰야 하는 NRx 시간의 42%에서 이전에 허락한 조각이 아직 실행 중이다.
+- 조각을 2.5 ms로 줄이면 AI 처리량은 같고 복구 유지율이 0.5–0.8%p 오른다. 이 차이는 실행 간 변동(같은 시드와 설정이 job에 따라 97.4%와 98.0%)과 같은 크기다. sweep은 4.0 ms로 실행했다.
+- 1.5 ms는 1,024 token 단위를 쓸 수 없어 AI 처리량이 10% 준다.
+
+### 6.10 복구 마감이 재전송 일정에 주는 영향 (계산)
+
+실제 L2로 확인하지 않은 계산이다.
+
+| 복구 마감 | 복구 실패 시 재전송 슬롯 | 복구 경로가 없을 때 대비 |
+|---|---|---|
+| 6.5 ms | T0 + 7.5 ms | 같음 |
+| 11.5 ms | T0 + 12.5 ms | 5 ms 늦음 |
+| 16.5 ms | T0 + 17.5 ms | 10 ms 늦음 |
+
+상관 낮은 채널, 11.5 ms 기준: 약한 셀 TB의 14.5%가 기존 수신기에서 실패하고 그 64%가 복구된다. 복구된 TB(약한 셀 TB의 9.3%)는 재전송이 없어지고, 데이터가 재전송 성공 시점보다 약 1 ms 빨리 나온다. 복구되지 않은 TB(5.2%)는 5 ms 늦게 재전송된다. 실패 TB 평균 +1.2 ms, 전체 TB 평균 +0.17 ms다. NRx로 보내지 않기로 한 TB(6.3절의 규칙에서 제외된 TB)는 기다릴 필요가 없으나, 현재 실험은 이 구분을 재전송 시각에 반영하지 않았다.
+
+---
+
+## 7. 유리하지 않은 결과와 철회한 주장
+
+### 7.1 Backstop이 우위가 아닌 조건
+
+| 조건 | 결과 | 원인 |
+|---|---|---|
+| GPU 1장 | 낮은 우선순위 + 70%와 같음 (8.8k 대 8.4k, 둘 다 복구 100%) | NRx가 하나라 빈 NRx 여유 규칙이 작동하지 않음 |
+| 48셀, 1/3 부하 | L1 놓침 0.14%. AI 없음 0.09%, 다른 방식 0.09–0.14% | 한 슬롯에 GPU당 최대 12셀 활성. 단위 크기 규칙을 활성 셀 4개 기준으로 보정함 |
+| 셀 버스트 (16셀, 평균 절반 부하) | 낮은 우선순위 + 70% 대비 AI +2.4–2.5%, 복구 +0.3–1.1%p | NRx 수요가 절반이라 낮은 우선순위만으로 복구를 거의 유지 |
+| 셀 버스트 2초, 32셀 | 모든 방식의 L1 놓침 0.9–1.5% (AI 없음 0.83%) | 무선만으로 GPU 용량 초과 |
+| 20셀 전 부하 | 고정 10%(복구 99.3%)보다 복구 유지율 3.2%p 낮음 | GPU당 5셀에서 NRx 여유가 줄어듦 |
+| AI 처리량만 비교 | 낮은 우선순위·한도 없음이 48.4k로 Backstop(39.5k)보다 많음 | 그 방식은 복구를 8.0% 잃음. Backstop의 우위는 복구를 유지하는 조건에서 성립 |
+
+### 7.2 철회한 주장
+
+| 이전 주장 | 철회 이유 | 현재 값 |
+|---|---|---|
+| NRx가 기존 수신기 실패의 62%를 복호한다 (단일 UE) | cuPHY LDPC 10회 기준. 20회로 맞추면 cuPHY가 스스로 96%를 복호 | 같은 횟수에서 11–12% (넓은 SNR 구간) |
+| NVlabs 실시간 모델이 실패의 25–35%를 복호한다 (상관 낮음) | NVlabs 평가의 LDPC가 20회, cuPHY가 10회 | 같은 횟수에서 2% |
+| 2026-10-01 이전의 "복구한 TB" 수치 전부 | NRx 입력(LS 추정값의 배열 순서와 배율)이 모델의 학습 형식과 달랐음 | 교정 후 NRx 복호 134 → 211 (TB 256개) |
+| 고정 10%의 5.0배, 부하 따라 비율의 1.17배, 27.4k @ 98.6% (v12) | 낮은 우선순위를 쓰지 않은 기준선과의 비교. v12 규칙은 낮은 우선순위 + 고정 비율과 같은 선 위에 있었음 | 46.2k @ 98.8%, 8.0배, 2.0배, 낮은 우선순위 결합 대비 1.34배 |
+| MPS 낮은 우선순위는 효과가 없다 | 작은 NRx 조건의 결과 | 큰 NRx 조건에서 고정 30%는 복구 93.7%, 낮은 우선순위 + 30%는 96.4% |
+| NRx 부하가 작으면 고정 비율이 낫다 (v12) | v12 규칙 기준 | v13 규칙은 NRx 수요 0에서 제공된 AI를 모두 처리 (53.9k, 낮은 우선순위·한도 없음 53.8k와 같음) |
+
+### 7.3 쓰지 않는 문장
+
+| 문장 | 이유 |
+|---|---|
+| "YinYangRAN, SMEC, Orion보다 낫다" | 그 방식을 이 저장소의 코드에 구현해 비교했고 원본 시스템을 실행하지 않았다 |
+| "L1 마감을 보장한다" | L1 놓침 0.03–0.04%는 AI 없는 실행과 같다는 뜻이다. 프로토타입의 측정값이고 한도가 아니다 |
+| "모든 규모에서 L1을 더 잘 지킨다" | 48셀과 셀 버스트에서 성립하지 않는다 |
+| "GPU 수와 무관하게 우위다" | GPU 1장에서 성립하지 않는다 |
+| "NRx를 쓰는 연구가 없다", "최초" | NRx 자체는 여러 연구가 쓴다. 조사는 전수 조사가 아니다 |
+| "빈 NRx 여유 규칙이 최적이다" | 여유 수(R=3)는 NRx 4개 조건에서 수동으로 정했다 |
+
+---
+
+## 8. 한계
+
+1. **입력.** 슬롯은 NVlabs 공개 설정의 합성 채널로 미리 생성했다. RU와 실측 IQ는 사용하지 않았다.
+2. **L2.** 복구 마감(11.5 ms)은 TDD 패턴과 PUSCH 준비 시간에서 계산했고 L2 스택으로 검증하지 않았다.
+3. **비교 대상.** 모두 이 저장소에 구현한 방식이다. 부하 따라 비율 방식에는 예측기가 없다.
+4. **규모.** 큰 NRx는 전 부하에서 GPU당 4–5셀이 한계다. 32셀과 48셀은 부분 부하에서 실행했다. GPU는 4장까지다.
+5. **통계.** 시드 2–3개, 실행 10–40초다. 같은 설정의 복구 유지율은 job에 따라 약 0.5%p 변동한다.
+6. **수동 설정.** 빈 NRx 여유 수, 단위 크기 규칙, 실패 code block 문턱 K를 GPU 수, GPU당 셀 수, 채널에 따라 수동으로 정했다.
+7. **조각 한도.** 실행 중인 AI 조각은 조건이 깨져도 끝까지 실행된다. 낮은 우선순위에서 조각의 실제 시간이 한도의 2배까지 늘어난다.
+8. **L1 수준.** L1 놓침 0.03–0.04%는 Python 프로토타입의 값이다. 99.999% 수준의 신뢰도는 검증하지 않았다.
+9. **하드웨어.** A100 80GB만 사용했다.
+10. **AI 작업.** LLM prefill 한 종류다. 생성(decode) 단계와 여러 종류의 AI 작업은 v13 조건에서 측정하지 않았다.
+
+---
+
+## 9. 결론
+
+1. **수신기.** LDPC 반복 횟수를 맞추면 실시간용 NRx는 UE 간 상관이 중간 이상일 때만 cuPHY보다 많이 복호한다. 시험한 세 채널 모두에서 cuPHY 실패의 15–67%를 추가로 복호하는 것은 큰 모델이고, 그 실행 시간은 UL 주기의 2배 이상이다.
+2. **구조.** 큰 NRx는 실패한 TB에만, L1 마감보다 늦은 복구 마감으로 실행하는 복구 경로로 쓸 수 있다. 실패 code block 수로 대상을 고르면 NRx 실행이 40–85% 줄고 복구는 5–22% 준다.
+3. **원인.** AI와 같은 GPU에서 복구를 잃는 원인은 NRx의 마감 초과가 아니라 실패 TB가 시작 시각 안에 빈 NRx를 찾지 못하는 것이다. 낮은 MPS 우선순위는 L1 마감을 지키고 복구를 8% 잃는다.
+4. **규칙.** AI를 낮은 우선순위로 실행하고 조각 단위로 허락하며, NRx 옆에서는 다른 NRx가 실행 중이 아닐 때만 허락한다. 16셀 전 부하에서 39.5k tokens/s를 처리하고 복구의 97.4%를 유지한다. L1 놓침은 AI 없는 실행과 같다.
+5. **비교.** 같은 복구 수준에서 고정 비율의 7.6–8.2배, 부하 따라 비율의 1.7–2.0배, 낮은 우선순위 + 고정 30%의 2.2배, 낮은 우선순위 + 부하 따라 비율의 1.2–1.34배다. 같은 AI 처리량의 낮은 우선순위 + 70%보다 잃는 복구가 2.5–4.0배 적다.
+6. **범위.** 이 결과는 AI 제공량 13k–106k tokens/s, 약한 셀 0–8개, 16–48셀, GPU 2–4장, 부하 교대 0.2–5초, 무작위 계단 부하, AI 요청 버스트에서 같은 순서로 나타난다. GPU 1장에서는 낮은 우선순위 + 70%와 같다. 48셀과 셀 버스트에서는 L1 우위가 없다.
+
+---
+
+## 10. 재현 방법
+
+```bash
+cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab
+cp scripts_for_node/backstop_slot/campaigns/*.sh run_state/backstop_slot/          # 실행 위치로 복사
+salloc -N 1 -C "gpu&hbm80g" -q interactive -A m5320_g -t 04:00:00 --no-shell      # job J
+R="srun --jobid=J --overlap -N1 -n1 --gpus-per-node=4"
+C=run_state/backstop_slot
+
+# 수신기 비교 (6.1절)
+$R bash $C/ldpc_check.sh
+
+# 시간 한도 측정 (4.4절). 20셀은 CELLS=20 TAG=k20 EXTRA="--weak-fraction 0.2"
+$R bash $C/v13_cal.sh
+
+# sweep (6.4–6.9절)
+$R bash $C/v13b.sh aiload phase steps
+$R bash $C/v13_chain2.sh nrx cells gpus dense burst aiburst
+$R bash $C/v13c.sh burst16 piece
+
+# 표와 그림 (로그인 노드)
+bash $C/v13_report.sh J[,J2]
 ```
 
-## 13. 디렉터리 구조
+- `campaigns/`의 스크립트는 `run_state/backstop_slot/`에서 실행한 것의 사본이다. 데이터셋, TensorRT 엔진, NVlabs 코드(`run_state/`, `runtime/`, `third_party/`)는 저장소에 포함하지 않았다. 새로 받은 저장소에서는 이 세 가지를 먼저 준비해야 한다.
+- `srun`에 `--gpus-per-node=4`가 없으면 CUDA 오류가 난다. 한 명령은 2시간 이내로 나눠 실행한다. `run_matrix.sh`는 같은 job에서 끝난 실행을 건너뛴다.
+- 실행 이름은 `<tag><seed>n`(AI 없음)과 `<tag><seed>r<AI 부하><방식>`이다.
+
+| tag | 조건 | 방식 코드 | 의미 |
+|---|---|---|---|
+| `q` | AI 부하 sweep, 16셀 전 부하 | `vf` | Backstop |
+| `ha` `hb` `hc` | 부하 교대 0.2 / 2 / 5초 | `sP` | 고정 P% |
+| `st` | 무작위 계단 부하 | `pP` | 낮은 우선순위 + P% |
+| `wa`–`wd` | 약한 셀 0 / 2 / 6 / 8개 | `dAxBlN` | 부하 따라 비율 A/B%, N 주기 지연 |
+| `ga` `gb` | GPU 1 / 2장 | `eAxBlN` | 위와 같음 + 낮은 우선순위 |
+| `ca` `cb` `da` | 32 / 48 / 20셀 | `i` | 유휴 시간만 |
+| `ba` `bc` `bd` `be` | 셀 버스트 (32셀, 16셀) | `v4` | v12 규칙 |
+| `ab` | AI 요청 버스트 | `ve` `vd` `vc` | 규칙별 구성 (6.8절) |
+
+논문 초안 빌드:
+
+```bash
+cd paper/backstop_slot_v7 && module load texlive/2024 && latexmk -pdf -interaction=nonstopmode main.tex
+```
+
+---
+
+## 11. 연구 경과
+
+| 기간 | 내용 | 결과 |
+|---|---|---|
+| 2026-05 ~ 08 | CloudLab d8545에서 MIG 기반 L1–NRx 배치(DART-Rx) | MIG cross-partition P2P는 L1 간섭이 1.04배, same-partition은 1.6–1.7배 |
+| 2026-06 | Perlmutter에서 MIG 미사용 측정 | MPS에서 L1 + NRx p99 40 ms, time-slicing 389 ms |
+| 2026-09-19 ~ 25 | SoftWall: MPS 위에서 선택적 NRx의 복구 의무를 인증하는 runtime (주기 180 ms harness) | 형식 모델, fault 검증, 원고 작성. 처리량 우위는 기각. production timing(4.5 ms) 미충족 |
+| 2026-09-28 | 시스템 이름을 Backstop으로 변경 | – |
+| 2026-09-29 ~ 30 | 슬롯 단위 재설계: UL 주기 2.5 ms, L1 마감 4.0 ms, 8–40셀, AI 단위 분할 | 두 마감, 실패 code block 규칙, 단위 크기별 허락 |
+| 2026-10-01 | 수신기 검증: NRx 입력 교정, LDPC 횟수 일치, NVlabs 모델 도입(v4–v12) | 큰 NRx를 복구 전용으로 쓰는 구조 확정. 이전 수치 철회 |
+| 2026-10-02 | 기존 방식 다섯 가지와의 sweep(v13) | 낮은 우선순위 기준선 도입, 빈 NRx 여유 규칙, 이 문서의 6.4–6.9절 |
+
+2026-09-25 기준의 이전 README(SoftWall 단계의 정의, 결과, 기각된 주장, production gate)는 [docs/archive/README_SOFTWALL_20260925.md](docs/archive/README_SOFTWALL_20260925.md)에 보존했다. SoftWall 원고는 `paper/softwall_sigmetrics27/`에 있고 현재 스킴을 기술하지 않는다.
+
+---
+
+## 12. 저장소 구조와 원본 파일
+
+### 12.1 먼저 읽을 문서
+
+| 순서 | 문서 | 내용 |
+|---|---|---|
+| 1 | [paper/backstop_slot_v7/main.pdf](paper/backstop_slot_v7/main.pdf) | 논문 초안 (영문, 14쪽) |
+| 2 | [docs/current/BACKSTOP_V13_SWEEPS_KO.md](docs/current/BACKSTOP_V13_SWEEPS_KO.md) | 기존 방식과의 sweep 비교. 6.4–6.9절의 근거 |
+| 3 | [docs/current/BACKSTOP_V4_VERIFICATION_KO.md](docs/current/BACKSTOP_V4_VERIFICATION_KO.md) | 수신기 검증과 v4–v12 실험. 6.1–6.3, 6.10절의 근거 |
+| 4 | [docs/current/BACKSTOP_SLOT_DIFFERENTIATION_KO.md](docs/current/BACKSTOP_SLOT_DIFFERENTIATION_KO.md) | 기존 연구와의 차이, 출처 링크, 쓸 수 있는 문장 |
+| 5 | [docs/current/BACKSTOP_SLOT_DESIGN_KO.md](docs/current/BACKSTOP_SLOT_DESIGN_KO.md) | 설계와 코드 대응. 15장이 v13 변경 |
+| 6 | [docs/current/CURRENT_RESEARCH_INDEX_KO.md](docs/current/CURRENT_RESEARCH_INDEX_KO.md) | 전체 문서 인덱스 |
+
+### 12.2 수치의 원본
+
+| 절 | 원본 |
+|---|---|
+| 6.1 | `results/backstop_slot/raw/ldpc_check_*`, `mu_probe_*` (요약은 검증 문서 2장) |
+| 6.2, 6.3 | `results/backstop_slot/v7_*`, `v8_*` (검증 문서 6.1–6.8절) |
+| 6.4–6.8 | `results/backstop_slot/sweep_<tag>_c<셀>_j59192512_59199237.json`, `v13_report_j59192512_59199237.md` |
+| 6.5.2 | `results/backstop_slot/series_st_c16_j59192512_59199237.json` |
+| 그림 | `docs/current/figures/backstop_v13/`, `results/backstop_slot/v13_*.png` |
+
+실행별 원자료(`results/backstop_slot/raw/`, 37 GB)는 저장소에 포함하지 않았다.
+
+### 12.3 디렉터리
 
 | 경로 | 역할 |
 |---|---|
-| `paper/softwall_sigmetrics27/` | SIGMETRICS LaTeX 원고와 참고문헌 |
-| `docs/current/` | 현재 판단에 사용하는 문서 |
-| `docs/current/figures/` | 원고용 그림 |
-| `docs/architecture/` | DART-Rx 구조와 novelty 문서 |
-| `docs/experiments/` | 이전 실험 계획과 campaign 문서 |
-| `docs/setup/` | CloudLab 설치와 복구 절차 |
-| `docs/tables/` | 실험 matrix와 요약 CSV |
-| `docs/archive/` | 이전 가설과 보고서. 현재 결론으로 사용하지 않음 |
-| `results/softwall_same_gpu/` | SoftWall 단일 GPU 실험 결과와 gate ledger |
-| `results/softwall_multigpu/` | SoftWall 멀티 GPU, 형식 모델, production gate 결과 |
-| `results/perlmutter_handoff/` | 2026-06 Perlmutter no-MIG 측정 스크립트와 결과 |
-| `results/visual_evidence/` | MIG와 Perlmutter 시각 증거 문서 |
-| `results/20260803/` | chain19 CloudLab MIG+MPS 결과 |
-| `results/<날짜>/` | 날짜별 이전 실험 결과 |
-| `scripts_for_node/softwall_same_gpu/` | SoftWall controller, runtime, 실행 스크립트 |
-| `scripts_for_node/task1/` | DART runtime과 NeuralRx 직결 경로 |
-| `scripts/` | Production gate 평가와 채널 분석 스크립트 |
-| `scripts_node/` | CloudLab 실행 스크립트 |
-| `task1_final/chain/` | 2026-08 chain 결과 |
-| `task1_p2p_fair/` | P2P 공정 비교 실험 |
-| `data/` | 데이터 카탈로그, BurstGPT 공개 trace |
-| `tools/` | 분석 도구 |
-| `archive/` | 과거 로그와 초기 실행 사본 |
+| `scripts_for_node/backstop_slot/` | 현재 스킴: controller, 수신기 worker, AI worker, 설정 생성, 분석, 그림 |
+| `scripts_for_node/backstop_slot/campaigns/` | 실험 실행 스크립트 사본 |
+| `results/backstop_slot/` | 현재 스킴의 결과 요약(JSON, 표, 그림) |
+| `paper/backstop_slot_v7/` | 현재 논문 초안 |
+| `docs/current/` | 현재 판단에 쓰는 문서 |
+| `docs/archive/` | 이전 가설과 보고서. 현재 결론으로 쓰지 않음 |
+| `paper/softwall_sigmetrics27/` | SoftWall 단계의 원고 (기록) |
+| `scripts_for_node/softwall_same_gpu/`, `results/softwall_*` | SoftWall 단계의 코드와 결과 (기록) |
+| `results/<날짜>/`, `task1_*`, `scripts_node/` | CloudLab MIG 단계의 결과와 스크립트 (기록) |
 
-## 14. 관리 원칙
+주요 코드 파일:
 
-- 새 연구 문서는 루트에 만들지 않고 `docs/`의 해당 분류에 둔다.
-- 실험 protocol은 실행 전에 고정한다. `PASS`는 해당 사전 고정 계약에만 해당한다.
-- 실패한 protocol과 오염된 결과는 삭제하지 않는다. 이후의 성공이 이전 실패를 대체하지 않는다.
-- Raw result는 덮어쓰지 않고 새 파일로 저장한다. Per-run raw capture(`results/softwall_same_gpu/raw/`, `results/softwall_multigpu/raw/`)는 `.gitignore`로 제외한다.
-- 원고의 정량 수치는 원본 파일과 필드로 추적할 수 있어야 한다.
-- 결과 문장에는 조건을 붙인다. 관측된 위반 0을 WCET나 보장으로 서술하지 않는다.
+| 파일 | 역할 |
+|---|---|
+| `controller4.py` | NRx 배정, AI 조각 허락(빈 NRx 여유 규칙 포함), AI 요청 배치, 비교 대상(부하 따라 비율) |
+| `conv_worker.py`, `slot_radio.py`, `mu_radio.py` | 기존 수신기와 NRx 경로 |
+| `nrx_lane.py` | NRx 프로세스 |
+| `ai_worker2.py`, `qwen_units.py` | AI 단위 분할과 조각 실행 |
+| `ai_worker_dyn.py` | 비교 대상: 비율별 AI worker |
+| `make_config.py`, `launch_slot.py`, `run_matrix.sh` | 설정 생성과 실행 |
+| `analyze_sweep.py`, `analyze_series.py`, `plot_v13.py`, `plot_reserve_timeline.py` | 분석과 그림 |
+| `probe_ldpc.py`, `probe_mu.py` | 수신기 비교 |
+
+### 12.4 관리 원칙
+
+- 실패한 실험과 철회한 주장은 삭제하지 않고 기록한다.
+- 결과 문장에는 조건을 붙인다. 측정값을 보장으로 쓰지 않는다.
+- 수치는 원본 파일로 추적할 수 있어야 한다.
+- 비교 대상은 구현한 방식의 이름으로 부르고, 원본 시스템의 이름으로 부르지 않는다.
+- 이 저장소는 changjongkim 계정으로 push한다(저장소 local 설정의 `core.sshCommand`, `user.name`, `user.email`).

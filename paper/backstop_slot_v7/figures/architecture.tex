@@ -20,14 +20,14 @@
   \node[pttl, anchor=north west] at (9.3,-0.6) {AI grant, one per GPU};
   \foreach \x/\w/\h in {9.3/0.7/GPU, 10.0/1.1/piece, 11.1/2.6/largest chunk}
     \node[hcell, minimum width=\w cm] at (\x,-1.0) {\h};
-  \foreach \y/\a/\b/\c in {-1.3/0/none/NeuralRx is running, -1.6/3/4.0 ms/128 tokens}
+  \foreach \y/\a/\b/\c in {-1.3/0/none/2 NeuralRx running, -1.6/3/4.0 ms/{1,024 tokens}}
   {
     \node[cell, minimum width=0.7cm] at (9.3,\y) {\a};
     \node[cell, minimum width=1.1cm] at (10.0,\y) {\b};
     \node[cell, minimum width=2.6cm] at (11.1,\y) {\c};
   }
-  \node[inote, anchor=north west] at (9.3,-2.0) {granted only if all radio jobs};
-  \node[inote, anchor=north west] at (9.3,-2.3) {of the GPU meet their deadlines};
+  \node[inote, anchor=north west] at (9.3,-2.0) {granted only if radio deadlines hold};
+  \node[inote, anchor=north west] at (9.3,-2.3) {and enough NeuralRx are free};
 
   % ---------------- GPU 3 ----------------
   \node[gpu, anchor=north west, minimum width=6.7cm, minimum height=3.5cm] (g3) at (0,-3.6) {};
@@ -40,7 +40,7 @@
     {cuPHY: cells 7, 11, 15};
   \node[comp, anchor=north west, minimum width=2.8cm, minimum height=0.6cm] (n3) at (3.7,-4.2) {NeuralRx (free)};
   \node[comp, anchor=north west, minimum width=2.8cm, minimum height=0.95cm, fill=aic] (a3) at (3.7,-5.9)
-    {AI worker (70\% share)\\runs the piece};
+    {AI worker (low priority)\\runs the piece};
 
   % ---------------- GPU 0 ----------------
   \node[gpu, anchor=north west, minimum width=6.7cm, minimum height=3.5cm] (g0) at (7.2,-3.6) {};

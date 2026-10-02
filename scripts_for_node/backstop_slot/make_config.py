@@ -55,12 +55,18 @@ def main() -> None:
     parser.add_argument("--group-size", type=int, default=1, help="cells per conventional process (group runtime)")
     parser.add_argument("--activity-prob", type=float, default=1.0,
                         help="probability that a cell carries a TB in an uplink period")
-    parser.add_argument("--activity-mode", choices=("bernoulli", "bursty", "phased"), default="bernoulli")
+    parser.add_argument("--activity-mode", choices=("bernoulli", "bursty", "phased", "steps"), default="bernoulli")
     parser.add_argument("--activity-phase", type=int, default=800,
                         help="phase length in periods (phased: full load and --activity-prob alternate)")
     parser.add_argument("--activity-high", type=float, default=1.0,
                         help="activity probability of the busy phases (phased)")
     parser.add_argument("--activity-burst", type=float, default=8.0, help="mean busy run in periods (bursty)")
+    parser.add_argument("--activity-levels", default="0.25,0.5,0.75,1.0",
+                        help="activity probabilities the load jumps between (steps)")
+    parser.add_argument("--ai-arrival-cv", type=float, default=1.0,
+                        help="coefficient of variation of AI inter-arrival times (1: Poisson)")
+    parser.add_argument("--dynamic-levels", default=None,
+                        help="load fractions that separate the dynamic shares, high to low, e.g. 0.875,0.625")
     parser.add_argument("--nrx-max-cb-fail", type=int, default=1)
     parser.add_argument("--nrx-ls-input", choices=("nvlabs", "example"), default="nvlabs",
                         help="layout of the LS estimate given to NeuralRx (example = runs before 2026-10-01)")
@@ -93,6 +99,8 @@ def main() -> None:
     parser.add_argument("--ai-slo-ms", type=float, default=200.0)
     parser.add_argument("--ai-admission", type=int, default=0,
                         help="1: admit an AI request only if it is predicted to meet its SLO")
+    parser.add_argument("--ai-admission-fraction", type=float, default=1.0,
+                        help="admit a request if it is predicted to finish within this share of its time limit")
     parser.add_argument("--static-mps-pct", type=int, default=30)
     parser.add_argument("--idle-budget-ms", type=float, default=1.0)
     parser.add_argument("--nrx-runtime", choices=("lanes", "per_cell"), default="lanes")
@@ -191,11 +199,14 @@ def main() -> None:
         bounds_part, _, conv_part = args.unit_gating.replace(";", "/").partition("/")
         config["ai_unit_gating"] = {
             "nrx_bound_corun_ms": {k: float(v) for k, v in (x.split(":") for x in bounds_part.split(","))},
-            "conv_safe_chunks": [int(c) for c in conv_part.replace("conv=", "").replace("+yield", "").replace("+queue", "").replace("+nrxbudget", "").split(",") if c],
+            "conv_safe_chunks": [int(c) for c in conv_part.replace("conv=", "").replace("+yield", "").replace("+queue", "").replace("+nrxbudget", "").split("+")[0].split(",") if c],
             "yield_to_waiting_nrx": "+yield" in conv_part,
             "queue_check": "+queue" in conv_part,
             "nrx_budget": "+nrxbudget" in conv_part,
         }
+        for part in conv_part.split("+"):
+            if part.startswith("reserve"):
+                config["ai_unit_gating"]["free_lane_reserve"] = int(part[len("reserve"):])
     if args.conv_budget:
         alone, margin, alphas = 0.0, 0.2, {}
         for part in args.conv_budget.split("/"):
@@ -225,10 +236,15 @@ def main() -> None:
     if args.conv_runtime == "group":
         config["conv_runtime"] = "group"
         config["conv_group_size"] = args.group_size
-    if args.activity_prob < 1.0:
+    if args.activity_prob < 1.0 or args.activity_mode == "steps":
         config["activity"] = {"prob": args.activity_prob, "mode": args.activity_mode,
                               "burst_periods": args.activity_burst, "seed": args.seed,
-                              "phase_periods": args.activity_phase, "phase_high": args.activity_high}
+                              "phase_periods": args.activity_phase, "phase_high": args.activity_high,
+                              "levels": [float(v) for v in args.activity_levels.split(",")]}
+    if args.ai_admission_fraction != 1.0:
+        config["ai"]["admission_fraction"] = args.ai_admission_fraction
+    if args.ai_arrival_cv != 1.0:
+        config["ai"]["arrival_cv"] = args.ai_arrival_cv
     if args.nrx_bound_busy:
         config["nrx_bound_by_busy_ms"] = [float(v) for v in args.nrx_bound_busy.split(",")]
     if args.conv_alone_by_load:
@@ -259,6 +275,8 @@ def main() -> None:
     if args.dynamic_shares:
         config["dynamic_share"] = {"shares": [int(s) for s in args.dynamic_shares.split(",")],
                                    "lag_periods": args.dynamic_lag, "window_periods": 40}
+        if args.dynamic_levels:
+            config["dynamic_share"]["levels"] = [float(v) for v in args.dynamic_levels.split(",")]
     if args.nrx_flags:
         flags = {}
         for item in args.nrx_flags.split(","):

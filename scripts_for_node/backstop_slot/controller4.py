@@ -10,6 +10,7 @@ Dynamic-share baseline (``dynamic_share``: shares [low, high], ``lag_periods``, 
 each GPU has one pre-loaded AI worker per share (``ai_worker_dyn.py``).  The controller makes
 the low-share worker the active one while the GPU's radio load is full and the high-share one
 otherwise, judged over the last ``window_periods`` periods as they were ``lag_periods`` ago.
+With more than two shares, ``levels`` (load fractions, high to low) separate them.
 
 
 Additions over ``controller.py``:
@@ -172,6 +173,10 @@ def main() -> None:
     second_lane = flags.get("second_lane", "always")
     by_value = flags.get("rank") == "value"
     two_lane_ai = unit_cfg.get("two_lane_corun_ms")      # None: no AI while two lanes run on a GPU
+    # Free-lane reserve: AI next to a running NeuralRx makes that lane busy for longer.  A failed
+    # TB cannot wait for a lane (it must start by its latest start), so AI runs next to a
+    # NeuralRx only while at least ``free_lane_reserve`` lanes of the server are free.
+    lane_reserve = int(unit_cfg.get("free_lane_reserve", 0))
     primary = {int(c["cell"]) for c in cells if c.get("nrx_mode") == "primary" and int(c["cell"]) in weak}
     queue_check = bool(unit_cfg.get("queue_check", False))
 
@@ -206,7 +211,7 @@ def main() -> None:
 
     job_state: dict[tuple[int, int], int] = {}
     reasons: dict[tuple[int, int], int] = {}
-    counters = {"assigned": 0, "dropped": 0, "skipped": 0, "low_value": 0, "grants": 0, "queue_blocked": 0,
+    counters = {"assigned": 0, "dropped": 0, "skipped": 0, "low_value": 0, "grants": 0, "queue_blocked": 0, "reserve_blocked": 0,
                 "grant_budget_ms": 0.0, "loops": 0, "max_loop_us": 0.0}
     lane_seq = {lane: 0 for lane in lanes}
     lane_job: dict[int, tuple[int, int] | None] = {lane: None for lane in lanes}
@@ -257,6 +262,9 @@ def main() -> None:
             state.requests[i, R_SEQ] = 1
         n_requests = len(plan)
         slo_ns = int(float(ai_cfg.get("slo_ms", 200.0)) * ms)
+        # A request is admitted if it is predicted to finish within this share of its time limit;
+        # below 1, the margin absorbs the error of the rate estimate when the queue is always full.
+        admit_ns = slo_ns * float(ai_cfg.get("admission_fraction", 1.0))
         prior_tps = float(ai_cfg.get("prior_tokens_per_s", 15000.0))
         pack = config.get("ai_dispatch_order") == "pack"
         pack_ns = float(config.get("ai_pack_fraction", 0.6)) * slo_ns
@@ -272,7 +280,9 @@ def main() -> None:
     activity = config.get("activity") or {}
     dynamic_level = (0.5 * (float(activity.get("phase_high", 1.0)) + float(activity.get("prob", 1.0)))
                      if activity.get("mode") == "phased" else 0.9)
+    dynamic_levels = [float(v) for v in (dynamic or {}).get("levels") or [dynamic_level]]
     if dynamic:
+        assert len(dynamic_levels) == len(dynamic["shares"]) - 1, "one level between two shares"
         for g in range(gpus):
             state.gpus[g][A_DYN_ACTIVE] = 1
 
@@ -392,8 +402,9 @@ def main() -> None:
             for g in range(gpus):
                 hi = max(0, min(args.periods, int(k_now) - dynamic_lag))
                 lo = max(0, hi - dynamic_window)
-                full = hi <= lo or float(load[g, lo:hi].mean()) >= dynamic_level * len(own_cells[g])
-                state.gpus[g][A_DYN_ACTIVE] = 1 if full else 2
+                frac = 1.0 if hi <= lo else float(load[g, lo:hi].mean()) / max(1, len(own_cells[g]))
+                # Shares are listed from low to high; a lower load selects a higher share.
+                state.gpus[g][A_DYN_ACTIVE] = 1 + sum(frac < level for level in dynamic_levels)
         # --- AI grants -----------------------------------------------------
         if ai_policy == "backstop_corun":
             for g in range(gpus):
@@ -429,12 +440,16 @@ def main() -> None:
                     grant(g, budget, now)
         elif ai_policy == "backstop_units":
             nrx_waiting = yield_to_waiting and any(st == ELIGIBLE for st in job_state.values())
+            lanes_free = sum(1 for lane in lanes if lane_free(lane)) if lane_reserve else 0
             for g in range(gpus):
                 if nrx_waiting:
                     break
                 box = state.gpus[g]
                 if int(box[A_DONE_SEQ]) != grant_seq[g] or not int(box[A_HAS_WORK]):
                     continue
+                if lane_reserve and lanes_free < lane_reserve and busy_lanes(g):
+                    counters["reserve_blocked"] += 1
+                    continue                  # lanes are scarce: this NeuralRx runs without AI
                 now = now_ns()
                 next_release = epoch + (k_now + 1) * period
                 conv_running = conv_pending(g, k_now)
@@ -558,7 +573,7 @@ def main() -> None:
                         best_g, best_finish = g, finish
                         break
                 arrival_abs = epoch + int(state.requests[next_request, R_ARRIVAL])
-                if ai_cfg.get("slo_admission") and best_finish - arrival_abs > slo_ns:
+                if ai_cfg.get("slo_admission") and best_finish - arrival_abs > admit_ns:
                     state.requests[next_request, R_GPU] = -2
                     counters["ai_rejected"] += 1
                 else:

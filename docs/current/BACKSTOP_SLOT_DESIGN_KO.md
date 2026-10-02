@@ -345,3 +345,23 @@ srun --jobid=$J --overlap -N1 -n1 --gpus-per-node=4 bash -c '
 MU-MIMO 셀에서 controller가 보는 "실패한 code block 수"는 두 UE의 합이다. NRx 한 번이 두 UE를 같이 복호하므로
 lane 배정 단위는 슬롯이다.
 
+## 15. v13에서 바뀐 것 (2026-10-02, job 59192512·59199237)
+
+근거와 수치는 [BACKSTOP_V13_SWEEPS_KO.md](BACKSTOP_V13_SWEEPS_KO.md).
+
+| 항목 | 이전 (v7–v12) | v13 | 코드 |
+|---|---|---|---|
+| AI의 MPS 우선순위 | 무선과 같음 | 낮음(`CUDA_MPS_CLIENT_PRIORITY=1`) | `make_config.py --ai-mps-priority 1`, `launch_slot.py` |
+| AI 비율 한도 | 70% | 없음 | `--gated-mps-pct` 생략 |
+| 기존 수신기 옆 AI 단위 | 128 token만 | GPU당 4셀: 128/512/1024 모두, 5셀: 128만 | `--unit-gating .../conv=128,512,1024` |
+| NRx 옆 AI | 그 NRx가 마감 안에 끝나면 허용 | 마감 조건 + 빈 lane이 R개 이상(4 lane에서 R=3: 다른 NRx가 없을 때만) | `controller4.py`의 `free_lane_reserve`, `--unit-gating ...+reserve3` |
+| 겹침 한도(128/512/1024) | 10.1 / 9.8 / 10.3 ms (p99.9) | 8.1 / 8.5 / 8.7 ms (낮은 우선순위에서 p99 + 여유) | `v13_cal.sh` |
+| AI 입장 제어 | 시간 제한 안에 끝난다고 예측되면 받음 | 제한의 75% 안에 끝난다고 예측되면 받음(모든 방식 공통) | `--ai-admission-fraction 0.75` |
+| 부하 모양 | 일정, 버스트, 교대(phased) | + 무작위 계단(`steps`) | `activity.py`, `--activity-mode steps` |
+| AI 도착 | Poisson | + 간격 변동계수 지정 | `ai_arrivals.py`, `--ai-arrival-cv` |
+| 부하 따라 비율(비교 대상) | 비율 2개 | 비율 3개까지(`--dynamic-levels`), 낮은 우선순위 결합 | `controller4.py`, `ai_worker_dyn.py` |
+
+lane 여유 규칙의 동작(`controller4.py`, AI 허락 단계): GPU g에 돌고 있는 NRx가 있고 서버 전체의 빈 lane 수가
+R보다 작으면, 이번 루프에서 g에는 AI 조각을 주지 않는다. NRx가 없는 GPU에는 이 규칙이 적용되지 않는다.
+이미 준 조각은 끝까지 돈다(낮은 우선순위라 조각 하나가 무선 옆에서 중앙값 2.3 ms, p99 8.7 ms 걸림).
+

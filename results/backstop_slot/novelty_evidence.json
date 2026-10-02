@@ -1,0 +1,862 @@
+{
+  "generality": [
+    {
+      "profile": "weak_rank1 (evaluation)",
+      "tbs": 1024,
+      "conv_fails": 307,
+      "nrx_rescues": 29,
+      "rescues_kept_by_rule": 28,
+      "nrx_runs_with_rule": 197,
+      "by_failed_code_blocks": {
+        "1": {
+          "conv_fails": 197,
+          "nrx_rescues": 28
+        },
+        "2": {
+          "conv_fails": 65,
+          "nrx_rescues": 1
+        },
+        "3": {
+          "conv_fails": 28,
+          "nrx_rescues": 0
+        },
+        "4": {
+          "conv_fails": 17,
+          "nrx_rescues": 0
+        }
+      }
+    },
+    {
+      "profile": "weak_cdl_e",
+      "tbs": 512,
+      "conv_fails": 166,
+      "nrx_rescues": 17,
+      "rescues_kept_by_rule": 17,
+      "nrx_runs_with_rule": 107,
+      "by_failed_code_blocks": {
+        "1": {
+          "conv_fails": 107,
+          "nrx_rescues": 17
+        },
+        "2": {
+          "conv_fails": 39,
+          "nrx_rescues": 0
+        },
+        "3": {
+          "conv_fails": 15,
+          "nrx_rescues": 0
+        },
+        "4": {
+          "conv_fails": 5,
+          "nrx_rescues": 0
+        }
+      }
+    },
+    {
+      "profile": "weak_wide_snr",
+      "tbs": 512,
+      "conv_fails": 228,
+      "nrx_rescues": 5,
+      "rescues_kept_by_rule": 4,
+      "nrx_runs_with_rule": 33,
+      "by_failed_code_blocks": {
+        "1": {
+          "conv_fails": 33,
+          "nrx_rescues": 4
+        },
+        "2": {
+          "conv_fails": 26,
+          "nrx_rescues": 1
+        },
+        "3": {
+          "conv_fails": 20,
+          "nrx_rescues": 0
+        },
+        "4": {
+          "conv_fails": 149,
+          "nrx_rescues": 0
+        }
+      }
+    },
+    {
+      "profile": "weak_mcs4",
+      "tbs": 512,
+      "conv_fails": 138,
+      "nrx_rescues": 6,
+      "rescues_kept_by_rule": 6,
+      "nrx_runs_with_rule": 31,
+      "by_failed_code_blocks": {
+        "1": {
+          "conv_fails": 31,
+          "nrx_rescues": 6
+        },
+        "2": {
+          "conv_fails": 16,
+          "nrx_rescues": 0
+        },
+        "3": {
+          "conv_fails": 91,
+          "nrx_rescues": 0
+        }
+      }
+    }
+  ],
+  "ablation_16cells": {
+    "4": [
+      {
+        "variant": "Our Scheme",
+        "late_tbs": 11.5,
+        "decoded_on_time": 0.8602543969849246,
+        "rescues": 1075.0,
+        "nrx_runs": 6310.5,
+        "nrx_late": 40.5,
+        "conv_p99_ms": 1.41723079,
+        "ai_slo_tokens_per_s": 6959.450000000001,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 64.33802231249999,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1082,
+          1068
+        ],
+        "per_seed_slo": [
+          6871.3,
+          7047.6
+        ]
+      },
+      {
+        "variant": "- value rule",
+        "late_tbs": 16.0,
+        "decoded_on_time": 0.8604663944723618,
+        "rescues": 1084.5,
+        "nrx_runs": 9724.0,
+        "nrx_late": 62.5,
+        "conv_p99_ms": 1.4247058099999999,
+        "ai_slo_tokens_per_s": 4101.25,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 139.2068148125,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1108,
+          1061
+        ],
+        "per_seed_slo": [
+          4764.1,
+          3438.4
+        ]
+      },
+      {
+        "variant": "- deadline admission",
+        "late_tbs": 5.0,
+        "decoded_on_time": 0.8604978015075377,
+        "rescues": 1074.0,
+        "nrx_runs": 6386.5,
+        "nrx_late": 80.5,
+        "conv_p99_ms": 1.4181266799999999,
+        "ai_slo_tokens_per_s": 6873.6,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 66.21285118750001,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1079,
+          1069
+        ],
+        "per_seed_slo": [
+          6788.6,
+          6958.599999999999
+        ]
+      },
+      {
+        "variant": "- lane sharing (partner GPU only)",
+        "late_tbs": 16.0,
+        "decoded_on_time": 0.8599403266331658,
+        "rescues": 1053.5,
+        "nrx_runs": 5691.0,
+        "nrx_late": 33.5,
+        "conv_p99_ms": 1.4227745649999999,
+        "ai_slo_tokens_per_s": 7040.450000000001,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 61.52887200000001,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1063,
+          1044
+        ],
+        "per_seed_slo": [
+          6840.2,
+          7240.700000000001
+        ]
+      },
+      {
+        "variant": "- latest-start start (conventional failure only)",
+        "late_tbs": 15.0,
+        "decoded_on_time": 0.8602622487437186,
+        "rescues": 1068.5,
+        "nrx_runs": 6304.0,
+        "nrx_late": 51.0,
+        "conv_p99_ms": 1.42673561,
+        "ai_slo_tokens_per_s": 6651.299999999999,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 71.3075069375,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1071,
+          1066
+        ],
+        "per_seed_slo": [
+          6357.4,
+          6945.2
+        ]
+      },
+      {
+        "variant": "- conventional first (NeuralRx at arrival)",
+        "late_tbs": 16.5,
+        "decoded_on_time": 0.8519707914572865,
+        "rescues": 545.0,
+        "nrx_runs": 15851.0,
+        "nrx_late": 46.5,
+        "conv_p99_ms": 1.7508126000000002,
+        "ai_slo_tokens_per_s": 3397.4500000000003,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 139.28671325,
+        "seeds": 2,
+        "per_seed_rescues": [
+          537,
+          553
+        ],
+        "per_seed_slo": [
+          3949.6000000000004,
+          2845.3
+        ]
+      },
+      {
+        "variant": "- co-run gating (fixed 50% share)",
+        "late_tbs": 11.5,
+        "decoded_on_time": 0.8597832914572865,
+        "rescues": 1034.0,
+        "nrx_runs": 6285.0,
+        "nrx_late": 218.5,
+        "conv_p99_ms": 1.4318191649999998,
+        "ai_slo_tokens_per_s": 7656.4,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 41.1105698125,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1023,
+          1045
+        ],
+        "per_seed_slo": [
+          7495.7,
+          7817.1
+        ]
+      },
+      {
+        "variant": "- co-run (AI only when radio idle)",
+        "late_tbs": 11.0,
+        "decoded_on_time": 0.8603486180904523,
+        "rescues": 1068.5,
+        "nrx_runs": 6303.5,
+        "nrx_late": 72.5,
+        "conv_p99_ms": 1.372270125,
+        "ai_slo_tokens_per_s": 901.2,
+        "ai_tokens_per_s": 7459.9,
+        "ttft_p50_ms": 476.828849375,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1078,
+          1059
+        ],
+        "per_seed_slo": [
+          1137.6,
+          664.8000000000001
+        ]
+      }
+    ],
+    "8": [
+      {
+        "variant": "Our Scheme",
+        "late_tbs": 15.5,
+        "decoded_on_time": 0.8603800251256282,
+        "rescues": 1075.0,
+        "nrx_runs": 6306.0,
+        "nrx_late": 34.0,
+        "conv_p99_ms": 1.41808277,
+        "ai_slo_tokens_per_s": 8741.099999999999,
+        "ai_tokens_per_s": 13254.55,
+        "ttft_p50_ms": 108.1226330625,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1076,
+          1074
+        ],
+        "per_seed_slo": [
+          8361.9,
+          9120.3
+        ]
+      },
+      {
+        "variant": "- value rule",
+        "late_tbs": 13.0,
+        "decoded_on_time": 0.860144472361809,
+        "rescues": 1064.0,
+        "nrx_runs": 9698.0,
+        "nrx_late": 166.0,
+        "conv_p99_ms": 1.426139785,
+        "ai_slo_tokens_per_s": 1590.05,
+        "ai_tokens_per_s": 12057.2,
+        "ttft_p50_ms": 777.9269836875,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1088,
+          1040
+        ],
+        "per_seed_slo": [
+          1795.2999999999997,
+          1384.8000000000002
+        ]
+      },
+      {
+        "variant": "- deadline admission",
+        "late_tbs": 13.5,
+        "decoded_on_time": 0.8603486180904523,
+        "rescues": 1078.5,
+        "nrx_runs": 6384.5,
+        "nrx_late": 68.5,
+        "conv_p99_ms": 1.4192367899999998,
+        "ai_slo_tokens_per_s": 7689.549999999999,
+        "ai_tokens_per_s": 13212.900000000001,
+        "ttft_p50_ms": 137.477196375,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1084,
+          1073
+        ],
+        "per_seed_slo": [
+          7507.5,
+          7871.599999999999
+        ]
+      },
+      {
+        "variant": "- lane sharing (partner GPU only)",
+        "late_tbs": 4.5,
+        "decoded_on_time": 0.8600109924623116,
+        "rescues": 1054.5,
+        "nrx_runs": 5690.0,
+        "nrx_late": 26.0,
+        "conv_p99_ms": 1.43725089,
+        "ai_slo_tokens_per_s": 8766.35,
+        "ai_tokens_per_s": 13212.9,
+        "ttft_p50_ms": 111.974602,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1056,
+          1053
+        ],
+        "per_seed_slo": [
+          8961.2,
+          8571.5
+        ]
+      },
+      {
+        "variant": "- latest-start start (conventional failure only)",
+        "late_tbs": 14.5,
+        "decoded_on_time": 0.8600345477386935,
+        "rescues": 1061.0,
+        "nrx_runs": 6299.5,
+        "nrx_late": 105.5,
+        "conv_p99_ms": 1.442337185,
+        "ai_slo_tokens_per_s": 7307.85,
+        "ai_tokens_per_s": 13090.8,
+        "ttft_p50_ms": 146.63081475,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1071,
+          1051
+        ],
+        "per_seed_slo": [
+          6868.599999999999,
+          7747.1
+        ]
+      },
+      {
+        "variant": "- conventional first (NeuralRx at arrival)",
+        "late_tbs": 14.5,
+        "decoded_on_time": 0.8519472361809045,
+        "rescues": 539.0,
+        "nrx_runs": 15813.0,
+        "nrx_late": 54.0,
+        "conv_p99_ms": 1.6903662799999997,
+        "ai_slo_tokens_per_s": 3580.2000000000003,
+        "ai_tokens_per_s": 12808.1,
+        "ttft_p50_ms": 349.84184612499996,
+        "seeds": 2,
+        "per_seed_rescues": [
+          558,
+          520
+        ],
+        "per_seed_slo": [
+          3908.8,
+          3251.6000000000004
+        ]
+      },
+      {
+        "variant": "- co-run gating (fixed 50% share)",
+        "late_tbs": 10.0,
+        "decoded_on_time": 0.8592807788944723,
+        "rescues": 1005.5,
+        "nrx_runs": 6273.0,
+        "nrx_late": 456.0,
+        "conv_p99_ms": 1.4611745649999999,
+        "ai_slo_tokens_per_s": 12786.550000000001,
+        "ai_tokens_per_s": 13533.9,
+        "ttft_p50_ms": 53.470941499999995,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1020,
+          991
+        ],
+        "per_seed_slo": [
+          12446.7,
+          13126.400000000001
+        ]
+      },
+      {
+        "variant": "- co-run (AI only when radio idle)",
+        "late_tbs": 11.5,
+        "decoded_on_time": 0.8600973618090453,
+        "rescues": 1065.0,
+        "nrx_runs": 6312.5,
+        "nrx_late": 65.0,
+        "conv_p99_ms": 1.33156988,
+        "ai_slo_tokens_per_s": 469.6,
+        "ai_tokens_per_s": 10723.650000000001,
+        "ttft_p50_ms": 1458.7457484375,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1067,
+          1063
+        ],
+        "per_seed_slo": [
+          514.0,
+          425.2
+        ]
+      }
+    ]
+  },
+  "ai_load_16cells": {
+    "Our Scheme": {
+      "4": {
+        "late_tbs": 11.5,
+        "decoded_on_time": 0.8602543969849246,
+        "rescues": 1075.0,
+        "nrx_runs": 6310.5,
+        "nrx_late": 40.5,
+        "conv_p99_ms": 1.41723079,
+        "ai_slo_tokens_per_s": 6959.450000000001,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 64.33802231249999,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1082,
+          1068
+        ],
+        "per_seed_slo": [
+          6871.3,
+          7047.6
+        ]
+      },
+      "8": {
+        "late_tbs": 15.5,
+        "decoded_on_time": 0.8603800251256282,
+        "rescues": 1075.0,
+        "nrx_runs": 6306.0,
+        "nrx_late": 34.0,
+        "conv_p99_ms": 1.41808277,
+        "ai_slo_tokens_per_s": 8741.099999999999,
+        "ai_tokens_per_s": 13254.55,
+        "ttft_p50_ms": 108.1226330625,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1076,
+          1074
+        ],
+        "per_seed_slo": [
+          8361.9,
+          9120.3
+        ]
+      },
+      "12": {
+        "late_tbs": 12.0,
+        "decoded_on_time": 0.8602936557788945,
+        "rescues": 1074.5,
+        "nrx_runs": 6311.5,
+        "nrx_late": 36.5,
+        "conv_p99_ms": 1.40619923,
+        "ai_slo_tokens_per_s": 4987.0,
+        "ai_tokens_per_s": 19443.949999999997,
+        "ttft_p50_ms": 416.099971,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1075,
+          1074
+        ],
+        "per_seed_slo": [
+          4685.8,
+          5288.2
+        ]
+      }
+    },
+    "fixed 30% share": {
+      "4": {
+        "late_tbs": 10.0,
+        "decoded_on_time": 0.8598618090452261,
+        "rescues": 1042.5,
+        "nrx_runs": 6309.5,
+        "nrx_late": 159.5,
+        "conv_p99_ms": 1.41266199,
+        "ai_slo_tokens_per_s": 7142.85,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 54.5591881875,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1058,
+          1027
+        ],
+        "per_seed_slo": [
+          6942.6,
+          7343.1
+        ]
+      },
+      "8": {
+        "late_tbs": 17.0,
+        "decoded_on_time": 0.8596969221105528,
+        "rescues": 1033.0,
+        "nrx_runs": 6289.5,
+        "nrx_late": 275.5,
+        "conv_p99_ms": 1.4410739,
+        "ai_slo_tokens_per_s": 10862.2,
+        "ai_tokens_per_s": 13424.349999999999,
+        "ttft_p50_ms": 76.09163487500001,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1054,
+          1012
+        ],
+        "per_seed_slo": [
+          10461.9,
+          11262.5
+        ]
+      },
+      "12": {
+        "late_tbs": 12.0,
+        "decoded_on_time": 0.8562342964824121,
+        "rescues": 819.5,
+        "nrx_runs": 6183.0,
+        "nrx_late": 1337.0,
+        "conv_p99_ms": 1.4843695549999998,
+        "ai_slo_tokens_per_s": 10934.9,
+        "ai_tokens_per_s": 20429.800000000003,
+        "ttft_p50_ms": 172.20791256249998,
+        "seeds": 2,
+        "per_seed_rescues": [
+          843,
+          796
+        ],
+        "per_seed_slo": [
+          10839.0,
+          11030.8
+        ]
+      }
+    },
+    "fixed 50% share": {
+      "4": {
+        "late_tbs": 11.5,
+        "decoded_on_time": 0.8597832914572865,
+        "rescues": 1034.0,
+        "nrx_runs": 6285.0,
+        "nrx_late": 218.5,
+        "conv_p99_ms": 1.4318191649999998,
+        "ai_slo_tokens_per_s": 7656.4,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 41.1105698125,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1023,
+          1045
+        ],
+        "per_seed_slo": [
+          7495.7,
+          7817.1
+        ]
+      },
+      "8": {
+        "late_tbs": 10.0,
+        "decoded_on_time": 0.8592807788944723,
+        "rescues": 1005.5,
+        "nrx_runs": 6273.0,
+        "nrx_late": 456.0,
+        "conv_p99_ms": 1.4611745649999999,
+        "ai_slo_tokens_per_s": 12786.550000000001,
+        "ai_tokens_per_s": 13533.9,
+        "ttft_p50_ms": 53.470941499999995,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1020,
+          991
+        ],
+        "per_seed_slo": [
+          12446.7,
+          13126.400000000001
+        ]
+      },
+      "12": {
+        "late_tbs": 26.0,
+        "decoded_on_time": 0.8556611180904523,
+        "rescues": 787.0,
+        "nrx_runs": 5992.5,
+        "nrx_late": 1367.5,
+        "conv_p99_ms": 1.53898318,
+        "ai_slo_tokens_per_s": 17677.1,
+        "ai_tokens_per_s": 20634.55,
+        "ttft_p50_ms": 81.6598884375,
+        "seeds": 2,
+        "per_seed_rescues": [
+          657,
+          917
+        ],
+        "per_seed_slo": [
+          17485.4,
+          17868.8
+        ]
+      }
+    },
+    "fixed 70% share": {
+      "4": {
+        "late_tbs": 21.0,
+        "decoded_on_time": 0.859390703517588,
+        "rescues": 1016.0,
+        "nrx_runs": 6252.0,
+        "nrx_late": 283.0,
+        "conv_p99_ms": 1.5133781699999997,
+        "ai_slo_tokens_per_s": 7656.4,
+        "ai_tokens_per_s": 7656.4,
+        "ttft_p50_ms": 33.3505520625,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1027,
+          1005
+        ],
+        "per_seed_slo": [
+          7495.7,
+          7817.1
+        ]
+      },
+      "8": {
+        "late_tbs": 18.5,
+        "decoded_on_time": 0.8578439070351759,
+        "rescues": 925.5,
+        "nrx_runs": 6096.0,
+        "nrx_late": 729.5,
+        "conv_p99_ms": 1.5723132999999998,
+        "ai_slo_tokens_per_s": 13106.85,
+        "ai_tokens_per_s": 13533.9,
+        "ttft_p50_ms": 45.036417625,
+        "seeds": 2,
+        "per_seed_rescues": [
+          909,
+          942
+        ],
+        "per_seed_slo": [
+          12818.2,
+          13395.5
+        ]
+      },
+      "12": {
+        "late_tbs": 16.5,
+        "decoded_on_time": 0.8560380025125628,
+        "rescues": 803.0,
+        "nrx_runs": 6064.0,
+        "nrx_late": 1357.5,
+        "conv_p99_ms": 1.55409854,
+        "ai_slo_tokens_per_s": 19456.95,
+        "ai_tokens_per_s": 20704.5,
+        "ttft_p50_ms": 64.8986116875,
+        "seeds": 2,
+        "per_seed_rescues": [
+          828,
+          778
+        ],
+        "per_seed_slo": [
+          19218.4,
+          19695.5
+        ]
+      }
+    }
+  },
+  "weak_fraction_16cells": {
+    "025": {
+      "Our Scheme": {
+        "late_tbs": 10.0,
+        "decoded_on_time": 0.9315326633165829,
+        "rescues": 413.0,
+        "nrx_runs": 2855.5,
+        "nrx_late": 30.5,
+        "conv_p99_ms": 1.433007825,
+        "ai_slo_tokens_per_s": 11526.349999999999,
+        "ai_tokens_per_s": 13485.4,
+        "ttft_p50_ms": 70.42714225,
+        "seeds": 2,
+        "per_seed_rescues": [
+          433,
+          393
+        ],
+        "per_seed_slo": [
+          10846.1,
+          12206.599999999999
+        ]
+      },
+      "our NeuralRx rule + fixed 50% share": {
+        "late_tbs": 15.5,
+        "decoded_on_time": 0.9309359296482412,
+        "rescues": 393.0,
+        "nrx_runs": 2871.0,
+        "nrx_late": 139.5,
+        "conv_p99_ms": 1.438512405,
+        "ai_slo_tokens_per_s": 12937.85,
+        "ai_tokens_per_s": 13533.9,
+        "ttft_p50_ms": 50.2743638125,
+        "seeds": 2,
+        "per_seed_rescues": [
+          413,
+          373
+        ],
+        "per_seed_slo": [
+          12679.2,
+          13196.5
+        ]
+      },
+      "both receivers at arrival, deadline drop + fixed 50% share": {
+        "late_tbs": 25.0,
+        "decoded_on_time": 0.9305826005025126,
+        "rescues": 374.5,
+        "nrx_runs": 14716.5,
+        "nrx_late": 731.0,
+        "conv_p99_ms": 1.84673271,
+        "ai_slo_tokens_per_s": 10208.4,
+        "ai_tokens_per_s": 13261.25,
+        "ttft_p50_ms": 89.56076974999999,
+        "seeds": 2,
+        "per_seed_rescues": [
+          378,
+          371
+        ],
+        "per_seed_slo": [
+          9833.0,
+          10583.8
+        ]
+      },
+      "no AI": {
+        "late_tbs": 10.5,
+        "decoded_on_time": 0.9314462939698492,
+        "rescues": 417.0,
+        "nrx_runs": 2859.5,
+        "nrx_late": 20.0,
+        "conv_p99_ms": 1.315332095,
+        "ai_slo_tokens_per_s": 0.0,
+        "ai_tokens_per_s": 0.0,
+        "ttft_p50_ms": null,
+        "seeds": 2,
+        "per_seed_rescues": [
+          433,
+          401
+        ],
+        "per_seed_slo": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "075": {
+      "Our Scheme": {
+        "late_tbs": 9.0,
+        "decoded_on_time": 0.796097675879397,
+        "rescues": 1339.0,
+        "nrx_runs": 8970.5,
+        "nrx_late": 44.5,
+        "conv_p99_ms": 1.3913715,
+        "ai_slo_tokens_per_s": 3908.1000000000004,
+        "ai_tokens_per_s": 12802.25,
+        "ttft_p50_ms": 369.8346115,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1313,
+          1365
+        ],
+        "per_seed_slo": [
+          4222.3,
+          3593.9
+        ]
+      },
+      "our NeuralRx rule + fixed 50% share": {
+        "late_tbs": 16.5,
+        "decoded_on_time": 0.7923680904522613,
+        "rescues": 1104.5,
+        "nrx_runs": 8730.0,
+        "nrx_late": 1139.5,
+        "conv_p99_ms": 1.4703516949999997,
+        "ai_slo_tokens_per_s": 12469.5,
+        "ai_tokens_per_s": 13524.05,
+        "ttft_p50_ms": 59.13024675,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1030,
+          1179
+        ],
+        "per_seed_slo": [
+          12139.5,
+          12799.5
+        ]
+      },
+      "both receivers at arrival, deadline drop + fixed 50% share": {
+        "late_tbs": 13.5,
+        "decoded_on_time": 0.7818074748743719,
+        "rescues": 425.5,
+        "nrx_runs": 15101.0,
+        "nrx_late": 910.5,
+        "conv_p99_ms": 1.765971655,
+        "ai_slo_tokens_per_s": 10119.8,
+        "ai_tokens_per_s": 13261.25,
+        "ttft_p50_ms": 90.7384705625,
+        "seeds": 2,
+        "per_seed_rescues": [
+          411,
+          440
+        ],
+        "per_seed_slo": [
+          9726.0,
+          10513.599999999999
+        ]
+      },
+      "no AI": {
+        "late_tbs": 8.5,
+        "decoded_on_time": 0.7958778266331659,
+        "rescues": 1316.5,
+        "nrx_runs": 8970.5,
+        "nrx_late": 24.0,
+        "conv_p99_ms": 1.303675615,
+        "ai_slo_tokens_per_s": 0.0,
+        "ai_tokens_per_s": 0.0,
+        "ttft_p50_ms": null,
+        "seeds": 2,
+        "per_seed_rescues": [
+          1308,
+          1325
+        ],
+        "per_seed_slo": [
+          0.0,
+          0.0
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "targets": {
+    "l1": 0.0005,
+    "rescue": 0.99
+  },
+  "settings": {
+    "a": {
+      "no_ai_rescues": {
+        "1": 2241.5,
+        "2": 2146.0
+      },
+      "no_ai_l1": {
+        "1": [
+          0.0001821608040201005,
+          0.00014447236180904522
+        ],
+        "2": [
+          0.00020100502512562814,
+          0.00032035175879396985
+        ]
+      },
+      "rows": [
+        {
+          "policy": "Our Scheme",
+          "ai_rate": 2,
+          "seeds": 2,
+          "slo": 0.0,
+          "rescue_min": 0.9986020503261882,
+          "rescue_mean": 0.9989664277952601,
+          "l1_max": 0.0006909547738693468,
+          "nrx_late": 1.0,
+          "compliant": false
+        },
+        {
+          "policy": "Our Scheme",
+          "ai_rate": 4,
+          "seeds": 2,
+          "slo": 4.15,
+          "rescue_min": 0.9979924157929958,
+          "rescue_mean": 0.9992291995087998,
+          "l1_max": 0.000521356783919598,
+          "nrx_late": 0.0,
+          "compliant": false
+        },
+        {
+          "policy": "fixed 30% share",
+          "ai_rate": 2,
+          "seeds": 2,
+          "slo": 3450.95,
+          "rescue_min": 0.9981360671015843,
+          "rescue_mean": 0.9989565010948475,
+          "l1_max": 0.0004271356783919598,
+          "nrx_late": 0.0,
+          "compliant": true
+        },
+        {
+          "policy": "fixed 30% share",
+          "ai_rate": 4,
+          "seeds": 2,
+          "slo": 6292.15,
+          "rescue_min": 0.9962078964978809,
+          "rescue_mean": 0.9981039482489404,
+          "l1_max": 0.0004020100502512563,
+          "nrx_late": 1.0,
+          "compliant": true
+        },
+        {
+          "policy": "fixed 50% share",
+          "ai_rate": 2,
+          "seeds": 2,
+          "slo": 3502.1500000000005,
+          "rescue_min": 0.9967381174277726,
+          "rescue_mean": 0.9975883315222736,
+          "l1_max": 0.000785175879396985,
+          "nrx_late": 1.0,
+          "compliant": false
+        },
+        {
+          "policy": "fixed 50% share",
+          "ai_rate": 4,
+          "seeds": 2,
+          "slo": 6343.35,
+          "rescue_min": 0.994408201304753,
+          "rescue_mean": 0.995977243636985,
+          "l1_max": 0.0011055276381909548,
+          "nrx_late": 1.0,
+          "compliant": false
+        }
+      ],
+      "capacity": {
+        "Our Scheme": {
+          "best": 0.0,
+          "at": null,
+          "first_fail": {
+            "ai_rate": 2,
+            "slo": 0.0
+          }
+        },
+        "fixed 30% share": {
+          "best": 6292.15,
+          "at": 4,
+          "first_fail": null
+        },
+        "fixed 50% share": {
+          "best": 0.0,
+          "at": null,
+          "first_fail": {
+            "ai_rate": 2,
+            "slo": 3502.1500000000005
+          }
+        }
+      }
+    },
+    "b": {
+      "no_ai_rescues": {
+        "1": 1453.5,
+        "2": 1476.0
+      },
+      "no_ai_l1": {
+        "1": [
+          0.0002512562814070352,
+          0.00022508375209380236
+        ],
+        "2": [
+          0.0002669597989949749,
+          0.0002617252931323283
+        ]
+      },
+      "rows": [
+        {
+          "policy": "Our Scheme",
+          "ai_rate": 2,
+          "seeds": 2,
+          "slo": 0.0,
+          "rescue_min": 0.9914000687994496,
+          "rescue_mean": 0.995361281012191,
+          "l1_max": 0.00045540201005025125,
+          "nrx_late": 0.0,
+          "compliant": true
+        },
+        {
+          "policy": "Our Scheme",
+          "ai_rate": 4,
+          "seeds": 2,
+          "slo": 0.0,
+          "rescue_min": 0.9920880632954936,
+          "rescue_mean": 0.9923177443848742,
+          "l1_max": 0.0004920435510887772,
+          "nrx_late": 0.5,
+          "compliant": true
+        },
+        {
+          "policy": "fixed 30% share",
+          "ai_rate": 2,
+          "seeds": 2,
+          "slo": 3450.95,
+          "rescue_min": 0.9898373983739838,
+          "rescue_mean": 0.9913067280827608,
+          "l1_max": 0.0004396984924623116,
+          "nrx_late": 1.0,
+          "compliant": false
+        },
+        {
+          "policy": "fixed 30% share",
+          "ai_rate": 4,
+          "seeds": 2,
+          "slo": 6292.15,
+          "rescue_min": 0.9898373983739838,
+          "rescue_mean": 0.9923387198268268,
+          "l1_max": 0.000675251256281407,
+          "nrx_late": 1.0,
+          "compliant": false
+        },
+        {
+          "policy": "fixed 50% share",
+          "ai_rate": 2,
+          "seeds": 2,
+          "slo": 3502.1499999999996,
+          "rescue_min": 0.9914000687994496,
+          "rescue_mean": 0.9946837742371232,
+          "l1_max": 0.0009265075376884422,
+          "nrx_late": 1.0,
+          "compliant": false
+        },
+        {
+          "policy": "fixed 50% share",
+          "ai_rate": 4,
+          "seeds": 2,
+          "slo": 6343.35,
+          "rescue_min": 0.9911924119241192,
+          "rescue_mean": 0.9919842348578285,
+          "l1_max": 0.0004972780569514238,
+          "nrx_late": 0.0,
+          "compliant": true
+        }
+      ],
+      "capacity": {
+        "Our Scheme": {
+          "best": 0.0,
+          "at": null,
+          "first_fail": null
+        },
+        "fixed 30% share": {
+          "best": 0.0,
+          "at": null,
+          "first_fail": {
+            "ai_rate": 2,
+            "slo": 3450.95
+          }
+        },
+        "fixed 50% share": {
+          "best": 6343.35,
+          "at": 4,
+          "first_fail": null
+        }
+      }
+    }
+  }
+}

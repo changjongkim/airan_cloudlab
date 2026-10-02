@@ -1,4 +1,30 @@
-# SoftWall 현재 권위 문서 인덱스
+# 현재 권위 문서 인덱스
+
+**기준일:** 2026-10-01
+
+## 슬롯 단위 Backstop (최신 스킴, 2026-09-29 ~)
+
+지금 구현된 스킴은 아래 문서가 기준이다. 논문 본문과 발표 자료에는 아직 반영하지 않았다.
+
+- **[수신기 검증과 다시 한 실험](BACKSTOP_V4_VERIFICATION_KO.md) (2026-10-01, 먼저 읽을 것):** NRx 입력 교정, LDPC 반복
+  횟수를 맞춘 수신기 비교, NVlabs 공개 NRx 둘(nrx_rt, nrx_large) 검증, 실험 네 판(v4, v5, v6, v7), 지금 쓸 수 있는
+  문장. 주장의 기준은 v7(큰 모델을 rescue로)이다. 아래 결과 문서의 "살린 TB" 수치는 이 문서로 대체된다.
+- 논문 초안(LaTeX, 10쪽): `paper/backstop_slot_v7/main.tex`, `main.pdf`. 새 스킴과 v7 결과로 쓴 초안이다. 구조 그림과 실측
+  시간표 그림이 들어 있다. 이전 스킴의 논문 `paper/softwall_sigmetrics27`은 그대로 두었다.
+- [논문용 영문 문단 초안](BACKSTOP_V7_PAPER_DRAFT_EN.md): LaTeX 초안을 쓰기 전의 문단 모음.
+
+- [설계](BACKSTOP_SLOT_DESIGN_KO.md): 마감 두 개, NRx 규칙, AI 규칙, 시간 한도, 코드 위치, 실행 방법, 알려진 틈
+- [결과](BACKSTOP_SLOT_RESULTS_KO.md): 유효한 실험과 폐기한 실험, 무선 목표를 지키며 낸 AI 처리량, 읽을 때 주의
+- [기존 연구와 다른 점](BACKSTOP_SLOT_DIFFERENTIATION_KO.md): 기존 연구가 돌리는 무선 작업, 동작 방식 차이 다섯 가지, 쓸 수 있는 문장
+
+- [스케줄러 발전 계획과 진행 기록](BACKSTOP_SLACK_BUDGET_PLAN_KO.md): 지금까지의 정리, 여유 예산 방식(v3) 계획, 단계별 결과
+
+과정 기록(수치를 인용할 때는 위 결과 문서를 따른다):
+
+- [슬롯 단위 재설계 기록](BACKSTOP_SLOT_SCALE_REDESIGN_KO.md): 8·16셀, 마감 하나(4.0 ms)였던 첫 구성과 ablation
+- [연속 슬롯 확장 계획과 실행 기록](BACKSTOP_CONTINUOUS_SLOT_PLAN_KO.md): 계획, 부품 측정, 폐기한 v2 결과, 버그 수정, 최종 비교
+
+## 논문 현재판 (SoftWall/Backstop P180·D155)
 
 **기준일:** 2026-09-25  
 **현재 연구축:** MIG-off MPS 기반 certified conditional-recovery substrate와 provenance-qualified feasibility envelope  

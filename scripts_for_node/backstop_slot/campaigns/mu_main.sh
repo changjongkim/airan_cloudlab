@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # MU-MIMO weak cells (two UEs, 16QAM, 273 PRBs) with the public NVlabs neural receiver as
-# NeuralRx.  Our Scheme vs fixed GPU shares, same NeuralRx rules, AI units, admission and
+# NeuralRx.  Antiphase vs fixed GPU shares, same NeuralRx rules, AI units, admission and
 # global dispatch.  Bounds come from mu_cal.sh:
 #   NRX_BOUND  NeuralRx run bound without AI      TABLE  co-run bound per AI unit size (70% share)
 #   KFAIL      most failed code blocks (both UEs) that still get a NeuralRx

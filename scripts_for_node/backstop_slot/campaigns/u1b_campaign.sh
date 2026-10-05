@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# U1: unit-aware Our Scheme (100% AI share, co-run bound per AI chunk from U0) vs fixed
+# U1: unit-aware Antiphase (100% AI share, co-run bound per AI chunk from U0) vs fixed
 # shares 30/50/70/100% and the prior-work combination; fair AI units (128/512/1024),
 # token-based AI admission for every policy, AI 12 req/s, 2 seeds.
 set -uo pipefail

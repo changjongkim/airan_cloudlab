@@ -16,8 +16,8 @@ ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 JOB = sys.argv[1] if len(sys.argv) > 1 else "59115134"
 D2 = ["4.0", "5.0", "6.5", "11.5", "21.5", "41.5"]
 POLICIES = [
-    ("Our Scheme", "x{s}d{t}_c16_rescue_value_backstop_corun"),
-    ("Our Scheme, 3 ms AI pieces", "x{s}d{t}p3_c16_rescue_value_backstop_corun"),
+    ("Antiphase", "x{s}d{t}_c16_rescue_value_backstop_corun"),
+    ("Antiphase, 3 ms AI pieces", "x{s}d{t}p3_c16_rescue_value_backstop_corun"),
     ("fixed 50% GPU share", "x{s}d{t}_c16_rescue_value_static"),
     ("fixed 70% GPU share", "x{s}d{t}s70_c16_rescue_value_static"),
 ]
@@ -57,7 +57,7 @@ def main() -> None:
         print(f"| {r['policy']} | {r['rescue_deadline_ms']} | {r['rescues']:.0f} | {r['nrx_late']:.0f} | "
               f"{r['late_tbs']:.0f} | {r['retx']:.0f} | {r['slo']:.0f} |")
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.8))
-    colors = {"Our Scheme": "tab:blue", "Our Scheme, 3 ms AI pieces": "tab:cyan",
+    colors = {"Antiphase": "tab:blue", "Antiphase, 3 ms AI pieces": "tab:cyan",
               "fixed 50% GPU share": "tab:orange", "fixed 70% GPU share": "tab:red"}
     for label, _ in POLICIES:
         pts = sorted((r["rescue_deadline_ms"], r["rescues"], r["slo"]) for r in rows if r["policy"] == label)

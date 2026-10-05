@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 32 cells, 1 lane: Our Scheme with co-run bounds raised by ~0.4 ms (closer to p99.9).
+# 32 cells, 1 lane: Antiphase with co-run bounds raised by ~0.4 ms (closer to p99.9).
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab
 M="bash scripts_for_node/backstop_slot/run_matrix.sh"

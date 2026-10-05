@@ -17,7 +17,7 @@ from analyze_runs import run_row  # noqa: E402
 ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 JOB = sys.argv[1]
 RUNS = sys.argv[2] if len(sys.argv) > 2 else "w"      # tag letter of the AI runs (no-AI references: w)
-LABEL = {"u": "Our Scheme (urgent class first)", "f": "Our Scheme (one line, arrival order)",
+LABEL = {"u": "Antiphase (urgent class first)", "f": "Antiphase (one line, arrival order)",
          "s50": "fixed 50% share", "s70": "fixed 70% share"}
 
 

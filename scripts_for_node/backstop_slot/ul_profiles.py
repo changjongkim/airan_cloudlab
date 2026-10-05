@@ -1,4 +1,4 @@
-"""Uplink cell profiles for the slot-scale Backstop mode.
+"""Uplink cell profiles for the slot-scale Antiphase mode.
 
 Every cell carries one full-band PUSCH allocation per uplink slot.  A weak
 (cell-edge) UE is scheduled with rank 1 and QPSK, which is the geometry the
@@ -125,5 +125,9 @@ NV_MU2 = UlProfile(
     scid=1,
 )
 
+# The same two-user cell at other 16QAM code rates (MCS 10-16 of table 1): the neural receiver
+# outputs 16QAM LLRs whatever the code rate, so one engine serves all of them (link adaptation).
+NV_MU2_BY_MCS = tuple(replace(NV_MU2, name=f"nv_mu2_m{m}", mcs_index=m) for m in range(10, 17))
+
 PROFILES = {profile.name: profile
-            for profile in (WEAK, STRONG, WEAK_E, WEAK_WIDE, WEAK_MCS4, NV_MU2)}
+            for profile in (WEAK, STRONG, WEAK_E, WEAK_WIDE, WEAK_MCS4, NV_MU2) + NV_MU2_BY_MCS}

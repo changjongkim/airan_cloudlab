@@ -318,7 +318,8 @@ def main() -> None:
             box[A_HAS_WORK] = 1 if working else 0
         if now > end_time:
             break
-        if working:
+        # While the share is being changed (no active worker), the GPU runs no AI.
+        if working and int(box[A_DYN_ACTIVE]) != 0:
             run_piece(None, int(ai.get("static_units_per_piece", 8)))
         continue
         seq = int(box[A_GRANT_SEQ])

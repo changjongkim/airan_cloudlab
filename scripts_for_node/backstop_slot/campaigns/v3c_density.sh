@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# v3c: Our Scheme with the NeuralRx slack budget (delay per ms of AI overlap instead of the
+# v3c: Antiphase with the NeuralRx slack budget (delay per ms of AI overlap instead of the
 # all-or-nothing co-run bound), calibrated conventional overlap and sustained chunk choice.
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab

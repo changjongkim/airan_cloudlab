@@ -1,0 +1,149 @@
+neural receiver alone / next to low-priority AI: r = 0.786
+
+| condition | seeds | neural receiver busy | AI time: rule, ideal | rule, measured | clairvoyant | runs cut by the clairvoyant | AI served: rule | low priority alone | clairvoyant (estimate) | rule / clairvoyant |
+|---|---|---|---|---|---|---|---|---|---|---|
+| fa c16 | 7 | 36% | 64% | 62% | 96.5% | 13.2% | 34.1k @ 99.9% | 49.0k @ 93.7% (AI on 92%) | 49.0k | 70% |
+| fb c16 | 7 | 27% | 73% | 69% | 98.1% | 9.2% | 41.4k @ 99.9% | – (offered 53.0k) | 53.0k | 78% |
+| fc c16 | 7 | 22% | 78% | 72% | 98.9% | 6.7% | 44.7k @ 100.0% | – (offered 53.0k) | 53.0k | 84% |
+| sx c16 | 2 | 18% | 82% | 77% | 99.6% | 3.0% | 46.6k @ 100.0% | – (offered 53.0k) | 53.0k | 88% |
+| sy c16 | 2 | 54% | 46% | 45% | 89.0% | 28.9% | 19.9k @ 100.0% | – (offered 53.0k) | 39.2k | 51% |
+| sw c16 | 4 | 67% | 33% | 33% | 76.1% | 48.3% | 11.8k @ 99.6% | – (offered 53.0k) | 27.3k | 43% |
+| sc c8 | 4 | 34% | 66% | 61% | 93.8% | 23.8% | 16.6k @ 100.0% | – (offered 26.5k) | 25.6k | 65% |
+| sd c8 | 4 | 61% | 39% | 35% | 78.6% | 46.3% | 6.9k @ 99.9% | – (offered 26.5k) | 15.5k | 45% |
+| sa c4 | 7 | 30% | 70% | 59% | 94.6% | 23.8% | 8.5k @ 99.8% | – (offered 13.2k) | 13.2k | 64% |
+| sb c4 | 7 | 50% | 50% | 40% | 84.8% | 42.8% | 4.5k @ 97.7% | – (offered 13.2k) | 9.6k | 47% |
+| tv c20 | 4 | 37% | 63% | 61% | 96.3% | 13.6% | 31.4k @ 99.5% | – (offered 53.0k) | 49.3k | 64% |
+| tm c32 | 4 | 37% | 63% | 62% | 97.5% | 10.6% | 33.4k @ 100.0% | – (offered 53.0k) | 52.6k | 63% |
+| tn c48 | 4 | 37% | 63% | 61% | 97.4% | 10.8% | 32.6k @ 99.7% | – (offered 53.0k) | 52.1k | 63% |
+
+fa c16: other measured policies against the clairvoyant estimate (49.0k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 7 | 34.1k | 99.9% | 70% |
+| wn | 5 | 37.6k | 100.0% | 77% |
+| s10 | 5 | 5.3k | 99.4% | 11% |
+| wr3 | 5 | 39.8k | 99.3% | 81% |
+| yyr | 5 | 9.8k | 99.1% | 20% |
+| yyp | 5 | 18.1k | 99.0% | 37% |
+| p30 | 5 | 18.0k | 98.8% | 37% |
+| vf | 2 | 39.5k | 97.8% | 81% |
+| p50 | 2 | 32.7k | 95.5% | 67% |
+| wr1 | 2 | 44.0k | 95.1% | 90% |
+| p70 | 5 | 42.4k | 94.4% | 87% |
+
+fb c16: other measured policies against the clairvoyant estimate (53.0k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 7 | 41.4k | 99.9% | 78% |
+| wn | 5 | 44.9k | 99.8% | 85% |
+| s10 | 5 | 5.7k | 99.5% | 11% |
+| wr3 | 5 | 46.1k | 99.5% | 87% |
+| d10x50l0 | 5 | 23.8k | 99.2% | 45% |
+| p30 | 5 | 20.3k | 99.2% | 38% |
+| e30x70l0 | 5 | 34.7k | 99.0% | 66% |
+| yyp | 5 | 27.2k | 97.8% | 51% |
+| p50 | 2 | 36.8k | 97.1% | 69% |
+| p70 | 5 | 46.9k | 96.0% | 88% |
+| yyr | 5 | 21.8k | 95.3% | 41% |
+
+fc c16: other measured policies against the clairvoyant estimate (53.0k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 7 | 44.7k | 100.0% | 84% |
+| wn | 5 | 47.8k | 99.9% | 90% |
+| s10 | 5 | 6.0k | 99.8% | 11% |
+| wr3 | 5 | 48.8k | 99.7% | 92% |
+| p30 | 5 | 22.2k | 99.5% | 42% |
+| e30x50x70l0 | 5 | 40.9k | 99.1% | 77% |
+| d10x30x50l0 | 5 | 30.0k | 98.6% | 57% |
+| yyp | 5 | 36.4k | 97.4% | 69% |
+| p70 | 5 | 48.6k | 97.3% | 92% |
+| yyr | 5 | 27.7k | 95.6% | 52% |
+
+sx c16: other measured policies against the clairvoyant estimate (53.0k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 2 | 46.6k | 100.0% | 88% |
+| p30 | 2 | 22.3k | 99.5% | 42% |
+| s10 | 2 | 5.7k | 99.5% | 11% |
+| p70 | 2 | 49.8k | 98.4% | 94% |
+
+sy c16: other measured policies against the clairvoyant estimate (39.2k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 2 | 19.9k | 100.0% | 51% |
+| s10 | 2 | 4.8k | 98.2% | 12% |
+| p30 | 2 | 14.1k | 97.4% | 36% |
+| p70 | 2 | 32.8k | 92.8% | 83% |
+
+sw c16: other measured policies against the clairvoyant estimate (27.3k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 4 | 11.8k | 99.6% | 43% |
+| wn | 2 | 11.9k | 99.4% | 44% |
+| wr3 | 2 | 12.7k | 98.7% | 46% |
+| s10 | 2 | 4.4k | 97.8% | 16% |
+| p30 | 2 | 11.5k | 96.0% | 42% |
+| p70 | 2 | 26.3k | 88.7% | 96% |
+
+sc c8: other measured policies against the clairvoyant estimate (25.6k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 4 | 16.6k | 100.0% | 65% |
+| wn | 2 | 17.9k | 99.6% | 70% |
+| p30 | 2 | 8.2k | 99.4% | 32% |
+| s10 | 2 | 2.4k | 99.4% | 9% |
+| wr1 | 2 | 20.1k | 95.7% | 79% |
+| p70 | 2 | 20.3k | 91.5% | 79% |
+
+sd c8: other measured policies against the clairvoyant estimate (15.5k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 4 | 6.9k | 99.9% | 45% |
+| wn | 2 | 7.0k | 100.3% | 45% |
+| s10 | 2 | 2.0k | 99.2% | 13% |
+| wr1 | 2 | 9.0k | 96.7% | 58% |
+| p30 | 2 | 5.8k | 96.6% | 37% |
+| p70 | 2 | 14.2k | 88.3% | 92% |
+
+sa c4: other measured policies against the clairvoyant estimate (13.2k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 7 | 8.5k | 99.8% | 64% |
+| p30 | 5 | 3.9k | 100.0% | 29% |
+| wn | 4 | 8.4k | 99.9% | 64% |
+| s10 | 5 | 1.1k | 99.7% | 8% |
+| p70 | 5 | 9.3k | 92.3% | 71% |
+
+sb c4: other measured policies against the clairvoyant estimate (9.6k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 7 | 4.5k | 97.7% | 47% |
+| wn | 4 | 5.3k | 98.2% | 55% |
+| s10 | 5 | 1.0k | 97.5% | 11% |
+| p30 | 5 | 2.9k | 96.8% | 30% |
+| p70 | 5 | 8.1k | 84.1% | 84% |
+
+tv c20: other measured policies against the clairvoyant estimate (49.3k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 4 | 31.4k | 99.5% | 64% |
+| s10 | 4 | 5.3k | 99.1% | 11% |
+| p30 | 4 | 17.3k | 97.0% | 35% |
+| p70 | 4 | 40.1k | 94.1% | 81% |
+
+tm c32: other measured policies against the clairvoyant estimate (52.6k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 4 | 33.4k | 100.0% | 63% |
+| s10 | 4 | 5.4k | 99.8% | 10% |
+| p30 | 4 | 17.6k | 99.2% | 33% |
+| p70 | 4 | 41.1k | 96.6% | 78% |
+
+tn c48: other measured policies against the clairvoyant estimate (52.1k tokens/s)
+| policy | seeds | AI served | recoveries kept | share of the clairvoyant |
+|---|---|---|---|---|
+| the rule | 4 | 32.6k | 99.7% | 63% |
+| s10 | 4 | 5.3k | 99.3% | 10% |
+| p30 | 4 | 17.6k | 98.5% | 34% |
+| p70 | 4 | 41.2k | 96.3% | 79% |

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Our Scheme with "yield to waiting NeuralRx": 32 cells (6.5 and 11.5 ms) and 24 cells (6.5 ms).
+# Antiphase with "yield to waiting NeuralRx": 32 cells (6.5 and 11.5 ms) and 24 cells (6.5 ms).
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab
 M="bash scripts_for_node/backstop_slot/run_matrix.sh"

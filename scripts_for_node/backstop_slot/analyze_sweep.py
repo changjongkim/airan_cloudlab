@@ -14,6 +14,7 @@ Per policy and AI rate, mean over seeds (range in the JSON):
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -22,8 +23,8 @@ import numpy as np
 
 ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 POLICY_NAMES = {
-    "vf": "Our Scheme", "i": "Radio-idle only", "p100": "Low priority, no cap",
-    "v4": "Our Scheme of v7-v12 (no priority, no lane reserve)", "ve": "Ours, AI never next to NeuralRx",
+    "vf": "Antiphase", "i": "Radio-idle only", "p100": "Low priority, no cap",
+    "v4": "Antiphase of v7-v12 (no priority, no lane reserve)", "ve": "Ours, AI never next to NeuralRx",
     "vd": "Ours, lane reserve 2", "vc": "Ours, 70% cap", "vb": "Ours, 70% cap, lane reserve 2",
     "vg": "Ours, pieces of 2.5 ms", "vh": "Ours, pieces of 1.5 ms", "vi": "Ours, pieces of 2.5 ms, lane reserve 2",
     "vj": "Ours, pieces of 1.5 ms, lane reserve 2",
@@ -32,10 +33,33 @@ POLICY_NAMES = {
 
 
 def policy_name(code: str) -> str:
+    # V14=1: tables of v14, where "Antiphase" is the rule with stoppable pieces (OUR_V14).
+    if os.environ.get("V14"):
+        if code == os.environ.get("OUR_V14", "wm"):
+            return "Antiphase"
+        if code == "vf":
+            return "Antiphase of v13 (pieces cannot stop)"
     if code in POLICY_NAMES:
         return POLICY_NAMES[code]
     if code[0] in "sp" and code[1:].isdigit():
         return f"Fixed {code[1:]}%" + (" + low priority" if code[0] == "p" else "")
+    # v14: stoppable AI pieces
+    if code == "wn":
+        return "Stoppable pieces, never next to NeuralRx, every unit size next to the conventional receiver"
+    if code == "wm":
+        return "Stoppable pieces, never next to NeuralRx"
+    if code == "ws":
+        return "Stoppable pieces, never next to NeuralRx, only the smallest units next to the conventional receiver"
+    if code == "wc":
+        return "Stoppable pieces, never next to NeuralRx, every unit size, 70% cap"
+    if code[:2] == "wr" and code[2:].isdigit():
+        return f"Stoppable pieces, next to NeuralRx while {code[2:]} free"
+    if code[:2] == "wu" and code[2:].isdigit():
+        return "Stoppable pieces, reuse-time rule" + (f" + {code[2:]} free" if code[2:] != "0" else "")
+    if code == "yyr":
+        return "Share chosen by a reliability estimator"
+    if code == "yyp":
+        return "Share chosen by a reliability estimator + low priority"
     if code[0] in "de":
         shares, lag = code[1:].split("l")
         late = "" if lag == "0" else f", {int(lag) * 2.5 / 1000:g} s late"

@@ -16,8 +16,8 @@ ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 JOB = sys.argv[1] if len(sys.argv) > 1 else "59115134"
 
 POLICIES = [
-    ("Our Scheme", "v{s}r{r}_c{c}_rescue_value_backstop_corun"),
-    ("Our Scheme, rescue by the L1 deadline", "v{s}r{r}d40_c{c}_rescue_value_backstop_corun"),
+    ("Antiphase", "v{s}r{r}_c{c}_rescue_value_backstop_corun"),
+    ("Antiphase, rescue by the L1 deadline", "v{s}r{r}d40_c{c}_rescue_value_backstop_corun"),
     ("fixed 50% GPU share", "v{s}r{r}_c{c}_rescue_value_static"),
     ("fixed 30% GPU share", "v{s}r{r}s30_c{c}_rescue_value_static"),
     ("AI only on idle GPU", "v{s}r{r}_c{c}_rescue_value_backstop"),
@@ -85,7 +85,7 @@ def main() -> None:
               f"{r['nrx_late']:.0f} | {r['ai_slo_tokens_per_s']:.0f} | {100*r['ai_rejected_fraction']:.0f}% | "
               f"{(r['ttft_p50_ms'] or 0):.0f} |")
 
-    labels = ["Our Scheme", "fixed 30% GPU share", "fixed 50% GPU share", "AI only on idle GPU",
+    labels = ["Antiphase", "fixed 30% GPU share", "fixed 50% GPU share", "AI only on idle GPU",
               "both receivers at arrival + fixed 50%"]
     colors = ["tab:blue", "tab:olive", "tab:orange", "tab:gray", "tab:purple"]
     fig, axes = plt.subplots(2, 2, figsize=(11, 6.4))

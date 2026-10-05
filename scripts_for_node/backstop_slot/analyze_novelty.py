@@ -81,7 +81,7 @@ def main() -> None:
     result = {"generality": generality()}
     ablation = {}
     variants = [
-        ("Our Scheme", "f{s}r{r}_c16_rescue_value_backstop_corun"),
+        ("Antiphase", "f{s}r{r}_c16_rescue_value_backstop_corun"),
         ("- value rule", "a{s}r{r}noval_c16_rescue_value_backstop_corun"),
         ("- deadline admission", "a{s}r{r}noadmit_c16_rescue_value_backstop_corun"),
         ("- lane sharing (partner GPU only)", "a{s}r{r}partner_c16_rescue_value_backstop_corun"),
@@ -100,7 +100,7 @@ def main() -> None:
 
     load = {}
     for label, pattern, rates in [
-        ("Our Scheme", {4: "f{s}r4_c16_rescue_value_backstop_corun", 8: "f{s}r8_c16_rescue_value_backstop_corun",
+        ("Antiphase", {4: "f{s}r4_c16_rescue_value_backstop_corun", 8: "f{s}r8_c16_rescue_value_backstop_corun",
                         12: "l{s}r12_c16_rescue_value_backstop_corun"}, (4, 8, 12)),
         ("fixed 30% share", {r: f"l{{s}}r{r}s30_c16_rescue_value_static" for r in (4, 8, 12)}, (4, 8, 12)),
         ("fixed 50% share", {4: "f{s}r4_c16_rescue_value_static", 8: "f{s}r8_c16_rescue_value_static",
@@ -117,7 +117,7 @@ def main() -> None:
     weak = {}
     for wf in ("025", "075"):
         weak[wf] = {}
-        for label, stem in [("Our Scheme", "rescue_value_backstop_corun"),
+        for label, stem in [("Antiphase", "rescue_value_backstop_corun"),
                             ("our NeuralRx rule + fixed 50% share", "rescue_value_static"),
                             ("both receivers at arrival, deadline drop + fixed 50% share", "parallel_admit_static"),
                             ("no AI", "rescue_value_none")]:
@@ -150,7 +150,7 @@ def main() -> None:
             print(f"- {wf}: {label}: {m['rescues']:.0f} / {m['nrx_runs']:.0f} / {m['ai_slo_tokens_per_s']:.0f}")
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.8))
-    colors = {"Our Scheme": "tab:blue", "fixed 30% share": "tab:olive",
+    colors = {"Antiphase": "tab:blue", "fixed 30% share": "tab:olive",
               "fixed 50% share": "tab:orange", "fixed 70% share": "tab:red"}
     for label, byrate in load.items():
         rates = sorted(int(r) for r in byrate)

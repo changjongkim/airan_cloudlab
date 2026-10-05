@@ -25,7 +25,7 @@ REF_PREFIX = "c"          # no-AI references come from the capacity campaign
 L1_TARGET, RESCUE_TARGET = 0.0005, 0.99
 SETTINGS = ([(24, "6.5", (4, 8, 12, 16, 20)), (32, "11.5", (4, 8, 12, 16)), (16, "6.5", (12, 16, 20))]
             if PREFIX == "c" else [(24, "6.5", (12, 16, 20)), (32, "11.5", (12, 16, 20))])
-POLICIES = [("Our Scheme", "u"), ("Our Scheme, 512-token units allowed during conventional", "w"),
+POLICIES = [("Antiphase", "u"), ("Antiphase, 512-token units allowed during conventional", "w"),
             ("fixed 30% share", "s30"), ("fixed 50% share", "s50"),
             ("fixed 70% share", "s70"), ("fixed 100% share", "s100")]
 
@@ -102,9 +102,9 @@ def main() -> None:
               f"(load {c['at_ai_rate']}) | {c['compliant_mean_ai_tokens_per_s']:.0f} (load {c['at_ai_rate_mean']})")
 
     fig, axes = plt.subplots(1, len(SETTINGS), figsize=(5 * len(SETTINGS), 3.8))
-    colors = {"Our Scheme": "tab:blue", "fixed 30% share": "tab:olive", "fixed 50% share": "tab:orange",
+    colors = {"Antiphase": "tab:blue", "fixed 30% share": "tab:olive", "fixed 50% share": "tab:orange",
               "fixed 70% share": "tab:red", "fixed 100% share": "tab:brown",
-              "Our Scheme, 512-token units allowed during conventional": "tab:cyan"}
+              "Antiphase, 512-token units allowed during conventional": "tab:cyan"}
     for ax, (cells, d2, _) in zip(axes, SETTINGS):
         for label, _ in POLICIES:
             pts = [r for r in table if r["cells"] == cells and r["rescue_deadline_ms"] == float(d2) and r["policy"] == label]

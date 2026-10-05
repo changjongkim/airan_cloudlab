@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # v4 main comparison (NeuralRx fed the NVlabs LS layout; rescue = conventional failure with
-# one failed code block).  Our Scheme (v3e70 + yield + stall fix) vs fixed GPU shares, same
+# one failed code block).  Antiphase (v3e70 + yield + stall fix) vs fixed GPU shares, same
 # NeuralRx rules, AI units, admission and global dispatch; AI load up to saturation; 2 seeds.
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab

@@ -19,7 +19,7 @@ ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 JOB = sys.argv[1]
 SETTINGS = sys.argv[2].split(",") if len(sys.argv) > 2 else ["a", "b"]
 L1_TARGET, RESCUE_TARGET = 0.0005, 0.99
-NAMES = {"u": "Our Scheme", "s30": "fixed 30% share", "s50": "fixed 50% share", "s70": "fixed 70% share",
+NAMES = {"u": "Antiphase", "s30": "fixed 30% share", "s50": "fixed 50% share", "s70": "fixed 70% share",
          "s100": "fixed 100% share"}
 
 

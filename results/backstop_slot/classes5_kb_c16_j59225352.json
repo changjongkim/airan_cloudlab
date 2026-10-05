@@ -1,0 +1,247 @@
+{
+ "p100": {
+  "name": "Low priority, no cap",
+  "seeds": 2,
+  "recovered_pct": 94.50001254358898,
+  "l1_late_pct": 0.001256281407035176,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1865.0500000000002,
+    "rejected_pct": 0.0,
+    "output_tokens_on_time_per_s": 188.35,
+    "responses_on_time_pct": 100.0
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 592.65,
+    "rejected_pct": 0.0
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 14489.6,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 4422.0,
+    "rejected_pct": 0.0
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 237.29999999999998,
+    "rejected_pct": 0.0
+   }
+  }
+ },
+ "p30": {
+  "name": "Fixed 30% + low priority",
+  "seeds": 2,
+  "recovered_pct": 98.75843556358345,
+  "l1_late_pct": 0.010050251256281407,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 395.04999999999995,
+    "rejected_pct": 38.028169014084504,
+    "output_tokens_on_time_per_s": 96.35,
+    "responses_on_time_pct": 43.58974358974359
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 552.9,
+    "rejected_pct": 0.18521636639164843
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 3993.6,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 1445.4,
+    "rejected_pct": 23.170731707317074
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 214.55,
+    "rejected_pct": 0.33592273777031284
+   }
+  }
+ },
+ "p70": {
+  "name": "Fixed 70% + low priority",
+  "seeds": 2,
+  "recovered_pct": 97.24944181029076,
+  "l1_late_pct": 0.00628140703517588,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1729.5,
+    "rejected_pct": 4.225352112676056,
+    "output_tokens_on_time_per_s": 176.15,
+    "responses_on_time_pct": 95.38461538461539
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 591.45,
+    "rejected_pct": 0.0
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 10188.8,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 4234.6,
+    "rejected_pct": 1.829268292682927
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 237.25,
+    "rejected_pct": 0.0
+   }
+  }
+ },
+ "s10": {
+  "name": "Fixed 10%",
+  "seeds": 2,
+  "recovered_pct": 99.15506384686788,
+  "l1_late_pct": 0.006909547738693468,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 14.7,
+    "rejected_pct": 67.6056338028169,
+    "output_tokens_on_time_per_s": 6.25,
+    "responses_on_time_pct": 0.0
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 117.5,
+    "rejected_pct": 44.34248189930965
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 2560.0,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 36.3,
+    "rejected_pct": 61.58536585365854
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 37.650000000000006,
+    "rejected_pct": 52.86584085660298
+   }
+  }
+ },
+ "s30": {
+  "name": "Fixed 30%",
+  "seeds": 2,
+  "recovered_pct": 97.09666089661575,
+  "l1_late_pct": 0.0018844221105527637,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 918.25,
+    "rejected_pct": 25.35211267605634,
+    "output_tokens_on_time_per_s": 111.0,
+    "responses_on_time_pct": 59.09090909090909
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 576.1,
+    "rejected_pct": 0.0
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 3481.6,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 1792.85,
+    "rejected_pct": 22.5609756097561
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 227.5,
+    "rejected_pct": 0.0
+   }
+  }
+ },
+ "wn": {
+  "name": "All unit sizes next to the conventional receiver",
+  "seeds": 2,
+  "recovered_pct": 99.87080103359173,
+  "l1_late_pct": 0.011306532663316583,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1425.75,
+    "rejected_pct": 11.267605633802816,
+    "output_tokens_on_time_per_s": 156.45,
+    "responses_on_time_pct": 84.48275862068965
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 591.3,
+    "rejected_pct": 0.27782454958747266
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 2969.6000000000004,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 3423.0,
+    "rejected_pct": 12.195121951219512
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 236.95,
+    "rejected_pct": 0.35691790888095737
+   }
+  }
+ },
+ "wr": {
+  "name": "All unit sizes, next to NeuralRx while 3 free",
+  "seeds": 2,
+  "recovered_pct": 99.6348561250345,
+  "l1_late_pct": 0.0018844221105527637,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1621.15,
+    "rejected_pct": 7.042253521126761,
+    "output_tokens_on_time_per_s": 151.0,
+    "responses_on_time_pct": 76.66666666666667
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 583.6500000000001,
+    "rejected_pct": 0.18521636639164843
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 3379.2,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 3341.0,
+    "rejected_pct": 10.365853658536585
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 233.45000000000002,
+    "rejected_pct": 0.419903422212891
+   }
+  }
+ }
+}

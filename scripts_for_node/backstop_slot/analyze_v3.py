@@ -20,7 +20,7 @@ ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 JOB = sys.argv[1]
 PREFIX = sys.argv[2] if len(sys.argv) > 2 else "h"
 L1_TARGET, RESCUE_TARGET = 0.0005, 0.99
-NAMES = {"v3": "Our Scheme v3", "v2": "Our Scheme v2", "v3b": "Our Scheme v3b", "v4": "Our Scheme", "v3c": "Our Scheme v3c", "v3d": "Our Scheme v3d", "v2b": "Our Scheme v2b", "o1": "AI only while radio idle",
+NAMES = {"v3": "Antiphase v3", "v2": "Antiphase v2", "v3b": "Antiphase v3b", "v4": "Antiphase", "v3c": "Antiphase v3c", "v3d": "Antiphase v3d", "v2b": "Antiphase v2b", "o1": "AI only while radio idle",
          "o2": "smallest AI unit always"}
 
 
@@ -66,7 +66,7 @@ def main() -> None:
                 continue
             ratio = [by_seed[x]["rescues"] / max(1.0, ref[x]) for x in seeds]
             late = [by_seed[x]["late"] / by_seed[x]["tbs"] for x in seeds]
-            row = {"cells": cells, "policy": NAMES.get(key[1], f"Our Scheme {key[1]}" if key[1].startswith("v") else f"fixed {key[1][1:]}% share"), "key": key[1],
+            row = {"cells": cells, "policy": NAMES.get(key[1], f"Antiphase {key[1]}" if key[1].startswith("v") else f"fixed {key[1][1:]}% share"), "key": key[1],
                    "ai_rate": key[2], "seeds": len(seeds),
                    "slo": float(np.mean([by_seed[x]["slo"] for x in seeds])),
                    "busy": float(np.mean([by_seed[x]["busy"] for x in seeds])),

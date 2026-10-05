@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# v10: Our Scheme against a dynamic-share baseline when the load changes within a run.
+# v10: Antiphase against a dynamic-share baseline when the load changes within a run.
 # 16 cells, nrx_large rescue (v7 setting), 20-second runs, 2-second phases alternating between
 # full load and every cell active with probability 0.5.  The baseline keeps one pre-loaded AI
 # worker per share on every GPU and activates the low share in full-load phases and the high

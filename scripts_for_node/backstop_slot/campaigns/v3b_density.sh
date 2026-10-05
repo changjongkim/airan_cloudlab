@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# v3 step 3b: Our Scheme with the sustained chunk choice (chunk size follows what the
+# v3 step 3b: Antiphase with the sustained chunk choice (chunk size follows what the
 # controller has recently allowed, not what is left of the current piece).
 #   v3b = v3 (calibrated overlap, adaptive unit bounds) + sustained chunk choice
 #   v2b = calibrated overlap + sustained chunk choice, without adaptive unit bounds

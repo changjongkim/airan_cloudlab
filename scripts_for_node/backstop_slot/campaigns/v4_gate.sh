@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Which protection for waiting NeuralRx TBs: none, yield (no AI while any TB waits), or the
-# queue feasibility check.  Our Scheme, k1, one seed.
+# queue feasibility check.  Antiphase, k1, one seed.
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab
 M="bash scripts_for_node/backstop_slot/run_matrix.sh"

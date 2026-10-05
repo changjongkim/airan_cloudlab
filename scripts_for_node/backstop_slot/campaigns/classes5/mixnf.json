@@ -1,0 +1,59 @@
+{
+ "bounds_file": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot/unit_bounds5.json",
+ "length_pairs": "/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/softwall_multigpu/c176_traces/burstgpt_pairs.json",
+ "size_class_ms": {
+  "128": 0.45,
+  "512": 1.2
+ },
+ "classes5": [
+  {
+   "name": "chat",
+   "kind": "chat",
+   "model": "Qwen/Qwen2.5-1.5B",
+   "rate_per_s": 0.8,
+   "ttft_ms": 200,
+   "tbt_ms": 50,
+   "sessions": 4,
+   "response_max": 64,
+   "chunks": [
+    128,
+    512
+   ]
+  },
+  {
+   "name": "large",
+   "kind": "prefill",
+   "model": "Qwen/Qwen2.5-3B",
+   "rate_per_s": 2,
+   "slo_ms": 400,
+   "chunks": [
+    128,
+    512
+   ]
+  },
+  {
+   "name": "embed",
+   "kind": "encoder",
+   "model": "BAAI/bge-base-en-v1.5",
+   "rate_per_s": 150,
+   "slo_ms": 50,
+   "batches": [
+    1,
+    4,
+    16
+   ]
+  },
+  {
+   "name": "vision",
+   "kind": "encoder",
+   "model": "google/vit-base-patch16-224",
+   "rate_per_s": 60,
+   "slo_ms": 50,
+   "batches": [
+    1,
+    4,
+    16
+   ]
+  }
+ ]
+}

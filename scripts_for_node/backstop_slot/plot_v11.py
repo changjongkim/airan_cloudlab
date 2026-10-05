@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Whole-run AI served versus rescued TBs when the load changes within the run:
-Our Scheme, fixed GPU shares, and shares switched with the load (analyze_phases.py output).
+Antiphase, fixed GPU shares, and shares switched with the load (analyze_phases.py output).
 
 usage: plot_v11.py PHASES.json OUT.png "title"
 """
@@ -37,7 +37,7 @@ for r in dyn:
     ax.annotate(f"{m.group(1)}/{m.group(2)}%{late}", (r["ai"] / 1e3, r["rescue"]), textcoords="offset points",
                 xytext=(-6, -16) if late else (8, -4), ha="right" if late else "left", fontsize=9, color=MUTED)
 ax.plot([r["ai"] / 1e3 for r in ours], [r["rescue"] for r in ours], color=BLUE, linewidth=0, marker="s", markersize=10,
-        markeredgecolor="white", markeredgewidth=1.5, label=os.environ.get("SCHEME_NAME", "Our Scheme"), zorder=4)
+        markeredgecolor="white", markeredgewidth=1.5, label=os.environ.get("SCHEME_NAME", "Antiphase"), zorder=4)
 lowest = min(r["rescue"] for r in rows)
 ax.set_ylim(lowest - 0.6, 100.2)
 ax.set_xlim(0, max(r["ai"] for r in rows) / 1e3 * 1.18)

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rescue-deadline sweep: 16 cells, AI 12 req/s, 2 seeds, Our Scheme vs fixed 50%.
+# Rescue-deadline sweep: 16 cells, AI 12 req/s, 2 seeds, Antiphase vs fixed 50%.
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab
 M="bash scripts_for_node/backstop_slot/run_matrix.sh"

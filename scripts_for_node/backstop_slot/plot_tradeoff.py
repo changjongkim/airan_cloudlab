@@ -31,8 +31,8 @@ fig, axes = plt.subplots(1, 2, figsize=(10, 4))
 for ax, rate in zip(axes, (4, 8)):
     series = [
         ("fixed MPS share", "static", [20, 30, 50, 70], "s", "tab:gray", "o"),
-        ("Our Scheme (co-run bound p99)", "backstop_corun", [50, 70, 100], "c", "tab:blue", "s"),
-        ("Our Scheme (co-run bound p90)", "backstop_corun", [50, 70], "q", "tab:cyan", "^"),
+        ("Antiphase (co-run bound p99)", "backstop_corun", [50, 70, 100], "c", "tab:blue", "s"),
+        ("Antiphase (co-run bound p90)", "backstop_corun", [50, 70], "q", "tab:cyan", "^"),
     ]
     for label, kind, shares, key, color, marker in series:
         points = []

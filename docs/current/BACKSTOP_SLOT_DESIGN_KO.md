@@ -1,8 +1,12 @@
-# Backstop 슬롯 단위 스킴: 설계 (현재 구현 기준)
+# Antiphase 슬롯 단위 스킴: 설계 (현재 구현 기준)
 
 기준일: 2026-09-30. 코드: `scripts_for_node/backstop_slot/`. 이 문서는 지금 구현된 스킴을 그대로 적는다.
 결과는 [BACKSTOP_SLOT_RESULTS_KO.md](BACKSTOP_SLOT_RESULTS_KO.md), 기존 연구와의 차이는
 [BACKSTOP_SLOT_DIFFERENTIATION_KO.md](BACKSTOP_SLOT_DIFFERENTIATION_KO.md)에 있다.
+
+> **2026-10-04:** AI 허락 규칙이 바뀌었다(AI 조각 중단, NRx가 도는 GPU의 AI 금지, 한도 1.2 ms를 넘는 AI 단위는 기존
+> 수신기 옆 금지, 여러 모델의 AI 단위). 현재 규칙은 [BACKSTOP_V14_MODEL_AND_EXTENSIONS_KO.md](BACKSTOP_V14_MODEL_AND_EXTENSIONS_KO.md)
+> 2장·5.1절과 README 4장에 있다. 이 문서의 AI 규칙 부분은 v13까지의 기록이다.
 
 ## 0. 요약
 
@@ -224,7 +228,7 @@ AI다. AI는 조건 B로 큰 단위를 막는다. 강제로 끊는 장치는 없
 | B_co(c), 겹쳐도 되는 크기, 양보 | `ai_unit_gating` (`--unit-gating "128:3.8,512:4.5,1024:5.2/conv=128,512"`, 양보는 끝에 `+yield`) |
 | 틀린 코드 블록 수 기준 | `nrx_max_cb_fail` |
 | NRx 규칙 묶음 | `nrx_policy=rescue_value` |
-| AI 방식 | `ai_policy`: `backstop_units`(Our Scheme), `static`(고정 비율), `none` |
+| AI 방식 | `ai_policy`: `backstop_units`(Antiphase), `static`(고정 비율), `none` |
 | AI 단위 크기 | `--ai-chunks 128,512,1024` |
 | AI 요청 받기, 배치 | `--ai-admission 1`, `--ai-dispatch global` |
 

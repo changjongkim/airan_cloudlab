@@ -1,0 +1,12 @@
+% The architecture figure alone (for the README): pdflatex architecture_standalone.tex, then PDF to PNG.
+\documentclass[border=3pt]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage{libertine}
+\usepackage[libertine]{newtxmath}
+\usepackage{pifont}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, calc, patterns, shapes.geometric}
+\input{tikz_style.tex}
+\begin{document}
+\input{architecture.tex}
+\end{document}

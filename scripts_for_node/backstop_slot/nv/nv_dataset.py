@@ -24,6 +24,9 @@ parser.add_argument("--prbs", type=int, default=273)
 parser.add_argument("--num-tx", type=int, default=2)
 parser.add_argument("--channel", default="DoubleTDLlow")
 parser.add_argument("--speed", type=float, default=None, help="UE speed in m/s (min = max)")
+parser.add_argument("--mcs", type=int, default=None, help="MCS index (default: the one of the base config)")
+parser.add_argument("--esno", default=None,
+                    help="Es/No points in dB; converted to the Eb/No of the configuration (overrides --ebno)")
 parser.add_argument("--ebno", default="0,1,2,3,4,5")
 parser.add_argument("--slots", type=int, default=64, help="slots per Eb/No point")
 parser.add_argument("--batch", type=int, default=4)
@@ -55,7 +58,9 @@ text = re.sub(r"(?m)^channel_type_eval\s*=.*", f'channel_type_eval = "{args.chan
 if args.speed is not None:
     text = re.sub(r"max_ut_velocity_eval\s*=.*", f"max_ut_velocity_eval = {args.speed}", text)
     text = re.sub(r"min_ut_velocity_eval\s*=.*", f"min_ut_velocity_eval = {args.speed}", text)
-name = f"bs_{label}_{args.prbs}_{args.channel}_{args.num_tx}.cfg"
+if args.mcs is not None:
+    text = re.sub(r"(?m)^mcs_index\s*=.*", f"mcs_index = [{args.mcs}]", text)
+name = f"bs_{label}_{args.prbs}_{args.channel}_{args.num_tx}{'' if args.mcs is None else '_m' + str(args.mcs)}.cfg"
 (Path("../config") / name).write_text(text)
 
 params = Parameters(name, training=False, system="nrx", num_tx_eval=args.num_tx)
@@ -85,6 +90,12 @@ meta = {
     "n_cell_id": int(params.n_cell_id), "slot_number": int(params.slot_number),
     "ebno_db": [float(e) for e in args.ebno.split(",")], "slots": args.slots,
 }
+if args.esno:
+    # Es/No (per resource element) -> rate-adjusted Eb/No of the link simulation.
+    import math
+    shift = 10 * math.log10(meta["num_bits_per_symbol"] * meta["target_coderate"])
+    meta["esno_db"] = [float(e) for e in args.esno.split(",")]
+    meta["ebno_db"] = [round(e - shift, 3) for e in meta["esno_db"]]
 print(json.dumps(meta), flush=True)
 
 slots, bits, ok, ebnos, seconds = [], [], [], [], []

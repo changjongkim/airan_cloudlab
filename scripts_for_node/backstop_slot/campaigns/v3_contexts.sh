@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Does a second/third request context per GPU help Our Scheme?  With one context a request
+# Does a second/third request context per GPU help Antiphase?  With one context a request
 # whose chunk in progress is larger than the grant allows stalls the GPU's AI; with more
 # contexts the worker can run another request's units meanwhile.  Same total arrival rate.
 set -uo pipefail

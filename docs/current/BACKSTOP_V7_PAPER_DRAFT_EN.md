@@ -1,4 +1,4 @@
-# Backstop: draft text for the paper (v7 results)
+# Antiphase: draft text for the paper (v7 results)
 
 Status: draft, 2026-10-01. Not merged into `paper/softwall_sigmetrics27`. Every number comes from
 [BACKSTOP_V4_VERIFICATION_KO.md](BACKSTOP_V4_VERIFICATION_KO.md) (sections in brackets). Citation keys in
@@ -15,23 +15,23 @@ transport blocks (TBs) that the conventional receiver fails, yet their value and
 are not established. We compare public neural receivers with the cuPHY receiver at the same LDPC iteration
 count and find that the real-time model helps only when the channels of paired users are correlated, while a
 larger model decodes 15-67% of the failed TBs on every channel we test. The larger model takes 5.3 ms per
-slot, twice the uplink period. This paper presents Backstop, which runs the larger model only for failed TBs
+slot, twice the uplink period. This paper presents Antiphase, which runs the larger model only for failed TBs
 under a later deadline and grants AI inference in short pieces that keep both the layer-1 deadline and the
-recovery deadline. On four A100 GPUs with 16 cells, Backstop recovers 63-66% of the failed TBs. Under a load
-that changes every two seconds, Backstop serves 27.4k tokens/s while keeping 98.6% of the recoveries, 5.0x a
+recovery deadline. On four A100 GPUs with 16 cells, Antiphase recovers 63-66% of the failed TBs. Under a load
+that changes every two seconds, Antiphase serves 27.4k tokens/s while keeping 98.6% of the recoveries, 5.0x a
 fixed GPU share and 1.17x a share that follows the load, at the same recovery level.
 
 ## Introduction, fourth paragraph
 
-In this paper, we present Backstop, a GPU sharing scheme for AI-RAN servers that uses a neural receiver as a
-second receiver for the TBs the conventional receiver fails. Specifically, Backstop introduces 1) a recovery
+In this paper, we present Antiphase, a GPU sharing scheme for AI-RAN servers that uses a neural receiver as a
+second receiver for the TBs the conventional receiver fails. Specifically, Antiphase introduces 1) a recovery
 path that sends a failed TB to the neural receiver only when the number of failed code blocks predicts a
 successful decode, 2) two deadlines per TB, the layer-1 deadline for the conventional receiver and a later
 recovery deadline before the retransmission is scheduled, and 3) AI admission in bounded pieces, where the
 controller allows a piece only if every running and waiting radio job still meets its deadline. Our
 evaluation on four A100 GPUs with 16-32 cells, the cuPHY receiver, the public NVlabs neural receivers and
-Qwen2.5 prefill requests shows that Backstop recovers 63-66% of the TBs the conventional receiver fails.
-With mixed channels and a load that alternates between full and half every two seconds, Backstop serves
+Qwen2.5 prefill requests shows that Antiphase recovers 63-66% of the TBs the conventional receiver fails.
+With mixed channels and a load that alternates between full and half every two seconds, Antiphase serves
 27.4k tokens/s within the 200 ms limit and keeps 98.6% of the recoveries. A fixed 10% GPU share keeps the
 same recoveries at 5.5k tokens/s, and a share that switches between 10% and 50% with the load, with no
 switching cost, reaches 23.5k tokens/s.
@@ -58,7 +58,7 @@ three channels and loses none of the TBs cuPHY decodes on two of them. It takes 
 6.3 ms next to the cell workload, against an uplink period of 2.5 ms. Running it for every slot of four
 cells leaves 61% of the slots unprocessed and decodes 89.4% of the TBs. Running it only for the TBs cuPHY
 fails needs 25% of the runs, gives the same decode result offline, and decodes 94.5-95.1% in the timed
-system [6.1, 6.8]. This motivates Backstop's recovery path.
+system [6.1, 6.8]. This motivates Antiphase's recovery path.
 
 **Failed code blocks predict the outcome.** On the UMi channel, 87% of the failed TBs have every code block
 failed and the neural receiver recovers 2% of them. TBs with at most nine failed code blocks are recovered
@@ -83,31 +83,31 @@ use the same neural receiver rules, the same AI requests and the same admission 
 
 | Policy | AI tokens/s within 200 ms | Recoveries kept (of the run without AI) |
 |---|---|---|
-| Backstop | 27.4k (26.0-28.5k) | 98.6% (97.6-99.3%) |
+| Antiphase | 27.4k (26.0-28.5k) | 98.6% (97.6-99.3%) |
 | Fixed 10% | 5.5k (5.3-5.6k) | 98.8% (97.4-99.8%) |
 | Fixed 30% | 22.8k (21.9-23.5k) | 96.7% (95.5-98.6%) |
 | Share follows load, 10/30%, load known at once | 13.5k (12.6-14.6k) | 98.7% (97.7-99.6%) |
 | Share follows load, 10/50%, load known at once | 23.5k (22.9-24.6k) | 98.4% (97.3-99.3%) |
 | Share follows load, 10/30%, load known 1 s late | 11.7k (11.5-11.8k) | 98.0% (96.6-99.2%) |
 
-Figure X shows AI served against recoveries kept. Backstop serves 27.4k tokens/s and keeps 98.6% of the
+Figure X shows AI served against recoveries kept. Antiphase serves 27.4k tokens/s and keeps 98.6% of the
 recoveries. The fixed 10% share keeps 98.8% and serves 5.5k tokens/s, 5.0x less. The fixed 30% share serves
-22.8k tokens/s and loses 3.3% of the recoveries, 2.4x more than Backstop. The share that follows the load
-serves 13.5-23.5k tokens/s at the same recovery level, 1.17-2.0x less than Backstop, and 11.7k tokens/s when
-it sees the load one second late. Backstop achieves this by granting AI during full load whenever no
+22.8k tokens/s and loses 3.3% of the recoveries, 2.4x more than Antiphase. The share that follows the load
+serves 13.5-23.5k tokens/s at the same recovery level, 1.17-2.0x less than Antiphase, and 11.7k tokens/s when
+it sees the load one second late. Antiphase achieves this by granting AI during full load whenever no
 neural receiver job runs on that GPU: it serves 18.8k tokens/s in the full-load phases, while the share
 that follows the load drops to its 10% share there and serves 2.4-2.7k tokens/s.
 
-**Steady full load and 32 cells.** At a steady full load with the same mixed channels, Backstop serves 22.7k
+**Steady full load and 32 cells.** At a steady full load with the same mixed channels, Antiphase serves 22.7k
 tokens/s and keeps 97.9% of the recoveries. A fixed 10% share keeps 98.3% at 5.0k tokens/s, and a fixed 30%
 share serves 20.9k tokens/s and keeps 95.1% (five seeds) [6.14]. With 32 cells and a load that alternates
-between half and a quarter, Backstop serves 26.4k tokens/s at 99.4%, against 5.3k for the fixed 10% share and
+between half and a quarter, Antiphase serves 26.4k tokens/s at 99.4%, against 5.3k for the fixed 10% share and
 22.7k for the share that follows the load (two seeds) [6.14].
 
 **Where sharing by a fixed share is enough.** With the real-time model (2.7 ms per recovery) and the 11.5 ms
-recovery deadline, a fixed 70% share loses 1.5% of the recoveries and serves more AI than Backstop [5.7].
+recovery deadline, a fixed 70% share loses 1.5% of the recoveries and serves more AI than Antiphase [5.7].
 With the UMi channel and the failed-code-block rule, 5% of the slots need the neural receiver and a fixed
-50% share serves 46.0k tokens/s against 33.6k for Backstop at the same 99.8% [6.7]. Backstop's advantage
+50% share serves 46.0k tokens/s against 33.6k for Antiphase at the same 99.8% [6.7]. Antiphase's advantage
 needs a neural receiver load that fills a large part of the GPU.
 
 ## Limitations (for the discussion section)

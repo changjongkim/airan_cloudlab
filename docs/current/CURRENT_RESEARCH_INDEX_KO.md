@@ -1,19 +1,25 @@
 # 현재 권위 문서 인덱스
 
-**기준일:** 2026-10-01
+**기준일:** 2026-10-04
 
-## 슬롯 단위 Backstop (최신 스킴, 2026-09-29 ~)
+## 슬롯 단위 Antiphase (최신 스킴, 2026-09-29 ~)
 
 지금 구현된 스킴은 아래 문서가 기준이다. 논문 본문과 발표 자료에는 아직 반영하지 않았다.
 
-- **[기존 GPU 공유 방식과의 sweep 비교](BACKSTOP_V13_SWEEPS_KO.md) (2026-10-02, 스케줄링 수치의 기준):** 낮은 MPS
-  우선순위를 기준선에 넣고 Our Scheme의 규칙을 고친 뒤(낮은 우선순위 + 빈 NRx 여유), AI 부하·부하 변화·NRx
+- **[복구 손실 모델, 스킴 수정, 범위 확장](BACKSTOP_V14_MODEL_AND_EXTENSIONS_KO.md) (2026-10-04, 스킴과 스케줄링 수치의
+  기준):** 복구 손실의 해석 모델(사건 모의, 닫힌 형태), 규칙 변경(AI 조각 중단, NRx 옆 금지, 한도 1.2 ms를 넘는 AI
+  단위는 기존 수신기 옆 금지), 512 슬롯 반복과 시드 5의 재측정, YinYangRAN 설계를 재구성한 추정기 기준선, 토큰
+  생성과 여러 모델, UL goodput, link adaptation, 미래를 아는 스케줄과의 거리(9장), outer loop를 넣은 닫힌 루프 link
+  adaptation(10장, 2026-10-05). README의 4장과 6.4–6.13절이 이 문서를 따른다.
+- **[기존 GPU 공유 방식과의 sweep 비교](BACKSTOP_V13_SWEEPS_KO.md) (2026-10-02, 이전 규칙의 수치; AI 부하·버스트·셀 수 sweep은 이 문서만 있음):** 낮은 MPS
+  우선순위를 기준선에 넣고 Antiphase의 규칙을 고친 뒤(낮은 우선순위 + 빈 NRx 여유), AI 부하·부하 변화·NRx
   수요·셀 수·GPU 수 sweep으로 고정 비율, 부하 따라 비율, 낮은 우선순위, 유휴 시간만 쓰는 방식과 비교했다.
 - **[수신기 검증과 다시 한 실험](BACKSTOP_V4_VERIFICATION_KO.md) (2026-10-01, 먼저 읽을 것):** NRx 입력 교정, LDPC 반복
   횟수를 맞춘 수신기 비교, NVlabs 공개 NRx 둘(nrx_rt, nrx_large) 검증, 실험 네 판(v4, v5, v6, v7), 지금 쓸 수 있는
   문장. 주장의 기준은 v7(큰 모델을 rescue로)이다. 아래 결과 문서의 "살린 TB" 수치는 이 문서로 대체된다.
-- 논문 초안(LaTeX, 10쪽): `paper/backstop_slot_v7/main.tex`, `main.pdf`. 새 스킴과 v7 결과로 쓴 초안이다. 구조 그림과 실측
-  시간표 그림이 들어 있다. 이전 스킴의 논문 `paper/softwall_sigmetrics27`은 그대로 두었다.
+- 논문 초안(LaTeX, 24쪽): `paper/backstop_slot_v14/main.tex`, `main.pdf`. v14의 규칙과 수치로 쓴 초안이다(손실 모델 절,
+  추정기 기준선, 여러 AI 작업, goodput, link adaptation, 미래를 아는 스케줄과의 거리, 닫힌 루프 link adaptation). v13까지의 초안은 `paper/backstop_slot_v7`, 이전 스킴의 논문은
+  `paper/softwall_sigmetrics27`에 그대로 두었다.
 - [논문용 영문 문단 초안](BACKSTOP_V7_PAPER_DRAFT_EN.md): LaTeX 초안을 쓰기 전의 문단 모음.
 
 - [설계](BACKSTOP_SLOT_DESIGN_KO.md): 마감 두 개, NRx 규칙, AI 규칙, 시간 한도, 코드 위치, 실행 방법, 알려진 틈

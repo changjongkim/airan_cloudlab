@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Follow-up: (a) Our Scheme at 24 cells allowing 512-token AI units during conventional
+# Follow-up: (a) Antiphase at 24 cells allowing 512-token AI units during conventional
 # (U0/1-lane probe: conventional p99.9 3.03 ms with 512 vs 3.06 with 128), AI 12/16/20;
 # fixed 50/70% at AI 20; (b) a second no-AI run per seed at 24 and 32 cells (noise floor).
 set -uo pipefail

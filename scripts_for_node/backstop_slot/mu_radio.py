@@ -76,6 +76,14 @@ class MuConvPath:
         self.last_cb_fail = 0
         self.last_crc_mask = 0
         self.last_cb_fail_by_ue = [0] * self.num_ue
+        self.levels = {profile.name: (self.configs, tb_size)}
+
+    def add_level(self, profile: UlProfile, tb_size: int) -> None:
+        """Another MCS of the same cell (link adaptation): same pipeline, other TB parameters."""
+        self.levels[profile.name] = (mu_pusch_configs(profile, tb_size)[0], tb_size)
+
+    def use(self, name: str) -> None:
+        self.configs, self.tb_size = self.levels[name]
 
     def run(self, rx_slot: cp.ndarray, slot: int) -> tuple[bool, list]:
         rx = self.rx
@@ -170,13 +178,27 @@ class MuNrxPath:
         self.engine.capture_graph()
         self.last_crc_mask = 0
         self.ls_factor: dict[int, cp.ndarray] = {}
-        # Constants of the bit-level chain (one entry per UE).
-        ue = self.per_ue[0].ue_configs[0]
+        # Constants of the bit-level chain (one entry per UE), per MCS level.
+        self.levels: dict[str, dict] = {}
+        self.current = profile.name
+        self.add_level(profile, tb_size)
+        level = self.levels[profile.name]
+        self.chain, self.cb_size, self.crc_input = level["chain"], level["cb_size"], None
+        length = int(level["chain"]["length"][0])
+        with stream:
+            self.padded = [cp.zeros((8, length // self.bits), dtype=cp.float16, order="F") for _ in range(self.num_ue)]
+        stream.synchronize()
+
+    def add_level(self, profile: UlProfile, tb_size: int) -> None:
+        """Another MCS of the same cell (link adaptation).  The model and its 16QAM LLRs are the
+        same; only rate recovery, LDPC and CRC depend on the TB size and code rate."""
+        configs, per_ue = mu_pusch_configs(profile, tb_size)
+        ue = per_ue[0].ue_configs[0]
         data_symbols = profile.num_symbols - len(profile.dmrs_positions)
         self.bits = int(ue.mod_order)
         length = data_symbols * self.bits * NUM_PRBS * 12
-        users = range(self.num_ue)
-        self.chain = {
+        users = range(len(per_ue))
+        chain = {
             "tb": [np.uint32(tb_size * 8) for _ in users],
             "rate": [np.float32(ue.code_rate / 10240.) for _ in users],
             "length": [np.uint32(length) for _ in users],
@@ -187,11 +209,19 @@ class MuNrxPath:
             "cinit": [np.uint32((ue.rnti << 15) + ue.data_scid) for _ in users],
             "group": [np.uint32(u) for u in users],
         }
-        self.cb_size = int(get_code_block_size(tb_size * 8, ue.code_rate / 10240.))
-        with stream:
-            self.padded = [cp.zeros((8, length // self.bits), dtype=cp.float16, order="F") for _ in users]
-            self.crc_input = None
-        stream.synchronize()
+        self.levels[profile.name] = {
+            "configs": configs, "per_ue": per_ue, "tb_size": tb_size, "chain": chain,
+            "cb_size": int(get_code_block_size(tb_size * 8, ue.code_rate / 10240.)), "crc_input": None,
+        }
+
+    def use(self, name: str) -> None:
+        if name == self.current:
+            return
+        self.levels[self.current]["crc_input"] = self.crc_input
+        level = self.levels[name]
+        self.configs, self.per_ue, self.tb_size = level["configs"], level["per_ue"], level["tb_size"]
+        self.chain, self.cb_size, self.crc_input = level["chain"], level["cb_size"], level["crc_input"]
+        self.current = name
 
     def _ls_fast(self, rx_slot: cp.ndarray, slot: int) -> cp.ndarray:
         """LS estimate in the model's layout: (DMRS symbol x pilot, UE, antenna)."""

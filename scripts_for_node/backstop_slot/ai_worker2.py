@@ -26,7 +26,7 @@ import torch
 from qwen_units import QwenUnits
 from slot_state import (
     A_BACKLOG_TOKENS, A_BUDGET_NS, A_CUR_CHUNK, A_DONE_SEQ, A_GRANT_SEQ, A_HAS_WORK, A_MAX_CHUNK,
-    A_NOT_AFTER, A_PIECE_END_NS, A_PULLED, A_RATE_TPS, A_RUNNING, H_ABORT, R_ARRIVAL, R_GPU,
+    A_NOT_AFTER, A_PIECE_END_NS, A_PULLED, A_RATE_TPS, A_RUNNING, A_STOP, H_ABORT, R_ARRIVAL, R_GPU,
     R_LENGTH, R_SEQ, SlotState, now_ns,
 )
 from ai_worker import arrivals, dist
@@ -204,7 +204,18 @@ def main() -> None:
                 r["head"] = True
         return False
 
+    # ``stop_check``: a granted piece is put on the GPU a few units at a time, and the worker
+    # reads the controller's stop word between these groups.  The controller can then end a
+    # piece within about one unit when a neural receiver needs the GPU, instead of waiting for
+    # the whole piece (which takes up to twice its bound next to radio work at low priority).
+    stop_check = bool(ai.get("stop_check", False)) and policy != "static"
+    group_units = {int(c): int(n) for c, n in (ai.get("stop_group_units") or {"128": 2, "512": 1, "1024": 1}).items()}
+    stops = {"count": 0}
+
     def run_piece(budget: int | None, max_units: int) -> None:
+        if stop_check and budget is not None:
+            run_piece_stoppable(budget)
+            return
         start = now_ns()
         launched, bound_sum = 0, 0
         raw_sum, used = 0, set()
@@ -262,6 +273,62 @@ def main() -> None:
         head = state_vars["head"]
         while head < len(requests) and (requests[head].get("rejected") or
                                         requests[head]["done_ns"] is not None):
+            head += 1
+        state_vars["head"] = head
+
+    def run_piece_stoppable(budget: int) -> None:
+        start = now_ns()
+        launched, bound_sum, gpu_ms = 0, 0, 0.0
+        index = state_vars["head"]
+        box[A_RUNNING] = 1
+        while index < len(requests):
+            if int(box[A_STOP]):
+                stops["count"] += 1
+                break
+            group, finished, limit, size = 0, [], None, None
+            begin_event.record(runner.stream)
+            while index < len(requests) and (limit is None or group < limit):
+                r = requests[index]
+                if r.get("rejected") or r["done_ns"] is not None:
+                    index += 1
+                    continue
+                if epoch + r["arrival_ns"] > start or not chunk_allowed(r):
+                    break
+                c, name, token = next_unit(r, budget - bound_sum)
+                if size is not None and c != size:
+                    break                              # one unit size per group
+                unit_cost = cost(c, name)
+                if bound_sum + unit_cost > budget:
+                    if r["chunk"] is not None and r["unit"] == 0 and name == "prep" and (c == large or sustained):
+                        r["chunk"] = None               # re-choose next time
+                        r["chunks_used"].pop()
+                    break
+                if r["first_ns"] is None:
+                    r["first_ns"] = start
+                    runner.load_prompt(prompts[index])
+                runner.launch(c, name, token)
+                size, limit = c, group_units.get(c, 1)
+                bound_sum += unit_cost
+                group += 1
+                if advance(r, name):
+                    finished.append(r)
+                    index += 1
+            if not group:
+                break
+            end_event.record(runner.stream)
+            box[A_PIECE_END_NS] = start + bound_sum
+            while not end_event.query():
+                pass
+            done = now_ns()
+            for r in finished:
+                r["done_ns"] = done
+            gpu_ms += float(begin_event.elapsed_time(end_event))
+            launched += group
+        box[A_RUNNING] = 0
+        if launched:
+            pieces.append([start, now_ns(), launched, bound_sum, gpu_ms])
+        head = state_vars["head"]
+        while head < len(requests) and (requests[head].get("rejected") or requests[head]["done_ns"] is not None):
             head += 1
         state_vars["head"] = head
 
@@ -348,6 +415,7 @@ def main() -> None:
         "gpu_busy_ms": float(sum(p[4] for p in pieces)),
         "chunks_used": chunk_counts,
         "unit_bound_scale": {str(c): scale[c] for c in chunks},
+        "pieces_stopped": stops["count"],
     }
     summary["headline"] = {k: summary[k] for k in (
         "arrived", "completed", "tokens_per_s", "within_slo", "tokens_within_slo_per_s", "piece_overruns")}

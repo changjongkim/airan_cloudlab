@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# After the main v6 runs: 24-cell variants of Our Scheme, 32-cell receiver times, then the
+# After the main v6 runs: 24-cell variants of Antiphase, 32-cell receiver times, then the
 # offline receiver-regime checks (one GPU, nothing else running).
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab
 export DATA=$PWD/run_state/backstop_slot/dataset_v5 ITER=20

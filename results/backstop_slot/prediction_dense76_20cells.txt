@@ -1,0 +1,12 @@
+Prediction written on 2026-10-04 09:36 PDT, before the runs (tag tv, job 59321430).
+Closed form (loss_model.lane_chain) with the candidates and run lengths of the 20-cell runs measured with the
+neural receiver bound 8.6 ms (tag to, job 59321430, latest start 2.9 ms), evaluated for a latest start of 3.9 ms
+(bound 7.6 ms).  Script: run_state/backstop_slot/check_bound20.py.
+
+policy   measured, bound 8.6   closed form, L=2.9   closed form, L=3.4   closed form, L=3.9 (prediction)
+n        3.6%                  3.8% (f 56%)         2.4% (f 29%)         1.6% (f 11%)
+wm       6.4%                  5.5% (f 89%)         2.9% (f 39%)         1.8% (f 15%)
+p30      6.8%                  6.0% (f 98%)         5.5% (f 89%)         3.1% (f 43%)
+p70      7.0%                  6.4% (f 100%)        5.9% (f 96%)         5.7% (f 92%)
+(lost candidates; f = share of neural receiver runs over three uplink slots)
+Runs longer than 7.6 ms (late if started at the latest start): n 0.25%, wm 0.35%, p30 0.83%, p70 76%.

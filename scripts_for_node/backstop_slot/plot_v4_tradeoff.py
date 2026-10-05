@@ -2,7 +2,7 @@
 """AI served versus rescued TBs kept, one panel per cell count (analysis JSON of analyze_v3.py).
 
 usage: plot_v4_tradeoff.py ANALYSIS.json OUT.png [title suffix]
-Each panel uses the AI load at which Our Scheme served the most; the line joins the fixed shares.
+Each panel uses the AI load at which Antiphase served the most; the line joins the fixed shares.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ for ax, count in zip(axes[0], cells):
             label="Fixed GPU share", zorder=2)
     ours = [r for r in ours_all if r["ai_rate"] == load]
     ax.plot([r["slo"] / 1e3 for r in ours], [100 * r["rescue_mean"] for r in ours], color=BLUE, linewidth=0,
-            marker="s", markersize=10, markeredgecolor="white", markeredgewidth=1.5, label="Our Scheme", zorder=3)
+            marker="s", markersize=10, markeredgecolor="white", markeredgewidth=1.5, label="Antiphase", zorder=3)
     top = max(r["slo"] for r in fixed + ours) / 1e3
     ax.set_xlim(0, top * 1.12)
     # Share labels: to the upper right; to the upper left when the next point sits on top of it.

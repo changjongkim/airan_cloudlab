@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Larger AI shares: Our Scheme at 70/100% MPS vs a fixed 70/100% share, fair AI units
+# Larger AI shares: Antiphase at 70/100% MPS vs a fixed 70/100% share, fair AI units
 # (chunks 128/512/1024), AI 12 req/s, 2 seeds. 16 cells at rescue deadline 4.0/5.0 ms,
 # 32 cells at 5.0/6.5 ms.
 set -uo pipefail

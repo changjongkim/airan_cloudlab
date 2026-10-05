@@ -21,7 +21,7 @@ import numpy as np
 from cell_ring import SLOT_BYTES
 from slot_radio import fortran_slot_views, nrx_path, result_masks
 from slot_state import (
-    C_NRX_LANE, FAIL, H_ABORT, L_ASSIGN_SEQ, L_CELL, L_DONE_SEQ, L_PERIOD, PASS,
+    C_LEVEL, C_NRX_LANE, C_NRX_MASK, FAIL, H_ABORT, L_ASSIGN_SEQ, L_CELL, L_DONE_SEQ, L_PERIOD, PASS,
     SlotState, now_ns,
 )
 from ul_profiles import PROFILES
@@ -52,10 +52,13 @@ def main() -> None:
     lane = state.lanes[args.lane]
 
     weak = [c for c in config["cells"] if PROFILES[c["profile"]].neural_eligible]
-    profile = PROFILES[weak[0]["profile"]]
-    meta = json.loads((dataset / f"{profile.name}_meta.json").read_text())
-    blocks = np.load(dataset / f"{profile.name}_tb.npy")
-    tb_bytes = int(meta["tb_bytes"])
+    la = config.get("la")                       # link adaptation: one ring per MCS level and cell
+    names = la["levels"] if la else [weak[0]["profile"]]
+    profile = PROFILES[names[-1]]
+    metas = [json.loads((dataset / f"{name}_meta.json").read_text()) for name in names]
+    blocks = [np.load(dataset / f"{name}_tb.npy") for name in names]
+    tb_sizes = [int(meta["tb_bytes"]) for meta in metas]
+    tb_bytes = tb_sizes[-1]
     rings = {}
     for cell in weak:
         ipc_file = args.work / f"cell{cell['cell']}.ipc"
@@ -65,23 +68,28 @@ def main() -> None:
                 raise TimeoutError(f"no IPC record at {ipc_file}")
             time.sleep(0.01)
         record = json.loads(ipc_file.read_text())
-        pointer = cp.cuda.runtime.ipcOpenMemHandle(
-            bytes.fromhex(record["handle"]), cp.cuda.runtime.cudaIpcMemLazyEnablePeerAccess
-        )
-        rings[int(cell["cell"])] = {
-            "ptr": pointer, "ring": int(record["ring"]),
-            "slots": [int(meta["slots"][i]) for i in record["indices"]],
-            "refs": [blocks[i] for i in record["indices"]],
-        }
+        levels = []
+        for level, entry in enumerate(record["levels"] if la else [record]):
+            pointer = cp.cuda.runtime.ipcOpenMemHandle(
+                bytes.fromhex(entry["handle"]), cp.cuda.runtime.cudaIpcMemLazyEnablePeerAccess
+            )
+            levels.append({
+                "ptr": pointer, "ring": int(entry["ring"]),
+                "slots": [int(metas[level]["slots"][i]) for i in entry["indices"]],
+                "refs": [blocks[level][i] for i in entry["indices"]],
+            })
+        rings[int(cell["cell"])] = levels
 
     local_ptr = cp.cuda.runtime.malloc(SLOT_BYTES)
     local = fortran_slot_views(local_ptr, rings, 1)[0]
     stream = cp.cuda.Stream(non_blocking=True)
     nrx = nrx_path(config, profile, tb_bytes, stream)
+    for name, size in (list(zip(names, tb_sizes))[:-1] if la else []):
+        nrx.add_level(PROFILES[name], size)
     every_ue = (1 << profile.num_ue) - 1
 
-    def fetch(cell: int, period: int) -> tuple[dict, int]:
-        ring = rings[cell]
+    def fetch(cell: int, period: int, level: int = -1) -> tuple[dict, int]:
+        ring = rings[cell][level]
         index = period % ring["ring"]
         cp.cuda.runtime.memcpyAsync(
             local_ptr, ring["ptr"] + index * SLOT_BYTES, SLOT_BYTES, MEMCPY_DEFAULT, stream.ptr
@@ -95,6 +103,11 @@ def main() -> None:
         cell = weak[step % len(weak)]["cell"]
         ring, index = fetch(cell, step)
         nrx.run(local, ring["slots"][index])
+    for level in (range(len(names) - 1) if la else []):
+        nrx.use(names[level])
+        for step in range(4):
+            ring, index = fetch(weak[step % len(weak)]["cell"], step, level)
+            nrx.run(local, ring["slots"][index])
 
     gc.collect()
     gc.disable()
@@ -116,18 +129,22 @@ def main() -> None:
         start = now_ns()
         state.cells[cell, period, C_NRX_LANE] = args.gpu
         state.set_nrx_running(cell, period, start)
-        ring, index = fetch(cell, period)
+        level = int(state.cells[cell, period, C_LEVEL]) if la else 0
+        if la:
+            nrx.use(names[level])
+        ring, index = fetch(cell, period, level)
         ok, payload = nrx.run(local, ring["slots"][index])
         done = now_ns()
+        state.cells[cell, period, C_NRX_MASK] = getattr(nrx, "last_crc_mask", int(ok))
         state.set_nrx(cell, period, PASS if ok else FAIL, done)
-        crc_mask, good = result_masks(nrx, ok, payload, ring["refs"][index], tb_bytes)
+        crc_mask, good = result_masks(nrx, ok, payload, ring["refs"][index], tb_sizes[level])
         payload_ok = good == every_ue
-        records.append([cell, period, start, done, int(ok), int(payload_ok), crc_mask, good])
+        records.append([cell, period, start, done, int(ok), int(payload_ok), crc_mask, good, level])
         if ok and not payload_ok and profile.num_ue == 1:
             # Diagnostic: which TB did we actually decode?
             match = None
-            for other_cell, other in rings.items():
-                for j, ref in enumerate(other["refs"]):
+            for other_cell, other_levels in rings.items():
+                for j, ref in enumerate(other_levels[-1]["refs"]):
                     if np.array_equal(payload[:tb_bytes], ref):
                         match = (other_cell, j)
                         break
@@ -144,12 +161,13 @@ def main() -> None:
         "lane": args.lane,
         "pid": os.getpid(),
         "columns": ["cell", "period", "start_ns", "done_ns", "crc_pass", "payload_ok",
-                    "ue_crc_mask", "ue_good_mask"],
+                    "ue_crc_mask", "ue_good_mask", "mcs_level"],
         "records": records,
         "false_pass_diagnostics": diag,
     }), encoding="utf-8")
-    for ring in rings.values():
-        cp.cuda.runtime.ipcCloseMemHandle(ring["ptr"])
+    for levels in rings.values():
+        for ring in levels:
+            cp.cuda.runtime.ipcCloseMemHandle(ring["ptr"])
     cp.cuda.runtime.free(local_ptr)
 
 

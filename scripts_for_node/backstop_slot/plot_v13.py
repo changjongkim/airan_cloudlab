@@ -6,7 +6,7 @@ usage:
   plot_v13.py frontier SWEEP.json RATE OUT.png [title] AI served vs recoveries kept at one AI load
   plot_v13.py axis     OUT.png XLABEL  X1=SWEEP1.json X2=SWEEP2.json ...   one condition per x value
   plot_v13.py series   SERIES.json SEED OUT.png        load, AI served and recoveries over time
-The scheme name comes from SCHEME_NAME (default "Our Scheme").
+The scheme name comes from SCHEME_NAME (default "Antiphase").
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 BLUE, ORANGE, AQUA, VIOLET, INK, MUTED, GRID = "#2a78d6", "#eb6834", "#1baf7a", "#8a5cd6", "#1f2328", "#59636e", "#d9dee4"
-NAME = os.environ.get("SCHEME_NAME", "Our Scheme")
+NAME = os.environ.get("SCHEME_NAME", "Antiphase")
 TOKENS_PER_REQUEST, GPUS = 414.8, 4
 OURS = "vf"
 RATE = int(os.environ.get("AI_RATE", "32"))     # AI load shown where a figure has one condition per x value

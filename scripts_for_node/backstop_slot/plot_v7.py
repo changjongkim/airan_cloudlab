@@ -29,7 +29,7 @@ for ax, (label, value, log) in zip(axes, panels):
     ax.plot([r["slo"] / 1e3 for r in fixed], [value(r) for r in fixed], color=ORANGE, linewidth=2, marker="o",
             markersize=8, markeredgecolor="white", markeredgewidth=1.5, label="Fixed GPU share", zorder=2)
     ax.plot([r["slo"] / 1e3 for r in ours], [value(r) for r in ours], color=BLUE, linewidth=0, marker="s",
-            markersize=10, markeredgecolor="white", markeredgewidth=1.5, label=os.environ.get("SCHEME_NAME", "Our Scheme"), zorder=3)
+            markersize=10, markeredgecolor="white", markeredgewidth=1.5, label=os.environ.get("SCHEME_NAME", "Antiphase"), zorder=3)
     for i, r in enumerate(fixed):
         if log and i < 3:
             offset, align = (-7, 7), "right"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Density phase B2: AI capacity under the radio targets at 10 and 12 cells per GPU.
-# No AI unit is safe next to the conventional receiver at these densities (B1), so Our Scheme
+# No AI unit is safe next to the conventional receiver at these densities (B1), so Antiphase
 # keeps every unit out of the conventional phase; fixed shares run as before.
 #   a: 40 cells, weak 50%, 2 lanes/GPU, rescue deadline 11.5 ms
 #   b: 48 cells, weak 25%, 1 lane/GPU,  rescue deadline 11.5 ms

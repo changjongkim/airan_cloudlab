@@ -18,7 +18,7 @@ ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 JOB = sys.argv[1]
 PREFIX = sys.argv[2] if len(sys.argv) > 2 else "y"
 PATTERN = sys.argv[3] if len(sys.argv) > 3 else r"([bu]\d+)"
-LABEL = {"u": "Our Scheme"}
+LABEL = {"u": "Antiphase"}
 
 
 def main() -> None:

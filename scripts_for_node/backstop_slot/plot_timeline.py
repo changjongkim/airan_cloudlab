@@ -69,7 +69,7 @@ def main() -> None:
     gpu, first, count = int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5])
     out = Path(sys.argv[6])
     fig, axes = plt.subplots(2, 1, figsize=(11, 4.6), sharex=True)
-    titles = sys.argv[7:9] if len(sys.argv) >= 9 else ["Our Scheme", "same NeuralRx rule + fixed GPU share"]
+    titles = sys.argv[7:9] if len(sys.argv) >= 9 else ["Antiphase", "same NeuralRx rule + fixed GPU share"]
     draw(axes[0], ours, titles[0], gpu, first, count)
     draw(axes[1], fixed, titles[1], gpu, first, count)
     axes[1].set_xlabel("time from uplink data arrival (ms); dotted: data arrival, dashed red: L1 deadline")

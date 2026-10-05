@@ -2,7 +2,7 @@
 # v3 step 5: several AI job classes on each GPU (24 cells, rescue deadline 6.5 ms).
 #   chat  Qwen2.5-1.5B prefill, SLO 200 ms      small  Qwen2.5-0.5B prefill, SLO 100 ms
 #   batch Qwen2.5-1.5B, always-full queue of 1,024-token prompts, no SLO
-# Our Scheme serves the most urgent class whose unit fits (urgency) or one line in arrival
+# Antiphase serves the most urgent class whose unit fits (urgency) or one line in arrival
 # order (fifo); fixed shares use the same worker without grants.
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab

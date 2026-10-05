@@ -1,0 +1,247 @@
+{
+ "p100": {
+  "name": "Low priority, no cap",
+  "seeds": 3,
+  "recovered_pct": 94.03133981680601,
+  "l1_late_pct": 0.022613065326633167,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1693.0333333333335,
+    "rejected_pct": 0.0,
+    "output_tokens_on_time_per_s": 154.03333333333333,
+    "responses_on_time_pct": 100.0
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 594.0,
+    "rejected_pct": 0.0
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 18602.666666666668,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 4647.666666666667,
+    "rejected_pct": 0.0
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 237.66666666666666,
+    "rejected_pct": 0.0
+   }
+  }
+ },
+ "p30": {
+  "name": "Fixed 30% + low priority",
+  "seeds": 3,
+  "recovered_pct": 98.53551345302719,
+  "l1_late_pct": 0.008375209380234505,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 443.6666666666667,
+    "rejected_pct": 28.8659793814433,
+    "output_tokens_on_time_per_s": 80.66666666666667,
+    "responses_on_time_pct": 30.76923076923077
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 542.1666666666666,
+    "rejected_pct": 0.23522822738728646
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 3925.3333333333335,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 1202.9333333333334,
+    "rejected_pct": 28.0
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 210.23333333333335,
+    "rejected_pct": 0.2937062937062937
+   }
+  }
+ },
+ "p70": {
+  "name": "Fixed 70% + low priority",
+  "seeds": 3,
+  "recovered_pct": 96.5338239591852,
+  "l1_late_pct": 0.007956448911222781,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1636.8,
+    "rejected_pct": 2.0618556701030926,
+    "output_tokens_on_time_per_s": 140.53333333333333,
+    "responses_on_time_pct": 100.0
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 593.1,
+    "rejected_pct": 0.0
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 12765.866666666669,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 4511.133333333334,
+    "rejected_pct": 1.6
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 237.16666666666666,
+    "rejected_pct": 0.0
+   }
+  }
+ },
+ "s10": {
+  "name": "Fixed 10%",
+  "seeds": 3,
+  "recovered_pct": 99.31427338466057,
+  "l1_late_pct": 0.0033500837520938024,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 17.433333333333334,
+    "rejected_pct": 63.91752577319588,
+    "output_tokens_on_time_per_s": 6.133333333333334,
+    "responses_on_time_pct": 0.0
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 117.03333333333335,
+    "rejected_pct": 45.91430971716606
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 2969.6,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 46.06666666666666,
+    "rejected_pct": 66.8
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 36.36666666666667,
+    "rejected_pct": 53.3986013986014
+   }
+  }
+ },
+ "s30": {
+  "name": "Fixed 30%",
+  "seeds": 3,
+  "recovered_pct": 97.2888542326986,
+  "l1_late_pct": 0.014656616415410384,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 751.1,
+    "rejected_pct": 24.742268041237114,
+    "output_tokens_on_time_per_s": 94.80000000000001,
+    "responses_on_time_pct": 54.716981132075475
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 572.3000000000001,
+    "rejected_pct": 0.0
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 4642.133333333334,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 2192.1666666666665,
+    "rejected_pct": 23.6
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 224.13333333333333,
+    "rejected_pct": 0.0
+   }
+  }
+ },
+ "wm": {
+  "name": "Our Scheme",
+  "seeds": 3,
+  "recovered_pct": 99.65630537676888,
+  "l1_late_pct": 0.010469011725293131,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1371.8,
+    "rejected_pct": 10.309278350515465,
+    "output_tokens_on_time_per_s": 119.10000000000001,
+    "responses_on_time_pct": 92.42424242424242
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 592.8000000000001,
+    "rejected_pct": 0.16241949033884065
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 5427.2,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 3667.1000000000004,
+    "rejected_pct": 10.8
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 237.29999999999998,
+    "rejected_pct": 0.23776223776223776
+   }
+  }
+ },
+ "wn": {
+  "name": "All unit sizes next to the conventional receiver",
+  "seeds": 3,
+  "recovered_pct": 99.65509615847309,
+  "l1_late_pct": 0.005025125628140704,
+  "classes": {
+   "chat": {
+    "kind": "chat",
+    "within_limit_per_s": 1388.7666666666664,
+    "rejected_pct": 9.278350515463918,
+    "output_tokens_on_time_per_s": 124.2,
+    "responses_on_time_pct": 86.95652173913044
+   },
+   "embed": {
+    "kind": "encoder",
+    "within_limit_per_s": 592.3000000000001,
+    "rejected_pct": 0.1792215065807897
+   },
+   "filler": {
+    "kind": "batch",
+    "within_limit_per_s": 6724.266666666667,
+    "rejected_pct": 0.0
+   },
+   "large": {
+    "kind": "prefill",
+    "within_limit_per_s": 3679.0333333333333,
+    "rejected_pct": 11.2
+   },
+   "vision": {
+    "kind": "encoder",
+    "within_limit_per_s": 236.73333333333335,
+    "rejected_pct": 0.2937062937062937
+   }
+  }
+ }
+}

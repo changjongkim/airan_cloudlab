@@ -7,7 +7,7 @@ for spec in "$@"; do
   case $spec in
     16) CELLS=16 TAG=x KFAIL=20 NRX_BOUND=4.2 TABLE="128:4.4,512:4.4,1024:4.6" GATING="conv=128+yield" SHARES="30 50 70 100" RATES="16 32" bash run_state/backstop_slot/mu_main.sh ;;
     24) CELLS=24 TAG=x KFAIL=20 NRX_BOUND=4.1 TABLE="128:5.0,512:4.6,1024:4.8" GATING="conv=128+yield" SHARES="30 50 70" RATES="8 16" bash run_state/backstop_slot/mu_main.sh ;;
-    16v) # variants of Our Scheme at 16 cells (references: tag x)
+    16v) # variants of Antiphase at 16 cells (references: tag x)
       ( export CELLS=16 KFAIL=20 NRX_BOUND=4.2 TABLE="128:4.4,512:4.4,1024:4.6" REFS=" " SHARES=" " RATES="16 32"
       TAG=ya GATING="conv=128,512+yield" bash run_state/backstop_slot/mu_main.sh
       TAG=yb GATING="conv=128+yield" BUDGET="--conv-budget alone=2.6/margin=0.2/512:1.0,1024:1.0" bash run_state/backstop_slot/mu_main.sh

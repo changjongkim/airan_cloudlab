@@ -39,6 +39,9 @@ def main() -> None:
     parser.add_argument("--ai-max-piece-ms", type=float, default=1.0)
     parser.add_argument("--ai-force-chunk", type=int, default=0)
     parser.add_argument("--ai-dispatch", choices=("per_gpu", "global"), default="per_gpu")
+    parser.add_argument("--conv-by-active", default=None,
+                        help="unit sizes allowed next to the conventional receiver by the number of active cells of the "
+                             "GPU in the slot, e.g. 4:128,512/5:128 (above the largest number: none)")
     parser.add_argument("--unit-gating", default=None,
                         help="e.g. 128:2.8,512:3.2,1024:3.6/conv=128,512 (NeuralRx co-run bound per AI chunk)")
     parser.add_argument("--conv-budget", default=None,
@@ -99,6 +102,20 @@ def main() -> None:
     parser.add_argument("--ai-slo-ms", type=float, default=200.0)
     parser.add_argument("--ai-admission", type=int, default=0,
                         help="1: admit an AI request only if it is predicted to meet its SLO")
+    parser.add_argument("--nrx-run-ms", default="6.3,128:7.4,512:7.9,1024:7.9",
+                        help="median NeuralRx run alone, then next to AI of each unit size (reuse-time rule)")
+    parser.add_argument("--nrx-reuse-alone-ms", type=float, default=6.7,
+                        help="NeuralRx run length used to predict when a run ends (reuse-time rule)")
+    parser.add_argument("--ai-stop-check", type=int, default=0,
+                        help="1: the AI worker reads the controller's stop word between unit groups")
+    parser.add_argument("--yyr", default=None,
+                        help="YinYangRAN-style baseline: estimator.json,kept target,l1 target,quantile,reconfig_ms,decision_periods "
+                             "(with --dynamic-shares)")
+    parser.add_argument("--ring", type=int, default=128,
+                        help="slots of the pool that every cell replays in a loop (128: the pattern of failed "
+                             "TBs repeats every 0.32 s)")
+    parser.add_argument("--ai-classes5", type=Path, default=None,
+                        help="JSON with classes5, bounds_file, length_pairs: several models and kinds of AI work (ai_worker5)")
     parser.add_argument("--ai-admission-fraction", type=float, default=1.0,
                         help="admit a request if it is predicted to finish within this share of its time limit")
     parser.add_argument("--static-mps-pct", type=int, default=30)
@@ -111,9 +128,21 @@ def main() -> None:
                         help="CUDA_MPS_CLIENT_PRIORITY for AI workers (1 = below normal)")
     parser.add_argument("--nrx-flags", default=None,
                         help="override NeuralRx mechanisms, e.g. value=0,admit=0,start=fail_only")
+    parser.add_argument("--la", default=None,
+                        help="closed-loop link adaptation of the two-user cells: 'MCS,MCS,...:TARGET[:DOWN[:DELAY[:START]]]' "
+                             "(MCS levels with a ring each in the dataset, target share of TBs that need a retransmission, "
+                             "pointer step down per such TB in levels, feedback delay in periods, start level)")
     parser.add_argument("--ai-extra", type=Path, help="JSON merged into the config")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    la = None
+    if args.la:
+        fields = args.la.split(":")
+        levels = [int(m) for m in fields[0].split(",")]
+        la = {"levels": [f"nv_mu2_m{m}" for m in levels], "mcs": levels, "target": float(fields[1]),
+              "down": float(fields[2]) if len(fields) > 2 else 0.25, "delay": int(fields[3]) if len(fields) > 3 else 5,
+              "start": float(fields[4]) if len(fields) > 4 else (len(levels) - 1) / 2.0}
+        args.weak_profile = la["levels"][-1]         # the cell's profile is its highest level
 
     weak_total = round(args.cells * args.weak_fraction)
     cells = []
@@ -135,7 +164,7 @@ def main() -> None:
             "cell": cell,
             "gpu": gpu,
             "profile": args.weak_profile if weak else "strong_rank2",
-            "num_ue": 2 if weak and args.weak_profile == "nv_mu2" else 1,
+            "num_ue": 2 if weak and args.weak_profile.startswith("nv_mu2") else 1,
             "nrx_gpu": (gpu + 1) % args.gpus if weak else None,
             "offset": 97 * cell + args.ring_offset,
         })
@@ -152,7 +181,7 @@ def main() -> None:
         "ai_policy": args.ai_policy,
         "engine": args.engine,
         "dataset": args.dataset,
-        "ring": 128,
+        "ring": args.ring,
         "skip_periods": 20,
         "tdd_pattern": "DDDSU, 30 kHz SCS, one UL slot per 2.5 ms",
         "deadline_basis": "testMAC UL indication at T0+4.5 ms; data is ready at slot end T0+0.5 ms",
@@ -207,6 +236,15 @@ def main() -> None:
         for part in conv_part.split("+"):
             if part.startswith("reserve"):
                 config["ai_unit_gating"]["free_lane_reserve"] = int(part[len("reserve"):])
+        if "+reuse" in conv_part:
+            alone, _, per_chunk = args.nrx_run_ms.partition(",")
+            config["ai_unit_gating"].update({
+                "reuse_rule": True, "run_alone_ms": float(alone), "reuse_alone_ms": args.nrx_reuse_alone_ms,
+                "run_ai_ms": {k: float(v) for k, v in (x.split(":") for x in per_chunk.split(","))}})
+    if args.conv_by_active:
+        config.setdefault("ai_unit_gating", {})["conv_safe_by_active"] = {
+            part.split(":")[0]: [int(c) for c in part.split(":")[1].split(",") if c]
+            for part in args.conv_by_active.split("/")}
     if args.conv_budget:
         alone, margin, alphas = 0.0, 0.2, {}
         for part in args.conv_budget.split("/"):
@@ -241,6 +279,11 @@ def main() -> None:
                               "burst_periods": args.activity_burst, "seed": args.seed,
                               "phase_periods": args.activity_phase, "phase_high": args.activity_high,
                               "levels": [float(v) for v in args.activity_levels.split(",")]}
+    if args.ai_classes5:
+        config["ai"].update(json.loads(args.ai_classes5.read_text()))
+        config["ai"]["worker"] = "ai_worker5.py"      # --ai-dispatch global: one arrival list for the server
+    if args.ai_stop_check:
+        config["ai"]["stop_check"] = True
     if args.ai_admission_fraction != 1.0:
         config["ai"]["admission_fraction"] = args.ai_admission_fraction
     if args.ai_arrival_cv != 1.0:
@@ -277,12 +320,19 @@ def main() -> None:
                                    "lag_periods": args.dynamic_lag, "window_periods": 40}
         if args.dynamic_levels:
             config["dynamic_share"]["levels"] = [float(v) for v in args.dynamic_levels.split(",")]
+        if args.yyr:
+            estimator, target, l1_target, quantile, reconfig, decision = args.yyr.split(",")
+            config["dynamic_share"].update({"mode": "yyr", "estimator": estimator, "target": float(target),
+                                            "l1_target": float(l1_target), "quantile": float(quantile),
+                                            "reconfig_ms": float(reconfig), "decision_periods": int(decision)})
     if args.nrx_flags:
         flags = {}
         for item in args.nrx_flags.split(","):
             key, value = item.split("=")
             flags[key] = bool(int(value)) if key in ("skip", "admit", "value") else value
         config["nrx_flags"] = flags
+    if la:
+        config["la"] = la
     if args.ai_extra:
         config.update(json.loads(args.ai_extra.read_text()))
     args.output.parent.mkdir(parents=True, exist_ok=True)

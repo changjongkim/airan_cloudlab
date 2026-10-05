@@ -16,7 +16,7 @@ ROOT = Path("/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot")
 JOB = sys.argv[1] if len(sys.argv) > 1 else "59103692"
 
 POLICIES = [
-    ("rescue_value", "backstop_corun", "Our Scheme"),
+    ("rescue_value", "backstop_corun", "Antiphase"),
     ("rescue_value", "static", "our NeuralRx rule + fixed GPU share"),
     ("parallel", "static", "always both receivers + fixed GPU share"),
     ("parallel_admit", "static", "both receivers at arrival, deadline drop + fixed GPU share"),
@@ -83,7 +83,7 @@ def main() -> None:
                                                else f"{v:.0f}"))
         print(f"| {r['cells']} | {r['ai_rate_per_gpu']} | {r['label']} | " + " | ".join(vals) + " |")
 
-    colors = {"Our Scheme": "tab:blue", "our NeuralRx rule + fixed GPU share": "tab:orange",
+    colors = {"Antiphase": "tab:blue", "our NeuralRx rule + fixed GPU share": "tab:orange",
               "always both receivers + fixed GPU share": "tab:red",
               "both receivers at arrival, deadline drop + fixed GPU share": "tab:purple",
               "no NeuralRx + fixed GPU share": "tab:gray"}

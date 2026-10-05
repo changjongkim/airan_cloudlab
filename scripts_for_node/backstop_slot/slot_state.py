@@ -28,7 +28,9 @@ C_NRX_DONE = 5
 C_NRX_LANE = 6             # GPU of the lane that ran NeuralRx, -1 if none
 C_NRX_REASON = 7           # 1 conv_fail, 2 latest_start, 3 arrival, 4 low_value
 C_CONV_CBFAIL = 8          # code blocks whose CRC failed in the conventional decode
-C_WORDS = 10
+C_LEVEL = 9                # link adaptation: index of the MCS level the slot was sent with
+C_NRX_MASK = 10            # NeuralRx: UEs whose CRC passed (bit per UE), written before C_NRX_STATUS
+C_WORDS = 12
 
 # NeuralRx lane mailbox (controller -> lane), one row of ``lanes`` per lane.
 L_ASSIGN_SEQ = 0
@@ -53,10 +55,15 @@ A_BACKLOG_TOKENS = 12      # AI worker: prompt tokens still to prefill in its qu
 A_RATE_TPS = 13            # AI worker: recent prefill rate (tokens per second)
 A_PULLED = 14              # AI worker: requests it has taken from the global table
 A_CUR_CHUNK = 15           # AI worker: chunk size (tokens) of the chunk in progress, 0 if none
+A_STOP = 16                # controller: 1 = end the running piece after the units already on the GPU
+A_CHATS_DONE = 17          # AI worker (classes5): responses finished or given up, for the session count
+A_BACKLOG_T1 = 18          # AI worker (classes5): backlog of work with a time limit up to 100 ms (ns of unit bounds)
+A_BACKLOG_T2 = 19          # AI worker (classes5): the same, time limit up to 250 ms
+A_RATE_T1 = 20             # AI worker (classes5): service rate for work with a time limit up to 100 ms
 MAX_REQUESTS = 16384       # global AI request table (dispatch mode)
 REQ_WORDS = 4
 R_ARRIVAL, R_LENGTH, R_GPU, R_SEQ = 0, 1, 2, 3   # R_GPU: -1 waiting, -2 rejected, else GPU
-G_WORDS = 16
+G_WORDS = 24
 MAX_LANES = 64             # NeuralRx lane mailboxes (lane id = gpu * lanes_per_gpu + j)
 LANE_WORDS = 8
 

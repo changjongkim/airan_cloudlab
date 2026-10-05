@@ -35,6 +35,8 @@ def main() -> None:
     parser.add_argument("--ldpc-iterations", type=int, default=10)
     parser.add_argument("--conv-iterations", type=int, default=0)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--per-slot", type=Path,
+                        help="also save the per-slot outcomes (.npz: conv_good, nrx_good, cb_fail per UE, esno_db)")
     args = parser.parse_args()
 
     count = json.loads((args.dataset / f"{args.profile}_meta.json").read_text())["count"]
@@ -106,6 +108,9 @@ def main() -> None:
                           "conventional_only": int((conv_good[chosen] & ~nrx_good[chosen]).sum())}
     report["by_ebno_db"] = by_snr
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    if args.per_slot:
+        np.savez(args.per_slot, conv_good=conv_good, nrx_good=nrx_good, cb_fail=cb_fail,
+                 esno_db=np.asarray(ring.esno_db), tb_bytes=ring.tb_bytes)
     args.output.write_text(json.dumps(report, indent=2))
     print(json.dumps(report))
 

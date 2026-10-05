@@ -84,7 +84,7 @@ def draw(ax, run: str, title: str, gpu: int, first: int, count: int) -> None:
 def main() -> None:
     ours, fixed = sys.argv[1], sys.argv[2]
     gpu, first, count = int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5])
-    name = os.environ.get("SCHEME_NAME", "Our Scheme")
+    name = os.environ.get("SCHEME_NAME", "Antiphase")
     other = sys.argv[7] if len(sys.argv) > 7 else "Fixed GPU share"
     fig, axes = plt.subplots(2, 1, figsize=(7.0, 3.9), sharex=True)
     draw(axes[0], ours, f"(a) {name}: AI stops while the neural receiver runs", gpu, first, count)

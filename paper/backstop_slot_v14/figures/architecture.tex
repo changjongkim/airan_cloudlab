@@ -1,0 +1,148 @@
+% Overall architecture of Antiphase in the CASCADE look: layers, components, data structures, numbered steps.
+% Values: run fa1r32wm of job 59313958, cell 3, slot 547 (conv3.json, lane0.json, ai0.json of the run).
+%   cuPHY of cell 3 (GPU 3) ends 1.73 ms after the samples arrive, CRC fails, 8 failed code blocks (K = 9).
+%   NeuralRx of GPU 0 runs 1.77-8.57 ms and recovers the TB; the NeuralRx of GPU 2 is busy with cell 1.
+%   AI of GPU 0: piece -1.74..2.44 ms, then off until 8.65 ms.  Slot 548 of cell 3: 20 failed code blocks.
+% Processes and GPU placement: launch_slot.py; state rows: slot_state.py; steps: controller5.py.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\scriptsize]
+  % ================= server =================
+  \node[frame, fill=white, anchor=north west, minimum width=13.9cm, minimum height=7.62cm] at (0,0) {};
+  \node[lttl, anchor=north] at (6.95,-0.03) {AI-RAN Server (four GPUs under MPS)};
+
+  % ================= control layer =================
+  \node[layer, anchor=north west, minimum width=13.6cm, minimum height=2.78cm] at (0.15,-0.48) {};
+  \node[lttl, anchor=north] at (6.95,-0.5) {Control Layer: Controller};
+
+  % ---- TB state ----
+  \node[sub, anchor=north west, minimum width=5.9cm, minimum height=2.12cm] at (0.3,-1.0) {};
+  \node[cttl, anchor=north] at (3.25,-1.02) {TB State (shared memory)};
+  \foreach \x/\w/\h in {0.4/0.55/cell, 0.95/0.65/slot, 1.6/0.95/cuPHY, 2.55/2.15/failed code blocks, 4.7/1.4/NeuralRx}
+    \node[hcell, minimum width=\w cm] at (\x,-1.45) {\h};
+  \foreach \y/\f/\a/\b/\c/\d/\e in {-1.75/white/3/546/pass/0/--, -2.05/bluec!55/3/547/fail/8/GPU 0, -2.35/black!12/3/548/fail/20/not eligible}
+  {
+    \node[cell, fill=\f, minimum width=0.55cm] at (0.4,\y) {\a};
+    \node[cell, fill=\f, minimum width=0.65cm] at (0.95,\y) {\b};
+    \node[cell, fill=\f, minimum width=0.95cm] at (1.6,\y) {\c};
+    \node[cell, fill=\f, minimum width=2.15cm] at (2.55,\y) {\d};
+    \node[cell, fill=\f, minimum width=1.4cm] at (4.7,\y) {\e};
+  }
+  \node[inote, anchor=north west] at (0.4,-2.7) {one row per cell and slot};
+
+  % ---- NeuralRx assigner ----
+  \node[sub, fill=peach, anchor=north west, minimum width=3.8cm, minimum height=2.12cm] at (6.35,-1.0) {};
+  \node[cttl, anchor=north] at (8.25,-1.02) {NeuralRx Assigner};
+  \node[blk, fill=bluec!55, minimum width=0.42cm] (cb) at (6.75,-2.0) {8};
+  \node[inote, anchor=south] at (6.75,-1.8) {failed};
+  \node[draw=black!80, fill=bluec!18, diamond, aspect=1.5, inner sep=0.3pt, line width=0.4pt, font=\rmfamily\itshape\scriptsize] (dia) at (7.72,-2.0) {$\le 9$?};
+  \draw[arr] (cb.east) -- (dia.west);
+  \foreach \i/\f in {0/gold, 1/white, 2/black!30, 3/white}
+    \node[blk, fill=\f, minimum width=0.4cm] (lane\i) at ({8.7+0.4*\i},-2.0) {\i};
+  \draw[arr] (dia.east) -- (lane0.west);
+  \node[inote, anchor=south] at (9.3,-1.8) {free NeuralRx};
+  \node[inote, anchor=north] at (8.25,-2.42) {start within 3.9 ms of arrival};
+
+  % ---- AI admission ----
+  \node[sub, anchor=north west, minimum width=3.3cm, minimum height=2.12cm] at (10.3,-1.0) {};
+  \node[cttl, anchor=north] at (11.95,-1.02) {AI Admission};
+  \foreach \x/\w/\h in {10.4/0.65/GPU, 11.05/1.0/AI piece, 12.05/1.45/AI units}
+    \node[hcell, minimum width=\w cm] at (\x,-1.45) {\h};
+  \node[cell, fill=badc, minimum width=0.65cm] at (10.4,-1.75) {0};
+  \node[cell, fill=badc, minimum width=1.0cm, text=dred, font=\rmfamily\bfseries\scriptsize] at (11.05,-1.75) {stop};
+  \node[cell, fill=badc, minimum width=1.45cm] at (12.05,-1.75) {--};
+  \node[cell, minimum width=0.65cm] at (10.4,-2.05) {3};
+  \node[cell, minimum width=1.0cm] at (11.05,-2.05) {4.0 ms};
+  \node[cell, minimum width=1.45cm] at (12.05,-2.05) {$\le$ 512 tokens};
+  \node[inote, anchor=north west, align=left] at (10.4,-2.42) {no AI on a GPU whose\\NeuralRx runs};
+
+  % ================= data layer =================
+  \node[layer, anchor=north west, minimum width=13.6cm, minimum height=3.55cm] at (0.15,-3.92) {};
+  \node[lttl, anchor=north] at (6.95,-3.94) {Data Layer};
+
+  % ---- GPU 3 ----
+  \node[gpu, anchor=north west, minimum width=6.15cm, minimum height=2.93cm] at (0.3,-4.42) {};
+  \node[cttl, anchor=north] at (3.37,-4.44) {GPU 3};
+  \node[comp, anchor=north west, minimum width=1.5cm, minimum height=1.2cm] (n3) at (0.45,-4.85) {};
+  \node[ittl, anchor=north] at (1.2,-4.9) {NeuralRx};
+  \node[inote] at (1.2,-5.55) {free};
+  \node[comp, anchor=north west, minimum width=4.2cm, minimum height=1.2cm] (c3) at (2.1,-4.85) {};
+  \node[ittl, anchor=north] at (4.2,-4.9) {Conventional Receivers (cuPHY)};
+  \node[num] at (2.36,-5.42) {1};
+  \node[font=\rmfamily\scriptsize, anchor=west, inner sep=1pt] at (2.58,-5.42) {cell 3};
+  \node[free, minimum width=0.55cm] at (3.65,-5.42) {};
+  \foreach \i/\f in {0/545, 1/546}
+    \node[blk, fill=white, minimum width=0.55cm] at ({4.2+0.55*\i},-5.42) {\f};
+  \node[blk, fill=gold, minimum width=0.55cm] (s547) at (5.3,-5.42) {547};
+  \node[inote, anchor=north] at (4.2,-5.64) {slot ring in GPU memory};
+  \node[comp, anchor=north west, minimum width=5.85cm, minimum height=1.05cm] (a3) at (0.45,-6.18) {};
+  \node[ittl, anchor=north west] at (0.5,-6.22) {AI Worker (low priority)};
+  \node[inote, anchor=north east] at (6.25,-6.22) {granted piece: 4.0 ms};
+  \foreach \i/\t in {0/128, 1/512, 2/512, 3/128, 4/512, 5/128}
+    \node[blk, fill=aic, minimum width=0.62cm] at ({0.95+0.62*\i},-6.92) {\t};
+  \node[inote, anchor=west] at (4.4,-6.92) {AI units (tokens)};
+
+  % ---- GPU 0 ----
+  \node[gpu, anchor=north west, minimum width=6.15cm, minimum height=2.93cm] at (7.45,-4.42) {};
+  \node[cttl, anchor=north] at (10.52,-4.44) {GPU 0};
+  \node[comp, fill=okc, anchor=north west, minimum width=3.15cm, minimum height=1.2cm] (n0) at (7.6,-4.85) {};
+  \node[ittl, anchor=north] at (9.17,-4.9) {NeuralRx (larger model)};
+  \node[blk, fill=gold, minimum width=1.55cm] (job) at (8.45,-5.42) {cell 3, slot 547};
+  \node[blk, fill=greenc, minimum width=1.16cm] (rec) at (10.1,-5.42) {recovered};
+  \draw[arr] (job.east) -- (rec.west);
+  \node[inote, anchor=north] at (9.17,-5.64) {runs 1.8--8.6 ms after arrival};
+  \node[comp, anchor=north west, minimum width=1.85cm, minimum height=1.2cm] (c0) at (10.9,-4.85) {};
+  \node[font=\rmfamily\bfseries\scriptsize, align=center] at (11.82,-5.45) {Conventional\\Receivers\\(cuPHY)};
+  \node[comp, anchor=north west, minimum width=5.85cm, minimum height=1.05cm] (a0) at (7.6,-6.18) {};
+  \node[ittl, anchor=north west] at (7.65,-6.22) {AI Worker (low priority)};
+  \node[inote, anchor=north east, text=dred] at (12.9,-6.22) {no AI from 2.4 to 8.7 ms};
+  \foreach \i/\t in {0/512, 1/128}
+    \node[blk, fill=aic, minimum width=0.62cm] at ({8.1+0.62*\i},-6.92) {\t};
+  \draw[dred, line width=1.6pt] (9.1,-7.13) -- (9.1,-6.71);
+  \foreach \i in {0, 1, 2}
+    \node[free, minimum width=0.62cm] at ({9.5+0.62*\i},-6.92) {};
+  \foreach \i/\t in {0/128, 1/512}
+    \node[blk, fill=aic, minimum width=0.62cm] at ({11.44+0.62*\i},-6.92) {\t};
+  \node[inote, anchor=west] at (12.4,-6.92) {\ldots};
+
+  % ================= steps =================
+  \draw[arr] (4.3,-4.85) -- (4.3,-3.26);
+  \node[num] at (4.62,-3.59) {2};
+  \node[note, anchor=west] at (4.8,-3.59) {CRC, failed code blocks};
+  \draw[arr] (8.2,-3.26) -- (8.2,-4.85);
+  \node[num] at (8.52,-3.59) {3};
+  \node[note, anchor=west] at (8.7,-3.59) {Assign};
+  \draw[fat, dblue] (s547.east) -- (7.6,-5.42);
+  \node[num] at (6.95,-5.08) {4};
+  \node[note, text=dblue, anchor=north] at (6.95,-5.6) {Copy};
+  \draw[arr] (9.75,-4.85) -- (9.75,-3.26);
+  \node[num] at (10.07,-3.59) {5};
+  \node[note, anchor=west] at (10.25,-3.59) {Recovered};
+  \draw[arr, dred] (13.12,-3.26) -- (13.12,-6.18);
+  \node[rnum] at (12.28,-3.59) {6};
+  \node[note, anchor=west, text=dred] at (12.44,-3.59) {Stop};
+
+  % ================= the same recovery over time =================
+  \node[layer, anchor=north west, minimum width=13.9cm, minimum height=2.0cm] at (0,-7.8) {};
+  \node[lttl, anchor=north] at (6.95,-7.82) {The Same Recovery over Time};
+  % time axis: x = 4.8 + 0.7 t, t in ms after the samples of slot 547 arrive
+  \foreach \y/\l in {-8.42/cuPHY of cell 3 (GPU 3), -8.77/NeuralRx (GPU 0), -9.12/AI Worker (GPU 0)}
+    \node[font=\rmfamily\bfseries\scriptsize, anchor=east] at (3.45,\y) {\l};
+  \node[job, fill=white, minimum width=1.21cm, minimum height=0.27cm, anchor=west] at (4.8,-8.42) {fails};
+  \node[job, fill=greenc, minimum width=4.76cm, minimum height=0.27cm, anchor=west] at (6.04,-8.77) {};
+  \node[font=\rmfamily\bfseries\scriptsize] at (9.4,-8.77) {recovers the TB};
+  \node[job, fill=aic, minimum width=2.93cm, minimum height=0.27cm, anchor=west] at (3.58,-9.12) {AI piece};
+  \node[job, pattern=north east lines, pattern color=black!45, minimum width=4.35cm, minimum height=0.27cm, anchor=west] at (6.51,-9.12) {};
+  \node[font=\rmfamily\itshape\bfseries\scriptsize, text=dred, fill=panel, inner sep=1pt] at (9.4,-9.12) {no AI};
+  \node[job, fill=aic, minimum width=2.7cm, minimum height=0.27cm, anchor=west] at (10.86,-9.12) {};
+  \node[font=\rmfamily\bfseries\scriptsize] at (11.85,-9.12) {AI piece};
+  \draw[guard] (7.6,-8.22) -- (7.6,-9.3);
+  \node[inote, anchor=west, text=dred] at (7.65,-8.42) {layer-1 deadline: 4.0};
+  \draw[guard] (12.85,-8.22) -- (12.85,-9.3);
+  \node[inote, anchor=east, text=dred] at (12.8,-8.42) {recovery deadline: 11.5};
+  \draw[line width=0.4pt] (3.5,-9.36) -- (13.75,-9.36);
+  \foreach \t in {0, 2, 4, 6, 8, 10, 12}
+  {
+    \draw[line width=0.4pt] ({4.8+0.7*\t},-9.36) -- ({4.8+0.7*\t},-9.42);
+    \node[font=\rmfamily\scriptsize, anchor=north, inner sep=1pt] at ({4.8+0.7*\t},-9.42) {\t};
+  }
+  \node[inote, anchor=north east, inner sep=1pt] at (4.5,-9.42) {ms after the samples arrive};
+\end{tikzpicture}

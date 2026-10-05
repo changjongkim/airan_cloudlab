@@ -72,7 +72,7 @@ def pick(nrx, ai, gpus, period_ns, epoch, count, periods) -> int:
 
 def main() -> None:
     run, count, out = sys.argv[1], int(sys.argv[3]), sys.argv[4]
-    name = os.environ.get("SCHEME_NAME", "Our Scheme")
+    name = os.environ.get("SCHEME_NAME", "Antiphase")
     config, gpus, period_ns, epoch, nrx, ai = load(run)
     first = pick(nrx, ai, gpus, period_ns, epoch, count, int(config["periods"])) if sys.argv[2] == "auto" else int(sys.argv[2])
     origin, span = epoch + first * period_ns, count * period_ns

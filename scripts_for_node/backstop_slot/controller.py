@@ -16,10 +16,10 @@ NeuralRx mechanisms (switched by ``nrx_flags``; presets by policy name):
   lanes   partner (lanes of the partner GPU) | any (all lanes, EDF)
 
 AI policies:
-  backstop_corun  (Our Scheme) AI runs in its MPS share next to radio work; a
+  backstop_corun  (Antiphase) AI runs in its MPS share next to radio work; a
                   grant is given only if every NeuralRx TB it may overlap
                   still meets its rescue deadline with the co-run bound
-  backstop_units  (Our Scheme, unit-aware) as backstop_corun, but every grant also
+  backstop_units  (Antiphase, unit-aware) as backstop_corun, but every grant also
                   names the largest AI chunk allowed: a chunk size is allowed only
                   if its co-run bound keeps every overlapping NeuralRx TB inside its
                   rescue deadline, and chunks not marked conventional-safe are kept
@@ -174,7 +174,7 @@ def main() -> None:
 
     # Global AI dispatch: one arrival stream for the whole server; each request goes to
     # the GPU whose queue, served at that GPU's recent rate, finishes it first.  Under
-    # Our Scheme the rates differ by GPU because radio work differs by GPU.
+    # Antiphase the rates differ by GPU because radio work differs by GPU.
     ai_cfg = config.get("ai", {})
     dispatch = ai_policy != "none" and ai_cfg.get("dispatch") == "global"
     n_requests = 0

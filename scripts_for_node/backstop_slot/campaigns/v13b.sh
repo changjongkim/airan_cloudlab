@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# v13: sweeps that compare Our Scheme with existing GPU sharing mechanisms.
+# v13: sweeps that compare Antiphase with existing GPU sharing mechanisms.
 # Setting of every run: nrx_large rescue, both receivers 20 LDPC iterations, mixed channels,
 # recovery deadline 11.5 ms, 4 A100 GPUs, Qwen2.5-1.5B prefill requests with a 200 ms limit.
 #
@@ -10,9 +10,9 @@
 #   pP     fixed MPS share P% with the AI at a low MPS priority (p100: priority only, SMEC-style)
 #   dAxBlN share follows the radio load: A% when full, B% otherwise, load seen N periods late
 #          (YinYangRAN-style; dAxBxClN uses three shares; eAxBlN: the same with low-priority AI)
-#   vf     Our Scheme: low-priority AI, pieces granted by deadline, every unit size next to the
+#   vf     Antiphase: low-priority AI, pieces granted by deadline, every unit size next to the
 #          conventional receiver, AI next to a running NeuralRx only while three lanes are free
-#   v4     Our Scheme of v7-v12 (no priority, no lane reserve)
+#   v4     Antiphase of v7-v12 (no priority, no lane reserve)
 #   ve/vd/vc/v8  ablations: AI never next to NeuralRx / reserve 2 / 70% cap / 128-token units only
 #
 # usage: bash v13b.sh STEP...      (STEP: smoke aiload phase steps nrx gpus cells burst aiburst)

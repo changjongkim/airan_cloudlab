@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# v3e: Our Scheme with the AI share capped (MPS) and co-run bounds measured under that cap.
+# v3e: Antiphase with the AI share capped (MPS) and co-run bounds measured under that cap.
 # usage: v3e_density.sh cells d2 radio gating-suffix budget pct table rates...
 set -uo pipefail
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab

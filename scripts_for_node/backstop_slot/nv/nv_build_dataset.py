@@ -25,12 +25,13 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    keep = [float(e) for e in args.ebno.split(",")]
+    keep = [] if args.ebno == "all" else [float(e) for e in args.ebno.split(",")]
     rx, tb, ebno, nrx_ok, meta = [], [], [], [], None
     for path in args.input:
         data = np.load(path, allow_pickle=False)
         meta = json.loads(str(data["meta"]))
-        chosen = np.isin(np.round(data["ebno"], 3), np.round(keep, 3))
+        chosen = (np.ones(len(data["ebno"]), dtype=bool) if args.ebno == "all"
+                  else np.isin(np.round(data["ebno"], 3), np.round(keep, 3)))
         rx.append(data["rx"][chosen])
         tb.append(data["payload"][chosen])
         ebno.append(data["ebno"][chosen])

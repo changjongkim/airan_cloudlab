@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# v5, 16 cells, AI load 32: variants of Our Scheme only (references: tag x of v5_chain.sh).
+# v5, 16 cells, AI load 32: variants of Antiphase only (references: tag x of v5_chain.sh).
 #   ya  shorter AI pieces (2 ms)            yb  only 128-token units may overlap conventional decode
 #   yc  128 always, 512/1024 within a conventional delay budget
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab

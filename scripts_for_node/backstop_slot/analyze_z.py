@@ -27,8 +27,8 @@ L1_TARGET = 0.0005          # 0.05% of TBs
 RESCUE_TARGET = 0.99
 
 POLICIES = [
-    ("Our Scheme", "{p}{s}d{t}u_c{c}_rescue_value_backstop_units"),
-    ("Our Scheme, no AI during conventional", "{p}{s}d{t}v_c{c}_rescue_value_backstop_units"),
+    ("Antiphase", "{p}{s}d{t}u_c{c}_rescue_value_backstop_units"),
+    ("Antiphase, no AI during conventional", "{p}{s}d{t}v_c{c}_rescue_value_backstop_units"),
     ("fixed 30% share", "{p}{s}d{t}s30_c{c}_rescue_value_static"),
     ("fixed 50% share", "{p}{s}d{t}s50_c{c}_rescue_value_static"),
     ("fixed 70% share", "{p}{s}d{t}s70_c{c}_rescue_value_static"),
@@ -102,7 +102,7 @@ def main() -> None:
         print(f"  {b['cells']} cells, rescue deadline {b['rescue_deadline_ms']} ms: {b['policy']} ({b['ai_slo_tokens_per_s']:.0f} tokens/s)")
 
     fig, axes = plt.subplots(1, 4, figsize=(16, 3.8))
-    colors = {"Our Scheme": "tab:blue", "Our Scheme, no AI during conventional": "tab:cyan",
+    colors = {"Antiphase": "tab:blue", "Antiphase, no AI during conventional": "tab:cyan",
               "fixed 30% share": "tab:olive", "fixed 50% share": "tab:orange", "fixed 70% share": "tab:red",
               "fixed 100% share": "tab:brown", "both receivers at arrival + fixed 50%": "tab:purple"}
     for ax, (cells, d2) in zip(axes, [(c, float(d)) for c, d in SETTINGS]):

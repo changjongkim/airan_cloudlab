@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared environment for slot-scale Backstop runs. Source from an allocation.
+# Shared environment for slot-scale Antiphase runs. Source from an allocation.
 
 source /pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/common.sh
 source /pscratch/sd/s/sgkim/kcj/airan_cloudlab/scripts_for_node/softwall_same_gpu/mps_runtime.sh

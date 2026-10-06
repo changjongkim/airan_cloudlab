@@ -1035,6 +1035,27 @@ share and of \textit{Priority-max} are 0.4\% and 0.6\% at the 10\% target, and t
 policies are 1.8\%, 3.1\%, and 6.5\% with eight two-user cells at the 1\% target; the order of the policies
 is the same.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/eval_frontier.pdf}
+\caption{AI served against the goodput of the two-user cells that is lost, with the outer loop (two seeds; all
+policies of a panel run in one job). Orange: low-priority AI with a cap of 20-70\% and without a cap. Blue:
+\sys, and its settings that allow AI next to a neural receiver while 3, 2, or 1 neural receivers are free.}
+\label{fig:frontier}
+\end{figure}
+
+\noindent\textbf{No Cap Replaces the Rule.} A share with a well-chosen cap might keep the radio. We sweep the
+cap of the low-priority share from 20\% to no cap in four settings (Figure~\ref{fig:frontier}). A higher cap
+serves more AI and loses more goodput in every setting: from the 20\% cap to no cap, the loss grows from
+0.1\% to 0.9\% at the 10\% target, from 0.2\% to 2.4\% at the 1\% target, and from 1.0\% to 8.2\% with
+eight two-user cells at the 1\% target. The cap that keeps the goodput within 0.3\% depends on the setting:
+it is 20-30\% with four two-user cells, and with eight two-user cells the fixed 10\% share already loses
+0.8-0.9\%. \sys stays within 0.3\% in the four settings with one configuration. In no setting does a cap
+serve at least the AI of a setting of \sys at no more loss. Reading the AI at a loss of at most 0.25\% from
+the lines between the measured points, \sys serves 1.2$\times$, 2.5$\times$, 2.7$\times$, and 7.5$\times$
+the AI of the caps. The settings of \sys that allow AI next to a neural receiver trade goodput for AI in the
+same way as a cap and from a lower loss; the default allows none.
+
 \subsection{Protection and latency}
 \label{sec:protect}
 

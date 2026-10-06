@@ -576,7 +576,7 @@ AI worker는 낮은 MPS 우선순위로 실행하고 비율 한도는 두지 않
 | 6.10 | 다른 AI 작업에도 통하는가 | 모델 4개, 작업 5종류를 함께 돌려 복구 99.7% |
 | 6.11 | 셀이 더 많으면 | 20–48셀: 고정 10%의 **5.9–6.2배**, 낮은 우선순위 + 30%의 **1.8–1.9배** |
 | 6.12 | 얼마나 더 나아질 수 있는가 | 상한의 **70%**를 처리한다. 기존 수단은 11–37% |
-| 6.13 | rate control이 MCS를 고르면 | 복구 경로 **+11–31%**. Antiphase는 아홉 조건 모두 0.3% 안. 비율 방식은 최대 8.2%를 잃고, 모든 조건을 지키는 한도 값이 없다. Antiphase의 AI 처리량은 NRx가 쉬는 시간에 비례한다 |
+| 6.13 | rate control이 MCS를 고르면 | 복구 경로 **+11–31%**. Antiphase는 아홉 조건 모두 0.3% 안. 비율 방식은 최대 8.2%를 잃고, 모든 조건을 지키는 한도 값이 없다(2-UE 셀 8개에서는 10%도 0.8–0.9%를 잃는다). 같은 손실에서 Antiphase의 설정이 AI를 **1.2–7.5배** 처리한다 |
 
 대표 그림은 문서 맨 위의 "한눈에 보기"에 있다. 표의 "복구"는 복구 유지율(AI 없는 서버가 복구한 TB 수 대비)이다.
 
@@ -1596,6 +1596,43 @@ Antiphase는 NRx가 쉬는 시간에 GPU를 AI에 다 주고, 비율 방식은 �
 
 원본: `results/backstop_slot/optimum_gap_closed.txt`, `la_closed_{laa,lac,lab,laf}.txt`.
 
+#### 6.13.7 한도를 바꿔 가며 본 goodput과 AI 처리량
+
+> **한 줄 결론.** 한도 값을 잘 고르는 것으로는 Antiphase를 대신하지 못한다. 한도를 올리면 AI와 함께 goodput 손실이 늘고, 2-UE 셀 8개에서는 한도를 10%로 내려도 0.8–0.9%를 잃는다. 네 조건 모두에서 Antiphase의 설정이 같은 손실 이하로 AI를 더 처리한다.
+
+낮은 우선순위의 한도를 20–70%와 한도 없음으로 바꾸고, Antiphase는 NRx 옆의 AI를 허용하는 설정(빈 NRx 여유 3, 2, 1)까지 함께 쟀다. 조건은 넷이고 한 조건의 모든 방식을 같은 job에서 돌렸다(job 59423316, `campaigns/v17_frontier.sh`, 시드 2. 시드 3은 대기열에 있다).
+
+![한도를 바꿔 가며 본 AI 처리량과 잃은 goodput](docs/current/figures/backstop_v14/eval_frontier.png)
+
+가로축은 AI 처리량, 세로축은 AI 없는 서버 대비 잃은 goodput이다. 오른쪽 아래가 좋다. 주황 선은 한도(숫자는 한도 값, max는 한도 없음), 초록 세모는 고정 10%, 큰 파란 점은 Antiphase, 파란 선은 Antiphase의 다른 설정(숫자는 빈 NRx 여유)이다.
+
+칸은 "AI 처리량 / 잃은 goodput"이다.
+
+| 조건 | **Antiphase** | 고정 10% | 한도 20% | 한도 30% | 한도 50% | 한도 70% | 한도 없음 |
+|---|---|---|---|---|---|---|---|
+| 2-UE 셀 4개, 목표 10% | **11.6k / 0.0%** | 4.7k / 0.1% | 6.9k / 0.1% | 11.5k / 0.2% | 19.5k / 0.5% | 25.1k / 0.6% | 29.6k / 0.9% |
+| 2-UE 셀 4개, 목표 1% | **33.6k / 0.1%** | 5.5k / 0.1% | 9.8k / 0.2% | 17.8k / 0.3% | 32.8k / 0.7% | 41.9k / 0.7% | 49.1k / 2.4% |
+| 2-UE 셀 8개, 목표 3% | **6.9k / 0.3%** | 4.4k / 0.9% | 6.1k / 0.8% | 10.3k / 1.3% | 17.0k / 1.7% | 21.4k / 2.1% | 28.2k / 4.2% |
+| 2-UE 셀 8개, 목표 1% | **16.6k / 0.1%** | 4.9k / 0.8% | 7.9k / 1.0% | 14.1k / 2.0% | 26.0k / 3.1% | 34.6k / 3.7% | 46.1k / 8.2% |
+
+Antiphase의 다른 설정(빈 NRx 여유 3 / 2 / 1):
+
+| 조건 | 여유 3 | 여유 2 | 여유 1 |
+|---|---|---|---|
+| 2-UE 셀 4개, 목표 10% | 12.2k / 0.0% | 13.9k / 0.1% | 17.7k / 0.4% |
+| 2-UE 셀 4개, 목표 1% | 35.4k / 0.2% | 38.4k / 0.6% | 40.2k / 0.7% |
+| 2-UE 셀 8개, 목표 3% | 7.2k / 0.5% | 8.4k / 0.6% | 12.8k / 1.4% |
+| 2-UE 셀 8개, 목표 1% | 18.3k / 0.6% | 22.8k / 1.8% | 27.9k / 2.7% |
+
+- **goodput을 0.3% 안에서 지키는 한도 값은 조건마다 다르고, 없는 조건도 있다.** 2-UE 셀 4개에서는 한도 20–30%까지가 0.3% 안이다. 2-UE 셀 8개에서는 고정 10%도 0.8–0.9%를 잃는다. Antiphase는 설정을 바꾸지 않고 네 조건에서 0.0–0.3%다.
+- **한도를 올리면 AI와 손실이 함께 는다.** 한도 20%에서 한도 없음으로 가면 손실이 0.1%에서 0.9%(목표 10%), 0.2%에서 2.4%(목표 1%), 0.8%에서 4.2%, 1.0%에서 8.2%(2-UE 셀 8개)로 는다. 손실 없이 AI를 더 주는 한도 값은 없다.
+- **같은 손실에서 Antiphase의 설정이 AI를 더 처리한다.** 네 조건 모두에서, Antiphase의 어느 설정보다 AI를 같거나 더 처리하면서 손실이 같거나 적은 한도는 없다. 반대로 Antiphase의 설정은 한도 10–30%(목표 10%), 10–60%(목표 1%), 10–20%(2-UE 셀 8개, 목표 3%), 10–50%(2-UE 셀 8개, 목표 1%)보다 AI를 같거나 더 처리하고 손실이 같거나 적다.
+- **손실 0.25% 이하에서 처리하는 AI.** 두 설정 사이와 AI 없음 사이를 직선으로 이어 읽으면 Antiphase는 15.7k / 36.1k / 6.8k / 17.5k, 한도 방식은 13.5k / 14.7k / 2.5k / 2.3k다. Antiphase가 1.2배 / 2.5배 / 2.7배 / 7.5배다.
+- **빈 NRx 여유는 Antiphase 안의 조절 값이다.** NRx 옆의 AI를 허용하면 AI가 늘고 손실도 는다(목표 10%에서 여유 1은 17.7k에 0.4%). 기본값은 NRx 옆 금지이고, 이 문서의 Antiphase 수치는 모두 기본값이다.
+- 시드 2개의 평균이다. 시드별 값의 차이는 0.1–0.3%p이고, 0.1%p의 차이는 시드 변동과 구분되지 않는다(`frontier_closed.txt`에 시드 범위).
+
+원본: `results/backstop_slot/la_closed_{lfa,lfb,lfc,lfd}.json`, `frontier_closed.txt`, `frontier_closed.json`.
+
 ### 6.14 이전 규칙(v13)으로 측정한 조건
 
 > **한 줄 결론.** 이 절은 이전 규칙(v13)의 기록이다. 현재 규칙의 값은 6.4–6.11절에 있다.
@@ -1981,6 +2018,7 @@ $R bash $C/v16_long_b.sh                     # 16셀: p100 yyp yyr, 시드 1–5
 $R bash $C/v16_long.sh long1                 # GPU 1장: n wd s10 p30, 시드 1–5 (약 45분)
 $R bash $C/v16_long.sh long20 long48         # 20셀과 48셀: n wd s10 p30, 시드 1–3 (약 70분)
 J6=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh sched   # 정상 상태의 지표와 시간대별 놓침 -> sched_metrics.txt, sched_*_w20.json, warmup_*.json
+JF=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh frontier   # 한도를 바꿔 가며 본 goodput과 AI (6.13.7절; $R bash $C/v17_frontier.sh "1 2 3"의 job) -> frontier_closed.txt, eval_frontier.png
 JL=J1,J2 bash scripts_for_node/backstop_slot/campaigns/v14_report.sh levels   # 세 단계(기존 수신기만 / + NRx / + AI)의 L1 지연 -> l1_levels.txt, 닫힌 루프 조건에서 NRx가 도는 시간 -> optimum_gap_closed.txt (6.0.1, 6.13.6절; JL은 닫힌 루프 실행의 job)
 
 # 표와 그림 (로그인 노드). J1 = 시드 1–2와 규칙 비교, J3 = 시드 3–5·다른 규모·link adaptation·Antiphase의 세 부하 조건,
@@ -2054,7 +2092,7 @@ cd paper/backstop_slot_v14 && bash figures.sh && module load texlive/2024 && lat
 | 3 | [docs/current/BACKSTOP_V4_VERIFICATION_KO.md](docs/current/BACKSTOP_V4_VERIFICATION_KO.md) | 수신기 검증과 v4–v12 실험. 6.1–6.3절의 근거 |
 | 4 | [docs/current/BACKSTOP_SLOT_DIFFERENTIATION_KO.md](docs/current/BACKSTOP_SLOT_DIFFERENTIATION_KO.md) | 기존 연구와의 차이, 출처 링크 (v13 기준) |
 | 5 | [docs/current/BACKSTOP_SLOT_DESIGN_KO.md](docs/current/BACKSTOP_SLOT_DESIGN_KO.md) | 설계와 코드 대응 (v13 기준) |
-| 6 | [paper/backstop_slot_v14/main.pdf](paper/backstop_slot_v14/main.pdf) | 논문 초안 (영문, 31쪽). v14의 규칙과 수치. 설계 절마다 그림(전체 구조, 복구 경로, 손실 모델, AI 허락·중단)이 있고, 평가 첫 절에 결과 요약 표와 그림이 있다. 손실 모델 절, 추정기 기준선, 여러 AI 작업, goodput, link adaptation, 미래를 아는 스케줄과의 거리, 닫힌 루프 link adaptation 포함. v13 초안은 `paper/backstop_slot_v7` |
+| 6 | [paper/backstop_slot_v14/main.pdf](paper/backstop_slot_v14/main.pdf) | 논문 초안 (영문, 32쪽). v14의 규칙과 수치. 설계 절마다 그림(전체 구조, 복구 경로, 손실 모델, AI 허락·중단)이 있고, 평가 첫 절에 결과 요약 표와 그림이 있다. 손실 모델 절, 추정기 기준선, 여러 AI 작업, goodput, link adaptation, 미래를 아는 스케줄과의 거리, 닫힌 루프 link adaptation 포함. v13 초안은 `paper/backstop_slot_v7` |
 | 7 | [docs/current/CURRENT_RESEARCH_INDEX_KO.md](docs/current/CURRENT_RESEARCH_INDEX_KO.md) | 전체 문서 인덱스 |
 
 ### 12.2 수치의 원본
@@ -2074,6 +2112,7 @@ cd paper/backstop_slot_v14 && bash figures.sh && module load texlive/2024 && lat
 | 6.11 | `results/backstop_slot/sweep_{ta,tu}_c16_j59321430.json`, `sweep_{to,tv}_c20_j59321430.json`, `sweep_tm_c32_j59321430.json`, `sweep_tn_c48_j59321430.json`, `prediction_dense76_20cells.txt`(실행 전에 적은 예측) |
 | 6.12 | `results/backstop_slot/optimum_gap.json`, `optimum_gap.txt` |
 | 6.13.6 | `results/backstop_slot/optimum_gap_closed.json`, `optimum_gap_closed.txt` (닫힌 루프 조건에서 NRx가 도는 시간과 상한) |
+| 6.13.7 | `results/backstop_slot/la_closed_{lfa,lfb,lfc,lfd}.json`, `.txt`, `frontier_closed.json`, `frontier_closed.txt` (`analyze_frontier.py`) |
 | 6.13 | `results/backstop_slot/la_closed_<tag>.json`, `.txt` (tag: `laa` 목표 10%, `lac` 3%, `lab` 1%, `lae` `lah` `lad` GPU 2장의 10% / 3% / 1%, `lag` GPU 1장 1%, `lai` `laf` 2-UE 셀 8개의 3% / 1%, `lal` `lak` 계단 0.5의 목표 10% / 2-UE 셀 8개 1%; job 59345188, 59362400). 단계별 수신기 비교는 `raw/lacl_high16_m<MCS>.json`(저장소에 없음, 6.13.1절의 표가 그 값) |
 | 6.14 | `results/backstop_slot/sweep_<tag>_c<셀>_j59192512_59199237.json`, `v13_report_j59192512_59199237.md` |
 | 추정기 | `results/backstop_slot/yyr_estimator_{fixed,lowprio}_j59210955.json` |

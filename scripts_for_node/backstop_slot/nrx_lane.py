@@ -55,8 +55,11 @@ def main() -> None:
     la = config.get("la")                       # link adaptation: one ring per MCS level and cell
     names = la["levels"] if la else [weak[0]["profile"]]
     profile = PROFILES[names[-1]]
-    metas = [json.loads((dataset / f"{name}_meta.json").read_text()) for name in names]
-    blocks = [np.load(dataset / f"{name}_tb.npy") for name in names]
+    # one ring per (channel state, MCS level), state-major, as the cell workers export them (la_states.py)
+    datasets = [Path(d) for d in la.get("datasets", [])] if la else []
+    datasets = datasets or [dataset]
+    metas = [json.loads((d / f"{name}_meta.json").read_text()) for d in datasets for name in names]
+    blocks = [np.load(d / f"{name}_tb.npy") for d in datasets for name in names]
     tb_sizes = [int(meta["tb_bytes"]) for meta in metas]
     tb_bytes = tb_sizes[-1]
     rings = {}
@@ -131,7 +134,7 @@ def main() -> None:
         state.set_nrx_running(cell, period, start)
         level = int(state.cells[cell, period, C_LEVEL]) if la else 0
         if la:
-            nrx.use(names[level])
+            nrx.use(names[level % len(names)])
         ring, index = fetch(cell, period, level)
         ok, payload = nrx.run(local, ring["slots"][index])
         done = now_ns()

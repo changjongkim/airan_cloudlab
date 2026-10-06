@@ -6,7 +6,8 @@
 #   link adaptation of jobs JL -> la_closed_<tag>.json/.txt and its figure; sched, the scheduling metrics per policy
 #   (L1 latency and misses, neural receiver run time, AI request latency, use of the GPU time) -> sched_<tag>_*.json
 #   and sched_metrics.txt; levels, the layer-1 latency without a neural receiver, with it, and with AI -> l1_levels.txt,
-#   and the busy time of the neural receivers in the closed-loop conditions -> optimum_gap_closed.txt)
+#   and the busy time of the neural receivers in the closed-loop conditions -> optimum_gap_closed.txt; frontier, AI served
+#   against goodput lost for the caps and the settings of the rule -> frontier_closed.txt and eval_frontier.png)
 # The figures of the paper: paper/backstop_slot_v14/figures.sh.
 # Jobs: J1 seeds 1-2 of the headline conditions and the rule comparison, J2 kinds of AI work (baselines),
 # J3 seeds 3-5, other server sizes, link adaptation, the final rule (wm) in the headline conditions,
@@ -126,6 +127,18 @@ for step in $steps; do
       shifter --image=$AERIAL_IMAGE --env=V14=1 --env=OTHERS=wn,wr3,wr1,vf,s10,p30,p50,p70,yyr,yyp,d10x50l0,e30x70l0,d10x30x50l0,e30x50x70l0 \
         python3 analyze_optimum.py ../../$R/optimum_gap.json $J1,$J3:fa:16 $J1,$J3:fb:16 $J1,$J3:fc:16 $J4:sx:16 $J4:sy:16 $J3,$J4:sw:16 \
         $J3,$J4:sc:8 $J3,$J4:sd:8 $J3,$J4,$J5:sa:4 $J3,$J4,$J5:sb:4 $J5:tv:20:wd $J5:tm:32:wd $J5:tn:48:wd > ../../$R/optimum_gap.txt 2>&1 ;;
+    frontier)    # README 6.13.7: AI served against goodput lost for the caps of the low-priority baseline and the settings
+                 # of the rule (v17_frontier.sh, jobs JF)
+      for tag in lfa lfb lfc lfd; do
+        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json ${JF:-59423316} $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+      done
+      $PY analyze_frontier.py ../../$R/frontier_closed.json "Four two-user cells, target 10%=../../$R/la_closed_lfa.json" \
+        "Four two-user cells, target 1%=../../$R/la_closed_lfb.json" "Eight two-user cells, target 3%=../../$R/la_closed_lfd.json" \
+        "Eight two-user cells, target 1%=../../$R/la_closed_lfc.json" > ../../$R/frontier_closed.txt 2>&1
+      cd ../..
+      ${PLOT/plot_v14.py/plot_eval.py} frontier $F/eval_frontier.png "Target 10%=$R/la_closed_lfa.json" "Target 1%=$R/la_closed_lfb.json" \
+        "Target 3%, eight two-user cells=$R/la_closed_lfd.json" "Target 1%, eight two-user cells=$R/la_closed_lfc.json"
+      cd $S ;;
     levels)      # README 6.0.1: what the neural receiver and the AI each add to the layer-1 latency (single-user cells of the
                  # closed-loop runs, which include the server without a neural receiver), and README 6.13.6: the share of the
                  # time in which the neural receivers run in the closed-loop conditions

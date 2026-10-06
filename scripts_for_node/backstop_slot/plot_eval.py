@@ -330,7 +330,7 @@ def frontier(out: str, items: list[str]) -> None:
         ax.plot(*point("wm"), color=blue, marker="o", markersize=13, linestyle="", markeredgecolor="white", zorder=5)
         for c in rule[1:]:
             x, y = point(c)
-            ax.annotate(c[2:], (x, y), textcoords="offset points", xytext=(0, -13), ha="center", fontsize=FS - 2.5, color=blue,
+            ax.annotate(c[2:], (x, y), textcoords="offset points", xytext=(9, -11), ha="center", fontsize=FS - 2.5, color=blue,
                         fontweight="normal")
         ys = [point(c)[1] for c in caps + rule + (["s10"] if "s10" in rows else [])]
         ax.set_ylim(min(-0.35, min(ys) - 0.25), max(1.2, max(ys) * 1.18))

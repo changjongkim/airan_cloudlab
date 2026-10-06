@@ -17,7 +17,7 @@
 - **[수신기 검증과 다시 한 실험](BACKSTOP_V4_VERIFICATION_KO.md) (2026-10-01, 먼저 읽을 것):** NRx 입력 교정, LDPC 반복
   횟수를 맞춘 수신기 비교, NVlabs 공개 NRx 둘(nrx_rt, nrx_large) 검증, 실험 네 판(v4, v5, v6, v7), 지금 쓸 수 있는
   문장. 주장의 기준은 v7(큰 모델을 rescue로)이다. 아래 결과 문서의 "살린 TB" 수치는 이 문서로 대체된다.
-- 논문 초안(LaTeX, 31쪽): `paper/backstop_slot_v14/main.tex`, `main.pdf`. v14의 규칙과 수치로 쓴 초안이다(손실 모델 절,
+- 논문 초안(LaTeX, 32쪽): `paper/backstop_slot_v14/main.tex`, `main.pdf`. v14의 규칙과 수치로 쓴 초안이다(손실 모델 절,
   추정기 기준선, 여러 AI 작업, goodput, link adaptation, 미래를 아는 스케줄과의 거리, 닫힌 루프 link adaptation). v13까지의 초안은 `paper/backstop_slot_v7`, 이전 스킴의 논문은
   `paper/softwall_sigmetrics27`에 그대로 두었다.
 - [논문용 영문 문단 초안](BACKSTOP_V7_PAPER_DRAFT_EN.md): LaTeX 초안을 쓰기 전의 문단 모음.

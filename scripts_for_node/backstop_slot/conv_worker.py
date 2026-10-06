@@ -52,10 +52,13 @@ def main() -> None:
     if la and args.profile not in la["levels"]:
         la = None
     names = la["levels"] if la else [args.profile]              # lowest MCS first
-    rings = [CellRing(args.dataset, name, args.ring, args.offset) for name in names]
+    # one ring per (channel state, MCS level), state-major; without la["datasets"] there is one state (la_states.py)
+    datasets = [Path(d) for d in la.get("datasets", [])] if la else []
+    datasets = datasets or [args.dataset]
+    rings = [CellRing(dataset, name, args.ring, args.offset) for dataset in datasets for name in names]
     ring = rings[-1]
     conv = conv_path(ring.profile, ring.tb_bytes, stream, int(run_config.get("conv_ldpc_iterations", 0)))
-    for other in rings[:-1]:
+    for other in rings[:len(names) - 1]:                        # the receiver configuration of a level is the same in every state
         conv.add_level(other.profile, other.tb_bytes)
     every_ue = (1 << ring.profile.num_ue) - 1
     if args.ipc_file:
@@ -80,6 +83,8 @@ def main() -> None:
         pointer = float(la.get("start", top / 2.0))
         rescue_ns = int(float(run_config.get("rescue_deadline_ms", run_config["deadline_ms"])) * 1e6)
         sent: dict[int, tuple[int, int]] = {}                   # period -> (release, UEs decoded here)
+        from la_states import state_sequence
+        channel_state = state_sequence(la, args.cell, args.periods)
 
     active = None
     if args.config:
@@ -106,9 +111,10 @@ def main() -> None:
                 for ue in range(ring.profile.num_ue):
                     pointer += up if (final >> ue) & 1 else -down
                 pointer = min(top + 0.999, max(0.0, pointer))
-            level = int(pointer)
+            mcs_level = int(pointer)
+            level = int(channel_state[period]) * len(names) + mcs_level     # flat index of the ring
             ring = rings[level]
-            conv.use(names[level])
+            conv.use(names[mcs_level])
             state.cells[args.cell, period, C_LEVEL] = level
         spin_until(release)
         index = period % ring.ring
@@ -138,7 +144,8 @@ def main() -> None:
         "records": records,
     }
     if la:
-        result["la"] = {"levels": names, "tb_bytes": [r.tb_bytes for r in rings], "pointer_end": pointer}
+        result["la"] = {"levels": names, "tb_bytes": [r.tb_bytes for r in rings], "pointer_end": pointer,
+                        "states": len(datasets)}
     args.output.write_text(json.dumps(result), encoding="utf-8")
     for r in rings:
         r.close()

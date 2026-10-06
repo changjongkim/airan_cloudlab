@@ -1,0 +1,17 @@
+closed-loop link adaptation, target 3% of the TBs needing a retransmission; two-user cells: 8; warm-up 800 periods
+
+| policy | seeds | mean MCS | first-transmission errors | TBs needing a retransmission | goodput per user slot | vs no recovery path | vs recovery path without AI | slots with a candidate | candidates without a NeuralRx | NeuralRx ended late | recovered TBs/s (vs recovery path without AI) | AI served (tokens/s) | L1 late |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Recovery path, no AI | 2 | 12.44 | 10.0% | 3.0% | 69.0k | – | +0.0% | 18.2% | 15.5% | 0.0% | 449 (+0.0%) | 0.0k | 0.020% |
+| Rule (stoppable pieces, no AI next to NeuralRx) | 2 | 12.42 | 9.9% | 3.0% | 68.8k | – | -0.3% | 17.9% | 15.9% | 0.0% | 441 (-1.8%) | 6.9k | 0.019% |
+| Rule, AI next to NeuralRx while 3 are free | 2 | 12.40 | 9.9% | 3.0% | 68.7k | – | -0.5% | 17.9% | 16.1% | 0.0% | 439 (-2.2%) | 7.2k | 0.023% |
+| Rule, AI next to NeuralRx while 2 are free | 2 | 12.39 | 9.8% | 3.0% | 68.6k | – | -0.6% | 17.7% | 16.4% | 0.0% | 434 (-3.3%) | 8.4k | 0.020% |
+| Rule, AI next to NeuralRx while 1 is free | 2 | 12.33 | 9.3% | 3.0% | 68.1k | – | -1.4% | 17.1% | 19.0% | 0.0% | 406 (-9.7%) | 12.8k | 0.045% |
+| Fixed 10% | 2 | 12.37 | 9.6% | 3.0% | 68.4k | – | -0.9% | 17.5% | 17.4% | 0.0% | 422 (-6.0%) | 4.4k | 0.022% |
+| Fixed 30% + low priority | 2 | 12.33 | 9.4% | 3.0% | 68.1k | – | -1.3% | 17.1% | 18.9% | 0.0% | 409 (-9.0%) | 10.3k | 0.021% |
+| Fixed 50% + low priority | 2 | 12.30 | 9.1% | 3.0% | 67.8k | – | -1.7% | 16.7% | 20.6% | 0.1% | 390 (-13.1%) | 17.0k | 0.021% |
+| Fixed 70% + low priority | 2 | 12.26 | 8.9% | 3.0% | 67.5k | – | -2.1% | 16.4% | 20.7% | 0.6% | 379 (-15.5%) | 21.4k | 0.028% |
+| Low priority, no cap | 2 | 12.09 | 8.1% | 3.0% | 66.2k | – | -4.1% | 14.9% | 19.5% | 7.1% | 324 (-27.8%) | 28.2k | 0.070% |
+| p20 | 2 | 12.38 | 9.6% | 3.0% | 68.5k | – | -0.8% | 17.6% | 17.2% | 0.0% | 425 (-5.3%) | 6.1k | 0.020% |
+| p40 | 2 | 12.32 | 9.3% | 3.0% | 68.0k | – | -1.5% | 17.0% | 19.4% | 0.1% | 402 (-10.4%) | 13.1k | 0.031% |
+| p60 | 2 | 12.27 | 9.0% | 3.0% | 67.6k | – | -2.0% | 16.6% | 20.8% | 0.2% | 386 (-13.9%) | 19.4k | 0.024% |

@@ -52,7 +52,9 @@ def run_stats(path: Path) -> dict:
             lanes[(r[0], r[1])] = r
     seconds = (int(config["periods"]) - WARM) * float(config["period_ms"]) / 1e3
     bits = tbs = fails = retx = recovered = candidates = lost = late = 0
-    level_slots = np.zeros(len(la["levels"]))
+    levels = len(la["levels"])                 # with channel states the records carry state * levels + MCS level
+    level_slots = np.zeros(levels)
+    state_slots: dict[int, list] = {}          # channel state -> [slots, sum of MCS]
     cells = 0
     for cell in config["cells"]:
         if cell.get("nrx_gpu") is None:
@@ -66,7 +68,10 @@ def run_stats(path: Path) -> dict:
             period, release, good, level = r[0], r[2], r[9], r[10]
             if period < WARM:
                 continue
-            level_slots[level] += 1
+            level_slots[level % levels] += 1
+            entry = state_slots.setdefault(level // levels, [0, 0.0])
+            entry[0] += 1
+            entry[1] += float(la["mcs"][level % levels])
             ran = lanes.get((cell["cell"], period))
             saved = 0
             if ran is not None and ran[3] - release <= rescue_ns:
@@ -89,6 +94,8 @@ def run_stats(path: Path) -> dict:
             "goodput_bits": bits / (tbs + retx / RETX_OK), "recovered_per_s": recovered / seconds,
             "nrx_demand_pct": 100.0 * candidates / (tbs / 2), "lost_candidates_pct": 100.0 * lost / max(1, candidates),
             "late_candidates_pct": 100.0 * late / max(1, candidates),
+            "mcs_by_state": [state_slots[k][1] / state_slots[k][0] for k in sorted(state_slots)],
+            "state_share": [state_slots[k][0] / level_slots.sum() for k in sorted(state_slots)],
             "ai_slo": m["ai_slo"], "l1_late_pct": m["l1_late_pct"], "target": float(la["target"])}
 
 
@@ -131,7 +138,9 @@ def main() -> None:
         row["recovered_vs_no_ai_pct"] = kept
         row.update(seeds=seeds, vs_no_recovery_pct=versus["x"], vs_recovery_no_ai_pct=versus["n"],
                    goodput_by_seed=[by_seed[s]["goodput_bits"] for s in seeds],
-                   level_share=np.mean([by_seed[s]["level_share"] for s in seeds], axis=0).tolist())
+                   level_share=np.mean([by_seed[s]["level_share"] for s in seeds], axis=0).tolist(),
+                   mcs_by_state=np.mean([by_seed[s]["mcs_by_state"] for s in seeds], axis=0).tolist(),
+                   retx_by_seed=[by_seed[s]["retx_pct"] for s in seeds])
         out["policies"][policy] = row
         pct = lambda v: "–" if v != v else f"{v:+.1f}%"
         print(f"| {NAMES.get(policy, policy)} | {len(seeds)} | {row['mean_mcs']:.2f} | {row['first_error_pct']:.1f}% | "

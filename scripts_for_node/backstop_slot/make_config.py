@@ -132,6 +132,10 @@ def main() -> None:
                         help="closed-loop link adaptation of the two-user cells: 'MCS,MCS,...:TARGET[:DOWN[:DELAY[:START]]]' "
                              "(MCS levels with a ring each in the dataset, target share of TBs that need a retransmission, "
                              "pointer step down per such TB in levels, feedback delay in periods, start level)")
+    parser.add_argument("--la-states", default=None,
+                        help="channel states of the two-user cells with --la: 'DATASET,DATASET,...:PHASE' (one dataset "
+                             "directory per state with the rings of every MCS level; a cell stays PHASE periods in a "
+                             "state and then moves to another one at random)")
     parser.add_argument("--ai-extra", type=Path, help="JSON merged into the config")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -143,6 +147,13 @@ def main() -> None:
               "down": float(fields[2]) if len(fields) > 2 else 0.25, "delay": int(fields[3]) if len(fields) > 3 else 5,
               "start": float(fields[4]) if len(fields) > 4 else (len(levels) - 1) / 2.0}
         args.weak_profile = la["levels"][-1]         # the cell's profile is its highest level
+        if args.la_states:
+            dirs, phase = args.la_states.rsplit(":", 1)
+            la.update(datasets=[str(Path(d).resolve()) for d in dirs.split(",")], phase=int(phase), state_seed=args.seed)
+            for d in la["datasets"]:
+                for name in la["levels"]:
+                    if not (Path(d) / f"{name}_meta.json").is_file():
+                        raise SystemExit(f"--la-states: no ring of {name} in {d}")
 
     weak_total = round(args.cells * args.weak_fraction)
     cells = []

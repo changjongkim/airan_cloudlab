@@ -1,0 +1,14 @@
+## Target 10%, runs of 100 s  (single-user cells, periods from 8000)
+
+| level | TBs | median | 99th | 99.9th | room to the deadline at the 99.9th | 99.99th | TBs past the deadline |
+|---|---|---|---|---|---|---|---|
+| Conventional receiver alone | 1152000 | 1.39 | 1.47 | 1.50 | 2.50 ms | 1.53 | 0 |
+| + neural receiver, no AI | 1152000 | 2.10 | 2.96 | 3.11 | 0.89 ms | 3.22 | 0 |
+| + AI, rule | 1152000 | 2.07 | 3.00 | 3.14 | 0.86 ms | 3.25 | 3 |
+| + AI, fixed 10% | 1152000 | 2.16 | 3.08 | 3.28 | 0.72 ms | 3.42 | 0 |
+| + AI, 30% share with low priority | 1152000 | 2.32 | 3.21 | 3.40 | 0.60 ms | 3.55 | 11 |
+| + AI, 70% share with low priority | 1152000 | 2.42 | 3.36 | 3.58 | 0.42 ms | 3.78 | 9 |
+| + AI, low priority alone | 1152000 | 2.54 | 3.56 | 3.89 | 0.11 ms | 4.20 | 470 |
+
+the neural receiver adds 1.61 ms at the 99.9th percentile (64% of the room of the conventional receiver alone); wm adds +0.03, s10 adds +0.17, p30 adds +0.29, p70 adds +0.47, p100 adds +0.78
+

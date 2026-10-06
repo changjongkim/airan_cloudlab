@@ -1169,8 +1169,14 @@ latency, because the conventional receiver of a GPU slows while the neural recei
 takes 62-64\% of the room to the deadline and leaves 0.90-0.95~ms. It is the price of the recovery path,
 which raises the goodput by 11-31\% (Section~\ref{sec:worth}). AI must fit into the room that is left. \sys
 adds 0.03-0.07~ms. \textit{Static} adds 0.17-0.21~ms, \textit{Priority} adds 0.30-0.36~ms, and
-\textit{Priority-max} adds 0.68-0.90~ms, which leaves 0.00-0.27~ms. In the rest of this section, the server
-without AI is the second level: it runs the neural receiver.
+\textit{Priority-max} adds 0.68-0.90~ms, which leaves 0.00-0.27~ms. We repeated the 10\% target, where the
+neural receivers run for 68\% of the time, in runs of 100~s (three seeds, 1.15 million TBs of single-user
+cells per level after the first 20~s). No TB passes the layer-1 deadline with the conventional receiver alone
+or with the neural receiver, and 3 do with \sys. \textit{Priority} serves the same AI as \sys in this
+setting (11.5k tokens/s); it adds 0.29~ms to the 99.9th percentile against 0.03~ms, loses 4.2\% of the
+recoveries against 0.9\%, and 11 TBs pass the deadline. With \textit{Priority-max} the 99.99th percentile is
+4.20~ms and 470 TBs pass the deadline. In the rest of this section, the server without AI is the second level:
+it runs the neural receiver.
 
 \noindent\textbf{Start of a Run.} The processes of a run start cold, and its first seconds are not the steady
 state. Table~\ref{tab:when} counts the TBs past the layer-1 deadline by the time since the start. Without

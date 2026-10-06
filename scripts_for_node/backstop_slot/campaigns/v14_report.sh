@@ -145,7 +145,11 @@ for step in $steps; do
       $PY analyze_l1_levels.py ../../$R/l1_levels.json ${JL:-59345188,59362400} "laa:16:Target 10%" "lac:16:Target 3%" "lab:16:Target 1%" \
         "laf:16:Target 1%, eight two-user cells" > ../../$R/l1_levels.txt 2>&1
       J=${JL:-59345188,59362400}
-      $PY analyze_optimum.py ../../$R/optimum_gap_closed.json $J:laa:16 $J:lac:16 $J:lab:16 $J:laf:16 > ../../$R/optimum_gap_closed.txt 2>&1 ;;
+      $PY analyze_optimum.py ../../$R/optimum_gap_closed.json $J:laa:16 $J:lac:16 $J:lab:16 $J:laf:16 > ../../$R/optimum_gap_closed.txt 2>&1
+      # the 10% target in runs of 100 s (v18_long_cl.sh, job JG): steady state, with the TBs past the deadline
+      ${PY/python3/--env=SKIP=8000 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_long_cl.json ${JG:-59423316} \
+        "lga:16:Target 10%, runs of 100 s" > ../../$R/l1_levels_long_cl.txt 2>&1
+      $PY analyze_la_closed.py ../../$R/la_closed_lga.json ${JG:-59423316} lga 16 > ../../$R/la_closed_lga.txt 2>&1 ;;
     lacl)        # README 6.13: closed-loop link adaptation (la_cl.sh, la_cl2.sh), jobs JL (comma-separated)
       for spec in ${LACL_TAGS:-laa:16 lac:16 lab:16 laf:16 lai:16 lae:8 lah:8 lad:8 lag:4 lak:16 lal:16}; do
         tag=${spec%%:*}

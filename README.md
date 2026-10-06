@@ -605,7 +605,23 @@ NRx와 AI를 넣은 서버에서 무선 작업의 지연은 0이 될 수 없다.
 - **손실이 작다는 것은 간섭이 없다는 뜻이 아니다.** 지연이 남은 여유 안에 머물러 마감 초과로 바뀌지 않는다는 뜻이다. 20초 실행은 실행 시작 구간의 놓침이 섞이므로 마감을 넘긴 TB 수는 이 표에 넣지 않았다(6.0.2절의 100초 실행으로 센다).
 - 아래의 정상 상태 표에서 "AI 없음"은 둘째 단계(NRx는 있고 AI는 없는 서버)다.
 
-원본: `results/backstop_slot/l1_levels.txt`, `l1_levels.json`.
+표준 조건(목표 10%)은 100초 실행으로도 쟀다(`campaigns/v18_long_cl.sh`, 시드 3, 처음 20초 제외, 단계마다 단일 UE 셀의 TB 115만 개). NRx가 시간의 68%를 돌아 L1 여유가 가장 좁은 조건이고, Antiphase와 낮은 우선순위 + 30%의 AI 처리량이 같은 조건이다(6.13.6절).
+
+| 단계 | AI 처리량 | 2-UE 셀의 goodput (NRx만 있는 서버 대비) | 잃은 복구 | L1 지연 중앙값 / p99.9 / p99.99 | 마감 여유 (p99.9) | L1 마감을 넘긴 TB (115만 개 중) |
+|---|---|---|---|---|---|---|
+| 기존 수신기만 | – | −10.7% | – | 1.39 / 1.50 / 1.53 ms | 2.50 ms | 0 |
+| + NRx (AI 없음) | – | 기준 | 기준 | 2.10 / 3.11 / 3.22 ms | 0.89 ms | 0 |
+| **+ AI, Antiphase** | **11.5k** | **0.0%** | **0.9%** | 2.07 / **3.14** / 3.25 ms | **0.86 ms** | **3** |
+| + AI, 고정 10% | 4.8k | −0.1% | 2.6% | 2.16 / 3.28 / 3.42 ms | 0.72 ms | 0 |
+| + AI, 낮은 우선순위 + 30% | 11.5k | −0.2% | 4.2% | 2.32 / 3.40 / 3.55 ms | 0.60 ms | 11 |
+| + AI, 낮은 우선순위 + 70% | 25.6k | −0.6% | 9.7% | 2.42 / 3.58 / 3.78 ms | 0.42 ms | 9 |
+| + AI, 낮은 우선순위만 | 30.7k | −1.0% | 14.4% | 2.54 / 3.89 / 4.20 ms | 0.11 ms | 470 |
+
+- **같은 AI를 처리하는 두 방식이 무선에 하는 일은 다르다.** Antiphase와 낮은 우선순위 + 30%는 둘 다 11.5k를 처리한다. Antiphase는 L1 p99.9에 0.03 ms를 더하고 복구를 0.9% 잃는다. 낮은 우선순위 + 30%는 0.29 ms를 더하고(10배) 복구를 4.2% 잃는다. L1 마감을 넘긴 TB는 3개와 11개다(AI 없는 서버는 0개).
+- **낮은 우선순위만 쓰면 L1 마감을 넘는다.** p99.99가 4.20 ms이고 115만 개 중 470개(0.041%)가 마감을 넘는다. 여유는 0.11 ms가 남는다.
+- 100초 실행의 goodput과 AI 처리량은 20초 실행(6.13.2절)과 같다.
+
+원본: `results/backstop_slot/l1_levels.txt`, `l1_levels.json`, `l1_levels_long_cl.txt`, `la_closed_lga.txt`.
 
 #### AI가 더하는 것: 방식별 지표
 
@@ -1591,7 +1607,7 @@ Antiphase는 NRx가 쉬는 시간에 GPU를 AI에 다 주고, 비율 방식은 �
 
 - **쉬는 시간이 64%면 1.9배, 32%면 같은 양이다.** "쉬는 시간 동안 GPU 전부"와 "항상 GPU의 30%"를 비교하는 것이므로, 쉬는 시간이 30%에 가까워지면 두 양이 같아진다.
 - **목표 10%에서 NRx가 쉬지 못하는 이유.** outer loop는 재전송이 필요한 TB가 10%가 될 때까지 MCS를 올린다. 실패가 많아지고 그 실패가 NRx로 간다. 슬롯의 28.7%에서 후보가 나고 NRx는 한 번에 2.5슬롯을 쓴다.
-- **같은 양을 처리해도 무선에 하는 일은 다르다.** 목표 10%에서 낮은 우선순위 + 30%는 NRx 옆에서 AI를 돌려 goodput 0.3%를 내고, L1 p99.9에 0.30 ms를 더해 마감 여유를 0.60 ms로 줄인다(Antiphase는 0.03 ms를 더해 0.86 ms를 남긴다, 6.0.1절). 같은 한도가 2-UE 셀 8개에서는 AI를 덜 처리하면서 goodput 2.3%를 낸다.
+- **같은 양을 처리해도 무선에 하는 일은 다르다.** 목표 10%를 100초 실행으로 재면(6.0.1절) 두 방식 모두 11.5k를 처리한다. 낮은 우선순위 + 30%는 NRx 옆에서 AI를 돌려 복구를 4.2% 잃고 goodput 0.2%를 내며, L1 p99.9에 0.29 ms를 더해 마감 여유를 0.60 ms로 줄이고, L1 마감을 넘긴 TB가 115만 개 중 11개다. Antiphase는 복구 0.9%, goodput 0.0%, L1 +0.03 ms(여유 0.86 ms), 3개다. 같은 한도가 2-UE 셀 8개에서는 AI를 덜 처리하면서 goodput 2.3%를 낸다.
 - **NRx가 도는 시간은 Antiphase가 쓰지 않는 시간이다.** 미래를 아는 스케줄은 그 시간의 일부를 AI에 줄 수 있어 27.8k–49.0k를 처리한다. Antiphase는 그 41–69%다(6.12절과 같은 계산).
 
 원본: `results/backstop_slot/optimum_gap_closed.txt`, `la_closed_{laa,lac,lab,laf}.txt`.
@@ -2099,7 +2115,7 @@ cd paper/backstop_slot_v14 && bash figures.sh && module load texlive/2024 && lat
 
 | 절 | 원본 |
 |---|---|
-| 6.0.1, 6.0.2 | `results/backstop_slot/sched_<tag>_c<셀>_j<job>[_w<초>].json`, `warmup_<tag>_*.json`, `sched_metrics.txt`(`analyze_sched.py`, `analyze_warmup.py`), `l1_levels.json`, `l1_levels.txt`(`analyze_l1_levels.py`: 기존 수신기만 / + NRx / + AI) |
+| 6.0.1, 6.0.2 | `results/backstop_slot/sched_<tag>_c<셀>_j<job>[_w<초>].json`, `warmup_<tag>_*.json`, `sched_metrics.txt`(`analyze_sched.py`, `analyze_warmup.py`), `l1_levels.json`, `l1_levels.txt`(`analyze_l1_levels.py`: 기존 수신기만 / + NRx / + AI), `l1_levels_long_cl.txt`, `la_closed_lga.txt`(목표 10%의 100초 실행) |
 | 6.1 | `results/backstop_slot/raw/ldpc_check_*`, `mu_probe_*` (요약은 검증 문서 2장) |
 | 6.2, 6.3 | `results/backstop_slot/v7_*`, `v8_*` (검증 문서 6.1–6.8절) |
 | 6.4, 6.5 | `results/backstop_slot/sweep_{fa,fb,fc}_c16_j59210955_59313958.json`, `series_fc_c16_j59210955_59313958.json` |

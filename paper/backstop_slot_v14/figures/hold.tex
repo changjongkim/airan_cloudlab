@@ -1,0 +1,112 @@
+% Where recoveries are lost: four NeuralRx and two failed TBs in each of four uplink slots, on a time axis.
+% x = 2.6 + 0.64 t, t in ms after the samples of slot k arrive.  P = 2.5 ms, c = 1.4 ms (cuPHY result),
+% L = 3.9 ms (latest start), S = 6.3 ms alone and 7.9 ms next to low-priority AI (medians).
+% A failed TB of slot m can start on a NeuralRx in the window [mP + c, mP + L]; the windows of consecutive
+% slots follow each other without a gap (L - c = P).  A run that starts at c ends at c + S:
+%   alone        1.4 + 6.3 = 7.7 ms, inside the window of slot k+2 (ends 8.9 ms): 1.2 ms to spare, 2 slots
+%   next to AI   1.4 + 7.9 = 9.3 ms, after that window: the TBs of slot k+2 are lost, 3 slots
+% Both runs end before the recovery deadline of their TB (11.5 ms).
+% Right: 4 NeuralRx / slots per run = TBs per slot the server can take; lost candidates measured with
+% 16 cells and five seeds (no AI 1.58%, low-priority AI without a cap 6.36%, whose median run is 1.7 ms
+% longer; sensitivity_fa_j59210955_59313958.json).
+% Every TB keeps its color: slot k violet, k+1 teal, k+2 gold, k+3 orange.  Thin blue strip: AI on the GPU.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\footnotesize]
+  \tikzset{run/.style={job, minimum height=0.22cm, anchor=west},
+           ai/.style={draw=black!55, line width=0.25pt, fill=aic, inner sep=0pt, minimum height=0.07cm, anchor=west}}
+  \node[layer, anchor=north west, minimum width=13.9cm, minimum height=4.7cm] at (0,0) {};
+  % uplink slots arrive every 2.5 ms
+  \foreach \t/\l in {0/k, 2.5/k{+}1, 5/k{+}2, 7.5/k{+}3}
+  {
+    \draw[black!45, densely dotted, line width=0.5pt] ({2.6+0.64*\t},-0.42) -- ({2.6+0.64*\t},-4.32);
+    \node[font=\rmfamily\scriptsize, anchor=south west, inner sep=1pt] at ({2.6+0.64*\t},-0.44) {Slot $\l$};
+  }
+  \node[rowl] at (2.45,-0.64) {Failed TBs};
+  % failed TBs and the window in which each can start (ends at its latest start)
+  \foreach \t/\a/\b/\f in {1.4/A/B/tba, 3.9/C/D/tbd, 6.4/E/F/gold, 8.9/G/H/recc}
+  {
+    \draw[draw=black!60, fill=\f!45, line width=0.3pt] ({2.6+0.64*\t},-0.69) rectangle ({4.2+0.64*\t},-0.59);
+    \draw[line width=0.8pt] ({4.2+0.64*\t},-0.79) -- ({4.2+0.64*\t},-0.49);
+    \node[blk, fill=\f, minimum width=0.3cm, minimum height=0.3cm] at ({2.75+0.64*\t},-0.64) {\a};
+    \node[blk, fill=\f, minimum width=0.3cm, minimum height=0.3cm] at ({3.05+0.64*\t},-0.64) {\b};
+  }
+  % the two cases
+  \node[cttl, align=center] at (0.55,-1.800) {Alone\\6.3 ms};
+  \node[cttl, align=center, text=dred] at (0.55,-3.540) {With AI\\7.9 ms};
+  \draw[black!60, line width=0.5pt] (0.1,-2.580) -- (10.66,-2.580);
+  \foreach \r in {0, 1, 2, 3}
+  {
+    \node[rowl] at (2.45,{-1.340-0.32*\r}) {NeuralRx \r};
+    \node[rowl] at (2.45,{-3.080-0.32*\r}) {NeuralRx \r};
+  }
+  % ---- alone: every run ends 1.2 ms before the latest start of E and F ----
+  \foreach \r/\a/\e in {0/A/E, 1/B/F}
+  {
+    \node[run, fill=tba, minimum width=4.032cm] at (3.496,{-1.320-0.32*\r}) {\a};
+    \node[run, fill=gold, minimum width=3.072cm] at (7.528,{-1.320-0.32*\r}) {\e};
+    \node[ai, minimum width=0.896cm] at (2.6,{-1.475-0.32*\r}) {};
+  }
+  \foreach \r/\a/\e in {2/C/G, 3/D/H}
+  {
+    \node[run, fill=tbd, minimum width=4.032cm] at (5.096,{-1.320-0.32*\r}) {\a};
+    \node[run, fill=recc, minimum width=1.472cm] at (9.128,{-1.320-0.32*\r}) {\e};
+    \node[ai, minimum width=2.496cm] at (2.6,{-1.475-0.32*\r}) {};
+  }
+  \draw[{Latex[length=1.1mm]}-{Latex[length=1.1mm]}, line width=0.7pt] (7.528,-0.97) -- (8.296,-0.97);
+  \draw[line width=0.4pt] (7.528,-1.190) -- (7.528,-0.88);
+  \draw[line width=0.4pt] (8.296,-1.06) -- (8.296,-0.79);
+  \node[key, anchor=east] at (7.48,-0.97) {1.2 ms to Spare};
+  \node[inote, anchor=east] at (10.66,-0.97) {Deadline of A, B};
+  % ---- next to AI: every run ends 0.4 ms after the latest start of E and F ----
+  \foreach \r/\a/\e in {0/A/G, 1/B/H}
+  {
+    \node[run, fill=tba, minimum width=4.032cm] at (3.496,{-3.060-0.32*\r}) {\a};
+    \node[run, fill=tba!45, minimum width=1.024cm] at (7.528,{-3.060-0.32*\r}) {};
+    \node[run, draw=dred, line width=0.8pt, pattern=north east lines, pattern color=dred, minimum width=1.024cm] at (7.528,{-3.060-0.32*\r}) {};
+    \node[run, fill=recc, minimum width=2.048cm] at (8.552,{-3.060-0.32*\r}) {\e};
+  }
+  \foreach \r/\a in {2/C, 3/D}
+  {
+    \node[run, fill=tbd, minimum width=4.032cm] at (5.096,{-3.060-0.32*\r}) {\a};
+    \node[run, fill=tbd!45, minimum width=1.024cm] at (9.128,{-3.060-0.32*\r}) {};
+    \node[run, draw=dred, line width=0.8pt, pattern=north east lines, pattern color=dred, minimum width=1.024cm] at (9.128,{-3.060-0.32*\r}) {};
+  }
+  \foreach \r in {0, 1, 2, 3}
+    \node[ai, minimum width=8.0cm] at (2.6,{-3.215-0.32*\r}) {};
+  \draw[{Latex[length=1.1mm]}-{Latex[length=1.1mm]}, dred, line width=0.7pt] (7.528,-2.780) -- (8.552,-2.780);
+  \draw[dred, line width=0.4pt] (7.528,-2.940) -- (7.528,-2.690);
+  \draw[dred, line width=0.4pt] (8.552,-2.940) -- (8.552,-2.690);
+  \node[key, text=dred, anchor=east] at (7.48,-2.780) {+1.6 ms};
+  \foreach \x/\l in {8.85/E, 9.15/F}
+  {
+    \node[blk, fill=gold, minimum width=0.3cm, minimum height=0.26cm] at (\x,-2.780) {\l};
+    \draw[dred, line width=1.1pt] ({\x-0.12},-2.890) -- ({\x+0.12},-2.670);
+    \draw[dred, line width=1.1pt] ({\x-0.12},-2.670) -- ({\x+0.12},-2.890);
+  }
+  \node[note, text=dred, anchor=west] at (9.33,-2.780) {Lost};
+  % recovery deadline of A and B (11.5 ms), drawn over the runs
+  \draw[line width=1.1pt, densely dotted] (9.96,-1.180) -- (9.96,-1.780);
+  \draw[line width=1.1pt, densely dotted] (9.96,-2.920) -- (9.96,-3.520);
+  % time axis
+  \draw[line width=0.4pt] (2.6,-4.340) -- (10.6,-4.340);
+  \foreach \t/\l in {0/0, 2.5/2.5, 5/5.0, 7.5/7.5, 10/10.0}
+  {
+    \draw[line width=0.4pt] ({2.6+0.64*\t},-4.340) -- ({2.6+0.64*\t},-4.400);
+    \node[font=\rmfamily\scriptsize, anchor=north, inner sep=1pt] at ({2.6+0.64*\t},-4.410) {\l};
+  }
+  \node[inote, anchor=north, inner sep=1pt] at (10.4,-4.410) {ms};
+  % ================= the server: four NeuralRx =================
+  \node[sub, anchor=north west, minimum width=3.08cm, minimum height=4.44cm] at (10.75,-0.13) {};
+  \node[hcell, minimum width=1.5cm, minimum height=0.3cm] at (10.75,-0.13) {4 NeuralRx};
+  \node[hcell, minimum width=0.7cm, minimum height=0.3cm] at (12.25,-0.13) {Alone};
+  \node[hcell, minimum width=0.88cm, minimum height=0.3cm, text=dred] at (12.95,-0.13) {With AI};
+  \foreach \y/\h/\a/\b in {-0.43/Slots per Run/2/3, -0.73/TBs per Slot/2.0/1.33, -1.03/Recovered/8 of 8/6 of 8, -1.33/Lost/1.6\%/6.4\%}
+  {
+    \node[hcell, minimum width=1.5cm, minimum height=0.3cm] at (10.75,\y) {\h};
+    \node[cell, fill=white, minimum width=0.7cm, minimum height=0.3cm] at (12.25,\y) {\a};
+    \node[cell, fill=badc, minimum width=0.88cm, minimum height=0.3cm, text=dred] at (12.95,\y) {\b};
+  }
+  \node[font=\rmfamily\bfseries\LARGE, text=dred, inner sep=1pt] at (12.29,-2.45) {4.0$\times$};
+  \node[note, text=dred] at (12.29,-3.05) {More Candidates Lost};
+  \node[ai, minimum width=0.5cm, anchor=center] at (11.3,-4.02) {};
+  \node[inote, anchor=west] at (11.6,-4.02) {AI on the GPU};
+\end{tikzpicture}

@@ -49,20 +49,20 @@ Neural Receivers and AI Inference in AI-RAN}
 \keywords{AI-RAN, GPU sharing, neural receiver, loss model, MPS, admission control}
 
 \begin{abstract}
-AI-RAN servers run the uplink physical layer and AI inference on the same GPUs. A neural receiver decodes
-transport blocks (TBs) that the conventional receiver fails, but the model that helps on every channel we
-test takes twice the uplink period, and its cost on a shared GPU is not established. We find that AI
-inference costs recoveries by a path that deadline checks miss: a failed TB cannot wait, and a neural
-receiver that AI slows by more than 1.2~ms holds its GPU for three uplink slots, not two. A loss model of
-this path predicts the lost recoveries of 672 measured runs with a mean absolute error of 0.82 percentage
-points. This paper presents \sys, which runs the larger model only for failed TBs under a later deadline and
-runs AI in antiphase with it: the low-priority AI pieces of a GPU stop while the neural receiver of that GPU
-runs. On four A100 GPUs with 16 cells and three load patterns, \sys serves 34.1k-44.7k tokens/s within
-200~ms and keeps 99.9\% of the recoveries, 6.4-7.5$\times$ a fixed GPU share and 1.2-1.9$\times$ a share
-chosen by a load estimator with low-priority AI. With an outer-loop rate controller, the recovery path
-raises the goodput of two-user cells by 11-31\%; \sys keeps this gain within 0.3\%, where the other
-policies lose up to 8.2\%. At full load, \sys serves 70\% of the AI of an offline schedule that knows every
-later failure.
+AI-RAN servers run the uplink physical layer and AI inference on the same GPUs. A neural receiver can decode
+transport blocks (TBs) that the conventional receiver fails, which saves their retransmissions. However,
+the model that helps on every channel we test takes 2.5$\times$ the uplink period, and it shares the GPU
+with AI. We find that AI inference costs these recoveries by a path that deadline checks miss: a failed TB
+cannot wait, and a neural receiver that AI slows by more than 1.2~ms holds its GPU for three uplink slots,
+not two. A loss model of this path predicts the lost recoveries of 672 measured runs within 0.82 percentage
+points on average. This paper presents \sys, which runs the neural receiver only for failed TBs and runs AI
+in antiphase with it: the AI of a GPU stops while the neural receiver of that GPU runs. On four A100 GPUs
+with 16 cells, \sys serves 6.4-7.5$\times$ the AI of a fixed 10\% GPU share and 1.2-1.9$\times$ that of
+the strongest combination of existing mechanisms, and it loses 0.1\% of the recoveries where the policies
+that serve more AI lose 2.7-6.3\%. \sys turns 70\% of the GPU time that is safe for AI into served
+tokens, 1.9$\times$ the best existing mechanism that keeps the recoveries. With a rate controller in the
+loop, the recovery path raises the uplink goodput of two-user cells by 11-31\%, and \sys keeps this gain
+within 0.3\%.
 \end{abstract}
 
 \maketitle
@@ -118,29 +118,43 @@ do not share the GPU with an AI workload. However, none of them runs a neural re
 on one GPU, and none explains how AI inference costs the recoveries of such a receiver.
 
 In this paper, we present \sys, a GPU sharing scheme for AI-RAN servers that uses a neural receiver as a
-second receiver for the TBs the conventional receiver fails. Specifically, \sys introduces 1) a recovery
-path that sends a failed TB to the neural receiver only when the number of failed code blocks predicts a
-successful decode, under a recovery deadline later than the layer-1 deadline, 2) a recovery-loss model that
-treats the neural receivers as the servers of a loss system and gives the share of failed TBs that find none
-of them free from the run lengths of the neural receiver, and 3) AI admission in stoppable pieces at low
-priority, where the AI of a GPU stops when the neural receiver of that GPU starts and the AI unit sizes
-that may run next to the conventional receivers follow from measured time bounds. The AI of a GPU runs in
-antiphase with the neural receiver of that GPU, and the scheme is named after this rule. Our evaluation on one to
-four A100 GPUs with 4-48 cells, the cuPHY receiver, the public NVlabs neural receivers, and four AI models
-shows that the closed form of the model predicts the lost failed TBs of 672 runs with a correlation of 0.994
-and a mean absolute error of 0.82 percentage points. We measured 260 of these runs after the model was
-final, and for one changed setting we computed the loss before the runs and were within 0.7 points. With 16 cells and mixed channels, \sys serves 34.1k
-tokens/s within the 200~ms limit at a steady full load and keeps 99.9\% of the recoveries; with a load that
-alternates every two seconds and with a load that jumps at random times, it serves 41.4k and 44.7k and keeps
-99.9\% and 100.0\%. This is 6.4-7.5$\times$ the AI throughput of a fixed 10\% share and 1.2-1.9$\times$ that
-of a share chosen every second by a load estimator with low-priority AI, the strongest combination of
-existing mechanisms that we built, with 0.9-2.6 percentage points more recoveries. The layer-1 misses of
-\sys stay at the level of the run without AI. The recovery path adds 5.6\% to the uplink goodput of two-user
-cells at a fixed MCS. With an outer-loop rate controller in the cells, it adds 11-12\% at a 10\%
-retransmission target and 24-31\% at 1-3\% targets. The controller turns lost recoveries into a lower MCS:
-the other policies lose up to 1.0\% of goodput at the 10\% target and up to 8.2\% at the 1\% target, and
-\sys stays within 0.3\%. An offline schedule that knows every later failure serves 1.4$\times$ the AI of
-\sys at full load. We report these results and the settings where \sys is not ahead.
+second receiver for the TBs the conventional receiver fails. \sys runs AI in antiphase with the neural
+receiver: the AI of a GPU stops when the neural receiver of that GPU starts and resumes when it ends. We
+make three contributions.
+\begin{itemize}
+\item \textbf{A finding.} AI inference costs recoveries by a path that deadline checks miss. A neural
+receiver that AI slows by more than 1.2~ms still meets its deadline, but it holds its GPU for three uplink
+slots, not two, and the failed TBs of the extra slot find no free neural receiver. This path accounts for
+83-99\% of the lost recoveries.
+\item \textbf{A model.} We treat the neural receivers as the servers of a loss system and compute the share
+of failed TBs that find none of them free from the run lengths of the neural receiver. The closed form
+predicts the loss of 672 measured runs with a correlation of 0.994 and a mean absolute error of 0.82
+percentage points. We measured 260 of these runs after the model was final, and for one changed setting we
+computed the loss before the runs and were within 0.7 points.
+\item \textbf{A design.} \sys has a recovery path that sends a failed TB to the neural receiver only when
+the number of failed code blocks predicts a successful decode, under a recovery deadline later than the
+layer-1 deadline. It admits AI in stoppable pieces at low priority: the AI of a GPU stops when the neural
+receiver of that GPU starts, and the AI unit sizes that may run next to the conventional receivers follow
+from measured time bounds.
+\end{itemize}
+
+We evaluate \sys on one to four A100 GPUs with 4-48 cells, the cuPHY receiver, the public NVlabs neural
+receivers, and four AI models. With 16 cells on four GPUs, the main results are as follows.
+\begin{itemize}
+\item \textbf{AI throughput.} \sys serves 34.1k-44.7k tokens/s within the 200~ms limit under three load
+patterns. This is 6.4-7.5$\times$ a fixed 10\% GPU share, 1.9-2.0$\times$ a 30\% share with low-priority
+AI, and 1.2-1.9$\times$ a share chosen every second by a load estimator with low-priority AI, the strongest
+combination of existing mechanisms that we built.
+\item \textbf{Recoveries.} \sys loses 0.0-0.1\% of the recoveries. The policies that serve more AI than
+\sys lose 2.7-6.3\%. The layer-1 misses of \sys stay at the level of the server without AI.
+\item \textbf{GPU utilization.} An offline schedule that knows every later failure gives the GPU time that
+is safe for AI. At full load \sys turns 70\% of it into served tokens, 1.9-6.4$\times$ the existing
+mechanisms that keep the recoveries (11-37\%).
+\item \textbf{Radio goodput.} The recovery path adds 5.6\% to the uplink goodput of two-user cells at a
+fixed MCS and 11-31\% when an outer-loop rate controller picks the MCS. \sys keeps this gain within 0.3\%.
+The other policies lose up to 1.0\% at a 10\% retransmission target and up to 8.2\% at a 1\% target.
+\end{itemize}
+We also report the settings where \sys is not ahead.
 
 \section{Background and Motivation}
 
@@ -212,41 +226,72 @@ code blocks and 30\% in slots with ten or more.
 This motivates \sys's design: run the larger model only for failed TBs that it is likely to decode, give
 that run a deadline later than the layer-1 deadline, and admit AI only where it does not cost recoveries.
 
-\section{Recovery Path}
+\section{\sys Design}
 \label{sec:path}
+
+\subsection{Overall architecture}
 
 \begin{figure}[t]
 \centering
 \resizebox{\linewidth}{!}{\input{figures/architecture.tex}}
-\caption{Overall architecture of \sys with the values of one recovery in a measured run (cell 3, slot 547;
-two of the four GPUs are shown). Numbers mark the steps of the text. Bottom: the same recovery over time.
-The AI of GPU 0 runs in antiphase with the neural receiver of GPU 0.}
+\caption{Overall architecture of \sys. Every GPU runs the conventional receivers of four cells, one neural
+receiver, and one AI worker. The contents of the boxes show the instant of Figures~\ref{fig:recovery}
+and~\ref{fig:admission}: two neural receivers are busy, and the AI workers of GPU~1-3 hold a request.}
 \label{fig:architecture}
 \end{figure}
 
-\noindent\textbf{Architecture.} \sys runs four kinds of processes on each server
-(Figure~\ref{fig:architecture}). A conventional receiver process per cell decodes the TBs of its cell with
-cuPHY every 2.5~ms. A neural receiver process per GPU decodes one TB at a time. An AI worker per GPU runs AI
-inference in pieces. One controller assigns failed TBs to neural receivers, grants and stops AI pieces, and
-places AI requests on GPUs. All processes read one shared state in memory and one clock.
+Figure~\ref{fig:architecture} shows the architecture of \sys. A server runs one controller and, on every
+GPU, the conventional receivers of the cells of that GPU, one neural receiver, and one AI worker under MPS.
+All processes read one shared state in memory and one clock.
 
-The steps for one slot are as follows. \ding{202}~The samples of a slot arrive in the slot ring of the cell,
-which stays in the GPU memory of its conventional receiver, and cuPHY decodes them. \ding{203}~The receiver
-writes the CRC result and the number of failed code blocks to the TB state. \ding{204}~The controller
-assigns an eligible failed TB to a free neural receiver before the latest start time of the TB.
-\ding{205}~Every neural receiver process maps the slot rings of all cells. Thus, the neural receiver copies
-the slot from the GPU of the cell and decodes it on its own GPU. \ding{206}~A result that arrives before
-the recovery deadline cancels the retransmission. \ding{207}~In every round the controller writes one AI
-grant per GPU, and the AI worker runs only inside the granted piece. In the recovery of the figure, the
-conventional receiver of cell 3 fails slot 547 with eight failed code blocks 1.7~ms after the samples
-arrive. The neural receiver of GPU 0 runs from 1.8 to 8.6~ms and recovers the TB, and the AI of GPU 0 is off
-from 2.4 to 8.7~ms.
+\noindent\textbf{Control Layer.} The controller runs four functions in one loop of 15-57~$\mu$s. \textit{TB
+State} holds one row per cell and slot with the result of the conventional receiver, the number of failed
+code blocks, and the state of the recovery. \textit{NeuralRx Assigner} gives a failed TB to a free neural
+receiver (Section~\ref{sec:recovery}). \textit{AI Admission} grants AI pieces to the AI worker of every
+GPU and stops them (Section~\ref{sec:admission}). \textit{Request Dispatcher} places every AI request on
+the GPU that finishes it first and rejects a request that cannot meet its time limit.
+
+\noindent\textbf{Data Layer.} A conventional receiver process per cell decodes the TBs of its cell with
+cuPHY every 2.5~ms and keeps the samples of the last slots in a \textit{slot ring} in GPU memory. One
+neural receiver process per GPU decodes one failed TB at a time. It maps the slot rings of all cells over
+CUDA IPC and can take a TB of any cell on any GPU. One AI worker per GPU runs AI inference in pieces at a
+low MPS priority.
+
+\subsection{Recovery path}
+\label{sec:recovery}
+
+\begin{figure}[t]
+\centering
+\resizebox{\linewidth}{!}{\input{figures/recovery_path.tex}}
+\caption{Recovery path as six steps, with three consecutive failed TBs of one cell in a measured run (cell 0,
+slots 2731-2733). Blue steps run on a GPU and peach steps in the controller. Every TB keeps its color.
+Bottom: \textit{TB State} after the six steps and the two deadlines of every TB; times count from the
+arrival of the samples of slot 2732.}
+\label{fig:recovery}
+\end{figure}
+
+Figure~\ref{fig:recovery} follows three consecutive failed TBs of one cell in a measured run through the six
+steps of the recovery path. \ding{202}~\textit{Receive.} The samples of a slot arrive in the slot ring of the
+cell on GPU~0. \ding{203}~\textit{Decode.} cuPHY decodes the slot and writes the CRC result and the number of
+failed code blocks to \textit{TB State}: the CRC of slot 2732 fails 2.3~ms after the samples arrive, with
+one failed code block of 20. \ding{204}~\textit{Select.} \textit{NeuralRx Assigner} keeps a failed TB as a
+candidate only if its slot has at most nine failed code blocks. Slot 2733 has ten and is retransmitted.
+\ding{205}~\textit{Assign.} The assigner gives the candidate with the earliest latest start time to a free
+neural receiver; among the free neural receivers, it takes one on a GPU without a running AI piece first.
+The neural receiver of GPU~0 is still running the TB of slot 2731, and the TB of slot 2732 goes to GPU~1.
+\ding{206}~\textit{Recover.} The neural receiver of GPU~1 copies the slot from the ring on GPU~0 over CUDA
+IPC (blue arrow) and runs the neural network, LDPC decoding, and the CRC on its own GPU, from 2.3 to 8.8~ms.
+The AI of GPU~1 stops when this run starts (Section~\ref{sec:admission}). \ding{207}~\textit{Report.} The
+result arrives before the recovery deadline and cancels the retransmission. \textit{TB State} at the
+bottom of the figure holds one row per TB with the values that the steps write.
 
 \noindent\textbf{Two Deadlines.} Every TB has a layer-1 deadline of 4.0~ms after its samples arrive, which
 the conventional receiver must meet. A TB that fails has a \emph{recovery deadline}: if the neural receiver
 decodes it before this deadline, the retransmission is cancelled. A recovery deadline of 6.5~ms keeps the
 retransmission slot of the conventional path. The larger model does not fit into 6.5~ms, and \sys uses
-11.5~ms, which delays the retransmission of a TB that is not recovered by two uplink slots (5~ms).
+11.5~ms, which delays the retransmission of a TB that is not recovered by two uplink slots (5~ms). The
+bottom of Figure~\ref{fig:recovery} shows both deadlines for the three TBs: cuPHY ends before the layer-1
+deadline for all three, and both recoveries end 2.7-3.9~ms before their recovery deadline.
 
 \noindent\textbf{Which TBs Are Recovered.} A failed TB becomes a \emph{candidate} only if its slot has at
 most $K$ failed code blocks. The controller computes the \emph{latest start time} of a candidate as its
@@ -274,6 +319,18 @@ keep the recoveries.
 
 \subsection{Model}
 
+\begin{figure}[t]
+\centering
+\resizebox{\linewidth}{!}{\input{figures/hold.tex}}
+\caption{Four neural receivers and two failed TBs in each of four uplink slots on a time axis. Every TB
+keeps its color, and the light bar behind it ends at its latest start time. Top: alone, a run ends 1.2~ms
+before the latest start time of E and F, and all eight TBs are recovered. Bottom: next to AI, a run is
+1.6~ms longer (hatched) and still ends before its own recovery deadline, and E and F find every neural
+receiver busy. Right: TBs per slot that four neural receivers can take, and the lost candidates measured
+with 16 cells.}
+\label{fig:hold}
+\end{figure}
+
 $N$ neural receivers serve the candidates of all cells, and an uplink slot arrives every $P = 2.5$~ms. A
 candidate of slot $k$ becomes known at time $kP + c$, where $c$ is the time that the conventional receiver
 takes (1.4~ms at the median). It must start on a neural receiver by $kP + L$, where $L = 3.9$~ms is the
@@ -286,8 +343,16 @@ take a candidate of slot $k+m$ only if $s + S \le mP + L$. Thus, the run holds i
 h = \left\lceil \frac{s + S - L}{P} \right\rceil
 \label{eq:hold}
 \end{equation}
-slots. With $s = 1.4$~ms, a run of $S = 6.3$~ms holds the neural receiver for two slots, and a run longer
-than 7.5~ms holds it for three. \emph{AI inference costs recoveries when it moves runs from two slots to
+slots. Figure~\ref{fig:hold} shows the two cases for four neural receivers and two failed TBs per slot. A
+failed TB of slot $m$ can start between $mP + c$ and $mP + L$; with $c = 1.4$~ms these windows follow each
+other without a gap. With $s = 1.4$~ms, a run of $S = 6.3$~ms ends at 7.7~ms, 1.2~ms before the latest
+start time of the failed TBs of slot $k+2$: it holds its neural receiver for two slots, and the TBs E and F
+of that slot take the neural receivers of A and B. A run longer than 7.5~ms ends after that latest start
+time and holds its neural receiver for three slots. Then, all four neural receivers are busy until E and
+F are dropped. $N$ neural receivers that hold $h$ slots each take at most $N/h$ candidates per slot: 2.0
+with two slots and 1.33 with three for $N = 4$. With 16 cells, the run without AI loses 1.6\% of the
+candidates, and low-priority AI without a cap loses 6.4\%, 4.0$\times$ as many
+(Section~\ref{sec:modelval}). \emph{AI inference costs recoveries when it moves runs from two slots to
 three}, not when it pushes a run past the recovery deadline. A neural receiver next to low-priority AI takes
 7.3-8.0~ms: it meets the recovery deadline, and $h = 3$.
 
@@ -336,11 +401,32 @@ far below the slack.
 \section{AI Admission in Stoppable Pieces}
 \label{sec:admission}
 
+\begin{figure}[t]
+\centering
+\resizebox{\linewidth}{!}{\input{figures/admission.tex}}
+\caption{AI admission with the values of a measured run at the instant the neural receiver of GPU~1 starts
+the TB of slot 2732 (Figure~\ref{fig:recovery}). Top: the decision of \textit{AI Admission} for one GPU.
+Bottom: the cells (gray: decoding), the neural receiver, the grant, and the 30 units of the AI request of
+every GPU. Numbers mark the steps of the text.}
+\label{fig:admission}
+\end{figure}
+
+Figure~\ref{fig:admission} shows how \sys admits AI, with the values of a measured run at the instant the
+neural receiver of GPU~1 starts. \ding{202}~\textit{GPU State} holds, for every GPU, the TB on its neural
+receiver, the number of its cells that are decoding, and whether an AI piece is on the GPU.
+\ding{203}~In every round and for every GPU, \textit{AI Admission} writes a \emph{grant}: the largest unit
+that may run, a budget of at most 4~ms of AI work, and a stop word. The AI workers of GPU~2 and GPU~3 hold a
+grant for units of up to 512 tokens and submit the units of their request one after another.
+\ding{204}~When a neural receiver starts on a GPU, or a candidate waits for a neural receiver, the controller
+sets the stop word. On GPU~1 the unit on the GPU ends 0.45~ms later, and the four remaining units of the
+request wait until the neural receiver ends at 8.8~ms. GPU~0 runs a neural receiver and has no AI request.
+
 \noindent\textbf{AI Units.} The AI worker splits every AI job into \emph{units}. A unit is one GPU graph
 over fixed buffers with a time bound measured once, 1.1 times the 99.9th percentile of the unit alone. The
 prefill of an LLM request is one unit per layer over a chunk of 128, 512, or 1,024 tokens, an output token
 is ten units of three layers each, and an embedding or image request is one unit per layer over a batch of
-1, 4, or 16 items. Table~\ref{tab:units} lists the bounds. A unit belongs to one of three size classes by its
+1, 4, or 16 items. A request of up to 512 tokens is 30 units: preparation, 28 layers, and the output head.
+Table~\ref{tab:units} lists the bounds. A unit belongs to one of three size classes by its
 bound: up to 0.45~ms, up to 1.2~ms, and above. The controller sees only the class of a unit and not the
 model or the kind of job.
 
@@ -449,34 +535,93 @@ image classification~\cite{vit}. Runs last 10-40~s; values are means over five s
 \noindent\textbf{Metrics.} \emph{AI served} is the prompt tokens per second of requests that finish within
 the limit. \emph{Recoveries kept} is the number of TBs that the neural receiver recovers before the recovery
 deadline as a share of the run without AI on the same seed; run-to-run variation moves it by a few tenths of
-a percent, and it can exceed 100\%. \emph{Layer-1 misses} is the share of TBs whose conventional result
+a percent, and it can exceed 100\%. \emph{Recoveries lost} is 100\% minus the recoveries kept.
+\emph{Layer-1 misses} is the share of TBs whose conventional result
 passes the layer-1 deadline. \emph{Lost candidates} is the share of candidates that find no free neural
 receiver by their latest start time.
 
 \noindent\textbf{Baselines.} Every policy uses the same recovery path, the same AI requests, and the same
 placement and rejection of AI requests. The policies differ in when AI may use the GPU.
 \begin{itemize}
-\item \emph{Fixed share} gives the AI worker a fixed MPS share, a static split of the GPU between radio and
-AI.
-\item \emph{Fixed share with low-priority AI} adds a low MPS priority for the AI worker, the mechanism that
-SMEC applies on an edge server~\cite{smec}. A share of 100\% is low priority alone.
-\item \emph{Share chosen by an estimator} follows the design of YinYangRAN~\cite{yinyangran}. Every second
+\item \textit{Static} gives the AI worker a fixed MPS share of 10\%, a static split of the GPU between
+radio and AI. It is the largest share we measured that keeps the recoveries at full load; a 30\% share
+loses 4.9\% of them.
+\item \textit{Priority} adds a low MPS priority for the AI worker, the mechanism that SMEC applies on an
+edge server~\cite{smec}, with a cap of 30\% on the share. \textit{Priority-70} and \textit{Priority-max}
+use a cap of 70\% and no cap; they serve more AI and lose recoveries.
+\item \textit{Estimator} follows the design of YinYangRAN~\cite{yinyangran}. Every second
 it picks the largest AI share for which an estimator predicts that the reliability targets hold, given the
 histogram of the radio load of the last second. The estimator is a neural network trained offline with a
 quantile loss on runs at four steady loads and every share, with a seed that the evaluation does not use.
 The targets are 97\% of the recoveries and 99.9\% of the TBs within the layer-1 deadline. A change of share
-stops AI for 0.27~s, the MPS reconfiguration time that YinYangRAN reports. We run it with and without
-low-priority AI.
-\item \emph{Share that follows the load} is an idealized form of the same idea: it keeps one AI worker per
-share loaded on every GPU and makes the worker of a lower share active when the radio load of the last
-100~ms is higher. It knows the load at once and has no switching cost. We run it with and without
-low-priority AI.
+stops AI for 0.27~s, the MPS reconfiguration time that YinYangRAN reports. \textit{Estimator+Priority} runs
+it with low-priority AI.
+\item \textit{Follow+Priority} is an idealized form of the same idea with low-priority AI: it keeps one AI
+worker per share loaded on every GPU and makes the worker of a lower share active when the radio load of
+the last 100~ms is higher. It knows the load at once and has no switching cost. \textit{Follow} is the
+same without low priority.
 \end{itemize}
+In the tables, \textit{Static} is the fixed 10\% share and \textit{Priority} is the 30\% share with
+low-priority AI.
 The baselines are the mechanisms of these systems on our code, not the systems. The estimator baseline is
 favored in two ways: the radio work stays on the GPU during a reconfiguration, and no model is reloaded.
 
+\subsection{Summary of results}
+\label{sec:summary}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/eval_headline.pdf}
+\caption{AI served (top) and recoveries lost (bottom) under three load patterns (16 cells, four GPUs, five
+seeds; lines show the range over seeds). The number on a baseline is how many times more AI \sys serves
+than that baseline.}
+\label{fig:times}
+\end{figure}
+
+\begin{table}[t]
+\caption{Main results with 16 cells on four GPUs. Factors are \sys over the compared baseline.}
+\label{tab:summary}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Result & \sys & Compared with & Factor \\
+\midrule
+AI served, steady full load & 34.1k tokens/s & \textit{Static} (5.3k) & 6.4$\times$ \\
+ & & \textit{Priority} (18.0k) & 1.9$\times$ \\
+ & & \textit{Estimator+Priority} (18.1k) & 1.9$\times$ \\
+AI served, load changes every 2~s & 41.4k tokens/s & \textit{Static} (5.7k) & 7.2$\times$ \\
+ & & \textit{Estimator+Priority} (27.2k) & 1.5$\times$ \\
+ & & \textit{Follow+Priority} (34.7k) & 1.2$\times$ \\
+AI served, random load steps & 44.7k tokens/s & \textit{Static} (6.0k) & 7.5$\times$ \\
+ & & \textit{Estimator+Priority} (36.4k) & 1.2$\times$ \\
+Recoveries lost & 0.0-0.1\% & \textit{Priority-70} (2.7-5.6\%) & \\
+GPU time safe for AI that is used & 70\% & \textit{Static} to \textit{Priority} (11-37\%) & 1.9-6.4$\times$ \\
+Goodput of two-user cells & within 0.3\% of no AI & \textit{Priority-max} (up to $-$8.2\%) & \\
+Loss model & 0.82 points error & 672 measured runs & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Figure~\ref{fig:times} and Table~\ref{tab:summary} summarize the evaluation. At a steady full load
+(Figure~\ref{fig:times}a), \sys serves 34.1k tokens/s, which is 6.4$\times$ \textit{Static} (5.3k),
+3.5$\times$ \textit{Estimator} (9.8k), and 1.9$\times$ \textit{Priority} and \textit{Estimator+Priority}
+(18.0k and 18.1k). \sys loses 0.1\% of the recoveries, and the baselines lose 0.6-1.2\%. When the load
+changes every 2~s (Figure~\ref{fig:times}b), \sys serves 41.4k tokens/s, 7.2$\times$ \textit{Static},
+2.0$\times$ \textit{Priority}, and 1.5$\times$ \textit{Estimator+Priority}. The two estimator policies
+lose 4.7\% and 2.2\% of the recoveries, because their decision is one second behind the load, and \sys
+loses 0.1\%. \textit{Follow+Priority} knows the load without lag and serves 34.7k; \sys serves
+1.2$\times$ more. With random load steps (Figure~\ref{fig:times}c), \sys serves 44.7k tokens/s,
+7.5$\times$ \textit{Static} and 1.1-2.0$\times$ the other baselines, and loses no recovery. In all three
+patterns \sys serves the most AI and loses the fewest recoveries. \textit{Priority-70} and
+\textit{Priority-max} serve 1.1-1.4$\times$ the AI of \sys and lose 2.7-6.3\% of the recoveries
+(Section~\ref{sec:steady}).
+
 \subsection{Model validation}
 \label{sec:modelval}
+
+\noindent\textbf{Takeaway.} The closed form predicts the lost candidates of 672 runs with a mean absolute
+error of 0.82 percentage points and has no fitted parameter.
 
 \begin{figure}[t]
 \centering
@@ -545,8 +690,8 @@ Neural receivers, two-user cells & No AI & \sys & 70\%, low-priority AI \\
 \end{table}
 
 Table~\ref{tab:modelcond} gives the values per setting. In all eight settings, \sys loses at most 1.0 point
-more candidates than the run without AI, and the 70\% share with low-priority AI loses 1.3-9.6 points more.
-The model is least accurate for the 30\% share with low-priority AI on one and two neural receivers, where
+more candidates than the run without AI, and \textit{Priority-70} loses 1.3-9.6 points more.
+The model is least accurate for \textit{Priority} on one and two neural receivers, where
 the closed form is 2.4-3.8 points high: a fixed share slows the neural receiver only while AI is active, and
 the closed form draws the run length of every run independently.
 
@@ -567,7 +712,7 @@ also 0.3~ms late, as it is next to AI, the step moves 0.3~ms to the left. The 13
 between the two lines or within 0.3 points of them; one setting that allows AI next to a neural receiver
 while one other is free is 0.8 points below. \sys adds 0.09~ms to the run of the neural receiver and loses
 1.7\% of the candidates, against 1.6\% without AI. The 30\% shares add 0.75-1.21~ms and lose 2.6-5.0\%, and
-the 70\% share with low-priority AI adds 1.33~ms and loses 6.2\%.
+\textit{Priority-70} adds 1.33~ms and loses 6.2\%.
 
 \noindent\textbf{A Bias of Slot Replay.} The model exposed a bias of our own method. Earlier runs replayed
 128 slots per cell (0.32~s). The slots in which the failures of several cells coincide then repeat every
@@ -578,11 +723,15 @@ rise by 1.0-1.5 points. Every result in this section uses 512 slots.
 \subsection{AI served at a steady full load}
 \label{sec:steady}
 
+\noindent\textbf{Takeaway.} At a steady full load \sys serves 6.4$\times$ the AI of \textit{Static} and
+1.9$\times$ that of the best existing mechanism that keeps the recoveries, and it keeps 99.9\% of the
+recoveries.
+
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.8\linewidth]{figures/tradeoff_full_load.pdf}
-\caption{AI served against recoveries kept at a steady full load (16 cells, four GPUs; bars show the range
-over seeds). Labels give the MPS shares.}
+\includegraphics[width=0.72\linewidth]{figures/eval_tradeoff.pdf}
+\caption{AI served against recoveries lost at a steady full load (16 cells, four GPUs). A baseline that
+takes a larger share moves up along its line.}
 \label{fig:tradeoff}
 \end{figure}
 
@@ -609,30 +758,29 @@ No AI & 0 & 100\% & 0.032\% \\
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:tradeoff} and Table~\ref{tab:steady} show AI served against recoveries kept with all 16
-cells at full load. The run without AI recovers 187 TBs per second.
+Figure~\ref{fig:tradeoff} and Table~\ref{tab:steady} show AI served against recoveries with all 16
+cells at full load. The run without AI recovers 187 TBs per second. A baseline cannot reach \sys by taking
+more GPU time. Raising the cap of \textit{Priority} from 30\% to 50\% brings its AI to 32.7k tokens/s,
+close to \sys, and its lost recoveries from 1.2\% to 4.5\%; \sys serves 34.1k and loses 0.1\%. A 30\%
+share for \textit{Static} serves 20.2k and loses 4.9\%.
 
 \noindent\textbf{Recoveries and Layer 1.} \sys keeps 99.9\% of the recoveries. It misses the layer-1
 deadline for 0.036\% of the TBs against 0.032\% without AI, and the conventional receivers finish in 3.14~ms
-at the 99.9th percentile against 3.10~ms without AI and 3.51~ms under the 70\% share with low-priority AI.
+at the 99.9th percentile against 3.10~ms without AI and 3.51~ms under \textit{Priority-70}.
 
 \noindent\textbf{AI Served.} \sys serves 34.1k tokens/s. Among the existing mechanisms that keep at least
-98.8\% of the recoveries, the estimator with low-priority AI and the 30\% share with low-priority AI serve
+98.8\% of the recoveries, \textit{Estimator+Priority} and \textit{Priority} serve
 the most, 18.1k and 18.0k; \sys serves 1.9$\times$ more. It serves 6.4$\times$ more than the fixed 10\%
 share and 3.5$\times$ more than the estimator without low priority. At a steady full load the estimator
 settles on a share of 20\%, or 30\% with low-priority AI, and equals that fixed share. The 70\% share with
-low-priority AI and low priority alone serve 24\% and 44\% more AI than \sys and lose 5.6\% and 6.3\% of the
+low-priority AI and \textit{Priority-max} serve 24\% and 44\% more AI than \sys and lose 5.6\% and 6.3\% of the
 recoveries.
 
 \subsection{AI served under a changing load}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figures/headline_load_patterns.pdf}
-\caption{AI served and recoveries kept under three load patterns (16 cells, four GPUs, five seeds; bars
-show the range over seeds). Labels give the MPS shares.}
-\label{fig:changing}
-\end{figure}
+\noindent\textbf{Takeaway.} When the radio load changes, \sys serves 7.2-7.5$\times$ the AI of a fixed 10\%
+share and 1.2-1.5$\times$ that of \textit{Estimator+Priority}, and it keeps 2.1-2.6 points more
+recoveries than that policy.
 
 \begin{table}[t]
 \caption{Changing load, 16 cells, five seeds. Each cell shows AI tokens/s within 200~ms and recoveries
@@ -656,14 +804,14 @@ Share chosen by an estimator, low-priority AI & 27.2k, 97.8\% & 36.4k, 97.4\% \\
 \end{table}
 
 \noindent\textbf{Alternating Load.} The radio load alternates every two seconds between full load and each
-cell active with probability 0.5. Figure~\ref{fig:changing} and Table~\ref{tab:changing} show the result.
+cell active with probability 0.5. Figure~\ref{fig:times} and Table~\ref{tab:changing} show the result.
 \sys serves 41.4k tokens/s and keeps 99.9\% of the recoveries, with layer-1 misses of 0.019\% against 0.018\%
-without AI. The fixed 10\% share serves 7.2$\times$ less. The estimator serves 21.8k tokens/s and keeps
+without AI. This is 7.2$\times$ the AI of \textit{Static}. The estimator serves 21.8k tokens/s and keeps
 95.3\%: its decision rests on the load of the last second, and its shares run one second behind the load,
-at 70\% for half of every full-load period. With low-priority AI it serves 27.2k at 97.8\%, 1.5$\times$
-less than \sys with 2.1 points fewer recoveries. The share that follows the load at once and without a
-switching cost serves 23.8k at 99.2\%, and 34.7k at 99.0\% with low-priority AI, 1.2$\times$ less than \sys.
-The fixed 70\% share with low-priority AI serves 13\% more AI than \sys and loses 4.0\% of the recoveries.
+at 70\% for half of every full-load period. With low-priority AI it serves 27.2k at 97.8\%; \sys serves
+1.5$\times$ more and keeps 2.1 points more recoveries. The share that follows the load at once and without a
+switching cost serves 23.8k at 99.2\%, and 34.7k at 99.0\% with low-priority AI; \sys serves 1.2$\times$ more.
+\textit{Priority-70} serves 13\% more AI than \sys and loses 4.0\% of the recoveries.
 
 \noindent\textbf{Alternation Interval.} With a change every 0.2~s and every 5~s (two seeds), \sys serves
 42.5k and 41.2k tokens/s and keeps 99.8\% of the recoveries in both. The policies that change the share
@@ -677,7 +825,7 @@ times 0.5-1.5~s apart for 40~s. \sys serves 44.7k tokens/s and keeps 100.0\% of 
 estimator with low-priority AI serves 36.4k at 97.4\%, and the share that follows the load with low-priority
 AI serves 40.9k at 99.1\%. The difference comes from the periods of full load. There \sys serves 34.9k
 tokens/s and keeps 100.0\%. The share that follows the load drops to its lowest share and serves 3.9k, or
-20.4k with low-priority AI. The 70\% share with low-priority AI and the estimator with low-priority AI serve
+20.4k with low-priority AI. \textit{Priority-70} and \textit{Estimator+Priority} serve
 44.0k and 35.4k and keep 94.3\% and 94.7\%.
 
 \noindent\textbf{Bursts.} When every cell switches on and off by itself with a mean busy run of 20~ms or
@@ -685,12 +833,16 @@ tokens/s and keeps 100.0\%. The share that follows the load drops to its lowest 
 16 cells, \sys serves 49.6k and 48.0k tokens/s and keeps 100.1\% and 99.8\% of the recoveries, and the 70\%
 share with low-priority AI serves 51.1k and 50.4k and keeps 99.5\% and 98.6\%: at this load low priority
 alone loses few recoveries. With 32 cells, \sys serves 33.5k and 34.4k tokens/s at 99.7\% and 99.1\%,
-1.9$\times$ the 30\% share with low-priority AI, and the 70\% share with low-priority AI serves 22-23\% more
+1.9$\times$ \textit{Priority}, and \textit{Priority-70} serves 22-23\% more
 and loses 3.8-4.6\% of the recoveries. With 2~s runs, several cells of a GPU are busy for seconds, and the
 layer-1 misses are 0.25\% with 16 cells and 1.1\% with 32 cells without AI. Every policy with AI misses more
 (0.26-0.31\% and 1.3-1.9\%), and we do not compare the policies on the layer-1 deadline in this setting.
 
 \subsection{What each rule adds}
+
+\noindent\textbf{Takeaway.} Stoppable AI pieces and no AI next to a running neural receiver raise the
+recoveries kept from 97.8\% to 100.0\%. Keeping the largest AI units away from the conventional receivers
+lowers the layer-1 misses from 0.061\% to 0.036\%.
 \label{sec:rules}
 
 \begin{table}[t]
@@ -743,10 +895,22 @@ picked large chunks waits when more cells become active.
 \subsection{Distance to a clairvoyant schedule}
 \label{sec:clairvoyant}
 
+\noindent\textbf{Takeaway.} \sys turns 70\% of the GPU time that is safe for AI into served tokens, which
+is 1.9-6.4$\times$ the existing mechanisms that keep the recoveries.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\linewidth]{figures/eval_gpu_use.pdf}
+\caption{Share of the GPU time that is safe for AI that each policy turns into served tokens at a steady
+full load (16 cells, four GPUs). 100\% is an offline schedule that knows every later failure and loses no
+recovery. The number on a baseline is the factor of \sys over it.}
+\label{fig:use}
+\end{figure}
+
 \begin{table}[t]
 \caption{Share of the GPU time in which AI may run with no recovery lost, computed on the runs without AI,
 and AI served. The clairvoyant AI served scales the measured AI served of \sys by the AI time and is at most
-what low priority alone serves (full load) or the offered load.}
+what \textit{Priority-max} serves (full load) or the offered load.}
 \label{tab:clairvoyant}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -791,11 +955,18 @@ consecutive slots (0.19-0.26 against a mean of 0.145) is too weak for it.
 
 \subsection{Neural receiver demand and server size}
 
+\noindent\textbf{Takeaway.} From one to four GPUs, \sys serves 6.4-7.8$\times$ the AI of \textit{Static} and
+1.9-2.2$\times$ that of \textit{Priority} (Figure~\ref{fig:sizes}a). With more two-user cells, the neural
+receivers run for more of the time and the factor falls: from 8.2$\times$ to 2.7$\times$ over
+\textit{Static} and from 2.1$\times$ to 1.0$\times$ over \textit{Priority}, which loses 4.0\% of the
+recoveries with eight two-user cells where \sys loses 0.4\% (Figure~\ref{fig:sizes}c).
+
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/server_sizes.pdf}
-\caption{AI served and recoveries kept for one, two, and four GPUs at full load (two-user: number of
-two-user cells). Labels give the MPS shares.}
+\includegraphics[width=\linewidth]{figures/eval_scale.pdf}
+\caption{AI served (top) and recoveries lost (bottom) at full load for (a) one, two, and four GPUs with one
+two-user cell per GPU, (b) 16-48 cells on four GPUs, and (c) two to eight two-user cells of sixteen.
+\textit{Priority-70} (dashed) serves more AI and loses 1.6-11.3\% of the recoveries.}
 \label{fig:sizes}
 \end{figure}
 
@@ -824,7 +995,7 @@ GPUs, cells, two-user cells & Recovered TBs/s, no AI & \sys & Fixed 10\% & 30\%,
 
 \noindent\textbf{Demand.} Table~\ref{tab:scale} raises the neural receiver demand by making more cells
 two-user cells. With two and four GPUs, \sys keeps at least 99.6\% of the recoveries in all six settings
-and serves 2.7-8.2$\times$ the AI of the fixed 10\% share and 1.0-2.1$\times$ that of the 30\% share with
+and serves 2.7-8.2$\times$ the AI of \textit{Static} and 1.0-2.1$\times$ that of the 30\% share with
 low-priority AI. \sys gives GPU time back as the demand grows: the neural receivers run for a larger part
 of the time, and the AI served falls from 46.6k tokens/s with two two-user cells to 11.8k with eight. The
 70\% share with low-priority AI serves 1.1-2.2$\times$ the AI of \sys and loses 1.6-11.7\% of the recoveries.
@@ -833,11 +1004,15 @@ of the time, and the AI served falls from 46.6k tokens/s with two two-user cells
 (Figure~\ref{fig:sizes}). With one GPU and one two-user cell, \sys serves 8.5k tokens/s at 99.8\%, and the
 70\% share with low-priority AI serves 9.3k at 92.3\%. With one GPU and two two-user cells, one neural
 receiver cannot serve the demand: 31\% of the candidates are lost without AI. \sys then keeps 97.7\% of the
-recoveries, the level of the fixed 10\% share and of the 30\% share with low-priority AI, and serves
+recoveries, the level of \textit{Static} and of \textit{Priority}, and serves
 1.6-4.5$\times$ their AI. With one GPU, \sys misses the layer-1 deadline for 0.04-0.06\% of the TBs against
 0.02-0.04\% without AI, inside the range of the fixed shares (0.02-0.07\%).
 
 \subsection{More cells and other loads}
+
+\noindent\textbf{Takeaway.} With 20, 32, and 48 cells on four GPUs, \sys serves 5.9-6.2$\times$ the AI of
+\textit{Static} and 1.8-1.9$\times$ that of \textit{Priority}, and it loses at most 0.5\% of the
+recoveries (Figure~\ref{fig:sizes}b).
 \label{sec:cells}
 
 \begin{table}[t]
@@ -861,7 +1036,7 @@ No AI & 0, 100\%, 0.032\% & 0, 100\%, 0.037\% & 0, 100\%, 0.090\% \\
 \noindent\textbf{Cells.} Table~\ref{tab:cells} keeps four GPUs and adds cells: 20 cells at full load, five
 per GPU, and 32 and 48 cells where each cell carries a TB in a slot with probability 0.5 and 0.33. \sys
 serves 31.4k-33.4k tokens/s and keeps 99.5-100.0\% of the recoveries, 5.9-6.2$\times$ the AI of the fixed
-10\% share and 1.8-1.9$\times$ that of the 30\% share with low-priority AI. The 70\% share with low-priority
+10\% share and 1.8-1.9$\times$ that of \textit{Priority}. The 70\% share with low-priority
 AI serves 23-28\% more and loses 3.4-5.9\% of the recoveries. With 20 and 32 cells, \sys misses the layer-1
 deadline for 0.044\% and 0.041\% of the TBs against 0.032\% and 0.037\% without AI; the other policies are at
 0.035-0.054\%. With 48 cells, up to 12 cells of a GPU are active in one slot, and every policy with AI
@@ -898,12 +1073,16 @@ policies. With the bound of 7.6~ms, the run without AI recovers 190 TBs per seco
 \noindent\textbf{AI Load.} With 13k and 27k tokens/s offered at a full radio load of 16 cells, \sys serves
 every request and keeps 99.4-99.8\% of the recoveries. At 106k tokens/s offered, every policy serves less
 than at 53k: the admission accepts shorter requests, which take more GPU time per token. \sys serves 24.3k
-tokens/s at 100.0\%, and the 70\% share with low-priority AI serves 27.9k at 93.6\%. When AI requests arrive
+tokens/s at 100.0\%, and \textit{Priority-70} serves 27.9k at 93.6\%. When AI requests arrive
 in bursts (inter-arrival times with a coefficient of variation of 4), \sys serves 23.3k tokens/s at 99.5\%,
-the fixed 10\% share 3.6k at 99.0\%, and the 70\% share with low-priority AI 27.4k at 95.9\%.
+\textit{Static} 3.6k at 99.0\%, and \textit{Priority-70} 27.4k at 95.9\%.
 
 \subsection{Several kinds of AI work}
 \label{sec:kinds}
+
+\noindent\textbf{Takeaway.} With four models and five kinds of AI work on every GPU, the same rule keeps
+99.7\% of the recoveries. \sys serves 1.5$\times$ the chat tokens and 3.1$\times$ the larger-LLM tokens of
+\textit{Priority}.
 
 \begin{table}[t]
 \caption{Five kinds of AI work on every GPU (16 cells at full load, three seeds, every policy in one job).
@@ -933,17 +1112,21 @@ items/s), and a filler of 1,024-token prefill without a limit. The work with a l
 time. Table~\ref{tab:kinds} shows the result.
 
 \sys keeps 99.7\% of the recoveries with the rule unchanged. It serves every embedding and image item, 80\%
-of the larger-LLM prompt tokens and 77\% of the chat output tokens that low priority alone serves, and 92\%
+of the larger-LLM prompt tokens and 77\% of the chat output tokens that \textit{Priority-max} serves, and 92\%
 of its chat responses have every token on time. Against the mechanisms that keep at least 98.5\% of the
-recoveries, \sys serves 1.5$\times$ the chat output tokens of the 30\% share with low-priority AI, with
+recoveries, \sys serves 1.5$\times$ the chat output tokens of \textit{Priority}, with
 92\% against 31\% of the responses fully on time, and 3.1$\times$ the larger-LLM tokens. \sys serves less of
-the work without a limit: the 70\% share with low-priority AI and low priority alone serve 2.4-3.4$\times$
+the work without a limit: \textit{Priority-70} and \textit{Priority-max} serve 2.4-3.4$\times$
 the filler tokens, at 3.2-5.7 points fewer recoveries. \sys rejects 10\% of the chat requests and 11\% of the
 larger-LLM requests, because the AI of a GPU stops for 6.4~ms while its neural receiver runs. With chat
 alone (1.5 requests/s per GPU, two seeds), \sys serves 258 output tokens/s with every response on time and
-keeps 99.7\%, and low priority alone serves 300 and keeps 97.2\%.
+keeps 99.7\%, and \textit{Priority-max} serves 300 and keeps 97.2\%.
 
 \subsection{What a recovery is worth}
+
+\noindent\textbf{Takeaway.} The recovery path raises the goodput of two-user cells by 5.6\% at a fixed MCS
+and by 11-31\% under closed-loop rate control. \sys keeps this gain within 0.3\%, where the other policies
+lose up to 8.2\%.
 
 \begin{table}[t]
 \caption{Uplink goodput with the retransmission schedule applied to the TB records of the runs of
@@ -973,11 +1156,11 @@ receiver is retransmitted 7.5~ms after its slot, as without a recovery path; a T
 fails is retransmitted 5~ms later. A retransmission succeeds with probability 0.95 and takes one uplink
 slot from new data. Table~\ref{tab:goodput} shows that the recovery path raises the goodput of two-user
 cells by 5.6\% and cuts the retransmissions per 100 TBs from 16.9 to 10.7. The policies differ little: one
-percent of lost recoveries is 0.06 points of goodput, and \sys and low priority alone are 0.36 points
+percent of lost recoveries is 0.06 points of goodput, and \sys and \textit{Priority-max} are 0.36 points
 apart. Over eight settings (full, alternating, and random load, eight two-user cells, two GPUs, and 20,
 32, and 48 cells), the recovery path adds 4.6-5.9\% of goodput, \sys keeps that gain within 0.03 points,
 and one percent of lost recoveries costs 0.05-0.06 points. The largest gap is with eight two-user cells,
-where \sys and the 70\% share with low-priority AI are 0.59 points apart ($+$5.26\% against $+$4.67\%). Thus, the result of \sys in goodput is that it keeps the gain of the recovery path while serving
+where \sys and \textit{Priority-70} are 0.59 points apart ($+$5.26\% against $+$4.67\%). Thus, the result of \sys in goodput is that it keeps the gain of the recovery path while serving
 34.1k tokens/s, where the existing mechanisms that keep the same gain serve 5.3k-18.1k. The 99th-percentile
 delay grows from 12 to 17~ms with the recovery path, because the retransmission of a failed recovery is
 5~ms late; the mean delay falls. A user of a two-user cell has 2.5 HARQ processes in use on average and at
@@ -1053,14 +1236,23 @@ Server, target & Goodput & Mean MCS, & \sys & Fixed 10\% & 30\% share & 70\% sha
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/eval_closed_loop.pdf}
+\caption{Goodput of the two-user cells that each policy loses against the same server without AI, with an
+outer-loop rate controller (target: share of TBs that need a retransmission; lines show the range over
+seeds).}
+\label{fig:closed}
+\end{figure}
+
 \noindent\textbf{Closed-Loop Rate Control.} The results above fix the MCS. We add an outer
 loop~\cite{eolla} to the two-user cells. A cell holds the slots of MCS 10-16 on the high-correlation channel
 at 16~dB and picks the MCS of every slot from a pointer over the levels. The pointer falls by 0.25 levels
 for every TB that needs a retransmission and rises by $0.25\,\tau/(1-\tau)$ for every other TB, where
 $\tau$ is the target share of TBs that need a retransmission; a TB that the neural receiver recovers before
 the recovery deadline needs none. The outcome of a slot reaches the loop 15~ms later.
-Table~\ref{tab:closedloop} reports the goodput of the two-user cells, the new data per uplink slot of a
-user, over 18~s per run.
+Figure~\ref{fig:closed} and Table~\ref{tab:closedloop} report the goodput of the two-user cells, the new
+data per uplink slot of a user, over 18~s per run.
 
 \noindent\textbf{The Recovery Path Is Worth More in Closed Loop.} With a 10\% target on four GPUs, the loop
 without a recovery path settles at a mean MCS of 12.5 and the loop with it at 13.5: the goodput rises by
@@ -1077,8 +1269,8 @@ fixed MCS. The error rate after recovery changes by 10.3 points per MCS level ne
 
 \noindent\textbf{Where the Loss Is Visible.} With a 10\% target, the policies are within 1.0\% of each other
 in goodput on two and four GPUs. With a 1\% target and a neural receiver demand near the capacity, the loss
-grows: with eight two-user cells, the 30\% and 70\% shares with low-priority AI lose 2.3\% and
-3.7\%, and low priority alone loses 8.2\%; with two GPUs they lose 0.9\%, 3.6\%, and 4.6\%. \sys
+grows: with eight two-user cells, \textit{Priority} and \textit{Priority-70} lose 2.3\% and
+3.7\%, and \textit{Priority-max} loses 8.2\%; with two GPUs they lose 0.9\%, 3.6\%, and 4.6\%. \sys
 stays within 0.3\% of the server without AI in all nine settings. In these two settings the 30\% share
 with low-priority AI serves less AI than \sys (14.3k against 17.0k, 9.0k against 17.6k) and loses more goodput.
 
@@ -1089,7 +1281,7 @@ low-priority AI (11.5k at $-$0.3\% of goodput). The 70\% share serves 25.4k at $
 alone serves 30.1k at $-$1.0\%. A server without the recovery path serves all 53.0k offered tokens/s with
 low-priority AI and has 10.6\% less goodput in the two-user cells. With eight two-user cells and a 3\% target, \sys serves 6.8k at $-$0.2\%, less
 than the 30\% share (10.3k at $-$1.2\%). With a step of 0.5 levels in the outer loop, the losses of the 70\%
-share and of low priority alone are 0.4\% and 0.6\% at the 10\% target, and those of the three low-priority
+share and of \textit{Priority-max} are 0.4\% and 0.6\% at the 10\% target, and those of the three low-priority
 policies are 1.8\%, 3.1\%, and 6.5\% with eight two-user cells at the 1\% target; the order of the policies
 is the same.
 
@@ -1141,12 +1333,12 @@ is not validated with a layer-2 stack; the goodput results apply a retransmissio
 schedule to measured TB records and do not run HARQ, and the outer loop runs on one channel at one Es/No
 with fixed channel statistics. At a fixed MCS, the goodput difference between \sys and the
 policies that serve more AI is 0.3-0.6 percentage points. With the outer loop and a 10\% target it is at most
-1.0\%, and there the 70\% share with low-priority AI serves 2.2$\times$ the AI of \sys. The closed form takes the run lengths of the neural receiver from
+1.0\%, and there \textit{Priority-70} serves 2.2$\times$ the AI of \sys. The closed form takes the run lengths of the neural receiver from
 runs of the policy; it does not predict them from the policy. The baselines are the mechanisms of prior
 systems on our code: the estimator follows the published design, with our reliability definition and
 without the look-ahead of the full system. With one GPU, the layer-1 misses of \sys and of the fixed shares are
 above the run without AI (0.02-0.07\% against 0.02-0.04\%), and \sys does not remove them. \sys serves less
-AI without a time limit than low priority alone. Layer-1 misses of 0.02-0.04\% with and without AI reflect
+AI without a time limit than \textit{Priority-max}. Layer-1 misses of 0.02-0.04\% with and without AI reflect
 the Python prototype and not a bound. All runs use one GPU model.
 
 \section{Conclusion}
@@ -1157,8 +1349,10 @@ checks miss: a failed TB cannot wait, and a neural receiver that AI slows by mor
 holds its GPU for one more uplink slot. A loss model of this path agrees with 672 runs within 0.82
 percentage points on average. \sys stops the low-priority AI of a GPU when its neural receiver starts and
 keeps the largest AI units away from the conventional receivers. Under three load patterns with mixed
-channels, \sys serves 34.1k-44.7k tokens/s while keeping 99.9\% of the recoveries, 6.4-7.5$\times$ a fixed
-GPU share and 1.2-1.9$\times$ a share chosen by a load estimator with low-priority AI. With an outer-loop
+channels, \sys serves 6.4-7.5$\times$ the AI of a fixed 10\% GPU share and 1.2-1.9$\times$ that of a share
+chosen by a load estimator with low-priority AI, and it keeps 99.9\% of the recoveries. It turns 70\% of
+the GPU time that is safe for AI into served tokens, 1.9-6.4$\times$ the existing mechanisms that keep the
+recoveries. With an outer-loop
 rate controller, lost recoveries lower the MCS: the cost in goodput is below 1\% at a 10\% retransmission
 target and reaches 8\% at a 1\% target with a neural receiver demand near the capacity, and \sys stays within
 0.3\% of the server without AI.

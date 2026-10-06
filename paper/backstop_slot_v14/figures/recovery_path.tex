@@ -1,0 +1,135 @@
+% Recovery path as a procedure: the six steps of a failed TB, left to right, with the values of a measured run.
+% Values: run fa1r32wm of job 59313958, cell 0 on GPU 0 (conv0.json, lane0.json, lane1.json, ai1.json).
+% Times in ms after the samples of slot 2732 arrive.
+%   slot 2731  cuPHY ends -1.20, CRC fails, 6 failed code blocks  -> NeuralRx of GPU 0, -1.14 to 5.11, recovered
+%   slot 2732  cuPHY ends  2.28, CRC fails, 1 failed code block   -> NeuralRx of GPU 1,  2.32 to 8.81, recovered
+%   slot 2733  cuPHY ends  3.93, CRC fails, 10 failed code blocks -> not eligible (K = 9), retransmitted
+% Latest start = arrival + 11.5 - 7.6 = arrival + 3.9 ms.  A slot has 20 code blocks.  The AI piece of GPU 1
+% ends 0.45 ms after its NeuralRx starts.  Every TB keeps its color: 2731 violet, 2732 gold, 2733 orange.
+% Blue boxes: steps on a GPU.  Peach boxes: steps of the controller.  The copy of the slot from the ring on
+% GPU 0 to the NeuralRx of GPU 1 runs below the steps; no arrow passes through another box.
+% Bottom: TB State (one row per TB; the steps fill its columns) and the two deadlines of every TB.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\footnotesize]
+  \tikzset{stage/.style={draw=navyf, line width=0.6pt, anchor=north west, minimum height=2.85cm},
+           tri/.style={isosceles triangle, fill=black, inner sep=0pt, minimum height=0.15cm, minimum width=0.24cm},
+           bc/.style={draw=black!70, line width=0.35pt, anchor=north west, inner sep=0pt, minimum height=0.32cm,
+                      text height=0.2cm, text depth=0.06cm, font=\rmfamily\footnotesize},
+           bh/.style={bc, fill=black!10},
+           where/.style={font=\rmfamily\itshape\footnotesize, inner sep=1.5pt}}
+  % ================= the six steps =================
+  \node[stage, fill=cyanp, minimum width=1.6cm] at (0,0) {};
+  \node[stage, fill=cyanp, minimum width=1.9cm] at (1.83,0) {};
+  \node[stage, fill=peach, minimum width=3.0cm, line width=1.1pt] at (3.96,0) {};
+  \node[stage, fill=peach, minimum width=2.05cm, line width=1.1pt] at (7.19,0) {};
+  \node[stage, fill=cyanp, minimum width=2.55cm] at (9.47,0) {};
+  \node[stage, fill=peach, minimum width=1.65cm] at (12.25,0) {};
+  \foreach \x/\t/\w in {0.8/\ding{202} Receive/{Slot Ring}, 2.78/\ding{203} Decode/{cuPHY, GPU 0}, 5.46/\ding{204} Select/Controller,
+                        8.215/\ding{205} Assign/Controller, 10.745/\ding{206} Recover/{NeuralRx, GPU 1}, 13.075/\ding{207} Report/{To Layer 2}}
+  {
+    \node[ttl, inner sep=1pt] at (\x,-0.23) {\t};
+    \node[where, anchor=north] at (\x,-0.42) {\w};
+  }
+  \foreach \x in {1.715, 3.845, 7.075, 9.355, 12.135}
+    \node[tri] at (\x,-1.34) {};
+  % ---- 1: the samples of three slots in the slot ring of cell 0 (GPU 0) ----
+  \foreach \y/\n/\f in {-0.86/2731/tba, -1.18/2732/gold, -1.5/2733/recc}
+    \node[bc, fill=\f, minimum width=1.0cm] at (0.3,\y) {\n};
+  \node[bc, pattern=north east lines, pattern color=black!45, minimum width=1.0cm] at (0.3,-1.82) {};
+  \node[where] at (0.8,-2.45) {GPU 0};
+  % ---- 2: cuPHY decodes slot 2732: one of 20 code blocks fails ----
+  \foreach \r in {0, 1}
+    \foreach \i in {0, 1, ..., 9}
+      \node[draw=black!70, line width=0.3pt, fill=gold!30, minimum width=0.17cm, minimum height=0.26cm, inner sep=0pt, anchor=west] at ({1.93+0.17*\i},{-1.02-0.27*\r}) {};
+  \node[draw=black!70, line width=0.3pt, fill=dred, minimum width=0.17cm, minimum height=0.26cm, inner sep=0pt, anchor=west] at (3.12,-1.02) {};
+  \node[where] at (2.78,-1.68) {1 of 20 Fails};
+  \node[bc, fill=badc, text=dred, minimum width=0.9cm, minimum height=0.34cm] at (1.92,-2.05) {CRC \xmark};
+  \node[where, anchor=west, inner sep=1pt] at (2.87,-2.22) {2.3 ms};
+  % ---- 3: at most nine failed code blocks? ----
+  \node[bh, minimum width=0.72cm] at (4.06,-0.86) {Slot};
+  \node[bh, minimum width=0.82cm] at (4.78,-0.86) {Failed};
+  \node[bc, fill=gold, minimum width=0.72cm] at (4.06,-1.18) {2732};
+  \node[bc, fill=white, minimum width=0.82cm] at (4.78,-1.18) {1};
+  \node[bc, fill=recc, minimum width=0.72cm] at (4.06,-1.5) {2733};
+  \node[bc, fill=white, minimum width=0.82cm, text=dred] at (4.78,-1.5) {10};
+  \node[draw=dred, fill=white, diamond, aspect=1.5, inner sep=0.3pt, line width=1.1pt, font=\rmfamily\itshape\footnotesize] (dia) at (6.43,-1.34) {$\le 9$?};
+  \draw[sarr] (5.6,-1.34) -- (dia.west);
+  \node[inote, text=black!75, anchor=south east, inner sep=1pt] at (6.92,-1.04) {Yes};
+  \node[bc, fill=recc, minimum width=0.72cm, minimum height=0.34cm] at (4.5,-2.2) {2733};
+  \node[bc, fill=badc, minimum width=1.5cm, minimum height=0.34cm, text=dred] at (5.22,-2.2) {Retransmit};
+  \draw[sarr, dred] (dia.south) -- (6.43,-2.2);
+  \node[inote, text=dred, anchor=east] at (6.4,-1.95) {No};
+  % ---- 4: a free NeuralRx, before the latest start ----
+  \node[bh, minimum width=0.65cm] at (7.29,-0.86) {GPU};
+  \node[bh, minimum width=1.2cm] at (7.94,-0.86) {NeuralRx};
+  \foreach \y/\g in {-1.18/0, -1.5/1, -1.82/2, -2.14/3}
+    \node[bc, fill=white, minimum width=0.65cm] at (7.29,\y) {\g};
+  \node[bc, fill=tba, minimum width=1.2cm] at (7.94,-1.18) {2731};
+  \node[bc, fill=gold, minimum width=1.2cm] at (7.94,-1.5) {2732};
+  \node[bc, fill=white, minimum width=1.2cm] at (7.94,-1.82) {Free};
+  \node[bc, fill=white, minimum width=1.2cm] at (7.94,-2.14) {Free};
+  \draw[dred, line width=1.4pt] (7.29,-1.5) rectangle (9.14,-1.82);
+  \node[key, text=dred] at (8.215,-2.65) {Start by 3.9 ms};
+  % ---- 5: the NeuralRx of GPU 1 decodes the slot; the AI of GPU 1 stops ----
+  \foreach \y/\t/\f in {-0.86/Copy Slot/white, -1.18/Neural Net/white, -1.5/LDPC/white, -1.82/CRC \cmark/greenc}
+    \node[bc, fill=\f, minimum width=1.35cm] at (9.74,\y) {\t};
+  \draw[sarr] (9.62,-0.9) -- (9.62,-2.1);
+  \node[bc, anchor=center, fill=gold, minimum width=0.75cm] at (11.55,-1.02) {2732};
+  \node[where] at (11.55,-1.5) {6.5 ms};
+  \foreach \i in {0, 1, 2}
+    \node[blk, fill=aic, minimum width=0.24cm, minimum height=0.26cm] at ({9.72+0.26*\i},-2.57) {};
+  \draw[dred, line width=1.6pt] (10.48,-2.74) -- (10.48,-2.4);
+  \node[where, text=dred, anchor=west] at (10.52,-2.57) {AI Stops};
+  % ---- 6: the result cancels the retransmission ----
+  \node[bc, anchor=center, fill=greenc, minimum width=1.0cm] at (13.075,-1.0) {CRC \cmark};
+  \draw[sarr] (13.075,-1.17) -- (13.075,-1.56);
+  \node[blk, fill=greenc, minimum width=1.4cm, minimum height=0.72cm, align=center, font=\rmfamily\footnotesize] at (13.075,-1.92) {Cancel\\Retransmit};
+  \node[key, text=dred] at (13.075,-2.6) {by 11.5 ms};
+
+  % ================= data path: the slot is copied from the ring on GPU 0 to the NeuralRx on GPU 1 =================
+  \draw[dblue, line width=2.0pt, -{Triangle[length=1.6mm,width=2.8mm]}] (0.8,-2.85) -- (0.8,-3.2) -- (10.3,-3.2) -- (10.3,-2.85);
+  \node[note, text=dblue, fill=white, inner sep=2pt] at (5.5,-3.2) {Copy over CUDA IPC};
+
+  % ================= TB state and the two deadlines of every TB =================
+  \node[layer, anchor=north west, minimum width=13.9cm, minimum height=1.8cm] at (0,-3.48) {};
+  \node[cttl, anchor=west] at (0.12,-3.66) {TB State};
+  \node[cttl, anchor=west] at (6.8,-3.66) {Two Deadlines};
+  \draw[guard] (9.25,-3.66) -- (9.6,-3.66);
+  \node[inote, anchor=west, text=dred] at (9.62,-3.66) {Layer 1: 4.0 ms};
+  \draw[dred, line width=1.3pt] (11.45,-3.66) -- (11.8,-3.66);
+  \node[inote, anchor=west, text=dred] at (11.82,-3.66) {Recovery: 11.5 ms};
+  \foreach \x/\w/\h in {0.15/0.9/Slot, 1.05/1.0/Failed, 2.05/1.2/Start By, 3.25/1.3/NeuralRx, 4.55/1.55/Retransmit}
+    \node[bh, minimum width=\w cm] at (\x,-3.84) {\h};
+  \foreach \y/\f/\a/\d/\l/\e/\g/\c in {-4.16/tba/2731/6/1.4 ms/GPU 0/Cancelled/black, -4.48/gold/2732/1/3.9 ms/GPU 1/Cancelled/black, -4.8/recc/2733/10/6.4 ms/None/Sent/dred}
+  {
+    \node[bc, fill=\f, minimum width=0.9cm] at (0.15,\y) {\a};
+    \node[bc, fill=white, minimum width=1.0cm] at (1.05,\y) {\d};
+    \node[bc, fill=white, minimum width=1.2cm] at (2.05,\y) {\l};
+    \node[bc, fill=white, minimum width=1.3cm, text=\c] at (3.25,\y) {\e};
+    \node[bc, fill=white, minimum width=1.55cm, text=\c] at (4.55,\y) {\g};
+  }
+  % time axis on top: x = 7.75 + 0.36 t, t in ms after the samples of slot 2732 arrive
+  \draw[line width=0.4pt] (6.8,-4.14) -- (13.2,-4.14);
+  \foreach \t/\l in {0/0, 4/4, 8/8, 12/12}
+  {
+    \draw[line width=0.4pt] ({7.75+0.36*\t},-4.14) -- ({7.75+0.36*\t},-4.08);
+    \node[font=\rmfamily\scriptsize, anchor=south, inner sep=1pt] at ({7.75+0.36*\t},-4.08) {\l};
+  }
+  \node[inote, anchor=south, inner sep=1pt] at (13.35,-4.1) {ms};
+  % slot 2731: cuPHY -2.5 to -1.2, NeuralRx of GPU 0 -1.14 to 5.11; deadlines at 1.5 and 9.0
+  \node[job, fill=tba!40, minimum width=0.468cm, minimum height=0.22cm, anchor=west, text=dred] at (6.85,-4.32) {\xmark};
+  \node[job, fill=tba, minimum width=2.25cm, minimum height=0.22cm, anchor=west] at (7.34,-4.32) {};
+  \node[font=\rmfamily\scriptsize, anchor=east, inner sep=1.5pt] at (9.59,-4.32) {GPU 0 \cmark};
+  \draw[guard] (8.29,-4.19) -- (8.29,-4.45);
+  \draw[dred, line width=1.3pt] (10.99,-4.19) -- (10.99,-4.45);
+  % slot 2732: cuPHY 0 to 2.28, NeuralRx of GPU 1 2.32 to 8.81; deadlines at 4.0 and 11.5
+  \node[job, fill=gold!40, minimum width=0.821cm, minimum height=0.22cm, anchor=west, text=dred] at (7.75,-4.64) {\xmark};
+  \node[job, fill=gold, minimum width=2.337cm, minimum height=0.22cm, anchor=west] at (8.585,-4.64) {};
+  \node[font=\rmfamily\scriptsize, anchor=east, inner sep=1.5pt] at (10.922,-4.64) {GPU 1 \cmark};
+  \draw[guard] (9.19,-4.51) -- (9.19,-4.77);
+  \draw[dred, line width=1.3pt] (11.89,-4.51) -- (11.89,-4.77);
+  % slot 2733: cuPHY 2.5 to 3.93, not eligible; deadlines at 6.5 and 14.0
+  \node[job, fill=recc!40, minimum width=0.515cm, minimum height=0.22cm, anchor=west, text=dred] at (8.65,-4.96) {\xmark};
+  \draw[guard] (10.09,-4.83) -- (10.09,-5.09);
+  \draw[dred, line width=1.3pt] (12.79,-4.83) -- (12.79,-5.09);
+  \node[inote, anchor=west, text=dred] at (10.2,-4.96) {Retransmit};
+\end{tikzpicture}

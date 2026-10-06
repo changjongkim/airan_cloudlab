@@ -132,6 +132,16 @@ for step in $steps; do
       $PLOT la $F/link_adaptation.png $R/link_adaptation_DoubleTDLlow.json
       $PLOT la $F/link_adaptation_high_correlation.png $R/link_adaptation_DoubleTDLhigh.json
       $PLOT timeline $F/timeline_server.png fa1r32wm_c16_rescue_value_backstop_units_j${J3} 10 205
+      EVAL="${PLOT/plot_v14.py/plot_eval.py}"         # evaluation figures: one metric per panel, one color per policy
+      FA=$R/sweep_fa_c16_j${J1}_${J3}.json
+      $EVAL headline $F/eval_headline.png $FA $R/sweep_fb_c16_j${J1}_${J3}.json $R/sweep_fc_c16_j${J1}_${J3}.json
+      $EVAL tradeoff $F/eval_tradeoff.png $FA
+      $EVAL scale $F/eval_scale.png gpus=$R/sweep_sa_c4_j${J3}_${J4}_${J5}.json,$R/sweep_sc_c8_j${J3}_${J4}.json,$FA \
+        cells=$FA,$R/sweep_tv_c20_j${J5}.json,$R/sweep_tm_c32_j${J5}.json,$R/sweep_tn_c48_j${J5}.json \
+        demand=$R/sweep_sx_c16_j${J4}.json,$FA,$R/sweep_sy_c16_j${J4}.json,$R/sweep_sw_c16_j${J3}_${J4}.json
+      $EVAL use $F/eval_gpu_use.png $R/optimum_gap.json
+      $EVAL closed $F/eval_closed_loop.png "Target 10%=$R/la_closed_laa.json" "Target 3%=$R/la_closed_lac.json" "Target 1%=$R/la_closed_lab.json" \
+        "Target 1%\\n2 GPUs=$R/la_closed_lad.json" "Target 1%\\n8 two-user cells=$R/la_closed_laf.json"
       cd $S ;;
   esac
 done

@@ -1,0 +1,14 @@
+## 16 cells at full load, fixed MCS, runs of 100 s  (all cells, periods from 8000)
+
+| level | TBs | median | 99th | 99.9th | room to the deadline at the 99.9th | 99.99th | TBs past the deadline |
+|---|---|---|---|---|---|---|---|
+| Conventional receiver alone | 3200000 | 1.38 | 1.47 | 1.49 | 2.51 ms | 1.55 | 0 |
+| + neural receiver, no AI | 3200000 | 1.39 | 2.87 | 3.01 | 0.99 ms | 3.18 | 0 |
+| + AI, rule | 3200000 | 1.81 | 2.90 | 3.06 | 0.94 ms | 3.18 | 3 |
+| + AI, fixed 10% | 3200000 | 1.47 | 2.97 | 3.19 | 0.81 ms | 3.35 | 6 |
+| + AI, 30% share with low priority | 3200000 | 1.62 | 3.08 | 3.30 | 0.70 ms | 3.46 | 0 |
+| + AI, 70% share with low priority | 3200000 | 1.80 | 3.23 | 3.48 | 0.52 ms | 3.63 | 10 |
+| + AI, low priority alone | 3200000 | 1.90 | 3.32 | 3.70 | 0.30 ms | 3.94 | 174 |
+
+the neural receiver adds 1.52 ms at the 99.9th percentile (61% of the room of the conventional receiver alone); wd adds +0.04, s10 adds +0.17, p30 adds +0.28, p70 adds +0.46, p100 adds +0.69
+

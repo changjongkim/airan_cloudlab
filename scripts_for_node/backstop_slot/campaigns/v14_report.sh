@@ -149,7 +149,10 @@ for step in $steps; do
       # the 10% target in runs of 100 s (v18_long_cl.sh, job JG): steady state, with the TBs past the deadline
       ${PY/python3/--env=SKIP=8000 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_long_cl.json ${JG:-59423316} \
         "lga:16:Target 10%, runs of 100 s" > ../../$R/l1_levels_long_cl.txt 2>&1
-      $PY analyze_la_closed.py ../../$R/la_closed_lga.json ${JG:-59423316} lga 16 > ../../$R/la_closed_lga.txt 2>&1 ;;
+      $PY analyze_la_closed.py ../../$R/la_closed_lga.json ${JG:-59423316} lga 16 > ../../$R/la_closed_lga.txt 2>&1
+      # full load at a fixed MCS in runs of 100 s: v16_long.sh (job J6) and the conventional receiver alone (v16_long_x.sh, job JG)
+      ${PY/python3/--env=SKIP=8000 --env=ALL_CELLS=1 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_long_full.json $J6,${JG:-59423316} \
+        "xa:16:16 cells at full load, fixed MCS, runs of 100 s" > ../../$R/l1_levels_long_full.txt 2>&1 ;;
     lacl)        # README 6.13: closed-loop link adaptation (la_cl.sh, la_cl2.sh), jobs JL (comma-separated)
       for spec in ${LACL_TAGS:-laa:16 lac:16 lab:16 laf:16 lai:16 lae:8 lah:8 lad:8 lag:4 lak:16 lal:16}; do
         tag=${spec%%:*}

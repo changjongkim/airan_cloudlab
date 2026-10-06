@@ -31,20 +31,20 @@ AI-RAN 서버가 GPU를 나누는 목적은 무선이 남기는 GPU 시간을 AI
 
 측정 조건: A100 GPU 4장, 100 MHz 셀 16개, 초당 53k token 분량의 LLM 요청(200 ms 안에 끝나야 함). 세 가지 무선 부하(계속 전 부하, 2초마다 바뀜, 무작위로 바뀜)를 시드 5개로 쟀다.
 
-**기준은 세 단계다.** NRx와 AI를 넣은 서버에서 무선 작업의 지연이 0일 수는 없다. 무엇이 얼마를 더하는지를 나눠 적는다. 표는 세 단계에서 워크로드가 같은 단일 UE 셀의 L1 지연이다(rate control을 넣은 네 조건의 범위, 6.0.1절).
+**기준은 세 단계다.** NRx와 AI를 넣은 서버에서 무선 작업의 지연이 0일 수는 없다. 무엇이 얼마를 더하는지를 나눠 적는다. 표는 100초 실행의 정상 상태 값이다(처음 20초 제외, 6.0.1절). 칸은 "L1 지연 p99.9 / L1 마감(4.0 ms)을 넘긴 TB 수"다.
 
-| 단계 | L1 지연 p99.9 | L1 마감(4.0 ms)까지 남는 여유 |
+| 단계 | 전 부하, 고정 MCS (TB 320만 개) | rate control, 목표 10% (단일 UE 셀의 TB 115만 개) |
 |---|---|---|
-| 기존 수신기만 (NRx 없음, AI 없음) | 1.50–1.52 ms | 2.48–2.50 ms |
-| + NRx (AI 없음) | 3.05–3.10 ms | 0.90–0.95 ms |
-| **+ AI, Antiphase** | **3.12–3.14 ms** | **0.86–0.88 ms** |
-| + AI, 고정 10% | 3.22–3.31 ms | 0.69–0.78 ms |
-| + AI, 낮은 우선순위 + 30% | 3.37–3.41 ms | 0.59–0.63 ms |
-| + AI, 낮은 우선순위 + 70% | 3.48–3.56 ms | 0.44–0.52 ms |
-| + AI, 낮은 우선순위만 | 3.73–4.00 ms | 0.00–0.27 ms |
+| 기존 수신기만 (NRx 없음, AI 없음) | 1.49 ms / 0 | 1.50 ms / 0 |
+| + NRx (AI 없음) | 3.01 ms / 0 | 3.11 ms / 0 |
+| **+ AI, Antiphase** | **3.06 ms / 3** | **3.14 ms / 3** |
+| + AI, 고정 10% | 3.19 ms / 6 | 3.28 ms / 0 |
+| + AI, 낮은 우선순위 + 30% | 3.30 ms / 0 | 3.40 ms / 11 |
+| + AI, 낮은 우선순위 + 70% | 3.48 ms / 10 | 3.58 ms / 9 |
+| + AI, 낮은 우선순위만 | 3.70 ms / 174 | 3.89 ms / 470 |
 
-- **L1 꼬리를 가장 크게 늘리는 것은 NRx다.** NRx를 넣으면 p99.9가 1.5 ms 늘어 마감 여유의 62–64%가 사라진다. 그 대가로 2-UE 셀의 goodput이 11–31% 오른다.
-- **AI는 남은 0.9 ms 안에서 돌아야 한다.** Antiphase는 0.03–0.07 ms를 더한다. 낮은 우선순위 + 30%는 0.30–0.36 ms, 낮은 우선순위만 쓰면 0.68–0.90 ms를 더해 여유가 0–0.27 ms 남는다.
+- **L1 꼬리를 가장 크게 늘리는 것은 NRx다.** NRx를 넣으면 p99.9가 1.5 ms 늘어 마감 여유(2.5 ms)의 61–64%가 사라지고 0.9–1.0 ms가 남는다. 그 대가로 2-UE 셀의 goodput이 11–31% 오른다.
+- **AI는 남은 여유 안에서 돌아야 한다.** Antiphase는 0.03–0.04 ms를 더한다. 낮은 우선순위 + 30%는 0.28–0.29 ms를 더하고, 낮은 우선순위만 쓰면 0.69–0.78 ms를 더해 174–470개의 TB가 마감을 넘는다.
 - 손실이 작다는 것은 간섭이 없다는 뜻이 아니다. 지연이 남은 여유 안에 머물러 마감 초과나 잃은 복구로 바뀌지 않는다는 뜻이다.
 
 ![방식별 AI 처리량과 잃은 복구](docs/current/figures/backstop_v14/eval_headline.png)
@@ -638,7 +638,8 @@ NRx와 AI를 넣은 서버에서 무선 작업의 지연은 0이 될 수 없다.
 
 | 방식 | AI 처리량 (k tok/s) | 복구 유지 | L1 지연 p50 / p99.9 / p99.99 | L1 마감을 넘긴 TB | NRx 실행 p50 / p99 | AI 요청 지연 p50 / p99 | 받지 않은 요청 | GPU 유휴 |
 |---|---|---|---|---|---|---|---|---|
-| AI 없음 | 0.0 | 100.0% | 1.39 / 3.01 / 3.18 | 0 / 3.20M | 6.28 / 6.57 | – | – | 26.4% |
+| 기존 수신기만 (NRx 없음, AI 없음) | 0.0 | – | 1.38 / 1.49 / 1.55 | 0 / 3.20M | – | – | – | – |
+| AI 없음 (NRx 있음) | 0.0 | 100.0% | 1.39 / 3.01 / 3.18 | 0 / 3.20M | 6.28 / 6.57 | – | – | 26.4% |
 | **Antiphase** | **34.1** | **99.9%** | 1.81 / **3.06** / **3.18** | **3 / 3.20M** | **6.38** / 6.82 | 77 / **175** | 16.4% | 1.0% |
 | 고정 10% (Static) | 5.6 | 99.3% | 1.47 / 3.18 / 3.34 | 6 / 3.20M | 6.76 / 7.05 | 120 / 210 | 64.9% | 2.1% |
 | 추정기 (Estimator) | 11.0 | 98.7% | 1.54 / 3.31 / 3.47 | 0 / 3.20M | 7.07 / 7.36 | 84 / 185 | 46.8% | 1.4% |
@@ -647,7 +648,7 @@ NRx와 AI를 넣은 서버에서 무선 작업의 지연은 0이 될 수 없다.
 | 낮은 우선순위 + 70% | 42.6 | 94.3% | 1.80 / 3.47 / 3.63 | 10 / 3.20M | 7.63 / 7.98 | 73 / 175 | 9.2% | 1.1% |
 | 낮은 우선순위, 한도 없음 | 48.9 | 93.7% | 1.90 / 3.70 / 3.94 | 174 / 3.20M | 8.00 / 8.53 | 61 / 162 | 4.0% | 1.7% |
 
-100초 실행의 AI 처리량과 복구 유지율은 10초 실행의 대표 결과(6.4절: 34.1k에 99.9%)와 같다.
+100초 실행의 AI 처리량과 복구 유지율은 10초 실행의 대표 결과(6.4절: 34.1k에 99.9%)와 같다. 첫 줄은 복구 경로 없이 기존 수신기만 돌린 100초 실행이다(`campaigns/v16_long_x.sh`, 시드 5). 이 조건에서 NRx는 L1 p99.9에 1.52 ms를 더하고(여유 2.51 ms의 61%), Antiphase의 AI는 그 위에 0.04 ms를 더한다.
 
 세 부하 조건을 함께 보면 다음과 같다(전 부하 / 2초마다 바뀜 / 무작위로 바뀜). 뒤의 두 조건은 20초와 40초 실행에서 처음 5초를 뺀 값이다.
 
@@ -2033,6 +2034,8 @@ $R bash $C/v16_long.sh long16                # 16셀: n wd s10 p30 p70, 시드 1
 $R bash $C/v16_long_b.sh                     # 16셀: p100 yyp yyr, 시드 1–5 (약 40분)
 $R bash $C/v16_long.sh long1                 # GPU 1장: n wd s10 p30, 시드 1–5 (약 45분)
 $R bash $C/v16_long.sh long20 long48         # 20셀과 48셀: n wd s10 p30, 시드 1–3 (약 70분)
+$R bash $C/v16_long_x.sh                     # 16셀, 기존 수신기만 (NRx 없음, AI 없음), 시드 1–5 (약 12분)
+$R bash $C/v18_long_cl.sh                    # rate control 목표 10%의 100초 실행: x n wm s10 p30 p70 p100, 시드 1–3 (약 50분)
 J6=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh sched   # 정상 상태의 지표와 시간대별 놓침 -> sched_metrics.txt, sched_*_w20.json, warmup_*.json
 JF=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh frontier   # 한도를 바꿔 가며 본 goodput과 AI (6.13.7절; $R bash $C/v17_frontier.sh "1 2 3"의 job) -> frontier_closed.txt, eval_frontier.png
 JL=J1,J2 bash scripts_for_node/backstop_slot/campaigns/v14_report.sh levels   # 세 단계(기존 수신기만 / + NRx / + AI)의 L1 지연 -> l1_levels.txt, 닫힌 루프 조건에서 NRx가 도는 시간 -> optimum_gap_closed.txt (6.0.1, 6.13.6절; JL은 닫힌 루프 실행의 job)
@@ -2115,7 +2118,7 @@ cd paper/backstop_slot_v14 && bash figures.sh && module load texlive/2024 && lat
 
 | 절 | 원본 |
 |---|---|
-| 6.0.1, 6.0.2 | `results/backstop_slot/sched_<tag>_c<셀>_j<job>[_w<초>].json`, `warmup_<tag>_*.json`, `sched_metrics.txt`(`analyze_sched.py`, `analyze_warmup.py`), `l1_levels.json`, `l1_levels.txt`(`analyze_l1_levels.py`: 기존 수신기만 / + NRx / + AI), `l1_levels_long_cl.txt`, `la_closed_lga.txt`(목표 10%의 100초 실행) |
+| 6.0.1, 6.0.2 | `results/backstop_slot/sched_<tag>_c<셀>_j<job>[_w<초>].json`, `warmup_<tag>_*.json`, `sched_metrics.txt`(`analyze_sched.py`, `analyze_warmup.py`), `l1_levels.json`, `l1_levels.txt`(`analyze_l1_levels.py`: 기존 수신기만 / + NRx / + AI), `l1_levels_long_cl.txt`, `la_closed_lga.txt`(목표 10%의 100초 실행), `l1_levels_long_full.txt`(전 부하의 100초 실행, 기존 수신기만 포함) |
 | 6.1 | `results/backstop_slot/raw/ldpc_check_*`, `mu_probe_*` (요약은 검증 문서 2장) |
 | 6.2, 6.3 | `results/backstop_slot/v7_*`, `v8_*` (검증 문서 6.1–6.8절) |
 | 6.4, 6.5 | `results/backstop_slot/sweep_{fa,fb,fc}_c16_j59210955_59313958.json`, `series_fc_c16_j59210955_59313958.json` |

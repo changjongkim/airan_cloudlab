@@ -1077,7 +1077,8 @@ conventional result. The number on a baseline is how many times more it adds tha
 \begin{table}[t]
 \caption{Scheduling metrics at a steady full load (16 cells, four GPUs; five runs of 100~s per policy without
 their first 20~s, 3.2 million TBs per policy). L1 latency and neural receiver run time are in ms; AI latency
-is from the arrival of a request to the end of its prefill, in ms.}
+is from the arrival of a request to the end of its prefill, in ms. cuPHY alone: a server without the neural
+receiver and without AI.}
 \label{tab:sched}
 \footnotesize
 \setlength{\tabcolsep}{3.2pt}
@@ -1086,6 +1087,7 @@ is from the arrival of a request to the end of its prefill, in ms.}
 Policy & AI served & Recoveries & L1 latency & TBs past & NeuralRx run & AI latency & Requests & GPU \\
  & (k tokens/s) & kept (\%) & p50 / p99.9 & L1 deadline & p50 / p99 & p50 / p99 & rejected (\%) & idle (\%) \\
 \midrule
+cuPHY alone & -- & -- & 1.38 / 1.49 & 0 & -- & -- & -- & -- \\
 No AI & 0.0 & 100.0 & 1.39 / 3.01 & 0 & 6.28 / 6.57 & -- & -- & 26.4 \\
 \sys & 34.1 & 99.9 & 1.81 / 3.06 & 3 & 6.38 / 6.82 & 77 / 175 & 16.4 & 1.0 \\
 \textit{Static} & 5.6 & 99.3 & 1.47 / 3.18 & 6 & 6.76 / 7.05 & 120 / 210 & 64.9 & 2.1 \\
@@ -1175,8 +1177,10 @@ cells per level after the first 20~s). No TB passes the layer-1 deadline with th
 or with the neural receiver, and 3 do with \sys. \textit{Priority} serves the same AI as \sys in this
 setting (11.5k tokens/s); it adds 0.29~ms to the 99.9th percentile against 0.03~ms, loses 4.2\% of the
 recoveries against 0.9\%, and 11 TBs pass the deadline. With \textit{Priority-max} the 99.99th percentile is
-4.20~ms and 470 TBs pass the deadline. In the rest of this section, the server without AI is the second level:
-it runs the neural receiver.
+4.20~ms and 470 TBs pass the deadline. At a steady full load with a fixed MCS (first rows of
+Table~\ref{tab:sched}), the conventional receiver alone has 1.49~ms at the 99.9th percentile and the neural
+receiver raises it to 3.01~ms. In the rest of this section, the server without AI is the second level: it
+runs the neural receiver.
 
 \noindent\textbf{Start of a Run.} The processes of a run start cold, and its first seconds are not the steady
 state. Table~\ref{tab:when} counts the TBs past the layer-1 deadline by the time since the start. Without

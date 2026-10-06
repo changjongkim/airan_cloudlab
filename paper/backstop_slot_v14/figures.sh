@@ -26,6 +26,7 @@ EVAL scale $F/eval_scale.$EXT gpus=$R/sweep_sa_c4_j${J3}_${J4}_${J5}.json,$R/swe
   cells=$FA,$R/sweep_tv_c20_j${J5}.json,$R/sweep_tm_c32_j${J5}.json,$R/sweep_tn_c48_j${J5}.json \
   demand=$R/sweep_sx_c16_j${J4}.json,$FA,$R/sweep_sy_c16_j${J4}.json,$R/sweep_sw_c16_j${J3}_${J4}.json
 EVAL use $F/eval_gpu_use.$EXT $R/optimum_gap.json
+EVAL protect $F/eval_protect.$EXT "Steady Full Load\n(100-s Runs)=$R/sched_xa_c16_j${J6:-59414960}_w20.json" "Load Changes Every 2 s\n(20-s Runs)=$R/sched_fb_c16_j${J1}_${J3}_w5.json"
 EVAL closed $F/eval_closed_loop.$EXT "Target 10%=$R/la_closed_laa.json" "Target 3%=$R/la_closed_lac.json" "Target 1%=$R/la_closed_lab.json" \
   "Target 1%\\n2 GPUs=$R/la_closed_lad.json" "Target 1%\\n8 two-user cells=$R/la_closed_laf.json"
 # The design figures for the README (TikZ sources in figures/*.tex)

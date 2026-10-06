@@ -7,6 +7,10 @@ usage:
   plot_eval.py scale    OUT gpus=A,B,C cells=A,B,C,D demand=A,B,C,D     scaling with GPUs, cells, two-user cells
   plot_eval.py use      OUT OPTIMUM_GAP.json                 share of the safe GPU time that becomes AI
   plot_eval.py closed   OUT "LABEL=LA_CLOSED.json" ...       goodput lost with a rate controller in the loop
+  plot_eval.py protect  OUT "TITLE=SCHED.json" ...           latency that AI adds to the radio work and latency of
+                                                             the AI requests (SCHED.json: output of analyze_sched.py)
+  plot_eval.py frontier OUT "TITLE=LA_CLOSED.json" ...       AI served against goodput lost with a rate controller in the
+                                                             loop: settings of the scheme and caps of the low-priority baseline
 Sweep files are the output of analyze_sweep.py.  The scheme is policy code OUR_V14 (default wm); in the sweeps
 with more than four cells per GPU it is wd.  Names of the baselines:
   Static               fixed 10% MPS share
@@ -114,6 +118,64 @@ def headline(out: str, paths: list[str]) -> None:
         style(axes[1][col], "Recoveries\nLost (%)" if col == 0 else "")
     legend(fig, names, ncol=6, y=1.0)
     fig.tight_layout(rect=(0, 0, 1, 0.93), w_pad=1.0, h_pad=0.8)
+    fig.savefig(out, dpi=200)
+
+
+# ---------------------------------------------------------------------------------------------------
+def protect(out: str, items: list[str]) -> None:
+    """One row per load pattern, one panel per metric: what AI adds to the latency of the radio work (the
+    run without AI is the zero or the dashed line) and the latency of the AI requests against their limit.
+    The L1 misses are those of all seeds together, per million TBs, with their 95% interval."""
+    names = [NAME, "Static", "Estimator", "Priority", "Estimator+Priority", "Follow+Priority", "Priority-70", "Priority-max"]
+    # label, key, value is the difference to the run without AI, reference line, digits, scale, keys of the interval
+    panels = [("L1 Latency Added\n(ms, 99.9th Pct.)", "l1_p999_ms", True, None, 2, 1.0, None),
+              ("L1 Deadlines Missed\n(per Million TBs)", "l1_late_pooled_pct", False, "No AI", 0, 1e4, ("l1_late_low_pct", "l1_late_high_pct")),
+              ("NeuralRx Run Time\nAdded (ms, Median)", "nrx_run_p50_ms", True, ("Slack", 1.2), 2, 1.0, None),
+              ("AI Request Latency\n(ms, 99th Pct.)", "ai_p99_ms", False, ("Limit", 200.0), 0, 1.0, None)]
+    fig, axes = plt.subplots(len(items), len(panels), figsize=(10.6, 2.45 * len(items) + 0.5), squeeze=False)
+    for row, item in enumerate(items):
+        title, path = item.split("=", 1)
+        by = rows_of(path)
+        none = by["n"]
+        present = [(i, n, pick(by, POLICIES[n][0])) for i, n in enumerate(names)]
+        present = [(i, n, r) for i, n, r in present if r is not None]
+        for col, (label, key, added, line, digits, scale, interval) in enumerate(panels):
+            ax = axes[row][col]
+            base = none[key] if added else 0.0
+            ours = (pick(by, "OURS")[key] - base) * scale
+            top = 0.0
+            for i, n, r in present:
+                color, lossy = POLICIES[n][1], POLICIES[n][3]
+                low_key, high_key = interval or (key + "_min", key + "_max")
+                value, low, high = (r[key] - base) * scale, (r[low_key] - base) * scale, (r[high_key] - base) * scale
+                ax.bar([i], [value], width=0.74, zorder=3, **bar_kind(color, lossy))
+                ax.plot([i, i], [low, high], color="black", linewidth=1.0, zorder=4)
+                text = f"{value:.{digits}f}" if (n == NAME or not added) else f"{value / ours:.0f}×"
+                ax.text(i, max(high, value), " " + text, fontsize=FS - 1.5, color=color if n == NAME else INK, ha="center", va="bottom",
+                        rotation=90)
+                top = max(top, high, value)
+            if line == "No AI":
+                ax.axhline(none[key] * scale, color=INK, linewidth=1.3, linestyle=(0, (4, 2)), zorder=5)
+                top = max(top, none[key] * scale)
+            elif line:
+                ax.axhline(line[1], color="#c00000", linewidth=1.3, linestyle=(0, (4, 2)), zorder=5)
+                top = max(top, line[1])
+            ax.set_ylim(0, max(top, 1e-9) * 1.42)
+            ax.set_xticks([])
+            ax.set_xlim(-0.7, len(names) - 0.3)
+            style(ax, label if row == len(items) - 1 else "")
+            if row == len(items) - 1:
+                ax.set_ylabel("")
+                ax.set_xlabel(label, fontsize=FS + 0.5, color=INK)
+            if col == 0:
+                ax.set_ylabel(title.replace("\\n", "\n"), fontsize=FS + 0.5, color=INK)
+    handles = [plt.Rectangle((0, 0), 1, 1, **bar_kind(POLICIES[n][1], POLICIES[n][3])) for n in names]
+    handles += [plt.Line2D([0], [0], color=INK, linewidth=1.3, linestyle=(0, (4, 2))),
+                plt.Line2D([0], [0], color="#c00000", linewidth=1.3, linestyle=(0, (4, 2)))]
+    labels = names + ["Server without AI", "Slack (1.2 ms), Limit (200 ms)"]
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=5, frameon=False, fontsize=FS,
+               handlelength=1.5, columnspacing=1.2, handletextpad=0.5)
+    fig.tight_layout(rect=(0, 0, 1, 1.0 - 0.5 / (2.45 * len(items) + 0.5) - 0.02), w_pad=0.8, h_pad=0.6)
     fig.savefig(out, dpi=200)
 
 
@@ -246,6 +308,47 @@ def closed(out: str, items: list[str]) -> None:
     fig.savefig(out, dpi=200)
 
 
+def frontier(out: str, items: list[str]) -> None:
+    """AI served against goodput lost, one panel per condition: the settings of the rule and the caps of the
+    low-priority baseline (items: "TITLE=LA_CLOSED.json")."""
+    conditions = [(i.rsplit("=", 1)[0], json.loads(Path(i.rsplit("=", 1)[1]).read_text())["policies"]) for i in items]
+    fig, axes = plt.subplots(1, len(conditions), figsize=(3.45 * len(conditions), 3.7), squeeze=False)
+    blue, orange, green = POLICIES[NAME][1], POLICIES["Priority"][1], POLICIES["Static"][1]
+    for ax, (title, rows) in zip(axes[0], conditions):
+        point = lambda c: (rows[c]["ai_slo"] / 1e3, -rows[c]["vs_recovery_no_ai_pct"])
+        caps = [c for c in ("p20", "p30", "p40", "p50", "p60", "p70", "p100") if c in rows]
+        rule = [c for c in ("wm", "wr3", "wr2", "wr1") if c in rows]
+        ax.axhline(0.0, color="#666666", linewidth=0.8, zorder=1)
+        ax.plot(*zip(*[point(c) for c in caps]), color=orange, marker="s", markersize=7, linewidth=2.2, markeredgecolor="white", zorder=3)
+        for c in caps:
+            x, y = point(c)
+            ax.annotate("max" if c == "p100" else c[1:], (x, y), textcoords="offset points", xytext=(0, 7), ha="center",
+                        fontsize=FS - 2.5, color=orange, fontweight="normal")
+        if "s10" in rows:
+            ax.plot(*point("s10"), color=green, marker="^", markersize=9, linestyle="", markeredgecolor="white", zorder=3)
+        ax.plot(*zip(*[point(c) for c in rule]), color=blue, marker="o", markersize=6, linewidth=2.2, markeredgecolor="white", zorder=4)
+        ax.plot(*point("wm"), color=blue, marker="o", markersize=13, linestyle="", markeredgecolor="white", zorder=5)
+        for c in rule[1:]:
+            x, y = point(c)
+            ax.annotate(c[2:], (x, y), textcoords="offset points", xytext=(0, -13), ha="center", fontsize=FS - 2.5, color=blue,
+                        fontweight="normal")
+        ys = [point(c)[1] for c in caps + rule + (["s10"] if "s10" in rows else [])]
+        ax.set_ylim(min(-0.35, min(ys) - 0.25), max(1.2, max(ys) * 1.18))
+        ax.set_xlim(0, max(point(c)[0] for c in caps + rule) * 1.12)
+        ax.set_title(title.replace("\\n", "\n"), fontsize=FS, color=INK)
+        style(ax, "Goodput Lost (%)" if ax is axes[0][0] else "", "AI Served (k tokens/s)")
+        ax.grid(axis="x", color="#bbbbbb", linewidth=0.6, linestyle=(0, (4, 3)))
+    handles = [plt.Line2D([], [], color=blue, marker="o", markersize=12, linestyle="", markeredgecolor="white"),
+               plt.Line2D([], [], color=blue, marker="o", markersize=6, linewidth=2.2, markeredgecolor="white"),
+               plt.Line2D([], [], color=orange, marker="s", markersize=7, linewidth=2.2, markeredgecolor="white"),
+               plt.Line2D([], [], color=green, marker="^", markersize=9, linestyle="", markeredgecolor="white")]
+    labels = [NAME, f"{NAME}, AI next to NeuralRx while 3 / 2 / 1 are free", "Priority, cap 20-70% and no cap", "Static"]
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=4, frameon=False, fontsize=FS - 0.5,
+               handlelength=1.6, columnspacing=1.4)
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
+    fig.savefig(out, dpi=200)
+
+
 def main() -> None:
     mode, out = sys.argv[1], sys.argv[2]
     if mode == "headline":
@@ -258,6 +361,10 @@ def main() -> None:
         use(out, sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else "fa c16")
     elif mode == "closed":
         closed(out, sys.argv[3:])
+    elif mode == "protect":
+        protect(out, sys.argv[3:])
+    elif mode == "frontier":
+        frontier(out, sys.argv[3:])
 
 
 if __name__ == "__main__":

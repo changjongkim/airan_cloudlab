@@ -3,14 +3,17 @@
 #   usage: bash v14_report.sh [STEP...]     (default: all)
 #   steps: sweep other model model_new stop mac classes la figs     (not in the default: model_old, the closed form
 #   on the two earlier run sets; optimum, the distance to a clairvoyant schedule -> optimum_gap.txt; lacl, closed-loop
-#   link adaptation of jobs JL -> la_closed_<tag>.json/.txt and its figure)
+#   link adaptation of jobs JL -> la_closed_<tag>.json/.txt and its figure; sched, the scheduling metrics per policy
+#   (L1 latency and misses, neural receiver run time, AI request latency, use of the GPU time) -> sched_<tag>_*.json
+#   and sched_metrics.txt; levels, the layer-1 latency without a neural receiver, with it, and with AI -> l1_levels.txt,
+#   and the busy time of the neural receivers in the closed-loop conditions -> optimum_gap_closed.txt)
 # The figures of the paper: paper/backstop_slot_v14/figures.sh.
 # Jobs: J1 seeds 1-2 of the headline conditions and the rule comparison, J2 kinds of AI work (baselines),
 # J3 seeds 3-5, other server sizes, link adaptation, the final rule (wm) in the headline conditions,
 # J4 the final rule in the other sizes and kinds of AI work, J5 one GPU seeds 3-5 and the conditions of v14g.sh / v14h.sh.
 cd /pscratch/sd/s/sgkim/kcj/airan_cloudlab
 source scripts_for_node/backstop_slot/slot_env.sh >/dev/null 2>&1
-J1=${J1:-59210955}; J2=${J2:-59225352}; J3=${J3:-59313958}; J4=${J4:-59318975}; J5=${J5:-59321430}
+J1=${J1:-59210955}; J2=${J2:-59225352}; J3=${J3:-59313958}; J4=${J4:-59318975}; J5=${J5:-59321430}; J6=${J6:-59414960}
 R=results/backstop_slot; F=docs/current/figures/backstop_v14; S=scripts_for_node/backstop_slot
 OUT=$R/v14_report_j${J1}_${J4}.md
 OURV=${OUR_V14:-wm}
@@ -37,6 +40,21 @@ for step in $steps; do
         say "Two GPUs, eight cells, four two-user cells (sd)"; $PY analyze_sweep.py $J3,$J4 sd 8
         say "Rule variants against L1 misses, full load (fv): wm = largest units not next to the conventional receiver, ws = only the smallest, wc = 70% cap"; $PY analyze_sweep.py $J3 fv 16
       } > ../../$OUT.sweep 2>&1 ;;
+    sched)       # scheduling metrics from the per-process records (README 6.0.1, 6.0.2); J6: the runs of 100 s (v16_long.sh)
+      { say "Full load, runs of 100 s without their first 20 s (xa, job $J6), seeds 1-5"
+        WARMUP_S=20 $PY analyze_sched.py $J6 xa 16 wd s10 yyr p30 yyp p70 p100
+        say "When the TBs past the L1 deadline occur in a run of 100 s: 16 cells (xa), one GPU (xs), 20 cells (xv), 48 cells (xn)"
+        $PY analyze_warmup.py $J6 xa 16 wd s10 yyr p30 yyp p70 p100; $PY analyze_warmup.py $J6 xs 4 wd s10 p30
+        $PY analyze_warmup.py $J6 xv 20 wd s10 p30; $PY analyze_warmup.py $J6 xn 48 wd s10 p30
+        say "One GPU, 4 cells, runs of 100 s without their first 20 s (xs)"; WARMUP_S=20 $PY analyze_sched.py $J6 xs 4 wd s10 p30
+        say "20 cells, runs of 100 s without their first 20 s (xv)"; WARMUP_S=20 $PY analyze_sched.py $J6 xv 20 wd s10 p30
+        say "48 cells at one third load, runs of 100 s without their first 20 s (xn)"; WARMUP_S=20 $PY analyze_sched.py $J6 xn 48 wd s10 p30
+        say "Load alternates every 2 s (fb), runs of 20 s without their first 5 s, seeds 1-5"; WARMUP_S=5 $PY analyze_sched.py $J1,$J3 fb 16 wm s10 yyr p30 yyp e30x70l0 p70
+        say "Load steps at random times (fc), runs of 40 s without their first 5 s, seeds 1-5"; WARMUP_S=5 $PY analyze_sched.py $J1,$J3 fc 16 wm s10 yyr p30 yyp e30x50x70l0 p70
+        say "Whole runs of 10 s at full load (fa), seeds 1-5: the start of the run is included"; $PY analyze_sched.py $J1,$J3 fa 16 wm s10 yyr p30 yyp p50 p70 p100
+        say "Unit sizes next to the conventional receiver (fv): ws = 128 tokens only, wm = 128 and 512, wn = every size"; $PY analyze_sched.py $J3 fv 16 ws wm wn wc
+        for r in 8 16 64; do say "AI offered load, rate code $r (ta)"; RATE=$r $PY analyze_sched.py $J5 ta 16 wm s10 p30 p70 p100; done
+      } > ../../$R/sched_metrics.txt 2>&1 ;;
     other)       # conditions of v14g.sh / v14h.sh in job J5 (README 6.11)
       { say "AI load 13k / 27k / 106k tokens/s offered (ta)"; $PY analyze_sweep.py $J5 ta 16
         say "AI requests in bursts (tu)"; $PY analyze_sweep.py $J5 tu 16
@@ -108,6 +126,13 @@ for step in $steps; do
       shifter --image=$AERIAL_IMAGE --env=V14=1 --env=OTHERS=wn,wr3,wr1,vf,s10,p30,p50,p70,yyr,yyp,d10x50l0,e30x70l0,d10x30x50l0,e30x50x70l0 \
         python3 analyze_optimum.py ../../$R/optimum_gap.json $J1,$J3:fa:16 $J1,$J3:fb:16 $J1,$J3:fc:16 $J4:sx:16 $J4:sy:16 $J3,$J4:sw:16 \
         $J3,$J4:sc:8 $J3,$J4:sd:8 $J3,$J4,$J5:sa:4 $J3,$J4,$J5:sb:4 $J5:tv:20:wd $J5:tm:32:wd $J5:tn:48:wd > ../../$R/optimum_gap.txt 2>&1 ;;
+    levels)      # README 6.0.1: what the neural receiver and the AI each add to the layer-1 latency (single-user cells of the
+                 # closed-loop runs, which include the server without a neural receiver), and README 6.13.6: the share of the
+                 # time in which the neural receivers run in the closed-loop conditions
+      $PY analyze_l1_levels.py ../../$R/l1_levels.json ${JL:-59345188,59362400} "laa:16:Target 10%" "lac:16:Target 3%" "lab:16:Target 1%" \
+        "laf:16:Target 1%, eight two-user cells" > ../../$R/l1_levels.txt 2>&1
+      J=${JL:-59345188,59362400}
+      $PY analyze_optimum.py ../../$R/optimum_gap_closed.json $J:laa:16 $J:lac:16 $J:lab:16 $J:laf:16 > ../../$R/optimum_gap_closed.txt 2>&1 ;;
     lacl)        # README 6.13: closed-loop link adaptation (la_cl.sh, la_cl2.sh), jobs JL (comma-separated)
       for spec in ${LACL_TAGS:-laa:16 lac:16 lab:16 laf:16 lai:16 lae:8 lah:8 lad:8 lag:4 lak:16 lal:16}; do
         tag=${spec%%:*}
@@ -140,6 +165,7 @@ for step in $steps; do
         cells=$FA,$R/sweep_tv_c20_j${J5}.json,$R/sweep_tm_c32_j${J5}.json,$R/sweep_tn_c48_j${J5}.json \
         demand=$R/sweep_sx_c16_j${J4}.json,$FA,$R/sweep_sy_c16_j${J4}.json,$R/sweep_sw_c16_j${J3}_${J4}.json
       $EVAL use $F/eval_gpu_use.png $R/optimum_gap.json
+      $EVAL protect $F/eval_protect.png "Steady Full Load\n(100-s Runs)=$R/sched_xa_c16_j${J6}_w20.json" "Load Changes Every 2 s\n(20-s Runs)=$R/sched_fb_c16_j${J1}_${J3}_w5.json"
       $EVAL closed $F/eval_closed_loop.png "Target 10%=$R/la_closed_laa.json" "Target 3%=$R/la_closed_lac.json" "Target 1%=$R/la_closed_lab.json" \
         "Target 1%\\n2 GPUs=$R/la_closed_lad.json" "Target 1%\\n8 two-user cells=$R/la_closed_laf.json"
       cd $S ;;

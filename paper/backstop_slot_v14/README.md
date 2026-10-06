@@ -22,6 +22,12 @@ bounds) and the recovery-loss model. `paper/backstop_slot_v7` keeps the v13 draf
   Every TB keeps one color in all figures (`tba`, `gold`, `recc`, `tbd` in `tikz_style.tex`), values come
   from one measured run, and every arrow runs in a gap between boxes. Text inside the figures is at least
   7 pt at the text width. Heights at the text width: 8.5, 5.5, 4.9, and 6.2 cm.
+- `figures/eval_protect.pdf`: what AI adds to the L1 latency and to the run of the neural receiver, the L1
+  deadlines missed per million TBs, and the latency of the AI requests, per policy (`plot_eval.py protect` on
+  the output of `analyze_sched.py`; Section "Protection and latency", Tables "Scheduling metrics" and "TBs past
+  the layer-1 deadline by the time since the start of a run"). The full-load row uses the runs of 100 s of
+  `campaigns/v16_long.sh` and `v16_long_b.sh` (job 59414960) without their first 20 s; the tables come from
+  `table_sched.py` on `results/backstop_slot/sched_*_w20.json` and `warmup_*.json`.
 - Typography of the design figures (stated at the top of `figures/tikz_style.tex`): bold only for the names
   of boxes (layers, components, GPUs, steps) and for the one or two key values of a figure; everything inside
   a box is regular; labels of arrows and notes are italic and never bold. Arrows are at least 0.35 cm long
@@ -41,5 +47,11 @@ module load texlive/2024
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
-The numbers are taken from `README.md` (sections 6.1-6.13) and
+Order of the claims (2026-10-06): a policy is judged first by whether it keeps the radio and then by how much of
+the GPU it uses. The abstract, the result list of the introduction, and the conclusion follow this order, and the
+evaluation runs: model validation, steady and changing load, what a recovery is worth (with "What a Share Pays"),
+protection and latency (with the three levels of Table `tab:levels`: conventional receiver alone, with the neural
+receiver, with AI), then the remaining studies. The paper does not write "lossless"; it states what each level adds.
+
+The numbers are taken from `README.md` (sections 6.0-6.13) and
 `docs/current/BACKSTOP_V14_MODEL_AND_EXTENSIONS_KO.md`.

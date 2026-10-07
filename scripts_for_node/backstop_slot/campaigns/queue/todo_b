@@ -1,0 +1,12 @@
+# kind|name|minutes|command      second queue (runner_q.sh, QUEUE_DIR=queue_b), 2026-10-06 20:50
+N|long_low|55|bash run_state/backstop_slot/v20_cont.sh long_low
+N|mixed|60|bash run_state/backstop_slot/v20_cont.sh mixed
+N|gen_low8|70|bash run_state/backstop_slot/la_cl_gen.sh low8 DoubleTDLlow 8 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
+N|lowsyn|15|bash run_state/backstop_slot/v20_cont.sh lowsyn
+L|check_lowsyn|0|bash run_state/backstop_slot/queue/check_synth.sh low6s:low6
+N|low45|48|bash run_state/backstop_slot/v20_cont.sh low45
+N|low75|48|bash run_state/backstop_slot/v20_cont.sh low75
+N|low6s3|25|bash run_state/backstop_slot/v20_cont.sh low6s3
+N|gc_probe|20|bash run_state/backstop_slot/gc_node_probe.sh
+L|release|0|j=$(cat run_state/backstop_slot/queue_b/current_job); grep -qx "$j" run_state/backstop_slot/queue_b/jobs && scancel $j; echo released $j
+L|stop|0|touch run_state/backstop_slot/queue_b/STOP

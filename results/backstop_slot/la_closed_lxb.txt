@@ -1,0 +1,12 @@
+closed-loop link adaptation, target 1% of the TBs needing a retransmission; two-user cells: 4; warm-up 800 periods
+
+| policy | seeds | mean MCS | first-transmission errors | TBs needing a retransmission | goodput per user slot | vs no recovery path | vs recovery path without AI | slots with a candidate | candidates without a NeuralRx | NeuralRx ended late | recovered TBs/s (vs recovery path without AI) | AI served (tokens/s) | L1 late |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| No recovery path | 2 | 10.00 | 1.6% | 1.6% | 51.4k | +0.0% | -22.5% | 3.2% | 100.0% | 0.0% | 0 (-100.0%) | 0.0k | 0.001% |
+| Recovery path, no AI | 2 | 11.96 | 7.0% | 1.0% | 66.3k | +29.0% | +0.0% | 12.5% | 0.8% | 0.0% | 192 (+0.0%) | 0.0k | 0.004% |
+| Rule (stoppable pieces, no AI next to NeuralRx) | 2 | 11.95 | 7.0% | 1.0% | 66.2k | +29.0% | -0.0% | 12.5% | 0.9% | 0.0% | 190 (-0.7%) | 36.9k | 0.006% |
+| Fixed 10% | 2 | 11.95 | 6.9% | 1.0% | 66.2k | +28.9% | -0.1% | 12.4% | 1.1% | 0.0% | 190 (-1.0%) | 5.7k | 0.005% |
+| Fixed 30% + low priority | 2 | 11.94 | 6.9% | 1.0% | 66.2k | +28.8% | -0.2% | 12.3% | 1.5% | 0.0% | 187 (-2.5%) | 18.8k | 0.004% |
+| Fixed 50% + low priority | 2 | 11.93 | 6.7% | 1.0% | 66.0k | +28.6% | -0.4% | 12.1% | 2.0% | 0.0% | 183 (-4.8%) | 34.7k | 0.003% |
+| Fixed 70% + low priority | 2 | 11.93 | 6.7% | 1.0% | 66.0k | +28.5% | -0.4% | 12.0% | 2.2% | 0.0% | 181 (-5.6%) | 44.2k | 0.005% |
+| Low priority, no cap | 2 | 11.88 | 6.4% | 1.0% | 65.6k | +27.7% | -1.0% | 11.5% | 2.2% | 1.7% | 172 (-10.2%) | 50.2k | 0.011% |

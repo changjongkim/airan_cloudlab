@@ -9,7 +9,9 @@
 #   and the busy time of the neural receivers in the closed-loop conditions -> optimum_gap_closed.txt; frontier, AI served
 #   against goodput lost for the caps and the settings of the rule -> frontier_closed.txt and eval_frontier.png; esno, the
 #   closed-loop runs at other Es/No, on the low-correlation channel and with a changing Es/No -> la_closed_l{v,h,j,w}?.txt,
-#   l1_levels_esno.txt, optimum_gap_esno.txt, eval_closed_vary.png)
+#   l1_levels_esno.txt, optimum_gap_esno.txt, eval_closed_vary.png; cont, an Es/No that changes from slot to slot, the
+#   low-correlation channel in runs of 100 s and mixed channels -> la_closed_l{x,y,z,m}?.txt, la_closed_lgw.txt, la_track.txt,
+#   l1_levels_long_low.txt, eval_closed_cont.png)
 # The figures of the paper: paper/backstop_slot_v14/figures.sh.
 # Jobs: J1 seeds 1-2 of the headline conditions and the rule comparison, J2 kinds of AI work (baselines),
 # J3 seeds 3-5, other server sizes, link adaptation, the final rule (wm) in the headline conditions,
@@ -160,6 +162,28 @@ for step in $steps; do
       $E closed $F/eval_closed_vary.png "Changing Es/No\nTarget 10%=$R/la_closed_lva.json" "Changing Es/No\nTarget 1%=$R/la_closed_lvb.json" \
         "Changing, 8 Cells\nTarget 1%=$R/la_closed_lvc.json" "14 dB, 8 Cells\nTarget 1%=$R/la_closed_lhc.json" \
         "20 dB, 8 Cells\nTarget 1%=$R/la_closed_ljc.json" "Low Correlation\nTarget 10%=$R/la_closed_lwa.json"
+      cd $S ;;
+    cont)        # README 6.13.9: an Es/No that changes from slot to slot (v20_cont.sh slow / walk / fast; jobs JC), the
+                 # low-correlation channel in runs of 100 s and two-user cells of two channels on one server (jobs JD).
+                 # SEEDS_SLOW / SEEDS_WALK / SEEDS_FAST keep those seeds while later seeds are still running.
+      JC=${JC:-59465023}; JD=${JD:-59466250}
+      for spec in lxa:SLOW lxb:SLOW lxc:SLOW lza:WALK lzb:WALK lzc:WALK lya:FAST lyb:FAST lyc:FAST; do
+        tag=${spec%%:*}; var=SEEDS_${spec#*:}
+        ${PY/python3/--env=SEEDS=${!var:-} python3} analyze_la_closed.py ../../$R/la_closed_$tag.json $JC $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+      done
+      $PY analyze_la_track.py ../../$R/la_track.json $JC "lxa:16:Slow change (period 5.12 s), target 10%" "lxb:16:Slow change, target 1%" \
+        "lya:16:Fast change (period 1.28 s), target 10%" "lyb:16:Fast change, target 1%" "lza:16:Random change, target 10%" \
+        "lzb:16:Random change, target 1%" > ../../$R/la_track.txt 2>&1
+      for tag in lgw lma lmb lmc; do
+        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json $JD $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+      done
+      ${PY/python3/--env=SKIP=8000 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_long_low.json $JD \
+        "lgw:16:Low-correlation channel at 6 dB, target 10%, runs of 100 s" > ../../$R/l1_levels_long_low.txt 2>&1
+      cd ../..
+      E="${PLOT/plot_v14.py/plot_eval.py}"
+      $E closed $F/eval_closed_cont.png "Slow Change\nTarget 10%=$R/la_closed_lxa.json" "Slow, 8 Cells\nTarget 1%=$R/la_closed_lxc.json" \
+        "Random Change\nTarget 10%=$R/la_closed_lza.json" "Random, 8 Cells\nTarget 1%=$R/la_closed_lzc.json" \
+        "Fast, 8 Cells\nTarget 1%=$R/la_closed_lyc.json" "Mixed Channels\n8 Cells, Target 1%=$R/la_closed_lmc.json"
       cd $S ;;
     levels)      # README 6.0.1: what the neural receiver and the AI each add to the layer-1 latency (single-user cells of the
                  # closed-loop runs, which include the server without a neural receiver), and README 6.13.6: the share of the

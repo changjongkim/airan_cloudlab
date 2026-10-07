@@ -2,6 +2,7 @@
 """Closed-loop link adaptation: what each GPU-sharing policy leaves of the cell goodput.
 
 usage: analyze_la_closed.py OUT.json JOB[,JOB] TAG CELLS      (runs of la_cl.sh: TAG<seed>x|n|r32<policy>)
+       env SEEDS=1,2 keeps those seeds only (a campaign whose later seeds are still running)
 
 Per run, for the two-user cells (the cells with an outer loop), after the first WARM periods:
   MCS             mean MCS of the slots, and the share of the slots at each level
@@ -20,6 +21,7 @@ without AI (n) of the same seed.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -113,7 +115,7 @@ def main() -> None:
     for job in jobs:
         for path in sorted(RAW.glob(f"{tag}[0-9]*_c{cells}_*_j{job}.json")):
             m = pattern.match(path.name)
-            if m:
+            if m and (not os.environ.get("SEEDS") or m.group(1) in os.environ["SEEDS"].split(",")):
                 runs.setdefault(m.group(3) or m.group(2), {}).setdefault(int(m.group(1)), run_stats(path))
     if not runs:
         raise SystemExit("no runs")

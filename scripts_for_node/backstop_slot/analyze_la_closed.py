@@ -55,6 +55,7 @@ def run_stats(path: Path) -> dict:
     levels = len(la["levels"])                 # with channel states the records carry state * levels + MCS level
     level_slots = np.zeros(levels)
     state_slots: dict[int, list] = {}          # channel state -> [slots, sum of MCS]
+    state_tbs: dict[int, list] = {}            # channel state -> [TBs, bits, TBs needing a retransmission]
     cells = 0
     for cell in config["cells"]:
         if cell.get("nrx_gpu") is None:
@@ -86,6 +87,10 @@ def run_stats(path: Path) -> dict:
             fails += ues - bin(good).count("1")
             recovered += bin(saved).count("1")
             retx += ues - bin(final).count("1")
+            acc = state_tbs.setdefault(level // levels, [0, 0, 0])
+            acc[0] += ues
+            acc[1] += ues * size[level]
+            acc[2] += ues - bin(final).count("1")
     m = metrics(path)
     mcs = np.asarray(la["mcs"], dtype=float)
     return {"cells": cells, "tbs": tbs, "mean_mcs": float((level_slots * mcs).sum() / level_slots.sum()),
@@ -95,6 +100,8 @@ def run_stats(path: Path) -> dict:
             "nrx_demand_pct": 100.0 * candidates / (tbs / 2), "lost_candidates_pct": 100.0 * lost / max(1, candidates),
             "late_candidates_pct": 100.0 * late / max(1, candidates),
             "mcs_by_state": [state_slots[k][1] / state_slots[k][0] for k in sorted(state_slots)],
+            "goodput_by_state": [state_tbs[k][1] / (state_tbs[k][0] + state_tbs[k][2] / RETX_OK) for k in sorted(state_tbs)],
+            "retx_by_state": [100.0 * state_tbs[k][2] / state_tbs[k][0] for k in sorted(state_tbs)],
             "state_share": [state_slots[k][0] / level_slots.sum() for k in sorted(state_slots)],
             "ai_slo": m["ai_slo"], "l1_late_pct": m["l1_late_pct"], "target": float(la["target"])}
 
@@ -140,6 +147,9 @@ def main() -> None:
                    goodput_by_seed=[by_seed[s]["goodput_bits"] for s in seeds],
                    level_share=np.mean([by_seed[s]["level_share"] for s in seeds], axis=0).tolist(),
                    mcs_by_state=np.mean([by_seed[s]["mcs_by_state"] for s in seeds], axis=0).tolist(),
+                   goodput_by_state=np.mean([by_seed[s]["goodput_by_state"] for s in seeds], axis=0).tolist(),
+                   goodput_by_state_seed=[by_seed[s]["goodput_by_state"] for s in seeds],
+                   retx_by_state=np.mean([by_seed[s]["retx_by_state"] for s in seeds], axis=0).tolist(),
                    retx_by_seed=[by_seed[s]["retx_pct"] for s in seeds])
         out["policies"][policy] = row
         pct = lambda v: "–" if v != v else f"{v:+.1f}%"

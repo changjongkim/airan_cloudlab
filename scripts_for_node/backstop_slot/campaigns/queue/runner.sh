@@ -69,6 +69,11 @@ while true; do
     srun --jobid=$job --overlap -N1 -n1 --gpus-per-node=4 --export=ALL bash -c "cd $ROOT && $command" \
       > $S/logs/q_${name}_j$job.log 2>&1 < /dev/null; rc=$?
   fi
+  if [ "$kind" != L ] && [ $rc -ne 0 ] && [ "$(left_min "$job")" -eq 0 ] && ! grep -qx "$name" $Q/retried 2>/dev/null; then
+    # the allocation ended under the step: run it once more in a new allocation
+    echo "$name" >> $Q/retried; log "step $name was cut by the end of job $job (exit code $rc); it runs again"
+    continue
+  fi
   printf '%s\t%s\t%s\t%s\t%s\n' "$name" "$rc" "$job" "$start" "$(date '+%F %T')" >> $Q/done
   log "step $name ended with exit code $rc"
 done

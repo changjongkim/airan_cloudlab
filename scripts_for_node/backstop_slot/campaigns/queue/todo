@@ -1,18 +1,23 @@
-# kind|name|minutes|command      (see runner.sh)
-L|install_states|0|bash run_state/backstop_slot/queue/install_states.sh
-N|smoke_states|10|bash run_state/backstop_slot/la_states_smoke.sh
-L|check_states|0|bash run_state/backstop_slot/queue/check_states.sh
-N|long_cl|58|bash run_state/backstop_slot/v18_long_cl.sh
-N|gen_high14|70|bash run_state/backstop_slot/la_cl_gen.sh high14 DoubleTDLhigh 14 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
-N|long_x|16|bash run_state/backstop_slot/v16_long_x.sh
-N|gen_high20|70|bash run_state/backstop_slot/la_cl_gen.sh high20 DoubleTDLhigh 20 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
-N|vary|100|bash run_state/backstop_slot/v19_esno.sh vary
-N|static14|48|bash run_state/backstop_slot/v19_esno.sh static14
-N|static20|48|bash run_state/backstop_slot/v19_esno.sh static20
-N|gen_low6|70|bash run_state/backstop_slot/la_cl_gen.sh low6 DoubleTDLlow 6 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
-N|low6|48|bash run_state/backstop_slot/v19_esno.sh low6
-N|vary8|52|bash run_state/backstop_slot/v19_esno.sh vary8
-N|frontier_s3_bc|32|bash run_state/backstop_slot/v17_frontier.sh "3" "lfb lfc"
-N|frontier_s3_ad|32|bash run_state/backstop_slot/v17_frontier.sh "3" "lfa lfd"
+# kind|name|minutes|command      (see runner.sh)   2026-10-06 evening: changing channel and low-correlation channel
+N|synth|20|bash run_state/backstop_slot/v20_cont.sh synth
+L|check_synth|0|bash run_state/backstop_slot/queue/check_synth.sh
+N|traj|15|bash run_state/backstop_slot/v20_cont.sh traj
+N|slow_s1|75|bash run_state/backstop_slot/v20_cont.sh slow "1"
+N|walk_s1|75|bash run_state/backstop_slot/v20_cont.sh walk "1"
+N|fast_s1|50|bash run_state/backstop_slot/v20_cont.sh fast "1"
+N|long_low|55|bash run_state/backstop_slot/v20_cont.sh long_low
+N|mixed|60|bash run_state/backstop_slot/v20_cont.sh mixed
+N|slow_s2|75|bash run_state/backstop_slot/v20_cont.sh slow "2"
+N|walk_s2|75|bash run_state/backstop_slot/v20_cont.sh walk "2"
+N|fast_s2|50|bash run_state/backstop_slot/v20_cont.sh fast "2"
+N|walk_s3|75|bash run_state/backstop_slot/v20_cont.sh walk "3"
+N|gen_low8|70|bash run_state/backstop_slot/la_cl_gen.sh low8 DoubleTDLlow 8 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
+N|lowsyn|15|bash run_state/backstop_slot/v20_cont.sh lowsyn
+L|check_lowsyn|0|bash run_state/backstop_slot/queue/check_synth.sh low6s:low6
+N|low45|48|bash run_state/backstop_slot/v20_cont.sh low45
+N|low75|48|bash run_state/backstop_slot/v20_cont.sh low75
+N|gen_umi|70|bash run_state/backstop_slot/la_cl_gen.sh umi10 UMi 10 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
+N|umi|48|bash run_state/backstop_slot/v20_cont.sh umi
+N|low6s3|25|bash run_state/backstop_slot/v20_cont.sh low6s3
 L|release|0|j=$(cat run_state/backstop_slot/current_job); grep -qx "$j" run_state/backstop_slot/queue/jobs && scancel $j; echo released $j
 L|stop|0|touch run_state/backstop_slot/queue/STOP

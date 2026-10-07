@@ -5,6 +5,8 @@ With ``la["datasets"]`` in the run configuration a cell holds one slot ring per 
 a dataset of the same channel at another Es/No.  The cell stays ``la["phase"]`` uplink periods in a state and
 then moves to another state chosen at random; the times of the changes differ between the cells.  The outer loop
 keeps its pointer over the MCS levels across a change, as a rate controller that does not know the channel.
+With ``la["phase"]`` = 0 the states are fixed: every cell stays in the state ``la["assign"][cell]`` (cells of
+different channels on one server).
 
 Rings and records use one flat index: state * (number of MCS levels) + MCS level.  With one state the flat index
 is the MCS level, as before.
@@ -25,6 +27,8 @@ def state_sequence(la: dict, cell: int, periods: int) -> np.ndarray:
     if states == 1:
         return np.zeros(periods, dtype=np.int64)
     phase = int(la["phase"])
+    if phase <= 0:
+        return np.full(periods, int(la["assign"][str(int(cell))]), dtype=np.int64)
     rng = np.random.default_rng(int(la.get("state_seed", 0)) * 1000 + int(cell))
     offset = int(rng.integers(phase))
     seq = np.empty(periods // phase + 2, dtype=np.int64)

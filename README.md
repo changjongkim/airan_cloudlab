@@ -1696,6 +1696,20 @@ Antiphase의 다른 설정(빈 NRx 여유 3 / 2 / 1):
 
 원본: `results/backstop_slot/la_closed_{lva,lvb,lvc,lha,lhb,lhc,lja,ljb,ljc,lwa,lwb,lwc}.json`, `.txt`, `l1_levels_esno.txt`, `optimum_gap_esno.txt`.
 
+#### 6.13.9 진행 중인 측정 (2026-10-06 저녁 시작)
+
+6.13.8절을 두 방향으로 더 넓히는 실험을 돌리고 있다(`campaigns/v20_cont.sh`). 결과가 나오면 이 절을 결과로 바꾼다. 스킴은 그대로다.
+
+| 주제 | 내용 | 보려는 것 |
+|---|---|---|
+| 연속적으로 변하는 채널 | Es/No가 슬롯마다 조금씩 변한다. 세 궤적: 14–20 dB를 5.1초 주기로 오르내림(최대 3.7 dB/초), 1.3초 주기로 오르내림(최대 14.7 dB/초), 무작위 변화(평균 16.5 dB, 표준편차 1.75 dB, 상관 시간 1초). 모든 방식, 목표 10%와 1%, 2-UE 셀 4개와 8개 | 6.13.8절의 변하는 채널은 세 값 사이의 계단이다. 연속으로 변할 때 outer loop가 따라가는지, 방식별 goodput과 AI 처리량이 달라지는지 |
+| 상관 낮은 채널의 L1 | 목표 10%를 100초 실행으로 | 이 채널에서는 비율 방식의 goodput 손실이 0.4% 이하다. L1 지연과 마감 초과에서 갈리는지 |
+| 섞인 채널 | 2-UE 셀의 절반은 상관 높은 채널(16 dB), 절반은 상관 낮은 채널(6 dB) | 채널이 섞인 서버에서 손실이 어느 셀에서 나는지, 한도 하나로 지킬 수 있는지 |
+| 상관 낮은 채널의 다른 Es/No | 4.5 dB와 7.5 dB | 6 dB 한 점의 결과가 Es/No에 따라 달라지는지 |
+| UMi 채널 | 10 dB, 목표 10%와 3% (MCS 10에서도 오류율이 1.5% 아래로 내려가지 않아 목표 1%는 잴 수 없다) | 워크로드의 세 채널을 모두 닫힌 루프로 |
+
+연속적으로 변하는 Es/No는 채널을 다시 생성하지 않고 만든다(`make_esno_dataset.py`). 20 dB로 생성한 슬롯에 백색 잡음을 더하면 같은 채널과 같은 TB를 더 낮은 Es/No로 받은 슬롯이 된다. 생성기의 잡음 분산은 `N0 = 1.2671 × 10^(−Es/No / 10)`이고 MCS와 채널에 무관하다(Sionna의 `ebnodb2no`에 이 설정의 resource grid를 넣은 값, `nv/n0_probe.py`). 따라서 Es/No를 e로 낮추려면 분산 `1.2671 × (10^(−e/10) − 10^(−2))`의 잡음을 더한다. 슬롯마다 e가 다른 데이터를 만들어 그대로 재생하므로 실험 코드는 바뀌지 않는다. 먼저 이 방법으로 만든 16 dB와 14 dB 슬롯을 직접 생성한 16 dB·14 dB 슬롯과 두 수신기의 MCS별 오류율로 대조한다. 맞지 않으면 이 방법을 쓰는 단계는 돌리지 않는다.
+
 ### 6.14 이전 규칙(v13)으로 측정한 조건
 
 > **한 줄 결론.** 이 절은 이전 규칙(v13)의 기록이다. 현재 규칙의 값은 6.4–6.11절에 있다.
@@ -2091,6 +2105,11 @@ $R bash $C/la_cl_gen.sh high14 DoubleTDLhigh 14 640 "0:13 16" "1:14 11" "2:12 10
 $R bash $C/v19_esno.sh static14 static20 low6     # 다른 Es/No와 상관 낮은 채널 (6.13.8절), 각 약 40분
 $R bash $C/v19_esno.sh vary vary8                 # 2초마다 변하는 Es/No (6.13.8절), 약 70분과 35분
 JV=J JW=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh esno   # 6.13.8절의 표와 그림 -> la_closed_l{v,h,j,w}?.txt, l1_levels_esno.txt, optimum_gap_esno.txt
+# 진행 중 (6.13.9절): 잡음을 더해 만든 Es/No 궤적, 상관 낮은 채널의 100초 실행, 섞인 채널, UMi
+$R bash $C/v20_cont.sh synth && bash $C/queue/check_synth.sh      # 잡음을 더해 만든 16·14 dB 슬롯과 생성한 슬롯의 대조
+$R bash $C/v20_cont.sh traj                                       # 궤적 데이터 (dataset_la_cslow, cfast, cwalk)
+$R bash $C/v20_cont.sh slow "1 2"; $R bash $C/v20_cont.sh walk "1 2 3"; $R bash $C/v20_cont.sh fast "1 2"
+$R bash $C/v20_cont.sh long_low; $R bash $C/v20_cont.sh mixed
 # 여러 단계를 차례로 돌리려면 campaigns/queue/runner.sh를 쓴다 (todo에 "N|이름|분|명령"을 적고 nohup setsid로 띄움; 한 번에 하나만 돈다)
 JF=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh frontier   # 한도를 바꿔 가며 본 goodput과 AI (6.13.7절; $R bash $C/v17_frontier.sh "1 2 3"의 job) -> frontier_closed.txt, eval_frontier.png
 JL=J1,J2 bash scripts_for_node/backstop_slot/campaigns/v14_report.sh levels   # 세 단계(기존 수신기만 / + NRx / + AI)의 L1 지연 -> l1_levels.txt, 닫힌 루프 조건에서 NRx가 도는 시간 -> optimum_gap_closed.txt (6.0.1, 6.13.6절; JL은 닫힌 루프 실행의 job)
@@ -2229,6 +2248,12 @@ cd paper/backstop_slot_v14 && bash figures.sh && module load texlive/2024 && lat
 | `analyze_stop.py`, `analyze_l1.py`, `analyze_classes5.py`, `analyze_sweep.py`, `analyze_series.py`, `table_v14.py`, `table_la.py` | 표 |
 | `plot_v14.py`, `plot_paper.py`, `plot_v13.py`, `plot_reserve_timeline.py` | 그림 (`plot_paper.py`: 논문 크기) |
 | `plot_eval.py` | 평가 그림: 지표 하나에 그림 하나, 방식마다 색 고정, 기준선 막대에 Antiphase의 배수 (`headline`, `tradeoff`, `scale`, `use`, `closed`) |
+| `analyze_sched.py`, `analyze_warmup.py`, `analyze_late.py`, `table_sched.py` | 방식별 스케줄링 지표(L1 지연과 놓침, NRx 실행 시간, AI 요청 지연, GPU 시간)와 시간대별 L1 놓침 (6.0.1, 6.0.2절) |
+| `analyze_l1_levels.py` | 세 단계(기존 수신기만 / + NRx / + AI)의 L1 지연 (6.0.1절) |
+| `analyze_frontier.py` | 한도를 바꿔 가며 본 AI 처리량과 goodput 손실, 같은 손실에서의 AI 처리량 (6.13.7절) |
+| `la_states.py` | 닫힌 루프에서 2-UE 셀의 채널 상태: 여러 Es/No 사이를 옮기거나 셀마다 다른 채널을 고정 (6.13.8절) |
+| `make_esno_dataset.py`, `nv/n0_probe.py` | 생성한 슬롯에 잡음을 더해 Es/No 궤적을 따르는 데이터를 만듦, 생성기의 잡음 분산 (6.13.9절) |
+| `campaigns/queue/runner.sh` | 대기열 실행기: todo의 단계를 노드에서 하나씩 차례로 실행하고, 노드 시간이 모자라면 새로 잡는다 |
 | `make_config.py`, `launch_slot.py`, `run_matrix.sh` | 설정 생성과 실행 |
 | `probe_ldpc.py`, `probe_mu.py` | 수신기 비교 |
 

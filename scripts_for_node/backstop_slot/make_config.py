@@ -135,7 +135,8 @@ def main() -> None:
     parser.add_argument("--la-states", default=None,
                         help="channel states of the two-user cells with --la: 'DATASET,DATASET,...:PHASE' (one dataset "
                              "directory per state with the rings of every MCS level; a cell stays PHASE periods in a "
-                             "state and then moves to another one at random)")
+                             "state and then moves to another one at random; PHASE 0: the two-user cells take the "
+                             "datasets in turn and keep them)")
     parser.add_argument("--ai-extra", type=Path, help="JSON merged into the config")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -343,6 +344,9 @@ def main() -> None:
             flags[key] = bool(int(value)) if key in ("skip", "admit", "value") else value
         config["nrx_flags"] = flags
     if la:
+        if la.get("datasets") and la["phase"] <= 0:      # fixed states: the two-user cells take the datasets in turn
+            two_user = [c["cell"] for c in cells if c["nrx_gpu"] is not None]
+            la["assign"] = {str(cell): i % len(la["datasets"]) for i, cell in enumerate(two_user)}
         config["la"] = la
     if args.ai_extra:
         config.update(json.loads(args.ai_extra.read_text()))

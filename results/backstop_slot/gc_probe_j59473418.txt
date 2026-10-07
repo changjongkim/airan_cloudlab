@@ -1,0 +1,32 @@
+## A. no MPS, one process
+RESULT receivers on 108 SMs (0): cuPHY p50 0.93 p99 0.99 ms, neural receiver p50 5.35 p99 5.43 ms
+RESULT receivers on 96 SMs (96): cuPHY p50 0.93 p99 0.98 ms, neural receiver p50 5.73 p99 5.79 ms
+RESULT receivers on 80 SMs (80): cuPHY p50 0.94 p99 1.01 ms, neural receiver p50 6.16 p99 6.31 ms
+RESULT receivers on 54 SMs (54): cuPHY p50 0.93 p99 0.99 ms, neural receiver p50 7.64 p99 7.73 ms
+## B. under MPS, one client
+RESULT receivers on 108 SMs (0): cuPHY p50 0.92 p99 0.98 ms, neural receiver p50 5.59 p99 5.64 ms
+RESULT receivers on 80 SMs (80): cuPHY p50 0.94 p99 0.99 ms, neural receiver p50 6.43 p99 6.51 ms
+RESULT receivers on 54 SMs (54): cuPHY p50 0.93 p99 1.10 ms, neural receiver p50 7.91 p99 8.06 ms
+## C. under MPS, receivers next to an AI stand-in (PyTorch matrix products)
+# C1 load alone (all SMs / 28 SMs in a green context)
+RESULT load on 108 SMs (0): 1908 products/s
+RESULT load on 28 SMs (28): 529 products/s
+# C2 load at normal priority on all SMs, receivers on all SMs
+RESULT receivers on 108 SMs (0): cuPHY p50 2.63 p99 2.67 ms, neural receiver p50 41.79 p99 44.67 ms
+RESULT load on 108 SMs (0): 1858 products/s
+# C3 load at low MPS priority on all SMs (as Priority-max)
+RESULT receivers on 108 SMs (0): cuPHY p50 1.54 p99 2.28 ms, neural receiver p50 15.84 p99 16.94 ms
+RESULT load on 108 SMs (0): 1836 products/s
+# C4 load at low priority with an MPS share of 26% (as a 26% cap)
+RESULT receivers on 108 SMs (0): cuPHY p50 0.98 p99 1.10 ms, neural receiver p50 7.69 p99 7.95 ms
+RESULT load on 28 SMs (0): 540 products/s
+# C5 load in a green context of 28 SMs, receivers on all SMs
+RESULT receivers on 108 SMs (0): cuPHY p50 0.96 p99 1.01 ms, neural receiver p50 6.65 p99 6.91 ms
+RESULT load on 28 SMs (28): 525 products/s
+# C6 load in a green context of 28 SMs, receivers in a green context on the other 80 SMs
+RESULT receivers on 80 SMs (rest:28): cuPHY p50 0.97 p99 1.05 ms, neural receiver p50 6.71 p99 6.77 ms
+RESULT load on 28 SMs (28): 526 products/s
+# C7 as C6 with the load at low MPS priority
+RESULT receivers on 80 SMs (rest:28): cuPHY p50 0.97 p99 1.25 ms, neural receiver p50 6.71 p99 7.02 ms
+RESULT load on 28 SMs (28): 526 products/s
+GC_NODE_PROBE_DONE

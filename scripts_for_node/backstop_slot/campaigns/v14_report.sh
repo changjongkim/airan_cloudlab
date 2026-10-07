@@ -145,7 +145,7 @@ for step in $steps; do
       cd $S ;;
     esno)        # README 6.13.8: closed-loop link adaptation at other Es/No, on the low-correlation channel, and with an Es/No
                  # that changes every 2 s (v19_esno.sh; jobs JV and JW)
-      JV=${JV:-59429165}; JW=${JW:-59439086}
+      JV=${JV:-59429165}; JW=${JW:-59439086,59473418}      # the second job of JW: seed 3 of the low-correlation channel
       for spec in lva:$JV lvb:$JV lvc:$JW lha:$JV lhb:$JV lhc:$JV lja:$JV ljb:$JV ljc:$JV lwa:$JW lwb:$JW lwc:$JW; do
         tag=${spec%%:*}
         $PY analyze_la_closed.py ../../$R/la_closed_$tag.json ${spec#*:} $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
@@ -176,6 +176,9 @@ for step in $steps; do
         "lzb:16:Random change, target 1%" > ../../$R/la_track.txt 2>&1
       for tag in lgw lma lmb lmc lpa lpb lpc lqa lqb lqc; do      # lp?: low-correlation channel at 4.5 dB, lq?: at 7.5 dB
         $PY analyze_la_closed.py ../../$R/la_closed_$tag.json $JD $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+      done
+      for tag in lua lub luc; do                                  # urban micro channel at 10 dB: 10% and 3% targets
+        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json $JC $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
       done
       ${PY/python3/--env=SKIP=8000 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_long_low.json $JD \
         "lgw:16:Low-correlation channel at 6 dB, target 10%, runs of 100 s" > ../../$R/l1_levels_long_low.txt 2>&1

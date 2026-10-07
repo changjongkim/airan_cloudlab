@@ -1,25 +1,25 @@
-## Four two-user cells, target 10%  (candidates without a NeuralRx, no AI: 6.4%; slots with a candidate: 28.7%)
+## Four two-user cells, target 10%  (candidates without a NeuralRx, no AI: 6.5%; slots with a candidate: 28.8%)
 | setting | seeds | AI served | goodput lost (seeds) | candidates without a NeuralRx | L1 late |
 |---|---|---|---|---|---|
-| rule: no AI next to NeuralRx | 2 | 11.6k | +0.01% (-0.06 to +0.08) | 7.2% | 0.023% |
-| rule: reserve 3 | 2 | 12.2k | +0.04% (+0.04 to +0.04) | 7.3% | 0.021% |
-| rule: reserve 2 | 2 | 13.9k | +0.13% (+0.04 to +0.22) | 8.2% | 0.043% |
-| rule: reserve 1 | 2 | 17.7k | +0.39% (+0.26 to +0.52) | 10.8% | 0.018% |
-| caps: fixed 10% | 2 | 4.7k | +0.14% (+0.08 to +0.20) | 8.5% | 0.019% |
-| caps: cap 20% | 2 | 6.9k | +0.13% (+0.13 to +0.14) | 8.4% | 0.019% |
-| caps: cap 30% | 2 | 11.5k | +0.20% (+0.19 to +0.21) | 9.9% | 0.017% |
-| caps: cap 40% | 2 | 14.8k | +0.30% (+0.23 to +0.36) | 10.3% | 0.027% |
-| caps: cap 50% | 2 | 19.5k | +0.49% (+0.45 to +0.52) | 12.6% | 0.023% |
-| caps: cap 60% | 2 | 22.9k | +0.55% (+0.48 to +0.61) | 13.4% | 0.028% |
-| caps: cap 70% | 2 | 25.1k | +0.56% (+0.51 to +0.62) | 13.9% | 0.029% |
-| caps: no cap | 2 | 29.6k | +0.87% (+0.77 to +0.97) | 14.5% | 0.103% |
+| rule: no AI next to NeuralRx | 3 | 11.5k | -0.00% (-0.06 to +0.08) | 7.3% | 0.027% |
+| rule: reserve 3 | 3 | 12.1k | +0.03% (+0.00 to +0.04) | 7.3% | 0.023% |
+| rule: reserve 2 | 3 | 13.9k | +0.12% (+0.04 to +0.22) | 8.3% | 0.035% |
+| rule: reserve 1 | 3 | 17.9k | +0.41% (+0.26 to +0.52) | 10.9% | 0.022% |
+| caps: fixed 10% | 3 | 4.7k | +0.15% (+0.08 to +0.20) | 8.5% | 0.022% |
+| caps: cap 20% | 3 | 6.9k | +0.16% (+0.13 to +0.21) | 8.6% | 0.018% |
+| caps: cap 30% | 3 | 11.6k | +0.20% (+0.19 to +0.22) | 9.9% | 0.021% |
+| caps: cap 40% | 3 | 14.8k | +0.28% (+0.23 to +0.36) | 10.5% | 0.029% |
+| caps: cap 50% | 3 | 19.6k | +0.48% (+0.45 to +0.52) | 12.6% | 0.021% |
+| caps: cap 60% | 3 | 22.9k | +0.53% (+0.48 to +0.61) | 13.5% | 0.031% |
+| caps: cap 70% | 3 | 25.1k | +0.59% (+0.51 to +0.64) | 14.0% | 0.037% |
+| caps: no cap | 3 | 29.8k | +0.89% (+0.77 to +0.97) | 14.6% | 0.105% |
 
 | goodput loss at most | rule: AI served | caps: AI served | rule / caps | rule: best measured setting | caps: best measured setting |
 |---|---|---|---|---|---|
-| 0.25% | 15.7k | 13.5k | 1.16x | reserve 2, 13.9k (+0.13%) | cap 30%, 11.5k (+0.20%) |
-| 0.50% | 17.7k | 22.8k | 0.78x | reserve 1, 17.7k (+0.39%) | cap 50%, 19.5k (+0.49%) |
-| 1.00% | 17.7k | 29.6k | 0.60x | reserve 1, 17.7k (+0.39%) | no cap, 29.6k (+0.87%) |
-| 2.00% | 17.7k | 29.6k | 0.60x | reserve 1, 17.7k (+0.39%) | no cap, 29.6k (+0.87%) |
+| 0.25% | 15.7k | 13.4k | 1.17x | reserve 2, 13.9k (+0.12%) | cap 30%, 11.6k (+0.20%) |
+| 0.50% | 17.9k | 22.2k | 0.81x | reserve 1, 17.9k (+0.41%) | cap 50%, 19.6k (+0.48%) |
+| 1.00% | 17.9k | 29.8k | 0.60x | reserve 1, 17.9k (+0.41%) | no cap, 29.8k (+0.89%) |
+| 2.00% | 17.9k | 29.8k | 0.60x | reserve 1, 17.9k (+0.41%) | no cap, 29.8k (+0.89%) |
 
 caps with a setting of the rule that serves at least the AI at no more loss: fixed 10%, cap 20%, cap 30%
 settings of the rule with a cap that serves at least the AI at no more loss: none
@@ -27,77 +27,77 @@ settings of the rule with a cap that serves at least the AI at no more loss: non
 ## Four two-user cells, target 1%  (candidates without a NeuralRx, no AI: 0.1%; slots with a candidate: 14.1%)
 | setting | seeds | AI served | goodput lost (seeds) | candidates without a NeuralRx | L1 late |
 |---|---|---|---|---|---|
-| rule: no AI next to NeuralRx | 2 | 33.6k | +0.11% (+0.11 to +0.11) | 0.3% | 0.016% |
-| rule: reserve 3 | 2 | 35.4k | +0.17% (+0.14 to +0.20) | 0.4% | 0.019% |
-| rule: reserve 2 | 2 | 38.4k | +0.64% (+0.52 to +0.76) | 1.3% | 0.037% |
-| rule: reserve 1 | 2 | 40.2k | +0.68% (+0.51 to +0.84) | 1.5% | 0.014% |
-| caps: fixed 10% | 2 | 5.5k | +0.14% (+0.08 to +0.19) | 0.4% | 0.019% |
-| caps: cap 20% | 2 | 9.8k | +0.17% (+0.15 to +0.18) | 0.4% | 0.016% |
-| caps: cap 30% | 2 | 17.8k | +0.32% (+0.26 to +0.39) | 0.6% | 0.011% |
-| caps: cap 40% | 2 | 24.4k | +0.59% (+0.47 to +0.70) | 1.0% | 0.025% |
-| caps: cap 50% | 2 | 32.8k | +0.69% (+0.63 to +0.75) | 1.5% | 0.024% |
-| caps: cap 60% | 2 | 38.1k | +0.81% (+0.64 to +0.99) | 1.5% | 0.018% |
-| caps: cap 70% | 2 | 41.9k | +0.71% (+0.62 to +0.80) | 1.5% | 0.039% |
-| caps: no cap | 2 | 49.1k | +2.44% (+1.55 to +3.34) | 1.6% | 0.034% |
+| rule: no AI next to NeuralRx | 3 | 33.8k | +0.14% (+0.11 to +0.21) | 0.3% | 0.023% |
+| rule: reserve 3 | 3 | 35.6k | +0.13% (+0.06 to +0.20) | 0.3% | 0.017% |
+| rule: reserve 2 | 3 | 38.5k | +0.66% (+0.52 to +0.76) | 1.2% | 0.029% |
+| rule: reserve 1 | 3 | 40.1k | +0.71% (+0.51 to +0.84) | 1.5% | 0.016% |
+| caps: fixed 10% | 3 | 5.5k | +0.15% (+0.08 to +0.19) | 0.3% | 0.016% |
+| caps: cap 20% | 3 | 9.9k | +0.15% (+0.10 to +0.18) | 0.3% | 0.013% |
+| caps: cap 30% | 3 | 17.9k | +0.35% (+0.26 to +0.40) | 0.7% | 0.015% |
+| caps: cap 40% | 3 | 24.6k | +0.61% (+0.47 to +0.70) | 1.1% | 0.021% |
+| caps: cap 50% | 3 | 32.9k | +0.70% (+0.63 to +0.75) | 1.5% | 0.020% |
+| caps: cap 60% | 3 | 38.2k | +0.81% (+0.64 to +0.99) | 1.5% | 0.016% |
+| caps: cap 70% | 3 | 42.1k | +0.75% (+0.62 to +0.84) | 1.5% | 0.030% |
+| caps: no cap | 3 | 49.2k | +2.47% (+1.55 to +3.34) | 1.5% | 0.033% |
 
 | goodput loss at most | rule: AI served | caps: AI served | rule / caps | rule: best measured setting | caps: best measured setting |
 |---|---|---|---|---|---|
-| 0.25% | 36.1k | 14.7k | 2.45x | reserve 3, 35.4k (+0.17%) | cap 20%, 9.8k (+0.17%) |
-| 0.50% | 38.5k | 29.5k | 1.31x | reserve 3, 35.4k (+0.17%) | cap 30%, 17.8k (+0.32%) |
-| 1.00% | 40.2k | 43.1k | 0.93x | reserve 1, 40.2k (+0.68%) | cap 70%, 41.9k (+0.71%) |
-| 2.00% | 40.2k | 47.3k | 0.85x | reserve 1, 40.2k (+0.68%) | cap 70%, 41.9k (+0.71%) |
+| 0.25% | 36.5k | 15.4k | 2.36x | reserve 3, 35.6k (+0.13%) | cap 20%, 9.9k (+0.15%) |
+| 0.50% | 38.4k | 28.7k | 1.34x | reserve 3, 35.6k (+0.13%) | cap 30%, 17.9k (+0.35%) |
+| 1.00% | 40.1k | 43.1k | 0.93x | reserve 1, 40.1k (+0.71%) | cap 70%, 42.1k (+0.75%) |
+| 2.00% | 40.1k | 47.3k | 0.85x | reserve 1, 40.1k (+0.71%) | cap 70%, 42.1k (+0.75%) |
 
 caps with a setting of the rule that serves at least the AI at no more loss: fixed 10%, cap 20%, cap 30%, cap 40%, cap 50%, cap 60%
 settings of the rule with a cap that serves at least the AI at no more loss: none
 
-## Eight two-user cells, target 3%  (candidates without a NeuralRx, no AI: 15.5%; slots with a candidate: 18.2%)
+## Eight two-user cells, target 3%  (candidates without a NeuralRx, no AI: 15.4%; slots with a candidate: 18.2%)
 | setting | seeds | AI served | goodput lost (seeds) | candidates without a NeuralRx | L1 late |
 |---|---|---|---|---|---|
-| rule: no AI next to NeuralRx | 2 | 6.9k | +0.26% (+0.15 to +0.37) | 15.9% | 0.019% |
-| rule: reserve 3 | 2 | 7.2k | +0.48% (+0.20 to +0.77) | 16.1% | 0.023% |
-| rule: reserve 2 | 2 | 8.4k | +0.58% (+0.47 to +0.70) | 16.4% | 0.020% |
-| rule: reserve 1 | 2 | 12.8k | +1.35% (+1.17 to +1.53) | 19.0% | 0.045% |
-| caps: fixed 10% | 2 | 4.4k | +0.87% (+0.67 to +1.08) | 17.4% | 0.022% |
-| caps: cap 20% | 2 | 6.1k | +0.76% (+0.64 to +0.88) | 17.2% | 0.020% |
-| caps: cap 30% | 2 | 10.3k | +1.30% (+1.28 to +1.31) | 18.9% | 0.021% |
-| caps: cap 40% | 2 | 13.1k | +1.47% (+1.38 to +1.56) | 19.4% | 0.031% |
-| caps: cap 50% | 2 | 17.0k | +1.73% (+1.55 to +1.91) | 20.6% | 0.021% |
-| caps: cap 60% | 2 | 19.4k | +2.01% (+1.98 to +2.04) | 20.8% | 0.024% |
-| caps: cap 70% | 2 | 21.4k | +2.14% (+2.10 to +2.17) | 20.7% | 0.028% |
-| caps: no cap | 2 | 28.2k | +4.15% (+3.75 to +4.55) | 19.5% | 0.070% |
+| rule: no AI next to NeuralRx | 3 | 6.9k | +0.32% (+0.15 to +0.45) | 16.0% | 0.025% |
+| rule: reserve 3 | 3 | 7.1k | +0.37% (+0.15 to +0.77) | 16.1% | 0.019% |
+| rule: reserve 2 | 3 | 8.7k | +0.65% (+0.47 to +0.77) | 16.7% | 0.034% |
+| rule: reserve 1 | 3 | 12.8k | +1.32% (+1.17 to +1.53) | 18.9% | 0.040% |
+| caps: fixed 10% | 3 | 4.4k | +0.84% (+0.67 to +1.08) | 17.3% | 0.020% |
+| caps: cap 20% | 3 | 6.2k | +0.70% (+0.58 to +0.88) | 17.2% | 0.022% |
+| caps: cap 30% | 3 | 10.4k | +1.18% (+0.95 to +1.31) | 18.7% | 0.025% |
+| caps: cap 40% | 3 | 13.2k | +1.41% (+1.28 to +1.56) | 19.4% | 0.034% |
+| caps: cap 50% | 3 | 17.0k | +1.70% (+1.55 to +1.91) | 20.6% | 0.024% |
+| caps: cap 60% | 3 | 19.4k | +1.93% (+1.77 to +2.04) | 20.9% | 0.043% |
+| caps: cap 70% | 3 | 21.4k | +2.14% (+2.10 to +2.17) | 20.7% | 0.030% |
+| caps: no cap | 3 | 28.3k | +4.15% (+3.75 to +4.55) | 19.4% | 0.071% |
 
 | goodput loss at most | rule: AI served | caps: AI served | rule / caps | rule: best measured setting | caps: best measured setting |
 |---|---|---|---|---|---|
-| 0.25% | 6.8k | 2.5k | 2.70x | none | none |
-| 0.50% | 8.2k | 5.0k | 1.64x | reserve 3, 7.2k (+0.48%) | none |
-| 1.00% | 10.9k | 10.0k | 1.09x | reserve 2, 8.4k (+0.58%) | cap 20%, 6.1k (+0.76%) |
-| 2.00% | 12.8k | 20.0k | 0.64x | reserve 1, 12.8k (+1.35%) | cap 50%, 17.0k (+1.73%) |
+| 0.25% | 5.4k | 2.5k | 2.15x | none | none |
+| 0.50% | 7.9k | 5.0k | 1.58x | reserve 3, 7.1k (+0.37%) | none |
+| 1.00% | 10.9k | 10.0k | 1.09x | reserve 2, 8.7k (+0.65%) | cap 20%, 6.2k (+0.70%) |
+| 2.00% | 12.8k | 20.1k | 0.64x | reserve 1, 12.8k (+1.32%) | cap 60%, 19.4k (+1.93%) |
 
 caps with a setting of the rule that serves at least the AI at no more loss: fixed 10%, cap 20%
 settings of the rule with a cap that serves at least the AI at no more loss: none
 
-## Eight two-user cells, target 1%  (candidates without a NeuralRx, no AI: 4.9%; slots with a candidate: 11.9%)
+## Eight two-user cells, target 1%  (candidates without a NeuralRx, no AI: 5.0%; slots with a candidate: 11.9%)
 | setting | seeds | AI served | goodput lost (seeds) | candidates without a NeuralRx | L1 late |
 |---|---|---|---|---|---|
-| rule: no AI next to NeuralRx | 2 | 16.6k | +0.05% (-0.12 to +0.22) | 5.3% | 0.024% |
-| rule: reserve 3 | 2 | 18.3k | +0.58% (+0.52 to +0.64) | 5.7% | 0.016% |
-| rule: reserve 2 | 2 | 22.8k | +1.76% (+1.71 to +1.81) | 7.2% | 0.016% |
-| rule: reserve 1 | 2 | 27.9k | +2.71% (+2.59 to +2.84) | 8.6% | 0.022% |
-| caps: fixed 10% | 2 | 4.9k | +0.83% (+0.62 to +1.04) | 6.2% | 0.014% |
-| caps: cap 20% | 2 | 7.9k | +0.98% (+0.95 to +1.01) | 6.4% | 0.030% |
-| caps: cap 30% | 2 | 14.1k | +2.04% (+1.72 to +2.35) | 7.6% | 0.021% |
-| caps: cap 40% | 2 | 18.6k | +2.62% (+2.52 to +2.71) | 8.5% | 0.033% |
-| caps: cap 50% | 2 | 26.0k | +3.07% (+3.02 to +3.13) | 9.0% | 0.032% |
-| caps: cap 60% | 2 | 30.5k | +3.28% (+3.23 to +3.33) | 9.2% | 0.040% |
-| caps: cap 70% | 2 | 34.6k | +3.72% (+3.63 to +3.82) | 9.5% | 0.035% |
-| caps: no cap | 2 | 46.1k | +8.15% (+7.77 to +8.53) | 7.0% | 0.204% |
+| rule: no AI next to NeuralRx | 3 | 16.9k | +0.10% (-0.12 to +0.22) | 5.4% | 0.024% |
+| rule: reserve 3 | 3 | 18.6k | +0.64% (+0.52 to +0.76) | 5.8% | 0.013% |
+| rule: reserve 2 | 3 | 23.0k | +1.72% (+1.65 to +1.81) | 7.2% | 0.022% |
+| rule: reserve 1 | 3 | 28.3k | +2.85% (+2.59 to +3.11) | 8.7% | 0.025% |
+| caps: fixed 10% | 3 | 4.9k | +0.87% (+0.62 to +1.04) | 6.3% | 0.018% |
+| caps: cap 20% | 3 | 8.0k | +1.17% (+0.95 to +1.54) | 6.5% | 0.030% |
+| caps: cap 30% | 3 | 14.2k | +2.20% (+1.72 to +2.52) | 7.7% | 0.026% |
+| caps: cap 40% | 3 | 18.9k | +2.70% (+2.52 to +2.87) | 8.5% | 0.027% |
+| caps: cap 50% | 3 | 26.2k | +3.24% (+3.02 to +3.57) | 9.2% | 0.030% |
+| caps: cap 60% | 3 | 31.1k | +3.46% (+3.23 to +3.82) | 9.3% | 0.029% |
+| caps: cap 70% | 3 | 35.1k | +4.03% (+3.63 to +4.63) | 9.6% | 0.036% |
+| caps: no cap | 3 | 45.7k | +8.01% (+7.75 to +8.53) | 7.1% | 0.203% |
 
 | goodput loss at most | rule: AI served | caps: AI served | rule / caps | rule: best measured setting | caps: best measured setting |
 |---|---|---|---|---|---|
-| 0.25% | 17.5k | 2.3k | 7.51x | no AI next to NeuralRx, 16.6k (+0.05%) | none |
-| 0.50% | 18.5k | 4.7k | 3.98x | no AI next to NeuralRx, 16.6k (+0.05%) | none |
-| 1.00% | 20.6k | 9.3k | 2.22x | reserve 3, 18.3k (+0.58%) | cap 20%, 7.9k (+0.98%) |
-| 2.00% | 24.9k | 18.6k | 1.34x | reserve 2, 22.8k (+1.76%) | cap 20%, 7.9k (+0.98%) |
+| 0.25% | 17.6k | 2.2k | 7.82x | no AI next to NeuralRx, 16.9k (+0.10%) | none |
+| 0.50% | 18.6k | 4.5k | 4.14x | no AI next to NeuralRx, 16.9k (+0.10%) | none |
+| 1.00% | 20.7k | 9.0k | 2.30x | reserve 3, 18.6k (+0.64%) | fixed 10%, 4.9k (+0.87%) |
+| 2.00% | 24.8k | 18.0k | 1.38x | reserve 2, 23.0k (+1.72%) | cap 20%, 8.0k (+1.17%) |
 
 caps with a setting of the rule that serves at least the AI at no more loss: fixed 10%, cap 20%, cap 30%, cap 40%, cap 50%
 settings of the rule with a cap that serves at least the AI at no more loss: none

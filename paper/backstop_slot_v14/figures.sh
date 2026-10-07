@@ -29,6 +29,9 @@ EVAL use $F/eval_gpu_use.$EXT $R/optimum_gap.json
 EVAL protect $F/eval_protect.$EXT "Steady Full Load\n(100-s Runs)=$R/sched_xa_c16_j${J6:-59414960}_w20.json" "Load Changes Every 2 s\n(20-s Runs)=$R/sched_fb_c16_j${J1}_${J3}_w5.json"
 EVAL closed $F/eval_closed_loop.$EXT "Target 10%=$R/la_closed_laa.json" "Target 3%=$R/la_closed_lac.json" "Target 1%=$R/la_closed_lab.json" \
   "Target 1%\\n2 GPUs=$R/la_closed_lad.json" "Target 1%\\n8 two-user cells=$R/la_closed_laf.json"
+EVAL closed $F/eval_closed_vary.$EXT "Changing Es/No\nTarget 10%=$R/la_closed_lva.json" "Changing Es/No\nTarget 1%=$R/la_closed_lvb.json" \
+  "Changing, 8 Cells\nTarget 1%=$R/la_closed_lvc.json" "14 dB, 8 Cells\nTarget 1%=$R/la_closed_lhc.json" \
+  "20 dB, 8 Cells\nTarget 1%=$R/la_closed_ljc.json" "Low Correlation\nTarget 10%=$R/la_closed_lwa.json"
 EVAL frontier $F/eval_frontier.$EXT "Target 10%=$R/la_closed_lfa.json" "Target 1%=$R/la_closed_lfb.json" \
   "Target 3%, Eight Two-User Cells=$R/la_closed_lfd.json" "Target 1%, Eight Two-User Cells=$R/la_closed_lfc.json"
 # The design figures for the README (TikZ sources in figures/*.tex)

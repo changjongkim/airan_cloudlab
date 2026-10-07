@@ -7,7 +7,9 @@
 #   (L1 latency and misses, neural receiver run time, AI request latency, use of the GPU time) -> sched_<tag>_*.json
 #   and sched_metrics.txt; levels, the layer-1 latency without a neural receiver, with it, and with AI -> l1_levels.txt,
 #   and the busy time of the neural receivers in the closed-loop conditions -> optimum_gap_closed.txt; frontier, AI served
-#   against goodput lost for the caps and the settings of the rule -> frontier_closed.txt and eval_frontier.png)
+#   against goodput lost for the caps and the settings of the rule -> frontier_closed.txt and eval_frontier.png; esno, the
+#   closed-loop runs at other Es/No, on the low-correlation channel and with a changing Es/No -> la_closed_l{v,h,j,w}?.txt,
+#   l1_levels_esno.txt, optimum_gap_esno.txt, eval_closed_vary.png)
 # The figures of the paper: paper/backstop_slot_v14/figures.sh.
 # Jobs: J1 seeds 1-2 of the headline conditions and the rule comparison, J2 kinds of AI work (baselines),
 # J3 seeds 3-5, other server sizes, link adaptation, the final rule (wm) in the headline conditions,
@@ -130,7 +132,7 @@ for step in $steps; do
     frontier)    # README 6.13.7: AI served against goodput lost for the caps of the low-priority baseline and the settings
                  # of the rule (v17_frontier.sh, jobs JF)
       for tag in lfa lfb lfc lfd; do
-        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json ${JF:-59423316} $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json ${JF:-59423316,59439086} $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
       done
       $PY analyze_frontier.py ../../$R/frontier_closed.json "Four two-user cells, target 10%=../../$R/la_closed_lfa.json" \
         "Four two-user cells, target 1%=../../$R/la_closed_lfb.json" "Eight two-user cells, target 3%=../../$R/la_closed_lfd.json" \
@@ -138,6 +140,26 @@ for step in $steps; do
       cd ../..
       ${PLOT/plot_v14.py/plot_eval.py} frontier $F/eval_frontier.png "Target 10%=$R/la_closed_lfa.json" "Target 1%=$R/la_closed_lfb.json" \
         "Target 3%, eight two-user cells=$R/la_closed_lfd.json" "Target 1%, eight two-user cells=$R/la_closed_lfc.json"
+      cd $S ;;
+    esno)        # README 6.13.8: closed-loop link adaptation at other Es/No, on the low-correlation channel, and with an Es/No
+                 # that changes every 2 s (v19_esno.sh; jobs JV and JW)
+      JV=${JV:-59429165}; JW=${JW:-59439086}
+      for spec in lva:$JV lvb:$JV lvc:$JW lha:$JV lhb:$JV lhc:$JV lja:$JV ljb:$JV ljc:$JV lwa:$JW lwb:$JW lwc:$JW; do
+        tag=${spec%%:*}
+        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json ${spec#*:} $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+      done
+      $PY analyze_l1_levels.py ../../$R/l1_levels_esno.json $JV,$JW "lva:16:Changing Es/No, target 10%" "lvb:16:Changing Es/No, target 1%" \
+        "lvc:16:Changing Es/No, target 1%, eight two-user cells" "lha:16:14 dB, target 10%" "lhb:16:14 dB, target 1%" \
+        "lhc:16:14 dB, target 1%, eight two-user cells" "lja:16:20 dB, target 10%" "ljb:16:20 dB, target 1%" \
+        "ljc:16:20 dB, target 1%, eight two-user cells" "lwa:16:Low correlation 6 dB, target 10%" "lwb:16:Low correlation 6 dB, target 1%" \
+        "lwc:16:Low correlation 6 dB, target 1%, eight two-user cells" > ../../$R/l1_levels_esno.txt 2>&1
+      $PY analyze_optimum.py ../../$R/optimum_gap_esno.json $JV:lva:16 $JV:lvb:16 $JW:lvc:16 $JV:lha:16 $JV:lhb:16 $JV:lhc:16 \
+        $JV:lja:16 $JV:ljb:16 $JV:ljc:16 $JW:lwa:16 $JW:lwb:16 $JW:lwc:16 > ../../$R/optimum_gap_esno.txt 2>&1
+      cd ../..
+      E="${PLOT/plot_v14.py/plot_eval.py}"
+      $E closed $F/eval_closed_vary.png "Changing Es/No\nTarget 10%=$R/la_closed_lva.json" "Changing Es/No\nTarget 1%=$R/la_closed_lvb.json" \
+        "Changing, 8 Cells\nTarget 1%=$R/la_closed_lvc.json" "14 dB, 8 Cells\nTarget 1%=$R/la_closed_lhc.json" \
+        "20 dB, 8 Cells\nTarget 1%=$R/la_closed_ljc.json" "Low Correlation\nTarget 10%=$R/la_closed_lwa.json"
       cd $S ;;
     levels)      # README 6.0.1: what the neural receiver and the AI each add to the layer-1 latency (single-user cells of the
                  # closed-loop runs, which include the server without a neural receiver), and README 6.13.6: the share of the

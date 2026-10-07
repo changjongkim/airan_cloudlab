@@ -64,9 +64,10 @@ rule, which we build as \sys: the AI of a GPU stops while the neural receiver of
 A100 GPUs with 16 cells, \sys serves 70\% of the bound, 1.9-6.4$\times$ the existing mechanisms that keep
 the recoveries, and adds 0.04-0.06~ms to the 99.9th-percentile latency of the layer-1 decode, 2.8-21$\times$
 less than the baselines. With a rate controller in the loop, the recovery path raises the uplink goodput of
-two-user cells by 11-31\%. \sys keeps this gain within 0.3\% in every setting with one configuration. No
-fixed or low-priority GPU share does, and the shares that serve more AI than \sys pay up to 8.2\% of the
-goodput.
+two-user cells by 11-40\% when the channels of the users are correlated. \sys loses at most 0.3\% of this
+goodput in 21 settings with one configuration, including other SNRs, a second channel, and an SNR that changes
+every 2~s. No fixed or low-priority GPU share does: a share that serves more AI than \sys pays up to 8.2\% of
+the goodput, and with a high neural receiver demand a 10\% share already loses 0.8-0.9\%.
 \end{abstract}
 
 \maketitle
@@ -129,8 +130,9 @@ We make three contributions.
 \item \textbf{A measurement.} We compare the public neural receivers with a production receiver at equal
 LDPC effort. The real-time model helps only when the channels of the paired users are correlated. The larger
 model decodes 15-67\% of the TBs that cuPHY fails, and it is too slow to run for every slot. As a recovery
-path for failed TBs, it raises the uplink goodput of two-user cells by 5.6\% at a fixed MCS and by 11-31\%
-when an outer-loop rate controller picks the MCS.
+path for failed TBs, it raises the uplink goodput of two-user cells by 5.6\% at a fixed MCS, and by 11-40\%
+on a high-correlation channel and 4-9\% on a low-correlation channel when an outer-loop rate controller picks
+the MCS.
 \item \textbf{A finding and a model.} AI inference costs recoveries by a path that deadline checks miss. A
 neural receiver that AI slows by more than 1.2~ms still meets its deadline, but it holds its GPU for three
 uplink slots, not two, and the failed TBs of the extra slot find no free neural receiver. This path accounts
@@ -154,14 +156,15 @@ radio must keep its performance. Therefore, we ask of every policy first whether
 how much of the GPU it uses. The main results are as follows.
 \begin{itemize}
 \item \textbf{\sys keeps the radio.} With one configuration, \sys keeps the radio in every setting we
-measure. With an outer-loop rate controller, the goodput of the two-user cells stays within 0.3\% of the
-server without AI in all nine settings. In steady state \sys adds 0.04-0.06~ms to the 99.9th-percentile
+measure. With an outer-loop rate controller, the two-user cells lose at most 0.3\% of their goodput against
+the server without AI in all 21 settings: three SNRs, two channels, and an SNR that changes every 2~s. In steady state \sys adds 0.04-0.06~ms to the 99.9th-percentile
 latency of the layer-1 decode and 0.07-0.09~ms to the run of the neural receiver, and after the start of a
 run its TBs pass the layer-1 deadline as rarely as those of the server without AI in all four server
 settings. It loses 0.0-0.1\% of the recoveries.
 \item \textbf{A GPU share does not.} A fixed share and a low-priority share run AI whatever the radio does,
 and no cap keeps the radio in every setting. The 10\% share loses up to 1.1\% of the goodput, and the 30\%
-share with low-priority AI loses up to 2.3\%. The shares add 0.14-0.87~ms to the layer-1 tail, 2.8-21$\times$
+share with low-priority AI loses up to 2.3\%. A higher cap serves more AI and loses more goodput in every
+setting, and no cap serves at least the AI of \sys at no more loss. The shares add 0.14-0.87~ms to the layer-1 tail, 2.8-21$\times$
 what \sys adds, and with one GPU 21-46 of 0.8 million TBs pass the layer-1 deadline, against none with \sys
 and none without AI. A share chosen every second by a load estimator loses 2.2-4.7\% of the recoveries when
 the load changes.
@@ -173,11 +176,12 @@ failure, \sys turns 70\% of the GPU time that is safe for AI into served tokens 
 mechanisms that keep the recoveries turn 11-37\%. The 99th-percentile latency of its AI requests is
 175-187~ms, inside the limit.
 \item \textbf{More AI than \sys is paid by the radio.} A low-priority share with a cap of 70\% or without a
-cap serves 1.1-1.4$\times$ the AI of \sys under the three load patterns and up to 4.1$\times$ under rate
-control. It pays with 2.7-6.3\% of the recoveries, 0.7-8.2\% of the goodput under rate control, and up to
-0.87~ms of the layer-1 tail, and the price of a cap changes with the load.
+cap serves 1.1-1.4$\times$ the AI of \sys under the three load patterns and up to 4.2$\times$ under rate
+control. It pays with 2.7-6.3\% of the recoveries, up to 8.2\% of the goodput under rate control, and up to
+0.9~ms of the layer-1 tail, and the price of a cap changes with the load and the channel.
 \item \textbf{The recovery path is worth protecting.} It adds 5.6\% to the uplink goodput of two-user cells
-at a fixed MCS and 11-31\% when an outer-loop rate controller picks the MCS.
+at a fixed MCS. When an outer-loop rate controller picks the MCS, it adds 11-40\% on a high-correlation
+channel and 4-9\% on a low-correlation channel.
 \end{itemize}
 
 \section{Background and Motivation}
@@ -623,7 +627,7 @@ AI served, random load steps & 44.7k tokens/s & \textit{Static} (6.0k) & 7.5$\ti
 Recoveries lost & 0.0-0.1\% & \textit{Priority-70} (2.7-5.6\%) & \\
 Layer-1 latency added, 99.9th percentile & 0.04-0.06~ms & baselines (0.14-0.87~ms) & 2.8-21$\times$ less \\
 GPU time safe for AI that is used & 70\% & \textit{Static} to \textit{Priority} (11-37\%) & 1.9-6.4$\times$ \\
-Goodput of two-user cells & within 0.3\% of no AI & \textit{Priority-max} (up to $-$8.2\%) & \\
+Goodput lost by two-user cells, 21 settings & at most 0.3\% & \textit{Priority-max} (up to 8.2\%) & \\
 Loss model & 0.82 points error & 672 measured runs & \\
 \bottomrule
 \end{tabular}
@@ -869,7 +873,8 @@ layer-1 misses are 0.25\% with 16 cells and 1.1\% with 32 cells without AI. Ever
 \label{sec:worth}
 
 \noindent\textbf{Takeaway.} The recovery path raises the goodput of two-user cells by 5.6\% at a fixed MCS
-and by 11-31\% under closed-loop rate control. \sys keeps this gain within 0.3\%, where the other policies
+and by 11-40\% under closed-loop rate control on a high-correlation channel. \sys loses at most 0.3\% of the
+goodput in 21 settings, where the other policies
 lose up to 8.2\%.
 
 \begin{table}[t]
@@ -1038,7 +1043,7 @@ is the same.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/eval_frontier.pdf}
-\caption{AI served against the goodput of the two-user cells that is lost, with the outer loop (two seeds; all
+\caption{AI served against the goodput of the two-user cells that is lost, with the outer loop (three seeds; all
 policies of a panel run in one job). Orange: low-priority AI with a cap of 20-70\% and without a cap. Blue:
 \sys, and its settings that allow AI next to a neural receiver while 3, 2, or 1 neural receivers are free.}
 \label{fig:frontier}
@@ -1047,14 +1052,68 @@ policies of a panel run in one job). Orange: low-priority AI with a cap of 20-70
 \noindent\textbf{No Cap Replaces the Rule.} A share with a well-chosen cap might keep the radio. We sweep the
 cap of the low-priority share from 20\% to no cap in four settings (Figure~\ref{fig:frontier}). A higher cap
 serves more AI and loses more goodput in every setting: from the 20\% cap to no cap, the loss grows from
-0.1\% to 0.9\% at the 10\% target, from 0.2\% to 2.4\% at the 1\% target, and from 1.0\% to 8.2\% with
+0.2\% to 0.9\% at the 10\% target, from 0.2\% to 2.5\% at the 1\% target, and from 1.2\% to 8.0\% with
 eight two-user cells at the 1\% target. The cap that keeps the goodput within 0.3\% depends on the setting:
-it is 20-30\% with four two-user cells, and with eight two-user cells the fixed 10\% share already loses
-0.8-0.9\%. \sys stays within 0.3\% in the four settings with one configuration. In no setting does a cap
-serve at least the AI of a setting of \sys at no more loss. Reading the AI at a loss of at most 0.25\% from
-the lines between the measured points, \sys serves 1.2$\times$, 2.5$\times$, 2.7$\times$, and 7.5$\times$
-the AI of the caps. The settings of \sys that allow AI next to a neural receiver trade goodput for AI in the
-same way as a cap and from a lower loss; the default allows none.
+it is 30\% at the 10\% target and 20\% at the 1\% target with four two-user cells, and with eight two-user
+cells the fixed 10\% share already loses 0.8-0.9\%. \sys loses 0.0-0.3\% in the four settings with one
+configuration. In no setting does a cap serve at least the AI of a setting of \sys at no more loss. Reading
+the AI at a loss of at most 0.25\% from the lines between the measured points, \sys serves 1.2$\times$,
+2.4$\times$, 2.2$\times$, and 7.8$\times$ the AI of the caps. The settings of \sys that allow AI next to a
+neural receiver trade goodput for AI in the same way as a cap and from a lower loss; the default allows none.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/eval_closed_vary.pdf}
+\caption{Goodput of the two-user cells that each policy loses in other settings of the outer loop. Changing
+Es/No: every two-user cell moves between 14, 16, and 20~dB and stays 2~s at a value. 8 Cells: eight two-user
+cells. Low correlation: the low-correlation channel at 6~dB. Lines show the range over seeds.}
+\label{fig:vary}
+\end{figure}
+
+\begin{table}[t]
+\caption{Closed-loop link adaptation in twelve more settings. Cells: AI served (tokens/s) / goodput of the
+two-user cells against the same server without AI. Busy: share of the time in which the neural receivers run
+without AI. Rows without a cell count have four two-user cells.}
+\label{tab:esno}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+Setting, target & Gain & Busy & \sys & Fixed 10\% & 30\% share & 70\% share & No cap \\
+\midrule
+Changing Es/No, 10\% & $+$12.5\% & 70\% & 10.4k / 0.0\% & 4.7k / $-$0.2\% & 11.3k / $-$0.4\% & 24.6k / $-$0.8\% & 30.1k / $-$1.3\% \\
+Changing Es/No, 1\% & $+$28.4\% & 35\% & 34.4k / $-$0.1\% & 5.6k / $-$0.2\% & 18.1k / $-$0.3\% & 42.9k / $-$0.8\% & 49.1k / $-$1.7\% \\
+Changing Es/No, 8 cells, 1\% & $+$25.5\% & 58\% & 17.4k / $-$0.2\% & 5.1k / $-$0.7\% & 13.9k / $-$1.4\% & 33.0k / $-$2.5\% & 43.8k / $-$6.3\% \\
+14~dB, 10\% & $+$13.9\% & 80\% & 6.1k / $-$0.1\% & 4.3k / $-$0.4\% & 10.0k / $-$0.7\% & 20.7k / $-$1.3\% & 25.8k / $-$2.5\% \\
+14~dB, 1\% & $+$18.2\% & 39\% & 31.5k / $-$0.1\% & 5.4k / $-$0.1\% & 17.0k / $-$0.2\% & 41.2k / $-$0.6\% & 49.2k / $-$2.2\% \\
+14~dB, 8 cells, 1\% & $+$15.6\% & 60\% & 15.5k / $-$0.1\% & 4.9k / $-$0.2\% & 13.3k / $-$0.9\% & 31.3k / $-$1.8\% & 45.2k / $-$7.0\% \\
+20~dB, 10\% & $+$10.8\% & 55\% & 18.7k / 0.0\% & 5.0k / $-$0.1\% & 13.5k / $-$0.1\% & 31.2k / $-$0.4\% & 36.2k / $-$0.5\% \\
+20~dB, 1\% & $+$40.2\% & 29\% & 38.5k / $+$0.1\% & 5.7k / $+$0.1\% & 19.3k / 0.0\% & 45.3k / $-$0.5\% & 50.5k / $-$0.6\% \\
+20~dB, 8 cells, 1\% & $+$39.5\% & 58\% & 17.2k / $-$0.2\% & 5.0k / $-$0.8\% & 13.5k / $-$1.3\% & 31.9k / $-$2.7\% & 38.3k / $-$3.7\% \\
+Low correlation, 10\% & $+$4.3\% & 52\% & 21.7k / 0.0\% & 5.1k / $-$0.1\% & 14.2k / $-$0.1\% & 33.3k / $-$0.3\% & 39.1k / $-$0.4\% \\
+Low correlation, 1\% & $+$8.4\% & 16\% & 47.8k / 0.0\% & 6.0k / 0.0\% & 22.9k / 0.0\% & 50.4k / 0.0\% & 52.6k / 0.0\% \\
+Low correlation, 8 cells, 1\% & $+$8.6\% & 33\% & 36.2k / 0.0\% & 5.5k / 0.0\% & 18.5k / 0.0\% & 43.7k / $-$0.2\% & 49.6k / $-$0.2\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Other SNRs, Another Channel, and a Changing Channel.} The results above use one channel at
+one Es/No. We generate the slots of MCS 10-16 for the high-correlation channel at 14 and 20~dB and for the
+low-correlation channel at 6~dB, and we let the Es/No of a two-user cell change: a cell stays 2~s at 14, 16,
+or 20~dB and then moves to another value at random, at times that differ between the cells. The outer loop
+does not know the channel and follows the outcomes. Table~\ref{tab:esno} and Figure~\ref{fig:vary} show the
+twelve settings. \sys loses at most 0.2\% of the goodput in all of them, also when the Es/No changes; with
+the nine settings of Table~\ref{tab:closedloop} this makes 21 settings with a loss of at most 0.3\%. The
+shares lose by setting: the 30\% share 0.0-1.4\%, the 70\% share 0.0-2.7\%, and low priority alone
+0.0-7.0\%. The large losses are those of the high-correlation channel with eight two-user cells, at 14~dB,
+at 20~dB, and with a changing Es/No. On the low-correlation channel the recovery path adds 4-9\% and a lost
+recovery costs little: no share loses more than 0.4\%, and \sys serves 1.5-2.1$\times$ the AI of the 30\%
+share because the neural receivers run for 16-52\% of the time. The AI that \sys serves follows the idle
+time of the neural receivers in all settings: against the 30\% share it serves 0.6$\times$ at 20\% idle
+time (14~dB at the 10\% target, where the share pays 0.7\% of the goodput), 0.9-1.0$\times$ at 30-32\%,
+1.2-1.5$\times$ at 40-48\%, and 1.9-2.1$\times$ from 61\%. In the twelve settings the neural receiver
+adds 1.45-1.62~ms to the 99.9th percentile of the layer-1 latency of the single-user cells, \sys adds
+0.00-0.13~ms on top, the 30\% share 0.23-0.34~ms, and low priority alone 0.60-0.89~ms.
 
 \subsection{Protection and latency}
 \label{sec:protect}
@@ -1564,10 +1623,11 @@ will be needed. The larger model allows four to five cells per GPU at full load;
 two thirds of the cells are idle, and with 48 cells nine TBs per million miss the layer-1 deadline in steady
 state with and without AI. The recovery deadline follows from the TDD pattern and the PUSCH preparation time~\cite{ts38214} and
 is not validated with a layer-2 stack; the goodput results apply a retransmission
-schedule to measured TB records and do not run HARQ, and the outer loop runs on one channel at one Es/No
-with fixed channel statistics. The goodput that the shares with more AI give up is
-0.3-0.6 percentage points at a fixed MCS and at most 1.0\% with the outer loop at a 10\% target, where
-\textit{Priority-70} serves 2.2$\times$ the AI of \sys; it reaches 8.2\% at a 1\% target. The closed form takes the run lengths of the neural receiver from
+schedule to measured TB records and do not run HARQ. The outer loop runs on two channels at four Es/No values
+and with an Es/No that changes in steps every 2~s; it does not run on the urban micro channel or with a
+continuously changing channel. The goodput that the shares with more AI give up is
+0.3-0.6 percentage points at a fixed MCS and at most 2.5\% with the outer loop at a 10\% target; it reaches
+8.2\% at a 1\% target, and it is at most 0.4\% on the low-correlation channel. The closed form takes the run lengths of the neural receiver from
 runs of the policy; it does not predict them from the policy. The baselines are the mechanisms of prior
 systems on our code: the estimator follows the published design, with our reliability definition and
 without the look-ahead of the full system. \sys raises the median L1 latency by 0.4~ms. \sys serves less
@@ -1590,10 +1650,10 @@ adds 0.04-0.06~ms to the 99.9th-percentile latency of the layer-1 decode, and af
 TBs pass the layer-1 deadline as rarely as those of the server without AI. It turns 70\% of
 the GPU time that is safe for AI into served tokens, 1.9-6.4$\times$ the existing mechanisms that keep the
 recoveries. With an outer-loop
-rate controller, lost recoveries lower the MCS: the cost in goodput is below 1\% at a 10\% retransmission
-target and reaches 8\% at a 1\% target with a neural receiver demand near the capacity. \sys stays within
-0.3\% of the server without AI in every setting with one configuration, which no fixed or low-priority GPU
-share does.
+rate controller, lost recoveries lower the MCS: the cost in goodput reaches 2.5\% at a 10\% retransmission
+target and 8\% at a 1\% target with a neural receiver demand near the capacity. \sys loses at most 0.3\% of
+the goodput in 21 settings with one configuration, which include a second channel and a changing SNR, and no
+fixed or low-priority GPU share does.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

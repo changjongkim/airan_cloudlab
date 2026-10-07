@@ -64,7 +64,7 @@ rule, which we build as \sys: the AI of a GPU stops while the neural receiver of
 A100 GPUs with 16 cells, \sys serves 70\% of the bound, 1.9-6.4$\times$ the existing mechanisms that keep
 the recoveries, and adds 0.04-0.06~ms to the 99.9th-percentile latency of the layer-1 decode, 2.8-21$\times$
 less than the baselines. With a rate controller in the loop, the recovery path raises the uplink goodput of
-two-user cells by 11-40\% when the channels of the users are correlated. \sys loses at most 0.4\% of this
+two-user cells by 11-40\% when the channels of the users are correlated. \sys loses at most 0.5\% of this
 goodput in 42 settings with one configuration: seven SNRs, three channels, an SNR that changes in steps and
 continuously, and cells with different channels on one server. No fixed or low-priority GPU share does: a share that serves more AI than \sys pays up to 8.2\% of
 the goodput, and with a high neural receiver demand a 10\% share already loses 0.8-0.9\%.
@@ -156,8 +156,8 @@ radio must keep its performance. Therefore, we ask of every policy first whether
 how much of the GPU it uses. The main results are as follows.
 \begin{itemize}
 \item \textbf{\sys keeps the radio.} With one configuration, \sys keeps the radio in every setting we
-measure. With an outer-loop rate controller, the two-user cells lose at most 0.4\% of their goodput against
-the server without AI in all 42 settings: seven SNRs, three channels, an SNR that changes in steps and
+measure. With an outer-loop rate controller, the two-user cells lose at most 0.5\% of their goodput against
+the server without AI in all 42 settings, and at most 0.3\% in 41 of them: seven SNRs, three channels, an SNR that changes in steps and
 continuously, and cells with different channels on one server. In steady state \sys adds 0.04-0.06~ms to the 99.9th-percentile
 latency of the layer-1 decode and 0.07-0.09~ms to the run of the neural receiver, and after the start of a
 run its TBs pass the layer-1 deadline as rarely as those of the server without AI in all four server
@@ -628,7 +628,7 @@ AI served, random load steps & 44.7k tokens/s & \textit{Static} (6.0k) & 7.5$\ti
 Recoveries lost & 0.0-0.1\% & \textit{Priority-70} (2.7-5.6\%) & \\
 Layer-1 latency added, 99.9th percentile & 0.04-0.06~ms & baselines (0.14-0.87~ms) & 2.8-21$\times$ less \\
 GPU time safe for AI that is used & 70\% & \textit{Static} to \textit{Priority} (11-37\%) & 1.9-6.4$\times$ \\
-Goodput lost by two-user cells, 42 settings & at most 0.4\% & \textit{Priority-max} (up to 8.2\%) & \\
+Goodput lost by two-user cells, 42 settings & at most 0.5\% & \textit{Priority-max} (up to 8.2\%) & \\
 Loss model & 0.82 points error & 672 measured runs & \\
 \bottomrule
 \end{tabular}
@@ -874,7 +874,7 @@ layer-1 misses are 0.25\% with 16 cells and 1.1\% with 32 cells without AI. Ever
 \label{sec:worth}
 
 \noindent\textbf{Takeaway.} The recovery path raises the goodput of two-user cells by 5.6\% at a fixed MCS
-and by 11-40\% under closed-loop rate control on a high-correlation channel. \sys loses at most 0.4\% of the
+and by 11-40\% under closed-loop rate control on a high-correlation channel. \sys loses at most 0.5\% of the
 goodput in 42 settings, where the other policies
 lose up to 8.2\%.
 
@@ -1175,8 +1175,9 @@ recovery costs little there: the shares lose at most 0.9\% and 0.7\%, and \sys a
 the urban micro channel the conventional receiver fails 1.5\% of the TBs at the lowest MCS; we use a 3\%
 target, at which the outer loop stays at the lowest MCS. Across the three channels the gain of the recovery
 path and the goodput that a share pays move together: 11-40\% and up to 8.2\%, 4-9\% and up to 0.9\%, and
-1-5\% and up to 0.7\%. With the 21 settings above, \sys loses at most 0.4\% of the goodput in 42 settings with
-one configuration; two measurements exceed 0.3\%, both with eight two-user cells (0.32\% and 0.34\%). We
+1-5\% and up to 0.7\%. With the 21 settings above, \sys loses at most 0.5\% of the goodput in 42 settings with
+one configuration, and at most 0.3\% in 41 of them (eight two-user cells at the 3\% target give 0.20\% and
+0.32\% in two measurements). We
 measured the setting with the largest loss, eight two-user cells at the 1\% target, in five campaigns with nine
 seeds: the 16 runs give 0.36\% on average with a standard error of 0.08 points, and 0.0-0.7\% by campaign. The
 30\% share loses 2.25\% in its 14 runs of this setting, 6.3$\times$ as much, and serves less AI than \sys.
@@ -1782,7 +1783,7 @@ TBs pass the layer-1 deadline as rarely as those of the server without AI. It tu
 the GPU time that is safe for AI into served tokens, 1.9-6.4$\times$ the existing mechanisms that keep the
 recoveries. With an outer-loop
 rate controller, lost recoveries lower the MCS: the cost in goodput reaches 2.5\% at a 10\% retransmission
-target and 8\% at a 1\% target with a neural receiver demand near the capacity. \sys loses at most 0.4\% of
+target and 8\% at a 1\% target with a neural receiver demand near the capacity. \sys loses at most 0.5\% of
 the goodput in 42 settings with one configuration, which include three channels and a continuously changing
 SNR, and no fixed or low-priority GPU share does.
 

@@ -193,6 +193,8 @@ for step in $steps; do
                  # its SMs with the neural receiver (jobs JS, seed 1 in the first and seed 2 in the second; runs of 100 s in
                  # job JSL); v22_slice2.sh: the neural receivers run on the other SMs (job JT; runs of 100 s in job JTL).
       JS=${JS:-59472374,59478477}; JSL=${JSL:-59478477}; JT=${JT:-59478478}; JTL=${JTL:-59478478}
+      # eight two-user cells at the 1% target with seeds 4-9 (la_cl4.sh lec; job JE): the rule, no AI, the 30% share
+      $PY analyze_la_closed.py ../../$R/la_closed_lec.json ${JE:-59482496} lec 16 > ../../$R/la_closed_lec.txt 2>&1
       for tag in lsa lsb lsc; do
         $PY analyze_la_closed.py ../../$R/la_closed_$tag.json $JS $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
       done

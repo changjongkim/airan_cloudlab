@@ -18,7 +18,7 @@ AI-RAN 서버가 GPU를 나누는 목적은 무선이 남기는 GPU 시간을 AI
 
 | 단계 | 무엇이 | Antiphase | 비교 | 절 |
 |---|---|---|---|---|
-| **1. 무선을 지키는가** | 무선 처리량 | rate control이 MCS를 고르는 마흔두 조건(Es/No 일곱 값, 채널 셋, 계단과 연속으로 변하는 채널, 섞인 채널) 모두에서 2-UE 셀의 goodput 손실이 **0.4% 이하**다(0.3%를 넘는 것은 2-UE 셀이 8개인 두 측정 0.32%와 0.34%뿐이다). 손실이 가장 큰 조건(2-UE 셀 8개·목표 1%)은 네 번 쟀고 측정별로 0.0–0.7%, 실행 10개의 평균은 0.28%다(6.13.10절). 설정은 하나다 | GPU 비율 방식은 조건에 따라 잃는다: 고정 10% 최대 1.1%, 낮은 우선순위 + 30% 최대 2.3%, 한도 없음 최대 8.2%. 2-UE 셀 8개에서는 한도를 10%로 내려도 0.8–0.9%를 잃는다. **모든 조건을 지키는 한도 값이 없다** | 6.13 |
+| **1. 무선을 지키는가** | 무선 처리량 | rate control이 MCS를 고르는 마흔두 조건(Es/No 일곱 값, 채널 셋, 계단과 연속으로 변하는 채널, 섞인 채널) 모두에서 2-UE 셀의 goodput 손실이 **0.4% 이하**다(0.3%를 넘는 것은 2-UE 셀이 8개인 두 측정 0.32%와 0.34%뿐이다). 손실이 가장 큰 조건(2-UE 셀 8개·목표 1%)은 시드 아홉 개, 실행 16개로 쟀다: 평균 0.36%(표준오차 0.08%p), 측정별 0.0–0.7%. 같은 조건에서 낮은 우선순위 + 30%는 2.25%를 잃는다(실행 14개, Antiphase의 6.3배; 6.13.10절). 설정은 하나다 | GPU 비율 방식은 조건에 따라 잃는다: 고정 10% 최대 1.1%, 낮은 우선순위 + 30% 최대 2.3%, 한도 없음 최대 8.2%. 2-UE 셀 8개에서는 한도를 10%로 내려도 0.8–0.9%를 잃는다. **모든 조건을 지키는 한도 값이 없다** | 6.13 |
 | | L1 지연 | AI를 넣어도 L1 복호 지연(p99.9)이 **0.04–0.06 ms** 는다 (정상 상태) | 비율 방식은 0.14–0.87 ms 늘린다. **2.8–21배** | 6.0.1 |
 | | L1 마감 | 실행 시작 구간이 지난 뒤 L1 마감을 넘는 TB가 **AI 없는 서버와 같다**: 16셀 3 / 320만, GPU 1장 0 / 80만, 20셀 3 / 230만, 48셀 17 / 192만 | AI 없는 서버 0, 0, 2, 17개. 고정 10%는 GPU 1장에서 46개, 낮은 우선순위 + 30%는 21개, 한도 없음은 16셀에서 174개 | 6.0.2 |
 | | NRx와 복구 | NRx 실행 시간이 **0.07–0.09 ms** 늘고 복구를 **99.9%** 유지한다 | 비율 방식은 NRx를 0.44–1.71 ms 늦춘다(**5.2–19배**). 부하가 바뀌면 추정기 방식은 복구를 2.2–4.7% 잃는다 | 6.0.1, 6.5 |
@@ -1893,7 +1893,27 @@ A100의 SM은 108개다. AI 단위(Qwen2.5-1.5B의 layer 단위)가 조각에 �
 - **NRx를 80 SM에 두면 AI는 1.1–1.6배가 되고 goodput은 0.5–3.3%를 낸다.** 조각의 SM을 AI만 쓰므로 AI는 더 빨라지지만 NRx는 SM 26%를 잃는다.
 - **같은 손실에서는 낮은 우선순위 + 70%가 AI를 더 처리한다**(25.7k / −0.7% 대 18.0k / −0.5%, 41.9k / −0.8% 대 36.5k / −0.9%, 34.0k / −3.6% 대 25.7k / −3.3%). SM을 갈라 주는 것이 MPS 비율보다 나은 맞교환이 아니다.
 - **green context만 쓰는 세 기준선은 아홉 경우 모두 Antiphase보다 goodput을 더 잃는다**(0.2–3.3% 대 같은 job의 Antiphase −0.1 ~ 0.7%). AI는 Antiphase의 0.4–1.1배다: NRx가 적게 도는 조건(목표 1%, 2-UE 셀 4개)에서는 13.2k–15.6k로 Antiphase 33.5k의 절반이 안 된다. AI가 GPU의 26%에 묶여 있기 때문이다.
-- 2-UE 셀 8개·목표 1%의 Antiphase가 이 job에서 −0.7%다. 이 조건은 실행마다 기준(AI 없는 서버)과 Antiphase가 각각 ±0.2%쯤 움직인다. 같은 조건을 네 번의 측정에서 실행 10개로 쟀고, 실행별 차이는 +0.25%에서 −0.80%, 측정별 평균은 −0.34%(6.13.3절), −0.10%(6.13.7절), −0.01%(결과 1), −0.70%(결과 2), 실행 10개의 평균은 −0.28%다. 같은 job 안의 방식 간 비교는 기준이 같아서 이 편차의 영향을 받지 않는다(조각 28·NRx 분리는 같은 job의 Antiphase보다 2.6%p 더 잃는다).
+- 2-UE 셀 8개·목표 1%의 Antiphase가 이 job에서 −0.7%다. 이 조건은 실행마다 기준(AI 없는 서버)과 Antiphase가 각각 ±0.2%쯤 움직인다. 같은 job 안의 방식 간 비교는 기준이 같아서 이 편차의 영향을 받지 않는다(조각 28·NRx 분리는 같은 job의 Antiphase보다 2.6%p 더 잃는다). 이 조건의 값은 아래에서 시드를 늘려 다시 쟀다.
+
+**2-UE 셀 8개·목표 1%를 시드 아홉 개로.** 이 조건은 42개 조건 가운데 Antiphase의 손실이 가장 큰 조건이다(NRx 수요가 용량에 가깝다). 시드 1–3을 네 번의 측정에서 실행 10개로 쟀고, 새 시드 여섯 개(4–9)를 한 job에서 더 쟀다(job 59482496, `la_cl4.sh lec`).
+
+| 측정 | 시드 | Antiphase의 goodput (AI 없는 서버 대비, 실행별) | 평균 |
+|---|---|---|---|
+| 6.13.3절 | 1–3 | −0.09, −0.20, −0.74% | −0.34% |
+| 6.13.7절 | 1–3 | +0.12, −0.22, −0.20% | −0.10% |
+| 결과 1의 job | 1–2 | −0.28, +0.25% | −0.01% |
+| 결과 2의 job | 1–2 | −0.80, −0.59% | −0.70% |
+| 새 시드 | 4–9 | −0.36, −0.36, −0.30, −0.77, −0.63, −0.51% | −0.49% |
+| **전체** | 아홉 개, 실행 16개 | +0.25 ~ −0.80% | **−0.36%** (표준오차 0.08%p) |
+
+| 새 시드 여섯 개 (4–9) | AI 처리량 | goodput (실행별 범위) | 복구 |
+|---|---|---|---|
+| **Antiphase** | **16.1k** | **−0.49%** (−0.30 ~ −0.77%) | −2.6% |
+| 낮은 우선순위 + 30% | 13.8k | −2.38% (−2.17 ~ −2.62%) | −12.6% |
+
+- **이 조건에서 Antiphase의 손실은 0.36%다**(실행 16개의 평균, 표준오차 0.08%p). 측정 하나(시드 2–6개)의 평균은 0.0%에서 0.7%까지 나온다. 6.13.3절의 표에 적은 0.34%는 첫 측정의 값이다.
+- **낮은 우선순위 + 30%는 같은 조건에서 2.25%를 잃는다**(실행 14개, 실행별 1.72–2.67%). Antiphase의 6.3배이고, AI는 Antiphase보다 적다(13.8k 대 16.1k). 실행별 범위가 겹치지 않는다.
+- NRx 수요가 용량에 가까우면 Antiphase도 복구를 2–3% 잃는다. AI 조각이 멈춘 뒤 돌던 단위가 끝날 때까지 NRx가 0.1–0.2 ms 길어지기 때문이다(NRx 실행 중앙값 6.40 → 6.57 ms). 다른 41개 조건의 손실은 0.3% 이하다(2-UE 셀 8개·목표 3%는 두 측정에서 0.20%와 0.32%).
 
 **전 부하, 고정 MCS (16셀, 10초, 시드 2).** rate control이 없는 조건이다. 칸은 "AI 처리량 / AI 없는 서버 대비 복구".
 
@@ -2377,7 +2397,8 @@ JC=J JD=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh cont    # 
 $R bash $C/v21_slice.sh cal                                       # AI 단위가 조각(12·16·28 SM)에서 걸리는 시간 -> slice_units_j<job>.txt
 $R bash $C/v21_slice.sh cl "1 2"; $R bash $C/v21_slice.sh fa "1 2"; $R bash $C/v21_slice.sh long "1 2 3"      # NRx가 SM 전부를 쓸 때
 $R bash $C/v22_slice2.sh cl "1 2"; POLS="n wm gn28 gd28" $R bash $C/v22_slice2.sh long "1 2 3"                # NRx를 조각 밖에 둘 때
-JS=J1,J2 JSL=J JT=J JTL=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh slice   # -> la_closed_l{s,t}?.txt, slice_time.txt, l1_levels_slice*.txt, eval_slice.png
+WEAK=0.5 $R bash $C/la_cl4.sh lec 0.01 "4 5 6 7 8 9" "n wm p30"                                              # 2-UE 셀 8개·목표 1%의 시드 4–9
+JS=J1,J2 JSL=J JT=J JTL=J JE=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh slice   # -> la_closed_l{s,t}?.txt, slice_time.txt, l1_levels_slice*.txt, eval_slice.png
 # 여러 단계를 차례로 돌리려면 campaigns/queue/runner.sh를 쓴다 (todo에 "N|이름|분|명령"을 적고 nohup setsid로 띄움; 한 번에 하나만 돈다)
 JF=J bash scripts_for_node/backstop_slot/campaigns/v14_report.sh frontier   # 한도를 바꿔 가며 본 goodput과 AI (6.13.7절; $R bash $C/v17_frontier.sh "1 2 3"의 job) -> frontier_closed.txt, eval_frontier.png
 JL=J1,J2 bash scripts_for_node/backstop_slot/campaigns/v14_report.sh levels   # 세 단계(기존 수신기만 / + NRx / + AI)의 L1 지연 -> l1_levels.txt, 닫힌 루프 조건에서 NRx가 도는 시간 -> optimum_gap_closed.txt (6.0.1, 6.13.6절; JL은 닫힌 루프 실행의 job)
@@ -2477,7 +2498,7 @@ cd paper/backstop_slot_v14 && bash figures.sh && module load texlive/2024 && lat
 | 6.13.6 | `results/backstop_slot/optimum_gap_closed.json`, `optimum_gap_closed.txt` (닫힌 루프 조건에서 NRx가 도는 시간과 상한) |
 | 6.13.7 | `results/backstop_slot/la_closed_{lfa,lfb,lfc,lfd}.json`, `.txt`, `frontier_closed.json`, `frontier_closed.txt` (`analyze_frontier.py`) |
 | 6.13.9 | `results/backstop_slot/la_closed_{lxa,lxb,lxc}.json`(느린 변화), `{lya,lyb,lyc}`(빠른 변화), `{lza,lzb,lzc}`(무작위 변화), `{lma,lmb,lmc}`(섞인 채널), `{lpa,lpb,lpc}`·`{lqa,lqb,lqc}`(상관 낮은 채널 4.5·7.5 dB), `{lua,lub,luc}`(UMi), `la_closed_lgw.json`·`l1_levels_long_low.txt`(상관 낮은 채널 100초), `la_track.txt`(Es/No 추종; `analyze_la_track.py`) |
-| 6.13.10 | `results/backstop_slot/la_closed_{lsa,lsb,lsc,lsg}.json`(SM 조각, NRx는 SM 전부), `la_closed_{lta,ltb,ltc,ltg}.json`(NRx는 조각 밖), `slice_time.txt`·`slice_time_{s1,s2,off}.json`(GPU 시간과 NRx 실행 시간; `analyze_slice.py`), `l1_levels_slice.txt`, `l1_levels_slice_off.txt`, `slice_units_j59472374.txt`(조각에서의 AI 단위 시간), `gc_probe_j59473418.txt`(노드 탐침) |
+| 6.13.10 | `results/backstop_slot/la_closed_{lsa,lsb,lsc,lsg}.json`(SM 조각, NRx는 SM 전부), `la_closed_{lta,ltb,ltc,ltg}.json`(NRx는 조각 밖), `la_closed_lec.json`(2-UE 셀 8개·목표 1%의 시드 4–9), `slice_time.txt`·`slice_time_{s1,s2,off}.json`(GPU 시간과 NRx 실행 시간; `analyze_slice.py`), `l1_levels_slice.txt`, `l1_levels_slice_off.txt`, `slice_units_j59472374.txt`(조각에서의 AI 단위 시간), `gc_probe_j59473418.txt`(노드 탐침) |
 | 6.13.8 | `results/backstop_slot/la_closed_{lva,lvb,lvc}.json`(변하는 Es/No), `la_closed_{lha,lhb,lhc}.json`(14 dB), `la_closed_{lja,ljb,ljc}.json`(20 dB), `la_closed_{lwa,lwb,lwc}.json`(상관 낮은 채널), `.txt`, `l1_levels_esno.txt`, `optimum_gap_esno.txt` |
 | 6.13 | `results/backstop_slot/la_closed_<tag>.json`, `.txt` (tag: `laa` 목표 10%, `lac` 3%, `lab` 1%, `lae` `lah` `lad` GPU 2장의 10% / 3% / 1%, `lag` GPU 1장 1%, `lai` `laf` 2-UE 셀 8개의 3% / 1%, `lal` `lak` 계단 0.5의 목표 10% / 2-UE 셀 8개 1%; job 59345188, 59362400). 단계별 수신기 비교는 `raw/lacl_high16_m<MCS>.json`(저장소에 없음, 6.13.1절의 표가 그 값) |
 | 6.14 | `results/backstop_slot/sweep_<tag>_c<셀>_j59192512_59199237.json`, `v13_report_j59192512_59199237.md` |

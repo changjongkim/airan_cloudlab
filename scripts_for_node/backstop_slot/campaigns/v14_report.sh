@@ -166,15 +166,15 @@ for step in $steps; do
     cont)        # README 6.13.9: an Es/No that changes from slot to slot (v20_cont.sh slow / walk / fast; jobs JC), the
                  # low-correlation channel in runs of 100 s and two-user cells of two channels on one server (jobs JD).
                  # SEEDS_SLOW / SEEDS_WALK / SEEDS_FAST keep those seeds while later seeds are still running.
-      JC=${JC:-59465023}; JD=${JD:-59466250}
+      JC=${JC:-59465023,59472374}; JD=${JD:-59466250,59473418}
       for spec in lxa:SLOW lxb:SLOW lxc:SLOW lza:WALK lzb:WALK lzc:WALK lya:FAST lyb:FAST lyc:FAST; do
-        tag=${spec%%:*}; var=SEEDS_${spec#*:}
-        ${PY/python3/--env=SEEDS=${!var:-} python3} analyze_la_closed.py ../../$R/la_closed_$tag.json $JC $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+        tag=${spec%%:*}; var=SEEDS_${spec#*:}; pick="${!var:+--env=SEEDS=${!var} }"      # shifter rejects an empty value
+        ${PY/python3/${pick}python3} analyze_la_closed.py ../../$R/la_closed_$tag.json $JC $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
       done
       $PY analyze_la_track.py ../../$R/la_track.json $JC "lxa:16:Slow change (period 5.12 s), target 10%" "lxb:16:Slow change, target 1%" \
         "lya:16:Fast change (period 1.28 s), target 10%" "lyb:16:Fast change, target 1%" "lza:16:Random change, target 10%" \
         "lzb:16:Random change, target 1%" > ../../$R/la_track.txt 2>&1
-      for tag in lgw lma lmb lmc; do
+      for tag in lgw lma lmb lmc lpa lpb lpc lqa lqb lqc; do      # lp?: low-correlation channel at 4.5 dB, lq?: at 7.5 dB
         $PY analyze_la_closed.py ../../$R/la_closed_$tag.json $JD $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
       done
       ${PY/python3/--env=SKIP=8000 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_long_low.json $JD \

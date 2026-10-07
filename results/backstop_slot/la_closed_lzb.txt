@@ -2,11 +2,11 @@ closed-loop link adaptation, target 1% of the TBs needing a retransmission; two-
 
 | policy | seeds | mean MCS | first-transmission errors | TBs needing a retransmission | goodput per user slot | vs no recovery path | vs recovery path without AI | slots with a candidate | candidates without a NeuralRx | NeuralRx ended late | recovered TBs/s (vs recovery path without AI) | AI served (tokens/s) | L1 late |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| No recovery path | 1 | 10.00 | 1.7% | 1.7% | 51.3k | +0.0% | -21.9% | 3.3% | 100.0% | 0.0% | 0 (-100.0%) | 0.0k | 0.003% |
-| Recovery path, no AI | 1 | 11.88 | 7.4% | 1.0% | 65.7k | +28.0% | +0.0% | 13.1% | 1.0% | 0.0% | 205 (+0.0%) | 0.0k | 0.003% |
-| Rule (stoppable pieces, no AI next to NeuralRx) | 1 | 11.86 | 7.3% | 1.0% | 65.5k | +27.7% | -0.2% | 12.9% | 1.1% | 0.0% | 202 (-1.5%) | 36.0k | 0.006% |
-| Fixed 10% | 1 | 11.86 | 7.3% | 1.0% | 65.5k | +27.6% | -0.3% | 12.8% | 1.2% | 0.0% | 200 (-2.4%) | 5.7k | 0.002% |
-| Fixed 30% + low priority | 1 | 11.84 | 7.1% | 1.0% | 65.3k | +27.3% | -0.5% | 12.6% | 1.7% | 0.0% | 196 (-4.1%) | 18.5k | 0.003% |
-| Fixed 50% + low priority | 1 | 11.81 | 6.9% | 1.0% | 65.1k | +26.8% | -0.9% | 12.3% | 3.0% | 0.0% | 190 (-7.2%) | 34.3k | 0.001% |
-| Fixed 70% + low priority | 1 | 11.81 | 7.0% | 1.0% | 65.0k | +26.7% | -1.0% | 12.3% | 2.8% | 0.1% | 190 (-7.0%) | 43.8k | 0.008% |
-| Low priority, no cap | 1 | 11.77 | 6.6% | 1.0% | 64.7k | +26.0% | -1.5% | 11.8% | 2.4% | 1.8% | 180 (-11.9%) | 49.6k | 0.014% |
+| No recovery path | 3 | 10.00 | 1.7% | 1.7% | 51.3k | +0.0% | -21.8% | 3.3% | 100.0% | 0.0% | 0 (-100.0%) | 0.0k | 0.002% |
+| Recovery path, no AI | 3 | 11.88 | 7.3% | 1.0% | 65.6k | +27.9% | +0.0% | 13.0% | 1.0% | 0.0% | 203 (+0.0%) | 0.0k | 0.004% |
+| Rule (stoppable pieces, no AI next to NeuralRx) | 3 | 11.87 | 7.3% | 1.0% | 65.5k | +27.7% | -0.1% | 12.9% | 1.1% | 0.0% | 200 (-1.2%) | 36.4k | 0.004% |
+| Fixed 10% | 3 | 11.86 | 7.3% | 1.0% | 65.5k | +27.6% | -0.2% | 12.8% | 1.2% | 0.0% | 200 (-1.4%) | 5.7k | 0.003% |
+| Fixed 30% + low priority | 3 | 11.85 | 7.1% | 1.0% | 65.4k | +27.4% | -0.4% | 12.6% | 1.7% | 0.0% | 196 (-3.2%) | 18.7k | 0.005% |
+| Fixed 50% + low priority | 3 | 11.82 | 7.0% | 1.0% | 65.1k | +26.8% | -0.8% | 12.3% | 2.7% | 0.0% | 191 (-6.0%) | 34.9k | 0.004% |
+| Fixed 70% + low priority | 3 | 11.81 | 6.9% | 1.0% | 65.0k | +26.6% | -1.0% | 12.2% | 2.7% | 0.1% | 188 (-7.5%) | 44.3k | 0.005% |
+| Low priority, no cap | 3 | 11.77 | 6.6% | 1.0% | 64.6k | +25.9% | -1.5% | 11.7% | 2.5% | 1.7% | 178 (-12.0%) | 50.0k | 0.013% |

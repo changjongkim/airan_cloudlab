@@ -1,0 +1,11 @@
+## Target 10%, runs of 100 s, AI always on 28 SMs  (single-user cells, periods from 8000)
+
+| level | TBs | median | 99th | 99.9th | room to the deadline at the 99.9th | 99.99th | TBs past the deadline |
+|---|---|---|---|---|---|---|---|
+| + neural receiver, no AI | 1152000 | 2.10 | 2.95 | 3.09 | 0.91 ms | 3.21 | 0 |
+| + AI, rule | 1152000 | 2.06 | 2.99 | 3.13 | 0.87 ms | 3.25 | 0 |
+| + AI, gd28 | 1152000 | 1.95 | 2.73 | 2.84 | 1.16 ms | 2.94 | 0 |
+| + AI, gn28 | 1152000 | 2.37 | 3.44 | 3.66 | 0.34 ms | 3.85 | 34 |
+
+at the 99.9th percentile: wm adds +0.04 ms, gd28 adds -0.25 ms, gn28 adds +0.56 ms
+

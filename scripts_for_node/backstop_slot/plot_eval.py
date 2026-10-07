@@ -11,6 +11,8 @@ usage:
                                                              the AI requests (SCHED.json: output of analyze_sched.py)
   plot_eval.py frontier OUT "TITLE=LA_CLOSED.json" ...       AI served against goodput lost with a rate controller in the
                                                              loop: settings of the scheme and caps of the low-priority baseline
+  plot_eval.py slice    OUT RESULTS_DIR                      AI on a slice of the SMs (CUDA green context): goodput lost against
+                                                             the run time of the neural receiver and against the AI served
 Sweep files are the output of analyze_sweep.py.  The scheme is policy code OUR_V14 (default wm); in the sweeps
 with more than four cells per GPU it is wd.  Names of the baselines:
   Static               fixed 10% MPS share
@@ -349,6 +351,71 @@ def frontier(out: str, items: list[str]) -> None:
     fig.savefig(out, dpi=200)
 
 
+def slice_option(out: str, results: str) -> None:
+    """AI on a slice of the SMs of a GPU (v21_slice.sh, v22_slice2.sh): goodput lost against the median run of the
+    neural receiver (top) and against the AI served (bottom), one column per condition."""
+    R = Path(results)
+    load = lambda name: json.loads((R / name).read_text())
+    times = [load("slice_time_s1.json"), load("slice_time_s2.json"), load("slice_time_off.json")]
+    blue, orange = POLICIES[NAME][1], POLICIES["Priority"][1]
+    purple, red, gray = "#9467bd", "#d62728", "#555555"
+    # family -> (policy codes, color, marker, size, labels next to the points, offset of a label in points);
+    # a slice of more SMs has a larger marker
+    by_sms = {"12": 5.5, "16": 8.0, "28": 11.0}
+    families = [("rule", ["wm"], blue, "o", 13, None, None),
+                ("shared", ["ws12", "ws16", "ws28"], purple, "D", by_sms, None, None),
+                ("apart", ["wd16", "wd28"], red, "D", by_sms, None, None),
+                ("always", ["g28", "gn28", "gd28"], gray, "^", 9, None, None),
+                ("share", ["p30", "p70"], orange, "s", 8, lambda c: c[1:], (9, 6))]
+    conditions = [("4 Two-User Cells\nTarget 10%", "lsa", "lta"), ("4 Two-User Cells\nTarget 1%", "lsb", "ltb"),
+                  ("8 Two-User Cells\nTarget 1%", "lsc", "ltc")]
+    fig, axes = plt.subplots(2, 3, figsize=(10.6, 6.7), squeeze=False)
+    for col, (title, shared_tag, apart_tag) in enumerate(conditions):
+        points = []                    # (family index, code, neural receiver run ms, AI k tokens/s, goodput lost %)
+        for tag in (shared_tag, apart_tag):
+            rows = load(f"la_closed_{tag}.json")["policies"]
+            for k, (_, codes, *_rest) in enumerate(families):
+                for code in codes:
+                    if code not in rows:
+                        continue
+                    runs = [r["nrx_run_ms"]["p50"] for t in times for r in t.get(tag, {}).get("r32" + code, {}).values()]
+                    points.append((k, code, sum(runs) / len(runs), rows[code]["ai_slo"] / 1e3, -rows[code]["vs_recovery_no_ai_pct"]))
+        for row, pick_x in ((0, lambda q: q[2]), (1, lambda q: q[3])):
+            ax = axes[row][col]
+            ax.axhline(0.0, color="#666666", linewidth=0.8, zorder=1)
+            for k, (_, codes, color, marker, size, label, offset) in enumerate(families):
+                mine = [q for q in points if q[0] == k]
+                for q in mine:
+                    ax.plot([pick_x(q)], [q[4]], color=color, marker=marker, linestyle="", markeredgecolor="white",
+                            markersize=size[q[1][2:]] if isinstance(size, dict) else size, zorder=5 if k == 0 else 3)
+                for q in mine:
+                    if label:
+                        ax.annotate(label(q[1]), (pick_x(q), q[4]), textcoords="offset points", xytext=offset, ha="center",
+                                    va="center", fontsize=FS - 2.5, color=color, fontweight="normal")
+            ys = [q[4] for q in points]
+            ax.set_ylim(min(-0.35, min(ys) - 0.25), max(1.2, max(ys) * 1.22))
+            if row == 0:
+                ax.axvline(7.5, color="#666666", linewidth=1.0, linestyle=(0, (4, 3)), zorder=1)
+                ax.set_xlim(6.2, 8.05)
+                if col == 0:
+                    ax.annotate("3 Uplink Periods", (7.5, ax.get_ylim()[1]), textcoords="offset points", xytext=(-5, -4),
+                                ha="right", va="top", fontsize=FS - 2.5, color="#444444", fontweight="normal")
+                ax.set_title(title.replace("\\n", "\n"), fontsize=FS, color=INK)
+                style(ax, "Goodput Lost (%)" if col == 0 else "", "NeuralRx Run (ms, Median)")
+            else:
+                ax.set_xlim(0, max(q[3] for q in points) * 1.12)
+                style(ax, "Goodput Lost (%)" if col == 0 else "", "AI Served (k tokens/s)")
+            ax.grid(axis="x", color="#bbbbbb", linewidth=0.6, linestyle=(0, (4, 3)))
+    handles = [plt.Line2D([], [], color=c, marker=m, markersize=8 if isinstance(z, dict) else min(z, 10), linestyle="",
+                          markeredgecolor="white") for _, _, c, m, z, _, _ in families]
+    labels = [NAME, f"{NAME} + AI on 12 / 16 / 28 SMs During NeuralRx (Small to Large)",
+              "The Same on 16 / 28 SMs, NeuralRx on the Other SMs", "AI Always on 28 SMs", "Priority, Cap 30% and 70%"]
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False, fontsize=FS - 0.5,
+               handlelength=1.4, columnspacing=1.4)
+    fig.tight_layout(rect=(0, 0, 1, 0.88))
+    fig.savefig(out, dpi=200)
+
+
 def main() -> None:
     mode, out = sys.argv[1], sys.argv[2]
     if mode == "headline":
@@ -365,6 +432,8 @@ def main() -> None:
         protect(out, sys.argv[3:])
     elif mode == "frontier":
         frontier(out, sys.argv[3:])
+    elif mode == "slice":
+        slice_option(out, sys.argv[3])
 
 
 if __name__ == "__main__":

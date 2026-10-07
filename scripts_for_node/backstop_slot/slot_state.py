@@ -60,6 +60,7 @@ A_CHATS_DONE = 17          # AI worker (classes5): responses finished or given u
 A_BACKLOG_T1 = 18          # AI worker (classes5): backlog of work with a time limit up to 100 ms (ns of unit bounds)
 A_BACKLOG_T2 = 19          # AI worker (classes5): the same, time limit up to 250 ms
 A_RATE_T1 = 20             # AI worker (classes5): service rate for work with a time limit up to 100 ms
+A_SLICE = 21               # controller: 1 = the granted piece runs on the SM slice of the GPU (ai.slice_sms), 0 = on the whole GPU
 MAX_REQUESTS = 16384       # global AI request table (dispatch mode)
 REQ_WORDS = 4
 R_ARRIVAL, R_LENGTH, R_GPU, R_SEQ = 0, 1, 2, 3   # R_GPU: -1 waiting, -2 rejected, else GPU

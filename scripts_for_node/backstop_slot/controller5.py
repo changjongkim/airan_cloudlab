@@ -85,7 +85,7 @@ from pathlib import Path
 from slot_state import (
     A_BUDGET_NS, A_CUR_CHUNK, A_DONE_SEQ, A_GRANT_SEQ, A_HAS_WORK, A_MAX_CHUNK, A_NOT_AFTER, A_RUNNING,
     C_CONV_CBFAIL, C_CONV_STATUS, C_NRX_REASON, C_NRX_START, DROPPED, FAIL, H_ABORT,
-    A_BACKLOG_TOKENS, A_DYN_ACTIVE, A_PULLED, A_RATE_TPS, A_STOP, R_ARRIVAL, R_GPU, R_LENGTH, R_SEQ,
+    A_BACKLOG_TOKENS, A_DYN_ACTIVE, A_PULLED, A_RATE_TPS, A_SLICE, A_STOP, R_ARRIVAL, R_GPU, R_LENGTH, R_SEQ,
     L_ASSIGN_SEQ, L_CELL, L_DONE_SEQ, L_PERIOD, PASS, PENDING, REASON_ARRIVAL,
     REASON_CONV_FAIL, REASON_LATEST_START, REASON_LOW_VALUE, SKIPPED, SlotState, now_ns,
 )
@@ -274,9 +274,19 @@ def main() -> None:
     def busy_lanes(g: int) -> list[int]:
         return [lane for lane in gpu_lanes.get(g, []) if not lane_free(lane)]
 
-    def grant(g: int, budget: int, now: int, max_chunk: int = 0) -> None:
+    # SM slice (``ai.slice_sms`` > 0, an option; 0 keeps the rule as it is): while the neural receiver of a GPU
+    # runs, the AI of that GPU is not stopped but moved to a few SMs of the GPU (a CUDA green context of the AI
+    # worker).  A piece on the slice has no radio deadline to respect; it ends when the whole GPU is free for AI
+    # again, and no AI runs while a candidate waits for a neural receiver.
+    slice_on = int(config.get("ai", {}).get("slice_sms", 0)) > 0 and not config.get("ai", {}).get("slice_always")
+    slice_budget = int(float(config.get("ai", {}).get("slice_piece_ms", 20.0)) * ms)
+    on_slice = {g: 0 for g in range(gpus)}
+
+    def grant(g: int, budget: int, now: int, max_chunk: int = 0, slice_mode: int = 0) -> None:
         box = state.gpus[g]
         box[A_MAX_CHUNK] = max_chunk
+        box[A_SLICE] = slice_mode
+        on_slice[g] = slice_mode
         box[A_STOP] = 0
         granted_chunk[g] = max_chunk
         box[A_BUDGET_NS] = budget
@@ -577,7 +587,9 @@ def main() -> None:
                     if int(box[A_DONE_SEQ]) == grant_seq[g] or int(box[A_STOP]):
                         continue
                     stop = nrx_waiting
-                    if not stop and busy_lanes(g):
+                    if on_slice[g]:
+                        stop = stop or not busy_lanes(g)          # the neural receiver has ended: back to the whole GPU
+                    elif not stop and busy_lanes(g):
                         c = granted_chunk[g] or min(corun_by_chunk)
                         if reuse_rule:
                             stop = nrx_room_of(g, c, loop_start, lanes_free) <= 0
@@ -602,6 +614,10 @@ def main() -> None:
                     break
                 box = state.gpus[g]
                 if int(box[A_DONE_SEQ]) != grant_seq[g] or not int(box[A_HAS_WORK]):
+                    continue
+                if slice_on and busy_lanes(g):
+                    grant(g, slice_budget, now_ns(), 0, 1)        # the neural receiver of this GPU runs: AI on the slice
+                    counters["slice_grants"] = counters.get("slice_grants", 0) + 1
                     continue
                 if not reuse_rule and lane_reserve and lanes_free < lane_reserve and busy_lanes(g):
                     counters["reserve_blocked"] += 1

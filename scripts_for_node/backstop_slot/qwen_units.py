@@ -115,6 +115,31 @@ class QwenUnits:
                 self.graphs[key] = graph
         self.stream.synchronize()
 
+    def add_slice(self, sms: int) -> int:
+        """A second way to run the same units: on ``sms`` SMs of the GPU, in a CUDA green context.
+
+        The unit bodies and their buffers are the same; the graphs are captured once more on a stream of the green
+        context (a graph or a torch stream of the primary context is not confined to the SMs).  Call before the
+        first request.  Returns the number of SMs of the slice."""
+        import greenctx
+        dev, primary, res = greenctx.init(self.device.index)
+        green, ctx, got, _ = greenctx.green(dev, res, sms)
+        full = (self.stream, self.graphs)
+        greenctx.use(ctx)
+        self.stream = torch.cuda.ExternalStream(greenctx.green_stream(green), device=self.device)
+        self.graphs = {}
+        self._capture()
+        self._modes = {0: (primary,) + full, 1: (ctx, self.stream, self.graphs)}
+        self._greenctx = greenctx
+        self.set_mode(0)
+        return got
+
+    def set_mode(self, mode: int) -> None:
+        """0: the whole GPU, 1: the slice.  Only while no unit of this runner is on the GPU."""
+        ctx, self.stream, self.graphs = self._modes[mode]
+        self._greenctx.use(ctx)
+        self.mode = mode
+
     def chunk_units(self, c: int) -> list[str]:
         return ["prep"] + [f"layer{i}" for i in range(self.layers)]
 

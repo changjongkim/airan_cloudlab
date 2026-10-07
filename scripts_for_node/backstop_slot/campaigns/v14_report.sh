@@ -11,7 +11,8 @@
 #   closed-loop runs at other Es/No, on the low-correlation channel and with a changing Es/No -> la_closed_l{v,h,j,w}?.txt,
 #   l1_levels_esno.txt, optimum_gap_esno.txt, eval_closed_vary.png; cont, an Es/No that changes from slot to slot, the
 #   low-correlation channel in runs of 100 s and mixed channels -> la_closed_l{x,y,z,m}?.txt, la_closed_lgw.txt, la_track.txt,
-#   l1_levels_long_low.txt, eval_closed_cont.png)
+#   l1_levels_long_low.txt, eval_closed_cont.png; slice, the SM slice option and the green-context baselines ->
+#   la_closed_l{s,t}?.txt, slice_time.txt, l1_levels_slice.txt, l1_levels_slice_off.txt, eval_slice.png)
 # The figures of the paper: paper/backstop_slot_v14/figures.sh.
 # Jobs: J1 seeds 1-2 of the headline conditions and the rule comparison, J2 kinds of AI work (baselines),
 # J3 seeds 3-5, other server sizes, link adaptation, the final rule (wm) in the headline conditions,
@@ -187,6 +188,28 @@ for step in $steps; do
       $E closed $F/eval_closed_cont.png "Slow Change\nTarget 10%=$R/la_closed_lxa.json" "Slow, 8 Cells\nTarget 1%=$R/la_closed_lxc.json" \
         "Random Change\nTarget 10%=$R/la_closed_lza.json" "Random, 8 Cells\nTarget 1%=$R/la_closed_lzc.json" \
         "Fast, 8 Cells\nTarget 1%=$R/la_closed_lyc.json" "Mixed Channels\n8 Cells, Target 1%=$R/la_closed_lmc.json"
+      cd $S ;;
+    slice)       # README 6.13.10: the SM slice option and the green-context baselines.  v21_slice.sh: the AI slice shares
+                 # its SMs with the neural receiver (jobs JS, seed 1 in the first and seed 2 in the second; runs of 100 s in
+                 # job JSL); v22_slice2.sh: the neural receivers run on the other SMs (job JT; runs of 100 s in job JTL).
+      JS=${JS:-59472374,59478477}; JSL=${JSL:-59478477}; JT=${JT:-59478478}; JTL=${JTL:-59478478}
+      for tag in lsa lsb lsc; do
+        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json $JS $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+      done
+      for tag in lta ltb ltc; do
+        $PY analyze_la_closed.py ../../$R/la_closed_$tag.json $JT $tag 16 > ../../$R/la_closed_$tag.txt 2>&1
+      done
+      $PY analyze_slice.py ../../$R/slice_time_s1.json ${JS%%,*} lsa,lsb,lsc 1 > ../../$R/slice_time.txt 2>&1
+      $PY analyze_slice.py ../../$R/slice_time_s2.json ${JS##*,} lsa,lsb,lsc 2 >> ../../$R/slice_time.txt 2>&1
+      $PY analyze_slice.py ../../$R/slice_time_off.json $JT lta,ltb,ltc 1,2 >> ../../$R/slice_time.txt 2>&1
+      $PY analyze_la_closed.py ../../$R/la_closed_lsg.json $JSL lsg 16 > ../../$R/la_closed_lsg.txt 2>&1
+      ${PY/python3/--env=SKIP=8000 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_slice.json $JSL \
+        "lsg:16:Target 10%, runs of 100 s, AI slice shared with the neural receiver" > ../../$R/l1_levels_slice.txt 2>&1
+      $PY analyze_la_closed.py ../../$R/la_closed_ltg.json $JTL ltg 16 > ../../$R/la_closed_ltg.txt 2>&1
+      ${PY/python3/--env=SKIP=8000 --env=LATE=1 python3} analyze_l1_levels.py ../../$R/l1_levels_slice_off.json $JTL \
+        "ltg:16:Target 10%, runs of 100 s, AI always on 28 SMs" > ../../$R/l1_levels_slice_off.txt 2>&1
+      cd ../..
+      ${PLOT/plot_v14.py/plot_eval.py} slice $F/eval_slice.png $R
       cd $S ;;
     levels)      # README 6.0.1: what the neural receiver and the AI each add to the layer-1 latency (single-user cells of the
                  # closed-loop runs, which include the server without a neural receiver), and README 6.13.6: the share of the

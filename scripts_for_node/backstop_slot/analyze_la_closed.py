@@ -39,6 +39,21 @@ NAMES = {"x": "No recovery path", "xp100": "No recovery path, low-priority AI", 
          "s10": "Fixed 10%", "s30": "Fixed 30%", "p30": "Fixed 30% + low priority", "p50": "Fixed 50% + low priority",
          "p70": "Fixed 70% + low priority", "p100": "Low priority, no cap"}
 ORDER = ("x", "xp100", "n", "wm", "wr3", "wr2", "wr1", "s10", "s30", "p30", "p50", "p70", "p100")
+# SM slice (v21_slice.sh, v22_slice2.sh): the policy code carries the SMs of the AI slice
+SLICE_NAMES = (("ws", "Rule + AI slice of {} SMs while the NeuralRx runs (NeuralRx on all SMs)"),
+               ("wd", "Rule + AI slice of {} SMs while the NeuralRx runs (NeuralRx on the other SMs)"),
+               ("gn", "AI always on {} SMs, normal priority (NeuralRx on all SMs)"),
+               ("gd", "Low-priority AI always on {} SMs (NeuralRx on the other SMs)"),
+               ("g", "Low-priority AI always on {} SMs (NeuralRx on all SMs)"))
+
+
+def name_of(policy: str) -> str:
+    if policy in NAMES:
+        return NAMES[policy]
+    for prefix, text in SLICE_NAMES:
+        if policy.startswith(prefix) and policy[len(prefix):].isdigit():
+            return text.format(policy[len(prefix):])
+    return policy
 
 
 def run_stats(path: Path) -> dict:
@@ -155,7 +170,7 @@ def main() -> None:
                    retx_by_seed=[by_seed[s]["retx_pct"] for s in seeds])
         out["policies"][policy] = row
         pct = lambda v: "–" if v != v else f"{v:+.1f}%"
-        print(f"| {NAMES.get(policy, policy)} | {len(seeds)} | {row['mean_mcs']:.2f} | {row['first_error_pct']:.1f}% | "
+        print(f"| {name_of(policy)} | {len(seeds)} | {row['mean_mcs']:.2f} | {row['first_error_pct']:.1f}% | "
               f"{row['retx_pct']:.1f}% | {row['goodput_bits'] / 1e3:.1f}k | {pct(versus['x'])} | {pct(versus['n'])} | "
               f"{row['nrx_demand_pct']:.1f}% | {row['lost_candidates_pct']:.1f}% | {row['late_candidates_pct']:.1f}% | "
               f"{row['recovered_per_s']:.0f} ({pct(kept)}) | "

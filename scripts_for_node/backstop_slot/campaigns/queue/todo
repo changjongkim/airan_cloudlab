@@ -11,5 +11,13 @@ N|fast_s2|50|bash run_state/backstop_slot/v20_cont.sh fast "2"
 N|walk_s3|75|bash run_state/backstop_slot/v20_cont.sh walk "3"
 N|gen_umi|70|bash run_state/backstop_slot/la_cl_gen.sh umi10 UMi 10 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
 N|umi|48|bash run_state/backstop_slot/v20_cont.sh umi
+L|install_slice|0|bash run_state/backstop_slot/queue/install_slice.sh
+N|slice_smoke|12|bash run_state/backstop_slot/v21_slice.sh smoke
+L|check_slice|0|bash run_state/backstop_slot/queue/check_slice.sh
+N|slice_cal|8|bash run_state/backstop_slot/v21_slice.sh cal
+N|slice_cl_s1|32|bash run_state/backstop_slot/v21_slice.sh cl "1"
+N|slice_fa|22|bash run_state/backstop_slot/v21_slice.sh fa "1 2"
+N|slice_cl_s2|32|bash run_state/backstop_slot/v21_slice.sh cl "2"
+N|slice_long|45|bash run_state/backstop_slot/v21_slice.sh long "1 2 3"
 L|release|0|j=$(cat run_state/backstop_slot/current_job); grep -qx "$j" run_state/backstop_slot/queue/jobs && scancel $j; echo released $j
 L|stop|0|touch run_state/backstop_slot/queue/STOP

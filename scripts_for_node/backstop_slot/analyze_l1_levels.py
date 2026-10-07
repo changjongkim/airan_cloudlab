@@ -70,9 +70,8 @@ def main() -> None:
         print("| level | TBs | median | 99th | 99.9th | room to the deadline at the 99.9th |" + (" 99.99th | TBs past the deadline |" if LATE else ""))
         print("|---|---|---|---|---|---|" + ("---|---|" if LATE else ""))
         rows = {}
-        for policy in ORDER:
-            if policy not in by:
-                continue
+        # policies outside ORDER (the SM slice of v21_slice.sh / v22_slice2.sh) follow, under their code names
+        for policy in [q for q in ORDER if q in by] + sorted(q for q in by if q not in ORDER):
             v = by[policy]
             p50, p99, p999 = (float(np.percentile(v, q)) for q in (50, 99, 99.9))
             rows[policy] = {"tbs": int(len(v)), "p50_ms": p50, "p99_ms": p99, "p999_ms": p999, "room_ms": DEADLINE_MS - p999}
@@ -80,7 +79,10 @@ def main() -> None:
             if LATE:
                 rows[policy].update(p9999_ms=float(np.percentile(v, 99.99)), late=int((v > DEADLINE_MS).sum()))
                 extra = f" {rows[policy]['p9999_ms']:.2f} | {rows[policy]['late']} |"
-            print(f"| {NAMES[policy]} | {len(v)} | {p50:.2f} | {p99:.2f} | {p999:.2f} | {DEADLINE_MS - p999:.2f} ms |{extra}")
+            print(f"| {NAMES.get(policy, '+ AI, ' + policy)} | {len(v)} | {p50:.2f} | {p99:.2f} | {p999:.2f} | {DEADLINE_MS - p999:.2f} ms |{extra}")
+        if "x" not in rows and "n" in rows:
+            print("\nat the 99.9th percentile: " + ", ".join(
+                f"{q} adds {rows[q]['p999_ms'] - rows['n']['p999_ms']:+.2f} ms" for q in rows if q != "n") + "\n")
         if "x" in rows and "n" in rows:
             added = rows["n"]["p999_ms"] - rows["x"]["p999_ms"]
             print(f"\nthe neural receiver adds {added:.2f} ms at the 99.9th percentile "

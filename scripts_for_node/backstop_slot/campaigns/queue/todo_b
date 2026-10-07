@@ -1,12 +1,8 @@
-# kind|name|minutes|command      second queue (runner_q.sh, QUEUE_DIR=queue_b), 2026-10-06 20:50
-N|long_low|55|bash run_state/backstop_slot/v20_cont.sh long_low
-N|mixed|60|bash run_state/backstop_slot/v20_cont.sh mixed
-N|gen_low8|70|bash run_state/backstop_slot/la_cl_gen.sh low8 DoubleTDLlow 8 640 "0:13 16" "1:14 11" "2:12 10" "3:15"
-N|lowsyn|15|bash run_state/backstop_slot/v20_cont.sh lowsyn
-L|check_lowsyn|0|bash run_state/backstop_slot/queue/check_synth.sh low6s:low6
-N|low45|48|bash run_state/backstop_slot/v20_cont.sh low45
-N|low75|48|bash run_state/backstop_slot/v20_cont.sh low75
-N|low6s3|25|bash run_state/backstop_slot/v20_cont.sh low6s3
-N|gc_probe|20|bash run_state/backstop_slot/gc_node_probe.sh
+# kind|name|minutes|command      (see runner_q.sh)   2026-10-07: SM slice with the neural receivers off the slice (script copy scripts_slice2)
+N|slice2_smoke|12|bash run_state/backstop_slot/v22_slice2.sh smoke
+L|check_slice2|0|bash run_state/backstop_slot/queue_b/check_slice2.sh
+N|slice2_cl_s1|26|bash run_state/backstop_slot/v22_slice2.sh cl "1"
+N|slice2_cl_s2|26|bash run_state/backstop_slot/v22_slice2.sh cl "2"
+N|slice2_long|36|POLS="n wm gn28 gd28" bash run_state/backstop_slot/v22_slice2.sh long "1 2 3"
 L|release|0|j=$(cat run_state/backstop_slot/queue_b/current_job); grep -qx "$j" run_state/backstop_slot/queue_b/jobs && scancel $j; echo released $j
 L|stop|0|touch run_state/backstop_slot/queue_b/STOP

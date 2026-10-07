@@ -26,7 +26,7 @@ import torch
 from qwen_units import QwenUnits
 from slot_state import (
     A_BACKLOG_TOKENS, A_BUDGET_NS, A_CUR_CHUNK, A_DONE_SEQ, A_GRANT_SEQ, A_HAS_WORK, A_MAX_CHUNK,
-    A_NOT_AFTER, A_PIECE_END_NS, A_PULLED, A_RATE_TPS, A_RUNNING, A_STOP, H_ABORT, R_ARRIVAL, R_GPU,
+    A_NOT_AFTER, A_PIECE_END_NS, A_PULLED, A_RATE_TPS, A_RUNNING, A_SLICE, A_STOP, H_ABORT, R_ARRIVAL, R_GPU,
     R_LENGTH, R_SEQ, SlotState, now_ns,
 )
 from ai_worker import arrivals, dist
@@ -64,11 +64,19 @@ def main() -> None:
     scale = {c: 1.0 for c in chunks}
     ratios = {c: [] for c in chunks}
 
+    # SM slice (``ai.slice_sms`` > 0): the runner can also put its units on a few SMs of the GPU (a CUDA green
+    # context).  The controller chooses per grant (A_SLICE); with ``ai.slice_always`` every unit runs there.
+    # A unit takes ``slice_factor`` times as long on the slice.
+    slice_sms = int(ai.get("slice_sms", 0))
+    slice_factor = float(ai.get("slice_factor", 1.0))
+    slice_always = bool(ai.get("slice_always", False))
+    mode = {"now": 0}
+
     def raw_cost(c: int, name: str) -> int:
         return bounds[c]["layer"] if name.startswith("layer") else bounds[c][name]
 
     def cost(c: int, name: str) -> int:
-        return int(raw_cost(c, name) * scale[c])
+        return int(raw_cost(c, name) * scale[c] * (slice_factor if mode["now"] else 1.0))
 
     def request_work(length: int) -> int:
         """Bound-time of a request if every chunk is the fitting one."""
@@ -93,6 +101,20 @@ def main() -> None:
     pieces = []
     begin_event = torch.cuda.Event(enable_timing=True)
     end_event = torch.cuda.Event(enable_timing=True)
+    events = {0: (begin_event, end_event)}
+    if slice_sms:
+        slice_sms = runner.add_slice(slice_sms)
+        events[1] = (torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True))   # events of the green context
+
+    def set_mode(want: int) -> None:
+        nonlocal begin_event, end_event
+        if want != mode["now"]:
+            runner.set_mode(want)
+            mode["now"] = want
+            begin_event, end_event = events[want]
+
+    if slice_sms and slice_always:
+        set_mode(1)
 
     slo_ns = int(float(ai.get("slo_ms", 200.0)) * 1e6)
     admission = bool(ai.get("slo_admission", False))
@@ -261,7 +283,7 @@ def main() -> None:
             for r in finished:
                 r["done_ns"] = finish
             pieces.append([start, finish, launched, bound_sum,
-                           float(begin_event.elapsed_time(end_event))])
+                           float(begin_event.elapsed_time(end_event)), mode["now"]])
             if adaptive and raw_sum:
                 for c in used:
                     window = ratios[c]
@@ -326,7 +348,7 @@ def main() -> None:
             launched += group
         box[A_RUNNING] = 0
         if launched:
-            pieces.append([start, now_ns(), launched, bound_sum, gpu_ms])
+            pieces.append([start, now_ns(), launched, bound_sum, gpu_ms, mode["now"]])
         head = state_vars["head"]
         while head < len(requests) and (requests[head].get("rejected") or requests[head]["done_ns"] is not None):
             head += 1
@@ -377,6 +399,8 @@ def main() -> None:
         if budget < 0:
             break
         max_chunk = int(box[A_MAX_CHUNK])
+        if slice_sms and not slice_always:
+            set_mode(1 if int(box[A_SLICE]) else 0)        # the last piece has ended: nothing of this worker is on the GPU
         # Share of recent time (not of grants: unused grants repeat every few microseconds)
         # in which each chunk size was allowed; time constant 20 ms.
         stamp = now_ns()
@@ -416,6 +440,10 @@ def main() -> None:
         "chunks_used": chunk_counts,
         "unit_bound_scale": {str(c): scale[c] for c in chunks},
         "pieces_stopped": stops["count"],
+        "slice_sms": slice_sms,
+        "slice_pieces": sum(1 for p in pieces if p[5]),
+        "slice_units": int(sum(p[2] for p in pieces if p[5])),
+        "slice_wall_ms": float(sum(p[1] - p[0] for p in pieces if p[5]) / 1e6),
     }
     summary["headline"] = {k: summary[k] for k in (
         "arrived", "completed", "tokens_per_s", "within_slo", "tokens_within_slo_per_s", "piece_overruns")}
@@ -424,7 +452,7 @@ def main() -> None:
     args.output.write_text(json.dumps({
         "schema": "backstop-slot-ai-worker-v2", "gpu": args.gpu, "pid": os.getpid(),
         "policy": policy, "epoch_ns": epoch, "summary": summary,
-        "pieces_columns": ["start_ns", "end_ns", "units", "bound_ns", "gpu_ms"], "pieces": pieces,
+        "pieces_columns": ["start_ns", "end_ns", "units", "bound_ns", "gpu_ms", "on_slice"], "pieces": pieces,
         "requests": [[r["arrival_ns"], r["prompt_len"], r["first_ns"], r["done_ns"]] for r in requests],
     }), encoding="utf-8")
 

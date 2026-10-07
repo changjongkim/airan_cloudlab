@@ -1176,7 +1176,62 @@ the urban micro channel the conventional receiver fails 1.5\% of the TBs at the 
 target, at which the outer loop stays at the lowest MCS. Across the three channels the gain of the recovery
 path and the goodput that a share pays move together: 11-40\% and up to 8.2\%, 4-9\% and up to 0.9\%, and
 1-5\% and up to 0.7\%. With the 21 settings above, \sys loses at most 0.4\% of the goodput in 42 settings with
-one configuration; two measurements exceed 0.3\%, both with eight two-user cells (0.32\% and 0.34\%).
+one configuration; two measurements exceed 0.3\%, both with eight two-user cells (0.32\% and 0.34\%). We
+measured the setting with the largest loss, eight two-user cells at the 1\% target, in four campaigns: the ten
+runs give 0.28\% on average, and 0.0-0.7\% by campaign.
+
+\begin{table}[t]
+\caption{AI on a slice of the SMs of a GPU (a CUDA green context), with the outer loop (two seeds). Cells as in
+Table~\ref{tab:esno}; settings by the number of two-user cells and the target. Slice $N$: \sys with the AI of a GPU on $N$ SMs while the neural receiver of that GPU
+runs. Always 28: the AI runs on 28 SMs at all times. Each block is one campaign with its own run of \sys.}
+\label{tab:slice}
+\footnotesize
+\setlength{\tabcolsep}{1.6pt}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+\multicolumn{8}{@{}l}{\emph{Neural receivers on all 108 SMs}} \\
+Setting & \sys & Slice 12 & Slice 16 & Slice 28 & Always 28 & 30\% share & 70\% share \\
+\midrule
+4 cells, 10\% & 11.8k / 0.0\% & 8.8k / $-$0.1\% & 11.7k / $-$0.2\% & 13.6k / $-$0.3\% & 8.8k / $-$0.2\% & 11.4k / $-$0.2\% & 25.7k / $-$0.7\% \\
+4 cells, 1\% & 33.7k / $-$0.1\% & 28.5k / $-$0.1\% & 31.7k / $-$0.2\% & 33.4k / $-$0.5\% & 13.2k / $-$0.2\% & 17.7k / $-$0.3\% & 41.9k / $-$0.8\% \\
+8 cells, 1\% & 16.8k / 0.0\% & 13.9k / $-$1.0\% & 16.9k / $-$0.9\% & 20.6k / $-$1.9\% & 10.2k / $-$1.2\% & 13.9k / $-$1.9\% & 34.0k / $-$3.6\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\multicolumn{6}{@{}l}{\emph{Neural receivers off the slice (on 92 or 80 SMs), or AI at normal priority}} \\
+Setting & \sys & Slice 16, off & Slice 28, off & Always 28, normal & Always 28, off \\
+\midrule
+4 cells, 10\% & 11.6k / $+$0.1\% & 12.2k / $-$0.1\% & 18.0k / $-$0.5\% & 11.6k / $-$0.4\% & 12.8k / $-$0.5\% \\
+4 cells, 1\% & 33.5k / 0.0\% & 31.7k / $-$0.4\% & 36.5k / $-$0.9\% & 15.4k / $-$0.7\% & 15.6k / $-$0.7\% \\
+8 cells, 1\% & 17.2k / $-$0.7\% & 17.8k / $-$1.7\% & 25.7k / $-$3.3\% & 13.4k / $-$3.2\% & 13.6k / $-$3.3\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{An SM Slice Does Not Replace the Rule.} A GPU can also be divided in space. A CUDA green
+context gives a process a set of the SMs of a GPU; Weaver~\cite{weaver} divides a GPU between LDPC decoding
+and AI training in this way. We build green contexts into the AI workers and the neural receiver processes
+and measure two uses (Table~\ref{tab:slice}). First, as a baseline, the AI always runs on 28 of the 108 SMs:
+with low priority, with normal priority, or with the neural receivers on the other 80 SMs. In all nine cases
+this loses more goodput than \sys in the same campaign, 0.2-3.3\%, and it serves 0.4-1.1$\times$ the AI,
+because the AI stays on 26\% of the GPU when the neural receivers are idle. Second, as an option of \sys, the
+AI of a GPU moves to a slice of 12, 16, or 28 SMs while the neural receiver of that GPU runs, and it is not
+stopped. With 28 SMs the option serves 1.0-1.2$\times$ the AI of the default and loses 0.3-1.9\% of the
+goodput; with the neural receivers on the other 80 SMs it serves 1.1-1.6$\times$ and loses 0.5-3.3\%. Slices
+of 12 and 16 SMs serve no more AI than the default. The loss follows the run time of the neural receiver,
+whatever divides the GPU. The policies with a median run of 6.4-6.6~ms (\sys) lose 0.0-0.7\%, those with
+6.8-7.2~ms lose 0.1-1.9\%, and those with 7.4-7.9~ms lose 0.4-3.6\%, shares and slices alike. This is the
+path of the model (Section~\ref{sec:model}): a run has 1.2~ms of slack, and the neural receiver alone takes
+0.84~ms longer on 80 SMs than on 108. A slice isolates the AI, and the neural receiver needs the SMs. The AI
+gains little on a slice next to a running neural receiver: a piece takes 7.1$\times$ its bound on the whole
+GPU on 28 shared SMs and 4.0$\times$ on 28 SMs of its own. In runs of 100~s, the option with 28 SMs adds
+0.23~ms to the 99.9th percentile of the layer-1 latency, and the default adds 0.06~ms. The fixed split with
+the neural receivers on 80 SMs lowers this percentile to 0.25~ms below the server without AI, because the
+conventional receivers no longer share 28 SMs with the neural receiver, and it loses 8.3\% of the recoveries.
+The default of \sys has no slice.
 
 \subsection{Protection and latency}
 \label{sec:protect}
@@ -1662,7 +1717,9 @@ one second. CloudRIC~\cite{cloudric} pools accelerators for LDPC decoding, and
 Concordia~\cite{concordia} reserves capacity for vRAN tasks. Weaver~\cite{weaver} shares the GPU of a RAN
 server between LDPC decoding and the training of foundation models with CUDA green contexts, which give each
 side a set of streaming multiprocessors (SMs), and it sets the SMs of the radio per slot from the MCS and the
-PRBs. AI-RAN
+PRBs. Its radio work is LDPC decoding without a neural receiver. We build the same means into our code: a
+neural receiver that gives up 26\% of the SMs runs 15\% longer, which is 70\% of its slack, and AI that
+stays on a slice of the SMs loses more goodput than \sys (Section~\ref{sec:worth}). AI-RAN
 studies~\cite{interplay,caora,haf,distributedairan} place AI and RAN workloads across servers. Their radio
 work has one deadline and no second receiver. \sys adds a recovery path with its own deadline, and our
 evaluation includes a share chosen by an estimator and a share that follows the load as baselines.
@@ -1705,7 +1762,9 @@ without the look-ahead of the full system. \sys raises the median L1 latency by 
 AI without a time limit than \textit{Priority-max}. The layer-1 misses of 0.02-0.13\% in the runs of 10-40~s
 come from the cold start of the prototype, with and without AI. The steady-state counts are from 0.8-3.2
 million TBs per setting and do not establish a reliability beyond 99.999\%; the changing loads and 32 cells
-are not measured in runs of 100~s. All runs use one GPU model.
+are not measured in runs of 100~s. The SM slices have a fixed size, two seeds, and one AI model, and we
+build them with the driver API because the MPS of this server cannot divide the SMs; we do not run Weaver.
+All runs use one GPU model.
 
 \section{Conclusion}
 

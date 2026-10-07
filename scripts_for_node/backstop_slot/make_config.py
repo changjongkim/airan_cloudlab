@@ -106,6 +106,16 @@ def main() -> None:
                         help="median NeuralRx run alone, then next to AI of each unit size (reuse-time rule)")
     parser.add_argument("--nrx-reuse-alone-ms", type=float, default=6.7,
                         help="NeuralRx run length used to predict when a run ends (reuse-time rule)")
+    parser.add_argument("--ai-slice-sms", type=int, default=0,
+                        help="option of the rule: while the neural receiver of a GPU runs, the AI of that GPU moves to "
+                             "this many SMs of the GPU (a CUDA green context) and is not stopped; 0 = off")
+    parser.add_argument("--ai-green-sms", type=int, default=0,
+                        help="baseline: the AI worker always runs on this many SMs of the GPU (a CUDA green context)")
+    parser.add_argument("--nrx-off-slice", type=int, default=0,
+                        help="1 (with --ai-slice-sms or --ai-green-sms): the neural receivers run on the SMs that "
+                             "the AI slice leaves (a CUDA green context of each lane)")
+    parser.add_argument("--ai-slice-factor", type=float, default=0.0,
+                        help="unit time on the slice / unit time on the whole GPU (default: from the SM count)")
     parser.add_argument("--ai-stop-check", type=int, default=0,
                         help="1: the AI worker reads the controller's stop word between unit groups")
     parser.add_argument("--yyr", default=None,
@@ -296,6 +306,13 @@ def main() -> None:
         config["ai"]["worker"] = "ai_worker5.py"      # --ai-dispatch global: one arrival list for the server
     if args.ai_stop_check:
         config["ai"]["stop_check"] = True
+    if args.ai_slice_sms or args.ai_green_sms:
+        sms = args.ai_slice_sms or args.ai_green_sms
+        # measured with the prefill units of Qwen2.5-1.5B (gc/gc_units.py): 28 SMs 2.4x, 16 SMs 3.8x
+        factor = args.ai_slice_factor or {28: 2.4, 16: 3.8, 12: 5.0}.get(sms, max(1.0, (108.0 / sms) ** 0.72))
+        config["ai"].update(slice_sms=sms, slice_factor=factor, slice_always=bool(args.ai_green_sms))
+        if args.nrx_off_slice:
+            config["nrx_off_slice_sms"] = sms
     if args.ai_admission_fraction != 1.0:
         config["ai"]["admission_fraction"] = args.ai_admission_fraction
     if args.ai_arrival_cv != 1.0:

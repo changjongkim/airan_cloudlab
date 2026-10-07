@@ -48,6 +48,26 @@ def main() -> None:
     config = json.loads(args.config.read_text())
     dataset = Path(config["dataset"])
     cp.cuda.Device(args.gpu).use()
+    # Option ``nrx_off_slice_sms`` (with the SM slice of the AI, ``ai.slice_sms``): the neural receiver of this lane
+    # runs in a CUDA green context on the SMs that the AI slice leaves, so the AI on its slice shares no SM with
+    # it.  The slot copy stays in the primary context (CUDA IPC memory, peer-to-peer); the context is set before
+    # every stage and every run, because the neural receiver path leaves the thread in the primary context.
+    off_slice = int(config.get("nrx_off_slice_sms", 0))
+    own_sms = 0
+    if off_slice:
+        import greenctx
+        gdev, primary_ctx, gres = greenctx.init(args.gpu)
+        green_handle, own_ctx, own_sms, _ = greenctx.green(gdev, gres, off_slice, rest_side=True)
+
+        def own() -> None:
+            greenctx.use(own_ctx)
+
+        def home() -> None:
+            greenctx.use(primary_ctx)
+    else:
+        def own() -> None:
+            pass
+        home = own
     state = SlotState(args.state, args.num_cells, args.periods, args.num_gpus)
     lane = state.lanes[args.lane]
 
@@ -86,14 +106,19 @@ def main() -> None:
     local_ptr = cp.cuda.runtime.malloc(SLOT_BYTES)
     local = fortran_slot_views(local_ptr, rings, 1)[0]
     stream = cp.cuda.Stream(non_blocking=True)
-    nrx = nrx_path(config, profile, tb_bytes, stream)
+    own()
+    run_stream = cp.cuda.Stream(non_blocking=True) if off_slice else stream
+    own()
+    nrx = nrx_path(config, profile, tb_bytes, run_stream)
     for name, size in (list(zip(names, tb_sizes))[:-1] if la else []):
+        own()
         nrx.add_level(PROFILES[name], size)
     every_ue = (1 << profile.num_ue) - 1
 
     def fetch(cell: int, period: int, level: int = -1) -> tuple[dict, int]:
         ring = rings[cell][level]
         index = period % ring["ring"]
+        home()
         cp.cuda.runtime.memcpyAsync(
             local_ptr, ring["ptr"] + index * SLOT_BYTES, SLOT_BYTES, MEMCPY_DEFAULT, stream.ptr
         )
@@ -105,11 +130,13 @@ def main() -> None:
     for step in range(args.warmup):
         cell = weak[step % len(weak)]["cell"]
         ring, index = fetch(cell, step)
+        own()
         nrx.run(local, ring["slots"][index])
     for level in (range(len(names) - 1) if la else []):
         nrx.use(names[level])
         for step in range(4):
             ring, index = fetch(weak[step % len(weak)]["cell"], step, level)
+            own()
             nrx.run(local, ring["slots"][index])
 
     gc.collect()
@@ -136,6 +163,7 @@ def main() -> None:
         if la:
             nrx.use(names[level % len(names)])
         ring, index = fetch(cell, period, level)
+        own()
         ok, payload = nrx.run(local, ring["slots"][index])
         done = now_ns()
         state.cells[cell, period, C_NRX_MASK] = getattr(nrx, "last_crc_mask", int(ok))
@@ -163,6 +191,7 @@ def main() -> None:
         "gpu": args.gpu,
         "lane": args.lane,
         "pid": os.getpid(),
+        "sms": own_sms,                 # SMs of the neural receiver; 0 = the whole GPU
         "columns": ["cell", "period", "start_ns", "done_ns", "crc_pass", "payload_ok",
                     "ue_crc_mask", "ue_good_mask", "mcs_level"],
         "records": records,

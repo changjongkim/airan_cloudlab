@@ -1,0 +1,12 @@
+## Target 10%, runs of 100 s, AI slice shared with the neural receiver  (single-user cells, periods from 8000)
+
+| level | TBs | median | 99th | 99.9th | room to the deadline at the 99.9th | 99.99th | TBs past the deadline |
+|---|---|---|---|---|---|---|---|
+| + neural receiver, no AI | 1152000 | 2.10 | 2.95 | 3.10 | 0.90 ms | 3.22 | 0 |
+| + AI, rule | 1152000 | 2.07 | 3.01 | 3.15 | 0.85 ms | 3.26 | 2 |
+| + AI, g28 | 1152000 | 2.26 | 3.17 | 3.36 | 0.64 ms | 3.50 | 2 |
+| + AI, ws16 | 1152000 | 2.16 | 3.03 | 3.21 | 0.79 ms | 3.35 | 5 |
+| + AI, ws28 | 1152000 | 2.21 | 3.15 | 3.33 | 0.67 ms | 3.46 | 0 |
+
+at the 99.9th percentile: wm adds +0.06 ms, g28 adds +0.26 ms, ws16 adds +0.12 ms, ws28 adds +0.23 ms
+

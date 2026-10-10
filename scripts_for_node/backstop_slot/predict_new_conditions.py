@@ -4,6 +4,9 @@
 usage: predict_new_conditions.py predict OUT.json          new conditions of v23_review.sh (steps pre_a, pre_b)
        predict_new_conditions.py retro OUT.json            the same procedure on conditions that were measured before
        predict_new_conditions.py compare OUT.json PRED.json JOB[,JOB]      the runs of the new conditions against PRED
+       predict_new_conditions.py deadline OUT.json         the headline condition with a recovery deadline of 12.0 and
+                                                           12.5 ms (v24_deadline.sh, step fixed), before those runs
+       predict_new_conditions.py deadline_compare OUT.json PRED.json JOB[,JOB]
 
 Nothing of a predicted condition is measured.  The inputs of the closed form are
   N   the number of neural receivers (GPUs) of the condition;
@@ -49,7 +52,15 @@ OLD = {"sx": (16, 4, 0.125, (1, 2), {"n": ("n", "59318975"), "wd": ("wm", "59318
        "sc": (8, 2, 0.25, (1, 2), {"n": ("n", "59313958"), "wd": ("wm", "59318975"), "p30": ("p30", "59313958"), "p70": ("p70", "59313958")}),
        "sd": (8, 2, 0.5, (1, 2), {"n": ("n", "59313958"), "wd": ("wm", "59318975"), "p30": ("p30", "59313958"), "p70": ("p70", "59313958")})}
 POLICIES = ("n", "wd", "p30", "p70")
-NAMES = {"n": "no AI", "wd": "Antiphase", "p30": "low priority + 30%", "p70": "low priority + 70%"}
+NAMES = {"n": "no AI", "wd": "Antiphase", "p30": "low priority + 30%", "p70": "low priority + 70%",
+         "p100": "low priority, no cap"}
+# recovery deadline of the headline condition (16 cells, four GPUs, four two-user cells): tag -> deadline in ms.  The time
+# limit of a neural receiver run stays 7.6 ms, so the latest start is 3.9 (measured before), 4.4 and 4.9 ms.
+CAL["main"]["p100"] = ("fa", 16, "p100", {"59210955": (1, 2), "59313958": (3, 4, 5)})
+DEADLINES = {"fa": 11.5, "fy": 12.0, "fz": 12.5}
+DEADLINE_POLICIES = ("n", "wd", "p30", "p70", "p100")
+DEADLINE_SEEDS = (1, 2, 3)
+TIME_LIMIT_MS = 7.6
 
 
 def weak_cells(cells: int, gpus: int, fraction: float) -> list[int]:
@@ -155,6 +166,71 @@ def measured(tag: str, cells: int, seeds, code: str, job: str | list[str]) -> di
             "lost_by_seed": lost} if n else None
 
 
+def predict_deadline() -> list[dict]:
+    """Lost and late candidates of the headline condition for each recovery deadline."""
+    rng = np.random.default_rng(0)
+    table_, ids, per_slot, _ = transitions(16, 4, 0.25, DEADLINE_SEEDS)
+    rows = []
+    for tag, deadline in DEADLINES.items():
+        latest = deadline - TIME_LIMIT_MS
+        for policy in DEADLINE_POLICIES:
+            known, length = timing(policy, "main")
+            model = lane_chain(4, table_, known, length, latest_start_ms=latest)
+            end = rng.choice(known, 400000) + rng.choice(length, 400000)      # a run that starts when the candidate is known
+            lost = 100.0 * model["lost_share"]
+            late = (100.0 - lost) * float((end > deadline).mean())
+            rows.append({"condition": tag, "deadline_ms": deadline, "latest_start_ms": latest, "policy": policy,
+                         "seeds": list(DEADLINE_SEEDS), "lost_pct": lost, "late_pct": late, "not_recovered_pct": lost + late,
+                         "three_slot_pct": 100.0 * model["three_slot_share"],
+                         "one_slot_pct": 100.0 * float((end <= latest + 2.5).mean())})
+    return rows
+
+
+def measured_deadline(tag: str, policy: str, jobs: list[str]) -> dict | None:
+    lost, late, three = [], [], []
+    for seed in DEADLINE_SEEDS:
+        for job in jobs:
+            try:
+                t = trace(run_name(tag, seed, policy, 16, job))
+            except FileNotFoundError:
+                continue
+            ran = t["start_ms"] >= 0
+            latest = float(t["rescue_ms"]) - float(t["bound_ms"])
+            lost.append(100.0 * float((~ran).mean()))
+            late.append(100.0 * float((ran & (t["start_ms"] + t["run_ms"] > float(t["rescue_ms"]))).mean()))
+            three.append(100.0 * float((t["start_ms"][ran] + t["run_ms"][ran] > 5.0 + latest).mean()))
+            break
+    if not lost:
+        return None
+    return {"lost_pct": float(np.mean(lost)), "late_pct": float(np.mean(late)), "runs": len(lost),
+            "not_recovered_pct": float(np.mean(lost) + np.mean(late)), "three_slot_pct": float(np.mean(three))}
+
+
+def table_deadline(rows: list[dict], with_measured: bool) -> None:
+    head = "| recovery deadline | latest start | policy | no neural receiver: predicted | ended late: predicted | not recovered in time: predicted |"
+    head += " measured (no neural receiver + late) | error | three-slot runs: predicted | measured |" if with_measured else " three-slot runs: predicted | runs that hold one slot |"
+    print(head)
+    print("|" + "---|" * (head.count("|") - 1))
+    for r in rows:
+        line = (f"| {r['deadline_ms']:.1f} ms ({r['condition']}) | {r['latest_start_ms']:.1f} ms | {NAMES[r['policy']]} | {r['lost_pct']:.1f}% | "
+                f"{r['late_pct']:.1f}% | {r['not_recovered_pct']:.1f}%")
+        if with_measured:
+            m = r.get("measured")
+            line += (f" | {m['not_recovered_pct']:.1f}% ({m['lost_pct']:.1f} + {m['late_pct']:.1f}; {m['runs']} runs) | "
+                     f"{r['not_recovered_pct'] - m['not_recovered_pct']:+.1f} | {r['three_slot_pct']:.0f}% | {m['three_slot_pct']:.0f}% |"
+                     ) if m else f" | - | - | {r['three_slot_pct']:.0f}% | - |"
+        else:
+            line += f" | {r['three_slot_pct']:.0f}% | {r['one_slot_pct']:.0f}% |"
+        print(line)
+    if with_measured:
+        done = [r for r in rows if r.get("measured") and r["condition"] != "fa"]
+        if done:
+            a = np.array([r["measured"]["not_recovered_pct"] for r in done])
+            b = np.array([r["not_recovered_pct"] for r in done])
+            print(f"\n{len(done)} pairs at the new deadlines: mean absolute error {np.abs(a - b).mean():.2f} points, mean error "
+                  f"{np.mean(b - a):+.2f} points, largest {np.abs(a - b).max():.2f} points")
+
+
 def table(rows: list[dict], with_measured: bool) -> None:
     head = "| condition | N | two-user cells | candidates per slot | policy | lost: predicted |"
     head += " measured | error | three-slot runs: predicted | measured |" if with_measured else " three-slot runs: predicted |"
@@ -199,6 +275,21 @@ def main() -> None:
             r["measured"] = measured(r["condition"], cells, seeds, code, job)
         out.write_text(json.dumps({"latest_start_ms": LATEST_START_MS, "rows": rows}, indent=1))
         table(rows, with_measured=True)
+    elif mode == "deadline":
+        rows = predict_deadline()
+        out.write_text(json.dumps({"time_limit_ms": TIME_LIMIT_MS, "rows": rows}, indent=1))
+        table_deadline(rows, with_measured=False)
+    elif mode == "deadline_compare":
+        rows = json.loads(Path(sys.argv[3]).read_text())["rows"]
+        jobs = sys.argv[4].split(",")
+        for r in rows:
+            if r["condition"] == "fa":          # measured before: the runs that also gave c and S
+                code = {"wd": "wm"}.get(r["policy"], r["policy"])
+                r["measured"] = measured_deadline("fa", code, ["59313958", "59210955"])
+            else:
+                r["measured"] = measured_deadline(r["condition"], r["policy"], jobs)
+        out.write_text(json.dumps({"time_limit_ms": TIME_LIMIT_MS, "jobs": jobs, "rows": rows}, indent=1))
+        table_deadline(rows, with_measured=True)
     else:
         rows = json.loads(Path(sys.argv[3]).read_text())["rows"]
         jobs = sys.argv[4].split(",")

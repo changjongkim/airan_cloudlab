@@ -5,7 +5,7 @@ usage:
   plot_eval.py headline OUT FA.json FB.json FC.json          AI served and recoveries lost, three load patterns
   plot_eval.py tradeoff OUT FA.json                          AI served against recoveries lost, steady full load
   plot_eval.py scale    OUT gpus=A,B,C cells=A,B,C,D demand=A,B,C,D     scaling with GPUs, cells, two-user cells
-  plot_eval.py use      OUT OPTIMUM_GAP.json                 share of the safe GPU time that becomes AI
+  plot_eval.py use      OUT OPTIMUM_GAP.json                 AI served against the estimate for an offline schedule that knows the future
   plot_eval.py closed   OUT "LABEL=LA_CLOSED.json" ...       goodput lost with a rate controller in the loop
   plot_eval.py protect  OUT "TITLE=SCHED.json" ...           latency that AI adds to the radio work and latency of
                                                              the AI requests (SCHED.json: output of analyze_sched.py)
@@ -271,7 +271,7 @@ def use(out: str, path: str, condition: str = "fa c16") -> None:
     ax.set_xticks([])
     ax.set_ylim(0, 108)
     ax.set_xlim(-0.6, len(names) - 0.4)
-    style(ax, "Safe GPU Time\nUsed for AI (%)")
+    style(ax, "AI Served vs. the\nOffline Reference (%)")
     legend(fig, names, ncol=3, y=1.0)
     fig.tight_layout(rect=(0, 0, 1, 0.84))
     fig.savefig(out, dpi=200)

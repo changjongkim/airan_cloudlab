@@ -8,8 +8,11 @@ conventional receiver decoded it and whether the neural receiver recovered it in
 schedule of a TB that is not decoded follows the TDD pattern of the paper:
   slot start T0, L1 result at T0 + 4.5 ms; a retransmission takes the uplink slot at T0 + 7.5 ms
   (three uplink periods later) and each further retransmission 7.5 ms more;
-  a TB whose neural receiver run was started waits for it until the recovery deadline, and its
-  retransmission then takes the slot at T0 + 12.5 ms (two uplink periods later).
+  a TB whose neural receiver run was started waits for it until the recovery deadline (11.5 ms
+  after the samples arrive, T0 + 12.0 ms).  The MAC fixes an uplink grant about three slots before
+  it goes on air (Aerial: slot_advance 3), so a decision at T0 + 12.0 ms reaches the uplink slot at
+  T0 + 15.0 ms, three uplink periods after the conventional retransmission slot (RESCUE_RETX_MS;
+  12.5 would assume no lead time, 17.5 is the slot with a lead of five or six slots).
 A candidate that got no neural receiver is known before the L1 result is sent (latest start
 3.9 ms after arrival), so it is retransmitted at T0 + 7.5 ms like a TB that was never a candidate.
 Every retransmission uses an uplink slot of that user that would have carried new data
@@ -36,6 +39,8 @@ from loss_trace import RAW
 
 PERIOD_MS = 2.5
 RETX_OK = float(__import__("os").environ.get("RETX_OK", "0.95"))
+# uplink slot (ms after the slot start) of the retransmission of a TB whose recovery failed
+RESCUE_RETX_MS = float(__import__("os").environ.get("RESCUE_RETX_MS", "15.0"))
 
 
 def tb_rows(path: Path):
@@ -99,7 +104,7 @@ def account(conv_ok, recovered, started, nrx_ms, recovery_path: bool, rng, user=
     if recovery_path:
         done = recovered
         delay[done] = 0.5 + nrx_ms[done]
-        first = np.where(started & ~recovered, 12.5, 7.5)       # slot of the first retransmission
+        first = np.where(started & ~recovered, RESCUE_RETX_MS, 7.5)       # slot of the first retransmission
     else:
         done = np.zeros(n, dtype=bool)
         first = np.full(n, 7.5)

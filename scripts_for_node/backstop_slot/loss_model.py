@@ -169,6 +169,7 @@ def simulate(period, known_ms, rule: str, setting: Setting, seed: int = 0, perio
         "ai_time_free": ai_free / gpu_time, "ai_time_next_to_nrx": ai_co / gpu_time,
         "ai_time": (ai_free + ai_co) / gpu_time,
         "lost_mask": lost[np.argsort(order)],
+        "end_offset_ms": finished[ran] - release[ran],    # end of each run, from the arrival of its slot
     }
 
 

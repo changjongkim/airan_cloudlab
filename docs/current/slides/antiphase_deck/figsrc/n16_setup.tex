@@ -1,0 +1,28 @@
+% Evaluation setup (README chapter 5): four A100 GPUs, 16 cells of 100 MHz, one two-user cell, one NeuralRx and
+% one AI worker per GPU. Three radio load patterns; the step shapes are a sketch.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \node[layer, anchor=north west, minimum width=13.4cm, minimum height=5.6cm] at (0,0) {};
+  \node[cttl, anchor=west] at (0.2,-0.4) {Server: Four A100 GPUs, 16 Cells of 100 MHz};
+  \foreach \g in {0,1,2,3}
+  {
+    \node[gpu, anchor=north west, minimum width=1.75cm, minimum height=3.7cm] at ({0.2+1.9*\g},-0.8) {};
+    \node[cttl] at ({1.075+1.9*\g},-1.05) {GPU \g};
+    \node[comp, fill=aic, minimum width=1.5cm, minimum height=0.5cm] at ({1.075+1.9*\g},-1.65) {AI Worker};
+    \node[comp, fill=okc, minimum width=1.5cm, minimum height=0.5cm] at ({1.075+1.9*\g},-2.3) {NeuralRx};
+    \node[comp, fill=gold, minimum width=1.5cm, minimum height=0.5cm, align=center] at ({1.075+1.9*\g},-2.95) {2-User Cell};
+    \node[comp, minimum width=1.5cm, minimum height=0.9cm, align=center] at ({1.075+1.9*\g},-3.8) {Three 1-User\\Cells};
+  }
+  \node[inote, anchor=west, align=left] at (0.2,-4.95) {AI: LLM Requests (Qwen2.5-1.5B), up to 1,024 Tokens,\\53k tokens/s Offered, Each Due in 200 ms};
+  % load patterns
+  \draw[black!60, line width=0.5pt] (7.9,-0.2) -- (7.9,-5.4);
+  \node[cttl, anchor=west] at (8.1,-0.4) {Three Radio Load Patterns};
+  \foreach \i/\l in {0/(a) Steady Full Load, 1/(b) Load Changes Every 2 s, 2/(c) Random Load Steps}
+  {
+    \node[font=\rmfamily\footnotesize, anchor=west] at (8.1,{-0.95-1.5*\i}) {\l};
+    \draw[line width=0.5pt] (8.3,{-2.0-1.5*\i}) -- (13.0,{-2.0-1.5*\i});
+  }
+  \draw[draw=dblue, line width=1.2pt] (8.3,-1.35) -- (13.0,-1.35);
+  \draw[draw=dblue, line width=1.2pt] (8.3,-2.85) -- (9.475,-2.85) -- (9.475,-3.35) -- (10.65,-3.35) -- (10.65,-2.85) -- (11.825,-2.85) -- (11.825,-3.35) -- (13.0,-3.35);
+  \draw[draw=dblue, line width=1.2pt] (8.3,-4.7) -- (8.9,-4.7) -- (8.9,-4.35) -- (9.9,-4.35) -- (9.9,-4.85) -- (10.5,-4.85) -- (10.5,-4.5) -- (11.4,-4.5) -- (11.4,-4.35) -- (12.2,-4.35) -- (12.2,-4.75) -- (13.0,-4.75);
+  \node[inote, anchor=east] at (13.2,-5.25) {Active Cells Over Time};
+\end{tikzpicture}

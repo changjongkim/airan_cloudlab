@@ -1,0 +1,32 @@
+% Intro: an AI-RAN server. One GPU carries three kinds of work, each with its own time limit.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  % radio side
+  \node[layer, anchor=north west, minimum width=2.3cm, minimum height=4.3cm] at (0,0) {};
+  \node[cttl, align=center] at (1.15,-0.4) {Radio Units};
+  \foreach \i/\l in {0/Cell 0, 1/Cell 1, 2/Cell 2, 3/Cell 3}
+    \node[comp, minimum width=1.7cm, font=\rmfamily\footnotesize] at (1.15,{-1.0-0.66*\i}) {\l};
+  \node[inote, align=center] at (1.15,-3.92) {An Uplink Slot\\Every 2.5 ms};
+  % the GPU
+  \node[gpu, anchor=north west, minimum width=6.0cm, minimum height=4.3cm] at (3.3,0) {};
+  \node[lttl] at (6.3,-0.32) {One GPU of the AI-RAN Server};
+  \node[comp, fill=white, minimum width=5.5cm, minimum height=0.95cm, align=left, font=\rmfamily\footnotesize] (cr) at (6.3,-1.2) {};
+  \node[cttl, anchor=west] at (3.7,-1.02) {Conventional Receiver};
+  \node[inote, anchor=west] at (3.7,-1.42) {Decodes Every TB.\ \ Result Due in 4.0 ms};
+  \node[comp, fill=okc, minimum width=5.5cm, minimum height=0.95cm] (nr) at (6.3,-2.3) {};
+  \node[cttl, anchor=west] at (3.7,-2.12) {Neural Receiver (NeuralRx)};
+  \node[inote, anchor=west] at (3.7,-2.52) {Recovers Failed TBs.\ \ Result Due in 11.5 ms};
+  \node[comp, fill=aic, minimum width=5.5cm, minimum height=0.95cm] (ai) at (6.3,-3.4) {};
+  \node[cttl, anchor=west] at (3.7,-3.22) {AI Inference};
+  \node[inote, anchor=west] at (3.7,-3.62) {Serves LLM Requests.\ \ Answer Due in 200 ms};
+  % in and out
+  \draw[fat] (2.35,-1.75) -- (3.25,-1.75);
+  \node[inote] at (2.8,-1.42) {Samples};
+  \node[draw=navyf, fill=navyf, text=white, font=\rmfamily\bfseries\footnotesize, minimum width=2.2cm, minimum height=0.6cm] (l2) at (11.2,-1.2) {Layer 2};
+  \node[draw=navyf, fill=navyf, text=white, font=\rmfamily\bfseries\footnotesize, minimum width=2.2cm, minimum height=0.6cm] (rq) at (11.2,-3.4) {AI Requests};
+  \draw[arr] (9.35,-1.2) -- (l2.west);
+  \node[inote] at (9.72,-0.95) {Data};
+  \draw[arr] (9.35,-2.3) -- (9.72,-2.3) -- (9.72,-1.45) -- (10.08,-1.45);
+  \draw[darr] (9.35,-3.4) -- (rq.west);
+  \node[inote, align=center] at (11.2,-0.55) {Retransmits\\What Failed};
+  \node[inote, align=center] at (11.2,-4.0) {53k tokens/s Offered};
+\end{tikzpicture}

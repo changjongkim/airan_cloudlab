@@ -1,0 +1,45 @@
+% Design: one criterion and three rules. Effects at full load with 16 cells (README 3.3).
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \tikzset{rule/.style={comp, minimum width=4.2cm, minimum height=3.9cm}}
+  \node[draw=dred, line width=1.0pt, fill=peach, minimum width=13.4cm, minimum height=0.9cm] at (6.7,-0.5) {};
+  \node[cttl] at (6.7,-0.5) {Criterion: Keep the Increase of the NeuralRx Run Time Below the 1.2 ms Slack};
+  % rule 1
+  \node[rule] at (2.1,-3.2) {};
+  \node[num] at (0.35,-1.6) {1};
+  \node[cttl, anchor=west] at (0.6,-1.6) {Recovery Path};
+  \node[font=\rmfamily\footnotesize, align=center] at (2.1,-2.25) {The Large NeuralRx Runs\\Only on Failed TBs};
+  \foreach \i in {0,...,7}
+    \node[blk, fill=tba!55, minimum width=0.36cm, minimum height=0.36cm] at ({0.6+0.42*\i},-3.25) {};
+  \foreach \i in {2, 6}
+    \node[blk, fill=gold, minimum width=0.36cm, minimum height=0.36cm, text=dred] at ({0.6+0.42*\i},-3.25) {\xmark};
+  \node[comp, fill=okc, minimum width=1.6cm, minimum height=0.45cm] (nr) at (2.1,-4.15) {NeuralRx};
+  \draw[sarr] (1.44,-3.45) -- (1.75,-3.9);
+  \draw[sarr] (3.12,-3.45) -- (2.5,-3.9);
+  \node[key, text=dred] at (2.1,-4.8) {NeuralRx Runs: 25\% of Slots};
+  % rule 2
+  \node[rule] at (6.7,-3.2) {};
+  \node[num] at (4.95,-1.6) {2};
+  \node[cttl, anchor=west] at (5.2,-1.6) {Stop AI Beside NeuralRx};
+  \node[font=\rmfamily\footnotesize, align=center] at (6.7,-2.25) {AI Stops on the GPU\\Whose NeuralRx Runs};
+  \node[rowl] at (5.8,-3.2) {NeuralRx};
+  \node[rowl] at (5.8,-3.75) {AI};
+  \node[job, fill=gold, anchor=west, minimum width=1.5cm, minimum height=0.36cm] at (6.5,-3.2) {};
+  \foreach \a in {5.9, 6.2, 8.05, 8.35}
+    \node[job, fill=bluec, anchor=west, minimum width=0.27cm, minimum height=0.36cm] at (\a,-3.75) {};
+  \draw[draw=dred, line width=1.2pt] (6.5,-3.98) -- (6.5,-3.52);
+  \node[inote, text=dred] at (7.27,-3.75) {Stopped};
+  \node[key, text=dred] at (6.7,-4.8) {3-Slot Runs: 52\% $\rightarrow$ 11\%};
+  % rule 3
+  \node[rule] at (11.3,-3.2) {};
+  \node[num] at (9.55,-1.6) {3};
+  \node[cttl, anchor=west] at (9.8,-1.6) {Large AI Units Wait};
+  \node[font=\rmfamily\footnotesize, align=center] at (11.3,-2.25) {The Largest AI Units Never Run\\Beside a Decoding Cell};
+  \node[rowl] at (10.1,-3.2) {Cells};
+  \node[rowl] at (10.1,-3.75) {AI};
+  \foreach \a in {10.2, 11.9}
+    \node[job, fill=black!25, anchor=west, minimum width=0.85cm, minimum height=0.36cm, font=\rmfamily\scriptsize] at (\a,-3.2) {Decode};
+  \foreach \a in {10.2, 10.5, 11.9, 12.2}
+    \node[job, fill=bluec, anchor=west, minimum width=0.27cm, minimum height=0.36cm] at (\a,-3.75) {};
+  \node[job, fill=dblue, anchor=west, minimum width=0.75cm, minimum height=0.36cm, text=white, font=\rmfamily\scriptsize] at (11.1,-3.75) {Large};
+  \node[key, text=dred] at (11.3,-4.8) {L1 Misses: 0.061\% $\rightarrow$ 0.036\%};
+\end{tikzpicture}

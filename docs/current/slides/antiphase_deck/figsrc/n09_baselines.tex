@@ -1,0 +1,54 @@
+% Background and evaluation: how each compared method gives GPU time to the AI. The radio load alternates
+% (high / low every 2 s); a method is drawn by the share of the GPU it gives to the AI over time. The heights
+% are a sketch of the mechanism, not measured values, except the fixed 10% and the 30% cap.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \tikzset{sh/.style={draw=black!70, line width=0.35pt, fill=aic}}
+  \node[layer, anchor=north west, minimum width=13.4cm, minimum height=6.5cm] at (0,0) {};
+  % x = 4.3 + 1.2 s
+  \foreach \s in {0, 2, 4, 6}
+  {
+    \draw[black!45, densely dotted, line width=0.5pt] ({4.3+1.2*\s},-0.25) -- ({4.3+1.2*\s},-5.75);
+    \node[font=\rmfamily\footnotesize, anchor=north, inner sep=2pt] at ({4.3+1.2*\s},-5.78) {\s};
+  }
+  \node[inote, anchor=west] at (11.8,-6.02) {Seconds};
+  % radio load
+  \node[rowl, font=\rmfamily\bfseries\footnotesize] at (4.15,-0.6) {Radio Load};
+  \draw[draw=black!70, fill=tba, line width=0.35pt] (4.3,-0.85) rectangle (6.7,-0.35);
+  \draw[draw=black!70, fill=tba!35, line width=0.35pt] (6.7,-0.85) rectangle (9.1,-0.67);
+  \draw[draw=black!70, fill=tba, line width=0.35pt] (9.1,-0.85) rectangle (11.5,-0.35);
+  \node[font=\rmfamily\footnotesize] at (5.5,-0.6) {High};
+  \node[font=\rmfamily\footnotesize] at (7.9,-0.48) {Low};
+  \node[font=\rmfamily\footnotesize] at (10.3,-0.6) {High};
+  \node[inote, anchor=west] at (11.65,-0.6) {AI Share of GPU};
+  % Static
+  \node[rowl, font=\rmfamily\bfseries\footnotesize] at (4.15,-1.55) {Static};
+  \node[rowl, font=\rmfamily\itshape\scriptsize] at (4.15,-1.85) {Fixed Share};
+  \draw[sh] (4.3,-1.95) rectangle (11.5,-1.87);
+  \node[inote, anchor=west] at (11.65,-1.75) {10\% Always};
+  % Priority
+  \node[rowl, font=\rmfamily\bfseries\footnotesize] at (4.15,-2.5) {Priority};
+  \node[rowl, font=\rmfamily\itshape\scriptsize] at (4.15,-2.8) {Low Priority + Cap};
+  \draw[sh] (4.3,-2.9) rectangle (11.5,-2.66);
+  \node[inote, anchor=west] at (11.65,-2.7) {30\% Cap Always};
+  % Estimator
+  \node[rowl, font=\rmfamily\bfseries\footnotesize] at (4.15,-3.45) {Estimator};
+  \node[rowl, font=\rmfamily\itshape\scriptsize] at (4.15,-3.75) {Share Re-Chosen Every 1 s};
+  \draw[sh] (4.3,-3.85) rectangle (7.9,-3.77);
+  \draw[sh] (7.9,-3.85) rectangle (9.1,-3.35);
+  \draw[sh, fill=badc, draw=dred] (9.1,-3.85) rectangle (10.3,-3.35);
+  \draw[sh] (10.3,-3.85) rectangle (11.5,-3.77);
+  \node[inote, text=dred, anchor=west] at (11.65,-3.6) {1 s Late};
+  % Follow
+  \node[rowl, font=\rmfamily\bfseries\footnotesize] at (4.15,-4.4) {Follow};
+  \node[rowl, font=\rmfamily\itshape\scriptsize] at (4.15,-4.7) {Knows the Load, No Delay};
+  \draw[sh] (4.3,-4.8) rectangle (6.7,-4.72);
+  \draw[sh] (6.7,-4.8) rectangle (9.1,-4.3);
+  \draw[sh] (9.1,-4.8) rectangle (11.5,-4.72);
+  \node[inote, anchor=west] at (11.65,-4.55) {Idealized};
+  % Antiphase
+  \node[rowl, font=\rmfamily\bfseries\footnotesize, text=dblue] at (4.15,-5.3) {Antiphase};
+  \node[rowl, font=\rmfamily\itshape\scriptsize] at (4.15,-5.6) {No Share: Grants per Piece};
+  \foreach \i in {0,...,35}
+    \draw[draw=dblue, line width=0.5pt] ({4.3+0.2*\i},-5.7) -- ({4.3+0.2*\i},-5.2);
+  \node[inote, text=dblue, anchor=west] at (11.65,-5.45) {Every 15--57 $\mu$s};
+\end{tikzpicture}

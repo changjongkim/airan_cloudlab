@@ -1,0 +1,29 @@
+% Design: where an AI request goes (README 4.5). The lengths of the queues are an illustration, not measured.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \node[layer, anchor=north west, minimum width=13.4cm, minimum height=5.3cm] at (0,0) {};
+  % requests
+  \node[cttl] at (1.15,-0.45) {AI Requests};
+  \foreach \i/\f/\l in {0/tba/R4, 1/tbd/R3, 2/debtc/R2, 3/greenc/R1}
+    \node[blk, fill=\f, minimum width=1.2cm, minimum height=0.42cm, font=\rmfamily\footnotesize] at (1.15,{-1.05-0.52*\i}) {\l};
+  \node[inote, align=center] at (1.15,-3.35) {Each Due\\in 200 ms};
+  % dispatcher
+  \node[comp, fill=peach, minimum width=3.2cm, minimum height=2.5cm] (d) at (4.3,-1.85) {};
+  \node[cttl] at (4.3,-0.95) {Request Dispatcher};
+  \node[font=\rmfamily\footnotesize, align=center] at (4.3,-1.95) {Predicts the Finish Time\\on Every GPU From Its\\Queue and Recent Rate};
+  \draw[fat] (1.85,-1.85) -- (2.65,-1.85);
+  % GPUs
+  \foreach \g/\w/\c in {0/2.6/black, 1/1.1/dblue, 2/3.3/black, 3/1.9/black}
+  {
+    \node[gpu, anchor=west, minimum width=5.6cm, minimum height=0.62cm] at (7.6,{-0.75-0.74*\g}) {};
+    \node[cttl, anchor=west] at (7.68,{-0.75-0.74*\g}) {GPU \g};
+    \draw[draw=black!70, fill=aic, line width=0.35pt] (8.9,{-0.93-0.74*\g}) rectangle ({8.9+\w},{-0.57-0.74*\g});
+  }
+  \node[inote, anchor=west] at (10.05,-1.49) {Shortest Queue};
+  \draw[arr, draw=dblue] (5.9,-1.49) -- (7.55,-1.49);
+  \node[key, text=dblue, anchor=south, align=center] at (6.72,-1.45) {Earliest\\Finish};
+  \node[inote, anchor=west] at (8.9,-3.55) {Queued AI Work on Each GPU};
+  % not admitted
+  \node[comp, fill=badc, minimum width=4.6cm, minimum height=0.75cm, align=center, font=\rmfamily\footnotesize] (rej) at (4.3,-4.4) {Not Admitted: Cannot Finish in 150 ms};
+  \draw[arr, draw=dred] (4.3,-3.1) -- (4.3,-4.0);
+  \node[inote, anchor=west, align=left] at (7.0,-4.4) {75\% of the 200 ms Limit. The Same Dispatch\\and Admission for Every Compared Method};
+\end{tikzpicture}

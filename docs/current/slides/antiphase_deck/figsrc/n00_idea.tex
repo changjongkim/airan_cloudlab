@@ -1,0 +1,21 @@
+% Cover: the idea in one picture. On one GPU the NeuralRx and the AI run in opposite phase:
+% while the NeuralRx recovers a failed TB the AI is stopped, and the AI has the whole GPU otherwise.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \node[layer, anchor=north west, minimum width=12.9cm, minimum height=2.9cm] at (0,0) {};
+  \node[lttl, anchor=north west] at (0.15,-0.08) {One GPU};
+  \node[note, anchor=east] at (12.75,-0.33) {Time};
+  \draw[arr] (11.45,-0.33) -- (11.9,-0.33);
+  \node[rowl, font=\rmfamily\small] at (2.05,-1.0) {NeuralRx};
+  \node[rowl, font=\rmfamily\small] at (2.05,-1.75) {AI};
+  \foreach \a in {3.6, 8.05}
+    \node[job, fill=gold, anchor=west, minimum width=3.0cm, minimum height=0.5cm, font=\rmfamily\footnotesize] at (\a,-1.0) {Recovers a Failed TB};
+  \foreach \a in {2.2, 2.65, 3.1, 6.65, 7.1, 7.55, 11.1, 11.55, 12.0}
+    \node[job, fill=bluec, anchor=west, minimum width=0.45cm, minimum height=0.5cm] at (\a,-1.75) {};
+  \foreach \x in {3.575, 6.625, 8.025, 11.075}
+    \draw[guard] (\x,-0.62) -- (\x,-2.12);
+  \node[key, text=dred] at (5.1,-2.45) {AI Stopped};
+  \node[key, text=dred] at (9.55,-2.45) {AI Stopped};
+  \node[key, text=dblue] at (2.87,-2.45) {Whole GPU};
+  \node[key, text=dblue] at (7.32,-2.45) {Whole GPU};
+  \node[key, text=dblue] at (11.77,-2.45) {Whole GPU};
+\end{tikzpicture}

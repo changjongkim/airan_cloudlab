@@ -1,0 +1,32 @@
+% Terms in one picture: what happens to one transport block (TB).
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \tikzset{dia/.style={diamond, draw=black!80, fill=white, line width=0.45pt, aspect=2, inner sep=1.5pt}}
+  \node[layer, anchor=north west, minimum width=13.4cm, minimum height=4.35cm] at (0,0) {};
+  \node[comp, fill=tba, minimum width=1.5cm, minimum height=0.8cm, font=\rmfamily\footnotesize, align=center] (tb) at (1.05,-1.1) {TB};
+  \node[inote, align=center] at (1.05,-1.85) {One User's Data\\in One Slot};
+  \node[comp, minimum width=2.3cm, minimum height=0.8cm, font=\rmfamily\footnotesize, align=center] (cr) at (3.6,-1.1) {Conventional\\Receiver};
+  \node[dia, font=\rmfamily\itshape\footnotesize] (crc) at (6.0,-1.1) {CRC?};
+  \node[comp, fill=okc, minimum width=1.7cm, minimum height=0.6cm, font=\rmfamily\footnotesize] (ok) at (8.25,-1.1) {Delivered};
+  \draw[arr] (tb.east) -- (cr.west);
+  \draw[arr] (cr.east) -- (crc.west);
+  \draw[arr] (crc.east) -- (ok.west);
+  \node[inote] at (7.05,-0.88) {Pass};
+  \node[key, text=dred, anchor=south] at (3.6,-0.62) {Layer-1 Deadline 4.0 ms};
+  % failed
+  \node[dia, draw=dred, line width=0.9pt, font=\rmfamily\itshape\footnotesize, aspect=2.3] (k) at (6.0,-2.75) {$\leq 9$ Failed Blocks?};
+  \draw[arr, draw=dred] (crc.south) -- (k.north);
+  \node[inote, text=dred, anchor=west] at (6.08,-1.82) {Fail};
+  \node[comp, fill=gold, minimum width=1.7cm, minimum height=0.6cm, font=\rmfamily\footnotesize] (cand) at (9.1,-2.75) {Candidate};
+  \draw[arr] (k.east) -- (cand.west);
+  \node[inote] at (7.98,-2.53) {Yes};
+  \node[comp, fill=okc, minimum width=1.9cm, minimum height=0.6cm, font=\rmfamily\footnotesize] (nrx) at (11.85,-2.75) {NeuralRx};
+  \draw[arr] (cand.east) -- (nrx.west);
+  \node[inote] at (10.45,-3.3) {Start by 3.9 ms};
+  \node[comp, fill=okc, minimum width=1.9cm, minimum height=0.6cm, font=\rmfamily\footnotesize] (rec) at (11.85,-1.1) {Recovered};
+  \draw[arr] (nrx.north) -- (rec.south);
+  \node[key, text=dred, anchor=west, align=left] at (9.75,-1.9) {by 11.5 ms};
+  \node[comp, fill=badc, minimum width=2.2cm, minimum height=0.6cm, font=\rmfamily\footnotesize] (rt) at (3.0,-2.75) {Retransmitted};
+  \draw[arr] (k.west) -- (rt.east);
+  \node[inote] at (4.5,-2.53) {No};
+  \node[inote, anchor=north west, align=left] at (0.2,-3.6) {A candidate that finds no free NeuralRx by 3.9 ms is dropped and retransmitted: a \textbf{lost recovery}.};
+\end{tikzpicture}

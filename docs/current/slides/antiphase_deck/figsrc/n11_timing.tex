@@ -1,0 +1,44 @@
+% Design: the time constants of one failed TB, t in ms after its samples arrive. x = 2.7 + 0.74 t.
+% P = 2.5 ms (uplink period), c = 1.4 ms (conventional result, median), L1 deadline 4.0 ms,
+% NeuralRx time limit 7.6 ms, recovery deadline 11.5 ms, latest start L = 11.5 - 7.6 = 3.9 ms.
+% A run alone takes S = 6.3 ms: started at 1.4 ms it ends at 7.7 ms, 1.2 ms before the latest start of the
+% failed TBs of slot k+2 (2P + L = 8.9 ms).
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \node[layer, anchor=north west, minimum width=13.4cm, minimum height=5.6cm] at (0,0) {};
+  \draw[line width=0.6pt] (2.7,-4.6) -- (12.4,-4.6);
+  \foreach \t in {0, 2.5, 5, 7.5, 10, 12.5}
+  {
+    \draw[line width=0.6pt] ({2.7+0.74*\t},-4.6) -- ({2.7+0.74*\t},-4.68);
+    \node[font=\rmfamily\footnotesize, anchor=north, inner sep=2pt] at ({2.7+0.74*\t},-4.68) {\t};
+  }
+  \foreach \t/\l in {0/Slot $k$, 2.5/Slot $k{+}1$, 5/Slot $k{+}2$, 7.5/Slot $k{+}3$}
+  {
+    \draw[black!60, line width=0.8pt] ({2.7+0.74*\t},-0.62) -- ({2.7+0.74*\t},-0.38);
+    \node[font=\rmfamily\scriptsize, anchor=west, inner sep=2pt] at ({2.7+0.74*\t},-0.5) {\l};
+  }
+  \node[rowl, font=\rmfamily\footnotesize] at (2.55,-0.5) {Samples Arrive};
+  \node[inote] at (7.5,-5.25) {Milliseconds After the Samples of Slot $k$ Arrive};
+  % conventional receiver
+  \node[rowl, font=\rmfamily\footnotesize, align=right] at (2.55,-1.2) {Conventional\\Receiver};
+  \node[job, fill=tba!55, anchor=west, minimum width=1.036cm, minimum height=0.42cm, font=\rmfamily\scriptsize] at (2.7,-1.2) {Decode};
+  \draw[guard] (5.66,-0.9) -- (5.66,-1.5);
+  \node[inote, text=dred, anchor=west] at (5.72,-1.2) {Layer-1 Deadline 4.0 ms};
+  % start window
+  \node[rowl, font=\rmfamily\footnotesize, align=right] at (2.55,-2.05) {May Start\\on a NeuralRx};
+  \draw[draw=black!60, fill=gold!45, line width=0.3pt] (3.736,-2.2) rectangle (5.586,-1.9);
+  \draw[line width=1.0pt] (5.586,-2.3) -- (5.586,-1.8);
+  \node[inote, anchor=west] at (5.66,-2.05) {Latest Start 3.9 ms $=$ 11.5 $-$ 7.6};
+  % NeuralRx run and the slack to the next-but-one slot
+  \node[rowl, font=\rmfamily\footnotesize] at (2.55,-2.9) {NeuralRx Run};
+  \node[job, fill=gold, anchor=west, minimum width=4.662cm, minimum height=0.42cm, font=\rmfamily\footnotesize] at (3.736,-2.9) {Alone: 6.3 ms};
+  \draw[line width=1.0pt] (9.286,-3.2) -- (9.286,-2.6);
+  \draw[darr, draw=dblue] (8.398,-2.9) -- (9.286,-2.9);
+  \node[key, text=dblue, anchor=west] at (9.36,-2.9) {1.2 ms Slack};
+  \node[inote, anchor=east] at (9.25,-3.38) {Latest Start of the Failed TBs of Slot $k{+}2$: 8.9 ms};
+  % limit and recovery deadline
+  \node[rowl, font=\rmfamily\footnotesize] at (2.55,-3.95) {Time Limit};
+  \draw[darr] (5.586,-3.95) -- (11.21,-3.95);
+  \node[inote, fill=panel, inner sep=2pt] at (7.2,-3.95) {7.6 ms};
+  \draw[draw=dred, line width=1.4pt] (11.21,-3.5) -- (11.21,-4.6);
+  \node[key, text=dred, anchor=south] at (11.21,-3.5) {Recovery Deadline 11.5 ms};
+\end{tikzpicture}

@@ -1,0 +1,18 @@
+% Three new things: a finding, a model, a design (README, "what is new").
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \tikzset{c/.style={comp, minimum width=4.3cm, minimum height=3.7cm}}
+  \node[c] at (2.15,-1.85) {};
+  \node[c] at (7.05,-1.85) {};
+  \node[c, fill=cyanp, draw=dblue, line width=0.9pt] at (11.95,-1.85) {};
+  \node[num] at (0.35,-0.4) {1}; \node[cttl, anchor=west] at (0.6,-0.4) {Finding};
+  \node[num] at (5.25,-0.4) {2}; \node[cttl, anchor=west] at (5.5,-0.4) {Model};
+  \node[num] at (10.15,-0.4) {3}; \node[cttl, anchor=west] at (10.4,-0.4) {Design: Antiphase};
+  \node[font=\rmfamily\footnotesize, align=center] at (2.15,-1.7) {AI Slows the NeuralRx\\Past the 1.2 ms Slack.\\The NeuralRx Stays Busy\\One Slot Longer, and the\\Next Failed TB Is Dropped};
+  \node[key, text=dred, align=center] at (2.15,-3.25) {83--99\% of Lost Recoveries};
+  \node[font=\rmfamily\footnotesize, align=center] at (7.05,-1.7) {A Formula Gives the\\Share of Lost Recoveries\\From the Run Time\\of the NeuralRx};
+  \node[key, text=dred, align=center] at (7.05,-3.25) {672 Runs, Error 0.82 Points};
+  \node[font=\rmfamily\footnotesize, align=center] at (11.95,-1.7) {NeuralRx Only on Failed TBs.\\AI Stops Beside a\\Running NeuralRx.\\Large AI Units Stay Away\\From Decoding Cells};
+  \node[key, text=dred, align=center] at (11.95,-3.25) {6.4--7.5$\times$ the AI of a Fixed 10\%};
+  \draw[fat] (4.35,-1.85) -- (4.85,-1.85);
+  \draw[fat] (9.25,-1.85) -- (9.75,-1.85);
+\end{tikzpicture}

@@ -1,0 +1,43 @@
+% Background: two measurements behind the recovery path (README 6.2, 6.3).
+%  (a) two-user cells, no AI: the large NeuralRx as the main receiver reaches 39% of the slots and the cells decode
+%      89.4% of their TBs; on failed TBs only, 94.5-95.1% (drawn at 94.8).
+%  (b) mixed channels: a failed TB of a slot with at most 9 failed code blocks is recovered in 75% of the cases
+%      (125 of 167), with 10 or more in 14% (24 of 170).
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \node[layer, anchor=north west, minimum width=13.4cm, minimum height=5.3cm] at (0,0) {};
+  % ---------------- (a) ----------------
+  \node[cttl, anchor=west] at (0.2,-0.4) {(a) How to Use the Large NeuralRx};
+  \node[inote, anchor=west] at (0.2,-0.82) {TBs of the Two-User Cells Decoded (\%)};
+  \draw[line width=0.6pt] (1.1,-4.3) -- (6.3,-4.3);
+  \draw[line width=0.6pt] (1.1,-4.3) -- (1.1,-1.2);
+  \foreach \v in {0, 25, 50, 75, 100}
+  {
+    \draw[line width=0.5pt] (1.02,{-4.3+0.03*\v}) -- (1.1,{-4.3+0.03*\v});
+    \node[font=\rmfamily\footnotesize, anchor=east, inner sep=2pt] at (1.02,{-4.3+0.03*\v}) {\v};
+  }
+  \draw[draw=black!80, fill=recc, line width=0.4pt] (1.7,-4.3) rectangle (3.2,-1.618);
+  \node[cttl] at (2.45,-1.38) {89.4};
+  \draw[draw=black!80, fill=bluec, line width=0.4pt] (4.1,-4.3) rectangle (5.6,-1.456);
+  \node[cttl, text=dblue] at (4.85,-1.2) {94.5--95.1};
+  \node[font=\rmfamily\footnotesize, align=center] at (2.45,-4.72) {Every Slot\\(Main Receiver)};
+  \node[font=\rmfamily\footnotesize, align=center] at (4.85,-4.72) {Failed TBs Only\\(Recovery)};
+  \node[inote, align=center] at (2.45,-3.0) {NeuralRx Reaches\\39\% of Slots};
+  % ---------------- (b) ----------------
+  \draw[black!60, line width=0.5pt] (6.8,-0.2) -- (6.8,-5.1);
+  \node[cttl, anchor=west] at (7.0,-0.4) {(b) Which Failed TBs to Send};
+  \node[inote, anchor=west] at (7.0,-0.82) {Failed TBs the NeuralRx Recovers (\%)};
+  \draw[line width=0.6pt] (7.9,-4.3) -- (13.1,-4.3);
+  \draw[line width=0.6pt] (7.9,-4.3) -- (7.9,-1.2);
+  \foreach \v in {0, 25, 50, 75, 100}
+  {
+    \draw[line width=0.5pt] (7.82,{-4.3+0.03*\v}) -- (7.9,{-4.3+0.03*\v});
+    \node[font=\rmfamily\footnotesize, anchor=east, inner sep=2pt] at (7.82,{-4.3+0.03*\v}) {\v};
+  }
+  \draw[draw=black!80, fill=bluec, line width=0.4pt] (8.5,-4.3) rectangle (10.0,-2.05);
+  \node[cttl, text=dblue] at (9.25,-1.81) {75};
+  \draw[draw=black!80, fill=recc, line width=0.4pt] (10.9,-4.3) rectangle (12.4,-3.88);
+  \node[cttl] at (11.65,-3.64) {14};
+  \node[font=\rmfamily\footnotesize, align=center] at (9.25,-4.72) {9 or Fewer\\Failed Code Blocks};
+  \node[font=\rmfamily\footnotesize, align=center] at (11.65,-4.72) {10 or More\\Failed Code Blocks};
+  \node[key, text=dred, align=center] at (11.65,-2.75) {Not Sent:\\Retransmitted};
+\end{tikzpicture}

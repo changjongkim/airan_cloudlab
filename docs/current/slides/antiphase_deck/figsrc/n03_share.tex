@@ -1,0 +1,48 @@
+% Intro: what a GPU share does to the NeuralRx, and what Antiphase does. One GPU, x = 2.6 + 0.62 t (ms).
+% A failed TB starts on the NeuralRx at 1.4 ms. Alone the run takes 6.3 ms. Next to low-priority AI with a 30%
+% cap the median run is 0.75 ms longer; with Antiphase 0.09 ms longer (README 3.2). Numbers on the right:
+% full load, 16 cells, five seeds (README 6.4): Priority 18.0k tokens/s and 1.2% recoveries lost,
+% Antiphase 34.1k and 0.1%.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\small]
+  \tikzset{run/.style={job, minimum height=0.42cm, anchor=west, font=\rmfamily\footnotesize},
+           ai/.style={draw=black!55, line width=0.3pt, fill=aic, inner sep=0pt, anchor=west}}
+  \node[layer, anchor=north west, minimum width=13.6cm, minimum height=4.9cm] at (0,0) {};
+  \foreach \t in {0, 2.5, 5, 7.5, 10}
+  {
+    \draw[black!45, densely dotted, line width=0.5pt] ({2.6+0.62*\t},-1.08) -- ({2.6+0.62*\t},-2.22);
+    \draw[black!45, densely dotted, line width=0.5pt] ({2.6+0.62*\t},-3.08) -- ({2.6+0.62*\t},-4.25);
+    \node[font=\rmfamily\footnotesize, anchor=north, inner sep=2pt] at ({2.6+0.62*\t},-4.27) {\t};
+  }
+  \node[inote, anchor=west] at (9.15,-4.48) {ms};
+  \draw[black!60, line width=0.5pt] (0.1,-2.3) -- (13.5,-2.3);
+  % ---- a GPU share ----
+  \node[cttl, align=left, anchor=west] at (0.15,-0.55) {GPU Share for AI};
+  \node[inote, align=left, anchor=west] at (0.15,-0.95) {Low Priority, 30\% Cap};
+  \node[rowl, font=\rmfamily\footnotesize] at (2.5,-1.4) {NeuralRx};
+  \node[rowl, font=\rmfamily\footnotesize] at (2.5,-1.95) {AI};
+  \node[run, fill=gold, minimum width=3.906cm] at (3.468,-1.4) {Recovery};
+  \node[run, fill=white, draw=dred, pattern=north east lines, pattern color=dred, minimum width=0.465cm] at (7.374,-1.4) {};
+  \node[key, text=dred, anchor=west] at (7.9,-1.4) {+0.75 ms};
+  \node[ai, minimum width=6.2cm, minimum height=0.16cm] at (2.6,-1.95) {};
+  \node[inote, anchor=west] at (2.7,-0.6) {AI Is Always on the GPU, Also Next to the NeuralRx};
+  % ---- Antiphase ----
+  \node[cttl, align=left, anchor=west, text=dblue] at (0.15,-2.6) {Antiphase};
+  \node[inote, align=left, anchor=west] at (0.15,-3.0) {This Work};
+  \node[rowl, font=\rmfamily\footnotesize] at (2.5,-3.4) {NeuralRx};
+  \node[rowl, font=\rmfamily\footnotesize] at (2.5,-3.95) {AI};
+  \node[run, fill=gold, minimum width=3.906cm] at (3.468,-3.4) {Recovery};
+  \node[key, text=dblue, anchor=west] at (7.9,-3.4) {+0.09 ms};
+  \foreach \a in {2.6, 3.03}
+    \node[ai, fill=bluec, minimum width=0.4cm, minimum height=0.42cm] at (\a,-3.95) {};
+  \foreach \a in {7.42, 7.85, 8.28}
+    \node[ai, fill=bluec, minimum width=0.4cm, minimum height=0.42cm] at (\a,-3.95) {};
+  \node[inote, anchor=west] at (2.7,-2.62) {AI Stops While the NeuralRx Runs, and Has the Whole GPU Otherwise};
+  % ---- results ----
+  \draw[black!60, line width=0.5pt] (9.75,-0.6) -- (9.75,-2.1);
+  \draw[black!60, line width=0.5pt] (9.75,-2.6) -- (9.75,-4.1);
+  \node[font=\rmfamily\footnotesize, anchor=west] at (9.9,-1.1) {AI Served: \textbf{18.0k} tokens/s};
+  \node[font=\rmfamily\footnotesize, anchor=west] at (9.9,-1.6) {Recoveries Lost: \textbf{1.2\%}};
+  \node[font=\rmfamily\footnotesize, anchor=west] at (9.9,-3.1) {AI Served: \textbf{34.1k} tokens/s};
+  \node[font=\rmfamily\footnotesize, anchor=west] at (9.9,-3.6) {Recoveries Lost: \textbf{0.1\%}};
+  \node[key, text=dred, anchor=west] at (9.9,-4.25) {1.9$\times$ the AI, 12$\times$ Fewer Lost};
+\end{tikzpicture}

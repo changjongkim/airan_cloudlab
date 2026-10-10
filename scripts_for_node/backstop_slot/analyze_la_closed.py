@@ -36,9 +36,11 @@ RETX_OK = 0.95
 NAMES = {"x": "No recovery path", "xp100": "No recovery path, low-priority AI", "n": "Recovery path, no AI",
          "wm": "Rule (stoppable pieces, no AI next to NeuralRx)", "wr3": "Rule, AI next to NeuralRx while 3 are free",
          "wr2": "Rule, AI next to NeuralRx while 2 are free", "wr1": "Rule, AI next to NeuralRx while 1 is free",
+         "wn": "Stop on NeuralRx only (every unit size next to the conventional receiver)",
+         "wr0": "Own deadline only (AI next to NeuralRx while that run meets its recovery deadline)",
          "s10": "Fixed 10%", "s30": "Fixed 30%", "p30": "Fixed 30% + low priority", "p50": "Fixed 50% + low priority",
          "p70": "Fixed 70% + low priority", "p100": "Low priority, no cap"}
-ORDER = ("x", "xp100", "n", "wm", "wr3", "wr2", "wr1", "s10", "s30", "p30", "p50", "p70", "p100")
+ORDER = ("x", "xp100", "n", "wm", "wn", "wr3", "wr2", "wr1", "wr0", "s10", "s30", "p30", "p50", "p70", "p100")
 # SM slice (v21_slice.sh, v22_slice2.sh): the policy code carries the SMs of the AI slice
 SLICE_NAMES = (("ws", "Rule + AI slice of {} SMs while the NeuralRx runs (NeuralRx on all SMs)"),
                ("wd", "Rule + AI slice of {} SMs while the NeuralRx runs (NeuralRx on the other SMs)"),

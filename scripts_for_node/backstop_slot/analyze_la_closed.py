@@ -125,7 +125,7 @@ def run_stats(path: Path) -> dict:
 
 def main() -> None:
     out_path, jobs, tag, cells = Path(sys.argv[1]), sys.argv[2].split(","), sys.argv[3], sys.argv[4]
-    pattern = re.compile(rf"^{re.escape(tag)}(\d)(x|n|r32([a-z0-9]+))_c{cells}_")
+    pattern = re.compile(rf"^{re.escape(tag)}(\d+)(x|n|r32([a-z0-9]+))_c{cells}_")
     runs: dict[str, dict[int, dict]] = {}
     for job in jobs:
         for path in sorted(RAW.glob(f"{tag}[0-9]*_c{cells}_*_j{job}.json")):

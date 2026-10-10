@@ -1,0 +1,25 @@
+| condition | N | two-user cells | candidates per slot | policy | lost: predicted | measured | error | three-slot runs: predicted | measured |
+|---|---|---|---|---|---|---|---|---|---|
+| sx (16 cells) | 4 | 2 | 0.29 | no AI | 0.1% | 0.0% (2 runs) | +0.0 | 4% | 4% |
+| sx (16 cells) | 4 | 2 | 0.29 | Antiphase | 0.1% | 0.0% (2 runs) | +0.0 | 4% | 7% |
+| sx (16 cells) | 4 | 2 | 0.29 | low priority + 30% | 0.3% | 0.5% (2 runs) | -0.2 | 27% | 19% |
+| sx (16 cells) | 4 | 2 | 0.29 | low priority + 70% | 1.1% | 1.3% (2 runs) | -0.1 | 85% | 78% |
+| sy (16 cells) | 4 | 6 | 0.89 | no AI | 4.5% | 4.7% (2 runs) | -0.2 | 14% | 14% |
+| sy (16 cells) | 4 | 6 | 0.89 | Antiphase | 4.8% | 4.8% (2 runs) | -0.0 | 17% | 17% |
+| sy (16 cells) | 4 | 6 | 0.89 | low priority + 30% | 6.5% | 6.8% (2 runs) | -0.3 | 37% | 42% |
+| sy (16 cells) | 4 | 6 | 0.89 | low priority + 70% | 11.6% | 11.4% (2 runs) | +0.2 | 87% | 90% |
+| sw (16 cells) | 4 | 8 | 1.18 | no AI | 10.5% | 10.1% (2 runs) | +0.4 | 22% | 21% |
+| sw (16 cells) | 4 | 8 | 1.18 | Antiphase | 11.0% | 10.5% (2 runs) | +0.5 | 25% | 23% |
+| sw (16 cells) | 4 | 8 | 1.18 | low priority + 30% | 13.7% | 13.6% (2 runs) | +0.1 | 44% | 51% |
+| sw (16 cells) | 4 | 8 | 1.18 | low priority + 70% | 20.1% | 19.7% (2 runs) | +0.4 | 88% | 89% |
+| sc (8 cells) | 2 | 2 | 0.29 | no AI | 7.8% (7.7% with the two-GPU timing) | 6.9% (2 runs) | +0.9 | 13% | 13% |
+| sc (8 cells) | 2 | 2 | 0.29 | Antiphase | 8.0% (7.9% with the two-GPU timing) | 7.2% (2 runs) | +0.9 | 15% | 16% |
+| sc (8 cells) | 2 | 2 | 0.29 | low priority + 30% | 10.1% (11.0% with the two-GPU timing) | 7.4% (2 runs) | +2.7 | 35% | 26% |
+| sc (8 cells) | 2 | 2 | 0.29 | low priority + 70% | 15.0% (14.7% with the two-GPU timing) | 14.1% (2 runs) | +0.8 | 86% | 78% |
+| sd (8 cells) | 2 | 4 | 0.60 | no AI | 20.9% (20.7% with the two-GPU timing) | 19.3% (2 runs) | +1.6 | 22% | 21% |
+| sd (8 cells) | 2 | 4 | 0.60 | Antiphase | 21.4% (21.1% with the two-GPU timing) | 19.4% (2 runs) | +1.9 | 25% | 24% |
+| sd (8 cells) | 2 | 4 | 0.60 | low priority + 30% | 24.2% (25.1% with the two-GPU timing) | 22.3% (2 runs) | +1.8 | 44% | 40% |
+| sd (8 cells) | 2 | 4 | 0.60 | low priority + 70% | 30.3% (29.9% with the two-GPU timing) | 28.8% (2 runs) | +1.5 | 88% | 83% |
+
+20 condition-policy pairs: mean absolute error 0.73 points, mean error +0.65 points, largest 2.67 points, correlation 0.997
+policies with AI (15): mean absolute error 0.76 points, mean error +0.69 points

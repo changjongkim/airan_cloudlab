@@ -1,0 +1,93 @@
+--- scripts_for_node/backstop_slot/controller5.py	2026-10-07 02:14:12.000000000 -0700
++++ run_state/backstop_slot/scripts_oracle/controller5.py	2026-10-10 09:22:35.000000000 -0700
+@@ -209,6 +209,41 @@
+     lane_reserve = int(unit_cfg.get("free_lane_reserve", 0))
+     reuse_rule = bool(unit_cfg.get("reuse_rule", False))
+     stop_check = bool(config.get("ai", {}).get("stop_check", False))
++    # Clairvoyant baseline (``oracle_candidates``: the number of candidates of every slot, known in advance from a
++    # run without AI of the same seed; not a setting of the scheme).  A neural receiver run of slot k is "needed"
++    # if the candidates of slot k+2 will need its receiver.  AI may run next to the runs that are not needed (such
++    # a run may then hold its receiver for a third slot) and never next to the others.  ``oracle_margin``
++    # receivers are kept free beyond the known demand.
++    oracle = unit_cfg.get("oracle_candidates")
++    oracle_margin = int(unit_cfg.get("oracle_margin", 0))
++    oracle_needed: dict[tuple[int, int], bool] = {}
++    oracle_runs: dict[int, int] = {}       # slot -> neural receiver runs assigned so far
++    oracle_free: dict[int, int] = {}       # slot -> runs of that slot that are not needed
++
++    def oracle_count(j: int) -> int:
++        return int(oracle[j]) if 0 <= j < len(oracle) else 0
++
++    def oracle_mark(cell: int, k: int) -> None:
++        n = len(lanes)
++        oracle_runs[k] = oracle_runs.get(k, 0) + 1
++        # Runs of slot k (each holds its receiver in slot k+1 as well): those assigned so far, or the candidates
++        # of the slot limited by the receivers that were free in it.
++        runs_k = max(oracle_runs[k], min(oracle_count(k), n - oracle_runs.get(k - 1, 0) - oracle_free.get(k - 2, 0)))
++        # Runs of slot k+1 (they hold their receivers in slot k+2): its candidates, limited by the receivers free
++        # then (the runs of slot k and the three-slot runs of slot k-1 still hold theirs).
++        runs_next = min(oracle_count(k + 1), max(0, n - runs_k - oracle_free.get(k - 1, 0)))
++        # Slot k+2 needs oracle_count(k+2) receivers out of the n - runs_next that the runs of slot k+1 leave.
++        allowed = max(0, n - runs_next - oracle_count(k + 2) - oracle_margin)
++        needed = oracle_free.get(k, 0) >= allowed
++        if not needed:
++            oracle_free[k] = oracle_free.get(k, 0) + 1
++        oracle_needed[(cell, k)] = needed
++        name = "oracle_needed" if needed else "oracle_free"
++        counters[name] = counters.get(name, 0) + 1
++
++    def oracle_blocks(g: int) -> bool:
++        """A neural receiver run of GPU g is needed two slots later: no AI next to it."""
++        return oracle is not None and any(oracle_needed.get(lane_job[lane], True) for lane in busy_lanes(g))
+     run_alone = float(unit_cfg.get("run_alone_ms", 6.3)) * ms            # median run, alone
+     reuse_alone = int(float(unit_cfg.get("reuse_alone_ms", 6.7)) * ms)   # run length used to predict its end
+     run_ai = {int(c): float(v) * ms for c, v in unit_cfg.get("run_ai_ms", {}).items()}
+@@ -270,6 +305,8 @@
+         lane_job[lane] = (cell, k)
+         job_state[(cell, k)] = ASSIGNED
+         counters["assigned"] += 1
++        if oracle is not None:
++            oracle_mark(cell, k)
+ 
+     def busy_lanes(g: int) -> list[int]:
+         return [lane for lane in gpu_lanes.get(g, []) if not lane_free(lane)]
+@@ -602,6 +639,8 @@
+                                 started = int(state.cells[cell, k, C_NRX_START]) or loop_start
+                                 if started + corun_by_chunk[c] > epoch + k * period + rescue_deadline:
+                                     stop = True
++                            if oracle_blocks(g):
++                                stop = True
+                     if not stop and conv_by_active and granted_chunk[g] and conv_pending(g, k_now) \
+                             and granted_chunk[g] not in conv_safe_of(g, k_now):
+                         stop = True       # more cells are active in this slot: this unit size may not run next to them
+@@ -622,6 +661,9 @@
+                 if not reuse_rule and lane_reserve and lanes_free < lane_reserve and busy_lanes(g):
+                     counters["reserve_blocked"] += 1
+                     continue                  # lanes are scarce: this NeuralRx runs without AI
++                if oracle_blocks(g):
++                    counters["reserve_blocked"] += 1
++                    continue                  # this NeuralRx is needed two slots later: it runs without AI
+                 now = now_ns()
+                 next_release = epoch + (k_now + 1) * period
+                 conv_running = conv_pending(g, k_now)
+--- scripts_for_node/backstop_slot/make_config.py	2026-10-07 02:55:27.000000000 -0700
++++ run_state/backstop_slot/scripts_oracle/make_config.py	2026-10-10 09:22:35.000000000 -0700
+@@ -116,6 +116,8 @@
+                              "the AI slice leaves (a CUDA green context of each lane)")
+     parser.add_argument("--ai-slice-factor", type=float, default=0.0,
+                         help="unit time on the slice / unit time on the whole GPU (default: from the SM count)")
++    parser.add_argument("--oracle-candidates", default=None,
++                        help="clairvoyant baseline (+oracleM in --unit-gating): JSON list with the candidates of every slot")
+     parser.add_argument("--ai-stop-check", type=int, default=0,
+                         help="1: the AI worker reads the controller's stop word between unit groups")
+     parser.add_argument("--yyr", default=None,
+@@ -258,6 +260,9 @@
+         for part in conv_part.split("+"):
+             if part.startswith("reserve"):
+                 config["ai_unit_gating"]["free_lane_reserve"] = int(part[len("reserve"):])
++            if part.startswith("oracle"):
++                config["ai_unit_gating"]["oracle_margin"] = int(part[len("oracle"):] or 0)
++                config["ai_unit_gating"]["oracle_candidates"] = json.loads(Path(args.oracle_candidates).read_text())
+         if "+reuse" in conv_part:
+             alone, _, per_chunk = args.nrx_run_ms.partition(",")
+             config["ai_unit_gating"].update({

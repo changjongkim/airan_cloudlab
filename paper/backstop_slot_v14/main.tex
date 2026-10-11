@@ -829,6 +829,37 @@ GPUs, cells, two-user cells & No AI & \sys & 30\%, low priority & 70\%, low prio
 \end{tabular}
 \end{table}
 
+\noindent\textbf{Steps in the Recovery Deadline.} The model makes a prediction about the form of the loss.
+In $h = \lceil (s + S - L)/P \rceil$ the latest start $L$ is the recovery deadline minus the time limit, so
+a later deadline moves runs from three slots to two and from two to one, and the deadline at which this
+happens is later for a policy with longer runs. The loss should therefore fall in steps, at deadlines that
+differ by policy. We computed the candidates that are not recovered in time for thirteen deadlines from
+11.0 to 14.0~ms, committed the values, and then ran the ten deadlines that had not been run
+(Figure~\ref{fig:sweep}; two seeds each; the default stays 11.5~ms). The closed form has no state for
+one-slot runs, so the computation is an event simulation with the candidates of the headline setting and,
+for each policy, the distributions of $c$ and $S$ measured at 11.5~ms. The 40 new values have a mean
+absolute error of 0.16 points, a mean error of $+$0.02 points, and a largest error of 0.70 points.
+
+The steps are where the model puts them. Without AI the loss is 2.1\% at 11.0~ms, flat at 1.3-1.5\% from
+11.5 to 12.5~ms, where the runs hold two slots, and 0.3\% at 13.0~ms, where 60\% of the runs are predicted
+to hold one. The three-slot runs fall below half at 11.25~ms for \textit{Priority} and at 12.0~ms for
+\textit{Priority-70}; the loss falls below 0.5\% at 13.0~ms without AI, at 13.5~ms for \sys, and at
+14.0~ms for \textit{Priority}, and \textit{Priority-70} stays at 1.6\%. The default deadline lies on the
+flat part of \sys: from 11.5 to 12.5~ms its loss is within 0.1 points of the server without AI, while the
+shares are still leaving their three-slot range. At the edges of a step \sys loses more than the server
+without AI, 0.3-0.8 points at 11.0-11.25~ms and at 12.75-13.25~ms: the AI left after a stop lengthens a run
+by 0.1-0.2~ms, which moves the step by about 0.25~ms. The computation had this difference at the second
+edge (0.1-0.7 points).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.74\linewidth]{figures/eval_deadline_sweep.pdf}
+\caption{Candidates that are not recovered in time against the recovery deadline (headline setting). Lines:
+computed and committed before the runs. Markers: measured. The loss falls in steps, at deadlines that differ
+by policy.}
+\label{fig:sweep}
+\end{figure}
+
 \subsection{AI served at a steady full load}
 \label{sec:steady}
 
@@ -1737,7 +1768,32 @@ neural receiver is needed two slots later is known only when that slot is decode
 next to the run until then has delayed it by 1.07~ms of the 1.2~ms slack, less than the stop latency and the
 spread of the run length leave. A rule that spends the slack lost 4.0\% of the recoveries in our runs.
 Closing the gap needs a prediction of the failures two slots ahead; the correlation between the failures of
-consecutive slots (0.19-0.26 against a mean of 0.145) is too weak for it.
+consecutive slots (0.19-0.26 against a mean of 0.145) is too weak for it. The next paragraph measures what
+such a prediction would have to deliver.
+
+\noindent\textbf{What a Prediction Would Have to Deliver.} The controller above reads an exact table. A
+predictor of the failures errs, so we ran the controller with errors in its table (Figure~\ref{fig:info};
+headline setting, three seeds). In a table with misses, each true candidate is kept with a given
+probability; in a table with false alarms, each slot of a two-user cell without a candidate is shown as one
+with a given probability. The two errors cost different things. A missed candidate lets AI run next to a
+neural receiver that is needed, and the recovery is lost: the controller keeps 99.3\% of the recoveries
+with 10\% of the candidates missing, 98.1\% with 25\%, and 95.8\% with 50\%. A false alarm only stops AI
+without need: with half of the other cell-slots shown as candidates, three of four entries of the table
+are wrong, and the controller keeps 99.7\% and serves 1.04$\times$ the AI of \sys. A predictor therefore
+needs to find nine of ten candidates and may raise many false alarms; with no misses and 10-25\% false
+alarms the controller serves 8-12\% more AI than \sys. The prize is bounded: an exact table is worth 15\%
+more AI, and every table costs 0.4-0.7~ms in the layer-1 tail (3.50-3.75~ms against 3.09~ms). With an
+empty table the controller serves 40.9k tokens/s at 93.5\%, close to the baseline that only checks the
+deadline of the neural receiver (41.3k at 93.8\%, \S\ref{sec:rules}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/eval_info_value.pdf}
+\caption{The clairvoyant controller with errors in its table: AI served (top) and recoveries kept (bottom)
+with (a) candidates missing from the table and (b) cell-slots shown as candidates by mistake. Dotted:
+\sys, which has no table.}
+\label{fig:info}
+\end{figure}
 
 \subsection{Neural receiver demand and server size}
 
@@ -1795,6 +1851,24 @@ recoveries, the level of \textit{Static} and of \textit{Priority}, and serves
 0.02-0.04\% without AI in these runs of 10~s. The difference comes from the start of the runs: in runs of
 100~s no TB is late after the first 20~s with \sys or without AI, and \textit{Static} and \textit{Priority}
 miss the deadline for 46 and 21 of 0.8 million TBs (Table~\ref{tab:when}).
+
+\noindent\textbf{Pooling.} With the same demand per GPU, a larger server loses fewer candidates, because
+the candidates of several cells share several neural receivers (Figure~\ref{fig:pooling}). With one
+two-user cell per GPU, 17.9\% of the candidates find no neural receiver on one GPU, 6.9\% on two, 4.0\% on
+three, and 1.7\% on four, without AI. \sys is within 0.3 points of these values at every size. The
+relative cost of a share grows with the server: \textit{Priority-70} loses 1.4$\times$ the candidates of
+the server without AI on one GPU and 3.6$\times$ on four (25.0\%, 14.1\%, 8.6\%, and 6.2\%). The part that
+is lost to a lack of receivers shrinks as the server grows; the part that is lost because AI makes a run
+hold one more slot does not. The event simulation of \S\ref{sec:modelval} gives 18.1\%, 6.2\%, 4.1\%, and
+1.7\% without AI and 1.2\% and 1.1\% for five and six GPUs, which we did not run.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.66\linewidth]{figures/eval_pooling.pdf}
+\caption{Candidates that find no neural receiver with one two-user cell per GPU (log scale). Markers:
+measured on one to four GPUs. Lines: computed; five and six GPUs were not run.}
+\label{fig:pooling}
+\end{figure}
 
 \subsection{More cells and other loads}
 
@@ -1890,6 +1964,7 @@ approaches \sys only in the recoveries kept at a fixed MCS. We committed the clo
 that are not recovered in time before these runs: the ten values have a mean absolute error of 0.59 points;
 no AI, \sys, and the 30\% share are within 0.2 points, and the 70\% share and no cap are 0.3-2.5 points
 low, because the runs that end after the deadline were predicted at 0.1\% and are 0.2-2.2\%.
+Figure~\ref{fig:sweep} extends the comparison to thirteen deadlines with an event simulation.
 
 \begin{table}[t]
 \caption{Headline setting with a later recovery deadline (three seeds; the first row five): AI served
@@ -2011,7 +2086,8 @@ slots are dependent, and the policy enters through the distribution of the run l
 The channels are the synthetic channels of the public NVlabs configuration, and every cell replays 512
 slots (a replay of 1,000 slots gives the same results in the headline setting). \sys serves 76-95\% of the AI of a
 clairvoyant controller that was run and 43-88\% of an estimate for an offline schedule; it does not predict
-which neural receiver will be needed. The clairvoyant controller is one rule and not the optimum. At a recovery
+which neural receiver will be needed; a predictor would have to find nine of ten candidates to keep 99\%
+of the recoveries, and exact knowledge is worth 15\% more AI. The clairvoyant controller is one rule and not the optimum. At a recovery
 deadline of 12.5~ms and a fixed MCS, a low-priority share with a cap of 70\% keeps 98.0\% of the recoveries and serves
 1.2$\times$ the AI of \sys; under rate control it loses 0.5-4.4\% of the goodput at every deadline we ran. The
 rule on unit sizes costs 9-12\% of the AI served, and we measure no effect of it on the late TBs in steady state. The larger model allows four to five cells per GPU at full load; 32 and 48 cells run when half or

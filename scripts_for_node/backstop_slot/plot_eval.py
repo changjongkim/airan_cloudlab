@@ -10,6 +10,12 @@ usage:
                                                              (analyze_clairvoyant.py); without that file, against the
                                                              estimate for an offline schedule that knows the future
   plot_eval.py closed   OUT "LABEL=LA_CLOSED.json" ...       goodput lost with a rate controller in the loop
+  plot_eval.py pooling  OUT POOLING.json                     candidates without a neural receiver against the number of GPUs
+                                                             (analyze_pooling.py): measured points, computed lines
+  plot_eval.py sweep    OUT SWEEP_MEASURED.json              candidates not recovered in time against the recovery deadline
+                                                             (predict_deadline_sweep.py compare): predicted lines, measured points
+  plot_eval.py info     OUT INFO.json                        AI served and recoveries kept of the clairvoyant controller with
+                                                             errors in its table (analyze_info.py)
   plot_eval.py protect  OUT "TITLE=SCHED.json" ...           latency that AI adds to the radio work and latency of
                                                              the AI requests (SCHED.json: output of analyze_sched.py)
   plot_eval.py frontier OUT "TITLE=LA_CLOSED.json" ...       AI served against goodput lost with a rate controller in the
@@ -291,6 +297,95 @@ def use(out: str, path: str, condition: str = "fa c16", measured: str | None = N
 
 
 # ---------------------------------------------------------------------------------------------------
+LINES = [("No AI", "n", "#555555", "D", (0, (1, 1.2))), (NAME, "wd", "#1f77b4", "o", "-"),
+         ("Priority", "p30", "#ff7f0e", "s", "-"), ("Priority-70", "p70", "#8c564b", "X", (0, (4, 2)))]
+
+
+def line_legend(fig, y=1.0, measured="measured", computed="computed") -> None:
+    handles = [plt.Line2D([0], [0], color=c, linestyle=ls, linewidth=1.8, marker=m, markersize=6.5, markerfacecolor=c,
+                          markeredgecolor="black") for _, _, c, m, ls in LINES]
+    handles += [plt.Line2D([0], [0], color=INK, linestyle="none", marker="o", markersize=6.5, markerfacecolor="white", markeredgecolor=INK),
+                plt.Line2D([0], [0], color=INK, linewidth=1.8)]
+    fig.legend(handles, [n for n, *_ in LINES] + [measured, computed], loc="upper center", bbox_to_anchor=(0.5, y), ncol=3,
+               frameon=False, fontsize=FS, handlelength=2.0, columnspacing=1.2, handletextpad=0.5)
+
+
+def pooling(out: str, path: str) -> None:
+    d = json.loads(Path(path).read_text())
+    xs = sorted(int(k) for k in d)
+    fig, ax = plt.subplots(figsize=(5.6, 4.1))
+    floor = 0.5
+    for _, code, color, marker, ls in LINES:
+        ax.plot(xs, [max(floor, d[str(x)][code]["computed_pct"]) for x in xs], color=color, linewidth=1.8, linestyle=ls, zorder=3)
+        mx = [x for x in xs if d[str(x)][code]["measured"]]
+        ax.plot(mx, [d[str(x)][code]["measured"]["lost_pct"] for x in mx], linestyle="none", marker=marker, markersize=7.5,
+                markerfacecolor=color, markeredgecolor="black", zorder=4)
+    last = max(x for x in xs if d[str(x)]["n"]["measured"])
+    ax.axvspan(last + 0.5, xs[-1] + 0.4, color="#eeeeee", zorder=1)
+    ax.text((last + 0.5 + xs[-1] + 0.4) / 2, 28, "not run", fontsize=FS, color=INK, ha="center", va="top", style="italic", fontweight="normal")
+    ax.set_yscale("log")
+    ax.set_ylim(floor, 40)
+    ax.set_yticks([0.5, 1, 2, 5, 10, 20])
+    ax.set_yticklabels(["0.5", "1", "2", "5", "10", "20"])
+    ax.minorticks_off()
+    ax.set_xticks(xs)
+    ax.set_xlim(xs[0] - 0.4, xs[-1] + 0.4)
+    style(ax, "Candidates Without a\nNeural Receiver (%)", "GPUs (Four Cells Each, One of Them a Two-User Cell)")
+    line_legend(fig)
+    fig.tight_layout(rect=(0, 0, 1, 0.82))
+    fig.savefig(out, dpi=200)
+
+
+def sweep(out: str, path: str) -> None:
+    rows = json.loads(Path(path).read_text())["rows"]
+    fig, ax = plt.subplots(figsize=(6.4, 4.1))
+    for _, code, color, marker, ls in LINES:
+        mine = sorted((r for r in rows if r["policy"] == code), key=lambda r: r["deadline_ms"])
+        ax.plot([r["deadline_ms"] for r in mine], [r["not_recovered_pct"] for r in mine], color=color, linewidth=1.8, linestyle=ls, zorder=3)
+        got = [r for r in mine if r.get("measured")]
+        ax.plot([r["deadline_ms"] for r in got], [r["measured"]["not_recovered_pct"] for r in got], linestyle="none", marker=marker,
+                markersize=7.5, markerfacecolor=color, markeredgecolor="black", zorder=4)
+    ax.axvline(11.5, color=INK, linewidth=0.9, linestyle=(0, (2, 2)))
+    ax.text(11.53, ax.get_ylim()[1] * 0.98, "default", fontsize=FS - 1, color=INK, ha="left", va="top", style="italic", fontweight="normal")
+    ax.set_ylim(0, None)
+    style(ax, "Candidates Not Recovered\nin Time (%)", "Recovery Deadline (ms)")
+    line_legend(fig, measured="measured", computed="computed before the runs")
+    fig.tight_layout(rect=(0, 0, 1, 0.82))
+    fig.savefig(out, dpi=200)
+
+
+def info(out: str, path: str) -> None:
+    d = json.loads(Path(path).read_text())
+    base = d["wd"]
+    color = "#17becf"
+    columns = [("(a) Candidates Missing from the Table", [("wo1", 0)] + [("wk" + v, 100 - int(v[1:])) for v in ("r90", "r75", "r50", "r25", "r00")],
+                "Candidates Missing from the Table (%)"),
+               ("(b) False Candidates in the Table", [("wo1", 0)] + [("wk" + v, int(v[1:])) for v in ("f05", "f10", "f25", "f50")],
+                "Cell-Slots Shown as a Candidate by Mistake (%)")]
+    fig, axes = plt.subplots(2, 2, figsize=(9.6, 5.2), sharex="col")
+    for col, (title, points, xlabel) in enumerate(columns):
+        pts = [(x, d[c]) for c, x in points if c in d]
+        xs = [x for x, _ in pts]
+        for row, (key, scale, ref, ylabel, limits) in enumerate((("tokens", 1e-3, base["tokens"] / 1e3, "AI Served (k tokens/s)", (32, 42)),
+                                                                 ("kept_pct", 1.0, base["kept_pct"], "Recoveries Kept (%)", (92, 100.6)))):
+            ax = axes[row][col]
+            ax.plot(xs, [r[key] * scale for _, r in pts], color=color, marker="P", markersize=8, markeredgecolor="black", linewidth=1.8, zorder=3)
+            ax.axhline(ref, color="#1f77b4", linewidth=1.3, linestyle=(0, (2, 2)), zorder=2)
+            if row == 0:
+                ax.text(xs[-1], ref + 0.25, NAME, fontsize=FS - 0.5, color="#1f77b4", ha="right", va="bottom", style="italic", fontweight="normal")
+            ax.set_ylim(*limits)
+            style(ax, ylabel if col == 0 else "", xlabel if row == 1 else "")
+            if row == 0:
+                ax.set_title(title, fontsize=FS + 1, color=INK)
+    handles = [plt.Line2D([0], [0], color=color, marker="P", markersize=8, markeredgecolor="black", linewidth=1.8),
+               plt.Line2D([0], [0], color="#1f77b4", linewidth=1.3, linestyle=(0, (2, 2)))]
+    fig.legend(handles, ["Controller that reads a table of the coming failures", NAME + " (no table)"], loc="upper center",
+               bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False, fontsize=FS, handlelength=2.2, columnspacing=1.6)
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.savefig(out, dpi=200)
+
+
+# ---------------------------------------------------------------------------------------------------
 def closed(out: str, items: list[str]) -> None:
     names = [NAME, "Static", "Priority", "Priority-70", "Priority-max"]
     codes = {NAME: "wm", "Static": "s10", "Priority": "p30", "Priority-70": "p70", "Priority-max": "p100"}
@@ -437,6 +532,12 @@ def main() -> None:
         tradeoff(out, sys.argv[3])
     elif mode == "scale":
         scale(out, sys.argv[3:])
+    elif mode == "pooling":
+        pooling(out, sys.argv[3])
+    elif mode == "sweep":
+        sweep(out, sys.argv[3])
+    elif mode == "info":
+        info(out, sys.argv[3])
     elif mode == "use":
         use(out, sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else "fa c16", sys.argv[5] if len(sys.argv) > 5 else None)
     elif mode == "closed":

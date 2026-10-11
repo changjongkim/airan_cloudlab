@@ -44,9 +44,9 @@ def arrivals(seed: int) -> list[np.ndarray]:
     return np.bincount(np.asarray(t["period"]), minlength=int(t["periods"]))[:int(t["periods"])]
 
 
-def simulate(counts: np.ndarray, known: np.ndarray, length: np.ndarray, deadline: float, rng) -> dict:
+def simulate(counts: np.ndarray, known: np.ndarray, length: np.ndarray, deadline: float, rng, lanes: int = LANES) -> dict:
     latest = deadline - TIME_LIMIT_MS
-    free = np.zeros(LANES)
+    free = np.zeros(lanes)
     total = lost = late = three = one = runs = 0
     for k, m in enumerate(counts):
         if not m:

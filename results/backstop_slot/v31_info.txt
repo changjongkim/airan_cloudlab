@@ -1,0 +1,17 @@
+
+## Clairvoyant controller with errors in its table, headline condition (fk; jobs 59665820)
+
+| table of the controller | true candidates in the table | false candidates added | AI served (tokens/s) | against Antiphase | recoveries kept | L1 p99.9 (ms) | seeds |
+|---|---|---|---|---|---|---|---|
+| Antiphase (knows nothing of the future) | – | – | 33.7k | 1.00x | 100.0% | 3.09 | 3 |
+| table with false alarms | 100% | 50% | 35.0k | 1.04x | 99.7% | 3.50 | 3 |
+| table with false alarms | 100% | 25% | 36.3k | 1.08x | 99.6% | 3.57 | 3 |
+| table with false alarms | 100% | 10% | 37.9k | 1.12x | 100.0% | 3.68 | 3 |
+| table with false alarms | 100% | 5% | 38.3k | 1.13x | 99.5% | 3.64 | 3 |
+| exact table | 100% | 0% | 38.8k | 1.15x | 99.6% | 3.63 | 3 |
+| table with misses | 90% | 0% | 38.9k | 1.15x | 99.3% | 3.70 | 3 |
+| table with misses | 75% | 0% | 39.2k | 1.16x | 98.1% | 3.75 | 3 |
+| table with misses | 50% | 0% | 40.1k | 1.19x | 95.8% | 3.67 | 3 |
+| table with misses | 25% | 0% | 40.6k | 1.20x | 94.6% | 3.69 | 3 |
+| table with misses | 0% | 0% | 40.9k | 1.21x | 93.5% | 3.71 | 3 |
+| table with both | 75% | 10% | 38.5k | 1.14x | 98.6% | 3.68 | 3 |

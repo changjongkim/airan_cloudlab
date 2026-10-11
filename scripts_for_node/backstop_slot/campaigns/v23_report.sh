@@ -12,8 +12,8 @@ for step in ${*:-seeds pre base}; do
   case $step in
     seeds) J=$(jobs_of seeds_a seeds_b)
       { say "Eight two-user cells, target 1%, seeds 10-33 (led; jobs $J)"; $PY analyze_la_closed.py $R/la_closed_led.json $J led 16
-        say "All seeds of this condition (earlier measurements laf, lfc, lsc, ltc, lec and the new seeds led)"
-        $PY analyze_seed_interval.py $R/seed_interval_8cells_1pct.json wm $R/la_closed_laf.json $R/la_closed_lfc.json $R/la_closed_lsc.json $R/la_closed_ltc.json $R/la_closed_lec.json $R/la_closed_led.json
+        say "All seeds of this condition (earlier measurements laf, lfc, lsc, ltc, lec, the runs of the baseline job lbc, and the new seeds led)"
+        $PY analyze_seed_interval.py $R/seed_interval_8cells_1pct.json wm $R/la_closed_laf.json $R/la_closed_lfc.json $R/la_closed_lsc.json $R/la_closed_ltc.json $R/la_closed_lec.json $R/la_closed_lbc.json $R/la_closed_led.json
       } > $R/v23_seeds.txt 2>&1 ;;
     pre) J=$(jobs_of pre_a pre_b)
       { say "Conditions never run before: predicted (commit 3b915a8a) against measured (jobs $J)"

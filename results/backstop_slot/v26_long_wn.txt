@@ -1,0 +1,30 @@
+
+## Runs of 100 s without their first 20 s, full load, seeds 1-3 (xa; job 59632171): wd = the rule, wn = stop on NeuralRx only
+
+| policy | seeds | AI in limit (k tok/s) | recoveries kept | L1 p50 / p99 / p99.9 (ms) | L1 late | NeuralRx run p50 / p99 (ms) | AI request p50 / p99 (ms) | in limit | rejected | GPU active | radio | AI | AI next to NeuralRx | idle |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| n | 3 | 0.0 | 100.0% | 1.39 / 2.89 / 3.02 | 0.000% | 6.29 / 6.57 | – / – | –% | –% | 73.6% | 73.6% | 0.0% | 0.0% | 26.4% |
+| wd | 3 | 34.0 | 99.8% | 1.82 / 2.89 / 3.06 | 0.000% | 6.37 / 6.81 | 77 / 175 | 99.8% | 16.4% | 99.0% | 83.4% | 62.3% | 2.3% | 1.0% |
+| wn | 3 | 37.8 | 99.6% | 1.82 / 2.91 / 3.10 | 0.000% | 6.41 / 7.05 | 74 / 184 | 99.5% | 13.5% | 98.7% | 83.5% | 61.7% | 2.7% | 1.3% |
+
+| policy | L1 late TBs / TBs | pooled | 95% interval | z against no AI | L1 p99.99 (ms) | L1 max (ms) |
+|---|---|---|---|---|---|---|
+| n | 1 / 1920000 | 0.0001% | 0.0000-0.0003% | – | 3.20 | 3.78 |
+| wd | 0 / 1920000 | 0.0000% | 0.0000-0.0002% | -1.0 | 3.18 | 3.38 |
+| wn | 0 / 1920000 | 0.0000% | 0.0000-0.0002% | -1.0 | 3.25 | 3.56 |
+/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot/sched_xa_c16_j59632171_w20.json
+
+## The same runs with their first 20 s
+
+| policy | seeds | AI in limit (k tok/s) | recoveries kept | L1 p50 / p99 / p99.9 (ms) | L1 late | NeuralRx run p50 / p99 (ms) | AI request p50 / p99 (ms) | in limit | rejected | GPU active | radio | AI | AI next to NeuralRx | idle |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| n | 3 | 0.0 | 100.0% | 1.39 / 2.89 / 3.03 | 0.003% | 6.29 / 6.58 | – / – | –% | –% | 73.6% | 73.6% | 0.0% | 0.0% | 26.4% |
+| wd | 3 | 34.0 | 99.8% | 1.82 / 2.89 / 3.06 | 0.003% | 6.37 / 6.82 | 77 / 175 | 99.8% | 16.0% | 99.0% | 83.4% | 62.3% | 2.3% | 1.0% |
+| wn | 3 | 37.7 | 99.6% | 1.82 / 2.91 / 3.10 | 0.003% | 6.41 / 7.05 | 74 / 183 | 99.5% | 13.1% | 98.8% | 83.5% | 61.8% | 2.7% | 1.2% |
+
+| policy | L1 late TBs / TBs | pooled | 95% interval | z against no AI | L1 p99.99 (ms) | L1 max (ms) |
+|---|---|---|---|---|---|---|
+| n | 69 / 2398800 | 0.0029% | 0.0023-0.0036% | – | 3.22 | 6.97 |
+| wd | 61 / 2398800 | 0.0025% | 0.0020-0.0033% | -0.7 | 3.21 | 5.61 |
+| wn | 62 / 2398800 | 0.0026% | 0.0020-0.0033% | -0.6 | 3.29 | 6.73 |
+/pscratch/sd/s/sgkim/kcj/airan_cloudlab/results/backstop_slot/sched_xa_c16_j59632171.json

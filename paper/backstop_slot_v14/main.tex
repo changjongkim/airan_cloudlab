@@ -58,10 +58,11 @@ every channel we test, and it takes 2.5$\times$ the uplink period. Thus, the mod
 for failed TBs, as a recovery path. We find that AI inference costs the recoveries of this path by a
 mechanism that deadline checks miss: a failed TB cannot wait, and a neural receiver that AI slows past
 its slack (1.2~ms at the median here) holds its GPU for three uplink slots, not two. A loss model of this path predicts the lost
-recoveries of 672 measured runs within 0.82 percentage points on average, and an offline schedule that knows
-every later failure gives a reference for the AI that a policy can serve without losing a recovery. The model points to a
+recoveries of 672 measured runs within 0.82 percentage points on average, and 24 values of six settings that
+had never been run, computed before the runs, within 0.34 points. The model points to a
 rule, which we build as \sys: the AI of a GPU stops while the neural receiver of that GPU runs. On four
-A100 GPUs with 16 cells, \sys serves 70\% of this reference, 1.9-6.4$\times$ the existing mechanisms that keep
+A100 GPUs with 16 cells, \sys serves 87\% of the AI of a clairvoyant controller that we ran with the failures of every slot
+known in advance, 1.9-6.4$\times$ the existing mechanisms that keep
 the recoveries, and adds 0.04-0.06~ms to the 99.9th-percentile latency of the layer-1 decode, 2.8-21$\times$
 less than the baselines. With a rate controller in the loop, the recovery path raises the uplink goodput of
 two-user cells by 11-40\% when the channels of the users are correlated. \sys loses at most 0.5\% of this
@@ -136,12 +137,14 @@ the MCS.
 \item \textbf{A finding and a model.} AI inference costs recoveries by a path that deadline checks miss. A
 neural receiver that AI slows by more than 1.2~ms still meets its deadline, but it holds its GPU for three
 uplink slots, not two, and the failed TBs of the extra slot find no free neural receiver. This path accounts
-for 83-99\% of the lost recoveries. We treat the neural receivers as the servers of a loss system and
+for 83-99\% of the lost recoveries. A baseline that admits AI whenever the neural receiver still meets its own
+deadline keeps every run inside the deadline and loses 6.2\% of the recoveries. We treat the neural receivers as the servers of a loss system and
 compute the share of failed TBs that find none of them free from the run lengths of the neural receiver. The
 closed form predicts the loss of 672 measured runs with a correlation of 0.994 and a mean absolute error of
-0.82 percentage points. We measured 260 of these runs after the model was final, and for one changed setting
-we computed the loss before the runs and were within 0.7 points. An offline schedule that knows every later
-failure gives the AI that a policy can serve without losing a recovery.
+0.82 percentage points. We measured 260 of these runs after the model was final. For six settings that had never
+been run we committed the predicted loss of four policies before the runs; the 24 values were within 0.34
+points on average. A controller that knows the failures of every slot in advance, which we ran, gives a
+reference for the AI that can be served while the recoveries are kept.
 \item \textbf{A design.} The model says what to protect: the run length of the neural receiver, not its
 deadline. \sys admits AI in stoppable pieces at low priority and stops the AI of a GPU when the neural
 receiver of that GPU starts. Its recovery path sends a failed TB to the neural receiver only when the number
@@ -157,7 +160,7 @@ how much of the GPU it uses. The main results are as follows.
 \begin{itemize}
 \item \textbf{\sys keeps the radio.} With one configuration, \sys keeps the radio in every setting we
 measure. With an outer-loop rate controller, the two-user cells lose at most 0.5\% of their goodput against
-the server without AI in all 42 settings, and at most 0.3\% in 41 of them (means per setting; the largest is 0.36\% over its 16 runs and 0.43\% over its nine seeds, with a 95\% interval of 0.29-0.57\%): seven SNRs, three channels, an SNR that changes in steps and
+the server without AI in all 42 settings, and at most 0.3\% in 41 of them (means per setting; the largest is 0.35\% over its 33 seeds, with a 95\% interval of 0.25-0.44\%): seven SNRs, three channels, an SNR that changes in steps and
 continuously, and cells with different channels on one server. In steady state \sys adds 0.04-0.06~ms to the 99.9th-percentile
 latency of the layer-1 decode and 0.07-0.09~ms to the run of the neural receiver, and after the start of a
 run its TBs pass the layer-1 deadline as rarely as those of the server without AI in all four server
@@ -172,9 +175,10 @@ the load changes.
 \item \textbf{\sys uses more of the GPU.} \sys serves 34.1k-44.7k tokens/s within the 200~ms limit under
 three load patterns. This is 6.4-7.5$\times$ a fixed 10\% share, 1.9-2.0$\times$ a 30\% share with
 low-priority AI, and 1.2-1.9$\times$ a share chosen by a load estimator with low-priority AI, the strongest
-combination of existing mechanisms that we built. Against the AI that we estimate for an offline schedule that knows every later
-failure, \sys serves 70\% at full load, and the
-mechanisms that keep the recoveries serve 11-37\%. The 99th-percentile latency of its AI requests is
+combination of existing mechanisms that we built. Against a clairvoyant controller that we ran, which knows the failures of every slot in advance,
+\sys serves 87\% at full load and 76-95\% in six settings, and the
+mechanisms that keep the recoveries serve 14-46\%. Against an estimate for an offline schedule, which is
+not run, \sys serves 70\%. The 99th-percentile latency of its AI requests is
 175-187~ms, inside the limit.
 \item \textbf{More AI than \sys is paid by the radio.} A low-priority share with a cap of 70\% or without a
 cap serves 1.1-1.4$\times$ the AI of \sys under the three load patterns and up to 4.2$\times$ under rate
@@ -671,7 +675,7 @@ AI served, random load steps & 44.7k tokens/s & \textit{Static} (6.0k) & 7.5$\ti
  & & \textit{Estimator+Priority} (36.4k) & 1.2$\times$ \\
 Recoveries lost & 0.0-0.1\% & \textit{Priority-70} (2.7-5.6\%) & \\
 Layer-1 latency added, 99.9th percentile & 0.04-0.06~ms & baselines (0.14-0.87~ms) & 2.8-21$\times$ less \\
-AI served against the offline reference & 70\% & \textit{Static} to \textit{Priority} (11-37\%) & 1.9-6.4$\times$ \\
+AI served against a clairvoyant controller that was run & 87\% & \textit{Static} to \textit{Priority} (14-46\%) & 1.9-6.4$\times$ \\
 Goodput lost by two-user cells, 42 settings & at most 0.5\% & \textit{Priority-max} (up to 8.2\%) & \\
 Loss model & 0.82 points error & 672 measured runs & \\
 \bottomrule
@@ -795,6 +799,36 @@ while one other is free is 0.8 points below. \sys adds 0.09~ms to the run of the
 0.32~s, and the loss without AI was 1.45\% and 3.76\% for two seeds, which the closed form did not
 reproduce. With 512 slots the two seeds give 1.30\% and 1.34\%, and the recoveries kept by the baselines
 rise by 1.0-1.5 points. Every result in this section uses 512 slots.
+
+\noindent\textbf{Predictions Before the Runs.} The comparisons above take $c$ and $S$ from runs of the same
+setting. Table~\ref{tab:prereg} is a stricter test: six settings that had never been run, with nothing of
+the setting measured. Which slots of a two-user cell are candidates is fixed by the data set, the cell, and
+the seed; they are the same slots in every job, setting, and policy (all 2,317 candidates of a seed agree in
+two jobs and three policies). We therefore put the candidates of a new set of two-user cells together from
+earlier runs without AI, took $c$ and $S$ of each policy from its runs in the headline setting, and
+committed the 24 predicted losses to the repository before the runs started. Three GPUs had not been run
+before. The mean absolute error is 0.34 points, the largest is 1.21 points (the 30\% share on two GPUs,
+where the closed form overestimates the three-slot runs, 39\% against 30\%), and the correlation is 0.998.
+The same procedure on five settings that had been measured before gives 0.73 points.
+
+\begin{table}[t]
+\caption{Candidates that find no free neural receiver in six settings that had not been run: predicted
+before the run / measured. Three seeds for the first three settings and two for the others.}
+\label{tab:prereg}
+\footnotesize
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+GPUs, cells, two-user cells & No AI & \sys & 30\%, low priority & 70\%, low priority \\
+\midrule
+3, 12, 2 & 1.8 / 2.1\% & 1.9 / 2.1\% & 2.4 / 2.8\% & 4.0 / 3.6\% \\
+3, 12, 3 & 4.2 / 4.0\% & 4.4 / 4.1\% & 5.5 / 4.9\% & 8.8 / 8.6\% \\
+4, 16, 3 & 0.6 / 0.5\% & 0.7 / 0.7\% & 1.3 / 1.0\% & 3.0 / 3.3\% \\
+4, 16, 5 & 2.6 / 2.5\% & 2.7 / 2.5\% & 4.0 / 4.1\% & 7.8 / 8.6\% \\
+4, 16, 7 & 7.3 / 7.2\% & 7.7 / 7.4\% & 10.0 / 10.3\% & 15.9 / 15.6\% \\
+2, 8, 3 & 13.4 / 13.1\% & 13.8 / 13.2\% & 16.2 / 15.0\% & 21.9 / 21.4\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{AI served at a steady full load}
 \label{sec:steady}
@@ -1101,7 +1135,8 @@ serves more AI and loses more goodput in every setting: from the 20\% cap to no 
 eight two-user cells at the 1\% target. The cap that keeps the goodput within 0.3\% depends on the setting:
 it is 30\% at the 10\% target and 20\% at the 1\% target with four two-user cells, and with eight two-user
 cells the fixed 10\% share already loses 0.8-0.9\%. \sys loses 0.0-0.3\% in the four settings with one
-configuration. In no setting does a cap serve at least the AI of a setting of \sys at no more loss. Reading
+configuration. In no setting does a cap serve at least the AI of a setting of \sys at no more loss; this holds at the
+recovery deadline of 11.5~ms, and \S\ref{sec:cells} gives later deadlines. Reading
 the AI at a loss of at most 0.25\% from the lines between the measured points, \sys serves 1.2$\times$,
 2.4$\times$, 2.2$\times$, and 7.8$\times$ the AI of the caps. The settings of \sys that allow AI next to a
 neural receiver trade goodput for AI in the same way as a cap and from a lower loss; the default allows none.
@@ -1222,11 +1257,21 @@ path and the goodput that a share pays move together: 11-40\% and up to 8.2\%, 4
 1-5\% and up to 0.7\%. With the 21 settings above, \sys loses at most 0.5\% of the goodput in 42 settings with
 one configuration, and at most 0.3\% in 41 of them (eight two-user cells at the 3\% target give 0.20\% and
 0.32\% in two measurements). We
-measured the setting with the largest loss, eight two-user cells at the 1\% target, in five campaigns with nine
-seeds: the 16 runs give 0.36\% on average with a standard error of 0.08 points, and 0.0-0.7\% by campaign. Grouped
-by seed, the mean is 0.43\% with a 95\% interval of 0.29-0.57\%; the 0.5\% above is a statement about the
-means of the settings. The
-30\% share loses 2.25\% in its 14 runs of this setting, 6.3$\times$ as much, and serves less AI than \sys.
+measured the setting with the largest loss, eight two-user cells at the 1\% target, with 33 seeds in 43 runs.
+The runs give 0.34\% on average with a standard error of 0.05 points. Grouped
+by seed, the mean is 0.35\% with a 95\% interval of 0.25-0.44\%, below 0.5\%; with the first nine seeds alone the
+interval was 0.29-0.57\%. A single run is between a gain of 0.25\% and a loss of 1.02\%, so the 0.5\% above is a
+statement about the mean of a setting and its interval and not about every run. The
+30\% share loses 2.25\% in its 14 runs of this setting, more than six times as much, and serves less AI than \sys.
+
+\noindent\textbf{The Assumed Success of a Retransmission.} The runs do not send retransmissions: every slot
+carries a new TB, and the goodput counts a retransmission as one uplink slot of the user that succeeds with
+probability 0.95. We recomputed the goodput of every seed with a success of 0.80, 0.90, and 1.00 and with no
+gain from combining. The loss of every policy against the server without AI is the same to two decimals,
+for example 0.31\% for \sys and 8.01\% for low priority without a cap with eight two-user cells at the 1\%
+target. The outer loop holds the share of TBs that need a retransmission at the target for every policy
+(1.00\% or 10.00\%), so the policies differ in the MCS at which the loop settles and not in the number of
+retransmissions, and the value of one retransmission cancels in the comparison.
 
 \begin{table}[t]
 \caption{AI on a slice of the SMs of a GPU (a CUDA green context), with the outer loop (two seeds). Cells as in
@@ -1455,8 +1500,10 @@ the unit that finishes after a stop, and for 19-38\% with the baselines.
 \subsection{What each rule adds}
 
 \noindent\textbf{Takeaway.} Stoppable AI pieces and no AI next to a running neural receiver raise the
-recoveries kept from 97.8\% to 100.0\%. Keeping the largest AI units away from the conventional receivers
-lowers the layer-1 misses from 0.061\% to 0.036\%.
+recoveries kept from 97.8\% to 100.0\%. Admitting AI by the deadline of each neural receiver run keeps every
+run inside its deadline and keeps 93.8\%. Keeping the largest AI units away from the conventional receivers
+does not change the goodput; it lowers the layer-1 misses of runs of 10~s from 0.061\% to 0.036\%, and in
+steady state with five cells per GPU from six TBs in 2.3 million to none.
 \label{sec:rules}
 
 \begin{table}[t]
@@ -1511,17 +1558,61 @@ The 99.9th percentile is the same without AI and with one or two classes (3.07-3
 every class. \sys allows two classes because the layer-1 decode has a deadline; a deployment that needs a
 lower median changes this parameter and no rule.
 
+\noindent\textbf{One Rule Away.} Table~\ref{tab:oneaway} runs two configurations that differ from \sys in
+one rule, under rate control. \emph{Stop only} drops the rule on unit sizes: the AI of a GPU stops when its
+neural receiver starts, and every unit size may run next to the conventional receivers. \emph{Own deadline
+only} replaces the stop by a deadline check: AI runs next to a neural receiver as long as that run still
+meets its own recovery deadline. At a fixed MCS and full load (five seeds), own deadline only serves 41.3k
+tokens/s and keeps 93.8\% of the recoveries. All of its neural receiver runs end inside the recovery
+deadline, 92.7\% of them hold a third slot (10.0\% without AI), and 6.6\% of the candidates find no free
+neural receiver. Under rate control it loses 0.65-3.46\% of the goodput. This is the finding of
+\S\ref{sec:model} measured directly: protecting the deadline of every neural receiver run does not protect
+the recoveries. Stop only has the goodput of \sys in all three settings (the ranges over the seeds overlap)
+and serves 0-11\% more AI: the goodput is kept by the recovery path and the stop, not by the rule on unit
+sizes.
+
+\begin{table}[t]
+\caption{Configurations one rule away from \sys under rate control (three seeds): goodput of the two-user
+cells against the server without AI / AI served (tokens/s) / three-slot runs.}
+\label{tab:oneaway}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Two-user cells, target & \sys & Stop only & Own deadline only & Low priority, no cap \\
+\midrule
+4, 10\% & $-$0.00\% / 11.5k / 25\% & $-$0.01\% / 11.5k / 27\% & $-$0.65\% / 22.8k / 91\% & $-$0.96\% / 30.3k / 94\% \\
+4, 1\% & $-$0.10\% / 33.7k / 19\% & $-$0.07\% / 37.3k / 22\% & $-$0.89\% / 41.0k / 96\% & $-$1.60\% / 48.7k / 89\% \\
+8, 1\% & $-$0.50\% / 17.2k / 34\% & $-$0.24\% / 17.7k / 35\% & $-$3.46\% / 32.0k / 97\% & $-$7.69\% / 45.0k / 94\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{What the Rule on Unit Sizes Protects.} The rule on unit sizes protects the layer-1
+deadline of the conventional receivers. Layer-1 misses concentrate at the start of a run
+(\S\ref{sec:protect}), so we compare \sys and stop only in runs of 100~s without their first 20~s (three
+seeds). With 16 cells, four per GPU, neither has a TB past the layer-1 deadline in 1.92 million TBs; the
+99.99th percentile is 3.18~ms against 3.25~ms and the maximum 3.38~ms against 3.56~ms. With 20 cells, five per
+GPU, stop only has six TBs past the deadline in 2.30 million and a maximum of 4.67~ms; \sys has none and a
+maximum of 3.54~ms (the server without AI: one TB, 3.64~ms). The rule costs 11\% of the AI served (34.0k
+against 37.8k, 31.9k against 35.7k tokens/s). It is a rule for dense servers: we keep it in the one
+configuration that is used for 4 to 48 cells, and a deployment with at most four cells per GPU can drop it.
+The difference is six TBs against none, so rarer events are not resolved.
+
 \subsection{Distance to a clairvoyant schedule}
 \label{sec:clairvoyant}
 
-\noindent\textbf{Takeaway.} \sys serves 70\% of the AI estimated for an offline schedule that knows the
-future, which is 1.9-6.4$\times$ the existing mechanisms that keep the recoveries.
+\noindent\textbf{Takeaway.} A controller that knows the failures of every slot in advance, which we ran,
+serves 15\% more AI than \sys at full load while it keeps 99.5\% of the recoveries: \sys serves 87\% of it
+(76-95\% in six settings), which is 1.9-6.4$\times$ the existing mechanisms that keep the recoveries.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.6\linewidth]{figures/eval_gpu_use.pdf}
-\caption{AI served by each policy against the estimate for an offline schedule that knows every later
-failure and loses no recovery (100\%), at a steady full load (16 cells, four GPUs). The number on a baseline is the factor of \sys over it.}
+\caption{AI served by each policy against a clairvoyant controller that was run (100\%; it knows the
+candidates of every slot in advance and keeps one neural receiver free beyond the known demand), at a
+steady full load (16 cells, four GPUs). The upper line is the estimate for an offline schedule, which is
+not run. The number on a baseline is the factor of \sys over it.}
 \label{fig:use}
 \end{figure}
 
@@ -1549,8 +1640,55 @@ One GPU, 4 cells & 30\% & 70\% & 59\% & 94.6\% & 8.5k & 13.2k & 64\% \\
 \end{tabular}
 \end{table}
 
-The comparisons above are with other online policies. Table~\ref{tab:clairvoyant} compares \sys with an
-offline schedule that knows every later candidate. We compute it on the runs without AI. The schedule keeps
+The comparisons above are with other online policies. We compare \sys with knowledge of the future in two
+ways: a clairvoyant controller that we ran (Table~\ref{tab:oracle}) and an estimate for an offline schedule
+(Table~\ref{tab:clairvoyant}).
+
+\noindent\textbf{A Clairvoyant Controller That Was Run.} The candidates of every slot are fixed by the data
+set, the cell, and the seed, so a run without AI gives a table of the candidates per slot for every run of
+the same seed. The controller reads this table. For a neural receiver run of slot $k$ it asks whether the
+candidates of slot $k+2$ will need that receiver: the runs next to which AI may continue are at most the
+number of neural receivers minus the runs of slot $k+1$, the candidates of slot $k+2$, and a margin. Next to
+those runs the AI keeps running, as long as the run meets its own recovery deadline, and the run then holds
+a third slot; next to the other runs the AI stops as in \sys. The rule on unit sizes and the stoppable
+pieces are those of \sys. The controller knows neither the run lengths nor the AI arrivals. It is a
+baseline, not a setting of \sys.
+
+\begin{table}[t]
+\caption{\sys against a clairvoyant controller that was run: AI served (tokens/s) at the share of
+recoveries kept. Margin: neural receivers kept free beyond the known demand. Five seeds at full load, two
+elsewhere.}
+\label{tab:oracle}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+ & & \multicolumn{2}{c}{Clairvoyant controller} & \sys\ / \\
+Setting & \sys & margin 1 & margin 0 & margin 1 \\
+\midrule
+16 cells, full load & 33.9k at 99.9\% & 39.1k at 99.5\% & 39.6k at 98.3\% & 87\% \\
+16 cells, load alternates & 41.1k at 99.9\% & 44.6k at 99.7\% & 45.0k at 98.7\% & 92\% \\
+16 cells, random steps & 44.2k at 99.8\% & 47.1k at 99.8\% & 47.4k at 99.1\% & 94\% \\
+Two two-user cells & 46.7k at 99.7\% & 49.0k at 99.3\% & 48.8k at 99.3\% & 95\% \\
+Six two-user cells & 19.9k at 99.7\% & 25.0k at 99.7\% & 27.5k at 98.0\% & 80\% \\
+Eight two-user cells & 11.6k at 99.5\% & 15.3k at 99.2\% & 17.5k at 97.0\% & 76\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+With one receiver kept free, the clairvoyant controller serves 39.1k tokens/s at full load and keeps 99.5\%
+of the recoveries; AI runs next to 82\% of its neural receiver runs. \sys serves 87\% of this, and 76-95\%
+in the six settings: knowing the future is worth 5-32\% more AI. Without the margin the controller serves
+up to 14\% more and keeps 97.0-99.3\% of the recoveries, because one run in ten holds a third slot even
+without AI next to it. The clairvoyant controller also pays in the layer-1 tail: its 99.9th percentile is
+3.52-3.73~ms against 3.04-3.19~ms for \sys and 3.01-3.15~ms without AI, because AI next to a neural receiver
+also delays the conventional receivers. The existing mechanisms that keep the recoveries serve 14-46\% of
+the controller at full load (Figure~\ref{fig:use}). The controller is one rule and not the optimum: it
+allows or forbids AI for a whole run, and a schedule that uses a part of the room of every run can serve
+more. The estimate below is a reference on that side.
+
+\noindent\textbf{An Estimate for an Offline Schedule.} Table~\ref{tab:clairvoyant} is computed on the runs
+without AI and is not run. The schedule knows every later candidate. It keeps
 the start time of every neural receiver run and loses no candidate. It runs AI next to a neural
 receiver for as long as the run still ends before the next run on that receiver starts; a run next to AI
 advances at 0.786 of its speed alone. For fixed start times this schedule is optimal: assigning each run to
@@ -1562,9 +1700,10 @@ reference and not as a proven upper bound.
 time. The rule of \sys allows AI for the other 64\%, and AI is on the GPU for 62\%: stops and grants cost
 two points.
 
-\noindent\textbf{What Knowledge of the Future Is Worth.} The clairvoyant schedule turns AI off for 3.5\% of
-the time: only 13\% of the runs must be cut for a later candidate. \sys serves 70\% of the clairvoyant AI
-at full load, 78-88\% at lower loads, and 43\% with eight two-user cells. The existing mechanisms that keep
+\noindent\textbf{What the Estimate Says.} The offline schedule turns AI off for 3.5\% of
+the time: only 13\% of the runs must be cut for a later candidate. \sys serves 70\% of the estimated AI
+at full load, 78-88\% at lower loads, and 43\% with eight two-user cells. The controller that was run
+reaches 80\% of the estimate at full load (39.1k of 49.0k tokens/s), so the estimate is on the high side. The existing mechanisms that keep
 at least 98.8\% of the recoveries serve 11-37\% at full load, and allowing AI next to a neural receiver
 while three are free serves 81\% and loses 0.7\% of the recoveries. The gap is one of information. Which
 neural receiver is needed two slots later is known only when that slot is decoded, 5.0~ms into the run; AI
@@ -1704,6 +1843,48 @@ tokens/s at 100.0\%, and \textit{Priority-70} serves 27.9k at 93.6\%. When AI re
 in bursts (inter-arrival times with a coefficient of variation of 4), \sys serves 23.3k tokens/s at 99.5\%,
 \textit{Static} 3.6k at 99.0\%, and \textit{Priority-70} 27.4k at 95.9\%.
 
+\noindent\textbf{A Later Recovery Deadline.} Every result so far uses a recovery deadline of 11.5~ms. With a
+MAC lead of three slots the decision for the retransmission slot could be as late as 12.0-12.5~ms
+(\S\ref{sec:recovery}), so we ran the headline setting at these two deadlines with the same time limit
+(Table~\ref{tab:deadline}; the latest start becomes 4.4 and 4.9~ms). \sys does not change: it serves
+33.7k-34.1k tokens/s and keeps 99.8-99.9\% of the recoveries at the three deadlines, because it never
+lengthens a neural receiver run and has nothing to gain from a later deadline. The shares gain: a later
+latest start turns fewer of their lengthened runs into three-slot runs (86\%, 46\%, and 21\% for the 70\%
+share). At 12.5~ms the 70\% share serves 1.2$\times$ the AI of \sys and keeps 98.0\% of the recoveries, ten
+times the loss of \sys, with a layer-1 tail of 3.55~ms against 3.14~ms. Low priority without a cap stays at
+93.9\%: fewer candidates find no neural receiver (3.7\% against 5.7\%) and more runs end after the deadline
+(2.2\% against 0.4\%). The statement that no cap serves more AI than \sys at the same loss
+(\S\ref{sec:worth}) therefore holds for the deadline of 11.5~ms. With eight two-user cells at the 1\%
+target, \sys loses 0.24\% and 0.18\% of the goodput at 12.0 and 12.5~ms, the 30\% share 1.75\% and 1.57\%,
+and low priority without a cap 5.95\% and 5.58\%. We committed the closed-form prediction of the candidates
+that are not recovered in time before these runs: the ten values have a mean absolute error of 0.59 points;
+no AI, \sys, and the 30\% share are within 0.2 points, and the 70\% share and no cap are 0.3-2.5 points
+low, because the runs that end after the deadline were predicted at 0.1\% and are 0.2-2.2\%.
+
+\begin{table}[t]
+\caption{Headline setting with a later recovery deadline (three seeds; the first row five): AI served
+(tokens/s) / recoveries kept.}
+\label{tab:deadline}
+\footnotesize
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Recovery deadline & \sys & 30\%, low priority & 70\%, low priority & Low priority, no cap \\
+\midrule
+11.5~ms (default) & 34.1k / 99.9\% & 18.0k / 98.8\% & 42.4k / 94.4\% & 49.0k / 93.7\% \\
+12.0~ms & 33.7k / 99.8\% & 17.8k / 99.0\% & 41.4k / 95.4\% & 48.4k / 93.9\% \\
+12.5~ms & 33.9k / 99.8\% & 17.6k / 99.6\% & 41.1k / 98.0\% & 48.0k / 93.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{A Longer Replay.} A replay of 128 slots per cell had biased earlier results by 1.0-1.5
+points of the recoveries kept. To check the 512 slots used here, we ran the headline setting with a replay
+of 1,000 slots, all the slots of the two-user cells in the data set (three seeds, 20~s). \sys serves 32.9k
+tokens/s and keeps 99.9\% of the recoveries (34.1k and 99.9\% with 512 slots), the 30\% share 17.5k and
+99.1\% (18.0k, 98.8\%), the 70\% share 41.2k and 95.4\% (42.4k, 94.4\%), and the fixed 10\% share 5.4k and
+99.4\% (5.3k, 99.4\%). The factors of \sys are 1.88$\times$ and 6.1$\times$ against 1.89$\times$ and
+6.4$\times$.
+
 \subsection{Several kinds of AI work}
 \label{sec:kinds}
 
@@ -1798,13 +1979,18 @@ slots are dependent, and the policy enters through the distribution of the run l
 \section{Limitations}
 
 The channels are the synthetic channels of the public NVlabs configuration, and every cell replays 512
-slots. \sys serves 43-88\% of the AI of a clairvoyant schedule; it does not predict which neural receiver
-will be needed. The larger model allows four to five cells per GPU at full load; 32 and 48 cells run when half or
+slots (a replay of 1,000 slots gives the same results in the headline setting). \sys serves 76-95\% of the AI of a
+clairvoyant controller that was run and 43-88\% of an estimate for an offline schedule; it does not predict
+which neural receiver will be needed. The clairvoyant controller is one rule and not the optimum. At a recovery
+deadline of 12.5~ms a low-priority share with a cap of 70\% keeps 98.0\% of the recoveries and serves
+1.2$\times$ the AI of \sys, so the statement that no cap matches \sys is for the deadline of 11.5~ms. The
+rule on unit sizes costs 11\% of the AI served and changes the layer-1 misses only with five cells per GPU. The larger model allows four to five cells per GPU at full load; 32 and 48 cells run when half or
 two thirds of the cells are idle, and with 48 cells nine TBs per million miss the layer-1 deadline in steady
 state with and without AI. The recovery deadline and the retransmission slot follow from the TDD pattern, the PUSCH preparation
 time~\cite{ts38214}, and a MAC lead of three slots; they are not validated with a layer-2 stack, and the path
 that hands the MAC a late CRC pass of a TB already reported as failed is not built; the goodput results apply a retransmission
-schedule to measured TB records and do not run HARQ. The outer loop runs on three channels at seven Es/No values,
+schedule to measured TB records and do not run HARQ; the assumed success of a retransmission does not change the
+comparison of the policies under rate control. The outer loop runs on three channels at seven Es/No values,
 with an Es/No that changes in steps and continuously, and with two channels on one server; the continuous
 change adds noise to generated slots, and the channel itself is replayed. On the urban micro channel the outer
 loop stays at the lowest MCS at the 3\% target. The goodput that the shares with more AI give up is
@@ -1826,13 +2012,13 @@ A neural receiver that decodes more TBs than a production receiver at equal LDPC
 uplink period. Running it as a recovery path next to AI inference loses recoveries by a path that deadline
 checks miss: a failed TB cannot wait, and a neural receiver that AI slows by more than the slack of 1.2~ms
 holds its GPU for one more uplink slot. A loss model of this path agrees with 672 runs within 0.82
-percentage points on average. \sys stops the low-priority AI of a GPU when its neural receiver starts and
+percentage points on average and predicted 24 values of six settings, before they were run, within 0.34 points. \sys stops the low-priority AI of a GPU when its neural receiver starts and
 keeps the largest AI units away from the conventional receivers. Under three load patterns with mixed
 channels, \sys serves 6.4-7.5$\times$ the AI of a fixed 10\% GPU share and 1.2-1.9$\times$ that of a share
 chosen by a load estimator with low-priority AI, and it keeps 99.9\% of the recoveries. In steady state it
 adds 0.04-0.06~ms to the 99.9th-percentile latency of the layer-1 decode, and after the start of a run its
-TBs pass the layer-1 deadline as rarely as those of the server without AI. It serves 70\% of
-the AI estimated for an offline schedule that knows every later failure, 1.9-6.4$\times$ the existing
+TBs pass the layer-1 deadline as rarely as those of the server without AI. It serves 87\% of
+the AI of a clairvoyant controller that we ran, 1.9-6.4$\times$ the existing
 mechanisms that keep the recoveries. With an outer-loop
 rate controller, lost recoveries lower the MCS: the cost in goodput reaches 2.5\% at a 10\% retransmission
 target and 8\% at a 1\% target with a neural receiver demand near the capacity. \sys loses at most 0.5\% of

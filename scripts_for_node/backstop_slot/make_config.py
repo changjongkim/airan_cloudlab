@@ -116,6 +116,8 @@ def main() -> None:
                              "the AI slice leaves (a CUDA green context of each lane)")
     parser.add_argument("--ai-slice-factor", type=float, default=0.0,
                         help="unit time on the slice / unit time on the whole GPU (default: from the SM count)")
+    parser.add_argument("--oracle-candidates", default=None,
+                        help="clairvoyant baseline (+oracleM in --unit-gating): JSON list with the candidates of every slot")
     parser.add_argument("--ai-stop-check", type=int, default=0,
                         help="1: the AI worker reads the controller's stop word between unit groups")
     parser.add_argument("--yyr", default=None,
@@ -258,6 +260,9 @@ def main() -> None:
         for part in conv_part.split("+"):
             if part.startswith("reserve"):
                 config["ai_unit_gating"]["free_lane_reserve"] = int(part[len("reserve"):])
+            if part.startswith("oracle"):
+                config["ai_unit_gating"]["oracle_margin"] = int(part[len("oracle"):] or 0)
+                config["ai_unit_gating"]["oracle_candidates"] = json.loads(Path(args.oracle_candidates).read_text())
         if "+reuse" in conv_part:
             alone, _, per_chunk = args.nrx_run_ms.partition(",")
             config["ai_unit_gating"].update({

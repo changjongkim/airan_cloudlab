@@ -1,0 +1,21 @@
+| condition | seeds | policy | AI served (tokens/s) | recoveries kept | L1 p99.9 (ms) | Antiphase / this |
+|---|---|---|---|---|---|---|
+| full load | 5 | Antiphase | 33.9k | 99.9% | 3.08 |  |
+| full load | 5 | clairvoyant, one receiver kept free | 39.1k | 99.5% | 3.68 | 87% |
+| full load | 5 | clairvoyant, none kept free | 39.6k | 98.3% | 3.67 | 86% |
+| full load | 5 | low priority, no cap | 48.8k | 93.7% | 3.80 | 70% |
+| load alternates every 2 s | 2 | Antiphase | 41.1k | 99.9% | 3.06 |  |
+| load alternates every 2 s | 2 | clairvoyant, one receiver kept free | 44.6k | 99.7% | 3.61 | 92% |
+| load alternates every 2 s | 2 | clairvoyant, none kept free | 45.0k | 98.7% | 3.64 | 91% |
+| load steps at random times | 2 | Antiphase | 44.2k | 99.8% | 3.04 |  |
+| load steps at random times | 2 | clairvoyant, one receiver kept free | 47.1k | 99.8% | 3.53 | 94% |
+| load steps at random times | 2 | clairvoyant, none kept free | 47.4k | 99.1% | 3.54 | 93% |
+| two two-user cells | 2 | Antiphase | 46.7k | 99.7% | 3.11 |  |
+| two two-user cells | 2 | clairvoyant, one receiver kept free | 49.0k | 99.3% | 3.71 | 95% |
+| two two-user cells | 2 | clairvoyant, none kept free | 48.8k | 99.3% | 3.67 | 96% |
+| six two-user cells | 2 | Antiphase | 19.9k | 99.7% | 3.08 |  |
+| six two-user cells | 2 | clairvoyant, one receiver kept free | 25.0k | 99.7% | 3.73 | 80% |
+| six two-user cells | 2 | clairvoyant, none kept free | 27.5k | 98.0% | 3.68 | 73% |
+| eight two-user cells | 2 | Antiphase | 11.6k | 99.5% | 3.19 |  |
+| eight two-user cells | 2 | clairvoyant, one receiver kept free | 15.3k | 99.2% | 3.52 | 76% |
+| eight two-user cells | 2 | clairvoyant, none kept free | 17.5k | 97.0% | 3.60 | 67% |

@@ -5,7 +5,10 @@ usage:
   plot_eval.py headline OUT FA.json FB.json FC.json          AI served and recoveries lost, three load patterns
   plot_eval.py tradeoff OUT FA.json                          AI served against recoveries lost, steady full load
   plot_eval.py scale    OUT gpus=A,B,C cells=A,B,C,D demand=A,B,C,D     scaling with GPUs, cells, two-user cells
-  plot_eval.py use      OUT OPTIMUM_GAP.json                 AI served against the estimate for an offline schedule that knows the future
+  plot_eval.py use      OUT OPTIMUM_GAP.json [fa c16] [CLAIRVOYANT.json]
+                                                             AI served against a clairvoyant controller that was run
+                                                             (analyze_clairvoyant.py); without that file, against the
+                                                             estimate for an offline schedule that knows the future
   plot_eval.py closed   OUT "LABEL=LA_CLOSED.json" ...       goodput lost with a rate controller in the loop
   plot_eval.py protect  OUT "TITLE=SCHED.json" ...           latency that AI adds to the radio work and latency of
                                                              the AI requests (SCHED.json: output of analyze_sched.py)
@@ -252,26 +255,36 @@ def scale(out: str, groups: list[str]) -> None:
 
 
 # ---------------------------------------------------------------------------------------------------
-def use(out: str, path: str, condition: str = "fa c16") -> None:
+def use(out: str, path: str, condition: str = "fa c16", measured: str | None = None) -> None:
     c = json.loads(Path(path).read_text())["conditions"][condition]
-    bound = c["clairvoyant_tokens"]
+    estimate = c["clairvoyant_tokens"]                 # offline schedule that knows the future: estimated, not run
+    bound = estimate
+    if measured:                                       # clairvoyant controller that was run (one receiver kept free)
+        bound = json.loads(Path(measured).read_text())["fo"]["policies"]["wo1"]["tokens"]
     names = [NAME, "Static", "Estimator", "Priority", "Estimator+Priority"]
     values = {NAME: c["rule_tokens"] / bound}
     for n in names[1:]:
         values[n] = c["others"][POLICIES[n][0]]["tokens"] / bound
-    fig, ax = plt.subplots(figsize=(5.4, 3.7))
+    fig, ax = plt.subplots(figsize=(5.4, 3.9 if measured else 3.7))
     for i, n in enumerate(names):
         color = POLICIES[n][1]
         ax.bar([i], [100 * values[n]], width=0.7, zorder=3, **bar_kind(color, False))
         label = f"{100 * values[n]:.0f}%" if n == NAME else f"{values[NAME] / values[n]:.1f}×"
         ax.text(i, 100 * values[n] + 1.5, label, fontsize=FS, color=color if n == NAME else INK, ha="center", va="bottom")
     ax.axhline(100.0, color=INK, linewidth=1.0, linestyle=(0, (2, 2)))
-    ax.text(len(names) - 0.55, 97.5, "offline schedule that knows the future", fontsize=FS - 1.5, color=INK, ha="right", va="top", style="italic",
-            fontweight="normal")
+    ax.text(len(names) - 0.55, 97.5, "controller that knows the future (measured)" if measured else "offline schedule that knows the future",
+            fontsize=FS - 1.5, color=INK, ha="right", va="top", style="italic", fontweight="normal")
+    top = 108.0
+    if measured:
+        level = 100.0 * estimate / bound
+        ax.axhline(level, color=INK, linewidth=0.8, linestyle=(0, (1, 3)))
+        ax.text(len(names) - 0.55, level - 2.5, "offline schedule (estimated, not run)", fontsize=FS - 1.5, color=INK, ha="right", va="top",
+                style="italic", fontweight="normal")
+        top = level + 8.0
     ax.set_xticks([])
-    ax.set_ylim(0, 108)
+    ax.set_ylim(0, top)
     ax.set_xlim(-0.6, len(names) - 0.4)
-    style(ax, "AI Served vs. the\nOffline Reference (%)")
+    style(ax, "AI Served vs. a Controller\nThat Knows the Future (%)" if measured else "AI Served vs. the\nOffline Reference (%)")
     legend(fig, names, ncol=3, y=1.0)
     fig.tight_layout(rect=(0, 0, 1, 0.84))
     fig.savefig(out, dpi=200)
@@ -425,7 +438,7 @@ def main() -> None:
     elif mode == "scale":
         scale(out, sys.argv[3:])
     elif mode == "use":
-        use(out, sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else "fa c16")
+        use(out, sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else "fa c16", sys.argv[5] if len(sys.argv) > 5 else None)
     elif mode == "closed":
         closed(out, sys.argv[3:])
     elif mode == "protect":

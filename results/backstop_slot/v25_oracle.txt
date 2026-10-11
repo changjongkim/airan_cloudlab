@@ -1,0 +1,134 @@
+
+## Clairvoyant controller, headline condition, seeds 1-5 (fo; job 59632171): wo0 = no receiver kept free beyond the known demand, wo1 = one
+
+| AI load | policy | seeds | AI served (tokens/s) | L1 late | L1 p99.9 ms | recovered /s | recovered kept | NRx runs /s | NRx on time |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | No AI | 5 | 0.0k | 0.028% | 3.10 | 187.3 | 100.0% | 462.1 | 100.0% |
+| 32 | Low priority, no cap | 5 | 48.8k | 0.052% | 3.80 | 175.5 | 93.7% | 439.8 | 99.4% |
+| 32 | Antiphase | 5 | 33.9k | 0.026% | 3.08 | 187.0 | 99.9% | 461.4 | 100.0% |
+| 32 | wo0 | 5 | 39.6k | 0.034% | 3.67 | 184.0 | 98.3% | 456.8 | 99.9% |
+| 32 | wo1 | 5 | 39.1k | 0.047% | 3.68 | 186.4 | 99.5% | 459.9 | 99.9% |
+
+## Neural receiver runs and the AI beside them (fo)
+
+
+fo n: 5 runs, 11494 neural receiver runs, L = 3.9 ms, candidates without a neural receiver 1.58%
+  known_ms: [1.28, 1.32, 2.27, 2.63]
+  start_after_known_ms: [0.04, 0.05, 0.07, 1.23]
+  start_offset_ms: [1.33, 1.37, 2.47, 3.29]
+  run_ms: [6.19, 6.3, 6.45, 6.68]
+  room_ms: [-0.7, 0.01, 1.23, 1.36]
+  room_below: {'0': 9.8, '0.2': 17.3, '0.43': 25.6, '0.84': 30.9, '1.2': 43.6}
+  waited_for_nrx_pct: 7.1
+  three_slot_pct: 9.8
+  three_slot_late_start_pct: 7.6
+  three_slot_lengthened_pct: 2.2
+  lengthened_with_ai_beside_pct: 0.0
+  ai_tail_share_pct: 0.0
+  ai_tail_ms: []
+  ai_inside_ms: []
+
+fo wd: 5 runs, 11478 neural receiver runs, L = 3.9 ms, candidates without a neural receiver 1.71%
+  known_ms: [1.41, 1.66, 2.21, 2.48]
+  start_after_known_ms: [0.05, 0.07, 0.12, 1.78]
+  start_offset_ms: [1.49, 1.74, 2.44, 3.52]
+  run_ms: [6.23, 6.39, 6.66, 6.87]
+  room_ms: [-0.81, -0.1, 0.66, 1.13]
+  room_below: {'0': 11.4, '0.2': 18.0, '0.43': 28.7, '0.84': 62.8, '1.2': 94.0}
+  waited_for_nrx_pct: 7.8
+  three_slot_pct: 11.4
+  three_slot_late_start_pct: 8.0
+  three_slot_lengthened_pct: 3.4
+  lengthened_with_ai_beside_pct: 3.3
+  ai_tail_share_pct: 81.9
+  ai_tail_ms: [0.09, 0.38, 1.04, 1.4]
+  ai_inside_ms: [0.09, 0.38, 1.04, 1.4]
+  run_ms_per_tail_ms: 0.3
+  run_ms_without_tail: 6.3
+  run_ms_by_tail: {'none': [2082, 6.31, 41.9], 'to 0.3': [3762, 6.32, 2.1], '0.3-0.6': [2446, 6.37, 3.1], '0.6-1.0': [1996, 6.55, 6.3], 'over 1.0': [1192, 6.68, 13.0]}
+  three_slot_pct_if_tail_capped_0.37: 10.0
+  three_slot_pct_if_tail_capped_0.2: 9.6
+  three_slot_pct_if_tail_capped_0.0: 9.0
+  known_later_than_alone_ms: 0.34
+  three_slot_pct_if_known_as_alone: 7.3
+  three_slot_pct_if_both: 6.7
+
+fo wo0: 5 runs, 11363 neural receiver runs, L = 3.9 ms, candidates without a neural receiver 2.7%
+  known_ms: [1.47, 1.71, 2.33, 2.64]
+  start_after_known_ms: [0.04, 0.07, 0.27, 1.88]
+  start_offset_ms: [1.54, 1.78, 2.6, 3.75]
+  run_ms: [6.37, 7.82, 8.07, 8.29]
+  room_ms: [-1.91, -1.41, -0.7, 0.18]
+  room_below: {'0': 86.9, '0.2': 90.2, '0.43': 92.4, '0.84': 95.9, '1.2': 99.1}
+  waited_for_nrx_pct: 9.6
+  three_slot_pct: 86.9
+  three_slot_late_start_pct: 10.0
+  three_slot_lengthened_pct: 76.9
+  lengthened_with_ai_beside_pct: 76.8
+  ai_tail_share_pct: 82.9
+  ai_tail_ms: [0.27, 4.26, 7.87, 8.12]
+  ai_inside_ms: [5.25, 7.77, 8.03, 8.24]
+  run_ms_per_tail_ms: 0.09
+  run_ms_without_tail: 7.27
+  run_ms_by_tail: {'none': [1940, 6.44, 72.6], 'to 0.3': [1062, 7.74, 70.8], '0.3-0.6': [836, 7.69, 72.8], '0.6-1.0': [644, 7.78, 76.9], 'over 1.0': [6881, 7.88, 96.0]}
+  three_slot_pct_if_tail_capped_0.37: 73.2
+  three_slot_pct_if_tail_capped_0.2: 72.5
+  three_slot_pct_if_tail_capped_0.0: 71.4
+  known_later_than_alone_ms: 0.38
+  three_slot_pct_if_known_as_alone: 75.2
+  three_slot_pct_if_both: 45.2
+
+fo wo1: 5 runs, 11439 neural receiver runs, L = 3.9 ms, candidates without a neural receiver 2.05%
+  known_ms: [1.48, 1.72, 2.33, 2.64]
+  start_after_known_ms: [0.04, 0.07, 0.12, 1.81]
+  start_offset_ms: [1.55, 1.8, 2.6, 3.55]
+  run_ms: [6.32, 7.78, 8.06, 8.25]
+  room_ms: [-1.96, -1.38, -0.66, 0.61]
+  room_below: {'0': 78.9, '0.2': 82.8, '0.43': 86.1, '0.84': 93.7, '1.2': 99.1}
+  waited_for_nrx_pct: 8.5
+  three_slot_pct: 78.9
+  three_slot_late_start_pct: 9.9
+  three_slot_lengthened_pct: 69.0
+  lengthened_with_ai_beside_pct: 68.9
+  ai_tail_share_pct: 83.6
+  ai_tail_ms: [0.23, 3.72, 7.85, 8.11]
+  ai_inside_ms: [0.49, 7.75, 8.02, 8.21]
+  run_ms_per_tail_ms: 0.12
+  run_ms_without_tail: 7.08
+  run_ms_by_tail: {'none': [1878, 6.43, 68.6], 'to 0.3': [1260, 6.49, 46.0], '0.3-0.6': [971, 7.16, 52.5], '0.6-1.0': [778, 7.24, 56.4], 'over 1.0': [6552, 7.88, 94.7]}
+  three_slot_pct_if_tail_capped_0.37: 58.1
+  three_slot_pct_if_tail_capped_0.2: 56.8
+  three_slot_pct_if_tail_capped_0.0: 55.5
+  known_later_than_alone_ms: 0.4
+  three_slot_pct_if_known_as_alone: 68.0
+  three_slot_pct_if_both: 35.4
+
+fo p100: 5 runs, 10940 neural receiver runs, L = 3.9 ms, candidates without a neural receiver 6.32%
+  known_ms: [1.46, 1.73, 2.33, 2.71]
+  start_after_known_ms: [0.04, 0.04, 0.06, 1.11]
+  start_offset_ms: [1.51, 1.78, 2.47, 3.16]
+  run_ms: [6.63, 8.01, 8.32, 8.58]
+  room_ms: [-2.36, -1.67, -0.9, 0.28]
+  room_below: {'0': 87.2, '0.2': 89.4, '0.43': 90.9, '0.84': 94.1, '1.2': 97.5}
+  waited_for_nrx_pct: 5.3
+  three_slot_pct: 87.2
+  three_slot_late_start_pct: 6.3
+  three_slot_lengthened_pct: 81.0
+  lengthened_with_ai_beside_pct: 80.8
+  ai_tail_share_pct: 84.6
+  ai_tail_ms: [0.76, 7.82, 8.29, 8.54]
+  ai_inside_ms: [7.32, 8.01, 8.32, 8.58]
+  run_ms_per_tail_ms: 0.11
+  run_ms_without_tail: 7.24
+  run_ms_by_tail: {'none': [1683, 6.43, 27.9], 'to 0.3': [444, 7.94, 95.3], '0.3-0.6': [354, 7.9, 92.9], '0.6-1.0': [211, 7.98, 96.2], 'over 1.0': [8248, 8.07, 98.4]}
+  three_slot_pct_if_tail_capped_0.37: 69.4
+  three_slot_pct_if_tail_capped_0.2: 67.9
+  three_slot_pct_if_tail_capped_0.0: 66.2
+  known_later_than_alone_ms: 0.41
+  three_slot_pct_if_known_as_alone: 79.3
+  three_slot_pct_if_both: 36.5
+
+## Controller counters (runs marked needed / not needed)
+
+wo0: AI allowed next to 92.2% of the neural receiver runs (10520 of 11412)
+wo1: AI allowed next to 82.3% of the neural receiver runs (9457 of 11489)

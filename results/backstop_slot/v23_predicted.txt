@@ -1,0 +1,32 @@
+
+## Conditions never run before: predicted (commit 3b915a8a) against measured (jobs 59632171)
+
+| condition | N | two-user cells | candidates per slot | policy | lost: predicted | measured | error | three-slot runs: predicted | measured |
+|---|---|---|---|---|---|---|---|---|---|
+| oa (12 cells) | 3 | 2 | 0.29 | no AI | 1.8% | 2.1% (3 runs) | -0.3 | 5% | 5% |
+| oa (12 cells) | 3 | 2 | 0.29 | Antiphase | 1.9% | 2.1% (3 runs) | -0.2 | 6% | 8% |
+| oa (12 cells) | 3 | 2 | 0.29 | low priority + 30% | 2.4% | 2.8% (3 runs) | -0.4 | 29% | 21% |
+| oa (12 cells) | 3 | 2 | 0.29 | low priority + 70% | 4.0% | 3.6% (3 runs) | +0.3 | 86% | 81% |
+| ob (12 cells) | 3 | 3 | 0.44 | no AI | 4.2% | 4.0% (3 runs) | +0.3 | 9% | 9% |
+| ob (12 cells) | 3 | 3 | 0.44 | Antiphase | 4.4% | 4.1% (3 runs) | +0.3 | 11% | 11% |
+| ob (12 cells) | 3 | 3 | 0.44 | low priority + 30% | 5.5% | 4.9% (3 runs) | +0.6 | 32% | 29% |
+| ob (12 cells) | 3 | 3 | 0.44 | low priority + 70% | 8.8% | 8.6% (3 runs) | +0.2 | 86% | 85% |
+| oc (16 cells) | 4 | 3 | 0.44 | no AI | 0.6% | 0.5% (3 runs) | +0.2 | 5% | 7% |
+| oc (16 cells) | 4 | 3 | 0.44 | Antiphase | 0.7% | 0.7% (3 runs) | +0.0 | 7% | 8% |
+| oc (16 cells) | 4 | 3 | 0.44 | low priority + 30% | 1.3% | 1.0% (3 runs) | +0.3 | 29% | 24% |
+| oc (16 cells) | 4 | 3 | 0.44 | low priority + 70% | 3.0% | 3.3% (3 runs) | -0.3 | 86% | 84% |
+| od (16 cells) | 4 | 5 | 0.74 | no AI | 2.6% | 2.5% (2 runs) | +0.1 | 10% | 11% |
+| od (16 cells) | 4 | 5 | 0.74 | Antiphase | 2.7% | 2.5% (2 runs) | +0.2 | 12% | 13% |
+| od (16 cells) | 4 | 5 | 0.74 | low priority + 30% | 4.0% | 4.1% (2 runs) | -0.1 | 33% | 36% |
+| od (16 cells) | 4 | 5 | 0.74 | low priority + 70% | 7.8% | 8.6% (2 runs) | -0.8 | 87% | 87% |
+| oe (16 cells) | 4 | 7 | 1.03 | no AI | 7.3% | 7.2% (2 runs) | +0.1 | 18% | 17% |
+| oe (16 cells) | 4 | 7 | 1.03 | Antiphase | 7.7% | 7.4% (2 runs) | +0.2 | 21% | 20% |
+| oe (16 cells) | 4 | 7 | 1.03 | low priority + 30% | 10.0% | 10.3% (2 runs) | -0.3 | 41% | 45% |
+| oe (16 cells) | 4 | 7 | 1.03 | low priority + 70% | 15.9% | 15.6% (2 runs) | +0.3 | 88% | 89% |
+| of (8 cells) | 2 | 3 | 0.44 | no AI | 13.4% (13.3% with the two-GPU timing) | 13.1% (2 runs) | +0.4 | 16% | 18% |
+| of (8 cells) | 2 | 3 | 0.44 | Antiphase | 13.8% (13.6% with the two-GPU timing) | 13.2% (2 runs) | +0.6 | 20% | 19% |
+| of (8 cells) | 2 | 3 | 0.44 | low priority + 30% | 16.2% (17.2% with the two-GPU timing) | 15.0% (2 runs) | +1.2 | 39% | 30% |
+| of (8 cells) | 2 | 3 | 0.44 | low priority + 70% | 21.9% (21.6% with the two-GPU timing) | 21.4% (2 runs) | +0.5 | 87% | 80% |
+
+24 condition-policy pairs: mean absolute error 0.34 points, mean error +0.14 points, largest 1.21 points, correlation 0.998
+policies with AI (18): mean absolute error 0.38 points, mean error +0.15 points

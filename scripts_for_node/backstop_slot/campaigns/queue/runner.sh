@@ -8,6 +8,8 @@
 #   done line:   NAME <tab> exit code <tab> job <tab> start <tab> end
 #   queue/STOP:      the runner exits before the next step
 #   queue/WAIT_FOR:  path of a log; the runner starts after the line CHAIN_EXIT appears in it
+#   env ALLOC_TIME (time limit of an allocation, default 04:00:00) and ALLOC_PAUSE (seconds between two salloc
+#   attempts, default 180; an interactive request that is not granted in about six minutes is cancelled by Slurm)
 # Nothing else may start a step on the node while the runner is alive (queue/lock is held).
 ROOT=/pscratch/sd/s/sgkim/kcj/airan_cloudlab
 S=$ROOT/run_state/backstop_slot
@@ -30,12 +32,12 @@ allocate() {
   local out job
   while true; do
     [ -f $Q/STOP ] && { log "STOP while waiting for an allocation"; exit 0; }
-    out=$(salloc -N 1 -C "gpu&hbm80g" -q interactive -A m5320_g -t 04:00:00 --no-shell 2>&1 < /dev/null)
+    out=$(salloc -N 1 -C "gpu&hbm80g" -q interactive -A m5320_g -t ${ALLOC_TIME:-04:00:00} --no-shell 2>&1 < /dev/null)
     job=$(echo "$out" | sed -n 's/.*Granted job allocation \([0-9]*\).*/\1/p' | head -1)
     if [ -n "$job" ]; then
       echo $job > $S/current_job; echo $job >> $Q/jobs; log "allocated job $job"; sleep 15; return
     fi
-    log "salloc failed: $(echo "$out" | tail -1)"; sleep 180
+    log "salloc failed: $(echo "$out" | tail -1)"; sleep ${ALLOC_PAUSE:-180}
   done
 }
 log "runner started (pid $$)"

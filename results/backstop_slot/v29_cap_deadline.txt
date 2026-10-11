@@ -1,0 +1,40 @@
+
+## 70% cap with a later recovery deadline: eight two-user cells, target 1%, deadline 12.0 ms (lcy; jobs 59659316)
+
+closed-loop link adaptation, target 1% of the TBs needing a retransmission; two-user cells: 8; warm-up 800 periods
+
+| policy | seeds | mean MCS | first-transmission errors | TBs needing a retransmission | goodput per user slot | vs no recovery path | vs recovery path without AI | slots with a candidate | candidates without a NeuralRx | NeuralRx ended late | recovered TBs/s (vs recovery path without AI) | AI served (tokens/s) | L1 late |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Recovery path, no AI | 3 | 11.85 | 6.7% | 1.0% | 65.5k | – | +0.0% | 12.3% | 4.0% | 0.0% | 363 (+0.0%) | 0.0k | 0.011% |
+| Rule (stoppable pieces, no AI next to NeuralRx) | 3 | 11.81 | 6.6% | 1.0% | 65.2k | – | -0.5% | 12.1% | 4.5% | 0.0% | 355 (-2.2%) | 15.8k | 0.024% |
+| Fixed 70% + low priority | 3 | 11.53 | 5.5% | 1.0% | 62.7k | – | -4.3% | 10.0% | 8.8% | 0.7% | 287 (-21.0%) | 33.8k | 0.042% |
+
+## 70% cap with a later recovery deadline: eight two-user cells, target 1%, deadline 12.5 ms (lcz; jobs 59659316)
+
+closed-loop link adaptation, target 1% of the TBs needing a retransmission; two-user cells: 8; warm-up 800 periods
+
+| policy | seeds | mean MCS | first-transmission errors | TBs needing a retransmission | goodput per user slot | vs no recovery path | vs recovery path without AI | slots with a candidate | candidates without a NeuralRx | NeuralRx ended late | recovered TBs/s (vs recovery path without AI) | AI served (tokens/s) | L1 late |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Recovery path, no AI | 3 | 11.87 | 6.8% | 1.0% | 65.7k | – | +0.0% | 12.6% | 3.5% | 0.0% | 371 (+0.0%) | 0.0k | 0.012% |
+| Rule (stoppable pieces, no AI next to NeuralRx) | 3 | 11.87 | 6.8% | 1.0% | 65.6k | – | -0.1% | 12.5% | 3.7% | 0.0% | 370 (-0.4%) | 14.1k | 0.023% |
+| Fixed 70% + low priority | 3 | 11.55 | 5.5% | 1.0% | 62.8k | – | -4.4% | 10.1% | 6.8% | 2.4% | 290 (-21.8%) | 32.9k | 0.049% |
+
+## 70% cap with a later recovery deadline: four two-user cells, target 1%, deadline 12.5 ms (ldb; jobs 59659316)
+
+closed-loop link adaptation, target 1% of the TBs needing a retransmission; two-user cells: 4; warm-up 800 periods
+
+| policy | seeds | mean MCS | first-transmission errors | TBs needing a retransmission | goodput per user slot | vs no recovery path | vs recovery path without AI | slots with a candidate | candidates without a NeuralRx | NeuralRx ended late | recovered TBs/s (vs recovery path without AI) | AI served (tokens/s) | L1 late |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Recovery path, no AI | 3 | 12.06 | 7.6% | 1.0% | 67.3k | – | +0.0% | 14.1% | 0.0% | 0.0% | 211 (+0.0%) | 0.0k | 0.011% |
+| Rule (stoppable pieces, no AI next to NeuralRx) | 3 | 12.06 | 7.6% | 1.0% | 67.3k | – | +0.0% | 14.1% | 0.0% | 0.0% | 211 (+0.1%) | 33.7k | 0.016% |
+| Fixed 70% + low priority | 3 | 12.02 | 7.4% | 1.0% | 67.0k | – | -0.5% | 13.8% | 0.3% | 0.5% | 206 (-2.6%) | 41.5k | 0.022% |
+
+## 70% cap with a later recovery deadline: four two-user cells, target 10%, deadline 12.5 ms (lda; jobs 59659316)
+
+closed-loop link adaptation, target 10% of the TBs needing a retransmission; two-user cells: 4; warm-up 800 periods
+
+| policy | seeds | mean MCS | first-transmission errors | TBs needing a retransmission | goodput per user slot | vs no recovery path | vs recovery path without AI | slots with a candidate | candidates without a NeuralRx | NeuralRx ended late | recovered TBs/s (vs recovery path without AI) | AI served (tokens/s) | L1 late |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Recovery path, no AI | 3 | 13.52 | 21.2% | 10.0% | 72.4k | – | +0.0% | 28.9% | 5.1% | 0.0% | 359 (+0.0%) | 0.0k | 0.018% |
+| Rule (stoppable pieces, no AI next to NeuralRx) | 3 | 13.52 | 21.2% | 10.0% | 72.5k | – | +0.1% | 28.9% | 5.5% | 0.0% | 359 (-0.0%) | 10.5k | 0.023% |
+| Fixed 70% + low priority | 3 | 13.46 | 20.2% | 10.0% | 72.0k | – | -0.5% | 28.0% | 10.0% | 1.0% | 328 (-8.7%) | 23.4k | 0.025% |

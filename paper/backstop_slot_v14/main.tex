@@ -163,8 +163,7 @@ measure. With an outer-loop rate controller, the two-user cells lose at most 0.5
 the server without AI in all 42 settings, and at most 0.3\% in 41 of them (means per setting; the largest is 0.35\% over its 33 seeds, with a 95\% interval of 0.25-0.44\%): seven SNRs, three channels, an SNR that changes in steps and
 continuously, and cells with different channels on one server. In steady state \sys adds 0.04-0.06~ms to the 99.9th-percentile
 latency of the layer-1 decode and 0.07-0.09~ms to the run of the neural receiver, and after the start of a
-run its TBs pass the layer-1 deadline as rarely as those of the server without AI in all four server
-settings. It loses 0.0-0.1\% of the recoveries.
+run four to eight of a million TBs pass the layer-1 deadline, against two without AI (36 runs of 100~s). It loses 0.0-0.1\% of the recoveries.
 \item \textbf{A GPU share does not.} A fixed share and a low-priority share run AI whatever the radio does,
 and no cap keeps the radio in every setting. The 10\% share loses up to 1.1\% of the goodput, and the 30\%
 share with low-priority AI loses up to 2.3\%. A higher cap serves more AI and loses more goodput in every
@@ -1135,8 +1134,8 @@ serves more AI and loses more goodput in every setting: from the 20\% cap to no 
 eight two-user cells at the 1\% target. The cap that keeps the goodput within 0.3\% depends on the setting:
 it is 30\% at the 10\% target and 20\% at the 1\% target with four two-user cells, and with eight two-user
 cells the fixed 10\% share already loses 0.8-0.9\%. \sys loses 0.0-0.3\% in the four settings with one
-configuration. In no setting does a cap serve at least the AI of a setting of \sys at no more loss; this holds at the
-recovery deadline of 11.5~ms, and \S\ref{sec:cells} gives later deadlines. Reading
+configuration. In no setting does a cap serve at least the AI of a setting of \sys at no more loss; \S\ref{sec:cells}
+repeats the 70\% cap at later recovery deadlines. Reading
 the AI at a loss of at most 0.25\% from the lines between the measured points, \sys serves 1.2$\times$,
 2.4$\times$, 2.2$\times$, and 7.8$\times$ the AI of the caps. The settings of \sys that allow AI next to a
 neural receiver trade goodput for AI in the same way as a cap and from a lower loss; the default allows none.
@@ -1331,7 +1330,7 @@ The default of \sys has no slice.
 
 \noindent\textbf{Takeaway.} In steady state \sys adds 0.04-0.06~ms to the 99.9th-percentile L1 latency and
 0.07-0.09~ms to the run of the neural receiver, 2.8-21$\times$ and 5.2-19$\times$ less than the baselines.
-After the start of a run, 3 of 3.2 million TBs pass the layer-1 deadline with \sys, and its AI requests
+After the start of a run, four to eight of a million TBs pass the layer-1 deadline with \sys against two without AI, and its AI requests
 finish within their limit at the 99th percentile.
 
 \begin{figure}[t]
@@ -1471,8 +1470,14 @@ After the first 20~s, no TB of 3.2 million is late without AI, three are late wi
 baselines that cap the share, and 174 with \textit{Priority-max}. With one GPU, no TB of 0.8 million is late
 after the first 20~s without AI or with \sys, and \textit{Static} and \textit{Priority} miss the deadline for
 46 and 21 TBs. With 20 cells, \sys has 3 late TBs of 2.3 million against 2 without AI, and with 48 cells 17 of
-1.9 million against 17. In all four settings the late TBs of \sys after the start are those of the server
-without AI. When the load changes, the two estimator policies add 0.53-0.87~ms, because their share is one
+1.9 million against 17. In these 16 runs the late TBs of \sys after the start cannot be told from those of the
+server without AI. With more runs they can. We repeated the runs of 100~s in later campaigns, and over 36
+runs each (20.6 million TBs; 16, 20, 32, and 48 cells and one GPU) the server without AI has 44 late TBs
+after the first 20~s and \sys has 155, of which 74 fall in 0.1~s of one run on all four GPUs. This is two
+per million against four to eight. The late TBs come in rare events of two to six TBs at one instant: 11
+events without AI and 25 with \sys, 0.3 and 0.7 per run (two-sided $p = 0.03$). In the same jobs as the
+first runs, \textit{Priority-max} has 54 late TBs per million with 16 cells, and \textit{Static} and
+\textit{Priority} 57 and 26 per million with one GPU. When the load changes, the two estimator policies add 0.53-0.87~ms, because their share is one
 second behind the load, and \textit{Estimator} misses the deadline for 0.05\% of the TBs; \sys adds
 0.04-0.06~ms. \sys raises the
 median L1 latency from 1.39 to 1.81~ms, as much as \textit{Priority-70}, because the two smaller unit classes
@@ -1502,8 +1507,8 @@ the unit that finishes after a stop, and for 19-38\% with the baselines.
 \noindent\textbf{Takeaway.} Stoppable AI pieces and no AI next to a running neural receiver raise the
 recoveries kept from 97.8\% to 100.0\%. Admitting AI by the deadline of each neural receiver run keeps every
 run inside its deadline and keeps 93.8\%. Keeping the largest AI units away from the conventional receivers
-does not change the goodput; it lowers the layer-1 misses of runs of 10~s from 0.061\% to 0.036\%, and in
-steady state with five cells per GPU from six TBs in 2.3 million to none.
+is a conservative setting from a calibration: it lowers the layer-1 misses of runs of 10~s from 0.061\% to
+0.036\%, changes neither the goodput nor the late TBs in steady state, and costs 9-12\% of the AI served.
 \label{sec:rules}
 
 \begin{table}[t]
@@ -1588,16 +1593,37 @@ Two-user cells, target & \sys & Stop only & Own deadline only & Low priority, no
 \end{tabular}
 \end{table}
 
-\noindent\textbf{What the Rule on Unit Sizes Protects.} The rule on unit sizes protects the layer-1
-deadline of the conventional receivers. Layer-1 misses concentrate at the start of a run
-(\S\ref{sec:protect}), so we compare \sys and stop only in runs of 100~s without their first 20~s (three
-seeds). With 16 cells, four per GPU, neither has a TB past the layer-1 deadline in 1.92 million TBs; the
-99.99th percentile is 3.18~ms against 3.25~ms and the maximum 3.38~ms against 3.56~ms. With 20 cells, five per
-GPU, stop only has six TBs past the deadline in 2.30 million and a maximum of 4.67~ms; \sys has none and a
-maximum of 3.54~ms (the server without AI: one TB, 3.64~ms). The rule costs 11\% of the AI served (34.0k
-against 37.8k, 31.9k against 35.7k tokens/s). It is a rule for dense servers: we keep it in the one
-configuration that is used for 4 to 48 cells, and a deployment with at most four cells per GPU can drop it.
-The difference is six TBs against none, so rarer events are not resolved.
+\noindent\textbf{What the Rule on Unit Sizes Protects.} The rule on unit sizes is meant to protect the
+layer-1 deadline of the conventional receivers. Layer-1 misses concentrate at the start of a run
+(\S\ref{sec:protect}), so we compare \sys and stop only in runs of 100~s without their first 20~s
+(Table~\ref{tab:unitrule}). In none of the five settings does the rule lower the late TBs. They come in
+rare events of two to six TBs at one instant under both configurations; 68 of the 90 late TBs of \sys with
+20 cells fall in 0.1~s of one run on all four GPUs. With the first three seeds at 20 cells, stop only had
+six late TBs and \sys none; with eight seeds the order reversed, so that difference was noise. The tails
+differ by 0.00-0.04~ms at the 99.9th percentile and by $-$0.04 to 0.07~ms at the 99.99th. The rule costs
+9-12\% of the AI served. Its basis is the calibration above, in which the conventional receivers of four
+cells finish in 4.05~ms at the 99.9th percentile next to 1,024-token units that run all the time; in the runs
+such units are not next to the conventional receivers all the time. We keep the rule as a conservative
+default, every headline number of this paper is measured with it, and a deployment can drop it for 9-12\%
+more AI at the same goodput.
+
+\begin{table}[t]
+\caption{The rule on unit sizes in runs of 100~s without their first 20~s: no AI / \sys / stop only.}
+\label{tab:unitrule}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Setting & Seeds & TBs & Late TBs & L1 99.99th pct. (ms) & AI served, \sys\ / stop only \\
+\midrule
+16 cells & 3 & 1.92M & 1 / 0 / 0 & 3.20 / 3.18 / 3.25 & 34.0k / 37.8k \\
+20 cells & 8 & 6.14M & 2 / 90 / 10 & 3.30 / 3.40 / 3.42 & 31.9k / 35.5k \\
+32 cells, half load & 3 & 1.92M & 0 / 10 / 2 & 3.38 / 3.39 / 3.41 & 33.6k / 37.5k \\
+48 cells, one third load & 3 & 1.92M & 18 / 22 / 23 & 3.49 / 3.50 / 3.54 & 33.0k / 36.9k \\
+One GPU, 4 cells & 3 & 0.48M & 4 / 10 / 0 & 3.09 / 3.13 / 3.09 & 8.2k / 8.9k \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Distance to a clairvoyant schedule}
 \label{sec:clairvoyant}
@@ -1683,9 +1709,10 @@ up to 14\% more and keeps 97.0-99.3\% of the recoveries, because one run in ten 
 without AI next to it. The clairvoyant controller also pays in the layer-1 tail: its 99.9th percentile is
 3.52-3.73~ms against 3.04-3.19~ms for \sys and 3.01-3.15~ms without AI, because AI next to a neural receiver
 also delays the conventional receivers. The existing mechanisms that keep the recoveries serve 14-46\% of
-the controller at full load (Figure~\ref{fig:use}). The controller is one rule and not the optimum: it
-allows or forbids AI for a whole run, and a schedule that uses a part of the room of every run can serve
-more. The estimate below is a reference on that side.
+the controller at full load (Figure~\ref{fig:use}). A variant that also runs AI next to the needed runs, while their predicted end stays before their reuse
+time, serves 3-4\% more AI (40.2k-40.5k tokens/s) and keeps 95.0-96.0\% of the recoveries, so the
+reference that keeps the recoveries is the controller above. The controller is one rule and not the
+optimum; the estimate below is a reference on that side.
 
 \noindent\textbf{An Estimate for an Offline Schedule.} Table~\ref{tab:clairvoyant} is computed on the runs
 without AI and is not run. The schedule knows every later candidate. It keeps
@@ -1801,9 +1828,9 @@ serves 31.4k-33.4k tokens/s and keeps 99.5-100.0\% of the recoveries, 5.9-6.2$\t
 AI serves 23-28\% more and loses 3.4-5.9\% of the recoveries. In these runs of 10~s, \sys misses the
 layer-1 deadline for 0.044\% and 0.041\% of the TBs with 20 and 32 cells against 0.032\% and 0.037\% without
 AI, and with 48 cells every policy with AI misses it more often than the run without AI (0.11-0.13\% against
-0.09\%). These misses come from the start of the runs. In runs of 100~s without their first 20~s, \sys
+0.09\%). Most of these misses come from the start of the runs. In runs of 100~s without their first 20~s, \sys
 has 3 late TBs of 2.3 million with 20 cells and 17 of 1.9 million with 48 cells, against 2 and 17 without AI
-(Table~\ref{tab:when}), and it adds 0.03~ms to the 99.9th-percentile L1 latency where \textit{Static} and
+(Table~\ref{tab:when}; with the later runs, 93 of 8.5 million against 4, and 39 of 3.8 million against 35), and it adds 0.03~ms to the 99.9th-percentile L1 latency where \textit{Static} and
 \textit{Priority} add 0.16-0.25~ms. With 48 cells, up to 12 cells of a GPU are active in one slot, and
 nine TBs per million are late with and without AI.
 
@@ -1853,10 +1880,13 @@ latest start turns fewer of their lengthened runs into three-slot runs (86\%, 46
 share). At 12.5~ms the 70\% share serves 1.2$\times$ the AI of \sys and keeps 98.0\% of the recoveries, ten
 times the loss of \sys, with a layer-1 tail of 3.55~ms against 3.14~ms. Low priority without a cap stays at
 93.9\%: fewer candidates find no neural receiver (3.7\% against 5.7\%) and more runs end after the deadline
-(2.2\% against 0.4\%). The statement that no cap serves more AI than \sys at the same loss
-(\S\ref{sec:worth}) therefore holds for the deadline of 11.5~ms. With eight two-user cells at the 1\%
-target, \sys loses 0.24\% and 0.18\% of the goodput at 12.0 and 12.5~ms, the 30\% share 1.75\% and 1.57\%,
-and low priority without a cap 5.95\% and 5.58\%. We committed the closed-form prediction of the candidates
+(2.2\% against 0.4\%). Under rate control the 70\% share does not come closer. With eight two-user cells at
+the 1\% target it loses 4.03\%, 4.29\%, and 4.39\% of the goodput at 11.5, 12.0, and 12.5~ms, and with four
+two-user cells 0.5-0.8\% at 11.5 and 12.5~ms; \sys loses at most 0.4\% in the same settings (0.35\% and
+0.15\% at 12.0 and 12.5~ms with eight two-user cells), the 30\% share 1.75\% and 1.57\%,
+and low priority without a cap 5.95\% and 5.58\%. The statement that no cap serves more AI than \sys at
+the same loss of goodput (\S\ref{sec:worth}) therefore holds at the three deadlines; the 70\% share
+approaches \sys only in the recoveries kept at a fixed MCS. We committed the closed-form prediction of the candidates
 that are not recovered in time before these runs: the ten values have a mean absolute error of 0.59 points;
 no AI, \sys, and the 30\% share are within 0.2 points, and the 70\% share and no cap are 0.3-2.5 points
 low, because the runs that end after the deadline were predicted at 0.1\% and are 0.2-2.2\%.
@@ -1982,9 +2012,9 @@ The channels are the synthetic channels of the public NVlabs configuration, and 
 slots (a replay of 1,000 slots gives the same results in the headline setting). \sys serves 76-95\% of the AI of a
 clairvoyant controller that was run and 43-88\% of an estimate for an offline schedule; it does not predict
 which neural receiver will be needed. The clairvoyant controller is one rule and not the optimum. At a recovery
-deadline of 12.5~ms a low-priority share with a cap of 70\% keeps 98.0\% of the recoveries and serves
-1.2$\times$ the AI of \sys, so the statement that no cap matches \sys is for the deadline of 11.5~ms. The
-rule on unit sizes costs 11\% of the AI served and changes the layer-1 misses only with five cells per GPU. The larger model allows four to five cells per GPU at full load; 32 and 48 cells run when half or
+deadline of 12.5~ms and a fixed MCS, a low-priority share with a cap of 70\% keeps 98.0\% of the recoveries and serves
+1.2$\times$ the AI of \sys; under rate control it loses 0.5-4.4\% of the goodput at every deadline we ran. The
+rule on unit sizes costs 9-12\% of the AI served, and we measure no effect of it on the late TBs in steady state. The larger model allows four to five cells per GPU at full load; 32 and 48 cells run when half or
 two thirds of the cells are idle, and with 48 cells nine TBs per million miss the layer-1 deadline in steady
 state with and without AI. The recovery deadline and the retransmission slot follow from the TDD pattern, the PUSCH preparation
 time~\cite{ts38214}, and a MAC lead of three slots; they are not validated with a layer-2 stack, and the path
@@ -2000,7 +2030,7 @@ runs of the policy; it does not predict them from the policy. The baselines are 
 systems on our code: the estimator follows the published design, with our reliability definition and
 without the look-ahead of the full system. \sys raises the median L1 latency by 0.4~ms. \sys serves less
 AI without a time limit than \textit{Priority-max}. The layer-1 misses of 0.02-0.13\% in the runs of 10-40~s
-come from the cold start of the prototype, with and without AI. The steady-state counts are from 0.8-3.2
+come from the cold start of the prototype, with and without AI. After the start of a run \sys has four to eight late TBs per million against two without AI. The steady-state counts are from 1.3-8.5
 million TBs per setting and do not establish a reliability beyond 99.999\%; the changing loads and 32 cells
 are not measured in runs of 100~s. The SM slices have a fixed size, two seeds, and one AI model, and we
 build them with the driver API because the MPS of this server cannot divide the SMs; we do not run Weaver.
@@ -2016,8 +2046,8 @@ percentage points on average and predicted 24 values of six settings, before the
 keeps the largest AI units away from the conventional receivers. Under three load patterns with mixed
 channels, \sys serves 6.4-7.5$\times$ the AI of a fixed 10\% GPU share and 1.2-1.9$\times$ that of a share
 chosen by a load estimator with low-priority AI, and it keeps 99.9\% of the recoveries. In steady state it
-adds 0.04-0.06~ms to the 99.9th-percentile latency of the layer-1 decode, and after the start of a run its
-TBs pass the layer-1 deadline as rarely as those of the server without AI. It serves 87\% of
+adds 0.04-0.06~ms to the 99.9th-percentile latency of the layer-1 decode, and after the start of a run
+four to eight of a million TBs pass the layer-1 deadline, against two without AI. It serves 87\% of
 the AI of a clairvoyant controller that we ran, 1.9-6.4$\times$ the existing
 mechanisms that keep the recoveries. With an outer-loop
 rate controller, lost recoveries lower the MCS: the cost in goodput reaches 2.5\% at a 10\% retransmission

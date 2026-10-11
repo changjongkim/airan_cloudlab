@@ -20,6 +20,12 @@ for step in ${*:-cap long oracle2}; do
         say "32 cells at half load, runs of 100 s without their first 20 s, seeds 1-3 (xm; job $J32)"
         [ -n "$J32" ] && V14=1 OUR_V14=wd WARMUP_S=20 $PY analyze_sched.py $J32 xm 32 wd wn
       } > $R/v29_long.txt 2>&1 ;;
+    long2) J48=$(jobs_of long48); J1=$(jobs_of long1)
+      { say "48 cells at one third load, runs of 100 s without their first 20 s, seeds 1-3 (xn; job $J48): wd = the rule, wn = stop on NeuralRx only"
+        [ -n "$J48" ] && V14=1 OUR_V14=wd WARMUP_S=20 $PY analyze_sched.py $J48 xn 48 wd wn
+        say "One GPU, 4 cells, runs of 100 s without their first 20 s, seeds 1-3 (xs; job $J1)"
+        [ -n "$J1" ] && V14=1 OUR_V14=wd WARMUP_S=20 $PY analyze_sched.py $J1 xs 4 wd wn
+      } > $R/v29_long2.txt 2>&1 ;;
     oracle2) J=$(jobs_of or2_full)
       { say "Clairvoyant controller with the reuse-time rule, headline condition, seeds 1-5 (ft; job $J): wo1 = AI for a whole run or not, wq1 / wq0 = also next to needed runs while the reuse time holds (one / no receiver kept free)"
         V14=1 OUR_V14=wd $PY analyze_sweep.py $J ft 16

@@ -1,0 +1,10 @@
+
+## Clairvoyant controller with the reuse-time rule, headline condition, seeds 1-5 (ft; job 59659316): wo1 = AI for a whole run or not, wq1 / wq0 = also next to needed runs while the reuse time holds (one / no receiver kept free)
+
+| AI load | policy | seeds | AI served (tokens/s) | L1 late | L1 p99.9 ms | recovered /s | recovered kept | NRx runs /s | NRx on time |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | No AI | 5 | 0.0k | 0.039% | 3.11 | 187.4 | 100.0% | 461.8 | 100.0% |
+| 32 | Antiphase | 5 | 34.0k | 0.020% | 3.09 | 187.2 | 99.9% | 461.4 | 99.9% |
+| 32 | wo1 | 5 | 39.0k | 0.034% | 3.67 | 186.9 | 99.7% | 460.7 | 99.9% |
+| 32 | wq0 | 5 | 40.5k | 0.040% | 3.67 | 178.0 | 95.0% | 445.0 | 99.7% |
+| 32 | wq1 | 5 | 40.2k | 0.045% | 3.71 | 179.9 | 96.0% | 448.4 | 99.7% |

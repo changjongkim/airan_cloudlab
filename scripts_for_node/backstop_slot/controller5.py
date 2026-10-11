@@ -410,7 +410,11 @@ def main() -> None:
             release = epoch + k * period
             last = min(release + rescue_deadline, release + 3 * period + slack)
             limit = last
-            if not plenty and started + reuse_alone <= release + 2 * period + slack:
+            # Clairvoyant baseline with the reuse-time rule (+oracleM+reuse): a run that is not needed two slots
+            # later has no reuse time to keep; a needed run may have AI next to it while its predicted end
+            # stays before its reuse time.
+            unneeded = oracle is not None and not oracle_needed.get((cell, k), True)
+            if not plenty and not unneeded and started + reuse_alone <= release + 2 * period + slack:
                 limit = release + 2 * period + slack           # keep the run reusable two slots later
             predicted = started + reuse_alone + nrx_slow.get((cell, k), 0.0)
             room = min(room, (limit - predicted) / d)
@@ -661,7 +665,7 @@ def main() -> None:
                 if not reuse_rule and lane_reserve and lanes_free < lane_reserve and busy_lanes(g):
                     counters["reserve_blocked"] += 1
                     continue                  # lanes are scarce: this NeuralRx runs without AI
-                if oracle_blocks(g):
+                if not reuse_rule and oracle_blocks(g):
                     counters["reserve_blocked"] += 1
                     continue                  # this NeuralRx is needed two slots later: it runs without AI
                 now = now_ns()

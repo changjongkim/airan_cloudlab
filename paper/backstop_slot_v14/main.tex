@@ -849,7 +849,9 @@ flat part of \sys: from 11.5 to 12.5~ms its loss is within 0.1 points of the ser
 shares are still leaving their three-slot range. At the edges of a step \sys loses more than the server
 without AI, 0.3-0.8 points at 11.0-11.25~ms and at 12.75-13.25~ms: the AI left after a stop lengthens a run
 by 0.1-0.2~ms, which moves the step by about 0.25~ms. The computation had this difference at the second
-edge (0.1-0.7 points).
+edge (0.1-0.7 points). The AI served does not move with the deadline: over the thirteen deadlines \sys serves
+33.4k-34.5k tokens/s and keeps 99.2-100.0\% of the recoveries, \textit{Priority} 17.3k-18.3k and
+94.9-99.7\%, and \textit{Priority-70} 41.1k-42.6k and 93.9-98.4\%.
 
 \begin{figure}[t]
 \centering

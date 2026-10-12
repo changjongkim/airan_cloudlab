@@ -1,0 +1,76 @@
+% Second TikZ style of the Antiphase design figures (2026-10-11): the look of the ScaleQsim paper, as used by the
+% SectorQ design figures (pauliprop/figures/src/tikz_style2.tex).  Used by src/design2_<name>.tex, built by
+% build_v2.sh into <name>.png.  The first style (paper/backstop_slot_v14/figures/tikz_style.tex) is kept.
+%
+% What makes the look:
+%   - all text is bold Times; names of panels and components are large, annotations are bold italic
+%   - a part of the system is a tinted panel (pan) with its name at the top left; inside it, white component
+%     boxes (comp) with a name and a black numbered circle (num)
+%   - state is drawn as tables with a blue header row (th) and example values (td), or as rows of colored cells (cl)
+%   - stages are joined by fat black block arrows (barrow); thin arrows (arr) inside a component; an action is a
+%     yellow rounded box (act); a decision is a mint box (dec)
+%   - red (dred) only for the key values of a figure and for what Antiphase stops or drops
+% One color per entity: AI blue, NeuralRx green, conventional receiver teal, two-user cell gold,
+% TB of slot 2731 violet, 2732 gold, 2733 orange.
+% Canvas: 17.6 cm wide.  No text or arrow crosses the border of a box it does not belong to; little empty space.
+\definecolor{pan}{HTML}{D9D8C4}     % panel
+\definecolor{pan2}{HTML}{EDEDED}    % a lighter panel inside a figure
+\definecolor{navy}{HTML}{1F3864}
+\definecolor{thblue}{HTML}{0070C0}  % table header
+\definecolor{dred}{HTML}{C00000}
+\definecolor{dgreen}{HTML}{2E7D32}
+\definecolor{actc}{HTML}{FFE699}    % an action
+\definecolor{tune}{HTML}{D5F2E3}    % a decision
+\definecolor{aic}{HTML}{8FAADC}     % AI
+\definecolor{ailarge}{HTML}{2F5597} % a large AI unit
+\definecolor{nrxc}{HTML}{A9D18E}    % NeuralRx
+\definecolor{convc}{HTML}{C5E0E6}   % conventional receiver
+\definecolor{gold}{HTML}{FFC000}    % two-user cell, TB of slot 2732
+\definecolor{tba}{HTML}{CDB5E8}     % TB of slot 2731
+\definecolor{recc}{HTML}{F4B183}    % TB of slot 2733
+\definecolor{badc}{HTML}{FBE0DD}    % stopped, dropped
+\definecolor{gpuc}{HTML}{DDDAB8}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\tikzset{
+  every node/.append style={execute at begin node=\boldmath},
+  pan/.style={draw=black!75, fill=pan, line width=0.6pt},
+  pan2/.style={draw=black!75, fill=pan2, line width=0.6pt},
+  comp/.style={draw=navy, fill=white, line width=0.7pt},
+  ptitle/.style={font=\rmfamily\bfseries\Large, inner sep=1.5pt},
+  rtitle/.style={font=\rmfamily\bfseries\large, inner sep=1.5pt},
+  ctitle/.style={font=\rmfamily\bfseries\normalsize, inner sep=1.5pt},
+  stitle/.style={font=\rmfamily\bfseries\small, inner sep=1.5pt},
+  txt/.style={font=\rmfamily\bfseries\footnotesize, inner sep=1.5pt, align=center},
+  stxt/.style={font=\rmfamily\bfseries\scriptsize, inner sep=1.5pt, align=center},
+  ann/.style={font=\rmfamily\bfseries\itshape\footnotesize, inner sep=1.5pt, align=center},
+  sann/.style={font=\rmfamily\bfseries\itshape\scriptsize, inner sep=1.5pt, align=center},
+  key/.style={font=\rmfamily\bfseries\itshape\footnotesize, text=dred, inner sep=1.5pt, align=center},
+  skey/.style={font=\rmfamily\bfseries\itshape\scriptsize, text=dred, inner sep=1.5pt, align=center},
+  bigkey/.style={font=\rmfamily\bfseries\itshape\small, text=dred, inner sep=1.5pt, align=center},
+  th/.style={draw=black, fill=thblue, text=white, font=\rmfamily\bfseries\scriptsize, anchor=north west, inner sep=0pt,
+             minimum height=0.40cm, text height=0.22cm, text depth=0.07cm, line width=0.4pt},
+  td/.style={draw=black, fill=white, font=\rmfamily\bfseries\scriptsize, anchor=north west, inner sep=0pt,
+             minimum height=0.40cm, text height=0.22cm, text depth=0.07cm, line width=0.4pt},
+  thb/.style={th, font=\rmfamily\bfseries\footnotesize, minimum height=0.46cm, text height=0.25cm, text depth=0.08cm},
+  tdb/.style={td, font=\rmfamily\bfseries\footnotesize, minimum height=0.46cm, text height=0.25cm, text depth=0.08cm},
+  cl/.style={draw=black!80, line width=0.4pt, anchor=west, inner sep=0pt, minimum width=0.46cm, minimum height=0.40cm,
+             font=\rmfamily\bfseries\scriptsize},
+  free/.style={cl, pattern=north east lines, pattern color=black!55},
+  act/.style={draw=black, fill=actc, rounded corners=3pt, line width=0.6pt, font=\rmfamily\bfseries\footnotesize, align=center,
+              inner sep=2.5pt, minimum height=0.55cm},
+  dec/.style={draw=black, fill=tune, line width=0.6pt, font=\rmfamily\bfseries\footnotesize, align=center, inner sep=2.5pt,
+              minimum height=0.55cm},
+  box/.style={draw=black, fill=white, line width=0.6pt, font=\rmfamily\bfseries\footnotesize, align=center, inner sep=2.5pt,
+              minimum height=0.55cm},
+  ext/.style={draw=black, fill=navy, text=white, line width=0.6pt, font=\rmfamily\bfseries\normalsize, align=center, inner sep=2.5pt},
+  gpu/.style={draw=black!85, fill=gpuc, line width=0.6pt},
+  barrow/.style={single arrow, fill=black, draw=black, inner xsep=0pt, inner ysep=0.11cm, minimum height=0.6cm,
+                 single arrow head extend=0.14cm, single arrow tip angle=90},
+  rbarrow/.style={barrow, fill=dred, draw=dred},
+  arr/.style={-{Latex[length=2.0mm,width=1.7mm]}, line width=1.0pt},
+  darr/.style={{Latex[length=2.0mm,width=1.7mm]}-{Latex[length=2.0mm,width=1.7mm]}, line width=1.0pt},
+  dsh/.style={-{Latex[length=2.2mm,width=1.9mm]}, line width=1.2pt, dashed},
+  rarr/.style={-{Latex[length=2.0mm,width=1.7mm]}, line width=1.1pt, draw=dred},
+  num/.style={circle, fill=black, text=white, font=\sffamily\bfseries\scriptsize, inner sep=0.6pt, minimum size=0.40cm},
+}

@@ -1,0 +1,151 @@
+% Overall structure of Antiphase (README 3.2), second style.
+% Message: one controller process sees every TB and every GPU.  It assigns failed TBs to free NeuralRx (2), grants
+% and stops the AI of every GPU (3), and places AI requests (4); the GPUs run the conventional receivers, one
+% NeuralRx and one AI worker each.
+% The state is that of the other design figures (run fa1r32wm of job 59313958): the NeuralRx of GPU 0 and GPU 1
+% process slots 2731 and 2732 of cell 0, slot 2733 has 10 failed code blocks and is retransmitted, the AI of GPU 0
+% and GPU 1 is stopped, and the AI workers of GPU 1-3 hold one request each.  One controller loop: 15-57 us.
+% Columns: x = 0.15, 4.6, 9.05, 13.5, each 3.95 wide (centers 2.125, 6.575, 11.025, 15.475).
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \tikzset{sub/.style={draw=black!85, line width=0.5pt, anchor=north west},
+           ipc/.style={{Latex[length=1.7mm,width=1.5mm]}-{Latex[length=1.7mm,width=1.5mm]}, line width=1.0pt, draw=thblue}}
+  % =============================== outside the server ===============================
+  \node[ext, anchor=north west, minimum width=3.95cm, minimum height=0.7cm] at (0.15,0) {Layer 2 (HARQ)};
+  \node[ext, anchor=north west, minimum width=3.95cm, minimum height=0.7cm] at (13.5,0) {AI Requests};
+  \node[bigkey] at (8.8,-0.35) {One Controller Sees Every TB and Every GPU};
+  \node[barrow, rotate=90, minimum height=0.5cm] at (2.125,-0.975) {};
+  \node[ann, anchor=west] at (2.5,-0.975) {CRC Results};
+  \node[barrow, rotate=-90, minimum height=0.5cm] at (15.475,-0.975) {};
+  \node[ann, anchor=east] at (15.1,-0.975) {Prompts, Limit 200 ms};
+
+  % =============================== controller ===============================
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=3.7cm] at (0,-1.25) {};
+  \node[ptitle, anchor=north west] at (0.08,-1.31) {Controller};
+  \node[ann, anchor=south west] at (2.75,-1.87) {One Process, Shared Memory};
+  \node[bigkey, anchor=north east] at (17.5,-1.39) {One Loop Takes 15--57 $\mu$s};
+  \foreach \x/\n/\t in {0.15/1/TB State, 4.6/2/NeuralRx Assigner, 9.05/3/AI Admission, 13.5/4/Request Dispatcher} {
+    \node[comp, anchor=north west, minimum width=3.95cm, minimum height=2.85cm] at (\x,-1.95) {};
+    \node[ctitle, anchor=north west] at ({\x+0.07},-2.0) {\t};
+    \node[num] at ({\x+3.68},-2.23) {\n};
+  }
+  % ---- 1 TB state: one row per TB
+  \foreach \x/\w/\h in {0.275/0.6/Cell, 0.875/0.9/Slot, 1.775/0.6/CRC, 2.375/1.6/Failed Blocks}
+    \node[th, minimum width=\w cm] at (\x,-2.52) {\h};
+  \foreach \y/\f/\s/\d in {-2.92/tba/2731/6, -3.32/gold/2732/1, -3.72/recc/2733/10} {
+    \node[td, minimum width=0.6cm] at (0.275,\y) {0};
+    \node[td, minimum width=0.9cm, fill=\f] at (0.875,\y) {\s};
+    \node[td, minimum width=0.6cm, text=dred] at (1.775,\y) {\xmark};
+    \node[td, minimum width=1.6cm] at (2.375,\y) {\d};
+  }
+  \node[sann] at (2.125,-4.45) {Read by Every Process};
+  % ---- 2 NeuralRx assigner: a failed TB with at most nine failed code blocks goes to a free NeuralRx
+  \node[cl, fill=gold, minimum width=0.6cm, minimum height=0.4cm] at (4.72,-2.85) {2732};
+  \draw[arr] (5.34,-2.85) -- (5.72,-2.85);
+  \node[dec, minimum width=2.6cm, minimum height=0.6cm] at (7.04,-2.85) {Failed Blocks $\le$ 9?};
+  \draw[arr] (6.1125,-3.15) -- (6.1125,-3.6);
+  \node[sann, anchor=west] at (6.2,-3.38) {Yes: Assign};
+  \foreach \g in {0, 1, 2, 3}
+    \node[th, minimum width=0.925cm] at ({4.725+0.925*\g},-3.62) {GPU \g};
+  \node[td, minimum width=0.925cm, fill=tba] at (4.725,-4.02) {2731};
+  \node[td, minimum width=0.925cm, fill=gold] at (5.65,-4.02) {2732};
+  \node[td, minimum width=0.925cm] at (6.575,-4.02) {Free};
+  \node[td, minimum width=0.925cm] at (7.5,-4.02) {Free};
+  \node[sann] at (6.575,-4.62) {Earliest Latest Start First};
+  % ---- 3 AI admission: the AI of a GPU whose NeuralRx runs is stopped
+  \node[dec, minimum width=3.6cm, minimum height=0.6cm] at (11.025,-2.85) {NeuralRx of the GPU Runs?};
+  \draw[arr] (11.025,-3.15) -- (11.025,-3.6);
+  \node[skey, anchor=east] at (10.93,-3.38) {Yes: Stop};
+  \node[sann, anchor=west] at (11.12,-3.38) {No: Grant};
+  \foreach \g in {0, 1, 2, 3}
+    \node[th, minimum width=0.925cm] at ({9.175+0.925*\g},-3.62) {GPU \g};
+  \node[td, minimum width=0.925cm, fill=badc, text=dred] at (9.175,-4.02) {Stop};
+  \node[td, minimum width=0.925cm, fill=badc, text=dred] at (10.1,-4.02) {Stop};
+  \node[td, minimum width=0.925cm, fill=aic] at (11.025,-4.02) {Grant};
+  \node[td, minimum width=0.925cm, fill=aic] at (11.95,-4.02) {Grant};
+  \node[sann] at (11.025,-4.62) {A Grant Is One Piece of AI Time};
+  % ---- 4 request dispatcher: a request goes to the GPU that will finish it first
+  \node[cl, fill=aic!45, minimum width=0.55cm, minimum height=0.4cm] at (13.62,-2.85) {R3};
+  \draw[arr] (14.19,-2.85) -- (14.57,-2.85);
+  \node[act, minimum width=2.7cm, minimum height=0.6cm] at (15.95,-2.85) {Earliest Finish};
+  \draw[arr] (16.8625,-3.15) -- (16.8625,-3.6);
+  \foreach \g in {0, 1, 2, 3}
+    \node[th, minimum width=0.925cm] at ({13.625+0.925*\g},-3.62) {GPU \g};
+  \node[td, minimum width=0.925cm] at (13.625,-4.02) {--};
+  \node[td, minimum width=0.925cm, fill=aic!45] at (14.55,-4.02) {R1};
+  \node[td, minimum width=0.925cm, fill=aic!45] at (15.475,-4.02) {R2};
+  \node[td, minimum width=0.925cm, fill=aic!45] at (16.4,-4.02) {R3};
+  \draw[dred, line width=1.3pt] (16.4,-4.02) rectangle (17.325,-4.42);
+  \node[sann] at (15.475,-4.62) {Rejects a Request It Cannot Finish};
+
+  % =============================== between the controller and the GPUs ===============================
+  \node[barrow, rotate=90, minimum height=0.62cm] at (2.125,-5.35) {};
+  \node[ann, anchor=west] at (2.5,-5.35) {Results};
+  \node[barrow, rotate=-90, minimum height=0.62cm] at (6.575,-5.35) {};
+  \node[ann, anchor=west] at (6.95,-5.35) {Assign};
+  \node[rbarrow, rotate=-90, minimum height=0.62cm] at (11.025,-5.35) {};
+  \node[key, anchor=west] at (11.4,-5.35) {Grant / Stop};
+  \node[barrow, rotate=-90, minimum height=0.62cm] at (15.475,-5.35) {};
+  \node[ann, anchor=west] at (15.85,-5.35) {Place};
+
+  % =============================== the GPUs ===============================
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=4.45cm] at (0,-5.75) {};
+  \node[ptitle, anchor=north west] at (0.08,-5.81) {Four GPUs under MPS};
+  \node[cl, fill=gold, minimum width=0.46cm, minimum height=0.32cm] at (5.35,-6.1) {};
+  \node[sann, anchor=west] at (5.85,-6.1) {Two-User Cell};
+  \draw[ipc] (7.75,-6.1) -- (8.3,-6.1);
+  \node[sann, anchor=west, text=thblue] at (8.36,-6.1) {CUDA IPC};
+  \node[free, minimum width=0.46cm, minimum height=0.32cm] at (9.75,-6.1) {};
+  \node[sann, anchor=west] at (10.25,-6.1) {Idle};
+  \node[bigkey, anchor=north east] at (17.5,-5.89) {A NeuralRx Serves the Cells of Every GPU};
+  \foreach \g/\x/\ca/\cb/\cc/\cd in {0/0.15/0/4/8/12, 1/4.6/1/5/9/13, 2/9.05/2/6/10/14, 3/13.5/3/7/11/15} {
+    \node[comp, anchor=north west, minimum width=3.95cm, minimum height=3.6cm] at (\x,-6.45) {};
+    \node[ctitle] at ({\x+1.975},-6.7) {GPU \g};
+    % AI worker
+    \node[sub, fill=aic!22, minimum width=3.75cm, minimum height=0.98cm] at ({\x+0.1},-6.95) {};
+    \node[stitle, anchor=north west] at ({\x+0.15},-6.99) {AI Worker};
+    \node[sann, anchor=north east] at ({\x+3.8},-7.02) {Low Priority};
+    % NeuralRx
+    \node[sub, fill=nrxc!40, minimum width=3.75cm, minimum height=0.6cm] at ({\x+0.1},-8.03) {};
+    \node[stitle, anchor=west] at ({\x+0.15},-8.33) {NeuralRx};
+    % conventional receivers and their slot rings
+    \node[sub, fill=convc!50, minimum width=3.75cm, minimum height=1.22cm] at ({\x+0.1},-8.73) {};
+    \node[stitle] at ({\x+1.975},-8.94) {Conventional Receivers};
+    \node[cl, fill=gold, minimum width=0.8cm, minimum height=0.36cm] at ({\x+0.375},-9.38) {\ca};
+    \foreach \i/\c in {1/\cb, 2/\cc, 3/\cd}
+      \node[cl, fill=white, minimum width=0.8cm, minimum height=0.36cm] at ({\x+0.375+0.8*\i},-9.38) {\c};
+    \node[sann] at ({\x+1.975},-9.76) {A Slot Ring per Cell};
+  }
+  % AI workers: GPU 0 has no request; the AI of GPU 1 is stopped; GPU 2 and GPU 3 run their pieces
+  \node[free, minimum width=0.5cm, minimum height=0.34cm] at (0.4,-7.62) {};
+  \foreach \i in {0, 1, 2, 3}
+    \node[free, minimum width=0.5cm, minimum height=0.34cm] at ({1.32+0.5*\i},-7.62) {};
+  \draw[arr] (0.92,-7.62) -- (1.3,-7.62);
+  \node[cl, fill=aic!45, minimum width=0.5cm, minimum height=0.34cm] at (4.85,-7.62) {R1};
+  \draw[arr] (5.37,-7.62) -- (5.75,-7.62);
+  \node[cl, fill=aic, minimum width=0.5cm, minimum height=0.34cm] at (5.77,-7.62) {};
+  \foreach \i in {1, 2, 3}
+    \node[free, minimum width=0.5cm, minimum height=0.34cm] at ({5.77+0.5*\i},-7.62) {};
+  \draw[dred, line width=1.8pt] (6.27,-7.84) -- (6.27,-7.4);
+  \foreach \x/\r in {9.05/R2, 13.5/R3} {
+    \node[cl, fill=aic!45, minimum width=0.5cm, minimum height=0.34cm] at ({\x+0.25},-7.62) {\r};
+    \draw[arr] ({\x+0.77},-7.62) -- ({\x+1.15},-7.62);
+    \foreach \i in {0, 1, 2, 3}
+      \node[cl, fill=aic, minimum width=0.5cm, minimum height=0.34cm] at ({\x+1.17+0.5*\i},-7.62) {};
+  }
+  % NeuralRx: slots 2731 and 2732 on GPU 0 and GPU 1; the other two are free
+  \node[cl, fill=tba, minimum width=1.4cm, minimum height=0.36cm] at (2.35,-8.33) {2731};
+  \node[cl, fill=gold, minimum width=1.4cm, minimum height=0.36cm] at (6.8,-8.33) {2732};
+  \node[cl, fill=white, minimum width=1.4cm, minimum height=0.36cm] at (11.25,-8.33) {Free};
+  \node[cl, fill=white, minimum width=1.4cm, minimum height=0.36cm] at (15.7,-8.33) {Free};
+  % a NeuralRx reads the slot rings of the other GPUs
+  \foreach \x in {4.1, 8.55, 13.0}
+    \draw[ipc] ({\x+0.02},-8.33) -- ({\x+0.48},-8.33);
+
+  % =============================== radio units ===============================
+  \foreach \x/\t in {2.125/{Cells 0, 4, 8, 12}, 6.575/{Cells 1, 5, 9, 13}, 11.025/{Cells 2, 6, 10, 14}, 15.475/{Cells 3, 7, 11, 15}} {
+    \node[barrow, rotate=90, minimum height=0.5cm] at ({\x-0.75},-10.475) {};
+    \node[ann, anchor=west] at ({\x-0.38},-10.475) {\t};
+  }
+  \node[pan2, anchor=north west, minimum width=17.6cm, minimum height=0.7cm] at (0,-10.75) {};
+  \node[ctitle] at (8.8,-11.1) {Radio Units: 16 Cells of 100 MHz, One Uplink Slot Every 2.5 ms};
+\end{tikzpicture}

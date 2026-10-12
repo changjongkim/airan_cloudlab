@@ -399,8 +399,10 @@ Antiphase는 기존 수신기, NRx, AI를 한 GPU에 올리고 15–57 µs마다
 
 설계는 AI-RAN 서버의 목표에서 출발한다. 먼저 무선을 지키고, 그 한도 안에서 GPU를 AI에 쓴다. 모델이 준 기준은 "NRx가 UL 슬롯 하나를 더 붙잡는 실행을 늘리지 않을 것"이고(대표 조건에서 여유 1.2 ms), 세 규칙이 이 기준을 구현한다. 각 규칙은 AI가 무선을 늦추는 경로를 하나씩 없앤다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n10_rules.png" width="860"></p>
-<p align="center"><b>그림 13.</b> 기준과 세 규칙. 위쪽 띠는 모델에서 나온 기준이고, 상자는 세 규칙과 16셀 전 부하에서 측정한 효과다.</p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/rules.png" width="900"></p>
+<p align="center"><b>그림 13.</b> 기준과 세 규칙. 위: 모델에서 나온 기준을 시간축에 그린 것. 가운데: 세 규칙. 아래: 규칙마다 없애는 경로, 지키는 것, 16셀 전 부하에서 측정한 효과.</p>
+
+**그림 설명.** 위 패널의 가로축은 시간이고 파란 칸 하나가 UL 슬롯 하나(2.5 ms)다. 슬롯 k의 실패 TB를 맡은 NRx 실행은 슬롯 도착 1.4 ms 뒤에 시작해 6.3 ms 뒤인 7.7 ms에 끝난다. 두 슬롯 뒤(슬롯 k+2)의 실패 TB는 8.9 ms(5.0 + 3.9 ms)까지 NRx에서 시작해야 하므로 여유가 1.2 ms다. AI가 GPU 비율로 옆에서 돌면 같은 실행이 길어져(낮은 우선순위, 한도 없음에서 1.7 ms; 2.5절) 그 시각을 넘고, 실행이 세 번째 슬롯을 붙잡아 슬롯 k+2의 실패 TB가 NRx를 받지 못한다. 가운데의 세 패널은 규칙 하나씩이고, 노란 상자가 그 규칙이 하는 일이다.
 
 | 규칙 | 하는 일 | 지키는 것 | 효과 (16셀 전 부하) |
 |---|---|---|---|
@@ -422,8 +424,8 @@ Antiphase는 기존 수신기, NRx, AI를 한 GPU에 올리고 15–57 µs마다
 | AI worker | GPU마다 하나 | AI 작업을 단위로 나눠, 허락받은 조각 안에서만 실행. 단위 묶음 사이에서 중단 표시를 읽음 |
 | Controller | 서버에 하나 | 실패 TB를 NRx에 배정, GPU별 AI 조각 허락과 중단, AI 요청을 GPU에 배정 |
 
-<p align="center"><img src="docs/current/figures/backstop_v14/architecture.png" width="860"></p>
-<p align="center"><b>그림 14.</b> Antiphase의 전체 구조. 위는 Controller(한 프로세스), 아래는 GPU 네 장의 기존 수신기, NRx, AI worker다. 금색 칸은 2-UE 셀이다.</p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/architecture.png" width="900"></p>
+<p align="center"><b>그림 14.</b> Antiphase의 전체 구조. 위는 Controller(한 프로세스)의 네 구성 요소, 아래는 GPU 네 장의 AI worker, NRx, 기존 수신기다. 금색 칸은 2-UE 셀, 빗금 칸은 쉬는 중이다.</p>
 
 | 층 | 구성 요소 | 하는 일 |
 |---|---|---|
@@ -435,14 +437,14 @@ Antiphase는 기존 수신기, NRx, AI를 한 GPU에 올리고 15–57 µs마다
 | | NeuralRx | GPU마다 하나. 실패한 TB를 하나씩 복호한다. 모든 셀의 슬롯 ring을 CUDA IPC로 읽으므로 어느 GPU의 셀이든 맡는다 |
 | | AI Worker | GPU마다 하나. 낮은 우선순위로, 허락받은 조각 안에서만 AI를 돌린다 |
 
-금색 칸은 2-UE 셀이다(GPU마다 하나). 상자 안의 내용은 3.3절·3.6절 그림과 같은 순간의 상태다: GPU 0과 GPU 1의 NRx가 슬롯 2731, 2732를 처리 중이고, GPU 1–3의 AI worker가 요청을 하나씩 갖고 있다. 아래 화살표는 어느 셀의 샘플이 어느 GPU로 들어가는지다. Controller의 루프 하나는 15–57 µs다.
+금색 칸은 2-UE 셀이다(GPU마다 하나). 상자 안의 내용은 3.3절·3.6절 그림과 같은 순간의 상태다: GPU 0과 GPU 1의 NRx가 슬롯 2731, 2732를 처리 중이고, GPU 1–3의 AI worker가 요청을 하나씩 갖고 있다. NRx가 도는 GPU 0과 GPU 1은 AI Admission의 표에서 Stop이고, GPU 1의 AI worker는 조각 하나 뒤에서 멈췄다(빨간 막대). GPU 사이의 파란 화살표는 NRx가 다른 GPU에 있는 셀의 슬롯을 CUDA IPC로 읽는다는 뜻이다. 아래 화살표는 어느 셀의 샘플이 어느 GPU로 들어가는지다. Controller의 루프 하나는 15–57 µs다.
 
 ### 3.3 규칙 1: 복구 경로
 
-<p align="center"><img src="docs/current/figures/backstop_v14/recovery_path.png" width="860"></p>
-<p align="center"><b>그림 15.</b> 복구 경로의 여섯 단계. 셀 0의 연속한 실패 TB 셋(슬롯 2731, 2732, 2733)이 왼쪽에서 오른쪽으로 지나간다. 파란 상자는 GPU에서 하는 단계, 복숭아색 상자는 Controller가 하는 단계다.</p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/recovery_path.png" width="900"></p>
+<p align="center"><b>그림 15.</b> 복구 경로의 여섯 단계. 셀 0의 연속한 실패 TB 셋(슬롯 2731, 2732, 2733)이 왼쪽에서 오른쪽으로 지나간다. 단계 이름 아래의 기울인 글자는 그 단계를 하는 곳이다.</p>
 
-그림은 복구 경로를 여섯 단계의 절차로 그린 것이다. 측정한 실행에서 셀 0의 연속한 실패 TB 셋(슬롯 2731, 2732, 2733)이 왼쪽에서 오른쪽으로 지나간다. 파란 상자는 GPU에서 하는 단계, 복숭아색 상자는 controller가 하는 단계다. TB는 모든 상자에서 같은 색이다(2731 보라, 2732 금색, 2733 주황). 시각은 슬롯 2732의 샘플 도착 기준이다.
+그림은 복구 경로를 여섯 단계의 절차로 그린 것이다. 측정한 실행에서 셀 0의 연속한 실패 TB 셋(슬롯 2731, 2732, 2733)이 왼쪽에서 오른쪽으로 지나간다. 단계 이름 아래에 그 단계를 하는 곳(GPU의 기존 수신기와 NRx, 또는 controller)을 적었다. TB는 모든 상자에서 같은 색이다(2731 보라, 2732 금색, 2733 주황). 시각은 슬롯 2732의 샘플 도착 기준이다.
 
 | 단계 | 하는 일 | 그림의 값 |
 |---|---|---|
@@ -2971,6 +2973,13 @@ bash docs/current/slides/antiphase_deck/figsrc/build.sh                      # 1
 bash docs/current/slides/antiphase_deck/figsrc/build.sh n03_share n10_rules  # 일부만
 ```
 
+3.1–3.3절의 설계 그림(그림 13–15) 빌드:
+
+```bash
+bash docs/current/figures/antiphase_v2/build_v2.sh                 # rules, architecture, recovery_path
+bash docs/current/figures/antiphase_v2/build_v2.sh architecture    # 하나만
+```
+
 ---
 
 ## 8. 연구 경과
@@ -3060,6 +3069,7 @@ bash docs/current/slides/antiphase_deck/figsrc/build.sh n03_share n10_rules  # �
 | `paper/backstop_slot_v7/` | 논문 초안 (v13 기준, 기록) |
 | `docs/current/` | 현재 판단에 쓰는 문서 |
 | `docs/current/slides/antiphase_deck/` | 1–4장의 설명용 그림 17장(`n00`–`n17`). TikZ 소스와 `build.sh`는 `figsrc/` |
+| `docs/current/figures/antiphase_v2/` | 3.1–3.3절의 설계 그림 세 장(기준과 규칙, 전체 구조, 복구 경로). TikZ 소스는 `src/design2_*.tex`, 스타일은 `src/tikz_style2.tex`, 빌드는 `build_v2.sh` |
 | `docs/archive/` | 이전 가설과 보고서. 현재 결론으로 쓰지 않음 |
 | `paper/softwall_sigmetrics27/` | SoftWall 단계의 원고 (기록) |
 | `scripts_for_node/softwall_same_gpu/`, `results/softwall_*` | SoftWall 단계의 코드와 결과 (기록) |

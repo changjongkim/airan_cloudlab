@@ -1,0 +1,102 @@
+% One criterion and three rules (README 3.1), second style.
+% Message: the model gives one criterion, "add no NeuralRx run that holds a third slot", and each of the three
+% rules removes one path by which AI delays the radio.
+%   top     the criterion on a time axis: a run that starts 1.4 ms after its slot arrives and takes 6.3 ms ends at
+%           7.7 ms, 1.2 ms before the latest start of the failed TB two slots later (5.0 + 3.9 = 8.9 ms).  With AI as
+%           a GPU share the run is longer (+1.72 ms with low priority and no cap, README 2.5) and passes that latest start: it holds a third slot.
+%   middle  the three rules, each with a small picture and its action
+%   bottom  what each rule removes, what it protects, and the measured effect (16 cells on four GPUs, full load;
+%           README 3.1: NeuralRx runs in 25% of the slots; three-slot runs 52% -> 11%, 10% without AI; layer-1
+%           misses of 10-s runs 0.061% -> 0.036%, no difference measured in steady state)
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  % =============================== criterion ===============================
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=3.22cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {Criterion from the Model};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {Add No NeuralRx Run That Holds a Third Slot};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=2.36cm] at (0.15,-0.72) {};
+  % time axis: x = 4.0 + t (ms after the samples of slot k arrive); a slot every 2.5 ms
+  \foreach \i/\t in {0/Uplink Slot $k$, 1/Slot $k{+}1$, 2/Slot $k{+}2$, 3/Slot $k{+}3$, 4/Slot $k{+}4$}
+    \node[th, minimum width=2.5cm] at ({4.0+2.5*\i},-0.84) {\t};
+  % without AI: the run ends 1.2 ms before the latest start of slot k+2
+  \node[txt, anchor=west] at (0.28,-1.52) {Without AI};
+  \node[sann, anchor=west] at (0.28,-1.83) {The Run Holds Two Slots};
+  \node[draw=black, fill=nrxc, line width=0.5pt, anchor=west, inner sep=0pt, minimum width=6.3cm, minimum height=0.38cm,
+        font=\rmfamily\bfseries\scriptsize] at (5.4,-1.62) {NeuralRx Run for the Failed TB of Slot $k$: 6.3 ms};
+  \node[draw=black, fill=nrxc!45, line width=0.5pt, anchor=west, inner sep=0pt, minimum width=4.8cm, minimum height=0.38cm,
+        font=\rmfamily\bfseries\scriptsize] at (11.7,-1.62) {};
+  \node[stxt] at (14.75,-1.62) {Run for Slot $k{+}2$};
+  % with a share: the run passes the latest start
+  \node[txt, anchor=west, text=dred] at (0.28,-2.3) {AI as a GPU Share};
+  \node[skey, anchor=west] at (0.28,-2.61) {The Run Holds a Third Slot};
+  \node[draw=black, fill=nrxc, line width=0.5pt, anchor=west, inner sep=0pt, minimum width=6.3cm, minimum height=0.38cm,
+        font=\rmfamily\bfseries\scriptsize] at (5.4,-2.4) {The Same Run Beside AI};
+  \node[draw=dred, line width=0.7pt, anchor=west, inner sep=0pt, minimum width=1.7cm, minimum height=0.38cm,
+        pattern=north east lines, pattern color=dred] at (11.7,-2.4) {};
+  \node[skey, anchor=north] at (12.55,-2.6) {+1.7 ms, No Cap};
+  \node[skey, anchor=west, align=left] at (13.62,-2.46) {The Failed TB of Slot $k{+}2$\\Finds No NeuralRx};
+  % latest start of the failed TB of slot k+2 and the slack
+  \draw[dred, line width=1.1pt, dashed] (12.9,-1.34) -- (12.9,-2.62);
+  \draw[darr] (11.7,-2.0) -- (12.9,-2.0);
+  \node[txt, anchor=east] at (11.6,-2.0) {Slack 1.2 ms};
+  \node[skey, anchor=west] at (13.0,-2.0) {Latest Start for the Failed TB of Slot $k{+}2$};
+
+  % =============================== three rules ===============================
+  \foreach \x in {2.85, 8.8, 14.75}
+    \node[barrow, rotate=-90, minimum height=0.5cm] at (\x,-3.5) {};
+  \foreach \x/\n/\t in {0/1/Recovery Path, 5.95/2/Stop AI Beside NeuralRx, 11.9/3/Large AI Units Wait} {
+    \node[pan, anchor=north west, minimum width=5.7cm, minimum height=3.95cm] at (\x,-3.8) {};
+    \node[num] at ({\x+0.38},-4.12) {\n};
+    \node[rtitle, anchor=west] at ({\x+0.62},-4.12) {\t};
+    \node[comp, anchor=north west, minimum width=5.4cm, minimum height=2.12cm] at ({\x+0.15},-4.46) {};
+  }
+  % ---- rule 1: the NeuralRx runs only on failed TBs
+  \node[sann] at (2.85,-4.7) {Slots of a Two-User Cell};
+  \foreach \i in {0, 1, 3, 4, 5, 7}
+    \node[cl, fill=white, minimum width=0.56cm, minimum height=0.4cm] at ({0.61+0.56*\i},-5.14) {};
+  \foreach \i in {2, 6}
+    \node[cl, fill=gold, minimum width=0.56cm, minimum height=0.4cm, text=dred] at ({0.61+0.56*\i},-5.14) {\xmark};
+  \node[draw=black, fill=nrxc, line width=0.6pt, minimum width=2.7cm, minimum height=0.5cm, inner sep=0pt] at (2.85,-6.14) {NeuralRx, 6.3 ms};
+  \draw[arr] (2.01,-5.36) -- (2.4,-5.87);
+  \draw[arr] (4.25,-5.36) -- (3.3,-5.87);
+  \node[sann, anchor=east] at (1.42,-5.72) {CRC Fails};
+  \node[act, minimum width=5.4cm] at (2.85,-7.17) {Run the Large NeuralRx\\Only on Failed TBs};
+  % ---- rule 2: the AI of the GPU stops when its NeuralRx starts
+  \node[sann] at (8.8,-4.7) {One GPU over Time};
+  \node[txt, anchor=west] at (6.25,-5.24) {NeuralRx};
+  \node[txt, anchor=west] at (6.25,-6.0) {AI};
+  \node[draw=black, fill=nrxc, line width=0.6pt, anchor=west, minimum width=2.2cm, minimum height=0.42cm, inner sep=0pt] at (8.3,-5.24) {Run};
+  \foreach \x in {7.5, 7.88}
+    \node[cl, fill=aic, minimum width=0.38cm, minimum height=0.42cm] at (\x,-6.0) {};
+  \draw[dred, line width=1.8pt] (8.3,-6.28) -- (8.3,-5.72);
+  \node[key] at (9.4,-6.0) {Stopped};
+  \foreach \x in {10.58, 10.96}
+    \node[cl, fill=aic, minimum width=0.38cm, minimum height=0.42cm] at (\x,-6.0) {};
+  \node[act, minimum width=5.4cm] at (8.8,-7.17) {Stop the AI on the GPU\\Whose NeuralRx Starts};
+  % ---- rule 3: the largest AI units run only while no cell decodes
+  \node[sann] at (14.75,-4.7) {One GPU over Time};
+  \node[txt, anchor=west] at (12.2,-5.24) {Decoding};
+  \node[txt, anchor=west] at (12.2,-6.0) {AI};
+  \node[draw=black, fill=convc, line width=0.6pt, anchor=west, minimum width=1.14cm, minimum height=0.42cm, inner sep=0pt] at (13.72,-5.24) {Cells};
+  \node[draw=black, fill=convc, line width=0.6pt, anchor=west, minimum width=1.14cm, minimum height=0.42cm, inner sep=0pt] at (16.16,-5.24) {Cells};
+  \foreach \x in {13.72, 14.1, 14.48, 16.16, 16.54, 16.92}
+    \node[cl, fill=aic, minimum width=0.38cm, minimum height=0.42cm] at (\x,-6.0) {};
+  \node[draw=black, fill=ailarge, text=white, line width=0.6pt, anchor=west, minimum width=1.14cm, minimum height=0.42cm, inner sep=0pt,
+        font=\rmfamily\bfseries\scriptsize] at (14.94,-6.0) {Large};
+  \node[act, minimum width=5.4cm] at (14.75,-7.17) {Admit AI Units over 1.2 ms\\Only While No Cell Decodes};
+
+  % =============================== what each rule removes ===============================
+  \node[thb, minimum width=2.6cm] at (0,-7.95) {};
+  \node[thb, minimum width=5.0cm] at (2.6,-7.95) {Rule 1: Recovery Path};
+  \node[thb, minimum width=5.0cm] at (7.6,-7.95) {Rule 2: Stop AI Beside NeuralRx};
+  \node[thb, minimum width=5.0cm] at (12.6,-7.95) {Rule 3: Large AI Units Wait};
+  \foreach \y/\h/\a/\b/\c/\col in {
+      -8.41/Path Removed/NeuralRx on Every Slot/AI Lengthens a NeuralRx Run/A Large AI Unit Delays Decoding/black,
+      -8.87/Protects/Premise of Rules 2 and 3/The Next Failed TB/{The Layer-1 Deadline, 4.0 ms}/black,
+      -9.33/Measured/{NeuralRx Runs: 25\% of the Slots}/{Three-Slot Runs: 52\% $\rightarrow$ 11\%}/{Layer-1 Misses: 0.061\% $\rightarrow$ 0.036\%}/dred} {
+    \node[tdb, fill=pan2, minimum width=2.6cm] at (0,\y) {\h};
+    \node[tdb, minimum width=5.0cm, text=\col] at (2.6,\y) {\a};
+    \node[tdb, minimum width=5.0cm, text=\col] at (7.6,\y) {\b};
+    \node[tdb, minimum width=5.0cm, text=\col] at (12.6,\y) {\c};
+  }
+  \node[sann, anchor=north west] at (0,-9.84) {16 cells on four GPUs at full load. Without AI, 10\% of the runs hold three slots. Rule 3: runs of 10 s; no difference was measured in steady state.};
+\end{tikzpicture}

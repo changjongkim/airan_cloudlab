@@ -1,0 +1,46 @@
+% Why the largest AI units are kept away from decoding cells (README 3.7), second style.  Completion of the
+% conventional receiver, 99.9th percentile, single-user cells, four cells per GPU, low-priority AI of one unit size
+% running all the time next to it: 3.65 / 3.86 / 4.05 ms for 128 / 512 / 1,024 tokens.  Deadline 4.0 ms.
+% The axis shows 3.4-4.2 ms; values are points, not bars from zero.  y = -6.0 + 4.6 * (v - 3.4).
+% Right: layer-1 misses of 10-s runs with and without the rule (0.061% -> 0.036%, no AI 0.032%); in the steady
+% state of 100-s runs no difference was measured (README 4.14).
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=7.9cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {Why Large AI Units Wait};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {Beside a 1,024-Token Unit, Decoding Ends After the Deadline};
+  % ---- the measurement
+  \node[comp, anchor=north west, minimum width=9.7cm, minimum height=7.0cm] at (0.15,-0.75) {};
+  \node[stitle, anchor=north west] at (0.25,-0.82) {When the Conventional Receiver Finishes};
+  \node[sann, anchor=north west] at (0.25,-1.27) {ms After the Samples, 99.9th Percentile};
+  \draw[axis] (1.5,-6.0) -- (9.6,-6.0);
+  \draw[axis] (1.5,-6.0) -- (1.5,-1.9);
+  \foreach \v in {3.4, 3.6, 3.8, 4.0, 4.2} {
+    \draw[axis] (1.4,{-6.0+4.6*(\v-3.4)}) -- (1.5,{-6.0+4.6*(\v-3.4)});
+    \draw[black!25, line width=0.4pt] (1.5,{-6.0+4.6*(\v-3.4)}) -- (9.6,{-6.0+4.6*(\v-3.4)});
+    \node[tick, anchor=east] at (1.38,{-6.0+4.6*(\v-3.4)}) {\v};
+  }
+  \draw[guard] (1.5,-3.24) -- (9.6,-3.24);
+  \node[key, anchor=south west] at (1.6,-3.22) {Layer-1 Deadline 4.0 ms};
+  \node[circle, draw=black, fill=aic!40, line width=0.6pt, minimum size=0.5cm, inner sep=0pt] at (3.0,-4.85) {};
+  \node[ctitle, anchor=west] at (3.35,-4.85) {3.65};
+  \node[circle, draw=black, fill=aic, line width=0.6pt, minimum size=0.5cm, inner sep=0pt] at (5.4,-3.884) {};
+  \node[ctitle, anchor=west] at (5.75,-3.884) {3.86};
+  \node[circle, draw=black, fill=ailarge, line width=0.6pt, minimum size=0.5cm, inner sep=0pt] at (7.8,-3.01) {};
+  \node[ctitle, anchor=west, text=dred] at (8.15,-2.92) {4.05};
+  \node[txt] at (3.0,-6.35) {128 Tokens};
+  \node[txt] at (5.4,-6.35) {512 Tokens};
+  \node[txt] at (7.8,-6.35) {1,024 Tokens};
+  \node[sann] at (5.4,-7.05) {Size of the AI Unit That Runs Beside the Decoding Cells};
+  % ---- the rule
+  \node[comp, anchor=north west, minimum width=7.3cm, minimum height=7.0cm] at (10.15,-0.75) {};
+  \node[stitle, anchor=north west] at (10.25,-0.82) {The Rule};
+  \node[dec, minimum width=6.9cm, minimum height=0.95cm] at (13.8,-1.95) {Beside a Decoding Cell:\\Small and Medium Units};
+  \node[box, fill=badc, minimum width=6.9cm, minimum height=0.95cm] at (13.8,-3.1) {Only While No Cell of the GPU Decodes:\\Large Units};
+  \node[th, minimum width=4.4cm] at (10.35,-3.95) {Layer-1 Misses, Runs of 10 s};
+  \node[th, minimum width=2.5cm] at (14.75,-3.95) {Share of TBs};
+  \foreach \y/\a/\b/\c in {-4.35/Without the Rule/0.061\%/black, -4.75/With the Rule/0.036\%/dred, -5.15/Server Without AI/0.032\%/black} {
+    \node[td, minimum width=4.4cm] at (10.35,\y) {\a};
+    \node[td, minimum width=2.5cm, text=\c] at (14.75,\y) {\b};
+  }
+  \node[sann] at (13.8,-6.35) {In the Steady State of 100-s Runs\\No Difference Was Measured.\\The Rule Is a Conservative Default.};
+\end{tikzpicture}

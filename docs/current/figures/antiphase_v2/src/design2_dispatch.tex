@@ -1,0 +1,37 @@
+% Where an AI request goes (README 3.8), second style.  The lengths of the queues are an illustration, not measured.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  % ---- requests
+  \node[pan, anchor=north west, minimum width=3.0cm, minimum height=6.2cm] at (0,0) {};
+  \node[rtitle, anchor=north west] at (0.08,-0.08) {AI Requests};
+  \node[comp, anchor=north west, minimum width=2.7cm, minimum height=5.35cm] at (0.15,-0.7) {};
+  \foreach \i/\l in {0/R4, 1/R3, 2/R2, 3/R1}
+    \node[cl, anchor=center, fill=aic!45, minimum width=1.7cm, minimum height=0.56cm, font=\rmfamily\bfseries\footnotesize] at (1.5,{-1.4-0.72*\i}) {\l};
+  \node[ann] at (1.5,-5.0) {Each Due\\in 200 ms};
+  \node[barrow, minimum height=0.5cm] at (3.3,-3.1) {};
+  % ---- dispatcher
+  \node[pan, anchor=north west, minimum width=5.6cm, minimum height=6.2cm] at (3.6,0) {};
+  \node[rtitle, anchor=north west] at (3.68,-0.08) {Request Dispatcher};
+  \node[comp, anchor=north west, minimum width=5.3cm, minimum height=5.35cm] at (3.75,-0.7) {};
+  \node[act, minimum width=4.9cm, minimum height=0.95cm] (pred) at (6.4,-1.5) {Predict the Finish Time\\on Every GPU};
+  \node[sann] at (6.4,-2.3) {From Its Queue and Recent Rate};
+  \node[dec, minimum width=4.9cm, minimum height=0.7cm] (q) at (6.4,-3.35) {Finishes Within 150 ms?};
+  \draw[arr] (6.4,-2.52) -- (6.4,-3.0);
+  \node[box, fill=badc, text=dred, minimum width=4.9cm, minimum height=0.7cm] (rej) at (6.4,-5.05) {Not Admitted};
+  \draw[rarr] (6.4,-3.7) -- (6.4,-4.7);
+  \node[skey, anchor=west] at (6.5,-4.2) {No};
+  \node[barrow, minimum height=0.5cm] at (9.5,-3.35) {};
+  \node[sann, anchor=south] at (9.5,-2.98) {Yes};
+  % ---- GPUs
+  \node[pan, anchor=north west, minimum width=7.8cm, minimum height=6.2cm] at (9.8,0) {};
+  \node[rtitle, anchor=north west] at (9.88,-0.08) {Queued AI Work on Each GPU};
+  \node[comp, anchor=north west, minimum width=7.5cm, minimum height=5.35cm] at (9.95,-0.7) {};
+  \foreach \g/\w in {0/3.4, 1/1.4, 2/4.3, 3/2.5} {
+    \node[gpu, anchor=west, minimum width=7.1cm, minimum height=0.8cm] at (10.15,{-1.45-1.02*\g}) {};
+    \node[ctitle, anchor=west] at (10.25,{-1.45-1.02*\g}) {GPU \g};
+    \draw[draw=black, fill=aic, line width=0.4pt] (11.75,{-1.7-1.02*\g}) rectangle ({11.75+\w},{-1.2-1.02*\g});
+  }
+  \draw[dred, line width=1.4pt] (10.15,-2.87) rectangle (17.25,-2.07);
+  \node[key, anchor=west] at (13.35,-2.47) {Earliest Finish: Here};
+  \node[sann] at (13.7,-5.55) {150 ms Is 75\% of the 200 ms Limit};
+  \node[sann, anchor=north west] at (0,-6.28) {The same dispatch and admission are used for every compared method.};
+\end{tikzpicture}

@@ -1,0 +1,33 @@
+% Evaluation setup (README 4.1), second style: four A100 GPUs, 16 cells of 100 MHz, one two-user cell, one
+% NeuralRx and one AI worker per GPU.  Three radio load patterns; the step shapes are a sketch.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  % ---- the server
+  \node[pan, anchor=north west, minimum width=10.7cm, minimum height=7.5cm] at (0,0) {};
+  \node[rtitle, anchor=north west] at (0.08,-0.08) {Server: Four A100 GPUs, 16 Cells of 100 MHz};
+  \foreach \g in {0, 1, 2, 3} {
+    \node[comp, anchor=north west, minimum width=2.5cm, minimum height=4.75cm] at ({0.15+2.63*\g},-0.75) {};
+    \node[ctitle] at ({1.4+2.63*\g},-1.05) {GPU \g};
+    \node[box, fill=aic, minimum width=2.2cm, minimum height=0.66cm] at ({1.4+2.63*\g},-1.78) {AI Worker};
+    \node[box, fill=nrxc, minimum width=2.2cm, minimum height=0.66cm] at ({1.4+2.63*\g},-2.6) {NeuralRx};
+    \node[box, fill=gold, minimum width=2.2cm, minimum height=0.66cm] at ({1.4+2.63*\g},-3.42) {Two-User Cell};
+    \node[box, fill=convc, minimum width=2.2cm, minimum height=1.05cm] at ({1.4+2.63*\g},-4.6) {Three\\One-User Cells};
+  }
+  \node[th, minimum width=1.7cm] at (0.15,-5.75) {AI Load};
+  \node[td, minimum width=8.69cm] at (1.85,-5.75) {LLM Requests (Qwen2.5-1.5B), up to 1,024 Tokens};
+  \node[th, minimum width=1.7cm] at (0.15,-6.15) {Offered};
+  \node[td, minimum width=8.69cm] at (1.85,-6.15) {53k tokens/s, Each Request Due in 200 ms};
+  \node[th, minimum width=1.7cm] at (0.15,-6.55) {Radio};
+  \node[td, minimum width=8.69cm] at (1.85,-6.55) {One Uplink Slot per Cell Every 2.5 ms};
+  % ---- the load patterns
+  \node[pan, anchor=north west, minimum width=6.7cm, minimum height=7.5cm] at (10.9,0) {};
+  \node[rtitle, anchor=north west] at (10.98,-0.08) {Three Radio Load Patterns};
+  \foreach \i/\l in {0/(a) Steady Full Load, 1/(b) Load Changes Every 2 s, 2/(c) Random Load Steps} {
+    \node[comp, anchor=north west, minimum width=6.4cm, minimum height=1.95cm] at (11.05,{-0.75-2.08*\i}) {};
+    \node[stitle, anchor=north west] at (11.13,{-0.8-2.08*\i}) {\l};
+    \draw[axis] (11.4,{-2.4-2.08*\i}) -- (17.1,{-2.4-2.08*\i});
+  }
+  \draw[draw=thblue, line width=1.6pt] (11.4,-1.6) -- (17.1,-1.6);
+  \draw[draw=thblue, line width=1.6pt] (11.4,-3.68) -- (12.825,-3.68) -- (12.825,-4.2) -- (14.25,-4.2) -- (14.25,-3.68) -- (15.675,-3.68) -- (15.675,-4.2) -- (17.1,-4.2);
+  \draw[draw=thblue, line width=1.6pt] (11.4,-6.15) -- (12.1,-6.15) -- (12.1,-5.78) -- (13.3,-5.78) -- (13.3,-6.3) -- (14.05,-6.3) -- (14.05,-5.95) -- (15.15,-5.95) -- (15.15,-5.78) -- (16.1,-5.78) -- (16.1,-6.2) -- (17.1,-6.2);
+  \node[sann, anchor=east] at (17.45,-7.2) {Active Cells over Time};
+\end{tikzpicture}

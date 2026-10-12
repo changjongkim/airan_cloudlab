@@ -1,0 +1,35 @@
+% An AI-RAN server (README 1.1), second style: one GPU carries three kinds of work, each with its own time limit.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  % =============================== radio units ===============================
+  \node[pan, anchor=north west, minimum width=3.1cm, minimum height=6.2cm] at (0,0) {};
+  \node[rtitle, anchor=north west] at (0.08,-0.08) {Radio Units};
+  \foreach \i in {0, 1, 2, 3}
+    \node[comp, minimum width=2.6cm, minimum height=0.62cm, font=\rmfamily\bfseries\footnotesize] at (1.55,{-1.3-0.8*\i}) {Cell \i};
+  \node[ann] at (1.55,-5.0) {Samples of an\\Uplink Slot\\Every 2.5 ms};
+  \node[barrow, minimum height=0.5cm] at (3.4,-3.1) {};
+  % =============================== the GPU ===============================
+  \node[pan, anchor=north west, minimum width=8.6cm, minimum height=6.2cm] at (3.7,0) {};
+  \node[ptitle, anchor=north west] at (3.78,-0.06) {One GPU of the AI-RAN Server};
+  \foreach \y/\n/\f/\t/\d/\l in {-0.8/1/convc/Conventional Receiver/Decodes Every TB/4.0 ms,
+                                  -2.6/2/nrxc/Neural Receiver (NeuralRx)/Recovers Failed TBs/11.5 ms,
+                                  -4.4/3/aic/AI Inference/Serves LLM Requests/200 ms} {
+    \node[comp, anchor=north west, minimum width=8.3cm, minimum height=1.65cm] at (3.85,\y) {};
+    \node[draw=navy, fill=\f, line width=0.7pt, anchor=north west, minimum width=0.38cm, minimum height=1.65cm, inner sep=0pt] at (3.85,\y) {};
+    \node[num] at (4.62,{\y-0.42}) {\n};
+    \node[ctitle, anchor=west] at (4.88,{\y-0.42}) {\t};
+    \node[ann, anchor=west] at (4.4,{\y-1.15}) {\d};
+    \node[th, minimum width=2.0cm] at (9.95,{\y-0.4}) {Time Limit};
+    \node[td, minimum width=2.0cm, text=dred, font=\rmfamily\bfseries\footnotesize, minimum height=0.5cm] at (9.95,{\y-0.8}) {\l};
+  }
+  % =============================== layer 2 and the AI clients ===============================
+  \node[barrow, minimum height=0.7cm] at (12.75,-1.625) {};
+  \node[barrow, minimum height=0.7cm] at (12.75,-3.425) {};
+  \node[dbarrow, minimum height=0.82cm] at (12.75,-5.225) {};
+  \node[comp, anchor=north west, minimum width=4.4cm, minimum height=3.45cm] at (13.2,-0.8) {};
+  \node[exth, minimum width=4.4cm] at (13.2,-0.8) {Layer 2};
+  \node[ann] at (15.4,-1.9) {Decoded Data};
+  \node[ann] at (15.4,-3.3) {Recovered TBs:\\Retransmission Cancelled};
+  \node[comp, anchor=north west, minimum width=4.4cm, minimum height=1.65cm] at (13.2,-4.4) {};
+  \node[exth, minimum width=4.4cm] at (13.2,-4.4) {AI Requests};
+  \node[ann] at (15.4,-5.5) {53k tokens/s Offered};
+\end{tikzpicture}

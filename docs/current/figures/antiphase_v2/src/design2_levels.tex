@@ -1,0 +1,26 @@
+% What each level adds to the layer-1 latency (README 4.7), second style: 99.9th percentile of the completion of
+% the conventional receiver in the steady state of 100-s runs at full load, 3.2 million TBs.
+% x = 6.3 + 2.55 * ms.  Deadline 4.0 ms.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=8.1cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {Layer-1 Latency, 99.9th Percentile};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {The NeuralRx Adds 1.5 ms; the AI of Antiphase 0.05 ms};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=7.2cm] at (0.15,-0.75) {};
+  \draw[axis] (6.3,-6.5) -- (17.0,-6.5);
+  \draw[axis] (6.3,-6.5) -- (6.3,-1.1);
+  \foreach \v in {0, 1, 2, 3, 4} {
+    \draw[axis] ({6.3+2.55*\v},-6.5) -- ({6.3+2.55*\v},-6.6);
+    \node[tick, anchor=north] at ({6.3+2.55*\v},-6.62) {\v};
+  }
+  \draw[guard] (16.5,-1.35) -- (16.5,-6.5);
+  \node[key, anchor=east] at (16.4,-1.12) {Deadline 4.0 ms};
+  \foreach \l/\y/\v/\f/\c in {
+     Conventional Receiver Only/-1.75/1.49/convc/black, + NeuralRx (No AI)/-2.47/3.01/nrxc/black,
+     + AI: Antiphase/-3.19/3.06/ailarge/white, + AI: Static/-3.91/3.19/aic/black, + AI: Priority/-4.63/3.30/aic/black,
+     + AI: Priority-70/-5.35/3.48/aic/black, + AI: Priority-max/-6.07/3.70/aic/black} {
+    \draw[draw=black, fill=\f, line width=0.5pt] (6.3,{\y-0.24}) rectangle ({6.3+2.55*\v},{\y+0.24});
+    \node[txt, anchor=east, inner sep=3pt, text=\c] at ({6.3+2.55*\v},\y) {\v};
+    \node[lab] at (6.15,\y) {\l};
+  }
+  \node[sann] at (8.8,-7.45) {ms After the Samples. Steady State of 100-s Runs at Full Load, 3.2 Million TBs.};
+\end{tikzpicture}

@@ -1,0 +1,21 @@
+% The idea in one picture (README top, deck cover and summary), second style.
+% On one GPU the NeuralRx and the AI run in opposite phase: while the NeuralRx recovers a failed TB the AI is
+% stopped, and the AI has the whole GPU otherwise.  The lengths are a sketch.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=4.15cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {One GPU over Time};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {The NeuralRx and the AI Run in Opposite Phase};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=3.25cm] at (0.15,-0.75) {};
+  \node[txt, anchor=west] at (0.35,-1.62) {NeuralRx};
+  \node[txt, anchor=west] at (0.35,-2.52) {AI};
+  \foreach \a in {4.59, 10.93}
+    \node[run, fill=nrxc, minimum width=4.27cm, minimum height=0.56cm, font=\rmfamily\bfseries\footnotesize] at (\a,-1.62) {Recovers a Failed TB};
+  \foreach \a in {2.6, 3.24, 3.88, 8.94, 9.58, 10.22, 15.27, 15.91, 16.55}
+    \node[cl, fill=aic, minimum width=0.64cm, minimum height=0.56cm] at (\a,-2.52) {};
+  \foreach \x in {4.555, 8.895, 10.895, 15.235}
+    \draw[guard] (\x,-1.16) -- (\x,-2.98);
+  \foreach \x in {3.56, 9.9, 16.23}
+    \node[bkey] at (\x,-3.4) {Whole GPU};
+  \foreach \x in {6.725, 13.065}
+    \node[key] at (\x,-3.4) {AI Stopped};
+\end{tikzpicture}

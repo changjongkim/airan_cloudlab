@@ -1,0 +1,28 @@
+% The two receivers (README 2.1), second style.  cuPHY 0.8-0.9 ms per slot; the large NeuralRx 6.3 ms next to the
+% cells (2.5 uplink periods); it decodes 15-67% of the TBs that cuPHY failed.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \tikzset{st/.style={box, minimum height=0.9cm}}
+  % =============================== conventional receiver ===============================
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=2.85cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {Conventional Receiver (cuPHY)};
+  \node[bigval, anchor=north east] at (17.5,-0.14) {0.8--0.9 ms per Slot};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=1.95cm] at (0.15,-0.75) {};
+  \node[st, fill=pan2, minimum width=2.0cm] (s1) at (1.55,-1.725) {Samples};
+  \node[st, fill=convc, minimum width=2.6cm] (c1) at (4.4,-1.725) {Channel\\Estimation};
+  \node[st, fill=convc, minimum width=2.6cm] (c2) at (7.55,-1.725) {Equalization};
+  \node[st, fill=convc, minimum width=2.6cm] (c3) at (10.7,-1.725) {Demapping};
+  \node[st, fill=convc, minimum width=2.4cm] (c4) at (13.75,-1.725) {LDPC\\Decoding};
+  \node[st, fill=convc, minimum width=1.5cm] (c5) at (16.25,-1.725) {CRC};
+  \draw[arr] (s1) -- (c1); \draw[arr] (c1) -- (c2); \draw[arr] (c2) -- (c3); \draw[arr] (c3) -- (c4); \draw[arr] (c4) -- (c5);
+  % =============================== neural receiver ===============================
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=2.85cm] at (0,-3.0) {};
+  \node[ptitle, anchor=north west] at (0.08,-3.06) {Neural Receiver (NeuralRx, Large Model)};
+  \node[bigkey, anchor=north east] at (17.5,-3.14) {6.3 ms per Slot};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=1.95cm] at (0.15,-3.75) {};
+  \node[st, fill=pan2, minimum width=2.0cm] (s2) at (1.55,-4.725) {Samples};
+  \node[st, fill=nrxc, minimum width=8.9cm] (n1) at (7.55,-4.725) {One Neural Network Replaces the Three Stages};
+  \node[st, fill=nrxc, minimum width=2.4cm] (n4) at (13.75,-4.725) {LDPC\\Decoding};
+  \node[st, fill=nrxc, minimum width=1.5cm] (n5) at (16.25,-4.725) {CRC};
+  \draw[arr] (s2) -- (n1); \draw[arr] (n1) -- (n4); \draw[arr] (n4) -- (n5);
+  \node[sann, anchor=north west] at (0,-5.92) {The uplink period is 2.5 ms: the large model takes 2.5 periods, and it decodes 15--67\% of the TBs that the conventional receiver failed.};
+\end{tikzpicture}

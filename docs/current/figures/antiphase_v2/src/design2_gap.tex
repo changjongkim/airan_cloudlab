@@ -1,0 +1,26 @@
+% Three lines of earlier work and the case none of them covers (README 2.6), second style.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=4.2cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {Three Lines of Earlier Work};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {None Has All Three Kinds of Work on One GPU};
+  \foreach \x/\t/\a/\av/\b/\bv/\c/\cv/\k in {
+      0.15/{Radio and Other Work Share a GPU}/YinYangRAN/INFOCOM'24/CloudRIC/MobiCom'24/Weaver/arXiv'26/No Neural Receiver,
+      5.975/{Neural Receiver Research}/DeepRx/2021/Real-Time NeuralRx/2025/ARCHES/arXiv'26/No AI on the Same GPU,
+      11.8/{General GPU Scheduling}/REEF/OSDI'22/Orion/EuroSys'24/XSched/OSDI'25/No Radio Deadlines} {
+    \node[comp, anchor=north west, minimum width=5.65cm, minimum height=3.3cm] at (\x,-0.75) {};
+    \node[stitle] at ({\x+2.825},-1.05) {\t};
+    \node[th, minimum width=3.1cm] at ({\x+0.225},-1.4) {System};
+    \node[th, minimum width=2.1cm] at ({\x+3.325},-1.4) {Venue};
+    \foreach \y/\n/\v in {-1.8/\a/\av, -2.2/\b/\bv, -2.6/\c/\cv} {
+      \node[td, minimum width=3.1cm] at ({\x+0.225},\y) {\n};
+      \node[td, minimum width=2.1cm] at ({\x+3.325},\y) {\v};
+    }
+    \node[key] at ({\x+2.825},-3.52) {\k};
+  }
+  \foreach \x in {2.975, 8.8, 14.625}
+    \node[barrow, rotate=-90, minimum height=0.5cm] at (\x,-4.5) {};
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=1.6cm] at (0,-4.8) {};
+  \node[ptitle, anchor=west] at (0.15,-5.6) {Antiphase};
+  \node[act, minimum width=13.6cm, minimum height=1.1cm, font=\rmfamily\bfseries\normalsize] at (10.6,-5.6)
+    {Conventional Receiver + NeuralRx + AI on One GPU, Decided Every 15--57 $\mu$s};
+\end{tikzpicture}

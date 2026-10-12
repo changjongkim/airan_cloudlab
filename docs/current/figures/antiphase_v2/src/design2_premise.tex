@@ -1,0 +1,37 @@
+% Two measurements behind the recovery path (README 2.2), second style.
+%  (a) two-user cells, no AI: the large NeuralRx as the main receiver reaches 39% of the slots and the cells decode
+%      89.4% of their TBs; on failed TBs only, 94.5-95.1% (drawn at 94.8).
+%  (b) mixed channels: a failed TB of a slot with at most 9 failed code blocks is recovered in 75% of the cases
+%      (125 of 167), with 10 or more in 14% (24 of 170).
+% Bars: y = -5.9 + 0.04 * percent.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \foreach \x/\t/\s in {0/(a) How to Use the Large NeuralRx/{TBs of the Two-User Cells Decoded (\%)},
+                        8.9/(b) Which Failed TBs to Send/{Failed TBs the NeuralRx Recovers (\%)}} {
+    \node[pan, anchor=north west, minimum width=8.7cm, minimum height=7.1cm] at (\x,0) {};
+    \node[rtitle, anchor=north west] at ({\x+0.08},-0.08) {\t};
+    \node[comp, anchor=north west, minimum width=8.4cm, minimum height=6.25cm] at ({\x+0.15},-0.7) {};
+    \node[ann] at ({\x+4.35},-1.0) {\s};
+    \draw[axis] ({\x+1.3},-5.9) -- ({\x+8.2},-5.9);
+    \draw[axis] ({\x+1.3},-5.9) -- ({\x+1.3},-1.7);
+    \foreach \v in {0, 25, 50, 75, 100} {
+      \draw[axis] ({\x+1.2},{-5.9+0.04*\v}) -- ({\x+1.3},{-5.9+0.04*\v});
+      \node[tick, anchor=east] at ({\x+1.18},{-5.9+0.04*\v}) {\v};
+    }
+  }
+  % (a)
+  \draw[draw=black, fill=black!22, line width=0.5pt] (1.9,-5.9) rectangle (4.5,-2.324);
+  \node[ctitle, anchor=south] at (3.2,-2.3) {89.4};
+  \draw[draw=black, fill=nrxc, line width=0.5pt] (5.3,-5.9) rectangle (7.9,-2.108);
+  \node[ctitle, anchor=south, text=dred] at (6.6,-2.08) {94.5--95.1};
+  \node[txt] at (3.2,-6.4) {Every Slot\\(Main Receiver)};
+  \node[txt] at (6.6,-6.4) {Failed TBs Only\\(Recovery)};
+  \node[sann] at (3.2,-4.1) {The NeuralRx\\Reaches Only\\39\% of the Slots};
+  % (b)
+  \draw[draw=black, fill=nrxc, line width=0.5pt] (10.8,-5.9) rectangle (13.4,-2.9);
+  \node[ctitle, anchor=south, text=dred] at (12.1,-2.88) {75};
+  \draw[draw=black, fill=black!22, line width=0.5pt] (14.2,-5.9) rectangle (16.8,-5.34);
+  \node[ctitle, anchor=south] at (15.5,-5.32) {14};
+  \node[txt] at (12.1,-6.4) {9 or Fewer\\Failed Code Blocks};
+  \node[txt] at (15.5,-6.4) {10 or More\\Failed Code Blocks};
+  \node[key] at (15.5,-3.9) {Not Sent:\\Retransmitted};
+\end{tikzpicture}

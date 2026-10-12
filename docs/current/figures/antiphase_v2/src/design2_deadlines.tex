@@ -1,0 +1,28 @@
+% The two deadlines of a transport block (README 1.2), second style.  x = 3.6 + 1.02 t, t in ms after the samples
+% arrive.  Conventional result at 2.3 ms (CRC fails), layer-1 deadline 4.0 ms, NeuralRx run 2.3-8.8 ms, recovery
+% deadline 11.5 ms.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=6.2cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {Two Deadlines of a Transport Block};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {A Recovery in Time Cancels the Retransmission};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=5.3cm] at (0.15,-0.75) {};
+  \draw[axis] (3.6,-4.85) -- (16.9,-4.85);
+  \foreach \t in {0, 2.5, 5, 7.5, 10, 12.5} {
+    \draw[axis] ({3.6+1.02*\t},-4.85) -- ({3.6+1.02*\t},-4.95);
+    \node[tick, anchor=north] at ({3.6+1.02*\t},-4.97) {\t};
+  }
+  \node[sann] at (10.0,-5.65) {Milliseconds After the Samples of the Slot Arrive};
+  % conventional receiver
+  \node[lab] at (3.45,-2.05) {Conventional\\Receiver};
+  \node[run, fill=convc, minimum width=2.346cm, minimum height=0.6cm, font=\rmfamily\bfseries\footnotesize] at (3.6,-2.05) {Decode};
+  \node[txt, text=dred, anchor=west] at (6.02,-2.05) {CRC \xmark};
+  \draw[guard] (7.68,-1.42) -- (7.68,-4.85);
+  \node[key, anchor=south] at (7.68,-1.42) {Layer-1 Deadline 4.0 ms};
+  % NeuralRx
+  \node[lab] at (3.45,-3.45) {NeuralRx};
+  \node[run, fill=nrxc, minimum width=6.63cm, minimum height=0.6cm, font=\rmfamily\bfseries\footnotesize] at (5.946,-3.45) {Recovers the Same TB: 6.5 ms};
+  \node[txt, text=dgreen, anchor=west] at (12.66,-3.45) {CRC \cmark};
+  \draw[hard] (15.33,-2.85) -- (15.33,-4.85);
+  \node[key, anchor=south] at (15.33,-2.85) {Recovery Deadline 11.5 ms};
+  \node[ann] at (11.1,-4.15) {In Time: the Retransmission Is Cancelled};
+\end{tikzpicture}

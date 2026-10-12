@@ -2,7 +2,7 @@
 
 *Antiphase: Sharing a Base-Station GPU between Radio Reception and AI Inference, with the Radio Protected First*
 
-**기준일:** 2026-10-11 (측정은 2026-10-11까지) · **논문 초안:** [paper/backstop_slot_v14/main.pdf](paper/backstop_slot_v14/main.pdf) (영문, 43쪽) · **그림:** [docs/current/figures/backstop_v14/](docs/current/figures/backstop_v14/), [docs/current/slides/antiphase_deck/](docs/current/slides/antiphase_deck/)
+**기준일:** 2026-10-11 (측정은 2026-10-11까지) · **논문 초안:** [paper/backstop_slot_v14/main.pdf](paper/backstop_slot_v14/main.pdf) (영문, 43쪽) · **그림:** [docs/current/figures/antiphase_v2/](docs/current/figures/antiphase_v2/), [docs/current/figures/backstop_v14/](docs/current/figures/backstop_v14/)
 
 AI-RAN 서버는 기지국의 무선 신호 처리와 AI 추론을 같은 GPU에서 돌린다. 이 연구는 그 GPU에 세 가지 작업을 함께 올린다. 모든 데이터 블록(TB)을 복호하는 기존 수신기(cuPHY), 기존 수신기가 실패한 블록을 다시 복호해 살리는 neural receiver(NRx), 남는 GPU 시간에 도는 AI 추론이다. NRx가 블록을 살리는 것을 **복구**라고 부른다. 복구된 블록은 재전송하지 않아도 된다.
 
@@ -10,7 +10,7 @@ Antiphase는 **NRx가 도는 동안 그 GPU의 AI를 멈추고, NRx가 쉬는 �
 
 > **핵심 결과.** rate control이 MCS를 고르는 42개 조건 모두에서 2-UE 셀의 goodput 손실(조건별 평균)이 0.5% 이하다(41개 조건은 0.3% 이하; 가장 어려운 조건은 시드 33개의 평균이 0.35%이고 95% 구간이 0.25–0.44%). AI가 L1 지연 p99.9에 더하는 값은 0.04–0.06 ms이고 비율 방식은 그 2.8–21배를 더한다. AI는 34.1k–44.7k tokens/s를 처리해 고정 10%의 6.4–7.5배, 낮은 우선순위 + 30%의 1.9–2.0배다. 슬롯별 실패를 미리 아는 controller를 실제로 돌려 재면 Antiphase는 그 87%를 처리하고(전 부하; 여섯 조건에서 76–95%), 복구를 지키는 기존 수단은 14–46%를 처리한다. 돌리지 않고 추정한 오프라인 스케줄 대비로는 70%다. 실패를 정확히 미리 알아도 AI는 15% 늘고, 실패 예측기는 후보의 90% 이상을 찾아야 복구를 지킨다. 손실 모델은 복구 마감 열 개(11.0–14.0 ms)의 40개 값을 실행 전에 평균 0.16%p 안에서 맞혔다. 표는 1.5절에 있다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n00_idea.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/idea.png" width="900"></p>
 <p align="center"><b>그림 1.</b> Antiphase의 동작. GPU 한 장의 시간축에서 NRx가 실패한 TB를 복구하는 동안 그 GPU의 AI는 멈추고, 그 밖의 시간에는 AI가 GPU 전체를 쓴다.</p>
 
 **목차:** [1. 서론](#1-서론) · [2. 배경](#2-배경) · [3. 설계](#3-설계) · [4. 평가](#4-평가) · [5. 비용과 한계](#5-비용과-한계) · [6. 결론](#6-결론) · [7. 재현 방법](#7-재현-방법) · [8. 연구 경과](#8-연구-경과) · [9. 저장소 구조와 원본 파일](#9-저장소-구조와-원본-파일)
@@ -25,7 +25,7 @@ Antiphase는 **NRx가 도는 동안 그 GPU의 AI를 멈추고, NRx가 쉬는 �
 
 기지국은 셀의 uplink(UL) 신호를 수 ms 안에 복호해야 하고, 이 작업을 GPU에서 한다. 무선 작업은 GPU를 다 채우지 않는다. AI가 없는 서버에서 GPU에 아무 작업도 없는 시간은 전 부하에서 26%, 부하가 바뀌는 조건에서 37–43%다(4.7절). 가장 긴 무선 작업인 NRx가 쉬는 시간은 전 부하에서 64%다(4.12절). AI-RAN 서버는 이 시간을 AI 추론에 쓴다. 그러면 제한 시간이 서로 다른 세 가지 작업이 한 GPU에 놓인다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n01_server.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/server.png" width="900"></p>
 <p align="center"><b>그림 2.</b> AI-RAN 서버의 GPU 한 장에서 도는 세 가지 작업. 왼쪽: 각 셀의 radio unit이 2.5 ms마다 UL 슬롯 하나의 샘플을 보낸다. 가운데: 기존 수신기, NRx, AI 추론과 각 작업의 제한 시간. 오른쪽: 복호한 데이터는 L2로 가고 L2는 실패한 TB를 재전송시킨다. AI 요청은 외부에서 들어온다(실험에서는 53k tokens/s 제공).</p>
 
 | 작업 | 하는 일 | 제한 시간 |
@@ -41,7 +41,7 @@ Antiphase는 **NRx가 도는 동안 그 GPU의 AI를 멈추고, NRx가 쉬는 �
 
 TB(transport block)는 한 사용자가 UL 슬롯 하나에 보내는 데이터다. TB에는 마감이 둘 있다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n02_deadlines.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/deadlines.png" width="900"></p>
 <p align="center"><b>그림 3.</b> TB 하나의 시간축. 위: 기존 수신기는 2.3 ms 안에 끝나고 CRC가 실패한다. 아래: NRx는 같은 TB에 6.5 ms가 걸려 8.8 ms에 끝난다. 점선은 L1 마감(4.0 ms), 실선은 복구 마감(11.5 ms)이다.</p>
 
 - **L1 마감 4.0 ms.** 기존 수신기의 결과는 샘플 도착 4.0 ms 뒤까지 나와야 한다. 모든 TB에 해당한다.
@@ -54,7 +54,7 @@ TB(transport block)는 한 사용자가 UL 슬롯 하나에 보내는 데이터�
 
 기존 방식은 AI에 GPU의 일정 비율을 준다. 고정 비율을 주거나, 낮은 우선순위에 한도를 두는 방식이다. 두 경우 모두 AI가 GPU에 항상 올라가 있고, NRx가 도는 동안에도 그렇다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n03_share.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/share.png" width="900"></p>
 <p align="center"><b>그림 4.</b> GPU 한 장의 두 시간축. 위: GPU 비율 방식(낮은 우선순위 + 30% 한도). AI 띠가 시간축 전체를 덮고, 빗금은 NRx의 늘어난 실행 시간이다. 아래: Antiphase. AI 조각은 NRx 실행의 앞뒤에만 있다. 오른쪽 수치는 16셀·GPU 4장 전 부하의 측정값이다(시드 5).</p>
 
 - 비율 방식에서 NRx 실행은 0.75 ms 길어진다(낮은 우선순위 + 30%).
@@ -109,7 +109,7 @@ TB(transport block)는 한 사용자가 UL 슬롯 하나에 보내는 데이터�
 
 ### 1.6 기여와 적용 범위
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n15_contrib.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/contrib.png" width="900"></p>
 <p align="center"><b>그림 6.</b> 새로운 점 세 가지와 그 관계. 발견이 제어할 양을 정하고, 모델이 그 양을 수치로 바꾸고, 설계가 실행 시간을 그 수치 안에 둔다.</p>
 
 | # | 새로운 점 | 한 문장 | 근거 |
@@ -139,7 +139,7 @@ AI를 Antiphase보다 더 처리하는 방식(낮은 우선순위 + 70%, 한도 
 
 ### 1.7 용어
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n05_tblife.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/tblife.png" width="900"></p>
 <p align="center"><b>그림 7.</b> TB 하나의 흐름. 기존 수신기가 복호하고 CRC가 통과하면 전달된다. 실패하면 슬롯의 실패 code block 수를 보고, 9개 이하이면 후보가 되어 NRx로 간다. NRx가 복구 마감 안에 복호하면 복구되고, 그렇지 않으면 재전송된다.</p>
 
 | 용어 | 뜻 |
@@ -169,7 +169,7 @@ AI를 Antiphase보다 더 처리하는 방식(낮은 우선순위 + 70%, 한도 
 
 기존 수신기는 채널 추정, 등화, 복조(demapping), LDPC 복호, CRC를 차례로 수행하고 슬롯 하나에 0.8–0.9 ms가 걸린다. NRx는 앞의 세 단계를 신경망 하나로 대신하고 LDPC 복호기는 그대로 쓴다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n06_receivers.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/receivers.png" width="900"></p>
 <p align="center"><b>그림 8.</b> 두 수신기의 단계. 위: 기존 수신기. 아래: NRx. 신경망 하나가 채널 추정, 등화, 복조를 대신한다. 오른쪽 시간은 슬롯 하나에 드는 GPU 시간이고 셀과 함께 돌 때의 측정값이다. 두 수신기는 모든 비교에서 같은 LDPC 복호기를 20회 반복으로 쓴다.</p>
 
 두 수신기의 LDPC 반복 횟수를 20회로 맞추고 공개 NRx(NVlabs `neural_rx`)의 두 모델을 cuPHY와 같은 슬롯에서 비교했다(4.4절).
@@ -187,7 +187,7 @@ AI를 Antiphase보다 더 처리하는 방식(낮은 우선순위 + 70%, 한도 
 
 큰 모델은 느리므로 쓰는 방법이 둘이다. 주 수신기로 두고 처리할 수 있는 슬롯을 모두 복호하게 하거나, 기존 수신기가 모든 TB를 복호하고 NRx에는 실패한 TB만 주는 것이다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n07_premise.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/premise.png" width="900"></p>
 <p align="center"><b>그림 9.</b> (a) 큰 모델을 쓰는 두 방법에서 2-UE 셀의 TB 가운데 복호된 비율(2-UE 셀 4개, AI 없음). (b) 슬롯의 실패 code block 수에 따라 NRx가 복구한 실패 TB의 비율(채널 혼합: 167개 중 125개, 170개 중 24개).</p>
 
 - 주 수신기로 쓰면 NRx가 슬롯의 39%만 처리하고 2-UE 셀의 복호 성공이 89.4%다.
@@ -200,7 +200,7 @@ AI를 Antiphase보다 더 처리하는 방식(낮은 우선순위 + 70%, 한도 
 
 GPU를 나누는 기존 수단은 비율과 우선순위다. 방식들은 AI의 비율을 정하는 방법에서 서로 다르다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n09_baselines.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/baselines.png" width="900"></p>
 <p align="center"><b>그림 10.</b> 무선 부하가 2초마다 높음과 낮음을 오가는 동안 각 방식이 AI에 주는 GPU 몫. 빨간 블록은 추정기 방식이 부하가 오른 뒤에도 1초 동안 큰 몫을 주는 구간이다. 높이는 동작 방식을 나타낸 것이고, 실험 설정값은 10%와 30%다.</p>
 
 - **고정 비율 (Static).** MPS로 AI에 GPU의 10%를 고정으로 준다. AI-RAN 실험의 고정 분할에 해당한다.
@@ -235,7 +235,7 @@ GPU를 나누는 기존 수단은 비율과 우선순위다. 방식들은 AI의 
 2. **NRx는 혼자 돌 때 UL 슬롯 두 개 동안 바쁘다.** 실행 시간이 6.3 ms이므로, 한 TB를 받으면 두 슬롯 뒤의 TB부터 다시 받을 수 있다. 이때 남는 여유가 1.2 ms다.
 3. **AI가 NRx를 1.2 ms 넘게 늦추면 세 슬롯 동안 바쁘다.** 비율 한도와 낮은 우선순위는 NRx를 1–2 ms 늦춘다. NRx는 여전히 복구 마감 안에 끝나지만, 한 슬롯 더 붙잡힌 동안 실패한 TB는 빈 NRx를 찾지 못한다.
 
-<p align="center"><img src="docs/current/figures/backstop_v14/loss_two_or_three_slots.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/loss_two_or_three_slots.png" width="900"></p>
 <p align="center"><b>그림 11.</b> NRx 4개에 슬롯마다 실패 TB가 2개씩(A–H) 오는 예. 위: NRx가 혼자 돌면 실행(6.3 ms)이 두 슬롯 뒤의 TB가 시작해야 하는 시각보다 1.2 ms 먼저 끝나 8개를 모두 복구한다. 아래: AI 옆에서 실행이 7.9 ms가 되면 0.4 ms 늦어 E와 F를 잃는다.</p>
 
 - 그림은 NRx 4개에 슬롯마다 실패 TB가 2개씩(A–H) 오는 예를 실제 시간축(ms)에 그린 것이다. TB는 어디서나 같은 색이다(슬롯 k 보라, k+1 청록, k+2 금색, k+3 주황). TB 뒤의 옅은 띠는 그 TB가 NRx에서 시작할 수 있는 구간이고, 띠 끝의 세로줄이 가장 늦은 시작 시각이다. 가는 파란 띠는 그 GPU에서 도는 AI다.
@@ -293,7 +293,7 @@ h = ceil((s + S − L) / P)        P = UL 주기 2.5 ms,  L = 가장 늦은 시�
 
 ### 2.6 기존 연구
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n04_gap.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/gap.png" width="900"></p>
 <p align="center"><b>그림 12.</b> 기존 연구의 세 갈래와 각 갈래에 빠진 요소. Antiphase는 기존 수신기, NRx, AI를 한 GPU에 올린다.</p>
 
 세 갈래의 기존 연구가 있고, 어느 것도 이 문제를 다루지 않는다.
@@ -471,8 +471,8 @@ Antiphase는 기존 수신기, NRx, AI를 한 GPU에 올리고 15–57 µs마다
 
 복구 경로의 상수는 UL 주기, 재전송 시점, NRx의 측정된 실행 시간에서 나온다. 실험마다 조정하는 값은 없다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n11_timing.png" width="860"></p>
-<p align="center"><b>그림 16.</b> 실패 TB 하나의 시간축. 위에서부터 기존 수신기의 복호와 L1 마감(4.0 ms), 후보가 NRx에서 시작할 수 있는 구간(3.9 ms까지), NRx 실행(6.3 ms)과 그 시간 한도(7.6 ms), 복구 마감(11.5 ms)이다. 파란 화살표는 여유 1.2 ms다.</p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/timing.png" width="900"></p>
+<p align="center"><b>그림 16.</b> 실패 TB 하나의 시간축. 위에서부터 기존 수신기의 복호와 L1 마감(4.0 ms), 후보가 NRx에서 시작할 수 있는 구간(3.9 ms까지), NRx 실행(6.3 ms)과 그 시간 한도(7.6 ms), 복구 마감(11.5 ms)이다. NRx 실행 뒤의 양쪽 화살표는 여유 1.2 ms다.</p>
 
 | 항목 | 값 | 근거 |
 |---|---|---|
@@ -502,7 +502,7 @@ Antiphase는 기존 수신기, NRx, AI를 한 GPU에 올리고 15–57 µs마다
 
 Controller가 시간을 지키려면 GPU에 올리는 AI 연산이 얼마나 걸리는지 알아야 한다. 그래서 모든 AI 작업을 길이를 잰 단위로 나눈다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n12_units.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/units.png" width="900"></p>
 <p align="center"><b>그림 17.</b> 네 모델의 AI 단위 하나의 시간 한도. 점선은 크기 등급의 경계(0.45 ms, 1.2 ms)다. 가장 큰 등급에 드는 단위는 1.5B 모델과 3B 모델의 1,024 token layer 둘이다.</p>
 
 모든 AI 작업을 단위로 나눈다. 단위는 고정 버퍼 위에서 잡은 CUDA graph 하나이고, 혼자 돌 때의 GPU 시간을 한 번 재서 한도(p99.9의 1.1배)로 쓴다.
@@ -519,7 +519,7 @@ Controller가 시간을 지키려면 GPU에 올리는 AI 연산이 얼마나 걸
 
 ### 3.6 규칙 2: AI 허락과 중단
 
-<p align="center"><img src="docs/current/figures/backstop_v14/ai_admission.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/ai_admission.png" width="900"></p>
 <p align="center"><b>그림 18.</b> AI 허락과 중단. 위: AI Admission이 GPU 하나에 대해 하는 세 가지 판단. 아래: GPU 1의 NRx가 슬롯 2732를 시작한 순간의 GPU별 셀, NRx, 허락, AI 요청의 단위.</p>
 
 그림은 3.3절 그림의 TB(슬롯 2732)를 GPU 1의 NRx가 시작한 순간(도착 2.3 ms)의 측정값이다. 위는 AI Admission이 GPU 하나에 대해 하는 판단 순서이고, 아래는 GPU마다 셀(회색 = 복호 중), NRx, 허락(Grant), AI 요청의 단위들이다. 512 token 이하의 요청은 단위 30개다(준비 1, layer 28, 출력 head 1).
@@ -555,7 +555,7 @@ AI worker는 낮은 MPS 우선순위로 실행하고 비율 한도는 두지 않
 
 규칙 2는 NRx를 지킨다. 규칙 3은 기존 수신기를 지킨다. NRx가 돌지 않을 때에도 AI는 기존 수신기와 GPU를 나누고, 기존 수신기의 결과는 4.0 ms까지 나와야 한다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n13_large.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/large.png" width="900"></p>
 <p align="center"><b>그림 20.</b> 한 크기의 AI 단위가 옆에서 계속 돌 때 기존 수신기가 끝나는 시각(p99.9, GPU당 단일 UE 셀 4개). 128 token과 512 token 단위에서는 3.65 ms와 3.86 ms로 L1 마감(4.0 ms) 안이고, 1,024 token 단위에서는 4.05 ms로 마감을 넘는다.</p>
 
 - 작은 두 등급(한도 1.2 ms 이하)은 복호 중인 셀 옆에서 돌려도 된다.
@@ -579,7 +579,7 @@ AI worker는 낮은 MPS 우선순위로 실행하고 비율 한도는 두지 않
 
 ### 3.8 AI 요청의 배정과 실행 순서
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n14_dispatch.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/dispatch.png" width="900"></p>
 <p align="center"><b>그림 21.</b> AI 요청의 배정. Request Dispatcher가 GPU마다 완료 시각을 대기량과 최근 처리율로 예측하고, 가장 먼저 끝낼 GPU로 요청을 보낸다. 제한의 75%(150 ms) 안에 끝내지 못할 요청은 받지 않는다. 대기 막대의 길이는 설명을 위한 것이다.</p>
 
 - 요청은 서버 전체에 하나의 목록으로 온다. Controller가 요청마다 "가장 먼저 끝낼 GPU"에 배정하고, 제한의 75% 안에 끝내지 못할 요청은 받지 않는다. 예측은 그 GPU의 대기량(시간 제한이 같거나 짧은 작업만)과 최근 처리율로 한다. 모든 방식이 같은 배정과 입장 제어를 쓴다.
@@ -618,7 +618,7 @@ AI worker는 낮은 MPS 우선순위로 실행하고 비율 한도는 두지 않
 
 ### 4.1 실험 환경과 방법
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n16_setup.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/setup.png" width="900"></p>
 <p align="center"><b>그림 22.</b> 실험 구성. 왼쪽: A100 GPU 네 장 각각에 AI worker, NRx, 2-UE 셀 하나, 단일 UE 셀 셋을 둔다. 오른쪽: 세 가지 무선 부하(계속 전 부하, 2초마다 바뀜, 무작위로 바뀜)의 모양이다.</p>
 
 | 항목 | 값 |
@@ -823,7 +823,7 @@ AI worker는 낮은 MPS 우선순위로 실행하고 비율 한도는 두지 않
 
 NRx와 AI를 넣은 서버에서 무선 작업의 지연은 0일 수 없다. 그래서 기준을 세 단계로 나눈다: 기존 수신기만 도는 서버, NRx를 더한 서버, AI까지 더한 서버. 각 단계가 무엇을 얼마나 더하는지를 적는다. 아래 표는 100초 실행의 정상 상태 값이다(처음 20초 제외). 칸은 "L1 지연 p99.9 / L1 마감(4.0 ms)을 넘긴 TB 수"다.
 
-<p align="center"><img src="docs/current/slides/antiphase_deck/n17_levels.png" width="860"></p>
+<p align="center"><img src="docs/current/figures/antiphase_v2/levels.png" width="900"></p>
 <p align="center"><b>그림 23.</b> 세 단계의 L1 지연 p99.9(전 부하, 고정 MCS, 100초 실행의 정상 상태). 기존 수신기만 도는 서버, NRx를 더한 서버, 각 방식의 AI를 더한 서버다. 점선은 L1 마감(4.0 ms)이다.</p>
 
 | 단계 | 전 부하, 고정 MCS (TB 320만 개) | rate control, 목표 10% (단일 UE 셀의 TB 115만 개) |
@@ -2966,17 +2966,17 @@ cd paper/backstop_slot_v14 && bash figures.sh && module load texlive/2024 && lat
 
 `paper/backstop_slot_v14`가 v14의 규칙과 수치로 쓴 초안이고, `paper/backstop_slot_v7`은 v13의 초안이다.
 
-1–4장의 설명용 그림(n00–n17) 빌드:
+첫 번째 스타일의 설명용 그림(n00–n17, 논문과 이전 문서가 쓴다) 빌드:
 
 ```bash
 bash docs/current/slides/antiphase_deck/figsrc/build.sh                      # 17장 전부 (texlive 2024의 pdflatex와 gs)
 bash docs/current/slides/antiphase_deck/figsrc/build.sh n03_share n10_rules  # 일부만
 ```
 
-3.1–3.3절의 설계 그림(그림 13–15) 빌드:
+1–4장의 설명 그림과 설계 그림(21장, 두 번째 스타일) 빌드:
 
 ```bash
-bash docs/current/figures/antiphase_v2/build_v2.sh                 # rules, architecture, recovery_path
+bash docs/current/figures/antiphase_v2/build_v2.sh                 # 21장 전부 (texlive 2024의 pdflatex와 gs)
 bash docs/current/figures/antiphase_v2/build_v2.sh architecture    # 하나만
 ```
 
@@ -3054,7 +3054,7 @@ bash docs/current/figures/antiphase_v2/build_v2.sh architecture    # 하나만
 | 4.10, 4.11, 4.13–4.15, 4.17, 4.18 전체 표 | `results/backstop_slot/v14_report_j59210955_59318975.md` (`campaigns/v14_report.sh`의 출력) |
 | 4.19 | `results/backstop_slot/sweep_<tag>_c<셀>_j59192512_59199237.json`, `v13_report_j59192512_59199237.md` |
 | 추정기 | `results/backstop_slot/yyr_estimator_{fixed,lowprio}_j59210955.json` |
-| 그림 | `docs/current/figures/backstop_v14/`, `docs/current/figures/backstop_v13/`, `docs/current/slides/antiphase_deck/`(1–4장의 설명용 그림) |
+| 그림 | `docs/current/figures/antiphase_v2/`(1–4장의 설명 그림과 설계 그림), `docs/current/figures/backstop_v14/`, `docs/current/figures/backstop_v13/`(평가 그림) |
 
 실행별 원자료(`results/backstop_slot/raw/`)는 저장소에 포함하지 않았다.
 
@@ -3068,8 +3068,8 @@ bash docs/current/figures/antiphase_v2/build_v2.sh architecture    # 하나만
 | `paper/backstop_slot_v14/` | 논문 초안 (v14 기준; `figures.sh`가 그림을 만든다) |
 | `paper/backstop_slot_v7/` | 논문 초안 (v13 기준, 기록) |
 | `docs/current/` | 현재 판단에 쓰는 문서 |
-| `docs/current/slides/antiphase_deck/` | 1–4장의 설명용 그림 17장(`n00`–`n17`). TikZ 소스와 `build.sh`는 `figsrc/` |
-| `docs/current/figures/antiphase_v2/` | 3.1–3.3절의 설계 그림 세 장(기준과 규칙, 전체 구조, 복구 경로). TikZ 소스는 `src/design2_*.tex`, 스타일은 `src/tikz_style2.tex`, 빌드는 `build_v2.sh` |
+| `docs/current/slides/antiphase_deck/` | 첫 번째 스타일의 설명용 그림 17장(`n00`–`n17`). 이 문서는 더 쓰지 않는다. TikZ 소스와 `build.sh`는 `figsrc/` |
+| `docs/current/figures/antiphase_v2/` | 이 문서 1–4장의 설명 그림과 설계 그림 21장(두 번째 스타일). TikZ 소스는 `src/design2_*.tex`, 스타일은 `src/tikz_style2.tex`, 빌드는 `build_v2.sh` |
 | `docs/archive/` | 이전 가설과 보고서. 현재 결론으로 쓰지 않음 |
 | `paper/softwall_sigmetrics27/` | SoftWall 단계의 원고 (기록) |
 | `scripts_for_node/softwall_same_gpu/`, `results/softwall_*` | SoftWall 단계의 코드와 결과 (기록) |

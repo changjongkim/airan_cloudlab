@@ -1,0 +1,34 @@
+% The terms in one picture: what happens to one transport block (README 1.7), second style.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=5.9cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {Life of One Transport Block (TB)};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=5.0cm] at (0.15,-0.75) {};
+  % first row: the conventional receiver
+  \node[cl, anchor=center, fill=tba, minimum width=1.4cm, minimum height=0.7cm, font=\rmfamily\bfseries\footnotesize] (tb) at (1.25,-1.95) {TB};
+  \node[sann] at (1.25,-2.75) {One User's Data\\in One Slot};
+  \node[box, fill=convc, minimum width=2.7cm, minimum height=0.8cm] (cr) at (4.3,-1.95) {Conventional\\Receiver};
+  \node[key, anchor=south] at (4.3,-1.5) {Layer-1 Deadline 4.0 ms};
+  \node[dec, minimum width=1.5cm, minimum height=0.66cm] (crc) at (7.6,-1.95) {CRC?};
+  \node[box, text=dgreen, minimum width=2.1cm, minimum height=0.66cm] (ok) at (10.75,-1.95) {Delivered};
+  \draw[arr] (tb.east) -- (cr.west);
+  \draw[arr] (cr.east) -- (crc.west);
+  \draw[arr] (crc.east) -- (ok.west);
+  \node[sann, anchor=south] at (9.0,-1.93) {Pass};
+  % second row: the recovery path
+  \node[dec, minimum width=3.3cm, minimum height=0.66cm] (k) at (7.6,-3.85) {Failed Blocks $\le$ 9?};
+  \draw[rarr] (crc.south) -- (k.north);
+  \node[skey, anchor=west] at (7.68,-2.9) {Fail};
+  \node[box, fill=badc, text=dred, minimum width=2.7cm, minimum height=0.66cm] (rt) at (3.2,-3.85) {Retransmitted};
+  \draw[rarr] (k.west) -- (rt.east);
+  \node[skey, anchor=south] at (5.25,-3.83) {No};
+  \node[box, fill=gold, minimum width=2.0cm, minimum height=0.66cm] (cand) at (11.45,-3.85) {Candidate};
+  \draw[arr] (k.east) -- (cand.west);
+  \node[sann, anchor=south] at (9.85,-3.83) {Yes};
+  \node[box, fill=nrxc, minimum width=2.2cm, minimum height=0.66cm] (nrx) at (15.2,-3.85) {NeuralRx};
+  \draw[arr] (cand.east) -- (nrx.west);
+  \node[key, anchor=north] at (13.3,-4.25) {Start by 3.9 ms};
+  \node[box, text=dgreen, minimum width=2.2cm, minimum height=0.66cm] (rec) at (15.2,-1.95) {Recovered};
+  \draw[arr] (nrx.north) -- (rec.south);
+  \node[key, anchor=east] at (15.1,-2.9) {by 11.5 ms};
+  \node[key, anchor=west] at (0.4,-5.2) {A Candidate That Finds No Free NeuralRx by 3.9 ms Is Dropped and Retransmitted: a Lost Recovery};
+\end{tikzpicture}

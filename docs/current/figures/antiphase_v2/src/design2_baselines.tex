@@ -1,0 +1,60 @@
+% How each compared method gives GPU time to the AI (README 2.3, 4.2), second style.  The radio load alternates
+% (high / low every 2 s); a method is drawn by the share of the GPU it gives to the AI over time.  The heights are
+% a sketch of the mechanism, not measured values, except the fixed 10% and the 30% cap.  x = 5.6 + 1.45 s.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \tikzset{sh/.style={draw=black, line width=0.4pt, fill=aic}}
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=8.5cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {How Each Method Gives GPU Time to the AI};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {Antiphase Has No Share};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=7.6cm] at (0.15,-0.75) {};
+  \node[th, minimum width=5.1cm] at (0.3,-0.9) {Method};
+  \node[th, minimum width=9.0cm] at (5.5,-0.9) {AI Share of the GPU over Time};
+  \node[th, minimum width=2.7cm] at (14.6,-0.9) {Share};
+  \foreach \s in {0, 2, 4, 6} {
+    \draw[grid] ({5.6+1.45*\s},-1.4) -- ({5.6+1.45*\s},-7.55);
+    \node[tick, anchor=north] at ({5.6+1.45*\s},-7.57) {\s};
+  }
+  \node[sann, anchor=west] at (14.6,-7.75) {Seconds};
+  \foreach \y in {-2.55, -3.55, -4.55, -5.55, -6.55}
+    \draw[black!35, line width=0.4pt] (0.3,\y) -- (17.3,\y);
+  % radio load
+  \node[txt, anchor=west] at (0.4,-2.0) {Radio Load};
+  \draw[draw=black, fill=convc, line width=0.4pt] (5.6,-2.3) rectangle (8.5,-1.7);
+  \draw[draw=black, fill=convc!45, line width=0.4pt] (8.5,-2.3) rectangle (11.4,-2.08);
+  \draw[draw=black, fill=convc, line width=0.4pt] (11.4,-2.3) rectangle (14.3,-1.7);
+  \node[txt] at (7.05,-2.0) {High};
+  \node[txt] at (9.95,-1.85) {Low};
+  \node[txt] at (12.85,-2.0) {High};
+  \node[sann, anchor=west] at (14.6,-2.0) {Changes Every 2 s};
+  % static
+  \node[txt, anchor=west] at (0.4,-2.87) {Static};
+  \node[sann, anchor=west] at (0.4,-3.2) {Fixed Share};
+  \draw[sh] (5.6,-3.3) rectangle (14.3,-3.2);
+  \node[ann, anchor=west] at (14.6,-3.05) {10\% Always};
+  % priority
+  \node[txt, anchor=west] at (0.4,-3.87) {Priority};
+  \node[sann, anchor=west] at (0.4,-4.2) {Low Priority and a Cap};
+  \draw[sh] (5.6,-4.3) rectangle (14.3,-4.02);
+  \node[ann, anchor=west] at (14.6,-4.05) {30\% Cap Always};
+  % estimator
+  \node[txt, anchor=west] at (0.4,-4.87) {Estimator};
+  \node[sann, anchor=west] at (0.4,-5.2) {Share Chosen Again Every 1 s};
+  \draw[sh] (5.6,-5.3) rectangle (9.95,-5.2);
+  \draw[sh] (9.95,-5.3) rectangle (11.4,-4.72);
+  \draw[sh, fill=badc, draw=dred, line width=0.8pt] (11.4,-5.3) rectangle (12.85,-4.72);
+  \draw[sh] (12.85,-5.3) rectangle (14.3,-5.2);
+  \node[key, anchor=west] at (14.6,-5.05) {1 s Late};
+  % follow
+  \node[txt, anchor=west] at (0.4,-5.87) {Follow};
+  \node[sann, anchor=west] at (0.4,-6.2) {Knows the Load, No Delay};
+  \draw[sh] (5.6,-6.3) rectangle (8.5,-6.2);
+  \draw[sh] (8.5,-6.3) rectangle (11.4,-5.72);
+  \draw[sh] (11.4,-6.3) rectangle (14.3,-6.2);
+  \node[ann, anchor=west] at (14.6,-6.05) {Idealized};
+  % Antiphase
+  \node[txt, anchor=west, text=thblue] at (0.4,-6.87) {Antiphase};
+  \node[sann, anchor=west] at (0.4,-7.2) {No Share: a Grant per Piece};
+  \foreach \i in {0,...,36}
+    \draw[draw=thblue, line width=0.7pt] ({5.6+0.2417*\i},-7.32) -- ({5.6+0.2417*\i},-6.75);
+  \node[bkey, anchor=west] at (14.6,-7.05) {Every 15--57 $\mu$s};
+\end{tikzpicture}

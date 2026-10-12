@@ -1,0 +1,116 @@
+% AI admission in stoppable pieces (README 3.6), second style: the decision of every controller round and the four
+% GPUs of a measured run.
+% Values: run fa1r32wm of job 59313958, 2.32 ms after the samples of slot 2732 arrive, the instant at which the
+% NeuralRx of GPU 1 starts the TB of the recovery path figure (ai0-3.json, lane0-3.json, conv*.json of the run).
+%   GPU 0  NeuralRx runs slot 2731; cells 4, 8, 12 decode slot 2732; no AI request is placed on it
+%   GPU 1  NeuralRx runs slot 2732; request of 392 tokens: 21 of 30 units done before this piece, the piece has
+%          5 units and its last unit is on the GPU (it ends 0.45 ms later), 4 units wait; stop word set
+%   GPU 2  NeuralRx free; request of 202 tokens: 15 units done, piece of 5 units granted (first on the GPU)
+%   GPU 3  NeuralRx free; request of 219 tokens: 6 units done, piece of 5 units (second on the GPU)
+% A request of up to 512 tokens is 30 units: preparation, 28 layers, output head.
+% Grant of a GPU: largest unit, budget (4.0 ms minus a guard of 0.05 ms), stop word.
+\begin{tikzpicture}[x=1cm, y=1cm, font=\rmfamily\bfseries\footnotesize]
+  \tikzset{unit/.style={draw=black!75, line width=0.3pt, minimum width=0.25cm, minimum height=0.32cm, inner sep=0pt, anchor=west},
+           mc/.style={cl, anchor=center, minimum width=0.5cm, minimum height=0.32cm}}
+  % =============================== the decision ===============================
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=2.95cm] at (0,0) {};
+  \node[ptitle, anchor=north west] at (0.08,-0.06) {AI Admission};
+  \node[ann, anchor=south west] at (3.55,-0.62) {Every Round, Every GPU};
+  \node[bigkey, anchor=north east] at (17.5,-0.14) {A Grant Is One Piece of at Most 4 ms};
+  \node[comp, anchor=north west, minimum width=17.3cm, minimum height=2.08cm] at (0.15,-0.72) {};
+  \node[box, minimum width=1.5cm, minimum height=0.66cm] (st) at (1.2,-1.3) {GPU State};
+  \node[dec, draw=dred, line width=1.1pt, minimum width=2.9cm, minimum height=0.66cm] (d1) at (4.3,-1.3) {NeuralRx Running?};
+  \node[dec, minimum width=2.9cm, minimum height=0.66cm] (d2) at (8.2,-1.3) {Candidate Waiting?};
+  \node[dec, minimum width=2.6cm, minimum height=0.66cm] (d3) at (11.95,-1.3) {Cells Decoding?};
+  \draw[arr] (st.east) -- (d1.west);
+  \draw[arr] (d1.east) -- (d2.west);
+  \draw[arr] (d2.east) -- (d3.west);
+  \draw[arr] (d3.east) -- (14.1,-1.3);
+  \foreach \x in {6.25, 10.15, 13.68}
+    \node[sann, anchor=south] at (\x,-1.28) {No};
+  \node[mc, fill=aic!40] at (14.37,-1.3) {128};
+  \node[mc, fill=aic] at (14.87,-1.3) {512};
+  \node[mc, fill=ailarge, text=white, minimum width=0.7cm] at (15.47,-1.3) {1,024};
+  \node[sann, anchor=west] at (15.85,-1.3) {Until the\\Next Slot};
+  \node[cl, anchor=center, fill=dred, text=white, minimum width=1.1cm, minimum height=0.36cm] (s1) at (4.3,-2.4) {Stop};
+  \node[cl, anchor=center, fill=badc, text=dred, minimum width=1.9cm, minimum height=0.36cm] (s2) at (8.2,-2.4) {Stop All GPUs};
+  \draw[rarr, line width=1.4pt] (4.3,-1.63) -- (4.3,-2.2);
+  \draw[rarr] (8.2,-1.63) -- (8.2,-2.2);
+  \draw[arr] (11.95,-1.63) -- (11.95,-2.2);
+  \foreach \x in {4.3, 8.2, 11.95}
+    \node[skey, anchor=west] at ({\x+0.06},-1.9) {Yes};
+  \node[mc, fill=aic!40] at (11.7,-2.4) {128};
+  \node[mc, fill=aic] at (12.2,-2.4) {512};
+  \node[sann, anchor=west] at (12.55,-2.4) {a Piece of at Most 4 ms};
+  % =============================== between the controller and the GPUs ===============================
+  \node[barrow, rotate=90, minimum height=0.5cm] at (1.2,-3.24) {};
+  \node[num] at (1.72,-3.24) {1};
+  \node[ann, anchor=west] at (1.98,-3.24) {State};
+  \node[rbarrow, rotate=-90, minimum height=0.5cm] at (4.3,-3.24) {};
+  \node[num, fill=dred] at (4.82,-3.24) {3};
+  \node[key, anchor=west] at (5.08,-3.24) {Stop};
+  \node[barrow, rotate=-90, minimum height=0.5cm] at (11.95,-3.24) {};
+  \node[num] at (12.47,-3.24) {2};
+  \node[ann, anchor=west] at (12.73,-3.24) {Grant};
+  % =============================== the four GPUs ===============================
+  \node[pan, anchor=north west, minimum width=17.6cm, minimum height=3.72cm] at (0,-3.53) {};
+  \node[ptitle, anchor=north west] at (0.08,-3.59) {Four GPUs};
+  \node[ann, anchor=south west] at (2.75,-4.15) {At the Instant the NeuralRx of GPU 1 Starts};
+  \foreach \x/\f/\t in {9.9/black!25/Done, 11.2/aic/Granted, 12.85/ailarge/On the GPU, 14.85/white/Waiting} {
+    \node[unit] at (\x,-3.9) {};
+    \node[unit, fill=\f] at (\x,-3.9) {};
+    \node[stxt, anchor=west] at ({\x+0.3},-3.9) {\t};
+  }
+  \draw[dred, line width=2.2pt] (16.45,-4.07) -- (16.45,-3.73);
+  \node[stxt, anchor=west] at (16.55,-3.9) {Stop};
+  \foreach \x/\w/\h in {0.15/1.1/GPU, 1.25/2.3/Cells, 3.55/1.3/NeuralRx, 4.85/0.8/Unit, 5.65/1.15/Budget, 6.8/0.7/Stop, 7.5/1.15/Request,
+                        8.65/8.8/{Units of the Request: Preparation, 28 Layers, Head}}
+    \node[th, minimum width=\w cm] at (\x,-4.25) {\h};
+  \foreach \g/\y/\ca/\cb/\cc/\cd/\f in {0/-4.65/0/4/8/12/black!25, 1/-5.29/1/5/9/13/white, 2/-5.93/2/6/10/14/white, 3/-6.57/3/7/11/15/white} {
+    \node[td, minimum width=1.1cm, minimum height=0.64cm, text height=0.34cm, text depth=0.1cm, font=\rmfamily\bfseries\footnotesize] at (0.15,\y) {GPU \g};
+    \foreach \x/\w in {1.25/2.3, 3.55/1.3, 4.85/0.8, 5.65/1.15, 6.8/0.7, 7.5/1.15, 8.65/8.8}
+      \node[td, minimum width=\w cm, minimum height=0.64cm] at (\x,\y) {};
+    \node[mc, fill=gold] at (1.63,{\y-0.32}) {\ca};
+    \foreach \i/\c in {1/\cb, 2/\cc, 3/\cd}
+      \node[mc, fill=\f] at ({1.63+0.515*\i},{\y-0.32}) {\c};
+  }
+  % NeuralRx of every GPU
+  \node[mc, fill=tba, minimum width=1.0cm] at (4.2,-4.97) {2731};
+  \node[mc, fill=gold, minimum width=1.0cm] at (4.2,-5.61) {2732};
+  \node[sann] at (4.2,-6.25) {Free};
+  \node[sann] at (4.2,-6.89) {Free};
+  % grant of every GPU
+  \foreach \x/\w in {5.25/0.6, 6.225/0.95, 7.15/0.5}
+    \node[free, anchor=center, minimum width=\w cm, minimum height=0.32cm] at (\x,-4.97) {};
+  \foreach \y in {-5.61, -6.25, -6.89} {
+    \node[mc, fill=aic, minimum width=0.6cm] at (5.25,\y) {512};
+    \node[stxt] at (6.225,\y) {3.95 ms};
+  }
+  \node[mc, fill=dred, text=white] at (7.15,-5.61) {1};
+  \node[stxt] at (7.15,-6.25) {0};
+  \node[stxt] at (7.15,-6.89) {0};
+  % requests (tokens) and their units
+  \node[sann] at (13.05,-4.97) {No Request};
+  \foreach \y/\t/\done/\run/\piece in {-5.61/392/21/26/26, -6.25/202/15/16/20, -6.89/219/6/8/11} {
+    \node[mc, fill=aic!45, minimum width=0.8cm] at (8.075,\y) {\t};
+    \foreach \i in {1, 2, ..., 30} {
+      \pgfmathtruncatemacro{\isdone}{\i <= \done}
+      \pgfmathtruncatemacro{\isrun}{\i == \run}
+      \pgfmathtruncatemacro{\ispiece}{(\i > \done) && (\i <= \piece)}
+      \ifnum\isdone=1
+        \node[unit, fill=black!25] at ({9.0+0.27*(\i-1)},\y) {};
+      \else\ifnum\isrun=1
+        \node[unit, fill=ailarge] at ({9.0+0.27*(\i-1)},\y) {};
+      \else\ifnum\ispiece=1
+        \node[unit, fill=aic] at ({9.0+0.27*(\i-1)},\y) {};
+      \else
+        \node[unit, fill=white] at ({9.0+0.27*(\i-1)},\y) {};
+      \fi\fi\fi
+    }
+  }
+  % the piece of every GPU (outline) and the stop on GPU 1
+  \draw[line width=1.3pt] (14.65,-5.81) rectangle (16.02,-5.41);
+  \draw[dred, line width=2.4pt] (16.07,-5.85) -- (16.07,-5.37);
+  \draw[line width=1.3pt] (13.03,-6.45) rectangle (14.4,-6.05);
+  \draw[line width=1.3pt] (10.6,-7.09) rectangle (11.97,-6.69);
+\end{tikzpicture}
